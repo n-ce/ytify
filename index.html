@@ -16,9 +16,13 @@
   <i class="fa-solid fa-circle-play" id="send" onclick="play()"></i>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js" integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
+
     function play() {
+
       const link = document.querySelector('input').value;
-      var sound = new Howl({
+      navigator.clipboard.readText().then(
+  clipLink => link = ClipLink;)
+var sound = new Howl({
         src: ["https://projectlounge.pw/ytdl/download?url=" + link + "&format=139"],
         html5: true
       });
