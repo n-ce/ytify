@@ -1,0 +1,9 @@
+html,body{margin:0;}
+body{
+height:100VH;
+display:flex;
+flex-direction: column;
+justify-content:center;
+align-items:center;
+background-color:black;
+}
