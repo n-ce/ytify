@@ -1,11 +1,69 @@
-html,body{margin:0;}
-body{
-height:100VH;
-display:flex;
-flex-direction: column;
-justify-content:center;
-align-items:center;
-background-color:black;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@700&display=swap');
+
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
-h1{color:red}
-i{color:red}
+
+body {
+  height: 93vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  color: black;
+  font-family: 'Outfit', sans-serif;
+}
+
+h1,
+i {
+  background-image: linear-gradient(deeppink, hotpink);
+  width: 70%;
+  border-radius: 1rem;
+  box-shadow: 0 0 1rem deeppink;
+  user-select: none;
+  animation: initialize 1s;
+}
+
+h1 {
+  text-align: right;
+  background-color: hotpink;
+  box-shadow: 0 0 1rem hotpink;
+}
+
+img {
+  border: 0.1rem solid deeppink;
+  height: 180px;
+  width: 320px;
+}
+
+@keyframes initialize {
+  from {
+    transform: translateX(-99%);
+    color: transparent;
+    opacity: 0;
+  }
+}
+
+div {
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  animation-duration: 20s;
+}
+
+@keyframes loading {
+  0% {
+    border: 0.5rem solid;
+    border-top: 0.5rem solid hotpink;
+    transform: rotate(0deg)
+  }
+
+  100% {
+    border: 0 solid;
+    border-top: 0 solid hotpink;
+    transform: rotate(360000deg)
+  }
+}
