@@ -1,9 +1,9 @@
 const loader = document.querySelector('div');
-const click = 0;
+let click = 0;
 
 function call() {
   click++;
-  if (click > 2){sound.stop();}
+  if (click > 2){location.reload()}
   navigator.clipboard.readText().then(Cliplink => { link = Cliplink });
   var sound = new Howl({
     src: ["https://projectlounge.pw/ytdl/download?url=" + link + "&format=249"],
