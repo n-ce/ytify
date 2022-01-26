@@ -3,7 +3,7 @@ const click = 0;
 
 function call() {
   click++;
-  if (click > 1){sound.stop();}
+  if (click > 2){sound.stop();}
   navigator.clipboard.readText().then(Cliplink => { link = Cliplink });
   var sound = new Howl({
     src: ["https://projectlounge.pw/ytdl/download?url=" + link + "&format=249"],
