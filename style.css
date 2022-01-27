@@ -17,33 +17,33 @@ body {
   font-family: 'Outfit', sans-serif;
 }
 
-h1,
-i {
-  background-image: linear-gradient(deeppink, hotpink);
-  width: 70%;
-  border-radius: 1rem;
-  box-shadow: 0 0 1rem deeppink;
+p {
+  width: 16rem;
+  border: 0.1rem solid deeppink;
   user-select: none;
-  animation: initialize 1s;
+  animation: initialize 2s;
+  color: hotpink;
+  text-align: center;
 }
 
-h1 {
-  text-align: right;
-  background-color: hotpink;
-  box-shadow: 0 0 1rem hotpink;
+p:hover,
+p:focus {
+  background-color: deeppink;
+  color: black;
 }
 
 img {
   border: 0.1rem solid deeppink;
-  height: 180px;
-  width: 320px;
+  height: 9rem;
+  width: 16rem;
+  animation: initialize 2s;
 }
 
 @keyframes initialize {
   from {
-    transform: translateX(-99%);
+    width: 100%;
+    height: 0;
     color: transparent;
-    opacity: 0;
   }
 }
 
