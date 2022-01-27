@@ -22,8 +22,8 @@ p {
   border: 0.1rem solid deeppink;
   user-select: none;
   animation: initialize 2s;
-  color: hotpink;
   text-align: center;
+  color: hotpink;
 }
 
 p:hover,
@@ -49,11 +49,11 @@ img {
 
 div {
   border-radius: 50%;
-  width: 4rem;
-  height: 4rem;
-  border: 0.5rem solid;
-  border-top: 0.5rem solid;
-  animation: loading 1s infinite;
+  width: 2rem;
+  height: 2rem;
+  border: 0.1rem solid;
+  border-top: 0.1rem solid;
+  animation: loading 1s linear infinite;
 }
 
 @keyframes loading {
@@ -62,6 +62,6 @@ div {
   }
 
   100% {
-    transform: rotate(360000deg)
+    transform: rotate(1000deg)
   }
 }
