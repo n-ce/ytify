@@ -32,8 +32,7 @@ p:focus {
   color: black;
 }
 
-img,
-iframe {
+img {
   border: 0.1rem solid deeppink;
   height: 9rem;
   width: 16rem;

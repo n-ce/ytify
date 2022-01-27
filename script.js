@@ -15,7 +15,7 @@ function call() {
   });
   sound.play();
   loader.style.borderTopColor = "hotpink";
-  setTimeout(animation,20000);
+  setTimeout(animation, 20000);
   let re = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
   let id = link.match(re)[7];
   document.querySelector('img').src = "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
