@@ -7,7 +7,10 @@ function call() {
   navigator.clipboard.readText().then(Cliplink => { link = Cliplink });
   var sound = new Howl({
     src: ["https://projectlounge.pw/ytdl/download?url=" + link + "&format=249"],
-    html5: true
+    html5: true,
+    onend: function() {
+    location.reload();
+  }
   });
   sound.play();
   loader.style.animationName = "loading";
