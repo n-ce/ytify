@@ -18,10 +18,11 @@ body {
 }
 
 p {
-  width: 16rem;
+  width: 24rem;
   border: 0.1rem solid deeppink;
+  border-bottom-right-radius: 1rem;
+  border-bottom-left-radius: 1rem;
   user-select: none;
-  animation: initialize 2s;
   text-align: center;
   color: hotpink;
 }
@@ -34,8 +35,18 @@ p:focus {
 
 img {
   border: 0.1rem solid deeppink;
-  height: 9rem;
-  width: 16rem;
+  height: 13.5rem;
+  width: 24rem;
+}
+
+audio {
+  width: 100%;
+  opacity: 50%;
+}
+
+p,
+img,
+audio {
   animation: initialize 2s;
 }
 
