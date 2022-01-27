@@ -14,8 +14,8 @@ function call() {
     }
   });
   sound.play();
-  loader.style.animationName = "loading";
-  setTimeout(animation, 20000);
+  loader.style.borderTopColor = "hotpink";
+  setTimeout(animation,20000);
   let re = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
   let id = link.match(re)[7];
   document.querySelector('img').src = "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
@@ -28,5 +28,5 @@ function about() {
 clicker.addEventListener('click', about);
 
 function animation() {
-  loader.style.animationName = "removed";
+  loader.style.borderTopColor = "black";
 }

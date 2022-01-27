@@ -32,7 +32,8 @@ p:focus {
   color: black;
 }
 
-img {
+img,
+iframe {
   border: 0.1rem solid deeppink;
   height: 9rem;
   width: 16rem;
@@ -51,19 +52,17 @@ div {
   border-radius: 50%;
   width: 4rem;
   height: 4rem;
-  animation-duration: 20s;
+  border: 0.5rem solid;
+  border-top: 0.5rem solid;
+  animation: loading 1s infinite;
 }
 
 @keyframes loading {
   0% {
-    border: 0.5rem solid;
-    border-top: 0.5rem solid hotpink;
     transform: rotate(0deg)
   }
 
   100% {
-    border: 0 solid;
-    border-top: 0 solid hotpink;
     transform: rotate(360000deg)
   }
 }
