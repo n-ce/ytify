@@ -10,37 +10,20 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: black;
-  color: black;
+  background-color: #f1f3f5;
 }
 
 img {
-  border: 0.1rem solid deeppink;
   height: 13.5rem;
   width: 24rem;
 }
 
 a {
   text-decoration: none;
-  color: hotpink;
   font-family: monospace;
 }
 
 audio {
   width: 90%;
-  opacity: 50%;
   margin: 1rem;
-}
-
-img,
-audio {
-  animation: initialize 2s;
-}
-
-@keyframes initialize {
-  from {
-    width: 100%;
-    height: 0;
-    color: transparent;
-  }
 }
