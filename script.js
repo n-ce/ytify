@@ -1,26 +1,25 @@
-const loader = document.querySelector('div');
+const audio = document.querySelector('audio');
+//copies from clipboard
+function script() {
+  navigator.clipboard.readText().then(link => {
 
+    audio.src = "https://projectlounge.pw/ytdl/download?url=" + link + "&format=249";
+    audio.play();
 
-document.querySelector('p').onclick =
-  function() {
-    //copies from clipboard
-    navigator.clipboard.readText().then(link => {
+    //Thumbnail
+    let re = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
+    let id = link.match(re)[7];
+    document.querySelector('img').src = "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
 
-      document.querySelector('audio').src = "https://projectlounge.pw/ytdl/download?url=" + link + "&format=249";
-
-      //Thumbnail
-      let re = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
-      let id = link.match(re)[7];
-      document.querySelector('img').src = "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
-
-    });
-    // Make the Loader Visible
-    loader.style.borderTopColor = "hotpink";
-
-    //Loading Animation Duration
-    setTimeout(animation, 10000);
-  }
-
-function animation() {
-  loader.style.borderTopColor = "black";
+  });
 }
+
+script();
+
+function checker() {
+  audio.onended = (e) => {
+    audio.src = null;
+    script();
+  }
+}
+setInterval(checker, 1000);
