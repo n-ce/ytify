@@ -9,5 +9,4 @@ https://ytify.netlify.app
 ## How its used
 - Copy youtube video link to clipboard.
 - The link is automatically captured on entering the page.
-- Playback Starts on Clicking the play button.
 - Click on Thumbnail to Restart or start a new playback.
