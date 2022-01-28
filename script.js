@@ -1,6 +1,7 @@
-if (localStorage.getItem("shown") == null) {
-    alert('YTIFY 1.9\nHow To Use :\n1. Copy YT Video link to Clipboard.\n2. Click on Thumbnail to Restart or Start a New Playback.\n3. Reload Page If Not Working.\n\nQueue Support Coming Soon.');
-    localStorage.setItem("shown", "true");
+if (localStorage.getItem("alert") == null) {
+  alert('YTIFY 1.9\nHow To Use :\n1. Copy YT Video link to Clipboard.\n2. Click on Thumbnail to Restart or Start a New Playback.\n3. Reload Page If Not Working.\n\nQueue Support Coming Soon.');
+  localStorage.setItem("alert", "yes");
+
 }
 
 const audio = document.querySelector('audio');
