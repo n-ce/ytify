@@ -10,17 +10,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #f1f3f5;
+  background-color: #1f1f1f;
 }
 
 img {
-  height: 13.5rem;
   width: 24rem;
-}
-
-a {
-  text-decoration: none;
-  font-family: monospace;
+  box-shadow: 0 0.3rem 1rem black;
 }
 
 audio {
