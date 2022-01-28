@@ -1,14 +1,10 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
+html {
+  height: 100%;
 }
 
 body {
-  height: 93vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   background-color: #1f1f1f;
 }
