@@ -26,3 +26,13 @@ function script() {
 
 script();
 thumb.onclick = (e) => { script() }
+
+const input = document.querySelector('input');
+input.addEventListener("click", function() {
+  if (input.checked == true) {
+    audio.onended = (e) => {
+      script();
+    }
+  }
+  else { audio.onended = null }
+});
