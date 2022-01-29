@@ -32,7 +32,8 @@ function script() {
     else if (y != id) { atsrc(id) }
   })
 }
-setInterval(script, 1000);
+script();
+setInterval(script, 2000);
 
 //Loop
 const input = document.querySelector('input');
