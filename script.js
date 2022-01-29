@@ -1,6 +1,6 @@
-if (localStorage.getItem("alert") == null) {
-  alert('YTIFY 1.9\nHow To Use :\n1. Copy YT Video link to Clipboard.\n2. Click on Thumbnail to Restart or Start a New Playback.\n3. Reload Page If Not Working.\n\nQueue Support Coming Soon.');
-  localStorage.setItem("alert", "yes");
+if (localStorage.getItem("1.9z") == null) {
+  alert('YTIFY 1.9z\nCopy YT Video link to Clipboard to start playing automatically.\n\nComing Soon. :\nQueuing Support.\nFirefox Browser Support.');
+  localStorage.setItem("1.9z", "yes");
 
 }
 
@@ -10,23 +10,31 @@ const a1 = "https://projectlounge.pw/ytdl/download?url=https://youtu.be/";
 const a2 = "&format=249";
 const t1 = "https://img.youtube.com/vi/";
 const t2 = "/maxresdefault.jpg";
+let y = null;
+
+function atsrc(x) {
+  //Playback
+  audio.src = a1 + x + a2;
+  audio.play();
+  //Thumbnail
+  thumb.src = t1 + x + t2;
+  y = x;
+}
 
 function script() {
   navigator.clipboard.readText().then(link => {
     //UID Extractor
     let re = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
     let id = link.match(re)[7];
-    //Playback
-    audio.src = a1 + id + a2;
-    audio.play();
-    //Thumbnail
-    thumb.src = t1 + id + t2;
+    //initial id value
+    if (y == null) { atsrc(id) }
+    //start playing if new id
+    else if (y != id) { atsrc(id) }
   })
 }
+setInterval(script, 1000);
 
-script();
-thumb.onclick = (e) => { script() }
-
+//Loop
 const input = document.querySelector('input');
 input.addEventListener("click", function() {
   if (input.checked == true) {
