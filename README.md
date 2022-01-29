@@ -3,7 +3,8 @@ Minimal youtube audio streaming front-end.
 
 Streams youtube audio only in ultra low bitrate at around 50kbps, save data!
 
-https://ytify.netlify.app
+Production : https://ytify.netlify.app
+Dev Branch : https://n-ce.github.io/ytify/
 ![](screenshot.png)
 
 ## How its used
