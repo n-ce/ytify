@@ -1,21 +1,47 @@
-html {
-  height: 100%;
-}
-
+html,
 body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 0;
+  height: 100%;
   background-color: #1f1f1f;
-  color: white;
+  font-family: monospace;
 }
 
 img {
-  width: 24rem;
   box-shadow: 0 0.3rem 1rem black;
 }
 
-audio {
+body,
+div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+audio,img {
   width: 90%;
-  margin: 1rem;
+}
+
+h1 {
+  text-shadow: 0 0.1rem 0.4rem white;
+  -webkit-text-stroke: 0.1rem white;
+  -webkit-text-fill-color: transparent;
+}
+
+div,
+a {
+  color: white;
+}
+
+@media(orientation:landscape) {
+  body {
+    flex-direction: row;
+    justify-content: space-evenly;
+  }
+
+  img,
+  div {
+    width: 40%;
+  }
 }
