@@ -2,12 +2,8 @@ html,
 body {
   margin: 0;
   height: 100%;
-  background-color: #1f1f1f;
+  background-color: black;
   font-family: monospace;
-}
-
-img {
-  box-shadow: 0 0.3rem 1rem black;
 }
 
 body,
@@ -19,29 +15,21 @@ div {
   width: 100%;
 }
 
-audio,img {
+audio,
+img {
   width: 90%;
 }
 
-h1 {
-  text-shadow: 0 0.1rem 0.4rem white;
-  -webkit-text-stroke: 0.1rem white;
-  -webkit-text-fill-color: transparent;
-}
-
-div,
-a {
+a,
+div {
   color: white;
 }
 
 @media(orientation:landscape) {
-  body {
-    flex-direction: row;
-    justify-content: space-evenly;
-  }
+  body {flex-direction: row;}
 
   img,
   div {
-    width: 40%;
+    width: 45%;
   }
 }
