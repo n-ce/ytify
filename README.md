@@ -7,7 +7,6 @@ Production : https://ytify.netlify.app
 Dev Branch : https://n-ce.github.io/ytify/
 ![](screenshot.png)
 
-## How its used
+## How it's used
 - Copy youtube video link to clipboard.
-- The link is automatically captured on entering the page.
-- Click on Thumbnail to Restart or start a new playback.
+- The link is automatically captured on the page and starts playing automatically.
