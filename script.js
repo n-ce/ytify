@@ -40,7 +40,7 @@ const input = document.querySelector('input');
 input.addEventListener("click", function() {
   if (input.checked == true) {
     audio.onended = (e) => {
-      script();
+      audio.play();
     }
   }
   else { audio.onended = null }
