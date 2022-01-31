@@ -1,7 +1,6 @@
-if (localStorage.getItem("1.9z") == null) {
-  alert('YTIFY 1.9z\nCopy YT Video link to Clipboard to start playing automatically.\n\nComing Soon :\nQueuing Support.\nFirefox Browser Support.');
-  localStorage.setItem("1.9z", "yes");
-
+if (localStorage.getItem("2") == null) {
+  alert('YTIFY 2.310122\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nComing Soon :\nQueuing Support.\nFirefox Browser Support.\n100% options save support');
+  localStorage.setItem("2", "yes");
 }
 
 const audio = document.querySelector('audio');
@@ -52,6 +51,7 @@ script();
 setInterval(script, 2000);
 
 //Loop
+
 input[0].addEventListener("click", function() {
   if (input[0].checked == true) {
     audio.onended = (e) => {
@@ -59,4 +59,32 @@ input[0].addEventListener("click", function() {
     }
   }
   else { audio.onended = null }
+});
+
+
+// Dark Mode
+const theme = window.localStorage.getItem('data-theme');
+const body = document.body.classList;
+
+if (theme == "dark") {
+  body.remove('bg-secondary');
+  body.add('bg-dark');
+}
+input[2].checked = theme == "dark" ? true : false;
+input[2].onchange = function() {
+  if (this.checked) {
+    body.remove('bg-secondary');
+    body.add('bg-dark');
+    window.localStorage.setItem('data-theme', "dark");
+  } else {
+    body.add('bg-secondary');
+    body.remove('bg-dark');
+    window.localStorage.setItem('data-theme', "secondary");
+  }
+}
+
+// clear settings
+document.querySelector('.btn').addEventListener("click", function()
+{
+  localStorage.clear();
 });

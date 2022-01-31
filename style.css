@@ -1,18 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
+
 html,
 body {
   margin: 0;
   height: 100%;
-  background-color: black;
-  font-family: monospace;
 }
 
 body,
 div {
-  display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   width: 100%;
+  font-family: 'Noto Sans Display';
 }
 
 audio,
@@ -20,13 +18,18 @@ img {
   width: 90%;
 }
 
-a,
-div {
-  color: white;
+audio::-webkit-media-controls-panel {
+  background-color: lavender;
+}
+
+img {
+  box-shadow: 0 0 0.5rem #0007;
 }
 
 @media(orientation:landscape) {
-  body {flex-direction: row;}
+  body {
+    flex-direction: row;
+  }
 
   img,
   div {

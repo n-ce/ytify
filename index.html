@@ -7,24 +7,38 @@
   <meta name="keywords" content="Youtube,Music,audio,opus,50kbps,Free">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="black">
+  <meta name="theme-color" content="#23242c">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/png" sizes="512x512" href="maskable_icon_x512.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
   <title>ytify</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
 </head>
 
-<body>
+<body class="bg-secondary flex-centered">
   <img>
   <br>
-  <div>
+  <div class="flex-centered">
     <audio controls></audio>
     <br>
-    <span><input type="checkbox">Loop&nbsp;&nbsp;<input type="checkbox">HQ 128kbps</span>
-    <br>
-    <a href="https://github.com/n-ce/ytify" target="_blank">v1.9z Fork on Github</a>
+    <span class="form-group">
+      <label class="form-switch">
+        <input type="checkbox">Loop
+        <i class="form-icon"></i>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox">HQ 128kbps
+        <i class="form-icon"></i>
+      </label>
+      <label class="form-switch">
+        <input type="checkbox">Dark Mode
+        <i class="form-icon"></i>
+      </label>
+    </span>
+    <button class="btn btn-link">Clear Data</button>
+    <a href="https://github.com/n-ce/ytify" target="_blank">Build 2.310122 <b>Fork on Github</b></a>
   </div>
   <script src="script.js"></script>
   <script src="service-worker.js"></script>
