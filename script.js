@@ -1,5 +1,5 @@
 if (localStorage.getItem("2") == null) {
-  alert('YTIFY 2.310122\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nComing Soon :\nQueuing Support.\nFirefox Browser Support.\n100% options save support');
+  alert('YTIFY 2.310122\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nComing Soon :\nQueuing Support.\nFirefox Browser Support.\n100% Options Save Support.');
   localStorage.setItem("2", "yes");
 }
 
@@ -87,4 +87,5 @@ input[2].onchange = function() {
 document.querySelector('.btn').addEventListener("click", function()
 {
   localStorage.clear();
+  location.reload();
 });
