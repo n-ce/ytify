@@ -7,14 +7,17 @@ body {
 }
 
 body,
-div {
+div{
   flex-direction: column;
   width: 100%;
   font-family: 'Noto Sans Display';
 }
+ul{
+  justify-content: space-evenly;
+}
 
 audio,
-img {
+img,ul {
   width: 90%;
 }
 
@@ -26,13 +29,14 @@ img {
   box-shadow: 0 0 0.5rem #0007;
 }
 
+
 @media(orientation:landscape) {
   body {
     flex-direction: row;
   }
 
   img,
-  div {
+  div{
     width: 45%;
   }
 }

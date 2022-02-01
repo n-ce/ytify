@@ -1,26 +1,36 @@
-if (localStorage.getItem("2") == null) {
-  alert('YTIFY 2.310122\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nComing Soon :\nQueuing Support.\nFirefox Browser Support.\n100% Options Save Support.');
-  localStorage.setItem("2", "yes");
+if (localStorage.getItem("2c") == null) {
+  alert('YTIFY 2c\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To queue :\nEnable Enqueue, copy next track link and click on plus button.\nComing Soon :\n\nFirefox Browser Support.\n100% options save support');
+  localStorage.setItem("2c", "yes");
 }
 
+const button = document.getElementsByClassName('btn');
+const theme = localStorage.getItem('data-theme');
+const input = document.querySelectorAll('input');
 const audio = document.querySelector('audio');
 const thumb = document.querySelector('img');
-const input = document.querySelectorAll('input');
+const scan = localStorage.getItem('scan');
+const scanarr = ["a", "b", "c", "d", "e", "f"];
+const i = document.querySelector('b');
+const body = document.body.classList;
+const array = [];
+const label = document.querySelector('.label');
 
-const a1 = "https://projectlounge.pw/ytdl/download?url=https://youtu.be/";
-const a2 = "&format=";
-const t1 = "https://img.youtube.com/vi/";
-const t2 = "/maxresdefault.jpg";
+
 let y;
+let m;
+let n = 0;
+let s = 2;
 let c = 249;
 let q = "low";
+let queue = false;
+
 
 function atsrc(x) {
   //Playback
-  audio.src = a1 + x + a2 + c;
+  audio.src = "https://projectlounge.pw/ytdl/download?url=https://youtu.be/" + x + "&format=" + c;
   audio.play();
   //Thumbnail
-  thumb.src = t1 + x + t2;
+  thumb.src = "https://img.youtube.com/vi/" + x + "/maxresdefault.jpg";
   y = x;
 }
 
@@ -41,14 +51,75 @@ function script() {
       q = "low";
     }
     //initial id value
-    if (y == undefined) { atsrc(id) }
+    if (y == undefined) { atsrc(id); }
     //start playing if new id
-    else if (y != id) { atsrc(id) }
-  })
+    else if (y != id && queue == false) { atsrc(id); }
+    // queue new id
+    else if (y != id && queue == true) {
+      array[m] = y = id;
+      audio.onended = (e) => {
+        atsrc(array[n]);
+        n++;
+        
+      }
+    }
+
+  });
 }
 
 script();
-setInterval(script, 2000);
+
+// scanning time interval
+
+if (scan != null) {
+  s = scanarr.indexOf(scan);
+  i.innerText = s;
+  const interval = setInterval(script, s * 1000);
+}
+else { setInterval(script, 2000); }
+
+button[2].addEventListener("click",
+  function() {
+    if (s < 5) {
+      s++;
+      i.innerText = s;
+      window.localStorage.setItem('scan', scanarr[s]);
+      location.reload();
+    }
+  });
+button[3].addEventListener("click",
+  function() {
+    if (s > 0) {
+      s--;
+      i.innerText = s;
+      window.localStorage.setItem('scan', scanarr[s]);
+      location.reload();
+    }
+  });
+
+// enable queue
+
+button[0].addEventListener("click", function() {
+
+  if (m == null) {
+    button[1].classList.remove('disabled');
+    input[0].disabled = queue = true;
+    m = 0;
+    clearInterval(interval);
+  }
+  else {
+    button[1].classList.add('disabled');
+    input[0].disabled = queue = false;
+    m = null;
+    label.innerText = 0;
+    const interval = setInterval(script,s*1000);
+  }
+});
+button[1].addEventListener("click", function() {
+  m++;
+  label.innerText = m;
+  script();
+});
 
 //Loop
 
@@ -56,15 +127,16 @@ input[0].addEventListener("click", function() {
   if (input[0].checked == true) {
     audio.onended = (e) => {
       audio.play();
-    }
+    };
+    button[0].disabled = true;
   }
-  else { audio.onended = null }
+  else {
+    audio.onended = null;
+    button[0].disabled = false;
+  }
 });
 
-
 // Dark Mode
-const theme = window.localStorage.getItem('data-theme');
-const body = document.body.classList;
 
 if (theme == "dark") {
   body.remove('bg-secondary');
@@ -84,7 +156,7 @@ input[2].onchange = function() {
 }
 
 // clear settings
-document.querySelector('.btn').addEventListener("click", function()
+button[4].addEventListener("click", function()
 {
   localStorage.clear();
   location.reload();
