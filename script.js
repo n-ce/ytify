@@ -1,11 +1,13 @@
-if (localStorage.getItem("2c") == null) {
-  alert('YTIFY 2c\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To queue :\nEnable Enqueue, copy next track link and click on plus button.\nComing Soon :\n\nFirefox Browser Support.\n100% options save support');
-  localStorage.setItem("2c", "yes");
+if (localStorage.getItem("2d") == null) {
+  alert('YTIFY 2d\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To queue :\nEnable Enqueue, copy next track link and click on plus button.\n\nComing Soon :\nFirefox Browser Support.');
+  localStorage.clear();
+  localStorage.setItem("2d", "yes");
 }
 
 const button = document.getElementsByClassName('btn');
 const theme = localStorage.getItem('data-theme');
 const input = document.querySelectorAll('input');
+const label = document.querySelector('.label');
 const audio = document.querySelector('audio');
 const thumb = document.querySelector('img');
 const scan = localStorage.getItem('scan');
@@ -13,7 +15,6 @@ const scanarr = ["a", "b", "c", "d", "e", "f"];
 const i = document.querySelector('b');
 const body = document.body.classList;
 const array = [];
-const label = document.querySelector('.label');
 
 
 let y;
@@ -34,6 +35,14 @@ function atsrc(x) {
   y = x;
 }
 
+// save hq setting
+if (localStorage.getItem('format') == "yes") {
+  input[1].checked = true;
+  c = 251;
+  q = "high";
+}
+
+
 function script() {
   navigator.clipboard.readText().then(link => {
     //UID Extractor
@@ -44,11 +53,13 @@ function script() {
       c = 251;
       atsrc(id);
       q = "high";
+      localStorage.setItem('format', "yes");
     }
     else if (input[1].checked == false && q == "high") {
       c = 249;
       atsrc(id);
       q = "low";
+      localStorage.setItem('format', "no");
     }
     //initial id value
     if (y == undefined) { atsrc(id); }
@@ -60,14 +71,18 @@ function script() {
       audio.onended = (e) => {
         atsrc(array[n]);
         n++;
-        
       }
     }
-
   });
 }
 
 script();
+
+// next track
+button[2].addEventListener("click", function() {
+  atsrc(array[n]);
+  n++;
+});
 
 // scanning time interval
 
@@ -78,7 +93,7 @@ if (scan != null) {
 }
 else { setInterval(script, 2000); }
 
-button[2].addEventListener("click",
+button[3].addEventListener("click",
   function() {
     if (s < 5) {
       s++;
@@ -87,7 +102,7 @@ button[2].addEventListener("click",
       location.reload();
     }
   });
-button[3].addEventListener("click",
+button[4].addEventListener("click",
   function() {
     if (s > 0) {
       s--;
@@ -99,20 +114,23 @@ button[3].addEventListener("click",
 
 // enable queue
 
+
 button[0].addEventListener("click", function() {
 
   if (m == null) {
     button[1].classList.remove('disabled');
+    button[2].classList.remove('disabled');
     input[0].disabled = queue = true;
     m = 0;
     clearInterval(interval);
   }
   else {
     button[1].classList.add('disabled');
+    button[2].classList.add('disabled');
     input[0].disabled = queue = false;
     m = null;
     label.innerText = 0;
-    const interval = setInterval(script,s*1000);
+    interval;
   }
 });
 button[1].addEventListener("click", function() {
@@ -123,16 +141,26 @@ button[1].addEventListener("click", function() {
 
 //Loop
 
+if (localStorage.getItem('loop') == "yes") {
+  input[0].checked = true;
+  audio.onended = (e) => {
+    audio.play();
+  };
+  button[0].disabled = true;
+}
+
 input[0].addEventListener("click", function() {
   if (input[0].checked == true) {
     audio.onended = (e) => {
       audio.play();
     };
     button[0].disabled = true;
+    localStorage.setItem('loop', "yes");
   }
   else {
     audio.onended = null;
     button[0].disabled = false;
+    localStorage.setItem('loop', "no");
   }
 });
 
@@ -156,7 +184,7 @@ input[2].onchange = function() {
 }
 
 // clear settings
-button[4].addEventListener("click", function()
+button[5].addEventListener("click", function()
 {
   localStorage.clear();
   location.reload();
