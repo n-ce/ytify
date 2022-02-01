@@ -5,7 +5,8 @@ Streams youtube audio only in ultra low bitrate at around 50kbps, save data!
 
 https://ytify.netlify.app
 
-![](screenshot.png)
+![](ss1.png)
+![](ss2.png)
 
 ## How it's used
 - Copy youtube video link to clipboard.
