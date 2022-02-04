@@ -22,15 +22,6 @@ let q = "low"; // quality boolean
 let queue = false; // queue boolean
 let error;
 
-function detect() {
-  if (navigator.userAgent.indexOf('Firefox') !=-1)
-    {
-        // Using Firefox
-window.location = "firefox.html"
- 
-    };
-}
-
 function atsrc(x) {
   //Playback
   audio.src = "https://projectlounge.pw/ytdl/download?url=https://youtu.be/" + x + "&format=" + c;
