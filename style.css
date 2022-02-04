@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Display&display=swap');
 
 html,
 body {
@@ -11,8 +11,9 @@ body,
 div.flex-centered {
   flex-direction: column;
   width: 100%;
-  font-family: "Noto Sans Display";
+  font-family: 'Noto Sans Display';
 }
+
 
 audio,
 img {
@@ -41,14 +42,4 @@ img {
   div.flex-centered {
     width: 45%;
   }
-}
-
-/* Utility class to hide elements */
-.hidden {
-  display: none !important;
-}
-
-.url-input {
-  display: flex;
-  flex-direction: row;
 }
