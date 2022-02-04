@@ -33,6 +33,7 @@ img {
   justify-content: space-around;
 }
 
+
 @media(orientation:landscape) {
   body {
     flex-direction: row;

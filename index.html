@@ -24,18 +24,22 @@
     <div class="d-flex">
       <button class="btn bg-primary"><<</button>
       <button class="btn bg-primary">>></button>
-      <button class="btn">Enqueue</button>
-      <button class="btn disabled">+</button>
-      <span class="label label-success">0</span>
-      <button class="btn bg-primary disabled">>|</button>
+      <button class="btn d-none">+</button>
+      <span class="label label-success d-none">0</span>
+      <button class="btn bg-primary d-none">>|</button>
     </div>
     <br>
     <audio controls></audio>
     <br>
     <span class="form-group">
-      <label class="form-switch">
-        <input type="checkbox">Loop
-        <i class="form-icon"></i>
+      <label class="form-radio form-inline">
+        <input type="radio" name="play"><i class="form-icon"></i> Queue
+      </label>
+      <label class="form-radio form-inline">
+        <input type="radio" name="play"><i class="form-icon"></i> Loop
+      </label>
+      <label class="form-radio form-inline">
+        <input type="radio" name="play"><i class="form-icon"></i> Auto
       </label>
       <label class="form-switch">
         <input type="checkbox">HQ 128kbps
