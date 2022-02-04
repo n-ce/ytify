@@ -1,7 +1,7 @@
-if (localStorage.getItem("2d") == null) {
-  alert('YTIFY 2d\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To queue :\nEnable Enqueue, copy next track link and click on plus button.\n\nComing Soon :\nFirefox Browser Support.');
+if (localStorage.getItem("2e") == null) {
+  alert('YTIFY 2e\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To queue :\nEnable Enqueue, copy next track link and click on plus button.\n\nComing Soon :\nFirefox Browser Support.');
   localStorage.clear();
-  localStorage.setItem("2d", "yes");
+  localStorage.setItem("2e", "yes");
 }
 
 const button = document.getElementsByClassName('btn');
@@ -10,20 +10,16 @@ const input = document.querySelectorAll('input');
 const label = document.querySelector('.label');
 const audio = document.querySelector('audio');
 const thumb = document.querySelector('img');
-const scan = localStorage.getItem('scan');
-const scanarr = ["a", "b", "c", "d", "e", "f"];
-const i = document.querySelector('b');
 const body = document.body.classList;
-const array = [];
+const array = []; // id storage
+const interval = setInterval(script, 2000);
 
-
-let y;
-let m;
-let n = 0;
-let s = 2;
-let c = 249;
-let q = "low";
-let queue = false;
+let y; // store id
+let m; // queue count 
+let n = 1; // current queue playing
+let c = 249; // quality value
+let q = "low"; // quality boolean
+let queue = false; // queue boolean
 
 
 function atsrc(x) {
@@ -67,6 +63,8 @@ function script() {
     else if (y != id && queue == false) { atsrc(id); }
     // queue new id
     else if (y != id && queue == true) {
+      m++;
+      label.innerText = m;
       array[m] = y = id;
       audio.onended = (e) => {
         atsrc(array[n]);
@@ -78,64 +76,35 @@ function script() {
 
 script();
 
+// rewind & forward
+button[0].addEventListener("click", function() {
+  audio.currentTime += -10;
+})
+button[1].addEventListener("click", function() {
+  audio.currentTime += 10;
+})
 // next track
-button[2].addEventListener("click", function() {
+button[4].addEventListener("click", function() {
   atsrc(array[n]);
   n++;
 });
 
-// scanning time interval
-
-if (scan != null) {
-  s = scanarr.indexOf(scan);
-  i.innerText = s;
-  const interval = setInterval(script, s * 1000);
-}
-else { setInterval(script, 2000); }
-
-button[3].addEventListener("click",
-  function() {
-    if (s < 5) {
-      s++;
-      i.innerText = s;
-      window.localStorage.setItem('scan', scanarr[s]);
-      location.reload();
-    }
-  });
-button[4].addEventListener("click",
-  function() {
-    if (s > 0) {
-      s--;
-      i.innerText = s;
-      window.localStorage.setItem('scan', scanarr[s]);
-      location.reload();
-    }
-  });
-
 // enable queue
 
-
-button[0].addEventListener("click", function() {
-
+button[2].addEventListener("click", function() {
+  button[2].classList.add('bg-primary');
   if (m == null) {
-    button[1].classList.remove('disabled');
-    button[2].classList.remove('disabled');
+    button[3].classList.remove('disabled');
+    button[4].classList.remove('disabled');
     input[0].disabled = queue = true;
     m = 0;
     clearInterval(interval);
+    script();
   }
-  else {
-    button[1].classList.add('disabled');
-    button[2].classList.add('disabled');
-    input[0].disabled = queue = false;
-    m = null;
-    label.innerText = 0;
-    interval;
-  }
+  else { location.reload(); }
 });
-button[1].addEventListener("click", function() {
-  m++;
-  label.innerText = m;
+
+button[3].addEventListener("click", function() {
   script();
 });
 
@@ -146,7 +115,7 @@ if (localStorage.getItem('loop') == "yes") {
   audio.onended = (e) => {
     audio.play();
   };
-  button[0].disabled = true;
+  button[2].disabled = true;
 }
 
 input[0].addEventListener("click", function() {
@@ -154,12 +123,12 @@ input[0].addEventListener("click", function() {
     audio.onended = (e) => {
       audio.play();
     };
-    button[0].disabled = true;
+    button[2].disabled = true;
     localStorage.setItem('loop', "yes");
   }
   else {
     audio.onended = null;
-    button[0].disabled = false;
+    button[2].disabled = false;
     localStorage.setItem('loop', "no");
   }
 });

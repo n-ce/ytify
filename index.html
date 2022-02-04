@@ -14,27 +14,6 @@
   <link rel="manifest" href="manifest.json" />
   <title>ytify</title>
   <link rel="stylesheet" href="style.css">
-  
-    <script type="text/javascript">
-      /*Function for Play & Pause Buttons*/
-      function play() {
-        var audioPlayer = document.getElementById("audioPlayer");
-        var btnPlay = document.getElementById("btnPlay");
-        if (audioPlayer.paused) {
-          audioPlayer.play();
-          btnPlay.textContent = "||";
-        } else {
-          audioPlayer.pause();
-          btnPlay.textContent = ">";
-        }
-      }
-      /*Function to Forward & Rewind*/
-      function forwardRewind(param) {
-        var audioPlayer = document.getElementById("audioPlayer");
-        audioPlayer.currentTime += param;
-      }
-    </script>
-  
   <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
 </head>
 
@@ -42,31 +21,17 @@
   <img>
   <br>
   <div class="flex-centered">
-    <ul class="d-flex">
+    <div class="d-flex">
+      <button class="btn bg-primary"><<</button>
+      <button class="btn bg-primary">>></button>
       <button class="btn">Enqueue</button>
       <button class="btn disabled">+</button>
-      <span class="label label-primary ">0</span>
-      <button class="btn disabled">>></button>
-    </ul>
-    <audio id="audioPlayer" controls></audio>
+      <span class="label label-success">0</span>
+      <button class="btn bg-primary disabled">>|</button>
+    </div>
     <br>
-    <div class="Buttons" id="playerButtons">
-      <button id="btnRewind" onclick="forwardRewind(-5)">
-        <<</i>
-      </button>
-      <button id="btnPlay" onclick="play()">
-        ></i>
-      </button>
-      <button id="btnForward" onclick="forwardRewind(5)">
-        >></i>
-      </button>
-      <br>
-
-    <label>
-      <span>Scanning Interval : <b>2</b>s</span>&nbsp;
-      <button class="btn">+</button>&nbsp;
-      <button class="btn">-</button>
-    </label>
+    <audio controls></audio>
+    <br>
     <span class="form-group">
       <label class="form-switch">
         <input type="checkbox">Loop
