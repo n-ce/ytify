@@ -26,23 +26,25 @@
       <input placeholder="Paste link here" type="text" class="form-input">
       <button class="btn btn-primary input-group-btn">Add video</button>
     </div>
-    <ul class="d-flex">
-      <button class="btn">Enqueue</button>
-      <button class="btn disabled">+</button>
-      <span class="label label-primary ">0</span>
-      <button class="btn disabled">>></button>
-    </ul>
+    <div class="d-flex">
+      <button class="btn bg-primary"><<</button>
+      <button class="btn bg-primary">>></button>
+      <button class="btn d-none">+</button>
+      <span class="label label-success d-none">0</span>
+      <button class="btn bg-primary d-none">>|</button>
+    </div>
+    <br>
     <audio controls></audio>
     <br>
-    <label>
-      <span>Scanning Interval : <b>2</b>s</span>&nbsp;
-      <button class="btn">+</button>&nbsp;
-      <button class="btn">-</button>
-    </label>
     <span class="form-group">
-      <label class="form-switch">
-        <input type="checkbox">Loop
-        <i class="form-icon"></i>
+      <label class="form-radio form-inline">
+        <input type="radio" name="play"><i class="form-icon"></i> Queue
+      </label>
+      <label class="form-radio form-inline">
+        <input type="radio" name="play"><i class="form-icon"></i> Loop
+      </label>
+      <label class="form-radio form-inline">
+        <input type="radio" name="play"><i class="form-icon"></i> Auto
       </label>
       <label class="form-switch">
         <input type="checkbox">HQ 128kbps
@@ -55,7 +57,7 @@
     </span>
     <button class="btn btn-link">Clear Data</button>
     <br>
-    <a href="https://github.com/n-ce/ytify" target="_blank">v2d Fork on Github</strong></a>
+    <a href="https://github.com/n-ce/ytify" target="_blank">v2f Fork on Github</strong></a>
   </div>
   <script src="script.js"></script>
   <script src="service-worker.js"></script>
