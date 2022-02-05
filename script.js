@@ -22,6 +22,7 @@ let error = "NotAllowedError: Read permission denied.";
 
 if (navigator.userAgent.indexOf('Firefox') != -1) {
   input[0].classList.remove('d-none');
+  input[1].classList.add('d-none');
   alert('Clipboard API Not Supported : Some Functions Might Not Work');
   error = true;
   clearInterval(interval);
