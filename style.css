@@ -43,3 +43,14 @@ img {
     width: 45%;
   }
 }
+
+input,button,a,audio,label,i{
+  animation: born 1s ease-in-out;
+}
+
+@keyframes born{
+  from{
+    opacity: 0;
+    
+  }
+}
