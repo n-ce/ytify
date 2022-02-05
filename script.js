@@ -76,8 +76,8 @@ function script() {
       array[m] = y = id;
       audio.onended = (e) => {
         atsrc(array[n]);
-        n++;
         label.innerText = m - n;
+        n++;
       }
     }
   }).catch(err => {
@@ -110,8 +110,8 @@ button[1].addEventListener("click", function() {
 // next track
 button[3].addEventListener("click", function() {
   atsrc(array[n]);
-  n++;
   label.innerText = m - n;
+  n++;
 });
 // store new id in queue
 button[2].addEventListener("click", function() {
