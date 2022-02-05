@@ -15,6 +15,7 @@
   <title>ytify</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
 </head>
 
 <body class="bg-secondary flex-centered">
@@ -22,15 +23,16 @@
   <br>
   <div class="flex-centered">
     <div class="d-flex">
-      <button class="btn bg-primary"><<</button>
+      <button class="btn bg-primary"><i class="icon icon-arrow-left"></i></button>
       <input placeholder="Paste link here & click enter" class="form-input d-none">
-      <button class="btn bg-primary">>></button>
-      <button class="btn d-none">+</button>
+      <button class="btn bg-primary"><i class="icon icon-arrow-right"></i></button>
+      <button class="btn d-none"><i class="icon icon-plus"></i></button>
       <span class="label label-success d-none">0</span>
-      <button class="btn bg-primary d-none">>|</button>
+      <button class="btn bg-primary d-none"><i class="icon icon-forward"></i></button>
     </div>
     <br>
     <audio controls></audio>
+    <br>
     <span class="form-group">
       <label class="form-radio form-inline">
         <input type="radio" name="play"><i class="form-icon"></i> Queue
@@ -50,9 +52,10 @@
         <i class="form-icon"></i>
       </label>
     </span>
-    <span>
-      <button class="btn btn-link">Clear Data</button>&nbsp;&nbsp;&nbsp;
-      <a class="btn btn-link" href="https://github.com/n-ce/ytify" target="_blank">v2i Fork on Github</a>
+    <span class="d-flex">
+      <button class="btn btn-link"><i class="icon icon-delete"></i></button>
+      <a class="btn btn-link" href="https://github.com/n-ce/ytify" target="_blank">Github</a>
+      <button class="btn btn-link"><i class="icon icon-message"></i></button>
     </span>
   </div>
   <script src="script.js"></script>

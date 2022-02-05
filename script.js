@@ -1,9 +1,3 @@
-if (localStorage.getItem("2i") == null) {
-  alert('YTIFY 2i\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To Queue :\nClick Queue, copy next track link and click on plus button.');
-  localStorage.clear();
-  localStorage.setItem("2i", "yes");
-}
-
 const button = document.getElementsByClassName('btn');
 const theme = localStorage.getItem('data-theme');
 const input = document.querySelectorAll('input');
@@ -196,4 +190,9 @@ button[4].addEventListener("click", function()
 {
   localStorage.clear();
   location.reload();
+});
+
+// alert
+button[6].addEventListener("click", function() {
+  alert('YTIFY 2j\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.');
 });
