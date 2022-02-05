@@ -1,11 +1,7 @@
-if (localStorage.getItem("2h") == null) {
-  alert('YTIFY 2h\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To Queue :\nClick Queue, copy next track link and click on plus button.');
+if (localStorage.getItem("2i") == null) {
+  alert('YTIFY 2i\n\nCopy YT Video link to Clipboard to start playing automatically.\n\nHow To Queue :\nClick Queue, copy next track link and click on plus button.');
   localStorage.clear();
-  localStorage.setItem("2h", "yes");
-}
-
-if (navigator.userAgent.indexOf('Firefox') !=-1) {
-  window.location = "firefox/index.html"
+  localStorage.setItem("2i", "yes");
 }
 
 const button = document.getElementsByClassName('btn');
@@ -24,7 +20,15 @@ let n = 1; // current queue playing
 let c = 249; // quality value
 let q = "low"; // quality boolean
 let queue = false; // queue boolean
-let error;
+let error = "NotAllowedError: Read permission denied.";
+
+
+if (navigator.userAgent.indexOf('Firefox') != -1) {
+  input[0].classList.remove('d-none');
+  alert('Clipboard API Not Supported : Some Functions Might Not Work');
+  clearInterval(interval);
+}
+
 
 function atsrc(x) {
   //Playback
@@ -78,9 +82,12 @@ function script() {
     }
   }).catch(err => {
     // maybe user didn't grant access to read from clipboard
-    input[0].classList.remove('d-none');
-    alert('Some functions might not work in your browser.');
-    clearInterval(interval);
+    if (err == error) {
+      error = true;
+      input[0].classList.remove('d-none');
+      alert('Permissions Denied : Some Functions Might Not Work');
+      clearInterval(interval);
+    }
   });
 }
 
