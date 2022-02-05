@@ -4,10 +4,6 @@ if (localStorage.getItem("2h") == null) {
   localStorage.setItem("2h", "yes");
 }
 
-if (navigator.userAgent.indexOf('Firefox') !=-1) {
-  window.location = "firefox/index.html"
-}
-
 const button = document.getElementsByClassName('btn');
 const theme = localStorage.getItem('data-theme');
 const input = document.querySelectorAll('input');
