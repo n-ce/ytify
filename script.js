@@ -72,7 +72,7 @@ function script() {
     // queue new id
     else if (y != id && queue == true) {
       m++;
-      label.innerText = m;
+      label.innerText = m - n + 1;
       array[m] = y = id;
       audio.onended = (e) => {
         atsrc(array[n]);
