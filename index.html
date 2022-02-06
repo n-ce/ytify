@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
-<head lang="en">
+<head>
   <meta charset="UTF-8">
   <meta name="description" content="50kbps opus youtube audio streaming front-end">
   <meta name="keywords" content="Youtube,Music,audio,opus,50kbps,Free">
@@ -9,10 +9,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#23242c">
   <meta name="mobile-web-app-capable" content="yes">
+  <title>ytify</title>
   <link rel="icon" type="image/png" sizes="512x512" href="maskable_icon_x512.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
-  <title>ytify</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
   <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
@@ -23,12 +23,12 @@
   <br>
   <div class="flex-centered">
     <div class="d-flex">
-      <button class="btn bg-primary"><i class="icon icon-arrow-left"></i></button>
+      <button class="btn bg-primary" onclick="skip(-10)"><i class="icon icon-arrow-left"></i></button>
       <input placeholder="Paste link here & click enter" class="form-input d-none">
-      <button class="btn bg-primary"><i class="icon icon-arrow-right"></i></button>
+      <button class="btn bg-primary" onclick="skip(10)"><i class="icon icon-arrow-right"></i></button>
       <button class="btn d-none"><i class="icon icon-plus"></i></button>
       <span class="label label-success d-none">0</span>
-      <button class="btn bg-primary d-none"><i class="icon icon-forward"></i></button>
+      <button class="btn bg-primary d-none" onclick="next()"><i class="icon icon-forward"></i></button>
     </div>
     <br>
     <audio controls></audio>
@@ -55,7 +55,7 @@
     <span class="d-flex">
       <button class="btn btn-link"><i class="icon icon-delete"></i></button>
       <a class="btn btn-link" href="https://github.com/n-ce/ytify" target="_blank">Github</a>
-      <button class="btn btn-link" onclick="alert('YTIFY version 2l\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
+      <button class="btn btn-link" onclick="alert('YTIFY Version 2M\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
     </span>
   </div>
   <script src="script.js"></script>

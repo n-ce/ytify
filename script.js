@@ -1,24 +1,19 @@
 const button = document.getElementsByClassName('btn');
-const theme = localStorage.getItem('data-theme');
 const input = document.querySelectorAll('input');
 const label = document.querySelector('.label');
 const audio = document.querySelector('audio');
-const thumb = document.querySelector('iframe');
 const body = document.body.classList;
 const array = []; // id storage
 const interval = setInterval(script, 2000);
-
+const play = localStorage.getItem('play');
 const abstract = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
 
 let y; // store id
 let m; // queue count 
-let link;
-let param;
 let n = 1; // current queue playing
 let c = 249; // quality value
 let queue = false; // queue boolean
 let error = "NotAllowedError: Read permission denied.";
-
 
 if (navigator.userAgent.indexOf('Firefox') != -1) {
   input[0].classList.remove('d-none');
@@ -28,7 +23,7 @@ if (navigator.userAgent.indexOf('Firefox') != -1) {
   clearInterval(interval);
 }
 
-// UID EXTRACTOR
+// link to id converter
 function caller(val) {
   return val.match(abstract)[7];
 }
@@ -38,30 +33,25 @@ function atsrc(x) {
   audio.src = "https://projectlounge.pw/ytdl/download?url=https://youtu.be/" + x + "&format=" + c;
   audio.play();
   //Thumbnail
-  thumb.src = "https://youtube.com/embed/" + x;
+  document.querySelector('iframe').src = "https://youtube.com/embed/" + x;
   y = x;
 }
 
-// save hq setting
-if (localStorage.getItem('format') == "yes") {
-  input[4].checked = true;
-  c = 251;
+function next() {
+  if ((m - n) > -1) {
+    atsrc(array[n]);
+    label.innerText = m - n;
+    n++;
+  }
 }
 
-// HQ 128kbps
+function save(name, key) {
+  localStorage.setItem(name, key);
+}
 
-input[4].addEventListener("click", function() {
-  if (input[4].checked == true) {
-    c = 251;
-    atsrc(param);
-    localStorage.setItem('format', "yes");
-  }
-  else if (input[4].checked == false) {
-    c = 249;
-    atsrc(param);
-    localStorage.setItem('format', "no");
-  }
-});
+function skip(t) {
+  audio.currentTime += t;
+}
 
 function algorithm(param) {
   //initial id value
@@ -75,14 +65,9 @@ function algorithm(param) {
     m++;
     label.innerText = m - n + 1;
     array[m] = y = param;
-    audio.onended = (e) => {
-      atsrc(array[n]);
-      label.innerText = m - n;
-      n++;
-    }
+    audio.onended = (e) => { next(); }
   }
 }
-
 
 function script() {
   navigator.clipboard.readText().then(link => { algorithm(caller(link)); }).catch(err => {
@@ -96,7 +81,6 @@ function script() {
   });
 }
 
-
 // input text player
 input[0].addEventListener("keyup", function(event) {
   if (event.keyCode === 13) {
@@ -104,19 +88,6 @@ input[0].addEventListener("keyup", function(event) {
   }
 });
 
-// rewind & forward
-button[0].addEventListener("click", function() {
-  audio.currentTime += -10;
-});
-button[1].addEventListener("click", function() {
-  audio.currentTime += 10;
-});
-// next track
-button[3].addEventListener("click", function() {
-  atsrc(array[n]);
-  label.innerText = m - n;
-  n++;
-});
 // store new id in queue
 button[2].addEventListener("click", function() {
   if (error == true) {
@@ -127,32 +98,27 @@ button[2].addEventListener("click", function() {
   }
 });
 
-// Queue Loop Auto Save
-
-if (localStorage.getItem('play') == "loop") {
-  audio.onended = (e) => {
-    audio.play();
-  };
+// Queue Loop Auto
+if (play == "loop") {
+  audio.onended = (e) => { audio.play(); };
   input[2].checked = true;
 }
-else if (localStorage.getItem('play') == "queue") {
+else if (play == "queue") {
   m = 0;
-  queue = true;
+  queue = input[1].checked = true;
   clearInterval(interval);
   script();
-  input[1].checked = true;
   button[2].classList.remove('d-none');
   button[3].classList.remove('d-none');
   label.classList.remove('d-none');
 }
 else {
   audio.onended = null;
-  localStorage.setItem('play', "auto");
+  save('play', "auto");
   input[3].checked = true;
 }
 
-// queue
-
+// Queue
 input[1].addEventListener("click", function() {
   m = 0;
   queue = true;
@@ -161,46 +127,58 @@ input[1].addEventListener("click", function() {
   button[2].classList.remove('d-none');
   button[3].classList.remove('d-none');
   label.classList.remove('d-none');
-  localStorage.setItem('play', "queue");
+  save('play', "queue");
 });
 
-//Loop
-
+// Loop
 input[2].addEventListener("click", function() {
-  audio.onended = (e) => {
-    audio.play();
-  };
-  localStorage.setItem('play', "loop");
+  save('play', "loop");
   location.reload();
 });
 
-// auto
+// Auto
 input[3].addEventListener("click", function() {
-  localStorage.setItem('play', "auto");
+  save('play', "auto");
   location.reload();
 });
 
+// HQ SETTING
+if (localStorage.getItem('format') == "yes") {
+  input[4].checked = true;
+  c = 251;
+}
+input[4].onchange = function() {
+  if (this.checked) {
+    c = 251;
+    atsrc(param);
+    save('format', "yes");
+  }
+  else {
+    c = 249;
+    atsrc(param);
+    save('format', "no");
+  }
+}
 
 // Dark Mode
-
-if (theme == "dark") {
+if (localStorage.getItem('theme') == "dark") {
   body.remove('bg-secondary');
   body.add('bg-dark');
+  input[5].checked = true;
 }
-input[5].checked = theme == "dark" ? true : false;
 input[5].onchange = function() {
   if (this.checked) {
     body.remove('bg-secondary');
     body.add('bg-dark');
-    window.localStorage.setItem('data-theme', "dark");
+    save('theme', "dark");
   } else {
     body.add('bg-secondary');
     body.remove('bg-dark');
-    window.localStorage.setItem('data-theme', "secondary");
+    save('theme', "secondary");
   }
 }
 
-// clear settings
+// Clear Settings
 button[4].addEventListener("click", function()
 {
   localStorage.clear();

@@ -49,13 +49,14 @@ iframe {
   }
 }
 
-input,
 button,
-a,
+iframe,
 audio,
 label,
-i,
-iframe {
+input,
+span,
+a,
+i {
   animation: born 1s ease-in-out;
 }
 
