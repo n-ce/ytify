@@ -67,7 +67,7 @@ function algorithm(param) {
   //initial id value
   if (y == undefined) { atsrc(param); }
   //start playing if new id
-  else if (y != param && queue == false) {
+  else if (y != param && queue == false) { atsrc(param);
   }
   // queue new id
   else if (y != param && queue == true) {
