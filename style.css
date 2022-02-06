@@ -16,7 +16,7 @@ div.flex-centered {
 
 
 audio,
-img {
+iframe {
   width: 90%;
 }
 
@@ -24,7 +24,8 @@ audio::-webkit-media-controls-panel {
   background-color: lavender;
 }
 
-img {
+iframe {
+  height: 50vw;
   box-shadow: 0 0 0.5rem #0007;
 }
 
@@ -38,19 +39,29 @@ img {
     flex-direction: row;
   }
 
-  img,
+  iframe {
+    height: 50vh;
+  }
+
+  iframe,
   div.flex-centered {
     width: 45%;
   }
 }
 
-input,button,a,audio,label,i{
+input,
+button,
+a,
+audio,
+label,
+i,
+iframe {
   animation: born 1s ease-in-out;
 }
 
-@keyframes born{
-  from{
+@keyframes born {
+  from {
     opacity: 0;
-    
+    transform: translateY(100%);
   }
 }

@@ -3,7 +3,7 @@ const theme = localStorage.getItem('data-theme');
 const input = document.querySelectorAll('input');
 const label = document.querySelector('.label');
 const audio = document.querySelector('audio');
-const thumb = document.querySelector('img');
+const thumb = document.querySelector('iframe');
 const body = document.body.classList;
 const array = []; // id storage
 const interval = setInterval(script, 2000);
@@ -38,7 +38,7 @@ function atsrc(x) {
   audio.src = "https://projectlounge.pw/ytdl/download?url=https://youtu.be/" + x + "&format=" + c;
   audio.play();
   //Thumbnail
-  thumb.src = "https://img.youtube.com/vi/" + x + "/maxresdefault.jpg";
+  thumb.src = "https://youtube.com/embed/" + x;
   y = x;
 }
 
@@ -67,7 +67,8 @@ function algorithm(param) {
   //initial id value
   if (y == undefined) { atsrc(param); }
   //start playing if new id
-  else if (y != param && queue == false) { atsrc(param);
+  else if (y != param && queue == false) {
+    atsrc(param);
   }
   // queue new id
   else if (y != param && queue == true) {
