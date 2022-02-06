@@ -1,7 +1,8 @@
-# ytify
-
-![](maskable_icon_x512.png)
-
+<div align="center">
+<h1><i>ytify</i></h1>
+<img width="50%" src="maskable_icon_x512.png"></img>
+</div>
+<br>
 Minimal youtube audio streaming front-end.
 
 Streams youtube audio only in ultra low bitrate at around 50kbps, save data!
