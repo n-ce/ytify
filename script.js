@@ -62,16 +62,7 @@ function algorithm(param) {
   }
 }
 
-async function script() {
-  try {
-    let link = await navigator.clipboard.readText();
-    algorithm(caller(link));
-  } catch (err) {
-    if (err == error) {
-      er();
-    }
-  }
-}
+function script() { navigator.clipboard.readText().then(link => { algorithm(caller(link)) }).catch(err => { if (err == error) { er(); } }); }
 
 function store() {
   if (error == true) { algorithm(caller(input[0].value)); }
