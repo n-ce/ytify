@@ -62,7 +62,10 @@ function algorithm(param) {
   }
 }
 
-function script() { navigator.clipboard.readText().then(link => { algorithm(caller(link)) }).catch(err => { if (err == error) { er(); } }); }
+function script() { 
+  navigator.clipboard.readText().then(link => { algorithm(caller(link)); }).catch(err => { 
+    if (err == error) { er(); } });
+}
 script();
 
 function store() {
