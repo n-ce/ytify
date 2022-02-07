@@ -10,23 +10,23 @@ const abstract = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis
 
 let y; // store id
 let m; // queue count 
+let param; // algorithm parameter
 let n = 1; // current queue playing
 let c = 249; // quality value
-let queue = false; // queue boolean
+let queue; // queue boolean
 let error = "NotAllowedError: Read permission denied.";
 
-if (navigator.userAgent.indexOf('Firefox') != -1) {
-  input[0].classList.remove('d-none');
-  input[1].classList.add('d-none');
-  alert('Clipboard API Not Supported : Some Functions Might Not Work');
+function er() {
   error = true;
   clearInterval(interval);
+  input[0].classList.remove('d-none');
+  alert('Error Detected : Some Functions Might Not Work');
 }
 
+if (navigator.userAgent.indexOf('Firefox') != -1) { er(); }
+
 // link to id converter
-function caller(val) {
-  return val.match(abstract)[7];
-}
+function caller(val) { return val.match(abstract)[7]; }
 
 function atsrc(x) {
   //Playback
@@ -45,56 +45,35 @@ function next() {
   }
 }
 
-function save(name, key) {
-  localStorage.setItem(name, key);
-}
+function save(name, key) { localStorage.setItem(name, key); }
 
-function skip(t) {
-  audio.currentTime += t;
-}
+function skip(t) { audio.currentTime += t; }
 
 function algorithm(param) {
-  //initial id value
-  if (y == undefined) { atsrc(param); }
-  //start playing if new id
-  else if (y != param && queue == false) {
-    atsrc(param);
-  }
-  // queue new id
-  else if (y != param && queue == true) {
-    m++;
-    label.innerText = m - n + 1;
-    array[m] = y = param;
-    audio.onended = (e) => { next(); }
+  if (y != param) {
+    // autoplay new id
+    if (queue == undefined) { atsrc(param); }
+    // queue new id
+    else {
+      m++;
+      label.innerText = m - n + 1;
+      array[m] = y = param;
+      audio.onended = (e) => { next(); }
+    }
   }
 }
 
-function script() {
-  navigator.clipboard.readText().then(link => { algorithm(caller(link)); }).catch(err => {
-    // maybe user didn't grant access to read from clipboard
-    if (err == error) {
-      error = true;
-      input[0].classList.remove('d-none');
-      alert('Permissions Denied : Some Functions Might Not Work');
-      clearInterval(interval);
-    }
-  });
+function script() { navigator.clipboard.readText().then(link => { algorithm(caller(link)) }).catch(err => { if (err == error) { er(); } }); }
+
+function store() {
+  if (error == true) { algorithm(caller(input[0].value)); }
+  else { script(); }
 }
 
 // input text player
 input[0].addEventListener("keyup", function(event) {
   if (event.keyCode === 13) {
     atsrc(caller(input[0].value));
-  }
-});
-
-// store new id in queue
-button[2].addEventListener("click", function() {
-  if (error == true) {
-    algorithm(caller(input[0].value));
-  }
-  else {
-    script();
   }
 });
 
@@ -107,10 +86,10 @@ else if (play == "queue") {
   m = 0;
   queue = input[1].checked = true;
   clearInterval(interval);
-  script();
   button[2].classList.remove('d-none');
   button[3].classList.remove('d-none');
   label.classList.remove('d-none');
+  store();
 }
 else {
   audio.onended = null;
@@ -123,11 +102,11 @@ input[1].addEventListener("click", function() {
   m = 0;
   queue = true;
   clearInterval(interval);
-  script();
   button[2].classList.remove('d-none');
   button[3].classList.remove('d-none');
   label.classList.remove('d-none');
   save('play', "queue");
+  store();
 });
 
 // Loop
@@ -150,14 +129,13 @@ if (localStorage.getItem('format') == "yes") {
 input[4].onchange = function() {
   if (this.checked) {
     c = 251;
-    atsrc(param);
     save('format', "yes");
   }
   else {
     c = 249;
-    atsrc(param);
     save('format', "no");
   }
+  atsrc(param);
 }
 
 // Dark Mode

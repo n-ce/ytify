@@ -22,11 +22,11 @@
   <iframe frameborder="0"></iframe>
   <br>
   <div class="flex-centered">
-    <div class="d-flex">
+   <div class="d-flex">
       <button class="btn bg-primary" onclick="skip(-10)"><i class="icon icon-arrow-left"></i></button>
-      <input placeholder="Paste link here & click enter" class="form-input d-none">
+       <input placeholder="Paste link here & click enter" class="form-input d-none">
       <button class="btn bg-primary" onclick="skip(10)"><i class="icon icon-arrow-right"></i></button>
-      <button class="btn d-none"><i class="icon icon-plus"></i></button>
+      <button class="btn d-none" onclick="store()"><i class="icon icon-plus"></i></button>
       <span class="label label-success d-none">0</span>
       <button class="btn bg-primary d-none" onclick="next()"><i class="icon icon-forward"></i></button>
     </div>
@@ -55,7 +55,7 @@
     <span class="d-flex">
       <button class="btn btn-link"><i class="icon icon-delete"></i></button>
       <a class="btn btn-link" href="https://github.com/n-ce/ytify" target="_blank">Github</a>
-      <button class="btn btn-link" onclick="alert('YTIFY Version 2M\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
+      <button class="btn btn-link" onclick="alert('YTIFY Version 2N\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
     </span>
   </div>
   <script src="script.js"></script>

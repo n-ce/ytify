@@ -25,7 +25,7 @@ audio::-webkit-media-controls-panel {
 }
 
 iframe {
-  height: 50vw;
+  height: 51vw;
   box-shadow: 0 0 0.5rem #0007;
 }
 
@@ -40,7 +40,7 @@ iframe {
   }
 
   iframe {
-    height: 50vh;
+    height: 25vw;
   }
 
   iframe,
