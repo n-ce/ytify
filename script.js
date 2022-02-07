@@ -20,7 +20,6 @@ function er() {
   error = true;
   clearInterval(interval);
   input[0].classList.remove('d-none');
-  alert('Error Detected : Some Functions Might Not Work');
 }
 
 if (navigator.userAgent.indexOf('Firefox') != -1) { er(); }
@@ -64,6 +63,7 @@ function algorithm(param) {
 }
 
 function script() { navigator.clipboard.readText().then(link => { algorithm(caller(link)) }).catch(err => { if (err == error) { er(); } }); }
+script();
 
 function store() {
   if (error == true) { algorithm(caller(input[0].value)); }
