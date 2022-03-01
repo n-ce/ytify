@@ -1,13 +1,13 @@
 const button = document.getElementsByClassName('btn');
-const input  = document.querySelectorAll('input');
-const badge  = document.querySelector('.badge');
-const audio  = document.querySelector('audio');
-const img    = document.querySelector('img');
-const body   = document.body.classList;
-const array  = []; // id storage
-const play   = localStorage.getItem('play');
-const regex  = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
-const url    = "https://noembed.com/embed?dataType=json&url=https://youtube.com/watch?v=";
+const input = document.querySelectorAll('input');
+const badge = document.querySelector('.badge');
+const audio = document.querySelector('audio');
+const img = document.querySelector('img');
+const body = document.body.classList;
+const array = []; // id storage
+const play = localStorage.getItem('play');
+const regex = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
+const url = "https://noembed.com/embed?dataType=json&url=https://youtube.com/watch?v=";
 const interval = setInterval(script, 2000);
 
 let y; // store id for changes check
@@ -19,6 +19,7 @@ let l = true; // thumbnail boolean
 let queue; // queue boolean
 let error = "NotAllowedError: Read permission denied.";
 
+// activate fallback functions when error detected
 function er() {
   error = true;
   clearInterval(interval);
@@ -100,7 +101,7 @@ function store() {
 
 // input text player
 input[0].oninput = () => { algorithm(caller(input[0].value)); }
-
+let k;
 // Queue Loop Auto
 if (play == "loop") {
   audio.onended = (e) => { audio.play(); };
@@ -113,6 +114,7 @@ else if (play == "queue") {
   button[2].classList.remove('d-none');
   button[3].classList.remove('d-none');
   store();
+  k = true;
 }
 else {
   audio.onended = null;
@@ -129,18 +131,25 @@ input[1].addEventListener("click", function() {
   button[3].classList.remove('d-none');
   save('play', "queue");
   store();
+  k = true;
 });
 
 // Loop
 input[2].addEventListener("click", function() {
+  //only reload if coming from queue
+  if (k == true) { location.reload() }
+
+  audio.onended = (e) => { audio.play(); };
   save('play', "loop");
-  location.reload();
 });
 
 // Auto
 input[3].addEventListener("click", function() {
+  //only reload if coming from queue
+  if (k == true) { location.reload() }
+
+  audio.onended = null;
   save('play', "auto");
-  location.reload();
 });
 
 // HQ SETTING
@@ -184,7 +193,16 @@ if (localStorage.getItem('thum') == "off") {
 }
 
 input[6].onchange = () => {
-  input[6].checked == true ? save('thum', "on") : save('thum', "off");
+  if (input[6].checked == true) {
+    save('thum', "on");
+    l = true;
+    atsrc(param);
+  }
+  else {
+    save('thum', "off");
+    l = false;
+    img.src = null;
+  }
   img.classList.toggle('d-none');
 }
 

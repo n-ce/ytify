@@ -25,8 +25,14 @@ audio::-webkit-media-controls-panel {
   background-color: lavender;
 }
 
-img {
+img,
+h1 {
   box-shadow: 0 0 0.5rem #0007;
+}
+
+img {
+  height: 51vw;
+  object-fit: cover;
 }
 
 .d-flex {
@@ -39,6 +45,10 @@ img {
     flex-direction: row;
   }
 
+  img {
+    height: 25vw;
+  }
+
   img,
   div.flex-centered {
     width: 45%;
@@ -48,7 +58,7 @@ img {
 button,
 img,
 audio,
-label,
+h1,
 input,
 span,
 a,
