@@ -16,7 +16,8 @@ div.flex-centered {
 
 
 audio,
-iframe {
+img,
+h1 {
   width: 90%;
 }
 
@@ -24,8 +25,7 @@ audio::-webkit-media-controls-panel {
   background-color: lavender;
 }
 
-iframe {
-  height: 51vw;
+img {
   box-shadow: 0 0 0.5rem #0007;
 }
 
@@ -39,18 +39,14 @@ iframe {
     flex-direction: row;
   }
 
-  iframe {
-    height: 25vw;
-  }
-
-  iframe,
+  img,
   div.flex-centered {
     width: 45%;
   }
 }
 
 button,
-iframe,
+img,
 audio,
 label,
 input,
