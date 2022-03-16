@@ -1,6 +1,6 @@
 <div align="center">
 <h1><i>ytify</i></h1>
-<img width="50%" src="maskable_icon_x512.png"></img>
+<img width="50%" src="Assets/maskable_icon_x512.png"></img>
 </div>
 <br>
 Minimal youtube audio streaming front-end.
@@ -9,8 +9,8 @@ Streams youtube audio only in ultra low bitrate at around 50kbps, save data!
 
 https://ytify.netlify.app
 
-![](ss1.png)
-![](ss2.png)
+![](Assets/ss1.png)
+![](Assets/ss2.png)
 
 ## How It's Used
 - Copy youtube video link to clipboard.
