@@ -1,16 +1,16 @@
-const button = document.getElementsByClassName('btn');
+const button = document.querySelectorAll('.btn');
 const input = document.querySelectorAll('input');
 const badge = document.querySelector('.badge');
 const audio = document.querySelector('audio');
 const img = document.querySelector('img');
 const body = document.body.classList;
-const array = []; // id storage
+const array = []; // url storage
 const play = localStorage.getItem('play');
-const regex = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
-const url = "https://noembed.com/embed?dataType=json&url=https://youtube.com/watch?v=";
+const metadata = "https://noembed.com/embed?dataType=json&url=";
 const interval = setInterval(script, 2000);
 
-let y; // store id for changes check
+let k;
+let y; // store url for changes check
 let m; // queue count 
 let param; // algorithm parameter
 let n = 1; // current queue playing
@@ -19,7 +19,10 @@ let l = true; // thumbnail boolean
 let queue; // queue boolean
 let error = "NotAllowedError: Read permission denied.";
 
+
+
 // activate fallback functions when error detected
+
 function er() {
   error = true;
   clearInterval(interval);
@@ -28,29 +31,34 @@ function er() {
 }
 
 // Fallback for Firefox
-if (navigator.userAgent.indexOf('Firefox') !== -1) { er(); }
 
-// link uid extractor
-function caller(val) { return val.match(regex)[7]; }
+if (navigator.userAgent.indexOf('Firefox') !== -1) {
+  er();
+}
 
 // audio thumbnail title src
-function atsrc(x) {
-  // Playback --- Needs changed to youtube dl exec module
-  audio.src = `https://projectlounge.pw/ytdl/download?url=https://youtu.be/${x}&format=${c}`;
-  audio.play();
 
-  fetch(url + x).then(res => res.json())
+function atsrc(url) {
+  fetch(metadata + url)
+    .then(res => res.json())
     .then(data => {
+      // Playback --- Needs changed to youtube dl exec module
+      audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${c}`;
+      audio.play();
+
       // Thumbnail
-      if (l === true) { img.src = data.thumbnail_url; }
+      if (l === true) {
+        img.src = data.thumbnail_url;
+      }
       // Title
       document.querySelector('h1').innerText = data.title;
     });
-  // not to run again
-  y = x;
+  // so that it does not run again for the same link
+  y = url;
 }
 
 // next track 
+
 function next() {
   if ((m - n) > -1) {
     atsrc(array[n]);
@@ -60,20 +68,39 @@ function next() {
 }
 
 // local storage saving shortcut
-function save(name, key) { localStorage.setItem(name, key); }
+
+function save(name, key) {
+  localStorage.setItem(name, key);
+}
 
 // forward backward
-function skip(t) { audio.currentTime += t; }
+
+function skip(t) {
+  audio.currentTime += t;
+}
 
 // proper link intercepting algorithm
+
 function algorithm(param) {
+
   if (y != param) {
+
     // autoplay new id
-    if (queue == undefined) { atsrc(param); }
+
+    if (queue == undefined) {
+      atsrc(param);
+    }
+
     // queue new id
+
     else {
-      fetch(url + param).then(res => res.json())
-        .then(da => { queueList[m] = da.title; });
+
+      fetch(metadata + param)
+        .then(res => res.json())
+        .then(da => {
+          queueList[m] = da.title;
+        });
+
       m++;
       badge.setAttribute("data-badge", m - n + 1);
       array[m] = y = param;
@@ -83,28 +110,47 @@ function algorithm(param) {
 }
 
 // clipboard copy
+
 function script() {
   navigator.clipboard.readText()
-    .then(link => { algorithm(caller(link)) })
-    .catch(err => {
-      if (err == error) {
-        er();
+    .then(
+      link => {
+        algorithm(link)
       }
-    });
+    )
+    .catch(
+      err => {
+        if (err == error) {
+          er();
+        }
+      }
+    );
 }
 
 // save current clipboard/input value to array storage
+
 function store() {
-  if (error == true) { algorithm(caller(input[0].value)); }
-  else { script(); }
+  if (error == true) {
+    algorithm(input[0].value);
+  }
+  else {
+    script();
+  }
 }
 
 // input text player
-input[0].oninput = () => { algorithm(caller(input[0].value)); }
-let k;
-// Queue Loop Auto
+
+input[0].oninput = () => {
+  algorithm(input[0].value);
+}
+
+
+// player load saved data
+
 if (play == "loop") {
-  audio.onended = (e) => { audio.play(); };
+  audio.onended = (e) => {
+    audio.play();
+  }
   input[2].checked = true;
 }
 else if (play == "queue") {
@@ -123,40 +169,55 @@ else {
 }
 
 // Queue
-input[1].addEventListener("click", function() {
-  m = 0;
-  queue = true;
-  clearInterval(interval);
-  button[2].classList.remove('d-none');
-  button[3].classList.remove('d-none');
-  save('play', "queue");
-  store();
-  k = true;
-});
+
+input[1].addEventListener("click",
+  function() {
+    m = 0;
+    queue = true;
+    clearInterval(interval);
+    button[2].classList.remove('d-none');
+    button[3].classList.remove('d-none');
+    save('play', "queue");
+    store();
+    k = true;
+  }
+);
 
 // Loop
-input[2].addEventListener("click", function() {
-  //only reload if coming from queue
-  if (k == true) { location.reload() }
 
-  audio.onended = (e) => { audio.play(); };
-  save('play', "loop");
-});
+input[2].addEventListener("click",
+  function() {
+    //only reload if coming from queue
+    if (k == true) {
+      location.reload()
+    }
+    audio.onended = (e) => {
+      audio.play();
+    };
+    save('play', "loop");
+  }
+);
 
 // Auto
-input[3].addEventListener("click", function() {
-  //only reload if coming from queue
-  if (k == true) { location.reload() }
 
-  audio.onended = null;
-  save('play', "auto");
-});
+input[3].addEventListener("click",
+  function() {
+    //only reload if coming from queue
+    if (k == true) {
+      location.reload()
+    }
+    audio.onended = null;
+    save('play', "auto");
+  }
+);
 
 // HQ SETTING
+
 if (localStorage.getItem('format') == "yes") {
   input[4].checked = true;
   c = 251;
 }
+
 input[4].onchange = function() {
   if (this.checked) {
     c = 251;
@@ -170,13 +231,17 @@ input[4].onchange = function() {
 }
 
 // Dark Mode
+
 if (localStorage.getItem('theme') == "dark") {
   body.remove('bg-secondary');
   body.add('bg-dark');
+
   for (w = 4; w < 7; w++)
     button[w].classList.add('text-secondary');
+
   input[5].checked = true;
 }
+
 input[5].onchange = () => {
   input[5].checked == true ? save('theme', "dark") : save('theme', "off");
   body.toggle('bg-secondary');
@@ -185,7 +250,9 @@ input[5].onchange = () => {
     button[w].classList.toggle('text-secondary');
 }
 
+
 // Thumbnail
+
 if (localStorage.getItem('thum') == "off") {
   l = false;
   img.classList.add('d-none');
@@ -206,9 +273,13 @@ input[6].onchange = () => {
   img.classList.toggle('d-none');
 }
 
+
 // Clear Settings
-button[4].addEventListener("click", () =>
-{
-  localStorage.clear();
-  location.reload();
-});
+
+button[4].addEventListener("click",
+  () =>
+  {
+    localStorage.clear();
+    location.reload();
+  }
+);
