@@ -13,18 +13,22 @@ https://ytify.netlify.app
 ![](Assets/ss2.png)
 
 ## Usage
+
 - Copy youtube video link to clipboard.
 - The link is automatically captured on the page and starts playing automatically.
 - Fallback Support is available for users without support for Clipboard API.
 
 
+
 ## Dependencies
-- YouTube.com - Hosting Content.
-- Spck.io - Coding Platform.
-- YouTubeDL - Main Extractor.
-- yt-dlp - YouTube DL Fork.
-- Projectlounge.pw/ytdl - yt-dlp FrontEnd.
-- noembed.com - Metadata provider.
-- Spectre.CSS - Design Framework.
-- Netlify.com - Hosting Site.
-- Google Fonts - Font Support.
+
+- ### [Project Lounge ytdlp web ui](https://projectlounge.pw/ytdl)
+- ### [noembed](https://noembed.com)
+- ### Honorable Mentions
+  - [YouTube](https://youtube.com)
+  - [Spck Code Editor](https://spck.io)
+  - [YTDL](https://github.com/ytdl-org/youtube-dl/)
+  - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+  - [Spectre](https://picturepan2.github.io/spectre/)
+  - [Netlify](https://www.netlify.com)
+  - [Google Fonts](https://fonts.google.com)
