@@ -9,17 +9,17 @@ const play = localStorage.getItem('play');
 const metadata = "https://noembed.com/embed?dataType=json&url=";
 const interval = setInterval(script, 2000);
 
-let k;
+let k = false;
 let y; // store url for changes check
 let m; // queue count 
 let param; // algorithm parameter
 let n = 1; // current queue playing
 let c = 249; // quality codec value
-let l = true; // thumbnail boolean
+let thumb = true; // thumbnail boolean
 let queue; // queue boolean
 let error = "NotAllowedError: Read permission denied.";
-
-
+let queueList = [];
+let storeThumbURL;
 
 // activate fallback functions when error detected
 
@@ -42,16 +42,23 @@ function atsrc(url) {
   fetch(metadata + url)
     .then(res => res.json())
     .then(data => {
-      // Playback --- Needs changed to youtube dl exec module
-      audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${c}`;
-      audio.play();
+      // check if link is valid
+      if (data.title !== undefined) {
+        // Playback
+        audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${c}`;
+        audio.play();
 
-      // Thumbnail
-      if (l === true) {
-        img.src = data.thumbnail_url;
+        // Thumbnail
+        if (thumb === true) {
+          img.src = data.thumbnail_url;
+        }
+        else {
+          storeThumbURL = data.thumbnail_url;
+        }
+
+        // Title
+        document.querySelector('h1').innerText = data.title;
       }
-      // Title
-      document.querySelector('h1').innerText = data.title;
     });
   // so that it does not run again for the same link
   y = url;
@@ -98,7 +105,9 @@ function algorithm(param) {
       fetch(metadata + param)
         .then(res => res.json())
         .then(da => {
-          queueList[m] = da.title;
+          if (da.title !== undefined) {
+            queueList[m] = da.title;
+          }
         });
 
       m++;
@@ -164,7 +173,6 @@ else if (play == "queue") {
 }
 else {
   audio.onended = null;
-  save('play', "auto");
   input[3].checked = true;
 }
 
@@ -187,9 +195,11 @@ input[1].addEventListener("click",
 
 input[2].addEventListener("click",
   function() {
+
     //only reload if coming from queue
     if (k == true) {
-      location.reload()
+      k = false;
+      location.reload();
     }
     audio.onended = (e) => {
       audio.play();
@@ -204,7 +214,8 @@ input[3].addEventListener("click",
   function() {
     //only reload if coming from queue
     if (k == true) {
-      location.reload()
+      k = false;
+      location.reload();
     }
     audio.onended = null;
     save('play', "auto");
@@ -254,7 +265,7 @@ input[5].onchange = () => {
 // Thumbnail
 
 if (localStorage.getItem('thum') == "off") {
-  l = false;
+  thumb = false;
   img.classList.add('d-none');
   input[6].removeAttribute('checked');
 }
@@ -262,12 +273,12 @@ if (localStorage.getItem('thum') == "off") {
 input[6].onchange = () => {
   if (input[6].checked == true) {
     save('thum', "on");
-    l = true;
-    atsrc(param);
+    thumb = true;
+    img.src = storeThumbURL;
   }
   else {
     save('thum', "off");
-    l = false;
+    thumb = false;
     img.src = null;
   }
   img.classList.toggle('d-none');
