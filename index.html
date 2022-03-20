@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
   <meta name="description" content="50kbps opus youtube audio streaming front-end">
   <meta name="keywords" content="Youtube,Music,audio,opus,50kbps,Free">
@@ -9,32 +10,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#303742">
   <meta name="mobile-web-app-capable" content="yes">
+  
   <title>ytify</title>
-  <link rel="icon" type="image/png" sizes="512x512" href="maskable_icon_x512.png" />
-  <link rel="icon" type="image/png" sizes="192x192" href="maskable_icon_x192.png" />
+  
+  <meta property="og:title" content="YTIFY">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ytify.netlify.app">
+  <meta property="og:description" content="50kbps Opus YouTube Audio Streaming Web App.">
+  <meta property="og:image" content="Assets/maskable_icon_x512.png">
+
+  <link rel="icon" type="image/png" sizes="512x512" href="Assets/maskable_icon_x512.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css">
+  <link rel="stylesheet" href="CSS/style.css">
+  <link rel="stylesheet" href="CSS/spectre.min.css">
+  <link rel="stylesheet" href="CSS/spectre-icons.min.css">
+
 </head>
 
 <body class="bg-secondary flex-centered">
-  <iframe frameborder="0"></iframe>
-  <br>
+  <img><br>
   <div class="flex-centered">
-   <div class="d-flex">
+  <h1 class="label label-primary label-rounded text-center text-large text-bold">YTIFY</h1>
+    <div class="d-flex">
       <button class="btn bg-primary" onclick="skip(-10)"><i class="icon icon-arrow-left"></i></button>
-       <input placeholder="Paste link here & click enter" class="form-input d-none">
+      <input placeholder="Paste link here." class="form-input d-none">
       <button class="btn bg-primary" onclick="skip(10)"><i class="icon icon-arrow-right"></i></button>
       <button class="btn d-none" onclick="store()"><i class="icon icon-plus"></i></button>
-      <span class="label label-success d-none">0</span>
-      <button class="btn bg-primary d-none" onclick="next()"><i class="icon icon-forward"></i></button>
+      <button class="btn bg-success d-none" onclick="next()"><i class="icon icon-forward"></i></button>
     </div>
     <br>
     <audio controls></audio>
     <br>
     <span class="form-group">
-      <label class="form-radio form-inline">
+      <label class="form-radio form-inline badge" data-badge="0">
         <input type="radio" name="play"><i class="form-icon"></i> Queue
       </label>
       <label class="form-radio form-inline">
@@ -51,15 +60,19 @@
         <input type="checkbox">Dark Mode
         <i class="form-icon"></i>
       </label>
+      <label class="form-switch">
+        <input type="checkbox" checked>Thumbnail
+        <i class="form-icon"></i>
+      </label>
     </span>
     <span class="d-flex">
       <button class="btn btn-link"><i class="icon icon-delete"></i></button>
       <a class="btn btn-link" href="https://github.com/n-ce/ytify" target="_blank">Github</a>
-      <button class="btn btn-link" onclick="alert('YTIFY v2 Final\n\nClipboard Permission : If not available or denied, use the link input box to perform operations, Note that auto-scanning will not be available here.\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
+      <button class="btn btn-link" onclick="alert('YTIFY V3\n\nClipboard Permission : If not available or denied, use the link input box to perform operations, Note that auto-scanning will not be available here.\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
     </span>
   </div>
-  <script src="script.js"></script>
-  <script src="service-worker.js"></script>
+  <script src="JavaScript/script.js"></script>
+  <script src="JavaScript/service-worker.js"></script>
 </body>
 
 </html>

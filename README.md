@@ -1,29 +1,34 @@
 <div align="center">
 <h1><i>ytify</i></h1>
-<img width="50%" src="maskable_icon_x512.png"></img>
+<img width="50%" src="Assets/maskable_icon_x512.png"></img>
 </div>
 <br>
 Minimal youtube audio streaming front-end.
 
-Streams youtube audio only in ultra low bitrate at around 50kbps, save data!
+Streams youtube audio in ultra low bitrate at around 50kbps & 160kbps, save data!
 
 https://ytify.netlify.app
 
-![](ss1.png)
-![](ss2.png)
+![](Assets/ss1.png)
+![](Assets/ss2.png)
 
-## How It's Used
+## Usage
+
 - Copy youtube video link to clipboard.
 - The link is automatically captured on the page and starts playing automatically.
 - Fallback Support is available for users without support for Clipboard API.
 
 
-## Thanks to
-- YouTube.com - Hosting Content.
-- Spck.io - Coding Platform.
-- YouTubeDL - Main Extractor.
-- yt-dlp - YouTube DL Fork.
-- Projectlounge.pw/ytdl - yt-dlp FrontEnd.
-- Spectre.CSS - Design Framework.
-- Netlify.com - Hosting Site.
-- Google Fonts - Font Support.
+
+## Dependencies
+
+- ### [Project Lounge ytdlp web ui](https://projectlounge.pw/ytdl)
+- ### [noembed](https://noembed.com)
+- ### Honorable Mentions
+  - [YouTube](https://youtube.com)
+  - [Spck Code Editor](https://spck.io)
+  - [YTDL](https://github.com/ytdl-org/youtube-dl/)
+  - [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+  - [Spectre](https://picturepan2.github.io/spectre/)
+  - [Netlify](https://www.netlify.com)
+  - [Google Fonts](https://fonts.google.com)
