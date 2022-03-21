@@ -1,8 +1,8 @@
 //Progressive Web App
 const staticLoader = "YTIFY"
 const assets = [
-  "Assets/maskable_icon_x192.png",
-  "Assets/maskable_icon_x512.png"
+  "../Assets/maskable_icon_x192.png",
+  "../Assets/maskable_icon_x512.png"
 ]
 
 self.addEventListener("install", installEvent => {
