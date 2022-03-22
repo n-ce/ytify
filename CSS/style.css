@@ -14,14 +14,7 @@ div.flex-centered {
   font-family: 'Noto Sans Display';
 }
 
-.green-audio-player{
-  background-color: transparent;
-}
-.pin,.slider{
-  background-color: midnightblue;
-}
 
-article,
 img,
 h1 {
   width: 90%;

@@ -1,0 +1,242 @@
+@keyframes spin {
+  from {
+    transform: rotateZ(0);
+  }
+
+  to {
+    transform: rotateZ(1turn);
+  }
+}
+
+.green-audio-player {
+  width: 400px;
+  min-width: 300px;
+  height: 56px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.07);
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 24px;
+  padding-right: 24px;
+  border-radius: 4px;
+  user-select: none;
+  background-color: transparent;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.green-audio-player.player-accessible .play-pause-btn:hover,
+.green-audio-player.player-accessible .controls:hover,
+.green-audio-player.player-accessible .volume__button:hover,
+.green-audio-player.player-accessible .volume__controls:hover,
+.green-audio-player.player-accessible .download:hover {
+  outline: dotted 1px #999;
+}
+
+.green-audio-player svg,
+.green-audio-player img {
+  display: block;
+}
+
+.green-audio-player .holder {
+  position: relative;
+}
+
+.green-audio-player .holder .loading .loading__spinner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #b0b0b0;
+  border-right-color: rgba(0, 0, 0, 0);
+  border-radius: 50%;
+  animation: spin 0.4s linear infinite;
+}
+
+.green-audio-player .holder .play-pause-btn {
+  visibility: hidden;
+  cursor: pointer;
+  outline: none;
+}
+
+.play-pause-btn{
+  transform: translateY(-9px);
+}
+
+.green-audio-player .holder .play-pause-btn:focus {
+  outline: none;
+}
+
+.green-audio-player .slider {
+  flex-grow: 1;
+  background-color: #d8d8d8;
+  cursor: pointer;
+  position: relative;
+}
+
+.green-audio-player .slider .gap-progress {
+  background-color: midnightblue;
+  border-radius: inherit;
+  position: absolute;
+  pointer-events: none;
+}
+
+.green-audio-player .slider .gap-progress .pin {
+  height: 16px;
+  width: 16px;
+  border-radius: 8px;
+  background-color: midnightblue;
+  position: absolute;
+  pointer-events: all;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.32);
+}
+
+.green-audio-player .slider .gap-progress .pin::after {
+  content: "";
+  display: block;
+  background: rgba(0, 0, 0, 0);
+  width: 200%;
+  height: 200%;
+  margin-left: -50%;
+  margin-top: -50%;
+  border-radius: 50%;
+}
+
+.green-audio-player .controls {
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  line-height: 18px;
+  color: #55606e;
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 15px;
+  margin-right: 15px;
+  outline: none;
+}
+
+.green-audio-player .controls .controls__slider {
+  margin-left: 16px;
+  margin-right: 16px;
+  border-radius: 2px;
+  height: 4px;
+}
+
+.green-audio-player .controls .controls__slider .controls__progress {
+  width: 0;
+  height: 100%;
+}
+
+.green-audio-player .controls .controls__slider .controls__progress .progress__pin {
+  right: -8px;
+  top: -6px;
+}
+
+.green-audio-player .controls span {
+  cursor: default;
+}
+
+.green-audio-player .controls:focus {
+  outline: none;
+}
+
+.green-audio-player .volume {
+  position: relative;
+}
+
+.green-audio-player .volume .volume__button {
+  cursor: pointer;
+  outline: none;
+}
+
+.green-audio-player .volume .volume__button:focus {
+  outline: none;
+}
+
+.green-audio-player .volume .volume__button.open path {
+  fill: midnightblue;
+}
+
+.green-audio-player .volume .volume__controls {
+  width: 30px;
+  height: 135px;
+  background-color: rgba(0, 0, 0, 0.62);
+  border-radius: 7px;
+  position: absolute;
+  left: -3px;
+  bottom: 52px;
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+  z-index: 2;
+  outline: none;
+}
+
+.green-audio-player .volume .volume__controls .volume__slider {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  width: 6px;
+  border-radius: 3px;
+}
+
+.green-audio-player .volume .volume__controls .volume__slider .volume__progress {
+  bottom: 0;
+  height: 100%;
+  width: 6px;
+}
+
+.green-audio-player .volume .volume__controls .volume__slider .volume__progress .volume__pin {
+  left: -5px;
+  top: -8px;
+}
+
+.green-audio-player .volume .volume__controls:focus {
+  outline: none;
+}
+
+.green-audio-player .volume .volume__controls.hidden {
+  display: none;
+}
+
+.green-audio-player .volume .volume__controls.top {
+  bottom: 52px;
+  left: -3px;
+}
+
+.green-audio-player .volume .volume__controls.middle {
+  bottom: -54px;
+  left: 54px;
+}
+
+.green-audio-player .volume .volume__controls.bottom {
+  bottom: -164px;
+  left: -3px;
+}
+
+.green-audio-player .download {
+  display: none;
+  margin-left: 16px;
+  cursor: pointer;
+  outline: none;
+}
+
+.green-audio-player .download:focus {
+  outline: none;
+}
+
+.green-audio-player:focus {
+  outline: none;
+}
+
+.message__offscreen {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal;
+}
