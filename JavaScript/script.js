@@ -247,7 +247,7 @@ let tabColor = (color) => {
   document.querySelector('meta[name="theme-color"]').setAttribute("content", color);
 }
 
-const z = 0; // light mode
+let z = 0; // light mode
 
 if (localStorage.getItem('theme') == "dark") {
   body.remove('bg-secondary');
