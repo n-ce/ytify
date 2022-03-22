@@ -264,7 +264,7 @@ if (localStorage.getItem('theme') == "dark") {
 
 input[5].onchange = () => {
   z++;
-  z % 2 == 0 ? tabColor('black') : tabColor('#f1f1fc');
+  z % 2 == 1 ? tabColor('black') : tabColor('#f1f1fc');
   input[5].checked == true ? save('theme', "dark") : save('theme', "off");
   body.toggle('bg-secondary');
   body.toggle('bg-dark');
