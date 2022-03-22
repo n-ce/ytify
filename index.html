@@ -8,11 +8,11 @@
   <meta name="keywords" content="Youtube,Music,audio,opus,50kbps,Free">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f1f1fc">
+  <meta name="theme-color" content="midnightblue">
   <meta name="mobile-web-app-capable" content="yes">
-  
+
   <title>ytify</title>
-  
+
   <meta property="og:title" content="YTIFY">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://ytify.netlify.app">
@@ -22,16 +22,19 @@
   <link rel="icon" type="image/png" sizes="512x512" href="Assets/maskable_icon_x512.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="CSS/style.css">
   <link rel="stylesheet" href="CSS/spectre.min.css">
   <link rel="stylesheet" href="CSS/spectre-icons.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/greghub/green-audio-player/dist/css/green-audio-player.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/greghub/green-audio-player/dist/js/green-audio-player.min.js"></script>
+  <link rel="stylesheet" href="CSS/style.css">
+
 
 </head>
 
 <body class="bg-secondary flex-centered">
   <img><br>
   <div class="flex-centered">
-  <h1 class="label label-primary label-rounded text-center text-large text-bold">YTIFY</h1>
+    <h1 class="label label-primary label-rounded text-center text-large text-bold">YTIFY</h1>
     <div class="d-flex">
       <button class="btn bg-primary" onclick="skip(-10)"><i class="icon icon-arrow-left"></i></button>
       <input placeholder="Paste link here." class="form-input d-none">
@@ -40,7 +43,9 @@
       <button class="btn bg-success d-none" onclick="next()"><i class="icon icon-forward"></i></button>
     </div>
     <br>
-    <audio controls></audio>
+    <article class="player">
+      <audio></audio>
+    </article>
     <br>
     <span class="form-group">
       <label class="form-radio form-inline badge" data-badge="0">

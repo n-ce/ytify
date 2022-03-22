@@ -14,15 +14,17 @@ div.flex-centered {
   font-family: 'Noto Sans Display';
 }
 
+.green-audio-player{
+  background-color: transparent;
+}
+.pin,.slider{
+  background-color: midnightblue;
+}
 
-audio,
+article,
 img,
 h1 {
   width: 90%;
-}
-
-audio::-webkit-media-controls-panel {
-  background-color: #f1f1fc;
 }
 
 img,
@@ -57,7 +59,7 @@ img {
 
 button,
 img,
-audio,
+article,
 input,
 span,
 a,
