@@ -243,17 +243,28 @@ input[4].onchange = function() {
 
 // Dark Mode
 
+let tabColor = (color) => {
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", color);
+}
+
+const z = 0; // light mode
+
 if (localStorage.getItem('theme') == "dark") {
   body.remove('bg-secondary');
   body.add('bg-dark');
-
+  tabColor('black');
+  z = 1;
   for (w = 4; w < 7; w++)
     button[w].classList.add('text-secondary');
 
   input[5].checked = true;
 }
 
+
+
 input[5].onchange = () => {
+  z++;
+  z % 2 == 0 ? tabColor('black') : tabColor('#f1f1fc');
   input[5].checked == true ? save('theme', "dark") : save('theme', "off");
   body.toggle('bg-secondary');
   body.toggle('bg-dark');
