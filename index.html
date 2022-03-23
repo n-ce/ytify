@@ -22,60 +22,48 @@
   <link rel="icon" type="image/png" sizes="512x512" href="Assets/maskable_icon_x512.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="CSS/spectre.min.css">
-  <link rel="stylesheet" href="CSS/spectre-icons.min.css">
-  <link rel="stylesheet" type="text/css" href="CSS/audioPlayer.css">
-  <script src="JavaScript/audioPlayer.js"></script>
-  <link rel="stylesheet" href="CSS/style.css">
+  <link rel="stylesheet" href="style.css">
 
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
 </head>
 
-<body class="bg-secondary flex-centered">
-  <img><br>
-  <div class="flex-centered">
-    <h1 class="label label-primary label-rounded text-center text-large text-bold">YTIFY</h1>
-    <div class="d-flex">
-      <button class="btn bg-primary" onclick="skip(-10)"><i class="icon icon-arrow-left"></i></button>
-      <input placeholder="Paste link here." class="form-input d-none">
-      <button class="btn bg-primary" onclick="skip(10)"><i class="icon icon-arrow-right"></i></button>
-      <button class="btn d-none" onclick="store()"><i class="icon icon-plus"></i></button>
-      <button class="btn bg-success d-none" onclick="next()"><i class="icon icon-forward"></i></button>
-    </div>
-    <br>
-    <article class="player">
-      <audio>title</audio>
-    </article>
-    <br>
-    <span class="form-group">
-      <label class="form-radio form-inline badge" data-badge="0">
-        <input type="radio" name="play"><i class="form-icon"></i> Queue
-      </label>
-      <label class="form-radio form-inline">
-        <input type="radio" name="play"><i class="form-icon"></i> Loop
-      </label>
-      <label class="form-radio form-inline">
-        <input type="radio" name="play"><i class="form-icon"></i> Auto
-      </label>
-      <label class="form-switch">
-        <input type="checkbox">HQ 128kbps
-        <i class="form-icon"></i>
-      </label>
-      <label class="form-switch">
-        <input type="checkbox">Dark Mode
-        <i class="form-icon"></i>
-      </label>
-      <label class="form-switch">
-        <input type="checkbox" checked>Thumbnail
-        <i class="form-icon"></i>
-      </label>
-    </span>
-    <span class="d-flex">
-      <button class="btn btn-link"><i class="icon icon-delete"></i></button>
-      <a class="btn btn-link" href="https://github.com/n-ce/ytify" target="_blank">Github</a>
-      <button class="btn btn-link" onclick="alert('YTIFY V3\n\nClipboard Permission : If not available or denied, use the link input box to perform operations, Note that auto-scanning will not be available here.\n\nCopy YouTube video link to clipboard to start playing automatically.\n\nBack & Forward : Rewind or Fast Forward 10 seconds.\n\nQueue: Click Queue & Add Next Playing links.\n\nNext: Skip to next track in queue.\n\nLoop: Set your track to be playing in a loop.\n\nAuto: Automatically intercept & play links.\n\nHQ 128kbps: Set audio quality to higher, costs 1MB per Minute.\n\nDelete: Clear all saved data.\n\nGithub: Fork this site and help improve.')"><i class="icon icon-message"></i></button>
-    </span>
+<body>
+   <div id="Configs">
+    <i class="fa-solid fa-circle-info"></i>
+    <i class="fa-solid fa-trash"></i>
+    <i class="fa-solid fa-clipboard"></i>
+    <i class="fa-solid fa-palette"></i>
   </div>
+
+  <div id="themes" class="hidden">
+    <i class="fa-solid fa-circle"></i>
+    <i class="fa-solid fa-circle"></i>
+    <i class="fa-solid fa-circle"></i>
+    <i class="fa-solid fa-circle"></i>
+    <i class="fa-solid fa-circle"></i>
+  </div>
+
+  <img src="hqdefault.jpg" alt="thumbnail"></img>
+
+  <p>Now Playing</p>
+  
+  <audio src="alarm_beep.mp3" controls></audio>
+  
+  <div id="player">
+    <i class="fa-solid fa-square-plus disabled"></i>
+    <i class="fa-solid fa-backward"></i>
+    <i class="fa-solid fa-forward"></i>
+    <i class="fa-solid fa-forward-step disabled"></i>
+  </div>
+  
+  <div id="playback">
+    <i class="fa-solid fa-list-ul"></i>
+    <i class="fa-solid fa-rotate-left off"></i>
+    <i class="fa-solid fa-gauge-simple-high"></i>
+  </div>
+
+  <input type="text" placeholder="paste link here" class="hidden">
+  
   <script src="JavaScript/script.js"></script>
   <script src="JavaScript/service-worker.js"></script>
 </body>
