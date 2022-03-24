@@ -1,12 +1,5 @@
-const playerBtn = document.querySelectorAll('button');
-const footBtn = document.querySelectorAll('i');
-const input = document.querySelector('input');
-const badge = document.querySelector('.fa-list-ul');
-const audio = document.querySelector('audio');
-const img = document.querySelector('img');
-const array = []; // url storage
-const play = localStorage.getItem('play');
-const metadata = "https://noembed.com/embed?dataType=json&url=";
+import { playerBtn, footBtn, input, badge, audio, img, array, play, metadata} from './constants.js';
+
 const interval = setInterval(script, 2000);
 
 let queueBool = false;

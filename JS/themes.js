@@ -1,22 +1,15 @@
-const r = document.querySelector(':root');
-const colorBtn = document.querySelectorAll('span');
+import { colorBtn, bgColor, bgColor2, elementColor, colorThief, img } from './constants.js';
 
-const bgColor = (bgVal) => {
-  r.style.setProperty('--background', bgVal);
-  document.querySelector('meta[name="theme-color"]').setAttribute("content", bgVal);
-}
-const bgColor2 = (bgVal2) => {
-  r.style.setProperty('--background2', bgVal2);
-}
-const elementColor = (elementVal) => {
-  r.style.setProperty('--element', elementVal);
+if (img.complete) {
+  colorThief.getColor(img);
+} else {
+  image.addEventListener('load', function() {
+    colorThief.getColor(img);
+  });
 }
 
-const colorThief = new ColorThief();
-let pker = colorThief.getColor(img);
+const pker = colorThief.getColor(img);
 const pcol = `rgb(${pker[0]},${pker[1]},${pker[2]})`;
-
-
 
 
 function defaultColor() {
@@ -35,6 +28,7 @@ colorBtn[1].addEventListener('click', function() {
   bgColor2('darkorange');
   elementColor('black');
 });
+
 colorBtn[2].addEventListener('click', function() {
   bgColor('lightskyblue');
   bgColor2('deepskyblue');
