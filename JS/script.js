@@ -1,9 +1,9 @@
-const i = document.querySelectorAll('i');
+const playerBtn = document.querySelectorAll('button');
+const footBtn = document.querySelectorAll('i');
 const input = document.querySelector('input');
 const badge = document.querySelector('.fa-list-ul');
 const audio = document.querySelector('audio');
 const img = document.querySelector('img');
-const body = document.body;
 const array = []; // url storage
 const play = localStorage.getItem('play');
 const metadata = "https://noembed.com/embed?dataType=json&url=";
@@ -79,11 +79,21 @@ function save(name, key) {
   localStorage.setItem(name, key);
 }
 
-// forward backward
+// rewind
+playerBtn[1].addEventListener('click', () => {
+  audio.currentTime += -10;
+});
 
-function skip(t) {
-  audio.currentTime += t;
-}
+// forward
+playerBtn[2].addEventListener('click', () => {
+  audio.currentTime += 10;
+})
+
+// next in queue
+playerBtn[3].addEventListener('click', () => {
+  next();
+});
+
 
 // proper link intercepting algorithm
 
@@ -146,6 +156,10 @@ function store() {
   }
 }
 
+playerBtn[0].addEventListener('click',function (){
+  store();
+});
+
 // input text player
 
 input.oninput = () => {
@@ -159,15 +173,15 @@ if (play == "loop") {
   audio.onended = (e) => {
     audio.play();
   }
-  i[14].style.color = 'red';
+  footBtn[1].classList.add('on');
 }
 else if (play == "queue") {
   m = 0;
   queue = true;
-  i[13].style.color = 'red';
   clearInterval(interval);
-  i[9].classList.remove('disabled');
-  i[12].classList.remove('disabled');
+  footBtn[2].classList.add('on');
+  playerBtn[0].removeAttribute('disabled');
+  playerBtn[3].removeAttribute('disabled');
   store();
   k = true;
 }
@@ -177,13 +191,13 @@ else {
 
 // Queue
 
-i[13].addEventListener("click",
+footBtn[0].addEventListener("click",
   function() {
     m = 0;
     queue = true;
     clearInterval(interval);
-    i[9].classList.remove('disabled');
-    i[12].classList.remove('disabled');
+    playerBtn[0].removeAttribute('disabled');
+    playerBtn[3].removeAttribute('disabled');
     save('play', "queue");
     store();
     k = true;
@@ -192,9 +206,10 @@ i[13].addEventListener("click",
 
 // Loop
 let zPlus = 0;
-i[14].addEventListener("click",
+footBtn[1].addEventListener("click",
   function() {
     //only reload if coming from queue
+    this.classList.toggle('on');
     zPlus++;
     if (zPlus % 2 == 0) {
       if (k == true) {
@@ -216,12 +231,13 @@ i[14].addEventListener("click",
 // HQ SETTING
 
 if (localStorage.getItem('format') == "yes") {
-  i[15].style.color = 'red';
+  footBtn[2].classList.add('on');
   c = 251;
 }
 
 let codec = 0;
-i[15].onclick = function() {
+footBtn[2].onclick = function() {
+  this.classList.toggle('on');
   codec++;
   if (codec % 2 == 0) {
     c = 251;
@@ -234,50 +250,32 @@ i[15].onclick = function() {
   atsrc(param);
 }
 
-// Dark Mode
-
-let tabColor = (color) => {
-  document.querySelector('meta[name="theme-color"]').setAttribute("content", color);
-}
-
 
 
 // Thumbnail
 
 if (localStorage.getItem('thum') == "off") {
   thumb = false;
-  img.style.display = 'none';
+  img.classList.add('hidden');
+  footBtn[3].classList.remove('on');
+}
+else {
+  img.classList.remove('hidden');
+  footBtn[3].classList.add('on');
 }
 
-
 let thumbPlus = 0;
-i[16].onclick = () => {
+footBtn[3].onclick = function() {
+  this.classList.toggle('on');
   thumbPlus++;
   img.classList.toggle('hidden');
   if (thumbPlus % 2 == 0) {
     save('thum', "on");
     thumb = true;
-    img.style.display = 'block';
     img.src = storeThumbURL;
   }
   else {
     save('thum', "off");
-    img.style.display = 'none';
     thumb = false;
-    img.src = null;
   }
 }
-
-
-// Clear Settings
-
-i[1].addEventListener("click",
-  () =>
-  {
-    localStorage.clear();
-    location.reload();
-  }
-);
-i[0].addEventListener("click", () => {
-  alert('about placeholder');
-});

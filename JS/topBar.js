@@ -1,4 +1,4 @@
-const topBtn = document.querySelectorAll('a');
+const topBtn = document.getElementsByTagName('a');
 
 // Delete data
 

@@ -91,8 +91,7 @@ i {
 }
 
 .on,
-button:hover,
-i:hover,a:hover{
+button:hover,a:hover{
   background-color: var(--element);
   color: var(--background);
 }
@@ -107,3 +106,4 @@ input{
   outline: none;
   background-color: #fff7;
 }
+
