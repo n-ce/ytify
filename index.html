@@ -8,7 +8,7 @@
   <meta name="keywords" content="Youtube,Music,audio,opus,50kbps,Free">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="midnightblue">
+  <meta name="theme-color" content="black">
   <meta name="mobile-web-app-capable" content="yes">
 
   <title>ytify</title>
@@ -23,49 +23,77 @@
   <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css">
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
 </head>
 
 <body>
-   <div id="Configs">
-    <i class="fa-solid fa-circle-info"></i>
-    <i class="fa-solid fa-trash"></i>
-    <i class="fa-solid fa-clipboard" onclick="er()"></i>
-    <i class="fa-solid fa-palette"></i>
+  <div id="configs">
+    <a class="material-icons" href="https://github.com/n-ce/ytify/" target="_blank">
+      info
+    </a>
+    <a class="material-icons">
+      delete
+    </a>
+    <a class="material-icons">
+      input
+    </a>
+    <a class="material-icons">
+      palette
+    </a>
   </div>
 
   <div id="themes" class="hidden">
-    <i class="fa-solid fa-circle"></i>
-    <i class="fa-solid fa-circle"></i>
-    <i class="fa-solid fa-circle"></i>
-    <i class="fa-solid fa-circle"></i>
-    <i class="fa-solid fa-circle"></i>
+    <span class="material-icons">
+      colorize
+    </span>
+    <span class="material-icons">
+      circle
+    </span>
+    <span class="material-icons">
+      circle
+    </span>
+    <span class="material-icons">
+      circle
+    </span>
+    <span class="material-icons">
+      circle
+    </span>
   </div>
 
-  <img alt="thumbnail"></img>
+  <img src="Assets/default.jpg" alt="thumbnail"></img>
 
   <p>Now Playing</p>
-  
+
   <input type="text" placeholder="paste link here" align="center" class="hidden">
-  
+
   <audio controls></audio>
-  
+
   <div id="player">
-    <i class="fa-solid fa-square-plus disabled" onclick="script()"></i>
-    <i class="fa-solid fa-backward" onclick="skip(-10)"></i>
-    <i class="fa-solid fa-forward" onclick="skip(10)"></i>
-    <i class="fa-solid fa-forward-step disabled" onclick="next()"></i>
+    <button class="material-icons" disabled >add_to_queue</button>
+
+    <button class="material-icons">
+      fast_rewind
+    </button>
+
+    <button class="material-icons">
+      fast_forward
+    </button>
+
+    <button class="material-icons" disabled>
+      skip_next
+    </button>
   </div>
-  
+
   <div id="playback">
-    <i class="fa-solid fa-list-ul"></i>
-    <i class="fa-solid fa-rotate-left off"></i>
-    <i class="fa-solid fa-gauge-simple-high"></i>
-    <i class="fa-solid fa-image"></i>
+    <i class="material-icons on">queue</i>
+    <i class="material-icons on">loop</i>
+    <i class="material-icons on">high_quality</i>
+    <i class="material-icons">image</i>
   </div>
 
   <script src="JS/script.js"></script>
+  <script src="JS/themes.js"></script>
+  <script src="JS/topBar.js"></script>
   <script src="JS/service-worker.js"></script>
 </body>
 

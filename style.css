@@ -1,55 +1,109 @@
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+:root {
+  --background: white;
+  --background2: grey;
+  --element: black;
+  --elementBG: black;
+}
+
+
+
 html,
 body {
   margin: 0;
-  padding:0;
+  padding: 0;
   height: 100%;
   flex-direction: column;
   align-items: center;
+  background-image: linear-gradient(var(--background),var(--background2));
 }
 
-body, #Configs,#themes,#player,#playback{
+body,
+#configs,
+#themes,
+#player,
+#playback {
   display: flex;
   justify-content: space-around;
 }
 
-
-div,audio,input{
+p{
+  color: var(--element);
+}
+div{
   width: 100%;
 }
 
-img{
-  width:85%;
+img,audio,input {
+  width: 85%;
   box-shadow: 0 0.7rem 3.5rem #0007;
   border-radius: 0.85rem;
 }
-.hidden,#themes.hidden{
+
+a{
+  text-decoration: none;
+  color: var(--element);
+}
+
+
+.hidden,
+#themes.hidden {
   display: none;
 }
 
-.fa-circle{
-  border:0.1rem solid white;
-  border-radius: 50%;
-}
-.fa-circle:nth-of-type(1){
-  color:transparent;
-  background:linear-gradient(red,blue,green);
-}
-.fa-circle:nth-of-type(2){
-  color: orangered;
-}
-.fa-circle:nth-of-type(3) {
-  color: seagreen;
-}
-.fa-circle:nth-of-type(4) {
-  color: skyblue;
-}
-audio::-webkit-media-controls-panel {
+span{
   background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
 }
 
-.disabled{
-  color: #0005;
+span:nth-of-type(1) {
+  color: var(--background);
 }
-.off{
-  color: red;
+
+span:nth-of-type(2) {
+  color: orange;
+}
+
+span:nth-of-type(3) {
+  color: lightskyblue;
+}
+
+span:nth-of-type(4) {
+  color: mediumseagreen;
+}
+
+button {
+  border: none;
+  background: none;
+  color: var(--element);
+}
+button,a{
+  border-radius: 1rem;
+  padding: 0.25rem 1rem;
+}
+
+i {
+  border-radius: 1rem;
+  padding: 0.25rem 1rem;
+  color: var(--element);
+}
+
+.on,
+button:hover,
+i:hover,a:hover{
+  background-color: var(--element);
+  color: var(--background);
+}
+
+
+input{
+  height: 2.5rem;
+  border-radius: 1rem;
+  background: none;
+  border: none;
+  text-align: center;
+  outline: none;
+  background-color: #fff7;
 }
