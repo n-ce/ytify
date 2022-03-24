@@ -9,14 +9,16 @@ const play = localStorage.getItem('play');
 const metadata = "https://noembed.com/embed?dataType=json&url=";
 const interval = setInterval(script, 2000);
 
-let k = false;
+let queueBool = false;
+let thumbBool = true;
+let loopBool = false;
+let hqBool = false;
+
 let y; // store url for changes check
 let m; // queue count 
 let param; // algorithm parameter
 let n = 1; // current queue playing
 let c = 249; // quality codec value
-let thumb = true; // thumbnail boolean
-let queue; // queue boolean
 let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
@@ -48,7 +50,7 @@ function atsrc(url) {
         audio.play();
 
         // Thumbnail
-        if (thumb === true) {
+        if (thumbBool === true) {
           img.src = data.thumbnail_url;
         }
         else {
@@ -103,7 +105,7 @@ function algorithm(param) {
 
     // autoplay new id
 
-    if (queue == undefined) {
+    if (queueBool == false) {
       atsrc(param);
     }
 
@@ -156,7 +158,7 @@ function store() {
   }
 }
 
-playerBtn[0].addEventListener('click',function (){
+playerBtn[0].addEventListener('click', function() {
   store();
 });
 
@@ -167,63 +169,42 @@ input.oninput = () => {
 }
 
 
-// player load saved data
-
-if (play == "loop") {
-  audio.onended = (e) => {
-    audio.play();
-  }
-  footBtn[1].classList.add('on');
-}
-else if (play == "queue") {
-  m = 0;
-  queue = true;
-  clearInterval(interval);
-  footBtn[2].classList.add('on');
-  playerBtn[0].removeAttribute('disabled');
-  playerBtn[3].removeAttribute('disabled');
-  store();
-  k = true;
-}
-else {
-  audio.onended = null;
-}
-
 // Queue
 
 footBtn[0].addEventListener("click",
   function() {
-    m = 0;
-    queue = true;
-    clearInterval(interval);
-    playerBtn[0].removeAttribute('disabled');
-    playerBtn[3].removeAttribute('disabled');
-    save('play', "queue");
-    store();
-    k = true;
+    if (queueBool == false) {
+      m = 0;
+      clearInterval(interval);
+      playerBtn[0].removeAttribute('disabled');
+      playerBtn[3].removeAttribute('disabled');
+      store();
+      queueBool = true;
+      footBtn[0].classList.add('on');
+    }
+    else {
+      location.reload();
+    }
   }
 );
 
 // Loop
-let zPlus = 0;
+
 footBtn[1].addEventListener("click",
   function() {
-    //only reload if coming from queue
     this.classList.toggle('on');
-    zPlus++;
-    if (zPlus % 2 == 0) {
-      if (k == true) {
-        k = false;
-        location.reload();
-      }
+    if (queueBool == true) {
+      location.reload();
+    }
+    if (loopBool == false) {
       audio.onended = (e) => {
         audio.play();
       };
-      save('play', "loop");
+      loopBool = true;
     }
     else {
       audio.onended = null;
-      save('play', "auto");
+      loopBool = false;
     }
   }
 );
@@ -233,49 +214,45 @@ footBtn[1].addEventListener("click",
 if (localStorage.getItem('format') == "yes") {
   footBtn[2].classList.add('on');
   c = 251;
+  hqBool = true;
 }
 
-let codec = 0;
 footBtn[2].onclick = function() {
   this.classList.toggle('on');
-  codec++;
-  if (codec % 2 == 0) {
+  if (hqBool == false) {
     c = 251;
+    hqBool = true;
     save('format', "yes");
   }
   else {
     c = 249;
+    hqBool = false;
     save('format', "no");
   }
   atsrc(param);
 }
 
 
-
 // Thumbnail
 
 if (localStorage.getItem('thum') == "off") {
-  thumb = false;
-  img.classList.add('hidden');
-  footBtn[3].classList.remove('on');
+  thumbBool = false;
 }
 else {
-  img.classList.remove('hidden');
   footBtn[3].classList.add('on');
+  img.classList.remove('hidden');
 }
 
-let thumbPlus = 0;
 footBtn[3].onclick = function() {
   this.classList.toggle('on');
-  thumbPlus++;
   img.classList.toggle('hidden');
-  if (thumbPlus % 2 == 0) {
-    save('thum', "on");
-    thumb = true;
+  if (thumbBool == true) {
+    save('thum', "off");
+    thumbBool = false;
     img.src = storeThumbURL;
   }
   else {
-    save('thum', "off");
-    thumb = false;
+    save('thum', "on");
+    thumbBool = true;
   }
 }

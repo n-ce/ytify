@@ -83,7 +83,9 @@ button,a{
   border-radius: 1rem;
   padding: 0.25rem 1rem;
 }
-
+button[disabled] {
+  color: #7777;
+}
 i {
   border-radius: 1rem;
   padding: 0.25rem 1rem;
