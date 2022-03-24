@@ -31,7 +31,7 @@
    <div id="Configs">
     <i class="fa-solid fa-circle-info"></i>
     <i class="fa-solid fa-trash"></i>
-    <i class="fa-solid fa-clipboard"></i>
+    <i class="fa-solid fa-clipboard" onclick="er()"></i>
     <i class="fa-solid fa-palette"></i>
   </div>
 
@@ -43,29 +43,30 @@
     <i class="fa-solid fa-circle"></i>
   </div>
 
-  <img src="hqdefault.jpg" alt="thumbnail"></img>
+  <img alt="thumbnail"></img>
 
   <p>Now Playing</p>
   
-  <audio src="alarm_beep.mp3" controls></audio>
+  <input type="text" placeholder="paste link here" align="center" class="hidden">
+  
+  <audio controls></audio>
   
   <div id="player">
-    <i class="fa-solid fa-square-plus disabled"></i>
-    <i class="fa-solid fa-backward"></i>
-    <i class="fa-solid fa-forward"></i>
-    <i class="fa-solid fa-forward-step disabled"></i>
+    <i class="fa-solid fa-square-plus disabled" onclick="script()"></i>
+    <i class="fa-solid fa-backward" onclick="skip(-10)"></i>
+    <i class="fa-solid fa-forward" onclick="skip(10)"></i>
+    <i class="fa-solid fa-forward-step disabled" onclick="next()"></i>
   </div>
   
   <div id="playback">
     <i class="fa-solid fa-list-ul"></i>
     <i class="fa-solid fa-rotate-left off"></i>
     <i class="fa-solid fa-gauge-simple-high"></i>
+    <i class="fa-solid fa-image"></i>
   </div>
 
-  <input type="text" placeholder="paste link here" class="hidden">
-  
-  <script src="JavaScript/script.js"></script>
-  <script src="JavaScript/service-worker.js"></script>
+  <script src="JS/script.js"></script>
+  <script src="JS/service-worker.js"></script>
 </body>
 
 </html>

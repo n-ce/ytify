@@ -1,11 +1,9 @@
-new GreenAudioPlayer('.player');
-
-const button = document.querySelectorAll('.btn');
-const input = document.querySelectorAll('input');
-const badge = document.querySelector('.badge');
+const i = document.querySelectorAll('i');
+const input = document.querySelector('input');
+const badge = document.querySelector('.fa-list-ul');
 const audio = document.querySelector('audio');
 const img = document.querySelector('img');
-const body = document.body.classList;
+const body = document.body;
 const array = []; // url storage
 const play = localStorage.getItem('play');
 const metadata = "https://noembed.com/embed?dataType=json&url=";
@@ -28,8 +26,7 @@ let storeThumbURL;
 function er() {
   error = true;
   clearInterval(interval);
-  input[0].classList.remove('d-none');
-  button[2].style.display = 'none';
+  input.classList.toggle('hidden');
 }
 
 // Fallback for Firefox
@@ -59,7 +56,7 @@ function atsrc(url) {
         }
 
         // Title
-        document.querySelector('h1').innerText = data.title;
+        document.querySelector('p').innerText = data.title;
       }
     });
   // so that it does not run again for the same link
@@ -71,7 +68,7 @@ function atsrc(url) {
 function next() {
   if ((m - n) > -1) {
     atsrc(array[n]);
-    badge.setAttribute("data-badge", m - n);
+    badge.innerText = m - n;
     n++;
   }
 }
@@ -113,7 +110,7 @@ function algorithm(param) {
         });
 
       m++;
-      badge.setAttribute("data-badge", m - n + 1);
+      badge.innerText = m - n + 1;
       array[m] = y = param;
       audio.onended = () => { next(); }
     }
@@ -142,7 +139,7 @@ function script() {
 
 function store() {
   if (error == true) {
-    algorithm(input[0].value);
+    algorithm(input.value);
   }
   else {
     script();
@@ -151,8 +148,8 @@ function store() {
 
 // input text player
 
-input[0].oninput = () => {
-  algorithm(input[0].value);
+input.oninput = () => {
+  algorithm(input.value);
 }
 
 
@@ -162,31 +159,31 @@ if (play == "loop") {
   audio.onended = (e) => {
     audio.play();
   }
-  input[2].checked = true;
+  i[14].style.color = 'red';
 }
 else if (play == "queue") {
   m = 0;
-  queue = input[1].checked = true;
+  queue = true;
+  i[13].style.color = 'red';
   clearInterval(interval);
-  button[2].classList.remove('d-none');
-  button[3].classList.remove('d-none');
+  i[9].classList.remove('disabled');
+  i[12].classList.remove('disabled');
   store();
   k = true;
 }
 else {
   audio.onended = null;
-  input[3].checked = true;
 }
 
 // Queue
 
-input[1].addEventListener("click",
+i[13].addEventListener("click",
   function() {
     m = 0;
     queue = true;
     clearInterval(interval);
-    button[2].classList.remove('d-none');
-    button[3].classList.remove('d-none');
+    i[9].classList.remove('disabled');
+    i[12].classList.remove('disabled');
     save('play', "queue");
     store();
     k = true;
@@ -194,45 +191,39 @@ input[1].addEventListener("click",
 );
 
 // Loop
-
-input[2].addEventListener("click",
-  function() {
-
-    //only reload if coming from queue
-    if (k == true) {
-      k = false;
-      location.reload();
-    }
-    audio.onended = (e) => {
-      audio.play();
-    };
-    save('play', "loop");
-  }
-);
-
-// Auto
-
-input[3].addEventListener("click",
+let zPlus = 0;
+i[14].addEventListener("click",
   function() {
     //only reload if coming from queue
-    if (k == true) {
-      k = false;
-      location.reload();
+    zPlus++;
+    if (zPlus % 2 == 0) {
+      if (k == true) {
+        k = false;
+        location.reload();
+      }
+      audio.onended = (e) => {
+        audio.play();
+      };
+      save('play', "loop");
     }
-    audio.onended = null;
-    save('play', "auto");
+    else {
+      audio.onended = null;
+      save('play', "auto");
+    }
   }
 );
 
 // HQ SETTING
 
 if (localStorage.getItem('format') == "yes") {
-  input[4].checked = true;
+  i[15].style.color = 'red';
   c = 251;
 }
 
-input[4].onchange = function() {
-  if (this.checked) {
+let codec = 0;
+i[15].onclick = function() {
+  codec++;
+  if (codec % 2 == 0) {
     c = 251;
     save('format', "yes");
   }
@@ -249,61 +240,44 @@ let tabColor = (color) => {
   document.querySelector('meta[name="theme-color"]').setAttribute("content", color);
 }
 
-let z = 0; // light mode
-
-if (localStorage.getItem('theme') == "dark") {
-  body.remove('bg-secondary');
-  body.add('bg-dark');
-  tabColor('black');
-  z = 1;
-  for (w = 4; w < 7; w++)
-    button[w].classList.add('text-secondary');
-
-  input[5].checked = true;
-}
-
-
-
-input[5].onchange = () => {
-  z++;
-  z % 2 == 1 ? tabColor('black') : tabColor('midnightblue');
-  input[5].checked == true ? save('theme', "dark") : save('theme', "off");
-  body.toggle('bg-secondary');
-  body.toggle('bg-dark');
-  for (w = 4; w < 7; w++)
-    button[w].classList.toggle('text-secondary');
-}
 
 
 // Thumbnail
 
 if (localStorage.getItem('thum') == "off") {
   thumb = false;
-  img.classList.add('d-none');
-  input[6].removeAttribute('checked');
+  img.style.display = 'none';
 }
 
-input[6].onchange = () => {
-  if (input[6].checked == true) {
+
+let thumbPlus = 0;
+i[16].onclick = () => {
+  thumbPlus++;
+  img.classList.toggle('hidden');
+  if (thumbPlus % 2 == 0) {
     save('thum', "on");
     thumb = true;
+    img.style.display = 'block';
     img.src = storeThumbURL;
   }
   else {
     save('thum', "off");
+    img.style.display = 'none';
     thumb = false;
     img.src = null;
   }
-  img.classList.toggle('d-none');
 }
 
 
 // Clear Settings
 
-button[4].addEventListener("click",
+i[1].addEventListener("click",
   () =>
   {
     localStorage.clear();
     location.reload();
   }
 );
+i[0].addEventListener("click", () => {
+  alert('about placeholder');
+});

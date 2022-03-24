@@ -13,7 +13,7 @@ body, #Configs,#themes,#player,#playback{
 }
 
 
-div,audio {
+div,audio,input{
   width: 100%;
 }
 
