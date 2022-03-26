@@ -1,0 +1,143 @@
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&display=swap');
+
+:root {
+  --background: white;
+  --background2: grey;
+  --element: black;
+  --elementBG: black;
+}
+
+
+
+html,
+body {
+  font-family: 'Hind Siliguri', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  background-image: linear-gradient(var(--background), var(--background2));
+}
+
+body,
+#configs,
+#themes,
+#player,
+#playback {
+  display: flex;
+  justify-content: space-around;
+}
+
+p {
+  color: var(--element);
+}
+
+div {
+  width: 100%;
+}
+
+img,
+audio,
+input {
+  width: 85%;
+  box-shadow: 0 0.7rem 3.5rem #0007;
+  border-radius: 0.85rem;
+}
+
+a {
+  text-decoration: none;
+  color: var(--element);
+}
+
+
+.hidden,
+#themes.hidden {
+  display: none;
+}
+
+[data-badge]:after {
+  background: var(--element);
+  border-radius: 0.75rem;
+  color: var(--background);
+  content: attr(badge);
+  font-size: 1rem;
+  margin-top: -1rem;
+  min-width: 2rem;
+  padding: 0.1rem;
+  position: absolute;
+  text-align: center;
+}
+
+[data-badge^="-"]:after,
+[data-badge=""]:after,
+[data-badge="0"]:after {
+  display: none;
+}
+
+span {
+  background-color: white;
+  border-radius: 50%;
+  border: 1px solid black;
+}
+
+span:nth-of-type(1) {
+  color: var(--background);
+}
+
+span:nth-of-type(2) {
+  color: orange;
+}
+
+span:nth-of-type(3) {
+  color: lightskyblue;
+}
+
+span:nth-of-type(4) {
+  color: mediumseagreen;
+}
+
+button {
+  border: none;
+  background: none;
+  color: var(--element);
+}
+
+button,
+a {
+  border-radius: 1rem;
+  padding: 0.25rem 1rem;
+}
+
+button[disabled] {
+  color: #7777;
+}
+
+i {
+  border-radius: 1rem;
+  padding: 0.25rem 1rem;
+  color: var(--element);
+}
+
+.on,
+button:hover,
+a:hover {
+  background-color: var(--element);
+  color: var(--background);
+}
+
+
+input {
+  height: 2.5rem;
+  border-radius: 1rem;
+  background: none;
+  border: none;
+  text-align: center;
+  outline: none;
+  background-color: #fff7;
+}
+input::placeholder{
+  color: var(--element);
+  opacity: 50%;
+}
