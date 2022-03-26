@@ -1,5 +1,5 @@
 <div align="center">
-<h1><i>ytify</i></h1>
+<h2><i>ytify</i></h2>
 <img width="50%" src="Assets/maskable_icon_x512.png"></img>
 </div>
 <br>
