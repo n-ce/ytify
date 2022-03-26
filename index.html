@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+  <script src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
 </head>
 
 <body>
@@ -61,9 +61,12 @@
   </div>
 
   <img class="hidden" src="Assets/default.jpg" alt="thumbnail"></img>
-
-  <p>Now Playing</p>
-
+  
+  <div id="title">
+    Track&nbsp;<b>0</b>&nbsp;
+    <p>Now Playing</p>
+  </div>
+  
   <input type="text" placeholder="paste link here" align="center" class="hidden">
 
   <audio controls></audio>

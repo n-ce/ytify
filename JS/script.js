@@ -1,6 +1,8 @@
-import { playerBtn, footBtn, input, badge, audio, img, array, play, metadata} from './constants.js';
+import { playerBtn, footBtn, input, badge, audio, img, array, play, metadata, title, bgColor, bgColor2, elementColor,colorBtn,googleProxyURL } from './constants.js';
 
 const interval = setInterval(script, 2000);
+
+// bottom bar values
 
 let queueBool = false;
 let thumbBool = true;
@@ -15,6 +17,24 @@ let c = 249; // quality codec value
 let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
+let queueVal = 0;
+let storeColor = 'lavender';
+
+
+// theme picker
+colorBtn[0].addEventListener('click', function() {
+  bgColor(storeColor);
+  bgColor2(storeColor);
+  elementColor('white');
+});
+
+// dark mode
+colorBtn[4].addEventListener('click', function() {
+  bgColor('black');
+  bgColor2('black');
+  elementColor(storeColor);
+});
+
 
 // activate fallback functions when error detected
 
@@ -45,13 +65,19 @@ function atsrc(url) {
         // Thumbnail
         if (thumbBool === true) {
           img.src = data.thumbnail_url;
+          colorjs.average(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, { format: 'hex' }, { group: 90 }).then(cols => {
+            storeColor= cols;
+            bgColor(cols);
+            bgColor2(cols);
+            elementColor('white');
+          });
         }
         else {
           storeThumbURL = data.thumbnail_url;
         }
 
         // Title
-        document.querySelector('p').innerText = data.title;
+        title.innerHTML = data.title;
       }
     });
   // so that it does not run again for the same link
