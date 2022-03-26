@@ -2,10 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&display=swap');
 
 :root {
-  --background: white;
-  --background2: grey;
-  --element: black;
-  --elementBG: black;
+  --background: #48c6ef;
+  --background2: #6f86d6;
+  --element: white;
 }
 
 
@@ -30,7 +29,8 @@ body,
   justify-content: space-around;
 }
 
-p {
+
+h2 {
   color: var(--element);
 }
 
@@ -38,12 +38,16 @@ div {
   width: 100%;
 }
 
+img {
+  object-fit: cover;
+  box-shadow: 0 0.7rem 3.5rem #0007;
+  border-radius: 0.85rem;
+}
+
 img,
 audio,
 input {
-  width: 85%;
-  box-shadow: 0 0.7rem 3.5rem #0007;
-  border-radius: 0.85rem;
+  width: 80%
 }
 
 a {
@@ -130,14 +134,15 @@ a:hover {
 
 input {
   height: 2.5rem;
-  border-radius: 1rem;
+  border-radius: 2rem;
   background: none;
   border: none;
   text-align: center;
   outline: none;
   background-color: #fff7;
 }
-input::placeholder{
+
+input::placeholder {
   color: var(--element);
   opacity: 50%;
 }

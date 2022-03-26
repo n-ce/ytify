@@ -6,7 +6,7 @@ const img = document.querySelector('img');
 const array = []; // url storage
 const play = localStorage.getItem('play');
 const metadata = "https://noembed.com/embed?dataType=json&url=";
-const title = document.querySelector('p');
+const title = document.querySelector('h2');
 
 const root = document.querySelector(':root');
 const colorBtn = document.querySelectorAll('span');

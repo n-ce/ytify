@@ -1,19 +1,21 @@
 import { colorBtn, bgColor, bgColor2, elementColor, img } from './constants.js';
 
 
+
+
 colorBtn[1].addEventListener('click', function() {
-  bgColor('orange');
-  bgColor2('darkorange');
+  bgColor('#ffb88c');
+  bgColor2('#de6262');
   elementColor('black');
 });
 
 colorBtn[2].addEventListener('click', function() {
-  bgColor('lightskyblue');
-  bgColor2('deepskyblue');
+  bgColor2('#2193b0');
+  bgColor('#6dd5ed');
   elementColor('black');
 });
 colorBtn[3].addEventListener('click', function() {
-  bgColor('mediumseagreen');
-  bgColor2('seagreen');
+  bgColor2('#56ab2f');
+  bgColor('#a8e063');
   elementColor('black');
 });
