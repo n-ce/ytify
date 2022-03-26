@@ -7,7 +7,6 @@ const array = []; // url storage
 const play = localStorage.getItem('play');
 const metadata = "https://noembed.com/embed?dataType=json&url=";
 const title = document.querySelector('p');
-const badge = document.querySelector('b');
 
 const root = document.querySelector(':root');
 const colorBtn = document.querySelectorAll('span');
@@ -26,4 +25,4 @@ const elementColor = (elementVal) => {
 const googleProxyURL = 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=';
 
 
-export {playerBtn,footBtn,input,audio,img,array,play,metadata,title,badge,root,colorBtn,bgColor,bgColor2,elementColor,googleProxyURL};
+export {playerBtn,footBtn,input,audio,img,array,play,metadata,title,root,colorBtn,bgColor,bgColor2,elementColor,googleProxyURL};

@@ -16,7 +16,7 @@ body {
   height: 100%;
   flex-direction: column;
   align-items: center;
-  background-image: linear-gradient(var(--background),var(--background2));
+  background-image: linear-gradient(var(--background), var(--background2));
 }
 
 body,
@@ -28,20 +28,23 @@ body,
   justify-content: space-around;
 }
 
-p{
+p {
   color: var(--element);
 }
-div{
+
+div {
   width: 100%;
 }
 
-img,audio,input {
+img,
+audio,
+input {
   width: 85%;
   box-shadow: 0 0.7rem 3.5rem #0007;
   border-radius: 0.85rem;
 }
 
-a{
+a {
   text-decoration: none;
   color: var(--element);
 }
@@ -51,13 +54,27 @@ a{
 #themes.hidden {
   display: none;
 }
-#title{
-  color: var(--element);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+[data-badge]:after {
+  background: var(--element);
+  border-radius: 0.75rem;
+  color: var(--background);
+  content: attr(badge);
+  font-size: 1rem;
+  margin-top: -1rem;
+  min-width: 2rem;
+  padding: 0.1rem;
+  position: absolute;
+  text-align: center;
 }
-span{
+
+[data-badge^="-"]:after,
+[data-badge=""]:after,
+[data-badge="0"]:after {
+  display: none;
+}
+
+span {
   background-color: white;
   border-radius: 50%;
   border: 1px solid black;
@@ -84,13 +101,17 @@ button {
   background: none;
   color: var(--element);
 }
-button,a{
+
+button,
+a {
   border-radius: 1rem;
   padding: 0.25rem 1rem;
 }
+
 button[disabled] {
   color: #7777;
 }
+
 i {
   border-radius: 1rem;
   padding: 0.25rem 1rem;
@@ -98,13 +119,14 @@ i {
 }
 
 .on,
-button:hover,a:hover{
+button:hover,
+a:hover {
   background-color: var(--element);
   color: var(--background);
 }
 
 
-input{
+input {
   height: 2.5rem;
   border-radius: 1rem;
   background: none;
@@ -113,4 +135,3 @@ input{
   outline: none;
   background-color: #fff7;
 }
-

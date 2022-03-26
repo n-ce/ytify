@@ -1,4 +1,4 @@
-import { playerBtn, footBtn, input, badge, audio, img, array, play, metadata, title, bgColor, bgColor2, elementColor,colorBtn,googleProxyURL } from './constants.js';
+import { playerBtn, footBtn, input, audio, img, array, play, metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL } from './constants.js';
 
 const interval = setInterval(script, 2000);
 
@@ -66,7 +66,7 @@ function atsrc(url) {
         if (thumbBool === true) {
           img.src = data.thumbnail_url;
           colorjs.average(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, { format: 'hex' }, { group: 90 }).then(cols => {
-            storeColor= cols;
+            storeColor = cols;
             bgColor(cols);
             bgColor2(cols);
             elementColor('white');
@@ -89,7 +89,7 @@ function atsrc(url) {
 function next() {
   if ((m - n) > -1) {
     atsrc(array[n]);
-    badge.innerText = m - n;
+    title.setAttribute('data-badge', m - n);
     n++;
   }
 }
@@ -141,7 +141,7 @@ function algorithm(param) {
         });
 
       m++;
-      badge.innerText = m - n + 1;
+      title.setAttribute('data-badge', m - n + 1);
       array[m] = y = param;
       audio.onended = () => { next(); }
     }
