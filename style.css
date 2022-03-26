@@ -1,4 +1,5 @@
-@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&display=swap');
 
 :root {
   --background: white;
@@ -11,6 +12,7 @@
 
 html,
 body {
+  font-family: 'Hind Siliguri', sans-serif;
   margin: 0;
   padding: 0;
   height: 100%;
@@ -134,4 +136,8 @@ input {
   text-align: center;
   outline: none;
   background-color: #fff7;
+}
+input::placeholder{
+  color: var(--element);
+  opacity: 50%;
 }
