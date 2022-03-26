@@ -89,7 +89,7 @@ function atsrc(url) {
 function next() {
   if ((m - n) > -1) {
     atsrc(array[n]);
-    title.setAttribute('data-badge', m - n);
+    document.getElementById('player').setAttribute('data-badge', m - n);
     n++;
   }
 }
@@ -141,7 +141,7 @@ function algorithm(param) {
         });
 
       m++;
-      title.setAttribute('data-badge', m - n + 1);
+      document.getElementById('player').setAttribute('data-badge', m - n + 1);
       array[m] = y = param;
       audio.onended = () => { next(); }
     }

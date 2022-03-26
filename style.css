@@ -2,8 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&display=swap');
 
 :root {
-  --background: #48c6ef;
-  --background2: #6f86d6;
+  --background: slateblue;
+  --background2: darkslateblue;
   --element: white;
 }
 
@@ -30,8 +30,10 @@ body,
 }
 
 
-h2 {
+h3 {
   color: var(--element);
+  width: 80%;
+  text-align: center;
 }
 
 div {
@@ -63,13 +65,11 @@ a {
 
 [data-badge]:after {
   background: var(--element);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   color: var(--background);
-  content: attr(badge);
-  font-size: 1rem;
-  margin-top: -1rem;
-  min-width: 2rem;
-  padding: 0.1rem;
+  content: attr(data-badge);
+  font-size: 1.25rem;
+  min-width: 3rem;
   position: absolute;
   text-align: center;
 }
