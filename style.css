@@ -8,7 +8,6 @@
 }
 
 
-
 html,
 body {
   font-family: 'Hind Siliguri', sans-serif;
@@ -19,7 +18,7 @@ body {
   flex-direction: column;
   align-items: center;
   background-image: linear-gradient(var(--background), var(--background2));
-  transition: background-image 0.5s;
+  transition: background-image 1s;
 }
 
 body,
@@ -79,6 +78,7 @@ input {
 
 h3 {
   color: var(--element);
+  transition: color 1s;
   width: 80%;
   text-align: center;
 }
