@@ -19,6 +19,7 @@ body {
   flex-direction: column;
   align-items: center;
   background-image: linear-gradient(var(--background), var(--background2));
+  transition: background-image 0.5s;
 }
 
 body,
@@ -31,6 +32,7 @@ div {
 a {
   text-decoration: none;
   color: var(--element);
+  transition: color 1s;
 }
 
 
@@ -93,6 +95,7 @@ input {
 
 input::placeholder {
   color: var(--element);
+  transition: color 1s;
   opacity: 50%;
 }
 
@@ -107,6 +110,7 @@ input::placeholder {
   min-width: 3rem;
   position: absolute;
   text-align: center;
+  transition: background 0.5s, color 1s;
 }
 
 [data-badge^="-"]:after,
@@ -119,6 +123,7 @@ button {
   border: none;
   background: none;
   color: var(--element);
+  transition: color 1s;
 }
 
 button,
