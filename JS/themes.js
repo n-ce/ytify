@@ -1,8 +1,6 @@
 import { colorBtn, bgColor, bgColor2, elementColor, img } from './constants.js';
 
 
-
-
 colorBtn[1].addEventListener('click', function() {
   bgColor('#ffb88c');
   bgColor2('#de6262');

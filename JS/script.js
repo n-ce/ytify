@@ -18,7 +18,7 @@ let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
 let queueVal = 0;
-let storeColor = 'darkslateblue';
+let storeColor = '#09203F';
 
 
 // theme picker
