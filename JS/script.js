@@ -18,13 +18,13 @@ let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
 let queueVal = 0;
-let storeColor = '#09203F';
+let storeColor = ['#537895','#09203F'];
 
 
 // theme picker
 colorBtn[0].addEventListener('click', function() {
-  bgColor(storeColor);
-  bgColor2(storeColor);
+  bgColor(storeColor[0]);
+  bgColor2(storeColor[1]);
   elementColor('white');
 });
 
@@ -32,7 +32,7 @@ colorBtn[0].addEventListener('click', function() {
 colorBtn[4].addEventListener('click', function() {
   bgColor('black');
   bgColor2('black');
-  elementColor(storeColor);
+  elementColor(storeColor[0]);
 });
 
 
@@ -65,10 +65,10 @@ function atsrc(url) {
         // Thumbnail
         if (thumbBool === true) {
           img.src = data.thumbnail_url;
-          colorjs.average(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, { format: 'hex' }, { group: 90 }).then(cols => {
-            storeColor = cols;
-            bgColor(cols);
-            bgColor2(cols);
+          colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, { format: 'hex' }, { group: 90 }).then(cols => {
+            storeColor = [cols[2],cols[0]];
+            bgColor(cols[2]);
+            bgColor2(cols[0]);
             elementColor('white');
           });
         }
