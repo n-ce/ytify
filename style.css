@@ -22,13 +22,16 @@ body {
 }
 
 body,
-div {
+#configs,
+#themes,
+#player,
+#playback {
   display: flex;
   justify-content: space-around;
   width: 100%;
 }
 
-a {
+#configs a {
   text-decoration: none;
   color: var(--element);
   transition: color 1s;
@@ -40,25 +43,25 @@ a {
   display: none;
 }
 
-span {
+#themes span {
   background-color: white;
   border-radius: 50%;
   border: 1px solid black;
 }
 
-span:nth-of-type(1) {
+#themes span:nth-of-type(1) {
   color: var(--background);
 }
 
-span:nth-of-type(2) {
+#themes span:nth-of-type(2) {
   color: #de6262;
 }
 
-span:nth-of-type(3) {
+#themes span:nth-of-type(3) {
   color: #6dd5ed;
 }
 
-span:nth-of-type(4) {
+#themes span:nth-of-type(4) {
   color: #a8e063;
 }
 
@@ -71,8 +74,7 @@ img {
 }
 
 img,
-audio,
-input {
+input[type="text"] {
   width: 80%
 }
 
@@ -119,33 +121,33 @@ input::placeholder {
   display: none;
 }
 
-button {
+#player button {
   border: none;
   background: none;
   color: var(--element);
   transition: color 1s;
 }
 
-button,
-a {
+#player button,
+#configs a {
   border-radius: 1rem;
   padding: 0.25rem 1rem;
 }
 
-button[disabled] {
+#player button[disabled] {
   color: #7777;
 }
 
 
 .on,
-button:hover,
-a:hover {
+#player button:hover,
+#configs a:hover {
   background-color: var(--element);
   color: var(--background);
   transition: background-color 0.5s, color 1s;
 }
 
-i {
+#playback i {
   border-radius: 1rem;
   padding: 0.25rem 1rem;
   color: var(--element);
