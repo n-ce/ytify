@@ -1,6 +1,6 @@
 const playerBtn = document.querySelectorAll('#player button');
-const footBtn = document.querySelectorAll('#playback i');
-const input = document.querySelector('input[type="text]');
+const footBtn = document.querySelectorAll('i');
+const input = document.querySelector('input[type="text"]');
 const audio = document.querySelector('audio');
 const img = document.querySelector('img');
 const array = []; // url storage

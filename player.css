@@ -2,12 +2,14 @@
 #play-icon,#mute-icon {
     padding: 0;
     border: 0;
-    background: transparent;
+    background-color:var(--element);
+    border-radius: 1rem;
     cursor: pointer;
     outline: none;
-    width: 40px;
-    height: 40px;
+    width: 3.5rem;
+    height: 2.5rem;
     float: left;
+    
 }
 #audio-player-container {
   --seek-before-width: 0%;
@@ -27,9 +29,6 @@
     z-index: -1;
 }
 
-#play-icon {
-    margin: 20px 2.5% 10px 2.5%;
-}
 path {
     stroke: #007db5;
 }
@@ -40,6 +39,7 @@ path {
     font-size: 20px;
     margin: 28.5px 0 18.5px 0;
     float: left;
+    color: var(--element);
 }
 output {
     display: inline-block;
@@ -49,6 +49,7 @@ output {
     margin: 10px 2.5% 0 5%;
     float: left;
     clear: left;
+    color:var(--element);
 }
 #volume-slider {
     margin: 10px 2.5%;
@@ -66,9 +67,7 @@ output {
 #volume-slider::before {
     width: var(--volume-before-width);
 }
-#mute-icon {
-    margin: 0 2.5%;
-}
+
 input[type="range"] {
     position: relative;
     -webkit-appearance: none;

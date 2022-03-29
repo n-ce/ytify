@@ -138,20 +138,20 @@ input::placeholder {
   color: #7777;
 }
 
+i {
+  border-radius: 1rem;
+  padding: 0.25rem 1rem;
+  color: var(--element);
+}
 
-.on,
+
 #player button:hover,
-#configs a:hover {
+#configs a:hover,.on{
   background-color: var(--element);
   color: var(--background);
   transition: background-color 0.5s, color 1s;
 }
 
-#playback i {
-  border-radius: 1rem;
-  padding: 0.25rem 1rem;
-  color: var(--element);
-}
 
 
 span,
