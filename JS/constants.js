@@ -1,6 +1,6 @@
-const playerBtn = document.querySelectorAll('button');
-const footBtn = document.querySelectorAll('i');
-const input = document.querySelector('input');
+const playerBtn = document.querySelectorAll('#player button');
+const footBtn = document.querySelectorAll('#playback i');
+const input = document.querySelector('input[type="text]');
 const audio = document.querySelector('audio');
 const img = document.querySelector('img');
 const array = []; // url storage
@@ -9,7 +9,7 @@ const metadata = "https://noembed.com/embed?dataType=json&url=";
 const title = document.querySelector('h3');
 
 const root = document.querySelector(':root');
-const colorBtn = document.querySelectorAll('span');
+const colorBtn = document.querySelectorAll('#themes span');
 
 const bgColor = (bgVal) => {
   root.style.setProperty('--background', bgVal);
