@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,11 +24,12 @@
   <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="player.css">
 </head>
 
 <body>
   <div id="configs">
-    <a class="material-icons" href="https://github.com/n-ce/ytify#about" target="_blank">
+    <a class="material-icons">
       info
     </a>
     <a class="material-icons">
@@ -65,7 +67,16 @@
 
   <input type="text" placeholder="paste link here" align="center" class="hidden">
 
-  <audio controls></audio>
+  <div id="audio-player-container">
+    <audio preload="metadata" ></audio>
+    <button id="play-icon"></button>
+    <span id="current-time" class="time">0:00</span>
+    <input type="range" id="seek-slider" max="100" value="0">
+    <span id="duration" class="time">0:00</span>
+    <output id="volume-output">100</output>
+    <input type="range" id="volume-slider" max="100" value="100">
+    <button id="mute-icon"></button>
+  </div>
 
   <div id="player">
     <button class="material-icons" disabled>
@@ -91,10 +102,11 @@
     <i class="material-icons">high_quality</i>
     <i class="material-icons">image</i>
   </div>
-
+  
   <script src="JS/script.js" type="module"></script>
   <script src="JS/themes.js" type="module"></script>
-  <script src="JS/Color.js"></script>
+  <script src="JS/player.js" type="module"></script>
+  <script src="JS/color.js"></script>
   <script src="JS/topBar.js"></script>
   <script src="JS/service-worker.js"></script>
 </body>
