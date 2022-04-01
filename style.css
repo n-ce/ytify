@@ -74,7 +74,8 @@ img {
 }
 
 img,
-input[type="text"],audio {
+input[type="text"],
+audio {
   width: 80%
 }
 
@@ -92,13 +93,31 @@ input {
   border: none;
   text-align: center;
   outline: none;
-  background-color: #fff7;
+  background-color: var(--background2);
 }
 
 input::placeholder {
   color: var(--element);
   transition: color 1s;
   opacity: 50%;
+}
+
+audio::-webkit-media-controls-panel {
+  background-color: var(--background2)
+}
+
+audio::-webkit-media-controls-timeline{
+  background-color: #fff4;
+  border-radius: 1rem;
+}
+audio::-webkit-media-controls-mute-button,
+audio::-webkit-media-controls-play-button {
+  background-color: var(--element);
+  border-radius: 1rem;
+}
+audio::-webkit-media-controls-current-time-display,
+audio::-webkit-media-controls-time-remaining-display{
+  color: var(--element);
 }
 
 
@@ -146,7 +165,8 @@ i {
 
 
 #player button:hover,
-#configs a:hover,.on{
+#configs a:hover,
+.on {
   background-color: var(--element);
   color: var(--background);
   transition: background-color 0.5s, color 1s;
