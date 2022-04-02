@@ -59,9 +59,9 @@ function atsrc(url) {
       // check if link is valid
       if (data.title !== undefined) {
         // Playback
+        audio.classList.remove('hidden');
         audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${c}`;
         audio.play();
-
         // Thumbnail
         if (thumbBool === true) {
           img.src = data.thumbnail_url;
