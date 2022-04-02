@@ -22,6 +22,7 @@ body {
 }
 
 body,
+section,
 #configs,
 #themes,
 #player,
@@ -30,7 +31,10 @@ body,
   justify-content: space-around;
   width: 100%;
 }
-
+section{
+  flex-direction: column;
+  align-items: center;
+}
 
 #configs a {
   text-decoration: none;
