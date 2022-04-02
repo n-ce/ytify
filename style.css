@@ -104,26 +104,6 @@ input::placeholder {
   transition: color 1s;
 }
 
-audio::-webkit-media-controls-panel {
-  background-color: var(--background2)
-}
-
-audio::-webkit-media-controls-timeline {
-  background-color: #fff4;
-  border-radius: 1rem;
-}
-
-audio::-webkit-media-controls-mute-button,
-audio::-webkit-media-controls-play-button {
-  background-color: var(--element);
-  border-radius: 1rem;
-}
-
-audio::-webkit-media-controls-current-time-display,
-audio::-webkit-media-controls-time-remaining-display {
-  color: var(--element);
-}
-
 
 
 [data-badge]:after {
