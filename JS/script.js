@@ -18,14 +18,14 @@ let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
 let queueVal = 0;
-let storeColor = ['#537895','#09203F'];
+let storeColor = ['#537895', '#09203F'];
 
 
 // theme picker
 colorBtn[0].addEventListener('click', function() {
   bgColor(storeColor[0]);
   bgColor2(storeColor[1]);
-  elementColor('white');
+  elementColor('#fffc');
 });
 
 // dark mode
@@ -66,10 +66,10 @@ function atsrc(url) {
         if (thumbBool === true) {
           img.src = data.thumbnail_url;
           colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, { format: 'hex' }, { group: 90 }).then(cols => {
-            storeColor = [cols[2],cols[0]];
+            storeColor = [cols[2], cols[0]];
             bgColor(cols[2]);
             bgColor2(cols[0]);
-            elementColor('white');
+            elementColor('#fffc');
           });
         }
         else {
@@ -78,6 +78,7 @@ function atsrc(url) {
 
         // Title
         title.innerHTML = data.title;
+        document.querySelector('h5').innerText = data.author_name;
       }
     });
   // so that it does not run again for the same link

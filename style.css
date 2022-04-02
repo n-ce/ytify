@@ -4,7 +4,7 @@
 :root {
   --background: #537895;
   --background2: #09203F;
-  --element: white;
+  --element: #fffc;
 }
 
 
@@ -31,6 +31,7 @@ body,
   width: 100%;
 }
 
+
 #configs a {
   text-decoration: none;
   color: var(--element);
@@ -39,7 +40,7 @@ body,
 
 
 .hidden,
-#themes.hidden {
+#themes.hidden,div.hidden {
   display: none;
 }
 
@@ -79,7 +80,7 @@ audio {
   width: 80%
 }
 
-h3 {
+h3,h5 {
   color: var(--element);
   transition: color 1s;
   width: 80%;
@@ -93,30 +94,33 @@ input {
   border: none;
   text-align: center;
   outline: none;
-  background-color: var(--background2);
+  opacity: 75%;
+  color: var(--element);
+  background-color: var(--background);
 }
 
 input::placeholder {
   color: var(--element);
   transition: color 1s;
-  opacity: 50%;
 }
 
 audio::-webkit-media-controls-panel {
   background-color: var(--background2)
 }
 
-audio::-webkit-media-controls-timeline{
+audio::-webkit-media-controls-timeline {
   background-color: #fff4;
   border-radius: 1rem;
 }
+
 audio::-webkit-media-controls-mute-button,
 audio::-webkit-media-controls-play-button {
   background-color: var(--element);
   border-radius: 1rem;
 }
+
 audio::-webkit-media-controls-current-time-display,
-audio::-webkit-media-controls-time-remaining-display{
+audio::-webkit-media-controls-time-remaining-display {
   color: var(--element);
 }
 
