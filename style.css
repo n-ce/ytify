@@ -131,22 +131,26 @@ input::placeholder {
 #player button {
   border: none;
   background: none;
+  border: 0.15rem solid var(--element);
   color: var(--element);
   transition: color 1s;
 }
 
 #player button,
 #configs a {
-  border-radius: 1rem;
+  border: 0.15rem solid var(--element);
+  border-radius: 1.25rem;
   padding: 0.25rem 1rem;
 }
 
 #player button[disabled] {
   color: #7777;
+  border: 0.15rem solid #7777;
 }
 
 i {
-  border-radius: 1rem;
+  border: 0.15rem solid var(--element);
+  border-radius: 1.25rem;
   padding: 0.25rem 1rem;
   color: var(--element);
 }
