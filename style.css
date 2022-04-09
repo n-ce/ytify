@@ -158,10 +158,11 @@ i {
 
 #player button:hover,
 #configs a:hover,
-.on {
+.on{
   background-color: var(--element);
   color: var(--background);
-  transition: background-color 0.5s, color 1s;
+  border-color:transparent;
+  transition: background-color 0.25s, color 0.25s;
 }
 
 
