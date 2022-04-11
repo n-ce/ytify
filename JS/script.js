@@ -1,4 +1,4 @@
-import { playerBtn, footBtn, input, audio, img, array, play, metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL } from './constants.js';
+import { playerBtn, footBtn, input, audio, img, array, play, metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
 
 const interval = setInterval(script, 2000);
 
@@ -64,10 +64,20 @@ function atsrc(url) {
         audio.play();
         // Thumbnail
         if (thumbBool === true) {
-          img.src = data.thumbnail_url;
-          colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, { format: 'hex' }, { group: 90 }).then(cols => {
-            storeColor = [cols[2], cols[0]];
-            bgColor(cols[2]);
+          img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.jpg";
+            
+            if (1==2) {
+              img.src = data.thumbnail_url;
+            }
+
+          colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, {
+            format: 'hex',
+            group: 25,
+            amount: 2,
+            sample: 1
+          }).then(cols => {
+            storeColor = [cols[1], cols[0]];
+            bgColor(cols[1]);
             bgColor2(cols[0]);
             elementColor('#fffc');
           });
