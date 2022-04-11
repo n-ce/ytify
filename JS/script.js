@@ -68,9 +68,9 @@ function atsrc(url) {
         // Thumbnail
         if (thumbBool === true) {
 
-          colorjs.average(`${googleProxyURL+encodeURIComponent(`${ytimg+url.match(abstract)[7]}/maxresdefault.jpg`)}`).then(vhk => {
+          colorjs.average(`${googleProxyURL+encodeURIComponent(`${ytimg+url.match(abstract)[7]}/maxresdefault.webp`)}`).then(vhk => {
             if (vhk[0] != 196) {
-              img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.jpg";
+              img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.webp";
             }
             else {
               img.src = data.thumbnail_url;
