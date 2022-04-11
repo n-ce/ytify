@@ -29,10 +29,13 @@ colorBtn[0].addEventListener('click', function() {
 });
 
 // dark mode
-colorBtn[4].addEventListener('click', function() {
+let dkmd = () => {
   bgColor('black');
   bgColor2('black');
   elementColor(storeColor[0]);
+}
+colorBtn[4].addEventListener('click', function() {
+  dkmd();
 });
 
 
@@ -64,22 +67,31 @@ function atsrc(url) {
         audio.play();
         // Thumbnail
         if (thumbBool === true) {
-          img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.jpg";
-            
-            if (1==2) {
+
+          colorjs.average(`${googleProxyURL+encodeURIComponent(`${ytimg+url.match(abstract)[7]}/maxresdefault.jpg`)}`).then(vhk => {
+            if (vhk[0] != 196) {
+              img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.jpg";
+            }
+            else {
               img.src = data.thumbnail_url;
             }
 
-          colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, {
-            format: 'hex',
-            group: 25,
-            amount: 2,
-            sample: 1
-          }).then(cols => {
-            storeColor = [cols[1], cols[0]];
-            bgColor(cols[1]);
-            bgColor2(cols[0]);
-            elementColor('#fffc');
+            colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, {
+              format: 'hex',
+              group: 25,
+              amount: 2,
+              sample: 1
+            }).then(cols => {
+              if (cols[1] == '#e1e1e1') {
+                dkmd();
+              }
+              else {
+                storeColor = [cols[1], cols[0]];
+                bgColor(cols[1]);
+                bgColor2(cols[0]);
+                elementColor('#fffc');
+              }
+            });
           });
         }
         else {
