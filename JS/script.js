@@ -18,13 +18,13 @@ let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
 let queueVal = 0;
-let storeColor = ['#537895', '#09203F'];
+let storeColor = 'crimson';
 
 
 // theme picker
 colorBtn[0].addEventListener('click', function() {
-  bgColor(storeColor[0]);
-  bgColor2(storeColor[1]);
+  bgColor(storeColor);
+  bgColor2('black');
   elementColor('#fffc');
 });
 
@@ -32,7 +32,7 @@ colorBtn[0].addEventListener('click', function() {
 let dkmd = () => {
   bgColor('black');
   bgColor2('black');
-  elementColor(storeColor[0]);
+  elementColor(storeColor);
 }
 colorBtn[4].addEventListener('click', function() {
   dkmd();
@@ -68,30 +68,24 @@ function atsrc(url) {
         // Thumbnail
         if (thumbBool === true) {
 
-          colorjs.average(`${googleProxyURL+encodeURIComponent(`${ytimg+url.match(abstract)[7]}/maxresdefault.webp`)}`).then(vhk => {
-            if (vhk[0] != 196) {
-              img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.webp";
+          colorjs.average(`${googleProxyURL+encodeURIComponent(`${ytimg+url.match(abstract)[7]}/maxresdefault.webp`)}`,
+          {
+            group: 25,
+            sample: 1,
+          }).then(cols => {
+            let [r, g, b] = cols;
+            storeColor = `rgb(${r},${g},${b})`;
+            // image fallback
+            if (r == g && g == b) {
+              img.src = data.thumbnail_url;
+              dkmd();
             }
             else {
-              img.src = data.thumbnail_url;
+              img.src = ytimg + url.match(abstract)[7] + "/maxresdefault.webp";
+              bgColor(storeColor);
+              bgColor2('black');
+              elementColor('#fffc');
             }
-
-            colorjs.prominent(`${googleProxyURL + encodeURIComponent(data.thumbnail_url)}`, {
-              format: 'hex',
-              group: 25,
-              amount: 2,
-              sample: 1
-            }).then(cols => {
-              if (cols[1] == '#e1e1e1') {
-                dkmd();
-              }
-              else {
-                storeColor = [cols[1], cols[0]];
-                bgColor(cols[1]);
-                bgColor2(cols[0]);
-                elementColor('#fffc');
-              }
-            });
           });
         }
         else {

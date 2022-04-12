@@ -26,4 +26,4 @@ const googleProxyURL = 'https://images1-focus-opensocial.googleusercontent.com/g
 const abstract = /(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i;
 const ytimg = "https://img.youtube.com/vi_webp/";
 
-export {playerBtn,footBtn,input,audio,img,array,play,metadata,title,root,colorBtn,bgColor,bgColor2,elementColor,googleProxyURL,abstract,ytimg};
+export { playerBtn, footBtn, input, audio, img, array, play, metadata, title, root, colorBtn, bgColor, bgColor2, elementColor, googleProxyURL, abstract, ytimg };
