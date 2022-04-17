@@ -2,9 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@500&display=swap');
 
 :root {
-  --background: #a7bfe8;
-  --background2: #6190e8;
-  --element: #000c;
+  --background: #1f1f1f;
+  --background2: black;
+  --element: white;
 }
 
 
@@ -18,7 +18,7 @@ body {
   flex-direction: column;
   align-items: center;
   background-image: linear-gradient(var(--background), var(--background2));
-  transition: background-image 1s;
+  transition: background-image 0.5s;
 }
 
 body,
@@ -31,25 +31,30 @@ section,
   justify-content: space-around;
   width: 100%;
 }
-#player,#playback{
+
+#player,
+#playback {
   margin-bottom: 1rem;
 }
-section{
+
+section {
   flex-direction: column;
   align-items: center;
 }
-article{
+
+article {
   width: 100%;
 }
+
 #configs a {
   text-decoration: none;
   color: var(--element);
-  transition: color 1s;
 }
 
 
 .hidden,
-#themes.hidden,div.hidden {
+#themes.hidden,
+div.hidden {
   display: none;
 }
 
@@ -89,9 +94,10 @@ audio {
   width: 80%
 }
 
-h3,h5 {
+h3,
+h5 {
   color: var(--element);
-  transition: color 1s;
+  transition: color 0.5s;
   width: 80%;
   text-align: center;
 }
@@ -138,7 +144,6 @@ input::placeholder {
   background: none;
   border: 0.15rem solid var(--element);
   color: var(--element);
-  transition: color 1s;
 }
 
 #player button,
@@ -163,13 +168,18 @@ i {
 
 #player button:hover,
 #configs a:hover,
-.on{
+.on {
   background-color: var(--element);
   color: var(--background);
-  border-color:transparent;
+  border-color: transparent;
   transition: background-color 0.25s, color 0.25s;
 }
 
+i,
+button,
+a {
+  transition: color 0.5s, border-color 0.5s;
+}
 
 
 span,
@@ -195,8 +205,13 @@ button {
   img {
     width: 25%;
   }
-  article{
-    display:flex;
+
+  article {
+    display: flex;
   }
-  #player,#playback{margin-bottom:0}
+
+  #player,
+  #playback {
+    margin-bottom: 0
+  }
 }

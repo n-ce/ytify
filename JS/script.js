@@ -18,7 +18,7 @@ let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
 let queueVal = 0;
-let storeColor = 'darkslategray';
+let storeColor = '#1f1f1f';
 
 
 // theme picker
@@ -32,7 +32,7 @@ colorBtn[0].addEventListener('click', function() {
 let dkmd = () => {
   bgColor('black');
   bgColor2('black');
-  elementColor(storeColor);
+  elementColor('white');
 }
 colorBtn[4].addEventListener('click', function() {
   dkmd();
