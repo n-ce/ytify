@@ -1,3 +1,8 @@
+[![GitHub issues](https://img.shields.io/github/issues/n-ce/ytify)](https://github.com/n-ce/ytify/issues)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://github.com/n-ce/ytify/blob/main/LICENSE)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/n-ce/ytify)](https://github.com/n-ce/ytify/pulls)
+
+
 <div align="center">
 <h3><i>Welcome to ytify</i></h3>
 <img width="50%" src="Assets/maskable_icon_x512.png"></img>
@@ -8,6 +13,8 @@ Ytify is a minimal YouTube streaming front end app. With ytify, you can stream Y
 https://ytify.netlify.app
 
 ![](Assets/ss1.png)
+
+
 
 ## Features
 Ytify has the following features that make your streaming activity a pleasure.
