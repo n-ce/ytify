@@ -1,4 +1,4 @@
-import { playerBtn, footBtn, input, audio, img, array, play, metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
+import { playerBtn, footBtn, controls, controlBtn, volume, progress, input, audio, img, array, /*play,*/ metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
 
 const interval = setInterval(script, 2000);
 
@@ -8,6 +8,11 @@ let queueBool = false;
 let thumbBool = true;
 let loopBool = false;
 let hqBool = false;
+
+// control bar values
+
+let play = true;
+let previousVolume = volume.value;
 
 let y; // store url for changes check
 let m; // queue count 
@@ -62,9 +67,17 @@ function atsrc(url) {
       // check if link is valid
       if (data.title !== undefined) {
         // Playback
-        audio.classList.remove('hidden');
+        controls.style.display = 'flex';
         audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${c}`;
         audio.play();
+        controlBtn[0].innerText = 'pause';
+
+        audio.onloadedmetadata = function() {
+          progress.value = 0;
+          progress.min = 0;
+          progress.max = Math.floor(audio.duration);
+        }
+        
         // Thumbnail
         if (thumbBool === true) {
 
@@ -292,3 +305,81 @@ footBtn[3].onclick = function() {
     thumbBool = true;
   }
 }
+
+// PLAY / PAUSE
+
+controlBtn[0].onclick = function() {
+  this.classList.toggle('on');
+
+  if (play) {
+    audio.pause();
+    this.innerText = 'play_arrow';
+  } else {
+    audio.play();
+    this.innerText = 'pause';
+  }
+
+  play = !play;
+}
+
+// MUTE
+
+controlBtn[1].onclick = function() {
+  this.classList.toggle('on');
+
+  if (audio.muted) {
+    volume.value = previousVolume;
+    if (previousVolume >= 50) {
+      this.innerText = 'volume_up';
+    } else {
+      this.innerText = 'volume_down';
+    }
+  } else {
+    volume.value = 0;
+    this.innerText = 'volume_mute';
+  }
+  
+  audio.muted = !audio.muted;
+}
+
+// VOLUME
+
+volume.onchange = function() {
+  if (this.value < 0 || this.value > 100) {
+    return;
+  } else if (this.value == 0) {
+    controlBtn[1].classList.add('on');
+    controlBtn[1].innerText = 'volume_mute';
+    audio.muted = true;
+  } else {
+    controlBtn[1].classList.remove('on');
+    audio.volume = this.value / 100;
+    audio.muted = false;
+    previousVolume = this.value;
+
+    if (this.value >= 50) {
+      controlBtn[1].innerText = 'volume_up';
+    } else {
+      controlBtn[1].innerText = 'volume_down';
+    }
+  }
+}
+
+// PROGRESS
+
+progress.onchange = function() {
+  if (this.value < 0 || this.value > audio.duration) {
+    return;
+  }
+
+  audio.currentTime = this.value;
+  this.blur();
+}
+
+audio.addEventListener('timeupdate', () => {
+  if (progress === document.activeElement) {
+    return;
+  }
+
+  progress.value = Math.floor(audio.currentTime);
+});

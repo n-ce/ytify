@@ -33,46 +33,62 @@
     <h5><span class="material-icons">fullscreen</span></h5>
     <input type="text" placeholder="paste link here" align="center" class="hidden">
     <br>
-    <audio controls class="hidden"></audio>
+    <audio></audio>
+
+    <div id="controls" style="display: none;">
+      <div id="play-controls">
+        <button class="material-icons btn">
+          play_arrow
+        </button>
+        <input type="range" min="0" max="100" value="0" id="progress" />
+      </div>
+      
+      <div id="volume-controls">
+        <button class="material-icons btn">
+          volume_up
+        </button>
+        <input type="range" min="0" max="100" value="100" id="volume" />
+      </div>
+    </div>
   </section>
   <article>
   <div id="player">
-    <button class="material-icons" disabled>
+    <button class="material-icons btn" disabled>
       add_to_queue
     </button>
 
-    <button class="material-icons">
+    <button class="material-icons btn">
       fast_rewind
     </button>
 
-    <button class="material-icons">
+    <button class="material-icons btn">
       fast_forward
     </button>
 
-    <button class="material-icons" disabled>
+    <button class="material-icons btn" disabled>
       skip_next
     </button>
   </div>
 
   <div id="playback">
-    <i class="material-icons">queue</i>
-    <i class="material-icons">loop</i>
-    <i class="material-icons">high_quality</i>
-    <i class="material-icons">image</i>
+    <button class="material-icons btn">queue</button>
+    <button class="material-icons btn">loop</button>
+    <button class="material-icons btn">high_quality</button>
+    <button class="material-icons btn">image</button>
   </div>
     <div id="configs">
-      <a class="material-icons">
+      <a><button class="material-icons btn">
         info
-      </a>
-      <a class="material-icons">
+      </button></a>
+      <a><button class="material-icons btn">
         delete
-      </a>
-      <a class="material-icons">
+      </button></a>
+      <a><button class="material-icons btn">
         input
-      </a>
-      <a class="material-icons">
+      </button></a>
+      <a><button class="material-icons btn">
         palette
-      </a>
+      </button></a>
     </div>
   
     <div id="themes" class="hidden">

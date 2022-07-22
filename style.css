@@ -139,53 +139,80 @@ input::placeholder {
   display: none;
 }
 
-#player button {
+/* #player button {
   border: none;
   background: none;
   border: 0.15rem solid var(--element);
   color: var(--element);
-}
+} */
 
-#player button,
+/* #player button,
 #configs a {
   border: 0.15rem solid var(--element);
   border-radius: 1.25rem;
   padding: 0.25rem 1rem;
-}
+} */
 
-#player button[disabled] {
+.btn[disabled] {
   color: #7777;
   border: 0.15rem solid #7777;
+  cursor: default;
 }
 
-i {
+.btn {
   border: 0.15rem solid var(--element);
   border-radius: 1.25rem;
   padding: 0.25rem 1rem;
+  background-color: var(--background2);
   color: var(--element);
+  cursor: pointer;
 }
 
-
-#player button:hover,
-#configs a:hover,
+.btn:not([disabled]):hover,
 .on {
   background-color: var(--element);
-  color: var(--background);
+  color: var(--background2);
   border-color: transparent;
   transition: background-color 0.25s, color 0.25s;
 }
 
-i,
-button,
-a {
-  transition: color 0.5s, border-color 0.5s;
+input[type="range"] {
+  cursor: pointer;
+}
+
+#controls {
+  width: 80%;
+  flex-wrap: wrap;
+  
+}
+
+#controls,
+#controls div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  column-gap: 10px;
+}
+
+#controls div > * {
+  vertical-align: middle;
+}
+
+#progress,
+#volume,
+#play-controls {
+  flex-grow: 15;
+}
+
+#volume-controls {
+  flex-grow: 1;
 }
 
 
 span,
 i,
 input,
-audio,
 input,
 h3,
 a,
