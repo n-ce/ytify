@@ -258,6 +258,19 @@ input[type=range]::-ms-thumb {
   background-color: var(--background2);
 }
 
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  height: 36px;
+  line-height: 1;
+  transition: border-radius ease-in-out 0.3s;
+}
+
+select:focus {
+  border-radius: 0.2rem;
+}
+
 #controls {
   width: 80%;
   flex-wrap: wrap;
@@ -271,6 +284,7 @@ input[type=range]::-ms-thumb {
   align-items: center;
   justify-content: center;
   column-gap: 10px;
+  margin-bottom: 5px;
 }
 
 #controls div > * {
@@ -294,7 +308,8 @@ input,
 h3,
 a,
 img,
-button {
+button,
+select {
   animation: appear 0.5s ease-in-out;
 }
 

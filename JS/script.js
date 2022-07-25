@@ -1,4 +1,4 @@
-import { playerBtn, footBtn, controls, controlBtn, volume, progress, input, audio, img, array, /*play,*/ metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
+import { playerBtn, footBtn, controls, controlBtn, volume, progress, playbackSpeed, input, audio, img, array, /*play,*/ metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
 
 const interval = setInterval(script, 2000);
 
@@ -383,3 +383,14 @@ audio.addEventListener('timeupdate', () => {
 
   progress.value = Math.floor(audio.currentTime);
 });
+
+// PLAYBACK SPEED
+
+playbackSpeed.onchange = function() {
+  if (this.value < 0 || this.value > 2) {
+    return;
+  }
+
+  audio.playbackRate = this.value;
+  this.blur();
+}
