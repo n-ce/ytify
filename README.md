@@ -1,9 +1,9 @@
 <div align="center">
-<h3><i>Welcome to ytify</i></h3>
+<h3><i>Welcome to Ytify</i></h3>
 <img width="50%" src="Assets/maskable_icon_x512.png"></img>
 </div>
 <br>
-Ytify is a minimal YouTube streaming front end app. With ytify, you can stream YouTube audio in ultra-low bitrate at around 50kbps & 160kbps. This saves your data and time!
+Ytify is a minimal YouTube streaming front end app. With ytify, you can stream YouTube audio in ultra-low bitrate at around 50kbps & 160kbps. This saves both your data and time!
 
 https://ytify.netlify.app
 
@@ -18,21 +18,21 @@ Ytify has the following features that make your streaming activity a pleasure.
 - Auto: This automatically intercepts and play links.
 - Higher Quality: Set audio quality to higher qualities of HQ 128kbps. This costs1MB per minute.
 - Delete: This clear all your saved data.
-- Dark mode: This helps you alternate between dark and light mode
+- Mode: It comes with 5 different modes.
 
 ![](Assets/ss2.png)
 ## Project description
-The current version of ytify is version 4 which is quite stable. The aim of this project is to help users save data when streaming YouTube videos. There is clipboard permission available. If you can’t find it or you’re denied, use the link input box to perform operations. Fallback support is available for users without support for Clipboard API. Also, note that auto-scanning is not available here.
+The current version of Ytify is version 4 which is quite stable. The aim of this project is to help users save data when streaming YouTube videos. There is clipboard permission available. If you can’t find it or you’re denied, use the link input box to perform operations. Fallback support is available for users without support for Clipboard API. Also, note that auto-scanning is not available here.
 
 ## How it works
-To use ytify, here are the steps to take.
+To use ytify, here are the steps to take:
 1. Copy the YouTube video link you want to stream.
 2. Paste the link on the ytify clipboard.
 3. Ytify will automatically capture the link on the page. 
 4. Your video plays immediately.
 
 ## How to contribute
-This is a growing project and you are highly welcome to contribute to it. You can help to improve this project on GitHub  
+This is a growing project and you are highly welcome to contribute to it. You can help to improve this project on GitHub by solving the ongoing issues. All you need to do is ask to assign the following issue to you and you're good to go.  
 
 ## Dependencies
 
