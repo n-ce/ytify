@@ -1,4 +1,6 @@
-import { playerBtn, footBtn, controls, controlBtn, volume, progress, playbackSpeed, input, audio, img, array, /*play,*/ metadata, title, bgColor, bgColor2, elementColor, colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
+import { playerBtn, footBtn, controls, controlBtn, volume, progress, playbackSpeed, 
+  input, audio, img, array, /*play,*/ metadata, title, bgColor, bgColor2, elementColor,
+   colorBtn, googleProxyURL, abstract, ytimg } from './constants.js';
 
 const interval = setInterval(script, 2000);
 
