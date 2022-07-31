@@ -334,3 +334,25 @@ select {
     margin-bottom: 0
   }
 }
+
+/* for 404 page */
+.headingone {
+  color:white;
+  font-size:60px;
+  margin-bottom:100px;
+  
+  width: 80%;
+  text-align: center;
+
+  
+
+}
+
+.btn-extra {
+  width:400px;
+  height:80px;
+  margin-bottom:200px;
+ 
+}
+
+
