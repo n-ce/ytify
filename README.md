@@ -71,14 +71,23 @@
   <div >
   <h1>Dependencies </h1>
     <ul style="margin-left:-20px"> 
-    <li>Project Lounge ytdlp web ui ✅</li>
-    <li>noembed ✅</li>
-    <li>color.js ✅</li>
-    <li>YouTube ✅</li>
-    <li>YTDL ✅</li>
-    <li>yt-dlp ✅</li>
-    <li>Netlify ✅ </li>
-  
+    <li>
+    <a href="https://projectlounge.pw/ytdl"> Project Lounge ytdlp web ui ✅ </a></li>
+    <li>
+    <a href="https://noembed.com"> noembed ✅</a></li>
+    <li>
+    <a href="https://github.com/luukdv/color.js/">color.js ✅ </a></li>
+    <li>
+    <a href="https://youtube.com"> YouTube ✅</a></li>
+    <li> <a href="https://spck.io"> Spck Code Editor ✅</a></li>
+    <li>
+    <a href="https://github.com/ytdl-org/youtube-dl">YTDL ✅ </a></li>
+    <li>
+    <a href="https://github.com/yt-dlp/yt-dlp"> yt-dlp ✅</a></li>
+    <li>
+    <a href="https://www.netlify.com">Netlify ✅ </a> </li>
+    <li>
+    <a href="https://fonts.google.com">Google fonts ✅ </a> </li>
   </ul>
   
    </div>
