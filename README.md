@@ -1,4 +1,4 @@
-<div align="center"> 
+<div > 
   <img src="https://img.shields.io/github/directory-file-count/n-ce/ytify" alt="GitHub repo file count"> </img>
 
   <img src="https://img.shields.io/github/languages/top/n-ce/ytify" alt="GitHub top language"> </img>
@@ -14,9 +14,9 @@
   <p> Ytify has lots of features to ensure a pleasurable streaming experience. </p>
  </div>
 
- <div align="center"> 
-    <ul style="; margin-top:20px;
-    list-style-type:none;" > 
+ <div > 
+    <ul style="; margin-top:20px;margin-left:-20px;
+    " > 
        <li>Rewind a video at any time and add more videos to playing list using queue  ✔️ </li> 
        <li>Skip any track anywhere or loop your favorite ones.  ✔️</li> 
        <li> Automatically play links w. auto.✔️</li> 
@@ -31,14 +31,14 @@
  
  </div>
 
- <div align="center" style="margin-top:40px">
+ <div  style="margin-top:40px">
    <h1>  How to use</h1>
    <p>Here are some quick instructions to get ytify running.. </p>
   </div>
 
- <div align="center"> 
-    <ul style=" margin-top:20px;
-    list-style-type:none;" > 
+ <div > 
+    <ul style=" margin-top:20px;margin-left:-20px;
+    " > 
        <li>Copy the YouTube Video Url ⭐	</li> 
        <li> Paste it into the ytify clipboard. ⭐	 </li> 
        <li>Ytify will do the rest. Enjoy ! ⭐	 </li> 
@@ -54,7 +54,7 @@
  
  </div>
   
-  <div align="center">
+  <div >
     <h1 style="margin-top:50px">Snapshots  </h1>
     <p>✨Let ´s see how ytify looks like ! ✨ </p>
 
@@ -68,9 +68,9 @@
    </div>
 
 
-  <div align="center">
+  <div >
   <h1>Dependencies </h1>
-    <ul style="list-style-type:none"> 
+    <ul style="margin-left:-20px"> 
     <li>Project Lounge ytdlp web ui ✅</li>
     <li>noembed ✅</li>
     <li>color.js ✅</li>
@@ -82,25 +82,25 @@
   </ul>
   
    </div>
-  <div align="center">
+  <div >
     <h1 style="margin-top:20px"> Our mission </h1>
     <p style=""> We want to  to help you save data when streaming YouTube videos. ✨</p>
    </div>
 
 
-<div align="center" style="margin-top:70px">
+<div  style="margin-top:70px">
   <h1> Contribute</h1>
  </div>
 
-<div align="center"> 
-    <ul style=" margin-top:20px;" > 
-       <p> Found a bug or feel comfortable fixing an issue ?
+<div > 
+    
+  <p> Found a bug or feel comfortable fixing an issue ?
        Then feel free to contribute. It ´s very simple. Simply fork the project and clone it. Make your changes and make
        a new branch , then push the code and make a pull request.
        It ´s that simple ! 🏆 </p>
-    </ul> 
+    
 
-  <img src="Assets/maskable_icon_x192.png" width="200" height="170" style="margin-top:20px; margin-left:30px;" />
+  <img src="Assets/maskable_icon_x192.png" width="200" height="170" style="margin-top:20px; " />
  
  </div>
 
