@@ -20,7 +20,7 @@ let y; // store url for changes check
 let m; // queue count 
 let param; // algorithm parameter
 let n = 1; // current queue playing
-let c = 249; // quality codec value
+let c = 600; // quality codec value
 let error = "NotAllowedError: Read permission denied.";
 let queueList = [];
 let storeThumbURL;
@@ -276,7 +276,7 @@ footBtn[2].onclick = function() {
     save('format', "yes");
   }
   else {
-    c = 249;
+    c = 600;
     hqBool = false;
     save('format', "no");
   }
