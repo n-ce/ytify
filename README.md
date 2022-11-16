@@ -5,7 +5,7 @@
 
   <h1> ytify -the minimal streaming app</h1>
 
-  <p> 🌟This is ytify - a minimal streaming app with which you can stream YouTube audio efficiently ( at around 50kbps & 160kbps) to save data and time. 🌟</p> <a href="https://ytify.netlify.app/">
+  <p> 🌟This is ytify - a minimal streaming app with which you can stream YouTube audio efficiently (at around 32kbps(default) & 128kbps(hq) OPUS) to save data and time. 🌟</p> <a href="https://ytify.netlify.app/">
     <img src="https://img.shields.io/badge/Check it out-00AFF0?style=for-the-badge&logo=groupme&logoColor=white" alt="Homepage" style="margin-top:20px; margin-bottom:30px "/>
   </a>
 
