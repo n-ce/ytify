@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="description" content="50kbps opus youtube audio streaming front-end">
+  <meta name="author" content="Animesh Nath">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1f1f1f">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 50kbps,Free , 
+     spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
+  <meta name="description" content="Ytify is a minimal YouTube streaming front end app.
+   With ytify, you can stream YouTube audio in ultra-low bitrate at around 50kbps & 160kbps.
+    This saves your data and time!">
+
+  <title>ytify</title>
+
+  <meta property="og:title" content="YTIFY">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ytify.netlify.app">
+  <meta property="og:description" content="50kbps Opus YouTube Audio Streaming Web App.">
+  <meta property="og:image" content="Assets/maskable_icon_x512.png">
+  
+  <!-- tells google that this url is most important (e.g. not http (without s = secure))-->
+  <link rel="canonical" href="https://ytify.netlify.app/">
+
+  <link rel="icon" type="image/png" alt="Main image" sizes="512x512" href="Assets/maskable_icon_x512.png" />
+  <link rel="icon" type="image/png" alt="Main image" sizes="192x192" href="Assets/maskable_icon_x192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <section>
+    <img class="hidden" ></img>
+    <h3>YTIFY v4 apr-22</h3>
+    <h5><span class="material-icons">fullscreen</span></h5>
+    <input type="text" placeholder="paste link here" align="center" class="hidden">
+    <br>
+    <audio></audio>
+
+    <div id="controls" style="display: none;">
+      <div id="play-controls">
+        <button class="material-icons btn">
+          play_arrow
+        </button>
+        <input type="range" min="0" max="100" value="0" id="progress" />
+      </div>
+      
+      <div id="volume-controls">
+        <select class="btn" id="playback-speed">
+          <option value="0.25">0.25x</option>
+          <option value="0.50">0.50x</option>
+          <option value="0.75">0.75x</option>
+          <option value="1.00" selected>1.00x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.50">1.50x</option>
+          <option value="1.75">1.75x</option>
+          <option value="2.00">2.00x</option>
+        </select>
+        <button class="material-icons btn">
+          volume_up
+        </button>
+        <input type="range" min="0" max="100" value="100" id="volume" />
+      </div>
+    </div>
+  </section>
+  <article>
+  <div id="player">
+    <button class="material-icons btn" disabled>
+      add_to_queue
+    </button>
+
+    <button class="material-icons btn">
+      fast_rewind
+    </button>
+
+    <button class="material-icons btn">
+      fast_forward
+    </button>
+
+    <button class="material-icons btn" disabled>
+      skip_next
+    </button>
+  </div>
+
+  <div id="playback">
+    <button class="material-icons btn">queue</button>
+    <button class="material-icons btn">loop</button>
+    <button class="material-icons btn">high_quality</button>
+    <button class="material-icons btn">image</button>
+  </div>
+    <div id="configs">
+      <a><button class="material-icons btn">
+        info
+      </button></a>
+      <a><button class="material-icons btn">
+        delete
+      </button></a>
+      <a><button class="material-icons btn">
+        input
+      </button></a>
+      <a><button class="material-icons btn">
+        palette
+      </button></a>
+    </div>
+  
+    <div id="themes" class="hidden">
+      <span class="material-icons">
+        colorize
+      </span>
+      <span class="material-icons">
+        circle
+      </span>
+      <span class="material-icons">
+        circle
+      </span>
+      <span class="material-icons">
+        circle
+      </span>
+      <span class="material-icons">
+        circle
+      </span>
+    </div>
+    </article>
+  <script src="JS/script.js" type="module"></script>
+  <script src="JS/themes.js" type="module"></script>
+  <script src="JS/immersive.js"></script>
+  <script src="JS/color.js"></script>
+  <script src="JS/bottomBar.js"></script>
+  <script src="JS/service-worker.js"></script>
+</body>
+
+</html>
+
