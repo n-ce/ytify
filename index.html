@@ -24,7 +24,7 @@
   div {
     background: #fff7;
     width: 80%;
-    margin-top: 2rem;
+    margin-bottom: 2rem;
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
@@ -34,24 +34,19 @@
 
   #settings {
     height: 3rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
   #metadata {
     background: none;
-    margin-top: 0;
+    margin-bottom: 0;
     width: 100%;
 
   }
 
-  @media screen and (min-width: 768px) {
-    #metadata {
-      flex-direction: row;
-      width: 80%
-    }
-  }
-
   #thumbnail {
-    height: 12rem;
+    height: 45vw;
   }
 
   #title {
@@ -60,6 +55,29 @@
 
   #player {
     height: 12rem;
+  }
+
+  @media screen and (min-width:768px),(orientation:landscape) {
+    div {
+      margin-bottom: 1rem;
+    }
+
+    #metadata {
+      flex-direction: row;
+      width: 80vw;
+      justify-content: space-between
+    }
+
+    #thumbnail {
+      height: 21.6vw;
+      width: 38.4vw;
+
+    }
+
+    #title {
+      height: 18vw;
+      width: 38.4vw;
+    }
   }
 </style>
 
@@ -73,7 +91,7 @@
     </div>
 
     <div id="title">
-      title + author
+      title<br>author
     </div>
   </div>
 
