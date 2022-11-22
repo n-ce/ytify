@@ -9,35 +9,38 @@
 <style>
   :root {
     /* default theme color before extraction */
-    --thumbnail: #f08765;
-
+    --thumbnail: #B0BEC5;
     /* Default Theme */
-    --bg: #B0BEC5;
-    --accent: #ECEFF1;
-    --depth: #CFD8DC;
-    --text: #263238;
+    --bg: var(--thumbnail);
+    --accent: #fff7;
+    --text: #000B;
     --border: none;
 
     /* Dark Theme */
     --bgDark: #1f1f1f;
-    --accentDark: #fff1;
-    --bgBlack: #000;
+    /* google dark */
+    --accentDark: #f003;
+    /* thumbnail + alpha = 3 */
+    --textDark: #fffE;
+    --borderDark: none;
 
     /* Black Theme */
+    --bgBlack: #000;
+    /* amoled */
     --accentBlack: none;
     --textBlack: #fff;
+    --borderBlack: var(--thumbnail);
   }
 
-  html,
-  body {
+  html {
+    background: var(--bgBlack);
+    /* filters saturated color */
+  }
 
+  body {
     margin: 0;
-    padding: 0;
-  }
-
-  body {
-    background-color: var(--bg);
-    color: var(--text);
+    background: linear-gradient(var(--accentBlack), transparent);
+    color: var(--textBlack);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -46,17 +49,17 @@
 
   div {
     width: 80vw;
-    background: var(--accent);
+    background: var(--accentBlack);
     border-radius: 1rem;
     text-align: center;
-    border: 1px dotted var(--border);
+    border: 1px dotted var(--borderBlack);
   }
 
   #settings {
     display: flex;
     justify-content: space-between;
     height: 3rem;
-    background: var(--depth);
+    background: var(--accentBlack);
     margin-top: 2rem;
   }
 
@@ -64,16 +67,12 @@
     width: 4rem
   }
 
-  #moreBtn:focus {
-    background: none;
-  }
-
   #more {
     width: 60vw;
   }
 
   #data {
-    background: var(--depth);
+    background: var(--accentBlack);
     margin-top: 2rem;
   }
 
@@ -91,8 +90,8 @@
   }
 
   #player {
-    margin-top: 2rem;
-    background: var(--depth);
+    margin: 2rem 0 2rem 0;
+    background: var(--accentBlack);
     display: flex;
     flex-direction: column;
     align-items: center;
