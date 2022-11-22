@@ -9,6 +9,7 @@
 <style>
   html,
   body {
+    height: 100%;
     margin: 0;
     padding: 0;
   }
@@ -19,85 +20,80 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-around;
   }
 
   div {
-    background: #fff7;
-    width: 80%;
-    margin-bottom: 2rem;
+    width: 80vw;
+    background: #fff3;
     border-radius: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
   }
 
   #settings {
-    height: 3rem;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    display: flex;
+    height: 2rem;
   }
 
-  #metadata {
-    background: none;
-    margin-bottom: 0;
-    width: 100%;
-
+  #moreBtn {
+    width: 4rem
+    
   }
 
   #thumbnail {
     height: 45vw;
   }
 
-  #title {
-    height: 6rem;
+  #meta {
+    background: none;
+    height: 15vw;
   }
 
-  #player {
-    height: 12rem;
+  #play {
+    height: 15vw;
   }
 
-  @media screen and (min-width:768px),(orientation:landscape) {
-    div {
-      margin-bottom: 1rem;
-    }
+  #track {
+    height: 15vw;
+  }
 
-    #metadata {
-      flex-direction: row;
-      width: 80vw;
-      justify-content: space-between
+  @media (orientation:landscape) {
+
+    #data {
+      display: flex;
     }
 
     #thumbnail {
-      height: 21.6vw;
-      width: 38.4vw;
-
+      height: 22.5vw
     }
-
-    #title {
-      height: 18vw;
-      width: 38.4vw;
+    #player{
+      display: flex
     }
   }
 </style>
 
 <body>
   <div id="settings">
-    settings
+    <div id="moreBtn">(...)</div>
+    <div id="more">more</div>
   </div>
-  <div id="metadata">
+
+  <div id="data">
     <div id="thumbnail">
       thumbnail
     </div>
 
-    <div id="title">
-      title<br>author
+    <div id="meta">
+      <p id="title">title</p>
+      <p id="author">author</p>
     </div>
   </div>
 
   <div id="player">
-    player
+    <div id="play">play</div>
+    <div id="track">track</div>
   </div>
+
 </body>
 
 </html>
