@@ -7,16 +7,37 @@
   <title>ytify</title>
 </head>
 <style>
+  :root {
+    /* default theme color before extraction */
+    --thumbnail: #f08765;
+
+    /* Default Theme */
+    --bg: #B0BEC5;
+    --accent: #ECEFF1;
+    --depth: #CFD8DC;
+    --text: #263238;
+    --border: none;
+
+    /* Dark Theme */
+    --bgDark: #1f1f1f;
+    --accentDark: #fff1;
+    --bgBlack: #000;
+
+    /* Black Theme */
+    --accentBlack: none;
+    --textBlack: #fff;
+  }
+
   html,
   body {
-    height: 100%;
+
     margin: 0;
     padding: 0;
   }
 
   body {
-    background-color: black;
-    color: white;
+    background-color: var(--bg);
+    color: var(--text);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,19 +46,35 @@
 
   div {
     width: 80vw;
-    background: #fff3;
+    background: var(--accent);
     border-radius: 1rem;
     text-align: center;
+    border: 1px dotted var(--border);
   }
 
   #settings {
     display: flex;
-    height: 2rem;
+    justify-content: space-between;
+    height: 3rem;
+    background: var(--depth);
+    margin-top: 2rem;
   }
 
   #moreBtn {
     width: 4rem
-    
+  }
+
+  #moreBtn:focus {
+    background: none;
+  }
+
+  #more {
+    width: 60vw;
+  }
+
+  #data {
+    background: var(--depth);
+    margin-top: 2rem;
   }
 
   #thumbnail {
@@ -46,11 +83,24 @@
 
   #meta {
     background: none;
-    height: 15vw;
+
+  }
+
+  #title {
+    font-size: 2rem
+  }
+
+  #player {
+    margin-top: 2rem;
+    background: var(--depth);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   #play {
     height: 15vw;
+    width: 20vw;
   }
 
   #track {
@@ -66,8 +116,9 @@
     #thumbnail {
       height: 22.5vw
     }
-    #player{
-      display: flex
+
+    #player {
+      flex-direction: row;
     }
   }
 </style>
