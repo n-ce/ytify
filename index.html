@@ -8,10 +8,11 @@
 </head>
 <style>
   :root {
-    /* default theme color before extraction */
-    --thumbnail: #B0BEC5;
+    /* default theme color */
+    --color: #000;
+
     /* Default Theme */
-    --bg: var(--thumbnail);
+    --bg: var(--color);
     --accent: #fff7;
     --text: #000B;
     --border: none;
@@ -19,28 +20,25 @@
     /* Dark Theme */
     --bgDark: #1f1f1f;
     /* google dark */
-    --accentDark: #f003;
-    /* thumbnail + alpha = 3 */
+    --accentDark: #9EF3;
+    /* color + alpha = 33 using JS */
     --textDark: #fffE;
-    --borderDark: none;
+    --borderDark: #fff4;
+
 
     /* Black Theme */
     --bgBlack: #000;
-    /* amoled */
-    --accentBlack: none;
+    --accentBlack: #000;
     --textBlack: #fff;
-    --borderBlack: var(--thumbnail);
+    --borderBlack: #fff;
   }
 
-  html {
-    background: var(--bgBlack);
-    /* filters saturated color */
-  }
 
   body {
     margin: 0;
-    background: linear-gradient(var(--accentBlack), transparent);
-    color: var(--textBlack);
+    background: var(--bg);
+    transition: background ease-in 2s;
+    color: var(--text);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -49,18 +47,21 @@
 
   div {
     width: 80vw;
-    background: var(--accentBlack);
+    background: var(--accent);
     border-radius: 1rem;
     text-align: center;
-    border: 1px dotted var(--borderBlack);
+    border: 1px solid var(--border);
+    box-shadow: 0 0.1rem 0.3rem #0003;
   }
 
   #settings {
     display: flex;
     justify-content: space-between;
     height: 3rem;
-    background: var(--accentBlack);
+    background: var(--accent);
     margin-top: 2rem;
+    padding: 0.3rem;
+    border-radius: 1.3rem;
   }
 
   #moreBtn {
@@ -72,34 +73,64 @@
   }
 
   #data {
-    background: var(--accentBlack);
+    background: var(--accent);
     margin-top: 2rem;
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 1.3rem;
   }
 
-  #thumbnail {
+  img {
     height: 45vw;
+    border-radius: 1rem;
+    box-shadow: 0 0.1rem 0.3rem #0003;
   }
 
   #meta {
     background: none;
-
+    border: none;
+    box-shadow: none;
   }
 
   #title {
-    font-size: 2rem
+    font-size: 2rem;
+  }
+
+  #input {
+    margin-top: 2rem;
+  }
+
+  input {
+    background: none;
+    height: 2rem;
+    width: 80%;
+    outline: none;
+    border: none;
+    text-align: center;
   }
 
   #player {
-    margin: 2rem 0 2rem 0;
-    background: var(--accentBlack);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    padding: 0.3rem;
+    height: 32vw;
+    background: var(--accent);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
+    border-radius: 1.3rem;
   }
 
   #play {
     height: 15vw;
-    width: 20vw;
+    width: 15vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
   }
 
   #track {
@@ -109,15 +140,21 @@
   @media (orientation:landscape) {
 
     #data {
-      display: flex;
+      flex-direction: row;
     }
 
-    #thumbnail {
+    img {
       height: 22.5vw
     }
 
     #player {
       flex-direction: row;
+      height: 16vw;
+      justify-content: space-around;
+    }
+
+    #track {
+      width: 60vw;
     }
   }
 </style>
@@ -129,21 +166,32 @@
   </div>
 
   <div id="data">
-    <div id="thumbnail">
-      thumbnail
-    </div>
+    <img>
 
     <div id="meta">
       <p id="title">title</p>
       <p id="author">author</p>
     </div>
   </div>
-
+  <div id="input">
+    <input type="url" placeholder="Input Link Here">
+  </div>
   <div id="player">
     <div id="play">play</div>
     <div id="track">track</div>
   </div>
-
+  <script src="JS/color.js"></script>
+  <script>
+    let fx = (url) => {
+      colorjs.average(url, { group: 25, sample: 1, }).then(colors => {
+        let [r, g, b] = colors;
+        storeColor = `rgb(${r},${g},${b})`;
+        document.querySelector('img').src = url;
+        document.querySelector(':root').style.setProperty('--color', storeColor);
+      });
+    }
+    fx('Assets/default_thumbnail.avif');
+  </script>
 </body>
 
 </html>
