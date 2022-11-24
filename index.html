@@ -8,36 +8,14 @@
 </head>
 <style>
   :root {
-    /* default theme color */
-    --color: #000;
-
-    /* Default Theme */
-    --bg: var(--color);
-    --accent: #fff7;
-    --text: #000B;
+    --bg: none;
+    --accent: none;
+    --text: none;
     --border: none;
-
-    /* Dark Theme */
-    --bgDark: #1f1f1f;
-    /* google dark */
-    --accentDark: #9EF3;
-    /* color + alpha = 33 using JS */
-    --textDark: #fffE;
-    --borderDark: #fff4;
-
-
-    /* Black Theme */
-    --bgBlack: #000;
-    --accentBlack: #000;
-    --textBlack: #fff;
-    --borderBlack: #fff;
   }
 
-
   body {
-    margin: 0;
     background: var(--bg);
-    transition: background ease-in 2s;
     color: var(--text);
     display: flex;
     flex-direction: column;
@@ -54,18 +32,29 @@
     box-shadow: 0 0.1rem 0.3rem #0003;
   }
 
+  .container {
+    margin-top: 2rem;
+    border-radius: 1.3rem;
+  }
+
   #settings {
     display: flex;
     justify-content: space-between;
     height: 3rem;
     background: var(--accent);
-    margin-top: 2rem;
     padding: 0.3rem;
-    border-radius: 1.3rem;
   }
 
   #moreBtn {
     width: 4rem
+  }
+
+  select {
+    background: var(--accent);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 1rem;
+    outline: none;
   }
 
   #more {
@@ -74,16 +63,15 @@
 
   #data {
     background: var(--accent);
-    margin-top: 2rem;
     padding: 0.3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    border-radius: 1.3rem;
   }
 
   img {
     height: 45vw;
+    border: 1px solid var(--border);
     border-radius: 1rem;
     box-shadow: 0 0.1rem 0.3rem #0003;
   }
@@ -98,21 +86,17 @@
     font-size: 2rem;
   }
 
-  #input {
-    margin-top: 2rem;
-  }
-
   input {
-    background: none;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    box-shadow: 0 0.1rem 0.3rem #0003;
     height: 2rem;
     width: 80%;
     outline: none;
-    border: none;
     text-align: center;
   }
 
   #player {
-    margin-top: 2rem;
     margin-bottom: 2rem;
     padding: 0.3rem;
     height: 32vw;
@@ -121,7 +105,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    border-radius: 1.3rem;
   }
 
   #play {
@@ -160,12 +143,16 @@
 </style>
 
 <body>
-  <div id="settings">
+  <div class="container" id="settings">
     <div id="moreBtn">(...)</div>
-    <div id="more">more</div>
+    <select id="more">
+      <option id="default"value="default">default</option>
+      <option id="dark"value="dark">dark</option>
+      <option id="black" value="black">black</option>
+    </select>
   </div>
 
-  <div id="data">
+  <div class="container" id="data">
     <img>
 
     <div id="meta">
@@ -173,24 +160,71 @@
       <p id="author">author</p>
     </div>
   </div>
-  <div id="input">
-    <input type="url" placeholder="Input Link Here">
-  </div>
-  <div id="player">
+  <input class="container" type="url" placeholder="Input Link Here">
+
+  <div class="container" id="player">
     <div id="play">play</div>
     <div id="track">track</div>
   </div>
+
   <script src="JS/color.js"></script>
   <script>
+    const palette = {
+      'default': {
+        bg: null,
+        accent: '#fff7',
+        text: '#000b',
+        border: 'none'
+      },
+      'dark': {
+        bg: '#1f1f1f',
+        accent: null,
+        text: '#fffe',
+        border: '#fff1'
+      },
+      'black': {
+        bg: '#000',
+        accent: '#000',
+        text: '#fff',
+        border: '#fff7'
+      }
+    };
+
+
+    const colorChanger = (variable, colour) => {
+      document.querySelector(':root').style.setProperty(variable, colour);
+    }
+
+    let theme = 'default';
+    if (localStorage.getItem('theme')) {
+      theme = localStorage.getItem('theme');
+      document.getElementById(theme).selected='true';
+    }
+
+    const select = document.querySelector('select');
+    select.onchange = () => {
+      theme = select.value;
+      fx(`Assets/${theme}_thumbnail.avif`);
+      localStorage.setItem('theme', theme);
+    }
+
+
     let fx = (url) => {
       colorjs.average(url, { group: 25, sample: 1, }).then(colors => {
         let [r, g, b] = colors;
-        storeColor = `rgb(${r},${g},${b})`;
         document.querySelector('img').src = url;
-        document.querySelector(':root').style.setProperty('--color', storeColor);
+
+        // thumbnail color injected into palette
+        palette['default'].bg = `rgb(${r},${g},${b})`;
+        palette['dark'].accent = `rgba(${r},${g},${b}, 0.3)`;
+
+        colorChanger('--bg', palette[theme].bg);
+        colorChanger('--accent', palette[theme].accent);
+        colorChanger('--text', palette[theme].text);
+        colorChanger('--border', palette[theme].border);
       });
     }
-    fx('Assets/default_thumbnail.avif');
+    fx(`Assets/${theme}_thumbnail.avif`);
   </script>
 </body>
 
