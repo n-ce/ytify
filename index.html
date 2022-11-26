@@ -7,10 +7,12 @@
   <title>ytify</title>
 </head>
 <style>
+  @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
   :root {
-    --bg: none;
-    --accent: none;
-    --text: none;
+    --bg: rgb(119, 149, 218);
+    --accent: #fff7;
+    --text: #000b;
     --border: none;
   }
 
@@ -39,26 +41,20 @@
 
   #settings {
     display: flex;
-    justify-content: space-between;
     height: 3rem;
     background: var(--accent);
     padding: 0.3rem;
+    width: auto;
   }
 
-  #moreBtn {
-    width: 4rem
-  }
 
-  select {
-    background: var(--accent);
-    border: 1px solid var(--border);
+  button {
+    background: none;
+    border: none;
     color: var(--text);
-    border-radius: 1rem;
+    width: 3rem;
+    border-radius: 50%;
     outline: none;
-  }
-
-  #more {
-    width: 60vw;
   }
 
   #data {
@@ -120,6 +116,15 @@
     height: 15vw;
   }
 
+  select {
+    border: none;
+    outline: none;
+    background: var(--accent);
+    color: var(--text);
+    border-radius: 1rem;
+    height: 3rem;
+  }
+
   @media (orientation:landscape) {
 
     #data {
@@ -143,18 +148,23 @@
 </style>
 
 <body>
+
   <div class="container" id="settings">
-    <div id="moreBtn">(...)</div>
-    <select id="more">
-      <option id="default"value="default">default</option>
-      <option id="dark"value="dark">dark</option>
-      <option id="black" value="black">black</option>
+    <select>
+      <option value="default" id="default">default</option>
+      <option value="dark" id="dark">dark</option>
+      <option value="black" id="black">black</option>
     </select>
+    <button class="material-icons">fullscreen</button>
+    <button class="material-icons">share</button>
+    <button class="material-icons">download</button>
+    <button class="material-icons">image</button>
+    <button class="material-icons" style="color:var(--bg);background:var(--text)">high_quality</button>
+    <button class="material-icons">input</button>
+    <button class="material-icons">delete</button>
   </div>
-
   <div class="container" id="data">
-    <img>
-
+    <img src="Assets/default_thumbnail.avif">
     <div id="meta">
       <p id="title">title</p>
       <p id="author">author</p>
@@ -163,69 +173,12 @@
   <input class="container" type="url" placeholder="Input Link Here">
 
   <div class="container" id="player">
-    <div id="play">play</div>
+    <div id="play" class="material-icons">play_arrow</div>
     <div id="track">track</div>
   </div>
 
   <script src="JS/color.js"></script>
-  <script>
-    const palette = {
-      'default': {
-        bg: null,
-        accent: '#fff7',
-        text: '#000b',
-        border: 'none'
-      },
-      'dark': {
-        bg: '#1f1f1f',
-        accent: null,
-        text: '#fffe',
-        border: '#fff1'
-      },
-      'black': {
-        bg: '#000',
-        accent: '#000',
-        text: '#fff',
-        border: '#fff7'
-      }
-    };
-
-
-    const colorChanger = (variable, colour) => {
-      document.querySelector(':root').style.setProperty(variable, colour);
-    }
-
-    let theme = 'default';
-    if (localStorage.getItem('theme')) {
-      theme = localStorage.getItem('theme');
-      document.getElementById(theme).selected='true';
-    }
-
-    const select = document.querySelector('select');
-    select.onchange = () => {
-      theme = select.value;
-      fx(`Assets/${theme}_thumbnail.avif`);
-      localStorage.setItem('theme', theme);
-    }
-
-
-    let fx = (url) => {
-      colorjs.average(url, { group: 25, sample: 1, }).then(colors => {
-        let [r, g, b] = colors;
-        document.querySelector('img').src = url;
-
-        // thumbnail color injected into palette
-        palette['default'].bg = `rgb(${r},${g},${b})`;
-        palette['dark'].accent = `rgba(${r},${g},${b}, 0.3)`;
-
-        colorChanger('--bg', palette[theme].bg);
-        colorChanger('--accent', palette[theme].accent);
-        colorChanger('--text', palette[theme].text);
-        colorChanger('--border', palette[theme].border);
-      });
-    }
-    fx(`Assets/${theme}_thumbnail.avif`);
-  </script>
+  <script src="themer.js"></script>
 </body>
 
 </html>
