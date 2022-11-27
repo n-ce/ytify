@@ -1,0 +1,160 @@
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+
+:root {
+  --bg: rgb(119, 149, 218);
+  --accent: #fff7;
+  --text: #000b;
+  --border: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+div {
+  width: 80vw;
+  background: var(--accent);
+  border-radius: 1rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  box-shadow: 0 0.1rem 0.3rem #0003;
+}
+
+.container {
+  margin-top: 2rem;
+  border-radius: 1.3rem;
+}
+
+#settings {
+  display: flex;
+  height: 3rem;
+  background:var(--accent);
+  padding: 0.3rem;
+  width: auto;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: -0.5rem;
+}
+select {
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--text);
+  border-radius: 1rem;
+  height: 3rem;
+  width: 3rem;
+}
+
+button {
+  background: none;
+  border: none;
+  color: var(--border);
+  width: 3rem;
+  border-radius: 50%;
+  outline: none;
+}
+
+#data {
+  background: var(--accent);
+  padding: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+img {
+  height: 45vw;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 0.1rem 0.3rem #0003;
+}
+
+#meta {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+#title {
+  font-size: 2rem;
+}
+
+input {
+  background: var(--accent);
+  border: 1px solid var(--border);
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  height: 2rem;
+  width: 80%;
+  outline: none;
+  text-align: center;
+}
+
+#player {
+  margin-bottom: 2rem;
+  padding: 0.3rem;
+  height: 32vw;
+  background: var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#play {
+  height: 15vw;
+  width: 15vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+#track {
+  height: 15vw;
+}
+
+
+
+@media (orientation:landscape) {
+
+  #data {
+    flex-direction: row;
+  }
+
+  img {
+    height: 22.5vw
+  }
+
+  #player {
+    flex-direction: row;
+    height: 16vw;
+    justify-content: space-around;
+  }
+
+  #track {
+    width: 60vw;
+  }
+}
+@media (max-width: 600px){
+  #settings{
+    height: 7rem;
+    display: grid;
+    
+    grid-template-columns: auto auto auto auto auto;
+  }
+  select{
+    margin-bottom: 1rem;
+  }
+  button{
+    height: 3rem;
+  }
+}
+.on{
+  background:var(--accent);
+  color: var(--text);
+  transform: scale(0.9)
+}

@@ -5,162 +5,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ytify</title>
+  <link rel="stylesheet" href="newstyle.css">
 </head>
-<style>
-  @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-
-  :root {
-    --bg: rgb(119, 149, 218);
-    --accent: #fff7;
-    --text: #000b;
-    --border: none;
-  }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-  }
-
-  div {
-    width: 80vw;
-    background: var(--accent);
-    border-radius: 1rem;
-    text-align: center;
-    border: 1px solid var(--border);
-    box-shadow: 0 0.1rem 0.3rem #0003;
-  }
-
-  .container {
-    margin-top: 2rem;
-    border-radius: 1.3rem;
-  }
-
-  #settings {
-    display: flex;
-    height: 3rem;
-    background: var(--accent);
-    padding: 0.3rem;
-    width: auto;
-  }
-
-
-  button {
-    background: none;
-    border: none;
-    color: var(--text);
-    width: 3rem;
-    border-radius: 50%;
-    outline: none;
-  }
-
-  #data {
-    background: var(--accent);
-    padding: 0.3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  img {
-    height: 45vw;
-    border: 1px solid var(--border);
-    border-radius: 1rem;
-    box-shadow: 0 0.1rem 0.3rem #0003;
-  }
-
-  #meta {
-    background: none;
-    border: none;
-    box-shadow: none;
-  }
-
-  #title {
-    font-size: 2rem;
-  }
-
-  input {
-    background: var(--accent);
-    border: 1px solid var(--border);
-    box-shadow: 0 0.1rem 0.3rem #0003;
-    height: 2rem;
-    width: 80%;
-    outline: none;
-    text-align: center;
-  }
-
-  #player {
-    margin-bottom: 2rem;
-    padding: 0.3rem;
-    height: 32vw;
-    background: var(--accent);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  #play {
-    height: 15vw;
-    width: 15vw;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
-  }
-
-  #track {
-    height: 15vw;
-  }
-
-  select {
-    border: none;
-    outline: none;
-    background: var(--accent);
-    color: var(--text);
-    border-radius: 1rem;
-    height: 3rem;
-  }
-
-  @media (orientation:landscape) {
-
-    #data {
-      flex-direction: row;
-    }
-
-    img {
-      height: 22.5vw
-    }
-
-    #player {
-      flex-direction: row;
-      height: 16vw;
-      justify-content: space-around;
-    }
-
-    #track {
-      width: 60vw;
-    }
-  }
-</style>
 
 <body>
 
-  <div class="container" id="settings">
-    <select>
-      <option value="default" id="default">default</option>
-      <option value="dark" id="dark">dark</option>
-      <option value="black" id="black">black</option>
-    </select>
+  <div id="settings">
+    
+  <button class="material-icons">palette</button>
+  
+  <select>
+    <option value="default" id="default">default</option>
+    <option value="dark" id="dark">dark</option>
+    <option value="black" id="black">black</option>
+  </select>
+  
     <button class="material-icons">fullscreen</button>
     <button class="material-icons">share</button>
     <button class="material-icons">download</button>
-    <button class="material-icons">image</button>
-    <button class="material-icons" style="color:var(--bg);background:var(--text)">high_quality</button>
-    <button class="material-icons">input</button>
+    <button class="material-icons on">image</button>
+    
+    <button class="material-icons on">high_quality</button>
+    <button class="on material-icons">input</button>
+    <button class="material-icons">info</button>
     <button class="material-icons">delete</button>
   </div>
   <div class="container" id="data">

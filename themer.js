@@ -24,6 +24,7 @@ const colorChanger = (variable, colour) => {
   document.querySelector(':root').style.setProperty(variable, colour);
 }
 
+
 const fx = (url) => {
   colorjs.average(url, { group: 25, sample: 1, }).then(colors => {
     let [r, g, b] = colors;
