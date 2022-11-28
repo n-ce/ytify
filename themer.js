@@ -47,13 +47,26 @@ const savedTheme = localStorage.getItem('theme');
 if (savedTheme) {
   theme = savedTheme;
   fx(`Assets/${theme}_thumbnail.avif`);
-  document.getElementById(theme).selected = 'true';
 }
 else { theme = 'default'; }
 
-const select = document.querySelector('select');
-select.onchange = () => {
-  theme = select.value;
-  theme == 'default' ? localStorage.clear() : localStorage.setItem('theme', theme);
+document.getElementById('theme').addEventListener('click', () => {
+  if (theme == 'default') {
+    theme = 'dark';
+    localStorage.setItem('theme', theme);
+  }
+  else if (theme == 'dark') {
+    theme = 'black';
+    localStorage.setItem('theme', theme);
+  }
+  else if (theme == 'black') {
+    theme = 'default';
+    localStorage.clear();
+  }
   fx(`Assets/${theme}_thumbnail.avif`);
-}
+
+});
+
+document.getElementById('stngBtn').addEventListener('click', ()=>{
+  document.querySelector('#settings').classList.toggle('show');
+})

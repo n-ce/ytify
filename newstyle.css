@@ -24,30 +24,18 @@ div {
   box-shadow: 0 0.1rem 0.3rem #0003;
 }
 
-.container {
-  margin-top: 2rem;
-  border-radius: 1.3rem;
-}
 
 #settings {
-  display: flex;
+  grid-template-columns: auto auto auto auto auto auto auto auto auto;
   height: 3rem;
-  background:var(--accent);
+  background: var(--accent);
   padding: 0.3rem;
   width: auto;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
-  margin-top: -0.5rem;
+  margin-top: -0.6rem;
 }
-select {
-  border: none;
-  outline: none;
-  background: none;
-  color: var(--text);
-  border-radius: 1rem;
-  height: 3rem;
-  width: 3rem;
-}
+
 
 button {
   background: none;
@@ -58,12 +46,25 @@ button {
   outline: none;
 }
 
+input {
+  background:var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  height: 2rem;
+  outline: none;
+  text-align: center;
+  color: var(--text);
+  font-weight: bold;
+}
+
 #data {
   background: var(--accent);
   padding: 0.3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 2rem;
 }
 
 img {
@@ -77,24 +78,16 @@ img {
   background: none;
   border: none;
   box-shadow: none;
+  
 }
 
 #title {
   font-size: 2rem;
 }
 
-input {
-  background: var(--accent);
-  border: 1px solid var(--border);
-  box-shadow: 0 0.1rem 0.3rem #0003;
-  height: 2rem;
-  width: 80%;
-  outline: none;
-  text-align: center;
-}
 
 #player {
-  margin-bottom: 2rem;
+  margin-top: 2rem;
   padding: 0.3rem;
   height: 32vw;
   background: var(--accent);
@@ -117,8 +110,6 @@ input {
   height: 15vw;
 }
 
-
-
 @media (orientation:landscape) {
 
   #data {
@@ -139,22 +130,27 @@ input {
     width: 60vw;
   }
 }
-@media (max-width: 600px){
-  #settings{
+
+@media (max-width: 600px) {
+  #settings {
     height: 7rem;
-    display: grid;
-    
     grid-template-columns: auto auto auto auto auto;
   }
-  select{
-    margin-bottom: 1rem;
-  }
-  button{
+
+  button {
     height: 3rem;
   }
+  
 }
-.on{
-  background:var(--accent);
+
+.on {
+  background: var(--accent);
   color: var(--text);
   transform: scale(0.9)
+}
+.hide {
+  display: none;
+}
+.show{
+  display: grid;
 }

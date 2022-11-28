@@ -10,37 +10,33 @@
 
 <body>
 
-  <div id="settings">
-    
-  <button class="material-icons">palette</button>
-  
-  <select>
-    <option value="default" id="default">default</option>
-    <option value="dark" id="dark">dark</option>
-    <option value="black" id="black">black</option>
-  </select>
-  
-    <button class="material-icons">fullscreen</button>
-    <button class="material-icons">share</button>
-    <button class="material-icons">download</button>
-    <button class="material-icons on">image</button>
-    
-    <button class="material-icons on">high_quality</button>
-    <button class="on material-icons">input</button>
-    <button class="material-icons">info</button>
-    <button class="material-icons">delete</button>
+  <div id="settings" class="hide">
+   <button class="material-icons on" id="theme">palette</button>
+    <button class="material-icons " id="fsBtn">fullscreen</button>
+    <button class="material-icons" id="shareBtn">share</button>
+    <button class="material-icons" id="dlBtn">download</button>
+    <button class="material-icons on" id="thumbBtn">image</button>
+    <button class="material-icons" id="qualityBtn">high_quality</button>
+    <button class="material-icons" id="info">info</button>
+    <button class="material-icons" id="delBtn">delete</button>
+    <button class="material-icons on" id="inputBtn">input</button>
   </div>
+ 
   <div class="container" id="data">
     <img src="Assets/default_thumbnail.avif">
     <div id="meta">
+     
       <p id="title">title</p>
       <p id="author">author</p>
+        <input type="url" placeholder="Input Link Here">
+
     </div>
   </div>
-  <input class="container" type="url" placeholder="Input Link Here">
 
   <div class="container" id="player">
     <div id="play" class="material-icons">play_arrow</div>
+   <button class="material-icons on" id="stngBtn">settings</button>
+   
     <div id="track">track</div>
   </div>
 
