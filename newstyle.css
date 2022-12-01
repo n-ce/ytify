@@ -34,8 +34,13 @@ div {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: -0.6rem;
+  animation: appear 1s ease-in-out;
 }
-
+@keyframes appear{
+  from{
+    transform: translateY(-100%);
+  }
+}
 
 button {
   background: none;
@@ -46,17 +51,6 @@ button {
   outline: none;
 }
 
-input {
-  background:var(--accent);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  box-shadow: 0 0.1rem 0.3rem #0003;
-  height: 2rem;
-  outline: none;
-  text-align: center;
-  color: var(--text);
-  font-weight: bold;
-}
 
 #data {
   background: var(--accent);
@@ -78,7 +72,7 @@ img {
   background: none;
   border: none;
   box-shadow: none;
-  
+
 }
 
 #title {
@@ -89,7 +83,8 @@ img {
 #player {
   margin-top: 2rem;
   padding: 0.3rem;
-  height: 32vw;
+  height: auto;
+  width: auto;
   background: var(--accent);
   display: flex;
   flex-direction: column;
@@ -98,19 +93,45 @@ img {
 }
 
 #play {
-  height: 15vw;
-  width: 15vw;
+  display: flex;
+  width: auto;
+  background: none;
+  box-shadow: none;
+}
+
+#playBtn {
+  height: 3rem;
+  width: 3rem;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
+  background: var(--accent)
 }
 
-#track {
-  height: 15vw;
+#stngBtn {
+  transition: transform 1s;
 }
 
-@media (orientation:landscape) {
+#stngBtn:focus {
+  transform: rotate(120deg);
+}
+
+input {
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  height: 3rem;
+  outline: none;
+  text-align: center;
+  color: var(--text);
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+
+@media (min-width:600px) {
 
   #data {
     flex-direction: row;
@@ -122,12 +143,13 @@ img {
 
   #player {
     flex-direction: row;
-    height: 16vw;
-    justify-content: space-around;
+    height: 3rem;
+    justify-content: space-between;
+    width: auto;
   }
 
-  #track {
-    width: 60vw;
+  input {
+    margin-top: 0;
   }
 }
 
@@ -140,7 +162,7 @@ img {
   button {
     height: 3rem;
   }
-  
+
 }
 
 .on {
@@ -148,9 +170,11 @@ img {
   color: var(--text);
   transform: scale(0.9)
 }
+
 .hide {
   display: none;
 }
-.show{
+
+.show {
   display: grid;
 }

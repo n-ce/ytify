@@ -11,7 +11,7 @@
 <body>
 
   <div id="settings" class="hide">
-   <button class="material-icons on" id="theme">palette</button>
+    <button class="material-icons on" id="theme">palette</button>
     <button class="material-icons " id="fsBtn">fullscreen</button>
     <button class="material-icons" id="shareBtn">share</button>
     <button class="material-icons" id="dlBtn">download</button>
@@ -21,23 +21,27 @@
     <button class="material-icons" id="delBtn">delete</button>
     <button class="material-icons on" id="inputBtn">input</button>
   </div>
- 
+
   <div class="container" id="data">
     <img src="Assets/default_thumbnail.avif">
     <div id="meta">
-     
+
       <p id="title">title</p>
       <p id="author">author</p>
-        <input type="url" placeholder="Input Link Here">
 
     </div>
   </div>
 
   <div class="container" id="player">
-    <div id="play" class="material-icons">play_arrow</div>
-   <button class="material-icons on" id="stngBtn">settings</button>
-   
-    <div id="track">track</div>
+    <div id="play">
+      <button id="playBtn" class="material-icons">play_arrow</button>
+      <button class="material-icons">add_to_queue</button>
+      <button class="material-icons">skip_next</button>
+      <button class="material-icons" id="stngBtn">settings</button>
+
+    </div>
+    <input type="url" placeholder="Input Link Here">
+
   </div>
 
   <script src="JS/color.js"></script>
