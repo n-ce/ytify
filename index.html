@@ -1,47 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="50kbps opus youtube audio streaming front-end">
+  <meta name="author" content="Animesh Nath">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="rgb(119, 149, 218)">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 50kbps,Free , 
+     spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
   <title>ytify</title>
-  <link rel="stylesheet" href="newstyle.css">
+
+  <meta property="og:title" content="YTIFY">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ytify.netlify.app">
+  <meta property="og:description" content="50kbps Opus YouTube Audio Streaming Web App.">
+  <meta property="og:image" content="Assets/maskable_icon_x512.png">
+
+  <!-- tells google that this url is most important (e.g. not http (without s = secure))-->
+  <link rel="canonical" href="https://ytify.netlify.app/">
+
+  <link rel="icon" type="image/png" alt="Main image" sizes="512x512" href="Assets/maskable_icon_x512.png" />
+  <link rel="icon" type="image/png" alt="Main image" sizes="192x192" href="Assets/maskable_icon_x192.png" />
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <div id="settings" class="hide">
-    <button class="material-icons on" id="theme">palette</button>
-    <button class="material-icons " id="fsBtn">fullscreen</button>
-    <button class="material-icons" id="shareBtn">share</button>
-    <button class="material-icons" id="dlBtn">download</button>
-    <button class="material-icons on" id="thumbBtn">image</button>
-    <button class="material-icons" id="qualityBtn">high_quality</button>
-    <button class="material-icons" id="info">info</button>
-    <button class="material-icons" id="delBtn">delete</button>
-    <button class="material-icons on" id="inputBtn">input</button>
+  <div id="settingsContainer" class="hide">
+    <button class="material-icons" id="themeButton">palette</button>
+    <button class="material-icons" id="fullscreenButton">fullscreen</button>
+    <button class="material-icons" id="shareAppButton">share</button>
+    <button class="material-icons" id="installButton">download</button>
+    <button class="material-icons" id="thumbnailButton">image</button>
+    <button class="material-icons" id="qualityButton">high_quality</button>
+    <button class="material-icons" id="infoButton">info</button>
+    <button class="material-icons" id="deleteDataButton">delete</button>
+    <button class="material-icons" id="inputToggleButton">input</button>
   </div>
 
-  <div class="container" id="data">
+  <div id="dataContainer">
     <img src="Assets/default_thumbnail.avif">
-    <div id="meta">
-
+    <div id="metadata" align="center">
       <p id="title">title</p>
       <p id="author">author</p>
-
     </div>
   </div>
 
-  <div class="container" id="player">
-    <div id="play">
-      <button id="playBtn" class="material-icons">play_arrow</button>
-      <button class="material-icons">add_to_queue</button>
-      <button class="material-icons">skip_next</button>
-      <button class="material-icons" id="stngBtn">settings</button>
-
+  <div id="playerContainer">
+    <div id="playbackButtons">
+      <button class="material-icons on" id="playButton">play_arrow</button>
+      <button class="material-icons" id="queueButton">add_to_queue</button>
+      <button class="material-icons" id="nextButton">skip_next</button>
+      <button class="material-icons" id="settingsButton">settings</button>
     </div>
     <input type="url" placeholder="Input Link Here">
-
   </div>
 
   <script src="JS/color.js"></script>

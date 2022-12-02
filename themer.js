@@ -50,7 +50,7 @@ if (savedTheme) {
 }
 else { theme = 'default'; }
 
-document.getElementById('theme').addEventListener('click', () => {
+document.getElementById('themeButton').addEventListener('click', () => {
   if (theme == 'default') {
     theme = 'dark';
     localStorage.setItem('theme', theme);
@@ -67,6 +67,6 @@ document.getElementById('theme').addEventListener('click', () => {
 
 });
 
-document.getElementById('stngBtn').addEventListener('click', ()=>{
-  document.querySelector('#settings').classList.toggle('show');
+document.getElementById('settingsButton').addEventListener('click', ()=>{
+  document.querySelector('#settingsContainer').classList.toggle('show');
 })
