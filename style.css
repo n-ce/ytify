@@ -27,7 +27,7 @@ body {
   border-radius: 1rem;
   box-shadow: 0 0.1rem 0.3rem #0003;
   grid-template-columns: auto auto auto auto auto;
-  animation: appear 1s ease-in-out;
+  animation: appear 750ms ease-out;
 }
 
 @keyframes appear {
@@ -62,7 +62,6 @@ button {
 
 img {
   height: 45vw;
-  border: 1px solid var(--border);
   border-radius: 0.7rem;
   box-shadow: 0 0.1rem 0.3rem #0003;
 }
