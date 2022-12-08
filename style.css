@@ -24,10 +24,11 @@ body {
   padding: 0.3rem;
   background: var(--accent);
   border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-radius: 0.7rem;
   box-shadow: 0 0.1rem 0.3rem #0003;
-  grid-template-columns: auto auto auto auto auto;
-  animation: appear 750ms ease-out;
+  grid-template-columns: auto auto auto auto;
+  animation: fade 500ms ease-out;
+  
 }
 
 @keyframes appear {
@@ -44,6 +45,7 @@ button {
   border: none;
   border-radius: 50%;
   outline: none;
+  animation: fade 1s ease-out
 }
 
 #dataContainer {
@@ -54,16 +56,18 @@ button {
   background: var(--accent);
   box-shadow: 0 0.1rem 0.3rem #0003;
   border: 1px solid var(--border);
-  border-radius: 1rem;
+  border-radius: 0.7rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fade 500ms ease-out;
 }
 
 img {
   height: 45vw;
-  border-radius: 0.7rem;
+  border-radius: 0.5rem;
   box-shadow: 0 0.1rem 0.3rem #0003;
+  animation: fade 1s ease-out;
 }
 
 #title {
@@ -76,13 +80,15 @@ img {
   padding: 0.3rem;
 
   background: var(--accent);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
+  border: 0.1px solid var(--border);
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  border-radius: 0.7rem;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  animation: fade 500ms ease-out;
 }
 
 #playbackButtons {
@@ -108,21 +114,36 @@ img {
   transform: rotate(120deg);
 }
 
+#queuePreviousButton {
+  transform: scaleX(-1)
+}
+
 input {
   height: 3rem;
+  width: 15rem;
   margin-top: 1rem;
 
   background: var(--accent);
   border: 1px solid var(--border);
-  border-radius: 0.7rem;
+  border-radius: 0.5rem;
   box-shadow: 0 0.1rem 0.3rem #0003;
   color: var(--text);
 
   outline: none;
   text-align: center;
   font-weight: bold;
+  animation: fade 1s ease-out
 }
 
+
+
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(-50%)
+  }
+}
 
 @media (min-width:600px) {
   #settingsContainer {
