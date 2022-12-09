@@ -69,5 +69,6 @@ const codecs = {
 
 const input = document.querySelector('input');
 const query = (new URL(location.href)).searchParams.get('q');
+const audio = document.querySelector('audio');
 
-export { ytID, palette, themer, imageURL, save, getSaved, metadata, codecs, input, query };
+export { ytID, palette, themer, imageURL, save, getSaved, metadata, codecs, input, query,audio };

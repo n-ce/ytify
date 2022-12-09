@@ -1,10 +1,7 @@
-import { ytID, themer, imageURL, getSaved, save, input, metadata, codecs, query } from './constants.js'
-
+import { ytID, themer, imageURL, getSaved, save, input, metadata, codecs, query ,audio} from './constants.js'
 
 let quality = codecs.low;
 let codecCount = 0;
-
-const audio = document.querySelector('audio');
 
 const play = (url) => {
   fetch(metadata + url)
@@ -28,6 +25,10 @@ const play = (url) => {
       }
     });
 }
+if (query != null) {
+  input.value = 'https://youtu.be/' + query;
+  play(input.value);
+}
 
 input.addEventListener('input', () => {
   play(input.value);
@@ -45,9 +46,8 @@ playButton.addEventListener('click', () => {
     audio.pause();
     playButton.innerText = 'play_arrow';
   }
+  playback=!playback;
 });
-audio.onended=()=>{
+audio.onended = () => {
   playButton.innerText = 'stop';
 }
-if (query != null)
-  play('https://youtu.be/' + query);
