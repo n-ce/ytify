@@ -135,9 +135,6 @@ input {
   animation: fade 1s ease-out
 }
 
-
-
-
 @keyframes fade {
   from {
     opacity: 0;
@@ -160,7 +157,9 @@ input {
   }
 
   #metadata {
+    height: 22.5vw;
     width: 40vw;
+    overflow: scroll;
   }
 
   #playerContainer {
@@ -179,6 +178,7 @@ input {
 .on {
   background: var(--accent);
   color: var(--text);
+  border: 1px solid var(--border);
   box-shadow: 0 0.1rem 0.3rem #0003;
   transform: scale(0.9)
 }
@@ -189,4 +189,8 @@ input {
 
 .show {
   display: grid;
+}
+
+a{
+  text-decoration: none
 }
