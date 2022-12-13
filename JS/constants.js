@@ -62,13 +62,10 @@ const themer = (url, theme) => {
   });
 }
 const metadata = "https://noembed.com/embed?dataType=json&url=";
-const codecs = {
-  'low': [600, 139, 249],
-  'high': [251, 140]
-}
+
 
 const input = document.querySelector('input');
 const query = (new URL(location.href)).searchParams.get('q');
 const audio = document.querySelector('audio');
 
-export { ytID, palette, themer, imageURL, save, getSaved, metadata, codecs, input, query,audio };
+export { ytID, palette, themer, imageURL, save, getSaved, metadata, input, query,audio };

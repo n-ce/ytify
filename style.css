@@ -18,6 +18,7 @@ body {
 }
 
 
+
 #settingsContainer {
   height: 7rem;
   width: auto;
@@ -48,6 +49,8 @@ button {
   animation: fade 1s ease-out
 }
 
+
+
 #dataContainer {
   width: 80vw;
   margin-top: 2rem;
@@ -71,9 +74,11 @@ img {
 }
 
 #title {
-  font-size: 2rem;
+  font-size: 1.25rem;
 }
-
+#author{
+  font-size: 0.75rem;
+}
 #playerContainer {
   height: auto;
   width: auto;

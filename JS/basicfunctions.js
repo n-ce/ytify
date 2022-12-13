@@ -1,4 +1,4 @@
-import { themer,getSaved, save } from './constants.js';
+import { themer, getSaved, save } from './constants.js';
 
 // settings panel toggle
 
@@ -70,14 +70,14 @@ if (!navigator.share) {
     shareButton.style.display = 'none';
   }
 }
-save('title','now playing');
+
 shareButton
   .addEventListener('click',
     () => {
       if (navigator.share) {
         navigator.share({
           title: 'ytify',
-          text: getSaved('title'),
+          text: document.querySelector('#title').innerText,
           url: location.href,
         })
       }
@@ -89,14 +89,12 @@ shareButton
 
 // Theme toggle
 
-save('image','Assets/default_thumbnail.avif');
-
 let theme = 'default';
 
 if (getSaved('theme')) {
   theme = getSaved('theme');
 }
-
+save('image', 'Assets/default_thumbnail.avif');
 themer(getSaved('image'), theme);
 
 document.querySelector('#themeButton').addEventListener('click', () => {
@@ -110,4 +108,26 @@ document.querySelector('#themeButton').addEventListener('click', () => {
     theme = 'default';
   }
   themer(getSaved('image'), theme);
+});
+
+
+// quality
+
+const qualityButton = document.querySelector('#qualityButton');
+
+let quality = true;
+
+if (getSaved('quality')=='251,140') {
+  qualityButton.classList.add('on');
+  quality = false;
+}
+else {
+  save('quality', '600, 139, 249'); // low
+}
+qualityButton.addEventListener('click', () => {
+  quality ?
+    save('quality', '251,140') : // high
+    save('quality', '600, 139, 249'); // low
+  qualityButton.classList.toggle('on');
+  quality = !quality;
 });

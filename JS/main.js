@@ -1,6 +1,7 @@
-import { ytID, themer, imageURL, getSaved, save, input, metadata, codecs, query ,audio} from './constants.js'
+import { ytID, themer, imageURL, getSaved, save, input, metadata, query, audio } from './constants.js'
 
-let quality = codecs.low;
+
+
 let codecCount = 0;
 
 const play = (url) => {
@@ -10,13 +11,13 @@ const play = (url) => {
       // check if link is valid
       if (data.title !== undefined) {
         // Playback
-        audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${quality[codecCount]}`;
+        audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${getSaved('quality').split(',')[codecCount]}`;
+
         themer(imageURL(url), getSaved('theme'));
         audio.onerror = () => {
           codecCount++;
           play(url);
         }
-        save('title', data.title);
         document.querySelector('#title').innerText = data.title;
         document.querySelector('#author').innerText = data.author_name;
         history.pushState('', '', location.origin + '/?q=' + ytID(url));
@@ -46,7 +47,7 @@ playButton.addEventListener('click', () => {
     audio.pause();
     playButton.innerText = 'play_arrow';
   }
-  playback=!playback;
+  playback = !playback;
 });
 audio.onended = () => {
   playButton.innerText = 'stop';

@@ -45,8 +45,8 @@
   <div id="dataContainer">
     <img>
     <div id="metadata" align="center">
-      <p id="title">beta</p>
-      <p id="author">1</p>
+      <p id="title">---</p>
+      <p id="author">----</p>
     </div>
   </div>
   <audio></audio>
@@ -68,10 +68,17 @@
 
   <br>
 
-  <code>ytify v5.β1, a
+  <code>ytify v5.β2, a
     <a href="https://github.com/n-ce">
       n-ce</a> project.
   </code>
+  <script>
+    // fixes compatibitity with older versions
+    localStorage.setItem('version', '5.beta2');
+    if (localStorage.getItem('version') !== '5.beta2') {
+      localStorage.clear();
+    }
+  </script>
   <script src="JS/main.js" type="module"></script>
   <script src="JS/basicfunctions.js" type="module"></script>
   <script src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
