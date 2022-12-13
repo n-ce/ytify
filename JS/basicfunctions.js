@@ -1,4 +1,4 @@
-import { themer, getSaved, save } from './constants.js';
+import { themer, getSaved, save, query } from './constants.js';
 
 // settings panel toggle
 
@@ -94,7 +94,9 @@ let theme = 'default';
 if (getSaved('theme')) {
   theme = getSaved('theme');
 }
-save('image', 'Assets/default_thumbnail.avif');
+if (query == null)
+  save('image', 'Assets/default_thumbnail.avif');
+
 themer(getSaved('image'), theme);
 
 document.querySelector('#themeButton').addEventListener('click', () => {
@@ -117,7 +119,7 @@ const qualityButton = document.querySelector('#qualityButton');
 
 let quality = true;
 
-if (getSaved('quality')=='251,140') {
+if (getSaved('quality') == '251,140') {
   qualityButton.classList.add('on');
   quality = false;
 }
