@@ -27,7 +27,7 @@ const play = (url) => {
     });
 }
 if (query != null) {
-  input.value = 'https://youtu.be/' + query;
+  input.value = 'https://m.youtube.com/watch?v=' + query;
   play(input.value);
 }
 

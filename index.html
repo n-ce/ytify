@@ -74,9 +74,9 @@
   </code>
   <script>
     // fixes compatibitity with older versions
-    localStorage.setItem('version', '5.beta2');
     if (localStorage.getItem('version') !== '5.beta2') {
       localStorage.clear();
+      localStorage.setItem('version', '5.beta2');
     }
   </script>
   <script src="JS/main.js" type="module"></script>
