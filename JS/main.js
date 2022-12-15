@@ -13,7 +13,7 @@ const play = (url) => {
         // Playback
         audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${getSaved('quality').split(',')[codecCount]}`;
 
-        themer(imageURL(url), getSaved('theme'));
+        themer(imageURL(url));
         audio.onerror = () => {
           codecCount++;
           play(url);

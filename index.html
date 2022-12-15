@@ -7,7 +7,7 @@
   <meta name="description" content="50kbps opus youtube audio streaming front-end">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="rgb(119, 149, 218)">
+  <meta name="theme-color" content="none">
   <meta name="mobile-web-app-capable" content="yes">
 
   <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 50kbps,Free , 
@@ -26,13 +26,16 @@
   <link rel="icon" type="image/png" alt="Main image" sizes="512x512" href="Assets/maskable_icon_x512.png" />
   <link rel="icon" type="image/png" alt="Main image" sizes="192x192" href="Assets/maskable_icon_x192.png" />
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="CSS/main.css">
+  <link rel="stylesheet" href="CSS/settings.css">
+  <link rel="stylesheet" href="CSS/data.css">
+  <link rel="stylesheet" href="CSS/player.css">
 </head>
 
 <body>
 
   <div id="settingsContainer" class="hide">
-    <button class="material-icons" id="themeButton">palette</button>
+    <button class="material-icons" id="themeButton">dark_mode</button>
     <button class="material-icons" id="fullscreenButton">fullscreen</button>
     <button class="material-icons" id="installButton">get_app</button>
     <button class="material-icons" id="thumbnailButton">image</button>
@@ -43,14 +46,20 @@
   </div>
 
   <div id="dataContainer">
+
     <img>
+
     <div id="metadata" align="center">
       <p id="title">---</p>
       <p id="author">----</p>
     </div>
+
   </div>
+
   <audio></audio>
+
   <div id="playerContainer">
+
     <div id="playbackButtons">
       <button class="material-icons on" id="playButton">play_arrow</button>
       <button class="material-icons   " id="queueButton">queue</button>
@@ -58,25 +67,32 @@
       <button class="material-icons   " id="shareButton">share</button>
       <button class="material-icons   " id="settingsButton">settings</button>
     </div>
+
     <div id="queueButtons" class="hide">
       <button class="material-icons" id="queuePreviousButton">queue_play_next</button>
       <button class="material-icons" id="queueAddButton">add_to_queue</button>
       <button class="material-icons" id="queueNextButton">queue_play_next</button>
     </div>
+
     <input type="url" placeholder="Input Link Here">
+
   </div>
 
   <br>
 
-  <code>ytify v5.β2, a
+  <code>ytify <kbd></kbd>, a
     <a href="https://github.com/n-ce">
       n-ce</a> project.
   </code>
-  <script>
+
+  <script type="module">
+    import { save, getSaved } from './JS/constants.js'
     // fixes compatibitity with older versions
-    if (localStorage.getItem('version') !== '5.beta2') {
+    const version = 'v5.β3';
+    document.querySelector('kbd').innerText = version;
+    if (getSaved('version') !== version) {
       localStorage.clear();
-      localStorage.setItem('version', '5.beta2');
+      save('version', version);
     }
   </script>
   <script src="JS/main.js" type="module"></script>

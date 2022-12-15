@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
+
+:root {
+  --bg: white;
+  --accent: transparent;
+  --text: black;
+  --border: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+
+@keyframes appear {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+button {
+  height: 3rem;
+  width: 3rem;
+  background: none;
+  color: var(--border);
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  animation: fade 1s ease-out
+}
+
+
+
+
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(-50%)
+  }
+}
+
+.on {
+  background: var(--accent);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  transform: scale(0.9)
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: grid;
+}
+
+a{
+  text-decoration: none
+}

@@ -12,15 +12,19 @@ document.querySelector('#settingsButton')
 // fullscreen
 
 let fullscreen = true;
-
-document.querySelector('#fullscreenButton')
-  .addEventListener('click',
-    () => {
-      fullscreen ?
-        document.documentElement.requestFullscreen() :
-        document.exitFullscreen();
-      fullscreen = !fullscreen;
-    });
+const fullscreenButton = document.querySelector('#fullscreenButton');
+fullscreenButton.addEventListener('click',
+  () => {
+    if (fullscreen) {
+      document.documentElement.requestFullscreen();
+      fullscreenButton.innerText = 'fullscreen_exit';
+    }
+    else {
+      document.exitFullscreen();
+      fullscreenButton.innerText = 'fullscreen';
+    }
+    fullscreen = !fullscreen;
+  });
 
 // info
 
@@ -88,28 +92,19 @@ shareButton
     });
 
 // Theme toggle
+const themeButton = document.querySelector('#themeButton');
 
-let theme = 'default';
-
-if (getSaved('theme')) {
-  theme = getSaved('theme');
-}
-if (query == null)
-  save('image', 'Assets/default_thumbnail.avif');
-
-themer(getSaved('image'), theme);
-
-document.querySelector('#themeButton').addEventListener('click', () => {
-  if (theme == 'default') {
-    theme = 'dark';
+themeButton.addEventListener('click', () => {
+  if (getSaved('theme') == 'black') {
+    localStorage.removeItem('theme');
+    themeButton.innerText = 'dark_mode';
   }
-  else if (theme == 'dark') {
-    theme = 'black';
+  else {
+    save('theme', 'black');
+    themeButton.innerText = 'light_mode';
   }
-  else if (theme == 'black') {
-    theme = 'default';
-  }
-  themer(getSaved('image'), theme);
+
+  themer(getSaved('image'));
 });
 
 

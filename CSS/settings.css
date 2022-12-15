@@ -1,0 +1,20 @@
+#settingsContainer {
+  height: 7rem;
+  width: auto;
+  padding: 0.3rem;
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  grid-template-columns: auto auto auto auto;
+  animation: fade 500ms ease-out;
+}
+
+
+@media (min-width:600px) {
+  #settingsContainer {
+    height: 3rem;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto;
+  }
+}
+
