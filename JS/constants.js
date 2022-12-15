@@ -8,24 +8,25 @@ const getSaved = (key) => {
 const ytID = (val) => {
   return val.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)[7];
 }
-const imageURL = (url) => {
-  let x = 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=' + encodeURIComponent("https://img.youtube.com/vi_webp/" + ytID(url) + "/maxresdefault.webp");
-  save('image', x);
-  return x;
-}
+
 const image = document.querySelector('img');
+
+
+const imageURL = (url) => {
+  return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=' + encodeURIComponent("https://img.youtube.com/vi_webp/" + ytID(url) + "/maxresdefault.webp");
+}
+
 const query = (new URL(location.href)).searchParams.get('q');
 
 
-
 const palette = {
-  'default': {
+  'light': {
     bg: 'white',
     accent: '#fff7',
     text: '#000b',
     border: 'none'
   },
-  'black': {
+  'dark': {
     bg: '#000',
     accent: '#000',
     text: '#fff',
@@ -33,17 +34,19 @@ const palette = {
   }
 };
 
+let theme;
 
 const colorInjector = (r, g, b) => {
-  let theme = 'default';
-  if (getSaved('theme'))
-    theme = getSaved('theme');
-  
+
+  getSaved('theme') ?
+    theme = 'dark' :
+    theme = 'light';
+
   if (r !== g && g !== b) {
 
-    let rgb = `rgb(${r},${g},${b}`;
-    palette['default'].bg = rgb + ')';
-    palette['black'].border = rgb + ')';
+    palette['light'].bg =
+      palette['dark'].border =
+      `rgb(${r},${g},${b})`;
 
     document.querySelector(':root').style.setProperty('--bg', palette[theme].bg);
     document.querySelector(':root').style.setProperty('--accent', palette[theme].accent);
@@ -53,10 +56,7 @@ const colorInjector = (r, g, b) => {
   }
 }
 
-
-
-const themer = (url) => {
-  image.src = url;
+const themer = () => {
   colorjs.average(
     image, {
       group: 25,
@@ -66,11 +66,10 @@ const themer = (url) => {
   });
 }
 
-if (query == null)
-  save('image', 'Assets/default_thumbnail.avif');
-
-themer(getSaved('image'));
-
+if (query == null) {
+  image.src = 'Assets/default_thumbnail.avif';
+  themer();
+}
 
 const metadata = "https://noembed.com/embed?dataType=json&url=";
 
@@ -78,4 +77,4 @@ const metadata = "https://noembed.com/embed?dataType=json&url=";
 const input = document.querySelector('input');
 const audio = document.querySelector('audio');
 
-export { ytID, palette, themer, imageURL, save, getSaved, metadata, input, query, audio };
+export { ytID, palette, themer, imageURL, save, getSaved, metadata, input, query, audio, image };

@@ -1,6 +1,4 @@
-import { ytID, themer, imageURL, getSaved, save, input, metadata, query, audio } from './constants.js'
-
-
+import { ytID, themer, imageURL, getSaved, save, input, metadata, query, audio, image } from './constants.js'
 
 let codecCount = 0;
 
@@ -10,10 +8,16 @@ const play = (url) => {
     .then(data => {
       // check if link is valid
       if (data.title !== undefined) {
-        // Playback
-        audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${getSaved('quality').split(',')[codecCount]}`;
 
-        themer(imageURL(url));
+        image.src = imageURL(url); // set thumbnail
+        // image fallback when max resolution is not available
+        image.onload = () => {
+          if (image.naturalWidth == 120)
+            image.src = image.src.replace('maxres', 'hq');
+        }
+        themer(); // call theme
+
+        audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${getSaved('quality').split(',')[codecCount]}`;
         audio.onerror = () => {
           codecCount++;
           play(url);
@@ -22,7 +26,6 @@ const play = (url) => {
         document.querySelector('#author').innerText = data.author_name;
         history.pushState('', '', location.origin + '/?q=' + ytID(url));
         history.replaceState('', '', location.origin + '/?q=' + ytID(url));
-
       }
     });
 }

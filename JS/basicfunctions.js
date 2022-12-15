@@ -1,4 +1,4 @@
-import { themer, getSaved, save, query } from './constants.js';
+import { themer, getSaved, save, query, image } from './constants.js';
 
 // settings panel toggle
 
@@ -95,16 +95,16 @@ shareButton
 const themeButton = document.querySelector('#themeButton');
 
 themeButton.addEventListener('click', () => {
-  if (getSaved('theme') == 'black') {
+  if (getSaved('theme') == 'dark') {
     localStorage.removeItem('theme');
     themeButton.innerText = 'dark_mode';
   }
   else {
-    save('theme', 'black');
+    save('theme', 'dark');
     themeButton.innerText = 'light_mode';
   }
 
-  themer(getSaved('image'));
+  themer();
 });
 
 
@@ -119,12 +119,27 @@ if (getSaved('quality') == '251,140') {
   quality = false;
 }
 else {
-  save('quality', '600, 139, 249'); // low
+  save('quality', '600,139,249'); // low
 }
 qualityButton.addEventListener('click', () => {
   quality ?
     save('quality', '251,140') : // high
-    save('quality', '600, 139, 249'); // low
+    save('quality', '600,139,249'); // low
   qualityButton.classList.toggle('on');
   quality = !quality;
+});
+
+
+// thumbnail toggle
+
+const thumbnailButton = document.querySelector('#thumbnailButton');
+const dataContainer = document.querySelector('#dataContainer');
+const html = '<div id="metadata"align="center"><p id="title"></p><p id ="author"></p></div>';
+
+let thumbnail = false;
+thumbnailButton.addEventListener('click', () => {
+  thumbnail ?
+    dataContainer.innerHTML = '<img>' + html :
+    dataContainer.innerHTML = html;
+  thumbnail = !thumbnail;
 });

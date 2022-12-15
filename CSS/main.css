@@ -7,6 +7,9 @@
   --text: black;
   --border: none;
 }
+*{
+  transition: background 0.5s;
+}
 
 body {
   background: var(--bg);
@@ -62,6 +65,9 @@ button {
   display: grid;
 }
 
+
 a{
-  text-decoration: none
+  text-decoration: none;
+  color: var(--bg);
+  background: var(--text)
 }
