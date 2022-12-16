@@ -1,13 +1,22 @@
-import { themer, getSaved, save, query, image } from './constants.js';
+import { themer, getSaved, save, query, image, audio } from './constants.js';
 
 // settings panel toggle
 
-document.querySelector('#settingsButton')
-  .addEventListener('click',
-    () => {
-      document.querySelector('#settingsContainer')
-        .classList.toggle('show');
-    });
+const settingsButton = document.querySelector('#settingsButton')
+let settingsPanel = true;
+
+settingsButton.addEventListener('click',
+  () => {
+    if (settingsPanel) {
+      settingsButton.style.transform = 'rotate(120deg)';
+    }
+    else {
+      settingsButton.style.transform = 'rotate(0deg)';
+    }
+    settingsButton.classList.toggle('on');
+    document.querySelector('#settingsContainer').classList.toggle('show');
+    settingsPanel = !settingsPanel;
+  });
 
 // fullscreen
 
@@ -49,11 +58,13 @@ document.querySelector('#deleteDataButton')
 
 // input bar toggle
 
-document.querySelector('#inputToggleButton')
-  .addEventListener('click',
-    () => {
-      document.querySelector('input').classList.toggle('hide');
-    });
+const inputToggleButton = document.querySelector('#inputToggleButton')
+
+inputToggleButton.addEventListener('click',
+  () => {
+    inputToggleButton.classList.toggle('on');
+    document.querySelector('input').classList.toggle('hide');
+  });
 
 // queue Buttons Toggle
 
@@ -81,7 +92,7 @@ shareButton
       if (navigator.share) {
         navigator.share({
           title: 'ytify',
-          text: document.querySelector('#title').innerText,
+          text: document.querySelector('#title').innerText + ' - ' + document.querySelector('#author').innerText,
           url: location.href,
         })
       }
@@ -114,17 +125,15 @@ const qualityButton = document.querySelector('#qualityButton');
 
 let quality = true;
 
-if (getSaved('quality') == '251,140') {
+if (getSaved('quality') == 'hq') {
   qualityButton.classList.add('on');
   quality = false;
 }
-else {
-  save('quality', '600,139,249'); // low
-}
+
 qualityButton.addEventListener('click', () => {
   quality ?
-    save('quality', '251,140') : // high
-    save('quality', '600,139,249'); // low
+    save('quality', 'hq') : // high
+    localStorage.removeItem('quality'); // low
   qualityButton.classList.toggle('on');
   quality = !quality;
 });
@@ -142,4 +151,54 @@ thumbnailButton.addEventListener('click', () => {
     dataContainer.innerHTML = '<img>' + html :
     dataContainer.innerHTML = html;
   thumbnail = !thumbnail;
+});
+
+// play button and events
+
+const playButton = document.querySelector('#playButton');
+
+let playback = true;
+
+playButton.addEventListener('click', () => {
+  if (playback) {
+    audio.play();
+    playButton.innerText = 'pause';
+  } else {
+    audio.pause();
+    playButton.innerText = 'play_arrow';
+  }
+  playback = !playback;
+});
+
+audio.onended = () => {
+  playButton.innerText = 'stop';
+}
+
+// PLAYBACK SPEED
+const playSpeed = document.querySelector('#playSpeed');
+
+playSpeed.addEventListener('change', () => {
+  if (playSpeed.value < 0 || playSpeed.value > 4) {
+    return;
+  }
+  audio.playbackRate = playSpeed.value;
+  playSpeed.blur();
+});
+
+// Loop
+
+const loopButton = document.querySelector('#loopButton');
+
+let loop = true;
+
+loopButton.addEventListener('click', () => {
+  loop ?
+    audio.onended = () => {
+      audio.play();
+    } :
+    audio.onended = () => {
+      playButton.innerText = 'stop';
+    }
+  loopButton.classList.toggle('on');
+  loop = !loop;
 });

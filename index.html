@@ -36,14 +36,14 @@
 <body>
 
   <div id="settingsContainer" class="hide">
-    <button class="material-icons" id="themeButton">dark_mode</button>
+    <button class="material-icons on " id="themeButton">dark_mode</button>
     <button class="material-icons" id="fullscreenButton">fullscreen</button>
     <button class="material-icons" id="installButton">get_app</button> <!-- not implemented -->
     <button class="material-icons" id="thumbnailButton">image</button>
     <button class="material-icons" id="qualityButton">high_quality</button>
     <button class="material-icons" id="infoButton">info</button>
     <button class="material-icons" id="deleteDataButton">delete</button>
-    <button class="material-icons" id="inputToggleButton">input</button>
+    <button class="material-icons on" id="inputToggleButton">input</button>
   </div>
 
   <div id="dataContainer">
@@ -62,11 +62,22 @@
   <div id="playerContainer">
 
     <div id="playbackButtons">
-      <button class="material-icons on" id="playButton">play_arrow</button>
-      <button class="material-icons   " id="queueButton">queue</button>
-      <button class="material-icons   " id="loopButton">loop</button>
-      <button class="material-icons   " id="shareButton">share</button>
-      <button class="material-icons   " id="settingsButton">settings</button>
+      <button class="material-icons" id="playButton">play_arrow</button>
+      <select id="playSpeed">
+        <option value="0.25">0.25x</option>
+        <option value="0.50">0.50x</option>
+        <option value="0.75">0.75x</option>
+        <option value="1.00" selected>1.00x</option>
+        <option value="1.25">1.25x</option>
+        <option value="1.50">1.50x</option>
+        <option value="1.75">1.75x</option>
+        <option value="2.00">2.00x</option>
+        <option value="4.00">4.00x</option>
+      </select>
+      <button class="material-icons" id="queueButton">queue</button>
+      <button class="material-icons" id="loopButton">loop</button>
+      <button class="material-icons" id="shareButton">share</button>
+      <button class="material-icons" id="settingsButton">settings</button>
     </div>
 
     <div id="queueButtons" class="hide">
@@ -89,7 +100,7 @@
   <script type="module">
     import { save, getSaved } from './JS/constants.js'
     // fixes compatibitity with older versions
-    const version = 'v5.β3';
+    const version = 'v5.β4';
     document.querySelector('kbd').innerText = version;
     if (getSaved('version') !== version) {
       localStorage.clear();
@@ -97,7 +108,7 @@
     }
   </script>
   <script src="JS/main.js" type="module"></script>
-  <script src="JS/basicfunctions.js" type="module"></script>
+  <script src="JS/buttons.js" type="module"></script>
   <script src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
 </body>
 

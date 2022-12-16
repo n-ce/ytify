@@ -1,4 +1,4 @@
-import { ytID, themer, imageURL, getSaved, save, input, metadata, query, audio, image } from './constants.js'
+import { ytID, themer, imageURL, getSaved, save, input, metadata, query, audio, image, audioSRC, codecs } from './constants.js'
 
 let codecCount = 0;
 
@@ -10,18 +10,21 @@ const play = (url) => {
       if (data.title !== undefined) {
 
         image.src = imageURL(url); // set thumbnail
-        // image fallback when max resolution is not available
         image.onload = () => {
+          // image fallback when max resolution is not available
           if (image.naturalWidth == 120)
             image.src = image.src.replace('maxres', 'hq');
+          themer(); // call theme when image loaded
         }
-        themer(); // call theme
 
-        audio.src = `https://projectlounge.pw/ytdl/download?url=${data.url}&format=${getSaved('quality').split(',')[codecCount]}`;
+        audioSRC(data.url, codecCount);
+
         audio.onerror = () => {
           codecCount++;
-          play(url);
+          audioSRC(data.url, codecCount);
         }
+        
+        document.querySelector('#playButton').classList.add('on');
         document.querySelector('#title').innerText = data.title;
         document.querySelector('#author').innerText = data.author_name;
         history.pushState('', '', location.origin + '/?q=' + ytID(url));
@@ -29,6 +32,7 @@ const play = (url) => {
       }
     });
 }
+
 if (query != null) {
   input.value = 'https://m.youtube.com/watch?v=' + query;
   play(input.value);
@@ -36,22 +40,4 @@ if (query != null) {
 
 input.addEventListener('input', () => {
   play(input.value);
-  playButton.innerText = 'play_arrow';
 });
-
-const playButton = document.querySelector('#playButton');
-let playback = true;
-
-playButton.addEventListener('click', () => {
-  if (playback) {
-    audio.play();
-    playButton.innerText = 'pause';
-  } else {
-    audio.pause();
-    playButton.innerText = 'play_arrow';
-  }
-  playback = !playback;
-});
-audio.onended = () => {
-  playButton.innerText = 'stop';
-}

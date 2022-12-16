@@ -28,15 +28,15 @@
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  background: var(--accent)
 }
-
+#playSpeed{
+  color: var(--border);
+  border: none;
+  background: none;
+  outline:none;
+}
 #settingsButton {
-  transition: transform 1s;
-}
-
-#settingsButton:focus {
-  transform: rotate(120deg);
+  transition: all 1s;
 }
 
 #queuePreviousButton {
@@ -45,7 +45,7 @@
 
 input {
   height: 3rem;
-  width: 15rem;
+  width: 18rem;
   margin-top: 1rem;
 
   background: var(--accent);

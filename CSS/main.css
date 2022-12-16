@@ -2,8 +2,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
 
 :root {
-  --bg: white;
-  --accent: transparent;
+  --bg: rgb(119,149,218);
+  --accent: #fff7;
   --text: black;
   --border: none;
 }
@@ -37,9 +37,6 @@ button {
   outline: none;
   animation: fade 1s ease-out
 }
-
-
-
 
 
 @keyframes fade {

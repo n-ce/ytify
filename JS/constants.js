@@ -11,13 +11,23 @@ const ytID = (val) => {
 
 const image = document.querySelector('img');
 
-
 const imageURL = (url) => {
   return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=' + encodeURIComponent("https://img.youtube.com/vi_webp/" + ytID(url) + "/maxresdefault.webp");
 }
+const audio = document.querySelector('audio');
+
+const codecs = {
+  'low': [600, 139, 249],
+  'high': [251, 140]
+}
+
+const audioSRC = (url, codec) => {
+  let quality = 'low';
+  if (getSaved('quality')) quality = 'high';
+  audio.src = `https://projectlounge.pw/ytdl/download?url=${url}&format=${codecs[quality][codec]}`;
+}
 
 const query = (new URL(location.href)).searchParams.get('q');
-
 
 const palette = {
   'light': {
@@ -43,17 +53,20 @@ const colorInjector = (r, g, b) => {
     theme = 'light';
 
   if (r !== g && g !== b) {
-
     palette['light'].bg =
       palette['dark'].border =
       `rgb(${r},${g},${b})`;
-
-    document.querySelector(':root').style.setProperty('--bg', palette[theme].bg);
-    document.querySelector(':root').style.setProperty('--accent', palette[theme].accent);
-    document.querySelector(':root').style.setProperty('--text', palette[theme].text);
-    document.querySelector(':root').style.setProperty('--border', palette[theme].border);
-    document.querySelector('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
   }
+  else {
+    palette['light'].bg = 'black';
+    palette['dark'].border = '#fff7';
+  }
+  document.querySelector(':root').style.setProperty('--bg', palette[theme].bg);
+  document.querySelector(':root').style.setProperty('--accent', palette[theme].accent);
+  document.querySelector(':root').style.setProperty('--text', palette[theme].text);
+  document.querySelector(':root').style.setProperty('--border', palette[theme].border);
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
+
 }
 
 const themer = () => {
@@ -68,13 +81,13 @@ const themer = () => {
 
 if (query == null) {
   image.src = 'Assets/default_thumbnail.avif';
-  themer();
+  if (getSaved('theme'))
+    themer();
 }
 
 const metadata = "https://noembed.com/embed?dataType=json&url=";
 
 
 const input = document.querySelector('input');
-const audio = document.querySelector('audio');
 
-export { ytID, palette, themer, imageURL, save, getSaved, metadata, input, query, audio, image };
+export { ytID, palette, themer, imageURL, save, getSaved, metadata, input, query, audio, image, audioSRC, codecs };
