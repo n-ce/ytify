@@ -2,9 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
 
 :root {
-  --bg: rgb(119,149,218);
-  --accent: #fff7;
-  --text: black;
+  --bg:none;
+  --accent: none;
+  --text: none;
   --border: none;
 }
 *{
@@ -12,19 +12,14 @@
 }
 
 body {
+  height: 100dvh;
   background: var(--bg);
   color: var(--text);
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   align-items: center;
   font-family: 'Noto Sans', sans-serif;
-}
-
-
-@keyframes appear {
-  from {
-    transform: translateY(-100%);
-  }
 }
 
 button {
@@ -38,11 +33,18 @@ button {
   animation: fade 1s ease-out
 }
 
+@keyframes appear {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+
 
 @keyframes fade {
   from {
     opacity: 0;
-    transform: translateY(-50%)
+    transform: translateX(-50%)
   }
 }
 
@@ -51,17 +53,12 @@ button {
   color: var(--text);
   border: 1px solid var(--border);
   box-shadow: 0 0.1rem 0.3rem #0003;
-  transform: scale(0.9)
+  transform: scale(0.9);
 }
 
 .hide {
   display: none;
 }
-
-.show {
-  display: grid;
-}
-
 
 a{
   text-decoration: none;

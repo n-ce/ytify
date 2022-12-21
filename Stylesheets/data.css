@@ -1,7 +1,5 @@
 #dataContainer {
   width: 80vw;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
   padding: 0.3rem;
   background: var(--accent);
   box-shadow: 0 0.1rem 0.3rem #0003;
@@ -16,6 +14,7 @@
 img {
   height: 45vw;
   border-radius: 0.5rem;
+  border: 1px solid var(--border);
   box-shadow: 0 0.1rem 0.3rem #0003;
   animation: fade 1s ease-out;
 }

@@ -26,24 +26,28 @@
   <link rel="icon" type="image/png" alt="Main image" sizes="512x512" href="Assets/maskable_icon_x512.png" />
   <link rel="icon" type="image/png" alt="Main image" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
+
+  <link rel="stylesheet" href="Stylesheets/main.css">
+  <link rel="stylesheet" href="Stylesheets/settings.css">
+  <link rel="stylesheet" href="Stylesheets/data.css">
+  <link rel="stylesheet" href="Stylesheets/player.css">
   
-  <link rel="stylesheet" href="CSS/main.css">
-  <link rel="stylesheet" href="CSS/settings.css">
-  <link rel="stylesheet" href="CSS/data.css">
-  <link rel="stylesheet" href="CSS/player.css">
+  <script type="module" src="Scripts/init.js"></script>
+  <script type="module" src="Scripts/main.js"></script>
+  <script type="module" src="Scripts/buttons.js"></script>
+  <script src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
+
 </head>
 
 <body>
 
   <div id="settingsContainer" class="hide">
-    <button class="material-icons on " id="themeButton">dark_mode</button>
+    <button class="material-icons on" id="themeButton">dark_mode</button>
     <button class="material-icons" id="fullscreenButton">fullscreen</button>
-    <button class="material-icons" id="installButton">get_app</button> <!-- not implemented -->
-    <button class="material-icons" id="thumbnailButton">image</button>
+    <button class="material-icons on" id="thumbnailButton">image</button>
     <button class="material-icons" id="qualityButton">high_quality</button>
     <button class="material-icons" id="infoButton">info</button>
     <button class="material-icons" id="deleteDataButton">delete</button>
-    <button class="material-icons on" id="inputToggleButton">input</button>
   </div>
 
   <div id="dataContainer">
@@ -54,14 +58,13 @@
       <p id="title">---</p>
       <p id="author">----</p>
     </div>
-
   </div>
 
   <audio></audio>
 
   <div id="playerContainer">
 
-    <div id="playbackButtons">
+    <div id="playerControls">
       <button class="material-icons" id="playButton">play_arrow</button>
       <select id="playSpeed">
         <option value="0.25">0.25x</option>
@@ -74,19 +77,17 @@
         <option value="2.00">2.00x</option>
         <option value="4.00">4.00x</option>
       </select>
+      <input type="range" min="0" max="100" value="0" id="progress" />
+    </div>
+
+    <div id="playerProfiles">
       <button class="material-icons" id="queueButton">queue</button>
+      <button class="material-icons hide" id="queueAddButton">add_to_queue</button>
+      <button class="material-icons hide" id="queueNextButton">skip_next</button>
       <button class="material-icons" id="loopButton">loop</button>
-      <button class="material-icons" id="shareButton">share</button>
       <button class="material-icons" id="settingsButton">settings</button>
+      <input type="url" placeholder="Input Link Here">
     </div>
-
-    <div id="queueButtons" class="hide">
-      <button class="material-icons" id="queuePreviousButton">queue_play_next</button>
-      <button class="material-icons" id="queueAddButton">add_to_queue</button>
-      <button class="material-icons" id="queueNextButton">queue_play_next</button>
-    </div>
-
-    <input type="url" placeholder="Input Link Here">
 
   </div>
 
@@ -97,19 +98,6 @@
       n-ce</a> project.
   </code>
 
-  <script type="module">
-    import { save, getSaved } from './JS/constants.js'
-    // fixes compatibitity with older versions
-    const version = 'v5.β4';
-    document.querySelector('kbd').innerText = version;
-    if (getSaved('version') !== version) {
-      localStorage.clear();
-      save('version', version);
-    }
-  </script>
-  <script src="JS/main.js" type="module"></script>
-  <script src="JS/buttons.js" type="module"></script>
-  <script src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
 </body>
 
 </html>

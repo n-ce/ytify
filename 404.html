@@ -8,10 +8,10 @@
   <meta name="keywords" content="Youtube,Music,audio,opus,50kbps,Free">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="rgb(119, 149, 218)">
   <meta name="mobile-web-app-capable" content="yes">
 
   <title>ytify</title>
+  
   <link rel="icon" type="image/png" sizes="512x512" href="Assets/maskable_icon_x512.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="Assets/maskable_icon_x192.png" />
   <link rel="manifest" href="manifest.json" />
@@ -20,8 +20,18 @@
 </head>
 
 <body>
-  <h1 style="background: var(--accent);padding: 2rem;border-radius: 1rem">Oops, nothing here.</h1>
-  <button onclick="location.href = '/index.html'" class="material-icons on">home</button>
+  
+  <h1 
+  style="animation: fade 1s">
+    Oops, nothing here.
+  </h1>
+
+  <button 
+  onclick="location.replace(location.origin)" 
+  class="material-icons on">
+    home
+  </button>
+
 </body>
 
 </html>
