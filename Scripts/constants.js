@@ -66,6 +66,8 @@ const audioSRC = (url, codec) => {
     })
   if (!query || played)
     audio.play();
+  document.querySelector("#playerControls").style.display='flex';
+ 
   played = true;
 }
 
