@@ -14,6 +14,11 @@ const codecs = {
   'low': [600, 139, 249],
   'high': [251, 140]
 }
+const bitrates = {
+  'low': ['30kbps Opus', '30kbps M4A', '50kbps Opus'],
+  'high': ['128kbps Opus', '128kbps M4A']
+}
+
 
 const palette = {
   'light': {
@@ -55,19 +60,37 @@ let played = false; // so audio.play() does not execute at startup when query is
 const proxy = 'https://corsproxy.io/?';
 const provider = 'https://alertreduser.animeshnath.repl.co/';
 
+
 const audioSRC = (url, codec) => {
   getSaved('quality') ?
     quality = 'high' :
     quality = 'low';
-  fetch(proxy + encodeURIComponent(`${provider}?url=${url}&format=${codecs[quality][codec]}`))
+  
+  document.querySelector('#bitrate').innerText = bitrates[quality][codec];
+  
+  fetch(proxy + encodeURIComponent(provider + ytID(url) + '/' + codecs[quality][codec]))
     .then(res => res.text())
     .then(data => {
       audio.src = data;
-    })
+    });
+    
+  audio.onerror = () => {
+    if (codec == 0) {
+      audioSRC(url, 1);
+    }
+    else if (codec == 1 && quality == 'low') {
+      audioSRC(url, 2);
+    }
+    else if (codec == 2) {
+      audio.onerror = null;
+      audio.src = null;
+      document.querySelector('#bitrate').innerText = 'Error: The Backend Is Down.';
+    }
+  }
   if (!query || played)
     audio.play();
-  document.querySelector("#playerControls").style.display='flex';
- 
+  document.querySelector("#playerControls").style.display = 'flex';
+
   played = true;
 }
 

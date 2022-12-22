@@ -27,7 +27,9 @@ img {
 #author {
   font-size: 0.75rem;
 }
-
+#bitrate{
+  font-size: 0.5rem;
+}
 @media (min-width:600px) {
   #dataContainer {
     flex-direction: row;

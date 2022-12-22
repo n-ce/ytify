@@ -149,14 +149,15 @@ playButton.addEventListener('click', () => {
   playback = !playback;
 });
 
-audio.addEventListener('playing', () => {
+audio.onplaying = () => {
   playButton.classList.add('on');
   playButton.innerText = 'pause';
   playback = false;
-});
-audio.addEventListener('pause', () => {
+};
+audio.onpause = () => {
+  playback=true;
   playButton.innerText = 'play_arrow';
-});
+};
 
 
 
@@ -214,6 +215,5 @@ audio.addEventListener('ended', () => {
 
 loopButton.addEventListener('click', () => {
   loopButton.classList.toggle('on');
-  queueButton.classList.toggle('hide');
   loop = !loop;
 });

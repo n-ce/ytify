@@ -12,12 +12,10 @@ import {
   audioSRC,
   codecs,
   mediaSessionAPI,
-  settingsButton,
   queueButton,
   loopButton
 } from './constants.js'
 
-let codecCount = 0;
 let oldURL;
 let queueCount=0;
 let queueNow = 1;
@@ -44,13 +42,7 @@ const play = (url) => {
             themer(); // call theme when image loaded
           }
         }
-        audioSRC(data.url, codecCount);
-
-        audio.addEventListener('error', (e) => {
-          console.log(e);
-          codecCount++;
-          audioSRC(data.url, codecCount);
-        });
+        audioSRC(data.url, 0);
 
         document.querySelector('#title').innerText = data.title;
         document.querySelector('#author').innerText = data.author_name;
@@ -115,26 +107,17 @@ input.addEventListener('input', () => {
 // queue functions and toggle
 
 const queueNext = document.querySelector('#queueNextButton');
-const queueAdd = document.querySelector('#queueAddButton');
 
 queueButton.addEventListener('click', () => {
   queue = !queue;
   if (queue)
     queueCount = 0;
 
-  queueAdd.classList.toggle('hide');
   queueNext.classList.toggle('hide');
-  settingsButton.classList.toggle('hide');
   queueButton.classList.toggle('on');
-  loopButton.classList.toggle('hide');
+  loopButton.classList.toggle('hide')
+  loopButton.classList.remove('on');
 });
 
-// queue add button function
-
-queueAdd.addEventListener('click', () => {
-  queueIt(input.value);
-});
 // queue Next
-queueNext.addEventListener('click', () => {
-  next();
-});
+queueNext.addEventListener('click', next)

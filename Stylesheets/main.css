@@ -2,17 +2,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
 
 :root {
-  --bg:none;
+  --bg: none;
   --accent: none;
   --text: none;
   --border: none;
 }
-*{
+
+* {
   transition: background 0.5s;
 }
 
+html,
 body {
-  height: 100dvh;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
   background: var(--bg);
   color: var(--text);
   display: flex;
@@ -60,7 +67,7 @@ button {
   display: none;
 }
 
-a{
+a {
   text-decoration: none;
   color: var(--bg);
   background: var(--text)
