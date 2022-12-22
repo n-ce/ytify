@@ -57,10 +57,6 @@ let quality;
 let played = false; // so audio.play() does not execute at startup when query is provided
 
 
-const proxy = 'https://corsproxy.io/?';
-const provider = 'https://alertreduser.animeshnath.repl.co/';
-
-
 const audioSRC = (url, codec) => {
   getSaved('quality') ?
     quality = 'high' :
@@ -68,7 +64,7 @@ const audioSRC = (url, codec) => {
   
   document.querySelector('#bitrate').innerText = bitrates[quality][codec];
   
-  fetch(proxy + encodeURIComponent(provider + ytID(url) + '/' + codecs[quality][codec]))
+  fetch(env.process.proxy+encodeURIComponent(env.process.provider + ytID(url) + '/' + codecs[quality][codec]))
     .then(res => res.text())
     .then(data => {
       audio.src = data;
