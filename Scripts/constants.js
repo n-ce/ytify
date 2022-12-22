@@ -64,7 +64,7 @@ const audioSRC = (url, codec) => {
   
   document.querySelector('#bitrate').innerText = bitrates[quality][codec];
   
-  fetch(env.process.proxy+encodeURIComponent(env.process.provider + ytID(url) + '/' + codecs[quality][codec]))
+  fetch(process.env.proxy+encodeURIComponent(process.env.provider + ytID(url) + '/' + codecs[quality][codec]))
     .then(res => res.text())
     .then(data => {
       audio.src = data;
