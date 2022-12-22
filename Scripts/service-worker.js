@@ -23,7 +23,7 @@ self.addEventListener("fetch", fetchEvent => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker
-      .register("JS/service-worker.js")
+      .register("Scripts/service-worker.js")
       .then(res => console.log("service worker registered"))
       .catch(err => console.log("service worker not registered", err))
   })

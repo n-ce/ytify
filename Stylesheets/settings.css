@@ -1,0 +1,12 @@
+#settingsContainer {
+  height: 3rem;
+  width: auto;
+  padding: 0.3rem;
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  animation: fade 500ms ease-out;
+}
+
+
