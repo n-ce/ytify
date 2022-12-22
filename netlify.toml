@@ -1,0 +1,7 @@
+[[plugins]]
+package = "netlify-plugin-nimbella"
+
+[plugins.inputs]
+path    = "/api"   # The prefix path to access your deployed packages.
+web     = false    # Deploy frontend and proxy domain to Nimbella (allowed values are true or false).
+env     = []       # Environment variables to export to serverless APIs.
