@@ -7,31 +7,36 @@
 
 
 ## Description
-
  - the name is a portmanteau for yt(YouTube) and spotify.
  - the app is a minimal audio streaming front-end which captures youtube links in order to provide the user with a playable audio stream easily.
  - it also encapsulates a number of features that make user experience smoother and personalised.
 
-
 ## File Structure
-- Assets/..
-- Scripts
-  - init.js
-  - constants.js
-  - main.js
-  - buttons.js
-  - service-worker.js
-- Stylesheets
-  - main.css
-  - data.css
-  - player.css
-  - settings.css
-- index.html
-- 404.html
-- manifest.json
-- README.md
-     
-     
+```
+ytify
+├─ web
+│ ├─ Assets/..
+│ ├─ Scripts
+│ │ ├─ init.js
+│ │ ├─ constants.js
+│ │ ├─ main.js
+│ │ ├─ buttons.js
+│ │ └─ service-worker.js
+│ ├─ Stylesheets
+│ │ ├─ main.css
+│ │ ├─ data.css
+│ │ ├─ player.css
+│ │ └─ settings.css
+│ ├─ index.html
+│ ├─ 404.html
+│ └─ manifest.json
+├─ packages
+│ └─ main.py
+├─ README.md
+├─ netlify.toml
+└─ LICENSE
+```
+
 ## Screenshots
 
 <p align="center">
@@ -52,7 +57,6 @@
 </p>
 
 ## Acknowledgments
-
 - [noembed](https://noembed.com)
 - [corsproxy.io](https://corsproxy.io)
 - [color.js](https://github.com/luukdv/color.js)
