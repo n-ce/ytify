@@ -56,7 +56,7 @@ const imageURL = (url) => {
 let quality;
 let played = false; // so audio.play() does not execute at startup when query is provided
 
-const proxy ='https://corsproxy.io/';
+const proxy ='https://corsproxy.io/?';
 const provider= 'https://xtcyg6.deta.dev/';
 
 const audioSRC = (url, codec) => {

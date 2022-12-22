@@ -1,6 +1,6 @@
 <div align="center">
   <h1>🎄YTIFY🎄</h1>
-  <img width="40%" src="web/Assets/maskable_icon_x512.png">
+  <img width="40%" src="Assets/maskable_icon_x512.png">
 </div>
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
@@ -13,45 +13,41 @@
 ## File Structure
 ```
 ytify
-├── web
-│ ├── Assets/..
-│ ├── Scripts
-│ │ ├── init.js
-│ │ ├── constants.js
-│ │ ├── main.js
-│ │ ├── buttons.js
-│ │ └── service-worker.js
-│ ├── Stylesheets
-│ │ ├── main.css
-│ │ ├── data.css
-│ │ ├── player.css
-│ │ └── settings.css
-│ ├── index.html
-│ ├── 404.html
-│ └── manifest.json
-├── packages
-│ └── main.py
+├── Assets/..
+├── Scripts
+│ ├── init.js
+│ ├── constants.js
+│ ├── main.js
+│ ├── buttons.js
+│ └── service-worker.js
+├── Stylesheets
+│ ├── main.css
+│ ├── data.css
+│ ├── player.css
+│ └── settings.css
+├── index.html
+├── 404.html
+└── manifest.json
 ├── README.md
-├── netlify.toml
 └── LICENSE
 ```
 ## Screenshots
 
 <p align="center">
-  <img src="web/Assets/Screenshots/portrait_light-mode.png" width="30%">
-  <img src="web/Assets/Screenshots/portrait_dark-mode.png" width="30%">
-  <img src="web/Assets/Screenshots/portrait_automatic_dark-mode.png" width="30%">
+  <img src="Assets/Screenshots/portrait_light-mode.png" width="30%">
+  <img src="Assets/Screenshots/portrait_dark-mode.png" width="30%">
+  <img src="Assets/Screenshots/portrait_automatic_dark-mode.png" width="30%">
   
-  <img src="web/Assets/Screenshots/portrait_music.png" width="45%">
-  <img src="web/Assets/Screenshots/portrait_audiobook.png" width="45%">
+  <img src="Assets/Screenshots/portrait_music.png" width="45%">
+  <img src="Assets/Screenshots/portrait_audiobook.png" width="45%">
   
-  <img src="web/Assets/Screenshots/landscape_thoughts.png" width="90%">
+  <img src="Assets/Screenshots/landscape_thoughts.png" width="90%">
   
-  <img src="web/Assets/Screenshots/landscape_dark-mode.png" width="45%">
-  <img src="web/Assets/Screenshots/landscape_light-mode.png" width="45%">
+  <img src="Assets/Screenshots/landscape_dark-mode.png" width="45%">
+  <img src="Assets/Screenshots/landscape_light-mode.png" width="45%">
   
-  <img src="web/Assets/Screenshots/landscape_trends.png" width="45%">
-  <img src="web/Assets/Screenshots/landscape_music.png" width="45%">
+  <img src="Assets/Screenshots/landscape_trends.png" width="45%">
+  <img src="Assets/Screenshots/landscape_music.png" width="45%">
 </p>
 
 ## Acknowledgments
