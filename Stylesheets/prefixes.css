@@ -1,0 +1,18 @@
+/* Template for css prefixes */
+.someClass {
+    /* Support for Firefox */
+    -moz-propertyName: propertyValue;
+ 
+    /* Support for webkit based browsers
+       (Chrome, Safari, iOS, etc.) */
+    -webkit-propertyName: propertyValue;
+ 
+    /* Support for Opera */
+    -o-propertyName: propertyValue;
+ 
+    /* Support for Edge and Internet Explorer */
+    -ms-propertyName: propertyValue;
+ 
+    /* Standardized property */
+    /* propertyName: propertyValue; */
+}
