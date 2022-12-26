@@ -7,6 +7,7 @@ const progress = document.querySelector('input[type="range"]');
 const settingsButton = document.querySelector('#settingsButton')
 const queueButton = document.querySelector('#queueButton');
 const loopButton = document.querySelector('#loopButton');
+const bitrate = document.querySelector('#bitrate');
 
 // Values
 
@@ -36,6 +37,8 @@ const palette = {
 };
 
 const noembed = "https://noembed.com/embed?dataType=json&url=";
+const proxy = 'https://corsproxy.io/?';
+const provider = 'https://xtcyg6.deta.dev/';
 const query = (new URL(location.href)).searchParams.get('q');
 
 // Reusable Functions
@@ -56,40 +59,48 @@ const imageURL = (url) => {
 let quality;
 let played = false; // so audio.play() does not execute at startup when query is provided
 
-const proxy ='https://corsproxy.io/?';
-const provider= 'https://xtcyg6.deta.dev/';
+const error = () => {
+  image.src = 'Assets/error_thumbnail.avif';
+  alert('Error!\nThis can happen due to multiple reasons :\n\n1. Stream requires authorisation.\n2. Proxy failure.\n3. Backend offline.')
+  audio.onerror = null;
+  document.querySelector("#playerControls").style.display = 'none';
+}
 
 const audioSRC = (url, codec) => {
   getSaved('quality') ?
     quality = 'high' :
     quality = 'low';
-  
-  document.querySelector('#bitrate').innerText = bitrates[quality][codec];
-  
-  fetch(proxy+encodeURIComponent(provider + ytID(url) + '/' + codecs[quality][codec]))
+
+  fetch(proxy + encodeURIComponent(provider + ytID(url) + '/' + codecs[quality][codec]))
     .then(res => res.text())
-    .then(data => {
-      audio.src = data;
-    });
-    
+    .then(data => audio.src = data)
+
+  bitrate.innerText = bitrates[quality][codec];
+
   audio.onerror = () => {
     if (codec == 0) {
-      audioSRC(url, 1);
-    }
-    else if (codec == 1 && quality == 'low') {
-      audioSRC(url, 2);
-    }
-    else if (codec == 2) {
-      audio.onerror = null;
-      audio.src = null;
-      document.querySelector('#bitrate').innerText = 'Error: The Backend Is Down.';
+      audioSRC(url, 1)
+    } else if (codec == 1) {
+      quality == 'low' ? audioSRC(url, 2) : error();
+    } else {
+      error()
     }
   }
+
   if (!query || played)
     audio.play();
+
   document.querySelector("#playerControls").style.display = 'flex';
 
   played = true;
+}
+
+const colorIt = (a, b, c, d) => {
+  document.querySelector(':root').style.setProperty('--bg', a);
+  document.querySelector(':root').style.setProperty('--accent', b);
+  document.querySelector(':root').style.setProperty('--text', c);
+  document.querySelector(':root').style.setProperty('--border', d);
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", a);
 }
 
 let theme;
@@ -110,11 +121,11 @@ const themer = () => {
 
     palette['light'].bg = palette['dark'].border = `rgb(${c[0]},${c[1]},${c[2]})`;
 
-    document.querySelector(':root').style.setProperty('--bg', palette[theme].bg);
-    document.querySelector(':root').style.setProperty('--accent', palette[theme].accent);
-    document.querySelector(':root').style.setProperty('--text', palette[theme].text);
-    document.querySelector(':root').style.setProperty('--border', palette[theme].border);
-    document.querySelector('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
+    colorIt(
+      palette[theme].bg,
+      palette[theme].accent,
+      palette[theme].text,
+      palette[theme].border)
 
   });
 }
@@ -151,6 +162,7 @@ export {
   ytID,
   imageURL,
   audioSRC,
+  colorIt,
   themer,
   mediaSessionAPI
 }

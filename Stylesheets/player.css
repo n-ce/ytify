@@ -4,13 +4,17 @@
   padding: 0.3rem;
   background: var(--accent);
   border: 0.1px solid var(--border);
+  -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
   border-radius: 0.7rem;
+  -webkit-animation: fade 500ms ease-out;
   animation: fade 500ms ease-out;
 }
 
 #playerControls {
   display: none;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
   justify-content: space-between
 }
 
@@ -22,8 +26,14 @@
 }
 
 #playerProfiles {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
   justify-content: space-between;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
 }
 
@@ -31,6 +41,8 @@
   font-family: 'Noto Sans';
   content: attr(data-badge);
   font-size: 1rem;
+  -webkit-transition: background 0.5s, color 1s;
+  -o-transition: background 0.5s, color 1s;
   transition: background 0.5s, color 1s;
 }
 
@@ -42,6 +54,8 @@
 
 
 #settingsButton {
+  -webkit-transition: all 0.5s ease-in;
+  -o-transition: all 0.5s ease-in;
   transition: all 0.5s ease-in;
 }
 
@@ -52,6 +66,7 @@ input[type="url"] {
   background: var(--accent);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
+  -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
   color: var(--text);
 
@@ -59,11 +74,14 @@ input[type="url"] {
   outline: none;
   text-align: center;
   font-weight: bold;
+  -webkit-animation: fade 1s ease-out;
   animation: fade 1s ease-out
 }
 
 @media (min-width:600px) {
   #playerContainer {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
   }
 }
@@ -93,4 +111,44 @@ input[type="range"]::-webkit-slider-thumb {
   background-color: var(--accent);
   border: 0.1rem solid var(--border);
   margin-top: -0.35rem
+}
+
+input[type="range"]::-moz-range-progress,
+input[type="range"]::-moz-range-track {
+  background-color: var(--accent);
+  height: 0.5rem;
+  border-radius: 1rem;
+  border: solid 0.1rem var(--border);
+}
+
+input[type=range]::-moz-range-thumb {
+  background-color: var(--accent);
+  height: 1rem;
+  width: 1rem;
+  border-radius: 1rem;
+  border: solid 0.1rem var(--border);
+}
+
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 0.5rem;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type=range]::-ms-fill-lower,
+input[type=range]::-ms-fill-upper {
+  background-color: var(--accent);
+  border: 0.1rem solid var(--border);
+  border-radius: 1rem;
+}
+
+input[type=range]::-ms-thumb {
+  margin-top: -0.35rem;
+  border: 0.1rem solid var(--border);
+  height: 1rem;
+  width: 1rem;
+  border-radius: 1rem;
+  background-color: var(--accent);
 }

@@ -35,16 +35,13 @@ settingsButton.addEventListener('click',
 
 const themeButton = document.querySelector('#themeButton');
 
-themeButton.addEventListener('click', () => {
-  if (getSaved('theme') == 'dark') {
-    localStorage.removeItem('theme');
-    themeButton.innerText = 'dark_mode';
-  }
-  else {
-    save('theme', 'dark');
-    themeButton.innerText = 'light_mode';
-  }
+if (getSaved('theme')) themeButton.classList.add('on');
 
+themeButton.addEventListener('click', () => {
+  getSaved('theme')?
+    localStorage.removeItem('theme'):
+    save('theme', 'dark');
+themeButton.classList.toggle('on');
   themer();
 });
 
@@ -56,14 +53,10 @@ let fullscreen = true;
 const fullscreenButton = document.querySelector('#fullscreenButton');
 fullscreenButton.addEventListener('click',
   () => {
-    if (fullscreen) {
-      document.documentElement.requestFullscreen();
-      fullscreenButton.innerText = 'fullscreen_exit';
-    }
-    else {
+    fullscreen?
+      document.documentElement.requestFullscreen():
       document.exitFullscreen();
-      fullscreenButton.innerText = 'fullscreen';
-    }
+    
     fullscreenButton.classList.toggle('on');
     fullscreen = !fullscreen;
   });
@@ -117,9 +110,9 @@ document.querySelector('#infoButton')
   .addEventListener('click',
     () => {
       if (
-        confirm("The about page will be opened in a new tab. Continue?")
+        confirm("The info page will be opened in a new tab. Continue?")
       ) {
-        window.open("https://github.com/n-ce/ytify#about");
+        window.open("https://github.com/n-ce/ytify");
       }
     });
 
@@ -155,7 +148,7 @@ audio.onplaying = () => {
   playback = false;
 };
 audio.onpause = () => {
-  playback=true;
+  playback = true;
   playButton.innerText = 'play_arrow';
 };
 

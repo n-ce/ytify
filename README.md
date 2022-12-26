@@ -1,37 +1,37 @@
 <div align="center">
-  <h1>🎄YTIFY🎄</h1>
+  <h1>🎄 YTIFY 🎄</h1>
   <img width="40%" src="Assets/maskable_icon_x512.png">
+  <img src="https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status">
 </div>
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
-
-## Description
+## 🦚 Description 🦚
  - the name is a portmanteau for yt(YouTube) and spotify.
  - the app is a minimal audio streaming front-end which captures youtube links in order to provide the user with a playable audio stream easily.
  - it also encapsulates a number of features that make user experience smoother and personalised.
+ - works even on the lowest bandwidth, never worry about metered data consumption anymore.
 
-## File Structure
+## 📂 File Structure 📂
 ```
 ytify
-├── Assets/..
+├── Assets/.. 
 ├── Scripts
-│ ├── init.js
-│ ├── constants.js
-│ ├── main.js
-│ ├── buttons.js
-│ └── service-worker.js
+│   ├── init.js
+│   ├── constants.js
+│   ├── main.js
+│   ├── buttons.js
+│   └── service-worker.js
 ├── Stylesheets
-│ ├── main.css
-│ ├── data.css
-│ ├── player.css
-│ └── settings.css
+│   ├── main.css
+│   ├── data.css
+│   ├── player.css
+│   └── settings.css
 ├── index.html
 ├── 404.html
-└── manifest.json
+├── manifest.json
 ├── README.md
 └── LICENSE
 ```
-## Screenshots
+## 🖼 Screenshots 🖼
 
 <p align="center">
   <img src="Assets/Screenshots/portrait_light-mode.png" width="30%">
@@ -50,7 +50,7 @@ ytify
   <img src="Assets/Screenshots/landscape_music.png" width="45%">
 </p>
 
-## Acknowledgments
+## 🙏 Acknowledgments 🙏
 - [noembed](https://noembed.com)
 - [corsproxy.io](https://corsproxy.io)
 - [color.js](https://github.com/luukdv/color.js)
