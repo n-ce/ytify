@@ -8,7 +8,10 @@ import {
   query,
   image,
   audio,
-  progress
+  progress,
+  currentDuration,
+  fullDuration,
+  convertSStoMMSS
 } from './constants.js';
 
 
@@ -183,12 +186,14 @@ audio.addEventListener('timeupdate', () => {
     return;
   }
   progress.value = Math.floor(audio.currentTime);
+	currentDuration.innerText = `${convertSStoMMSS(audio.currentTime)}`;
 });
 
 audio.addEventListener('loadedmetadata', () => {
   progress.value = 0;
   progress.min = 0;
   progress.max = Math.floor(audio.duration);
+	fullDuration.innerText = `${convertSStoMMSS(audio.duration)}`;
 });
 
 // Loop
