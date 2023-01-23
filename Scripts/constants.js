@@ -7,19 +7,9 @@ const progress = document.querySelector('input[type="range"]');
 const settingsButton = document.querySelector('#settingsButton')
 const queueButton = document.querySelector('#queueButton');
 const loopButton = document.querySelector('#loopButton');
-const bitrate = document.querySelector('#bitrate');
+const bitrates = document.querySelector('#bitrate');
 
 // Values
-
-const codecs = {
-  'low': [600, 139, 249],
-  'high': [251, 140]
-}
-const bitrates = {
-  'low': ['30kbps Opus', '30kbps M4A', '50kbps Opus'],
-  'high': ['128kbps Opus', '128kbps M4A']
-}
-
 
 const palette = {
   'light': {
@@ -36,9 +26,6 @@ const palette = {
   }
 };
 
-const noembed = "https://noembed.com/embed?dataType=json&url=";
-const proxy = 'https://corsproxy.io/?';
-const provider = 'https://xtcyg6.deta.dev/';
 const query = (new URL(location.href)).searchParams.get('q');
 
 // Reusable Functions
@@ -49,43 +36,35 @@ const save = (key, pair) => {
 const getSaved = (key) => {
   return localStorage.getItem(key);
 }
-const ytID = (val) => {
-  return val.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)[7];
+
+const streamID = (url) => {
+  const match = url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i);
+  if (match !== null) return match[7];
 }
-const imageURL = (url) => {
-  return 'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=' + encodeURIComponent("https://img.youtube.com/vi_webp/" + ytID(url) + "/maxresdefault.webp");
+const playlistID = (url) => {
+  const match= url.match(/[&?]list=([^&]+)/i)
+  if (match !== null) return match[1];
 }
+
 
 let quality;
 let played = false; // so audio.play() does not execute at startup when query is provided
 
-const error = () => {
-  image.src = 'Assets/error_thumbnail.avif';
-  alert('Error!\nThis can happen due to multiple reasons :\n\n1. Stream requires authorisation.\n2. Proxy failure.\n3. Backend offline.')
-  audio.onerror = null;
-  document.querySelector("#playerControls").style.display = 'none';
-}
 
-const audioSRC = (url, codec) => {
+const audioSRC = (streams) => {
   getSaved('quality') ?
     quality = 'high' :
     quality = 'low';
 
-  fetch(proxy + encodeURIComponent(provider + ytID(url) + '/' + codecs[quality][codec]))
-    .then(res => res.text())
-    .then(data => audio.src = data)
+  let lowest = streams[0].bitrate;
 
-  bitrate.innerText = bitrates[quality][codec];
-
-  audio.onerror = () => {
-    if (codec == 0) {
-      audioSRC(url, 1)
-    } else if (codec == 1) {
-      quality == 'low' ? audioSRC(url, 2) : error();
-    } else {
-      error()
+  for (const value of streams) {
+    if (value.bitrate <= lowest) {
+      lowest = value.bitrate;
+      audio.src = value.url;
     }
   }
+  bitrates.innerText = lowest + 'kbps opus';
 
   if (!query || played)
     audio.play();
@@ -146,10 +125,10 @@ const mediaSessionAPI = (name, author, image) => {
 }
 
 const convertSStoMMSS = (seconds) => {
-  let mm = Math.floor(seconds/60);
-  let ss = Math.floor(seconds%60);
-  if(mm<10) mm = `0${mm}`;
-  if(ss<10) ss = `0${ss}`;
+  let mm = Math.floor(seconds / 60);
+  let ss = Math.floor(seconds % 60);
+  if (mm < 10) mm = `0${mm}`;
+  if (ss < 10) ss = `0${ss}`;
   return `${mm}:${ss}`
 }
 
@@ -161,14 +140,12 @@ export {
   settingsButton,
   queueButton,
   loopButton,
-  codecs,
   palette,
-  noembed,
   query,
   save,
   getSaved,
-  ytID,
-  imageURL,
+  streamID,
+  playlistID,
   audioSRC,
   colorIt,
   themer,

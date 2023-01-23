@@ -35,22 +35,20 @@ ytify
 ## Screenshots 🖼
 
 <p align="center">
-  <img src="Assets/Screenshots/portrait_light-mode.png" width="30%">
-  <img src="Assets/Screenshots/portrait_dark-mode.png" width="30%">
-  <img src="Assets/Screenshots/portrait_automatic_dark-mode.png" width="30%">
-  <img src="Assets/Screenshots/portrait_music.png" width="45%">
-  <img src="Assets/Screenshots/portrait_audiobook.png" width="45%">
-  <img src="Assets/Screenshots/landscape_thoughts.png" width="90%">
-  <img src="Assets/Screenshots/landscape_dark-mode.png" width="45%">
-  <img src="Assets/Screenshots/landscape_light-mode.png" width="45%">
-  <img src="Assets/Screenshots/landscape_trends.png" width="45%">
-  <img src="Assets/Screenshots/landscape_music.png" width="45%">
+  <img src="Assets/Screenshots/portrait_light-mode.avif" width="30%">
+  <img src="Assets/Screenshots/portrait_dark-mode.avif" width="30%">
+  <img src="Assets/Screenshots/portrait_automatic_dark-mode.avif" width="30%">
+  <img src="Assets/Screenshots/portrait_music.avif" width="45%">
+  <img src="Assets/Screenshots/portrait_audiobook.avif" width="45%">
+  <img src="Assets/Screenshots/landscape_thoughts.avif" width="90%">
+  <img src="Assets/Screenshots/landscape_dark-mode.avif" width="45%">
+  <img src="Assets/Screenshots/landscape_light-mode.avif" width="45%">
+  <img src="Assets/Screenshots/landscape_trends.avif" width="45%">
+  <img src="Assets/Screenshots/landscape_music.avif" width="45%">
 </p>
 
 ## Acknowledgments 🙏
-- [noembed](https://noembed.com)
-- [corsproxy.io](https://corsproxy.io)
+- [piped](https://github.com/teampiped/piped)
 - [color.js](https://github.com/luukdv/color.js)
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [netlify](https://www.netlify.com)
 - [google Fonts & Icons](https://fonts.google.com)

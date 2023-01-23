@@ -61,4 +61,17 @@ img {
     overflow: scroll;
   }
 
+  #title {
+    font-size: 1.75rem;
+  }
+
+  #author {
+    font-size: 1.25rem;
+  }
+
+  #bitrate {
+    font-size: 0.75rem;
+  }
+
+
 }

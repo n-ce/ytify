@@ -1,60 +1,79 @@
 import {
-  ytID,
+  streamID,
+  playlistID,
   themer,
-  imageURL,
   getSaved,
   save,
   input,
-  noembed,
   query,
   audio,
   image,
   audioSRC,
-  codecs,
   mediaSessionAPI,
   queueButton,
   loopButton
 } from './constants.js'
 
 let oldURL;
-let queueCount=0;
+let queueCount = 0;
 let queueNow = 1;
 let queueList = [];
 let queue = false;
-const array = [];
+let array = [];
+const api = 'https://pipedapi.tokhmi.xyz';
+
+const validator = (inputValue) => {
+
+  if (streamID(inputValue)) play(inputValue);
+
+  else if (playlistID(inputValue)) {
+    queueFx();
+    fetch(api + '/playlists/' + playlistID(inputValue))
+      .then(res => res.json())
+      .then(data => {
+        data.relatedStreams.forEach((v, i) => {
+          queueIt('https://youtube.com' + v.url);
+        });
+      });
+      
+
+  }
+  // so that it does not run again for the same link
+  oldURL = inputValue;
+}
 
 const play = (url) => {
-  fetch(noembed + url)
+  fetch(api + '/streams/' + streamID(url))
     .then(res => res.json())
     .then(data => {
-      // check if link is valid
-      if (data.title !== undefined) {
-
-        if (getSaved('thumbnail')) {
-          save('thumbnail', imageURL(url)); // save thumbnail url
-        }
-        else {
-          image.src = imageURL(url); // set thumbnail
-          image.onload = () => {
-            // image fallback when max resolution is not available
-            if (image.naturalWidth == 120)
-              image.src = image.src.replace('maxres', 'hq');
-            themer(); // call theme when image loaded
-          }
-        }
-        audioSRC(data.url, 0);
-
-        document.querySelector('#title').innerText = data.title;
-        document.querySelector('#author').innerText = data.author_name;
-
-        history.pushState('', '', location.origin + '/?q=' + ytID(url));
-        history.replaceState('', '', location.origin + '/?q=' + ytID(url));
-
-        mediaSessionAPI(data.title, data.author_name, image.src)
+      if (getSaved('thumbnail')) {
+        save('thumbnail', data.thumbnailUrl);
       }
+      else {
+        image.src = data.thumbnailUrl;
+        image.onload = () => themer();
+      }
+
+      // extracting opus streams
+      const opusStreams = [];
+
+      for (const value of data.audioStreams) {
+        if (Object.values(value).includes('opus'))
+          opusStreams.push({
+            'bitrate': parseInt(value.quality.match(/\d+/)[0]),
+            'url': value.url
+          });
+      }
+      audioSRC(opusStreams);
+
+      document.querySelector('#title').innerText = data.title;
+      document.querySelector('#author').innerText = data.uploader;
+
+      history.pushState('', '', location.origin + '/?q=' + streamID(url));
+      history.replaceState('', '', location.origin + '/?q=' + streamID(url));
+
+      mediaSessionAPI(data.title, data.uploader, data.thumbnailUrl)
     });
-  // so that it does not run again for the same link
-  oldURL = url;
 }
 
 
@@ -77,14 +96,6 @@ const next = () => {
 // link queuing algorithm
 
 const queueIt = url => {
-  // queue new id
-  fetch(noembed + url)
-    .then(res => res.json())
-    .then(da => {
-      if (da.title !== undefined) {
-        queueList[queueCount] = da.title;
-      }
-    });
   queueCount++;
   queueButton.setAttribute('data-badge', queueCount - queueNow + 1);
   array[queueCount] = oldURL = url;
@@ -100,7 +111,8 @@ input.addEventListener('input', () => {
   if (oldURL != input.value)
     queue ?
     queueIt(input.value) :
-    play(input.value);
+    validator(input.value);
+
 });
 
 
@@ -108,7 +120,7 @@ input.addEventListener('input', () => {
 
 const queueNext = document.querySelector('#queueNextButton');
 
-queueButton.addEventListener('click', () => {
+const queueFx = () => {
   queue = !queue;
   if (queue)
     queueCount = 0;
@@ -117,7 +129,9 @@ queueButton.addEventListener('click', () => {
   queueButton.classList.toggle('on');
   loopButton.classList.toggle('hide')
   loopButton.classList.remove('on');
-});
+
+}
+queueButton.addEventListener('click', queueFx);
 
 // queue Next
 queueNext.addEventListener('click', next)

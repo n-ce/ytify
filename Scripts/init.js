@@ -9,7 +9,7 @@ import {
 
 // fixes compatibitity with older versions
 
-const version = 'v5.1';
+const version = 'v5.2_alpha';
 document.querySelector('kbd').innerText = version;
 if (getSaved('version') !== version) {
   localStorage.clear();
