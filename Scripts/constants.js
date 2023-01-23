@@ -8,8 +8,6 @@ const settingsButton = document.querySelector('#settingsButton')
 const queueButton = document.querySelector('#queueButton');
 const loopButton = document.querySelector('#loopButton');
 const bitrate = document.querySelector('#bitrate');
-const currentDuration = document.querySelector('#currentDuration');
-const fullDuration = document.querySelector('#fullDuration');
 
 // Values
 
@@ -148,8 +146,10 @@ const mediaSessionAPI = (name, author, image) => {
 }
 
 const convertSStoMMSS = (seconds) => {
-  const mm = Math.floor(seconds/60);
-  const ss = Math.floor(seconds%60);
+  let mm = Math.floor(seconds/60);
+  let ss = Math.floor(seconds%60);
+  if(mm<10) mm = `0${mm};
+  if(ss<10) ss = `0${ss};
   return `${mm}:${ss}`
 }
 
@@ -173,7 +173,5 @@ export {
   colorIt,
   themer,
   mediaSessionAPI,
-  currentDuration,
-  fullDuration,
   convertSStoMMSS
 }
