@@ -182,18 +182,17 @@ progress.addEventListener('change', () => {
 });
 
 audio.addEventListener('timeupdate', () => {
-  if (progress === document.activeElement) {
-    return;
-  }
+  if (progress === document.activeElement) return;
+  
   progress.value = Math.floor(audio.currentTime);
-	currentDuration.innerText = `${convertSStoMMSS(audio.currentTime)}`;
+  document.querySelector('#currentDuration').innerText = convertSStoMMSS(audio.currentTime);
 });
 
 audio.addEventListener('loadedmetadata', () => {
   progress.value = 0;
   progress.min = 0;
   progress.max = Math.floor(audio.duration);
-	fullDuration.innerText = `${convertSStoMMSS(audio.duration)}`;
+  document.querySelector('#fullDuration').innerText = convertSStoMMSS(audio.duration);
 });
 
 // Loop
