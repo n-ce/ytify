@@ -16,7 +16,6 @@
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  align-items: center;
 }
 
 #playSpeed {
@@ -40,8 +39,9 @@
 
 #currentDuration,
 #fullDuration {
-	font-size: 0.8rem;
-	padding: 2px;
+  color: var(--border);
+  font-size: 0.7rem;
+  padding: 0.3rem;
 }
 
 [data-badge]:after {
