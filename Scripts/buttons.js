@@ -9,8 +9,6 @@ import {
   image,
   audio,
   progress,
-  currentDuration,
-  fullDuration,
   convertSStoMMSS
 } from './constants.js';
 
