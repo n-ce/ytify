@@ -7,7 +7,7 @@ const progress = document.querySelector('input[type="range"]');
 const settingsButton = document.querySelector('#settingsButton')
 const queueButton = document.querySelector('#queueButton');
 const loopButton = document.querySelector('#loopButton');
-const bitrates = document.querySelector('#bitrate');
+const bitrateInfo = document.querySelector('#bitrate');
 
 // Values
 
@@ -42,29 +42,22 @@ const streamID = (url) => {
   if (match !== null) return match[7];
 }
 const playlistID = (url) => {
-  const match= url.match(/[&?]list=([^&]+)/i)
+  const match = url.match(/[&?]list=([^&]+)/i)
   if (match !== null) return match[1];
 }
 
 
-let quality;
 let played = false; // so audio.play() does not execute at startup when query is provided
 
+const audioSRC = (bitrates, urls) => {
+  let DBR;
 
-const audioSRC = (streams) => {
   getSaved('quality') ?
-    quality = 'high' :
-    quality = 'low';
+    DBR = Math.max(...bitrates) :
+    DBR = Math.min(...bitrates);
 
-  let lowest = streams[0].bitrate;
-
-  for (const value of streams) {
-    if (value.bitrate <= lowest) {
-      lowest = value.bitrate;
-      audio.src = value.url;
-    }
-  }
-  bitrates.innerText = lowest + 'kbps opus';
+  audio.src = urls[bitrates.indexOf(DBR)];
+  bitrateInfo.innerText = DBR + ' kbps Opus';
 
   if (!query || played)
     audio.play();
@@ -114,12 +107,12 @@ const mediaSessionAPI = (name, author, image) => {
     title: name,
     artist: author,
     artwork: [
-      { src: image, sizes: '96x96', type: 'image/webp' },
-      { src: image, sizes: '128x128', type: 'image/webp' },
-      { src: image, sizes: '192x192', type: 'image/webp' },
-      { src: image, sizes: '256x256', type: 'image/webp' },
-      { src: image, sizes: '384x384', type: 'image/webp' },
-      { src: image, sizes: '512x512', type: 'image/webp' },
+      { src: image, sizes: '96x96' },
+      { src: image, sizes: '128x128' },
+      { src: image, sizes: '192x192' },
+      { src: image, sizes: '256x256' },
+      { src: image, sizes: '384x384' },
+      { src: image, sizes: '512x512' },
               ]
   })
 }

@@ -44,6 +44,7 @@
   padding: 0.3rem;
 }
 
+
 [data-badge]:after {
   font-family: 'Noto Sans';
   content: attr(data-badge);
@@ -54,7 +55,7 @@
 }
 
 [data-badge^="-"]:after,
-[data-badge=""]:after,
+[data-badge=" "]:after,
 [data-badge="0"]:after {
   display: none;
 }

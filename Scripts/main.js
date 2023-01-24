@@ -22,55 +22,38 @@ let queue = false;
 let array = [];
 const api = 'https://pipedapi.tokhmi.xyz';
 
-const validator = (inputValue) => {
-
-  if (streamID(inputValue)) play(inputValue);
-
-  else if (playlistID(inputValue)) {
-    queueFx();
-    fetch(api + '/playlists/' + playlistID(inputValue))
-      .then(res => res.json())
-      .then(data => {
-        data.relatedStreams.forEach((v, i) => {
-          queueIt('https://youtube.com' + v.url);
-        });
-      });
-      
-
-  }
-  // so that it does not run again for the same link
-  oldURL = inputValue;
-}
 
 const play = (url) => {
-  fetch(api + '/streams/' + streamID(url))
+  let id = streamID(url);
+  fetch(api + '/streams/' + id)
     .then(res => res.json())
     .then(data => {
+      
       if (getSaved('thumbnail')) {
         save('thumbnail', data.thumbnailUrl);
-      }
-      else {
+      } else {
         image.src = data.thumbnailUrl;
         image.onload = () => themer();
       }
 
       // extracting opus streams
-      const opusStreams = [];
+      const bitrates = [];
+      const urls = [];
 
       for (const value of data.audioStreams) {
-        if (Object.values(value).includes('opus'))
-          opusStreams.push({
-            'bitrate': parseInt(value.quality.match(/\d+/)[0]),
-            'url': value.url
-          });
+        if (Object.values(value).includes('opus')) {
+          bitrates.push(parseInt(value.quality));
+          urls.push(value.url);
+        }
       }
-      audioSRC(opusStreams);
+
+      audioSRC(bitrates, urls);
 
       document.querySelector('#title').innerText = data.title;
       document.querySelector('#author').innerText = data.uploader;
 
-      history.pushState('', '', location.origin + '/?q=' + streamID(url));
-      history.replaceState('', '', location.origin + '/?q=' + streamID(url));
+      history.pushState('', '', location.origin + '/?q=' + id);
+      history.replaceState('', '', location.origin + '/?q=' + id);
 
       mediaSessionAPI(data.title, data.uploader, data.thumbnailUrl)
     });
@@ -105,16 +88,6 @@ const queueIt = url => {
 }
 
 
-// input text player
-
-input.addEventListener('input', () => {
-  if (oldURL != input.value)
-    queue ?
-    queueIt(input.value) :
-    validator(input.value);
-
-});
-
 
 // queue functions and toggle
 
@@ -135,3 +108,32 @@ queueButton.addEventListener('click', queueFx);
 
 // queue Next
 queueNext.addEventListener('click', next)
+
+
+
+const validator = (inputValue) => {
+  const pID = playlistID(inputValue);
+  if (streamID(inputValue)) play(inputValue);
+
+  else if (pID) {
+    queueFx();
+    fetch(api + '/playlists/' + pID)
+      .then(res => res.json())
+      .then(data => {
+        for (const i of data.relatedStreams)
+          queueIt('https://youtube.com' + i.url);
+      });
+  }
+  // so that it does not run again for the same link
+  oldURL = inputValue;
+}
+
+// input text player
+
+input.addEventListener('input', () => {
+  if (oldURL != input.value)
+    queue ?
+    queueIt(input.value) :
+    validator(input.value);
+
+});

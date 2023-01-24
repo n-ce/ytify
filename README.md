@@ -6,10 +6,10 @@
 </div>
 
 ## Description 🦚
- - the name is a portmanteau for yt(YouTube) and spotify.
- - the app is a minimal audio streaming front-end which captures youtube links in order to provide the user with a playable audio stream easily.
- - it also encapsulates a number of features that make user experience smoother and personalised.
- - works even on the lowest bandwidth, never worry about metered data consumption anymore.
+ - The name is a portmanteau for YouTube & spotIFY.
+ - The app is a minimal audio streaming front-end which captures youtube links in order to provide the user with a playable audio stream easily.
+ - It also encapsulates a number of features that make user experience smoother and personalised.
+ - Works even on the lowest bandwidth, never worry about metered data consumption anymore.
 
 ## File Structure 📂
 ```
