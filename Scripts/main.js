@@ -20,7 +20,7 @@ let queueNow = 1;
 let queueList = [];
 let queue = false;
 let array = [];
-const api = 'https://pipedapi.tokhmi.xyz';
+const api = 'https://pipedapi.kavin.rocks';
 
 
 const play = (url) => {
