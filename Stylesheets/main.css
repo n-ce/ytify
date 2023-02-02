@@ -101,7 +101,7 @@ button {
   display: none;
 }
 
-a {
+code a {
   text-decoration: none;
   color: var(--bg);
   background: var(--text)

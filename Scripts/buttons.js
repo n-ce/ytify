@@ -73,12 +73,10 @@ let thumbnail = true;
 thumbnailButton.addEventListener('click', () => {
   if (thumbnail) {
     save('thumbnail', image.src);
-    document.querySelector('#dataContainer').style.width='40vw';
   } else {
     image.src = getSaved('thumbnail');
     localStorage.removeItem('thumbnail');
-    document.querySelector('#dataContainer').style.width='80vw';
-  }
+     }
   thumbnail = !thumbnail;
   thumbnailButton.classList.toggle('on');
   image.classList.toggle('hide');

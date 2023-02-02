@@ -4,49 +4,49 @@
 <head>
 
   <meta charset="UTF-8">
-  
-  <meta name="description"            content="32kbps, 64kbps, 128kbps youtube audio streaming website.">
-  <meta name="author"                 content="Animesh Nath">
-  <meta name="viewport"               content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color"            content="none">
+
+  <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website.">
+  <meta name="author" content="Animesh Nath">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="none">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="keywords"               content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
-  
+  <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
+
   <title>ytify</title>
 
-  <meta property="og:title"       content="YTIFY">
-  <meta property="og:type"        content="website">
-  <meta property="og:url"         content="https://ytify.netlify.app">
+  <meta property="og:title" content="YTIFY">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ytify.netlify.app">
   <meta property="og:description" content="50kbps Opus YouTube Audio Streaming Web App.">
-  <meta property="og:image"       content="Assets/maskable_icon_x512.png">
+  <meta property="og:image" content="Assets/maskable_icon_x512.png">
 
   <!-- tells google that this url is most important (e.g. not http (without s = secure))-->
-  <link rel="canonical"  href="https://ytify.netlify.app/">
-  <link rel="icon"       href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
-  <link rel="icon"       href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192"  />
-  <link rel="manifest"   href="manifest.json" />
+  <link rel="canonical" href="https://ytify.netlify.app/">
+  <link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
+  <link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="Stylesheets/main.css">
   <link rel="stylesheet" href="Stylesheets/settings.css">
   <link rel="stylesheet" href="Stylesheets/data.css">
   <link rel="stylesheet" href="Stylesheets/player.css">
 
   <script type="module" src="Scripts/init.js"></script>
-  <script               src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
+  <script src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
   <script type="module" src="Scripts/main.js"></script>
   <script type="module" src="Scripts/buttons.js"></script>
-  <script               src="Scripts/service-worker.js"></script>
-  
+  <script src="Scripts/service-worker.js"></script>
+
 </head>
 
 <body>
 
   <div id="settingsContainer" class="hide">
-    <button class="material-icons"    id="themeButton">dark_mode</button>
-    <button class="material-icons"    id="fullscreenButton">fullscreen</button>
+    <button class="material-icons" id="themeButton">dark_mode</button>
+    <button class="material-icons" id="fullscreenButton">fullscreen</button>
     <button class="material-icons on" id="thumbnailButton">image</button>
-    <button class="material-icons"    id="qualityButton">high_quality</button>
-    <button class="material-icons"    id="infoButton">info</button>
-    <button class="material-icons"    id="deleteDataButton">delete</button>
+    <button class="material-icons" id="qualityButton">high_quality</button>
+    <button class="material-icons" id="infoButton">info</button>
+    <button class="material-icons" id="deleteDataButton">delete</button>
   </div>
 
   <div id="dataContainer">
@@ -83,10 +83,10 @@
     </div>
 
     <div id="playerProfiles">
-      <button class="material-icons"      id="queueButton">queue</button>
+      <button class="material-icons" id="queueButton">queue</button>
       <button class="material-icons hide" id="queueNextButton">skip_next</button>
-      <button class="material-icons"      id="loopButton">loop</button>
-      <button class="material-icons"      id="settingsButton">settings</button>
+      <button class="material-icons" id="loopButton">loop</button>
+      <button class="material-icons" id="settingsButton">settings</button>
       <input type="url" placeholder="Input Link Here">
     </div>
 
