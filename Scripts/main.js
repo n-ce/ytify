@@ -28,7 +28,7 @@ const play = (url) => {
   fetch(api + '/streams/' + id)
     .then(res => res.json())
     .then(data => {
-      
+
       if (getSaved('thumbnail')) {
         save('thumbnail', data.thumbnailUrl);
       } else {
@@ -49,8 +49,8 @@ const play = (url) => {
 
       audioSRC(bitrates, urls);
 
-      document.querySelector('#title').innerText = data.title;
-      document.querySelector('#author').innerText = data.uploader;
+      document.querySelector('#title').innerHTML = `<a href="${url}">${data.title}</a>`;
+      document.querySelector('#author').innerHTML = `<a href="https://youtube.com${data.uploaderUrl}">${data.uploader}</a>`;
 
       history.pushState('', '', location.origin + '/?q=' + id);
       history.replaceState('', '', location.origin + '/?q=' + id);

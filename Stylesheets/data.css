@@ -30,6 +30,11 @@ img {
   animation: fade 1s ease-out;
 }
 
+#metadata {
+  width: 100%;
+  overflow: scroll;
+}
+
 #title {
   font-size: 1rem;
   font-weight: bold;
@@ -37,6 +42,11 @@ img {
 
 #author {
   font-size: 0.75rem;
+}
+
+#metadata a{
+  text-decoration: none;
+  color: inherit;
 }
 
 #bitrate {
@@ -51,17 +61,9 @@ img {
     flex-direction: row;
   }
 
-  img {
-    height: 22.5vw;
-  }
-
+  img,
   #metadata {
     height: 22.5vw;
-    width: 40vw;
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow-y: scroll;
   }
 
   #title {
