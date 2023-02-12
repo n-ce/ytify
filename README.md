@@ -1,32 +1,36 @@
 <div align="center">
-  <h1>🎄 YTIFY 🎄</h1>
-  <img src="Assets/default_thumbnail.avif">
-  <br>
-  <img src="https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status">
+
+# 🎄 YTIFY 🎄
+![](Assets/default_thumbnail.avif)
+
+|*Powered*|*By*|
+|:-:|:-:|
+|![](https://www.netlify.com/v3/img/components/logomark.svg)|![](https://jamstack.org/img/logo/svg/Jamstack_Logo_DarkBG.svg)|
+
+|JS|API|MARKUP|
+|:-:|:-:|:-:|
+|![](https://raw.githubusercontent.com/voodootikigod/logo.js/master/js.png)|![](https://raw.githubusercontent.com/TeamPiped/Piped/master/public/img/icons/logo.svg)|![](https://www.w3.org/html/logo/downloads/HTML5_Logo.svg)|
 </div>
 
 ## Table of Contents
-- [Description 🦚](#description-🦚)
-- [File Structure 📂](#file-structure-📂)
-- [Getting Started 🖼](#getting-started-🖼)
-- [Licence 📝](#licence-📝)
-- [Contributing 📋](#contributing-📋)
-- [Acknowledegments 🙏](#acknowledgements-🙏)
+- [**Description 🦚**](#description-)
+- [**File Structure** 📂](#file-structure-)
+- [**Getting Started** 🖼](#getting-started-)
+- [**Licence** 📝](#licence-)
+- [**Contributing** 📋](#contributing-)
+- [**Acknowledegments** 🙏](#acknowledgements-)
 
 
 ## Description 🦚
-ytify, a portmanteau for YouTube & spotIFY, is a minimal audio streaming application which easily captures youtube links 
+**ytify**, a portmanteau for YouTube & spotIFY, is a minimal audio streaming application which takes youtube links as input 
 to provide the user with a stream of audio. ytify allows users to listen without worrying about low bandwidth or metered 
 data consumption. It also provides a smooth and personalised user experience with features including:
 
- - Queue: Always have something coming up next. ytify lets you add multiple links to keep your music going. 
- - Playlist Support: Drop the link to a youtube playlist to fill up your queue without having to copy and paste each link. 
- - Colour Picker: ytify’s sleek design uses colours selected from the thumbnail of your youtube link. 
+ - **Queue** : Always have something coming up next. ytify lets you add multiple links to keep your music going. 
+ - **Playlist Support** : Drop the link to a youtube playlist to fill up your queue without having to copy and paste each link. 
+ - **Theming** : ytify’s sleek design themes itself using colours selected from the thumbnail of your youtube link. 
 
-ytify is a web app developed using HTML, CSS, and JavaScript to smoothly integrate into your browsing experience. 
-
-Upcoming features include backward and forward seek buttons, performance enhancements, an expanded settings menu, and bitrate selection. 
-
+We are always improving : Upcoming features include backward and forward seek buttons, performance enhancements, an expanded settings menu, and bitrate selection. 
 
 ## File Structure 📂
 ```
@@ -51,7 +55,7 @@ ytify
 ```
 ## Getting Started 🖼
 To use ytify, simply navigate to our website, paste a youtube link, and press play!
-
+Take a look at some Screenshots here ->
 <p align="center">
   <img src="Assets/Screenshots/landscape_dark-mode.avif" width="45%">
   <img src="Assets/Screenshots/landscape_light-mode.avif" width="45%">
@@ -66,16 +70,26 @@ To use ytify, simply navigate to our website, paste a youtube link, and press pl
 </p>
 
 ## Licence 📝
-ytify is licensed under the GNU General Public License v3.0, see [LICENSE](https://github.com/n-ce/ytify/blob/main/LICENSE) 
-for more information
+```
+Copyright 2021-2023, Animesh Nath
+ytify is licensed under the GNU General Public License v3.0.
+```
+see [LICENSE](https://github.com/n-ce/ytify/blob/main/LICENSE) for more information.
 
 ## Contributing 📋
-This project is open to contributions! To add to our repository, check out our issues. We have a number of features on the way, 
-and tag some issues as "good first issue" to signal that they are good for newcomers. To contribute, fork the repository, make a branch,
- commit your changes, and make a pull request. 
+```
+This project is open to contributions!
+ever since v4 & v5 we have made changes
+& refactored the entire project such that
+it is highly contributable and understandable.
+```
+See [contributing](https://github.com/n-ce/ytify/blob/main/contributing.md) for more information.
 
 ## Acknowledgements 🙏
-- [piped](https://github.com/teampiped/piped)
-- [color.js](https://github.com/luukdv/color.js)
-- [netlify](https://www.netlify.com)
-- [google Fonts & Icons](https://fonts.google.com)
+- [Piped](https://github.com/teampiped/piped)
+- [Color.js](https://github.com/luukdv/color.js)
+- [Netlify](https://www.netlify.com)
+- [Google Fonts & Icons](https://fonts.google.com)
+
+<hr>
+End, or is it? Here check out a music that I designed years ago https://ytify.netlify.app/?q=L7l1VpHD9lc
