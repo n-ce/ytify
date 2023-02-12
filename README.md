@@ -3,13 +3,8 @@
 # 🎄 YTIFY 🎄
 ![](Assets/default_thumbnail.avif)
 
-|*Powered*|*By*|
-|:-:|:-:|
-|![](https://www.netlify.com/v3/img/components/logomark.svg)|![](https://jamstack.org/img/logo/svg/Jamstack_Logo_DarkBG.svg)|
+![](Assets/jamstack.png)
 
-|JS|API|MARKUP|
-|:-:|:-:|:-:|
-|![](https://raw.githubusercontent.com/voodootikigod/logo.js/master/js.png)|![](https://raw.githubusercontent.com/TeamPiped/Piped/master/public/img/icons/logo.svg)|![](https://www.w3.org/html/logo/downloads/HTML5_Logo.svg)|
 </div>
 
 ## Table of Contents
