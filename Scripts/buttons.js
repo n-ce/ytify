@@ -21,7 +21,7 @@ let style;
 settingsButton.addEventListener('click',
   () => {
     settingsPanel ?
-      style = ['rotate(360deg) scale(0.9)', 'flex'] :
+      style = ['rotate(180deg) scale(0.9)', 'flex'] :
       style = ['rotate(0deg)', 'none'];
     settingsButton.style.transform = style[0];
     document.querySelector('#settingsContainer').style.display = style[1];
@@ -38,10 +38,10 @@ const themeButton = document.querySelector('#themeButton');
 if (getSaved('theme')) themeButton.classList.add('on');
 
 themeButton.addEventListener('click', () => {
-  getSaved('theme')?
-    localStorage.removeItem('theme'):
+  getSaved('theme') ?
+    localStorage.removeItem('theme') :
     save('theme', 'dark');
-themeButton.classList.toggle('on');
+  themeButton.classList.toggle('on');
   themer();
 });
 
@@ -53,10 +53,10 @@ let fullscreen = true;
 const fullscreenButton = document.querySelector('#fullscreenButton');
 fullscreenButton.addEventListener('click',
   () => {
-    fullscreen?
-      document.documentElement.requestFullscreen():
+    fullscreen ?
+      document.documentElement.requestFullscreen() :
       document.exitFullscreen();
-    
+
     fullscreenButton.classList.toggle('on');
     fullscreen = !fullscreen;
   });
@@ -75,7 +75,7 @@ thumbnailButton.addEventListener('click', () => {
   } else {
     image.src = getSaved('thumbnail');
     localStorage.removeItem('thumbnail');
-     }
+  }
   thumbnail = !thumbnail;
   thumbnailButton.classList.toggle('on');
   image.classList.toggle('hide');
@@ -106,15 +106,10 @@ qualityButton.addEventListener('click', () => {
 
 // info
 
-document.querySelector('#infoButton')
+document.querySelector('#githubButton')
   .addEventListener('click',
-    () => {
-      if (
-        confirm("The info page will be opened in a new tab. Continue?")
-      ) {
-        window.open("https://github.com/n-ce/ytify");
-      }
-    });
+    () => window.open("https://github.com/n-ce/ytify")
+  );
 
 
 
@@ -123,8 +118,10 @@ document.querySelector('#infoButton')
 document.querySelector('#deleteDataButton')
   .addEventListener('click',
     () => {
-      localStorage.clear();
-      location.replace(location.origin);
+      if (confirm('Clear all saved data?')) {
+        localStorage.clear();
+        location.replace(location.origin);
+      }
     });
 
 
@@ -142,15 +139,16 @@ playButton.addEventListener('click', () => {
   playback = !playback;
 });
 
-audio.onplaying = () => {
+audio.addEventListener('playing', () => {
   playButton.classList.add('on');
-  playButton.innerText = 'pause';
+  playButton.classList.replace(playButton.classList[0], 'ri-pause-fill')
   playback = false;
-};
-audio.onpause = () => {
+});
+
+audio.addEventListener('pause', () => {
   playback = true;
-  playButton.innerText = 'play_arrow';
-};
+  playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
+});
 
 
 
@@ -180,7 +178,7 @@ progress.addEventListener('change', () => {
 
 audio.addEventListener('timeupdate', () => {
   if (progress === document.activeElement) return;
-  
+
   progress.value = Math.floor(audio.currentTime);
   document.querySelector('#currentDuration').innerText = convertSStoMMSS(audio.currentTime);
 });
@@ -202,7 +200,7 @@ audio.addEventListener('ended', () => {
     audio.play();
   }
   else {
-    playButton.innerText = 'stop';
+    playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
     playback = true;
   }
 });

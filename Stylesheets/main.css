@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
+
 
 :root {
   --bg: none;
@@ -41,6 +41,7 @@ body {
 }
 
 button {
+  font-size: 1.5rem;
   height: 3rem;
   width: 3rem;
   background: none;

@@ -74,17 +74,17 @@ see [LICENSE](https://github.com/n-ce/ytify/blob/main/LICENSE) for more informat
 ## Contributing 📋
 ```
 This project is open to contributions!
-ever since v4 & v5 we have made changes
-& refactored the entire project such that
-it is highly contributable and understandable.
+Since v4 & v5 we have refactored the
+entire project such that it is highly 
+contributable and understandable.
 ```
 See [contributing](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md) for more information.
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)
-- [Color.js](https://github.com/luukdv/color.js)
 - [Netlify](https://www.netlify.com)
-- [Google Fonts & Icons](https://fonts.google.com)
+- [Remix Icons](https://github.com/Remix-Design/RemixIcon)
+- [Google Fonts](https://fonts.google.com)
 
-<hr>
-End, or is it? Here check out a music that I designed years ago https://ytify.netlify.app/?q=L7l1VpHD9lc
+---
+The End, or is it? Here check out a music that I designed years ago https://ytify.netlify.app/?s=L7l1VpHD9lc

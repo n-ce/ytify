@@ -2,14 +2,12 @@ import {
   save,
   getSaved,
   params,
-  image,
-  colorIt,
-  input
+  image
 } from './constants.js'
 
 // fixes compatibitity with older versions
 
-const version = 'v5.3';
+const version = 'v5.4';
 document.querySelector('b b').innerText = version;
 if (getSaved('version') !== version) {
   localStorage.clear();
@@ -19,18 +17,12 @@ if (getSaved('version') !== version) {
 // initial theme apply
 
 if (!params.get('s')) {
-  let colorSchemeQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+  let colorSchemeQueryList = matchMedia('(prefers-color-scheme: dark)');
   //prefers color scheme
   const setColorScheme = e => {
-    if (e.matches) {
-      colorIt('black', '#fff1', 'white', '#fff7')
-      image.src = 'Assets/dark_thumbnail.avif';
-    } else {
+    e.matches?
+      image.src = 'Assets/dark_thumbnail.avif':
       image.src = 'Assets/default_thumbnail.avif';
-      getSaved('theme') ?
-        colorIt('#000', '#000', '#fff', 'rgb(119,149,218)') :
-        colorIt('rgb(119,149,218)', '#fff5', '#000b', '#000b');
-    }
   }
   setColorScheme(colorSchemeQueryList);
   colorSchemeQueryList.addListener(setColorScheme);

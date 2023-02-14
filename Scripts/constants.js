@@ -13,7 +13,7 @@ const bitrateInfo = document.querySelector('#bitrate');
 
 const palette = {
   'light': {
-    bg: 'white',
+    bg: 'none',
     accent: '#fff5',
     text: '#000b',
     border: '#000b'
@@ -76,63 +76,63 @@ const audioSRC = (bitrates, urls) => {
   played = true;
 }
 
-const colorIt = (a, b, c, d) => {
-  document.querySelector(':root').style.setProperty('--bg', a);
-  document.querySelector(':root').style.setProperty('--accent', b);
-  document.querySelector(':root').style.setProperty('--text', c);
-  document.querySelector(':root').style.setProperty('--border', d);
-  document.querySelector('meta[name="theme-color"]').setAttribute("content", a);
-}
 
 let theme;
 
 const themer = () => {
-  colorjs.average(
-    image, {
-      group: 25,
-      sample: 1
-    }).then(c => {
 
-    getSaved('theme') ?
-      theme = 'dark' :
-      theme = 'light';
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
 
-    if ((c[0] + c[1] + c[2]) < 85)
-      c[0] += 34, c[1] += 34, c[2] += 34;
+  canvas.width = image.width;
+  canvas.height = image.height;
+  context.drawImage(image, 0, 0, 1, 1);
 
-    palette['light'].bg = palette['dark'].border = `rgb(${c[0]},${c[1]},${c[2]})`;
+  const c = context.getImageData(0, 0, 1, 1).data;
 
-    colorIt(
-      palette[theme].bg,
-      palette[theme].accent,
-      palette[theme].text,
-      palette[theme].border)
+  getSaved('theme') ?
+    theme = 'dark' :
+    theme = 'light';
 
-  });
+  if ((c[0] + c[1] + c[2]) < 85)
+    c[0] += 34, c[1] += 34, c[2] += 34;
+
+  palette['light'].bg = palette['dark'].border = `rgb(${c[0]},${c[1]},${c[2]})`;
+
+  document.querySelector(':root').style.setProperty('--bg', palette[theme].bg);
+  document.querySelector(':root').style.setProperty('--accent', palette[theme].accent);
+  document.querySelector(':root').style.setProperty('--text', palette[theme].text);
+  document.querySelector(':root').style.setProperty('--border', palette[theme].border);
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
 }
 
-const setMetadata = (thumbnail, id, title, author,authorUrl) => {
+image.addEventListener('load', themer);
+
+
+const setMetadata = (thumbnail, id, title, author, authorUrl) => {
   if (getSaved('thumbnail')) {
     save('thumbnail', thumbnail);
   } else {
     image.src = thumbnail;
-    image.onload = () => themer();
   }
   document.getElementById('title').innerHTML = `<a href="https://youtu.be/${id}">${title}</a>`;
   document.getElementById('author').innerHTML = `<a href="https://youtube.com${authorUrl}">${author}</a>`;
-  
-  navigator.mediaSession.metadata = new MediaMetadata({
-    title: title,
-    artist: author,
-    artwork: [
-      { src: thumbnail, sizes: '96x96' },
-      { src: thumbnail, sizes: '128x128' },
-      { src: thumbnail, sizes: '192x192' },
-      { src: thumbnail, sizes: '256x256' },
-      { src: thumbnail, sizes: '384x384' },
-      { src: thumbnail, sizes: '512x512' },
+ 
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: author,
+      artwork: [
+        { src: thumbnail, sizes: '96x96' },
+        { src: thumbnail, sizes: '128x128' },
+        { src: thumbnail, sizes: '192x192' },
+        { src: thumbnail, sizes: '256x256' },
+        { src: thumbnail, sizes: '384x384' },
+        { src: thumbnail, sizes: '512x512' },
               ]
-  })
+    })
+  }
+
 }
 
 const convertSStoMMSS = (seconds) => {
@@ -140,7 +140,7 @@ const convertSStoMMSS = (seconds) => {
   let ss = Math.floor(seconds % 60);
   if (mm < 10) mm = `0${mm}`;
   if (ss < 10) ss = `0${ss}`;
-  return `${mm}:${ss}`
+  return `${mm}:${ss}`;
 }
 
 export {
@@ -151,7 +151,6 @@ export {
   settingsButton,
   queueButton,
   loopButton,
-  palette,
   api,
   params,
   save,
@@ -159,7 +158,6 @@ export {
   streamID,
   playlistID,
   audioSRC,
-  colorIt,
   themer,
   setMetadata,
   convertSStoMMSS

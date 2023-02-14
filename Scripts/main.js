@@ -8,7 +8,6 @@ import {
   api,
   params,
   audio,
-  image,
   audioSRC,
   queueButton,
   loopButton
@@ -55,7 +54,7 @@ const play = (url) => {
     .catch(err => {
       instance < 4 ?
         play(url) :
-        alert(err);
+        console.log(err);
 
       instance++;
     })
@@ -116,14 +115,14 @@ const playlistLoad = (id) => {
         id,
         data.name,
         'Click on Next Button to start',
-        null);
+        '');
       for (const i of data.relatedStreams)
         queueIt('https://youtube.com' + i.url);
     })
     .catch(err => {
       instance < 4 ?
         playlistLoad(id) :
-        alert(err);
+        console.log(err);
 
       instance++;
     });

@@ -42,11 +42,18 @@
   padding: 0.3rem;
 }
 
+#queueButton{
+  border-radius: 0.5rem;
+  width: auto;
+  display:flex;
+  align-items: center;
+}
 
 [data-badge]:after {
   font-family: 'Noto Sans';
   content: attr(data-badge);
   font-size: 1rem;
+  font-weight: bold;
   -webkit-transition: background 0.5s, color 1s;
   -o-transition: background 0.5s, color 1s;
   transition: background 0.5s, color 1s;
@@ -60,6 +67,7 @@
 
 
 #settingsButton {
+  box-shadow: none;
   -webkit-transition: all 1s;
   -o-transition: all 1s;
   transition: all 1s;
