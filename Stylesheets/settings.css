@@ -7,6 +7,12 @@
   border-radius: 0.7rem;
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
-  -webkit-animation: fade 500ms ease-out;
-  animation: fade 500ms ease-out;
+  -webkit-animation: fade 1s;
+  animation: fade 1s;
+}
+
+@keyframes fade{
+  from{
+    transform: translateX(-100%);
+  }
 }

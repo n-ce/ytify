@@ -7,8 +7,6 @@
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
   border-radius: 0.7rem;
-  -webkit-animation: fade 500ms ease-out;
-  animation: fade 500ms ease-out;
 }
 
 #playerControls {
@@ -62,9 +60,9 @@
 
 
 #settingsButton {
-  -webkit-transition: all 0.5s ease-in;
-  -o-transition: all 0.5s ease-in;
-  transition: all 0.5s ease-in;
+  -webkit-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
 }
 
 input[type="url"] {
@@ -82,8 +80,6 @@ input[type="url"] {
   outline: none;
   text-align: center;
   font-weight: bold;
-  -webkit-animation: fade 1s ease-out;
-  animation: fade 1s ease-out
 }
 
 @media (min-width:600px) {

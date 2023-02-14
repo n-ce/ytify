@@ -66,7 +66,7 @@ Take a look at some Screenshots here ->
 
 ## Licence 📝
 ```
-Copyright 2021-2023, Animesh Nath
+Copyright 2022-2023, Animesh Nath
 ytify is licensed under the GNU General Public License v3.0.
 ```
 see [LICENSE](https://github.com/n-ce/ytify/blob/main/LICENSE) for more information.
@@ -78,7 +78,7 @@ ever since v4 & v5 we have made changes
 & refactored the entire project such that
 it is highly contributable and understandable.
 ```
-See [contributing](https://github.com/n-ce/ytify/blob/main/contributing.md) for more information.
+See [contributing](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md) for more information.
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)

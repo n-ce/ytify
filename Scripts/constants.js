@@ -26,7 +26,16 @@ const palette = {
   }
 };
 
-const query = (new URL(location.href)).searchParams.get('q');
+const api = [
+  'https://pipedapi.kavin.rocks/',
+  'https://pipedapi-libre.kavin.rocks/',
+  'https://pipedapi.tokhmi.xyz/',
+  'https://api-piped.mha.fi/',
+  'https://pipedapi.moomoo.me/'
+  ];
+
+const params = (new URL(document.location)).searchParams;
+
 
 // Reusable Functions
 
@@ -59,7 +68,7 @@ const audioSRC = (bitrates, urls) => {
   audio.src = urls[bitrates.indexOf(DBR)];
   bitrateInfo.innerText = DBR + ' kbps Opus';
 
-  if (!query || played)
+  if (!params.get('s') || played)
     audio.play();
 
   document.querySelector("#playerControls").style.display = 'flex';
@@ -102,17 +111,26 @@ const themer = () => {
   });
 }
 
-const mediaSessionAPI = (name, author, image) => {
+const setMetadata = (thumbnail, id, title, author,authorUrl) => {
+  if (getSaved('thumbnail')) {
+    save('thumbnail', thumbnail);
+  } else {
+    image.src = thumbnail;
+    image.onload = () => themer();
+  }
+  document.getElementById('title').innerHTML = `<a href="https://youtu.be/${id}">${title}</a>`;
+  document.getElementById('author').innerHTML = `<a href="https://youtube.com${authorUrl}">${author}</a>`;
+  
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: name,
+    title: title,
     artist: author,
     artwork: [
-      { src: image, sizes: '96x96' },
-      { src: image, sizes: '128x128' },
-      { src: image, sizes: '192x192' },
-      { src: image, sizes: '256x256' },
-      { src: image, sizes: '384x384' },
-      { src: image, sizes: '512x512' },
+      { src: thumbnail, sizes: '96x96' },
+      { src: thumbnail, sizes: '128x128' },
+      { src: thumbnail, sizes: '192x192' },
+      { src: thumbnail, sizes: '256x256' },
+      { src: thumbnail, sizes: '384x384' },
+      { src: thumbnail, sizes: '512x512' },
               ]
   })
 }
@@ -134,7 +152,8 @@ export {
   queueButton,
   loopButton,
   palette,
-  query,
+  api,
+  params,
   save,
   getSaved,
   streamID,
@@ -142,6 +161,6 @@ export {
   audioSRC,
   colorIt,
   themer,
-  mediaSessionAPI,
+  setMetadata,
   convertSStoMMSS
 }

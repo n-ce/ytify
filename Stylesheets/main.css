@@ -29,14 +29,14 @@ body {
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
   -webkit-box-pack: space-evenly;
-      -ms-flex-pack: space-evenly;
-          justify-content: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
   -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
   font-family: 'Noto Sans', sans-serif;
 }
 
@@ -48,60 +48,25 @@ button {
   border: none;
   border-radius: 50%;
   outline: none;
-  -webkit-animation: fade 1s ease-out;
-          animation: fade 1s ease-out
 }
 
-@-webkit-keyframes appear {
-  from {
-    -webkit-transform: translateY(-100%);
-            transform: translateY(-100%);
-  }
-}
-
-@keyframes appear {
-  from {
-    -webkit-transform: translateY(-100%);
-            transform: translateY(-100%);
-  }
-}
-
-
-
-@-webkit-keyframes fade {
-  from {
-    opacity: 0;
-    -webkit-transform: translateX(-50%);
-            transform: translateX(-50%)
-  }
-}
-
-
-
-@keyframes fade {
-  from {
-    opacity: 0;
-    -webkit-transform: translateX(-50%);
-            transform: translateX(-50%)
-  }
-}
 
 .on {
   background: var(--accent);
   color: var(--text);
   border: 1px solid var(--border);
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-          box-shadow: 0 0.1rem 0.3rem #0003;
+  box-shadow: 0 0.1rem 0.3rem #0003;
   -webkit-transform: scale(0.9);
-      -ms-transform: scale(0.9);
-          transform: scale(0.9);
+  -ms-transform: scale(0.9);
+  transform: scale(0.9);
 }
 
 .hide {
   display: none;
 }
 
-code a {
+b a {
   text-decoration: none;
   color: var(--bg);
   background: var(--text)

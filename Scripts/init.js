@@ -1,7 +1,7 @@
 import {
   save,
   getSaved,
-  query,
+  params,
   image,
   colorIt,
   input
@@ -9,8 +9,8 @@ import {
 
 // fixes compatibitity with older versions
 
-const version = 'v5.2_RC';
-document.querySelector('kbd').innerText = version;
+const version = 'v5.3';
+document.querySelector('b b').innerText = version;
 if (getSaved('version') !== version) {
   localStorage.clear();
   save('version', version);
@@ -18,7 +18,7 @@ if (getSaved('version') !== version) {
 
 // initial theme apply
 
-if (query == null) {
+if (!params.get('s')) {
   let colorSchemeQueryList = window.matchMedia('(prefers-color-scheme: dark)');
   //prefers color scheme
   const setColorScheme = e => {

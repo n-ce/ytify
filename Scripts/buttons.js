@@ -5,7 +5,6 @@ import {
   themer,
   getSaved,
   save,
-  query,
   image,
   audio,
   progress,

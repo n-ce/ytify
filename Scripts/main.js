@@ -1,15 +1,15 @@
 import {
+  setMetadata,
   streamID,
   playlistID,
-  themer,
   getSaved,
   save,
   input,
-  query,
+  api,
+  params,
   audio,
   image,
   audioSRC,
-  mediaSessionAPI,
   queueButton,
   loopButton
 } from './constants.js'
@@ -20,21 +20,21 @@ let queueNow = 1;
 let queueList = [];
 let queue = false;
 let array = [];
-const api = 'https://pipedapi.kavin.rocks';
-
+let instance = 0;
 
 const play = (url) => {
   let id = streamID(url);
-  fetch(api + '/streams/' + id)
+  fetch(api[instance] + 'streams/' + id)
     .then(res => res.json())
     .then(data => {
 
-      if (getSaved('thumbnail')) {
-        save('thumbnail', data.thumbnailUrl);
-      } else {
-        image.src = data.thumbnailUrl;
-        image.onload = () => themer();
-      }
+      setMetadata(
+        data.thumbnailUrl,
+        id,
+        data.title,
+        data.uploader,
+        data.uploaderUrl
+      );
 
       // extracting opus streams
       const bitrates = [];
@@ -49,20 +49,16 @@ const play = (url) => {
 
       audioSRC(bitrates, urls);
 
-      document.querySelector('#title').innerHTML = `<a href="${url}">${data.title}</a>`;
-      document.querySelector('#author').innerHTML = `<a href="https://youtube.com${data.uploaderUrl}">${data.uploader}</a>`;
+      history.pushState('', '', location.origin + '/?s=' + id);
+      history.replaceState('', '', location.origin + '/?s=' + id);
+    })
+    .catch(err => {
+      instance < 4 ?
+        play(url) :
+        alert(err);
 
-      history.pushState('', '', location.origin + '/?q=' + id);
-      history.replaceState('', '', location.origin + '/?q=' + id);
-
-      mediaSessionAPI(data.title, data.uploader, data.thumbnailUrl)
-    });
-}
-
-
-if (query != null) {
-  input.value = 'https://m.youtube.com/watch?v=' + query;
-  play(input.value);
+      instance++;
+    })
 }
 
 
@@ -110,20 +106,38 @@ queueButton.addEventListener('click', queueFx);
 queueNext.addEventListener('click', next)
 
 
+const playlistLoad = (id) => {
+  queueFx();
+  fetch(api[instance] + 'playlists/' + id)
+    .then(res => res.json())
+    .then(data => {
+      setMetadata(
+        data.thumbnailUrl,
+        id,
+        data.name,
+        'Click on Next Button to start',
+        null);
+      for (const i of data.relatedStreams)
+        queueIt('https://youtube.com' + i.url);
+    })
+    .catch(err => {
+      instance < 4 ?
+        playlistLoad(id) :
+        alert(err);
+
+      instance++;
+    });
+  history.pushState('', '', location.origin + '/?p=' + id);
+  history.replaceState('', '', location.origin + '/?p=' + id);
+
+}
+
 
 const validator = (inputValue) => {
   const pID = playlistID(inputValue);
   if (streamID(inputValue)) play(inputValue);
 
-  else if (pID) {
-    queueFx();
-    fetch(api + '/playlists/' + pID)
-      .then(res => res.json())
-      .then(data => {
-        for (const i of data.relatedStreams)
-          queueIt('https://youtube.com' + i.url);
-      });
-  }
+  else if (pID) playlistLoad(pID)
   // so that it does not run again for the same link
   oldURL = inputValue;
 }
@@ -137,3 +151,17 @@ input.addEventListener('input', () => {
     validator(input.value);
 
 });
+
+
+// stream param
+if (params.get('s')) {
+  play('https://youtu.be/' + params.get('s'));
+}
+// timestamp param
+if (params.get('t')) {
+  audio.currentTime = params.get('t')
+}
+// playlist param
+if (params.get('p')) {
+  playlistLoad(params.get('p'))
+}
