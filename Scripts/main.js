@@ -54,7 +54,7 @@ const play = (url) => {
     .catch(err => {
       instance < 4 ?
         play(url) :
-        console.log(err);
+        alert(err);
 
       instance++;
     })
@@ -122,7 +122,7 @@ const playlistLoad = (id) => {
     .catch(err => {
       instance < 4 ?
         playlistLoad(id) :
-        console.log(err);
+        alert(err);
 
       instance++;
     });
