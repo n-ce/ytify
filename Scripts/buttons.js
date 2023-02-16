@@ -32,8 +32,20 @@ settingsButton.addEventListener('click',
 
 
 // Theme toggle
-
 const themeButton = document.querySelector('#themeButton');
+
+let colorSchemeQueryList = matchMedia('(prefers-color-scheme: dark)');
+//prefers color scheme
+const setColorScheme = e => {
+  e.matches ?
+    save('theme', 'dark') :
+    localStorage.removeItem('theme');
+  themeButton.classList.toggle('on');
+  themer();
+}
+setColorScheme(colorSchemeQueryList);
+colorSchemeQueryList.addListener(setColorScheme);
+
 
 if (getSaved('theme')) themeButton.classList.add('on');
 

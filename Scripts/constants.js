@@ -56,7 +56,6 @@ const playlistID = (url) => {
 }
 
 
-let played = false; // so audio.play() does not execute at startup when query is provided
 
 const audioSRC = (bitrates, urls) => {
   let DBR;
@@ -68,13 +67,12 @@ const audioSRC = (bitrates, urls) => {
   audio.src = urls[bitrates.indexOf(DBR)];
   bitrateInfo.innerText = DBR + ' kbps Opus';
 
-  if (!params.get('s') || played)
-    audio.play();
+  if (!params.get('s')) audio.play();
 
   document.querySelector("#playerControls").style.display = 'flex';
-
-  played = true;
+  
 }
+
 
 
 let theme;
@@ -115,9 +113,15 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
   } else {
     image.src = thumbnail;
   }
-  document.getElementById('title').innerHTML = `<a href="https://youtu.be/${id}">${title}</a>`;
-  document.getElementById('author').innerHTML = `<a href="https://youtube.com${authorUrl}">${author}</a>`;
- 
+
+  const titleElem = document.getElementById('title');
+  const authorElem = document.getElementById('author');
+
+  titleElem.href = `https://youtu.be/${id}`;
+  titleElem.innerText = title;
+  authorElem.href = `https://youtube.com${authorUrl}`;
+  authorElem.innerText = author;
+
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,

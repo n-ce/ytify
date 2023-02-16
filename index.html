@@ -25,13 +25,14 @@
   <link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
   <link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
   <link rel="manifest" href="manifest.json" />
-  
+
   <link rel="stylesheet" href="Stylesheets/main.css">
   <link rel="stylesheet" href="Stylesheets/settings.css">
   <link rel="stylesheet" href="Stylesheets/data.css">
   <link rel="stylesheet" href="Stylesheets/player.css">
   <link rel="stylesheet" href="Assets/Icons/remixicon.css">
-  
+
+  <script src="constants.js"></script> <!-- Optional: added for combining all JS files into one -->
   <script type="module" src="Scripts/init.js"></script>
   <script type="module" src="Scripts/main.js"></script>
   <script type="module" src="Scripts/buttons.js"></script>
@@ -52,16 +53,14 @@
 
   <div id="dataContainer">
 
-    <img crossorigin="anonymous">
-
+    <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
+    
     <div id="metadata" align="center">
-      <p id="title">Copy a YouTube Video/Playlist Link</p>
-      <p id="author">Paste it in the Input Box</p>
+      <a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
+      <a id="author" href="#" target="_blank">Paste it in the Input Box</a>
       <p id="bitrate"></p>
     </div>
   </div>
-
-
 
   <audio></audio>
 
@@ -95,10 +94,11 @@
 
   </div>
 
-  <b>ytify <b></b>, a
+  <footer>ytify&nbsp;<p></p>, a&nbsp;
     <a href="https://github.com/n-ce" target="_blank">
-      n-ce</a> project.
-  </b>
+    n-ce
+    </a>&nbsp;project.
+  </footer>
 
 </body>
 

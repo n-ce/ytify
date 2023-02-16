@@ -67,8 +67,13 @@ button {
   display: none;
 }
 
-b a {
+footer{
+  display:flex;
+  align-items: center;
+}
+footer a {
   text-decoration: none;
   color: var(--bg);
-  background: var(--text)
+  background: var(--text);
+  border-radius: 0.3rem;
 }
