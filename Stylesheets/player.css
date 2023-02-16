@@ -44,9 +44,10 @@
 
 #queueButton{
   border-radius: 0.5rem;
-  width: auto;
+  min-width: 3rem;
   display:flex;
   align-items: center;
+  justify-content: center;
 }
 
 [data-badge]:after {
