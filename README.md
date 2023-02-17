@@ -1,10 +1,6 @@
 <div align="center">
-
-# 🎄 YTIFY 🎄
-![](Assets/default_thumbnail.avif)
-
-![](Assets/jamstack.png)
-
+ <h1> 💠 YTIFY 💠 </h1>
+ <img src="Assets/default_thumbnail.avif" width="80%">
 </div>
 
 ## Table of Contents
@@ -23,16 +19,14 @@ data consumption. It also provides a smooth and personalised user experience wit
 
  - **Queue** : Always have something coming up next. ytify lets you add multiple links to keep your music going. 
  - **Playlist Support** : Drop the link to a youtube playlist to fill up your queue without having to copy and paste each link. 
- - **Theming** : ytify’s sleek design themes itself using colours selected from the thumbnail of your youtube link. 
+ - **Theming** : ytify personalizes itself using colours selected from the thumbnail of your youtube stream. 
 
-We are always improving : Upcoming features include backward and forward seek buttons, performance enhancements, an expanded settings menu, and bitrate selection. 
 
 ## File Structure 📂
 ```
 ytify
 ├─── Assets/.. 
 ├─── Scripts
-│    ├─── init.js
 │    ├─── constants.js
 │    ├─── main.js
 │    ├─── buttons.js
@@ -85,6 +79,3 @@ See [contributing](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md) for 
 - [Netlify](https://www.netlify.com)
 - [Remix Icons](https://github.com/Remix-Design/RemixIcon)
 - [Google Fonts](https://fonts.google.com)
-
----
-The End, or is it? Here check out a music that I designed years ago https://ytify.netlify.app/?s=L7l1VpHD9lc
