@@ -7,7 +7,7 @@
 
   <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website.">
   <meta name="author" content="Animesh Nath">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="none">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
@@ -71,7 +71,7 @@
 
     <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
-    <div id="metadata"><br>
+    <div id="metadata">
       <a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
       <br>
       <a id="author" href="#" target="_blank">Paste it in the Input Box</a>
@@ -103,8 +103,16 @@
 
     <div id="playerProfiles">
       <span>
+        <button class="ri-rewind-fill" id="seekBwdButton"></button>
+        <label for="seekBwdButton">Seek Bwd</label>
+      </span>
+      <span>
+        <button class="ri-speed-fill" id="seekFwdButton"></button>
+        <label for="seekFwdButton">Seek Fwd</label>
+      </span>
+      <span>
         <button class="ri-play-list-add-fill" id="queueButton"></button>
-        <label for="queueButton">Add To Queue</label>
+        <label for="queueButton">Queue</label>
       </span>
       <span class="hide" id="qnbSpan">
         <button class="ri-skip-forward-fill" id="queueNextButton"></button>
@@ -123,15 +131,11 @@
 
   </div>
 
-
-
-  <footer>ytify v5.5, a&nbsp;
-    <a href="https://github.com/n-ce" target="_blank">
-      n-ce
-    </a>&nbsp;project.
+  <footer>
+    ytify v5.6, a&nbsp;
+    <a href="https://github.com/n-ce" target="_blank">n-ce</a>
+    &nbsp;project.
   </footer>
-
-
 
 </body>
 
