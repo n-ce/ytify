@@ -1,5 +1,5 @@
 #settingsContainer {
-  height: 3rem;
+  height: auto;
   width: auto;
   padding: 0.3rem;
   background: var(--accent);
@@ -11,8 +11,14 @@
   animation: fade 1s;
 }
 
-@keyframes fade{
-  from{
+@keyframes fade {
+  from {
     transform: translateX(-100%);
+  }
+}
+@media (min-width:600px) {
+  #settingsContainer span{
+    flex-direction: row;
+    margin-right: 1rem;
   }
 }

@@ -14,6 +14,7 @@
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  align-items: center;
 }
 
 #playSpeed {
@@ -44,9 +45,10 @@
 
 #queueButton{
   border-radius: 0.5rem;
-  width: auto;
+  min-width: 3rem;
   display:flex;
   align-items: center;
+  justify-content: center;
 }
 
 [data-badge]:after {
@@ -74,7 +76,7 @@
 }
 
 input[type="url"] {
-  height: 3rem;
+  height: 3.5rem;
   width: 9rem;
 
   background: var(--accent);

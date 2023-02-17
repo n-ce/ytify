@@ -1,13 +1,5 @@
-// Elements
-
-const image = document.querySelector('img');
-const audio = document.querySelector('audio');
-const input = document.querySelector('input[type="url"]');
-const progress = document.querySelector('input[type="range"]');
-const settingsButton = document.querySelector('#settingsButton')
-const queueButton = document.querySelector('#queueButton');
-const loopButton = document.querySelector('#loopButton');
-const bitrateInfo = document.querySelector('#bitrate');
+// binder the ultimate dom selector
+const $ = document.querySelector.bind(document);
 
 // Values
 
@@ -36,7 +28,6 @@ const api = [
 
 const params = (new URL(document.location)).searchParams;
 
-
 // Reusable Functions
 
 const save = (key, pair) => {
@@ -45,6 +36,8 @@ const save = (key, pair) => {
 const getSaved = (key) => {
   return localStorage.getItem(key);
 }
+
+if (getSaved('thumbnail')) localStorage.removeItem('thumbnail')
 
 const streamID = (url) => {
   const match = url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i);
@@ -56,7 +49,6 @@ const playlistID = (url) => {
 }
 
 
-let played = false; // so audio.play() does not execute at startup when query is provided
 
 const audioSRC = (bitrates, urls) => {
   let DBR;
@@ -65,16 +57,21 @@ const audioSRC = (bitrates, urls) => {
     DBR = Math.max(...bitrates) :
     DBR = Math.min(...bitrates);
 
-  audio.src = urls[bitrates.indexOf(DBR)];
-  bitrateInfo.innerText = DBR + ' kbps Opus';
+  const index = bitrates.indexOf(DBR);
+  $('audio').src = urls[index];
+   $('#bitrateSelector').selectedIndex = index;
 
-  if (!params.get('s') || played)
-    audio.play();
+  params.get('s') ?
+    $('#playButton').classList.add('on') :
+    $('audio').play();
 
-  document.querySelector("#playerControls").style.display = 'flex';
-
-  played = true;
+  $('#playerControls').style.display = 'flex';
 }
+
+$('#bitrateSelector').addEventListener('change', () => {
+  $('audio').src = $('#bitrateSelector').value;
+  $('audio').play();
+});
 
 
 let theme;
@@ -84,9 +81,9 @@ const themer = () => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
 
-  canvas.width = image.width;
-  canvas.height = image.height;
-  context.drawImage(image, 0, 0, 1, 1);
+  canvas.width = $('img').width;
+  canvas.height = $('img').height;
+  context.drawImage($('img'), 0, 0, 1, 1);
 
   const c = context.getImageData(0, 0, 1, 1).data;
 
@@ -94,30 +91,38 @@ const themer = () => {
     theme = 'dark' :
     theme = 'light';
 
-  if ((c[0] + c[1] + c[2]) < 85)
-    c[0] += 34, c[1] += 34, c[2] += 34;
+  const ct = c[0] + c[1] + c[2];
+  if (ct < 100)
+    c[0] += 34,
+    c[1] += 34,
+    c[2] += 34;
 
   palette['light'].bg = palette['dark'].border = `rgb(${c[0]},${c[1]},${c[2]})`;
 
-  document.querySelector(':root').style.setProperty('--bg', palette[theme].bg);
-  document.querySelector(':root').style.setProperty('--accent', palette[theme].accent);
-  document.querySelector(':root').style.setProperty('--text', palette[theme].text);
-  document.querySelector(':root').style.setProperty('--border', palette[theme].border);
-  document.querySelector('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
+  $(':root').style.setProperty('--bg', palette[theme].bg);
+  $(':root').style.setProperty('--accent', palette[theme].accent);
+  $(':root').style.setProperty('--text', palette[theme].text);
+  $(':root').style.setProperty('--border', palette[theme].border);
+  $('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
+
 }
 
-image.addEventListener('load', themer);
+$('img').addEventListener('load', themer);
+if (!params.get('s')) $('img').src = 'Assets/default_thumbnail.avif'
 
 
 const setMetadata = (thumbnail, id, title, author, authorUrl) => {
   if (getSaved('thumbnail')) {
     save('thumbnail', thumbnail);
   } else {
-    image.src = thumbnail;
+    $('img').src = thumbnail;
   }
-  document.getElementById('title').innerHTML = `<a href="https://youtu.be/${id}">${title}</a>`;
-  document.getElementById('author').innerHTML = `<a href="https://youtube.com${authorUrl}">${author}</a>`;
- 
+
+  $('#title').href = `https://youtu.be/${id}`;
+  $('#title').innerText = title;
+  $('#author').href = `https://youtube.com${authorUrl}`;
+  $('#author').innerText = author;
+
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,
@@ -144,13 +149,7 @@ const convertSStoMMSS = (seconds) => {
 }
 
 export {
-  image,
-  audio,
-  input,
-  progress,
-  settingsButton,
-  queueButton,
-  loopButton,
+  $,
   api,
   params,
   save,

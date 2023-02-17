@@ -29,6 +29,7 @@ img {
 #metadata {
   width: 100%;
   overflow: scroll;
+  padding: 0 0.5rem 0 1.5rem;
 }
 
 #title {
@@ -37,7 +38,7 @@ img {
 }
 
 #author {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 #metadata a{
@@ -45,8 +46,12 @@ img {
   color: inherit;
 }
 
-#bitrate {
-  font-size: 0.5rem;
+#bitrateSelector {
+  font-size: 0.7rem;
+  color: inherit;
+  border: none;
+  background: none;
+  outline: none;
 }
 
 @media (min-width:600px) {
@@ -63,15 +68,11 @@ img {
   }
 
   #title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 
-  #author {
-    font-size: 1rem;
-  }
-
-  #bitrate {
-    font-size: 0.75rem;
+  #author,#bitrateSelector {
+    font-size: 0.9rem;
   }
 
 

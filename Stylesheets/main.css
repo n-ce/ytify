@@ -67,8 +67,26 @@ button {
   display: none;
 }
 
-b a {
+footer{
+  display:flex;
+  align-items: center;
+}
+footer a {
   text-decoration: none;
   color: var(--bg);
-  background: var(--text)
+  background: var(--text);
+  border-radius: 0.3rem;
+}
+
+span{
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+label{
+  opacity: 75%;
+  color: var(--border);
+  font-size: 0.5rem;
+  font-weight: bold;
 }

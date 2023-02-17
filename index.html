@@ -7,7 +7,7 @@
 
   <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website.">
   <meta name="author" content="Animesh Nath">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0">
   <meta name="theme-color" content="none">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
@@ -25,39 +25,57 @@
   <link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
   <link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
   <link rel="manifest" href="manifest.json" />
-  
+
   <link rel="stylesheet" href="Stylesheets/main.css">
   <link rel="stylesheet" href="Stylesheets/settings.css">
   <link rel="stylesheet" href="Stylesheets/data.css">
   <link rel="stylesheet" href="Stylesheets/player.css">
   <link rel="stylesheet" href="Assets/Icons/remixicon.css">
-  
-  <script type="module" src="Scripts/init.js"></script>
+
   <script type="module" src="Scripts/main.js"></script>
   <script type="module" src="Scripts/buttons.js"></script>
   <script src="Scripts/service-worker.js"></script>
+
 
 </head>
 
 <body>
 
   <div id="settingsContainer" class="hide">
-    <button class="ri-moon-fill" id="themeButton"></button>
-    <button class="ri-fullscreen-fill" id="fullscreenButton"></button>
-    <button class="ri-landscape-fill on" id="thumbnailButton"></button>
-    <button class="ri-hq-fill" id="qualityButton"></button>
-    <button class="ri-github-fill" id="githubButton"></button>
-    <button class="ri-delete-bin-7-fill" id="deleteDataButton"></button>
+    <span>
+      <button class="ri-moon-fill" id="themeButton"></button>
+      <label for="themeButton">Dark Mode</label>
+    </span>
+    <span>
+      <button class="ri-fullscreen-fill" id="fullscreenButton"></button>
+      <label for="fullscreenButton">FullScreen</label>
+    </span>
+    <span>
+      <button class="ri-landscape-fill on" id="thumbnailButton"></button>
+      <label for="thumbnailButton">Thumbnail</label>
+    </span>
+    <span>
+      <button class="ri-hq-fill" id="qualityButton"></button>
+      <label for="qualityButton">HighQuality</label>
+    </span>
+    <span>
+      <button class="ri-github-fill" id="githubButton"></button>
+      <label for="githubButton">Github</label>
+    </span>
+    <span>
+      <button class="ri-delete-bin-7-fill" id="deleteDataButton"></button>
+      <label for="deleteDataButton">Clear Data</label>
+    </span>
   </div>
-
   <div id="dataContainer">
 
-    <img crossorigin="anonymous">
+    <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
-    <div id="metadata" align="center">
-      <p id="title">Copy a YouTube Video/Playlist Link</p>
-      <p id="author">Paste it in the Input Box</p>
-      <p id="bitrate"></p>
+    <div id="metadata"><br>
+      <a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
+      <br>
+      <a id="author" href="#" target="_blank">Paste it in the Input Box</a>
+      <select id="bitrateSelector"></select>
     </div>
   </div>
 
@@ -84,19 +102,36 @@
     </div>
 
     <div id="playerProfiles">
-      <button class="ri-play-list-add-fill" id="queueButton"></button>
-      <button class="ri-skip-forward-fill hide" id="queueNextButton"></button>
-      <button class="ri-repeat-fill" id="loopButton"></button>
-      <button class="ri-settings-4-fill" id="settingsButton"></button>
+      <span>
+        <button class="ri-play-list-add-fill" id="queueButton"></button>
+        <label for="queueButton">Add To Queue</label>
+      </span>
+      <span class="hide" id="qnbSpan">
+        <button class="ri-skip-forward-fill" id="queueNextButton"></button>
+        <label for="queueNextButton">Skip Next</label>
+      </span>
+      <span id="loopSpan">
+        <button class="ri-repeat-fill" id="loopButton"></button>
+        <label for="loopButton">Loop</label>
+      </span>
+      <span>
+        <button class="ri-settings-4-fill" id="settingsButton"></button>
+        <label for="settingsButton">Settings</label>
+      </span>
       <input type="url" placeholder="Input Link Here">
     </div>
 
   </div>
 
-  <b>ytify <b></b>, a
+
+
+  <footer>ytify v5.5, a&nbsp;
     <a href="https://github.com/n-ce" target="_blank">
-      n-ce</a> project.
-  </b>
+      n-ce
+    </a>&nbsp;project.
+  </footer>
+
+
 
 </body>
 

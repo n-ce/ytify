@@ -1,18 +1,16 @@
 import {
+  $,
   setMetadata,
   streamID,
   playlistID,
   getSaved,
   save,
-  input,
   api,
   params,
-  audio,
-  audioSRC,
-  queueButton,
-  loopButton
+  audioSRC
 } from './constants.js'
 
+const input = $('input[type="url"]');
 let oldURL;
 let queueCount = 0;
 let queueNow = 1;
@@ -43,6 +41,10 @@ const play = (url) => {
         if (Object.values(value).includes('opus')) {
           bitrates.push(parseInt(value.quality));
           urls.push(value.url);
+          const bitrateOptions = document.createElement('option');
+          bitrateOptions.setAttribute('value',value.url);
+          bitrateOptions.appendChild(document.createTextNode(value.quality));
+          $('#bitrateSelector').appendChild(bitrateOptions);
         }
       }
 
@@ -54,18 +56,19 @@ const play = (url) => {
     .catch(err => {
       instance < 4 ?
         play(url) :
-        console.log(err);
+        alert(err);
 
       instance++;
     })
 }
 
 
+
 // next track 
 const next = () => {
   if ((queueCount - queueNow) > -1) {
     play(array[queueNow]);
-    queueButton.setAttribute('data-badge', queueCount - queueNow);
+    $('#queueButton').setAttribute('data-badge', queueCount - queueNow);
     queueNow++;
   }
 }
@@ -75,9 +78,9 @@ const next = () => {
 
 const queueIt = url => {
   queueCount++;
-  queueButton.setAttribute('data-badge', queueCount - queueNow + 1);
+  $('#queueButton').setAttribute('data-badge', queueCount - queueNow + 1);
   array[queueCount] = oldURL = url;
-  audio.onended = () => {
+  $('audio').onended = () => {
     next();
   }
 }
@@ -86,23 +89,21 @@ const queueIt = url => {
 
 // queue functions and toggle
 
-const queueNext = document.querySelector('#queueNextButton');
-
 const queueFx = () => {
   queue = !queue;
   if (queue)
     queueCount = 0;
 
-  queueNext.classList.toggle('hide');
-  queueButton.classList.toggle('on');
-  loopButton.classList.toggle('hide')
-  loopButton.classList.remove('on');
+  $('#qnbSpan').classList.toggle('hide');
+  $('#queueButton').classList.toggle('on');
+  $('#loopSpan').classList.toggle('hide')
+  $('#loopButton').classList.remove('on');
 
 }
-queueButton.addEventListener('click', queueFx);
+$('#queueButton').addEventListener('click', queueFx);
 
 // queue Next
-queueNext.addEventListener('click', next)
+$('#queueNextButton').addEventListener('click', next)
 
 
 const playlistLoad = (id) => {
@@ -122,7 +123,7 @@ const playlistLoad = (id) => {
     .catch(err => {
       instance < 4 ?
         playlistLoad(id) :
-        console.log(err);
+        alert(err);
 
       instance++;
     });
@@ -158,7 +159,7 @@ if (params.get('s')) {
 }
 // timestamp param
 if (params.get('t')) {
-  audio.currentTime = params.get('t')
+  $('audio').currentTime = params.get('t')
 }
 // playlist param
 if (params.get('p')) {
