@@ -7,7 +7,8 @@ const progress = document.querySelector('input[type="range"]');
 const settingsButton = document.querySelector('#settingsButton')
 const queueButton = document.querySelector('#queueButton');
 const loopButton = document.querySelector('#loopButton');
-const bitrateInfo = document.querySelector('#bitrate');
+const bitrateSelector = document.querySelector('#bitrate');
+
 
 // Values
 
@@ -64,15 +65,21 @@ const audioSRC = (bitrates, urls) => {
     DBR = Math.max(...bitrates) :
     DBR = Math.min(...bitrates);
 
-  audio.src = urls[bitrates.indexOf(DBR)];
-  bitrateInfo.innerText = DBR + ' kbps Opus';
+  const index = bitrates.indexOf(DBR);
+  audio.src = urls[index];
+  bitrateSelector.selectedIndex = index;
 
-  if (!params.get('s')) audio.play();
+  params.get('s') ?
+    document.querySelector('#playButton').classList.add('on') :
+    audio.play();
 
   document.querySelector("#playerControls").style.display = 'flex';
-  
 }
 
+bitrateSelector.addEventListener('change', () => {
+  audio.src = bitrateSelector.value;
+  audio.play();
+});
 
 
 let theme;
@@ -118,9 +125,9 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
   const authorElem = document.getElementById('author');
 
   titleElem.href = `https://youtu.be/${id}`;
-  titleElem.innerText = title;
+  titleElem.innerHTML = title;
   authorElem.href = `https://youtube.com${authorUrl}`;
-  authorElem.innerText = author;
+  authorElem.innerHTML = author;
 
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
