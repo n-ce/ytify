@@ -59,7 +59,7 @@ const audioSRC = (bitrates, urls) => {
 
   const index = bitrates.indexOf(DBR);
   $('audio').src = urls[index];
-   $('#bitrate').selectedIndex = index;
+   $('#bitrateSelector').selectedIndex = index;
 
   params.get('s') ?
     $('#playButton').classList.add('on') :
@@ -68,8 +68,8 @@ const audioSRC = (bitrates, urls) => {
   $('#playerControls').style.display = 'flex';
 }
 
-$('#bitrate').addEventListener('change', () => {
-  $('audio').src = bitrateSelector.value;
+$('#bitrateSelector').addEventListener('change', () => {
+  $('audio').src = $('#bitrateSelector').value;
   $('audio').play();
 });
 

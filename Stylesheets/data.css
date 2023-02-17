@@ -46,7 +46,7 @@ img {
   color: inherit;
 }
 
-#bitrate {
+#bitrateSelector {
   font-size: 0.7rem;
   color: inherit;
   border: none;
@@ -71,7 +71,7 @@ img {
     font-size: 1.5rem;
   }
 
-  #author,#bitrate {
+  #author,#bitrateSelector {
     font-size: 0.9rem;
   }
 

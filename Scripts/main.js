@@ -44,7 +44,7 @@ const play = (url) => {
           const bitrateOptions = document.createElement('option');
           bitrateOptions.setAttribute('value',value.url);
           bitrateOptions.appendChild(document.createTextNode(value.quality));
-          $('#bitrate').appendChild(bitrateOptions);
+          $('#bitrateSelector').appendChild(bitrateOptions);
         }
       }
 
