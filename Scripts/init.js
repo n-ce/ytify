@@ -7,7 +7,7 @@ import {
 
 // fixes compatibitity with older versions
 
-const version = 'v5.4';
+const version = 'v5.5';
 document.querySelector('footer p').innerText = version;
 if (getSaved('version') !== version) {
   localStorage.clear();

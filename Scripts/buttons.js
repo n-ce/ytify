@@ -110,6 +110,7 @@ qualityButton.addEventListener('click', () => {
   quality ?
     save('quality', 'hq') : // high
     localStorage.removeItem('quality'); // low
+  location.href += '&t=' + Math.floor(audio.currentTime);
   qualityButton.classList.toggle('on');
   quality = !quality;
 });

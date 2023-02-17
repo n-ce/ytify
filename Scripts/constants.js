@@ -72,7 +72,7 @@ const audioSRC = (bitrates, urls) => {
   params.get('s') ?
     document.querySelector('#playButton').classList.add('on') :
     audio.play();
-
+  
   document.querySelector("#playerControls").style.display = 'flex';
 }
 
@@ -125,9 +125,9 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
   const authorElem = document.getElementById('author');
 
   titleElem.href = `https://youtu.be/${id}`;
-  titleElem.innerHTML = title;
+  titleElem.innerText = title;
   authorElem.href = `https://youtube.com${authorUrl}`;
-  authorElem.innerHTML = author;
+  authorElem.innerText = author;
 
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
