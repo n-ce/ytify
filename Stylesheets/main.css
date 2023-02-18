@@ -49,8 +49,15 @@ button {
   border: none;
   border-radius: 50%;
   outline: none;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
 }
 
+button:active {
+  background: var(--accent);
+  color: var(--text);
+}
 
 .on {
   background: var(--accent);
@@ -67,10 +74,11 @@ button {
   display: none;
 }
 
-footer{
-  display:flex;
+footer {
+  display: flex;
   align-items: center;
 }
+
 footer a {
   text-decoration: none;
   color: var(--bg);
@@ -78,13 +86,14 @@ footer a {
   border-radius: 0.3rem;
 }
 
-span{
-  display:flex;
+span {
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-label{
+
+label {
   opacity: 75%;
   color: var(--border);
   font-size: 0.5rem;

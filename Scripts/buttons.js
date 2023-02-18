@@ -1,5 +1,6 @@
 import {
   $,
+  params,
   themer,
   getSaved,
   save,
@@ -42,16 +43,15 @@ $('#themeButton').addEventListener('click', () => {
 
 // fullscreen
 
-let fullscreen = true;
-
 $('#fullscreenButton').addEventListener('click',
   () => {
-    fullscreen ?
-      document.documentElement.requestFullscreen() :
+    if (document.fullscreenElement) {
       document.exitFullscreen();
-
-    $('#fullscreenButton').classList.toggle('on');
-    fullscreen = !fullscreen;
+      $('#fullscreenButton').classList.remove('on');
+    } else {
+      document.documentElement.requestFullscreen();
+      $('#fullscreenButton').classList.add('on');
+    }
   });
 
 
@@ -76,20 +76,19 @@ $('#thumbnailButton').addEventListener('click', () => {
 
 // quality
 
-let quality = true;
-
-if (getSaved('quality') == 'hq') {
+if (getSaved('quality') == 'hq')
   $('#qualityButton').classList.add('on');
-  quality = false;
-}
 
 $('#qualityButton').addEventListener('click', () => {
-  quality ?
-    save('quality', 'hq') : // high
-    localStorage.removeItem('quality'); // low
-  location.href += '&t=' + Math.floor($('audio').currentTime);
+
   $('#qualityButton').classList.toggle('on');
-  quality = !quality;
+
+  getSaved('quality') ?
+    localStorage.removeItem('quality') : // low
+    save('quality', 'hq'); // high
+
+  if (params.get('s'))
+    location.href += '&t=' + Math.floor($('audio').currentTime);
 });
 
 
@@ -146,29 +145,37 @@ $('#playSpeed').addEventListener('change', () => {
 });
 
 
+// Seek Forward && Backward
+
+$('#seekFwdButton').addEventListener('click', () => {
+  $('audio').currentTime += 10;
+});
+$('#seekBwdButton').addEventListener('click', () => {
+  $('audio').currentTime -= 10;
+});
+
 
 // PROGRESS Bar event
-const progress = $('input[type="range"]');
 
-progress.addEventListener('change', () => {
-  if (progress.value < 0 || progress.value > $('audio').duration) {
+$('#progress').addEventListener('change', () => {
+  if ($('#progress').value < 0 || $('#progress').value > $('audio').duration) {
     return;
   }
-  $('audio').currentTime = progress.value;
-  progress.blur();
+  $('audio').currentTime = $('#progress').value;
+  $('#progress').blur();
 });
 
 $('audio').addEventListener('timeupdate', () => {
-  if (progress === document.activeElement) return;
+  if ($('#progress') === document.activeElement) return;
 
-  progress.value = Math.floor($('audio').currentTime);
+  $('#progress').value = Math.floor($('audio').currentTime);
   $('#currentDuration').innerText = convertSStoMMSS($('audio').currentTime);
 });
 
 $('audio').addEventListener('loadedmetadata', () => {
-  progress.value = 0;
-  progress.min = 0;
-  progress.max = Math.floor($('audio').duration);
+  $('#progress').value = 0;
+  $('#progress').min = 0;
+  $('#progress').max = Math.floor($('audio').duration);
   $('#fullDuration').innerText = convertSStoMMSS($('audio').duration);
 });
 

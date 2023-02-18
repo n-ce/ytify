@@ -1,7 +1,6 @@
-// binder the ultimate dom selector
-const $ = document.querySelector.bind(document);
+// Variables
 
-// Values
+const $ = document.querySelector.bind(document);
 
 const palette = {
   'light': {
@@ -33,9 +32,8 @@ const params = (new URL(document.location)).searchParams;
 const save = (key, pair) => {
   localStorage.setItem(key, pair);
 }
-const getSaved = (key) => {
-  return localStorage.getItem(key);
-}
+const getSaved = (key) => localStorage.getItem(key);
+
 
 if (getSaved('thumbnail')) localStorage.removeItem('thumbnail')
 
@@ -59,17 +57,18 @@ const audioSRC = (bitrates, urls) => {
 
   const index = bitrates.indexOf(DBR);
   $('audio').src = urls[index];
-   $('#bitrateSelector').selectedIndex = index;
+  $('#bitrateSelector').selectedIndex = index;
 
   params.get('s') ?
     $('#playButton').classList.add('on') :
     $('audio').play();
 
-  $('#playerControls').style.display = 'flex';
 }
 
 $('#bitrateSelector').addEventListener('change', () => {
+  const ct = $('audio').currentTime;
   $('audio').src = $('#bitrateSelector').value;
+  $('audio').currentTime = ct;
   $('audio').play();
 });
 
@@ -108,15 +107,15 @@ const themer = () => {
 }
 
 $('img').addEventListener('load', themer);
+
 if (!params.get('s')) $('img').src = 'Assets/default_thumbnail.avif'
 
 
 const setMetadata = (thumbnail, id, title, author, authorUrl) => {
-  if (getSaved('thumbnail')) {
-    save('thumbnail', thumbnail);
-  } else {
+
+  getSaved('thumbnail') ?
+    save('thumbnail', thumbnail) :
     $('img').src = thumbnail;
-  }
 
   $('#title').href = `https://youtu.be/${id}`;
   $('#title').innerText = title;
