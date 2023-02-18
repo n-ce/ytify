@@ -1,6 +1,6 @@
 <div align="center">
  <h1> 💠 YTIFY 💠 </h1>
- <img src="Assets/default_thumbnail.avif" width="80%">
+ <img src="Assets/default_thumbnail.avif" width="60%">
 </div>
 
 ## Table of Contents

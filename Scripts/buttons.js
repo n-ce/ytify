@@ -1,5 +1,6 @@
 import {
   $,
+  params,
   themer,
   getSaved,
   save,
@@ -42,16 +43,15 @@ $('#themeButton').addEventListener('click', () => {
 
 // fullscreen
 
-let fullscreen = true;
-
 $('#fullscreenButton').addEventListener('click',
   () => {
-    fullscreen ?
-      document.documentElement.requestFullscreen() :
+    if (document.fullscreenElement) {
       document.exitFullscreen();
-
-    $('#fullscreenButton').classList.toggle('on');
-    fullscreen = !fullscreen;
+      $('#fullscreenButton').classList.remove('on');
+    } else {
+      document.documentElement.requestFullscreen();
+      $('#fullscreenButton').classList.add('on');
+    }
   });
 
 
@@ -76,20 +76,19 @@ $('#thumbnailButton').addEventListener('click', () => {
 
 // quality
 
-let quality = true;
-
-if (getSaved('quality') == 'hq') {
+if (getSaved('quality') == 'hq')
   $('#qualityButton').classList.add('on');
-  quality = false;
-}
 
 $('#qualityButton').addEventListener('click', () => {
-  quality ?
-    save('quality', 'hq') : // high
-    localStorage.removeItem('quality'); // low
-  location.href += '&t=' + Math.floor($('audio').currentTime);
+
   $('#qualityButton').classList.toggle('on');
-  quality = !quality;
+
+  getSaved('quality') ?
+    localStorage.removeItem('quality') : // low
+    save('quality', 'hq'); // high
+
+  if (params.get('s'))
+    location.href += '&t=' + Math.floor($('audio').currentTime);
 });
 
 

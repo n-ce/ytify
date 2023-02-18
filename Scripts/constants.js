@@ -1,7 +1,6 @@
-// binder the ultimate dom selector
-const $ = document.querySelector.bind(document);
+// Variables
 
-// Values
+const $ = document.querySelector.bind(document);
 
 const palette = {
   'light': {
@@ -64,7 +63,6 @@ const audioSRC = (bitrates, urls) => {
     $('#playButton').classList.add('on') :
     $('audio').play();
 
-  $('#playerControls').style.display = 'flex';
 }
 
 $('#bitrateSelector').addEventListener('change', () => {
@@ -109,15 +107,15 @@ const themer = () => {
 }
 
 $('img').addEventListener('load', themer);
+
 if (!params.get('s')) $('img').src = 'Assets/default_thumbnail.avif'
 
 
 const setMetadata = (thumbnail, id, title, author, authorUrl) => {
-  if (getSaved('thumbnail')) {
-    save('thumbnail', thumbnail);
-  } else {
+
+  getSaved('thumbnail') ?
+    save('thumbnail', thumbnail) :
     $('img').src = thumbnail;
-  }
 
   $('#title').href = `https://youtu.be/${id}`;
   $('#title').innerText = title;

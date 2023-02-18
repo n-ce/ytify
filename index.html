@@ -36,7 +36,6 @@
   <script type="module" src="Scripts/buttons.js"></script>
   <script src="Scripts/service-worker.js"></script>
 
-
 </head>
 
 <body>
@@ -67,11 +66,13 @@
       <label for="deleteDataButton">Clear Data</label>
     </span>
   </div>
+  
   <div id="dataContainer">
 
     <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
     <div id="metadata">
+      <br>
       <a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
       <br>
       <a id="author" href="#" target="_blank">Paste it in the Input Box</a>
@@ -96,9 +97,9 @@
         <option value="2.00">2.00x</option>
         <option value="4.00">4.00x</option>
       </select>
-      <p id="currentDuration"></p>
+      <p id="currentDuration">00:00</p>
       <input type="range" min="0" max="100" value="0" id="progress" />
-      <p id="fullDuration"></p>
+      <p id="fullDuration">00:00</p>
     </div>
 
     <div id="playerProfiles">

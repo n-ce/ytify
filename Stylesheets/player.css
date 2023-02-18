@@ -10,7 +10,7 @@
 }
 
 #playerControls {
-  display: none;
+  display: flex;
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
@@ -70,9 +70,9 @@
 
 #settingsButton {
   box-shadow: none;
-  -webkit-transition: all 1s;
-  -o-transition: all 1s;
-  transition: all 1s;
+    -webkit-transition-duration: 1s;
+    -o-transition-duration: 1s;
+    transition-duration: 1s;
 }
 
 input[type="url"] {
@@ -168,8 +168,3 @@ input[type="range"]::-ms-thumb {
   margin-top: -0.35rem;
 }
 
-#seekFwdButton:active,
-#seekBwdButton:active{
-  background: var(--accent);
-  color: var(--text);
-}
