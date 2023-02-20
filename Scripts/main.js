@@ -36,17 +36,16 @@ const play = (url) => {
       // extracting opus streams
       const bitrates = [];
       const urls = [];
+      let bitrateOptions;
 
       for (const value of data.audioStreams) {
         if (Object.values(value).includes('opus')) {
           bitrates.push(parseInt(value.quality));
           urls.push(value.url);
-          const bitrateOptions = document.createElement('option');
-          bitrateOptions.setAttribute('value',value.url);
-          bitrateOptions.appendChild(document.createTextNode(value.quality));
-          $('#bitrateSelector').appendChild(bitrateOptions);
+          bitrateOptions += `<option value=${value.url}>${value.quality}</option>`;
         }
       }
+      $('#bitrateSelector').innerHTML = bitrateOptions;
 
       audioSRC(bitrates, urls);
 
