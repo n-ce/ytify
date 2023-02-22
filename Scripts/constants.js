@@ -46,7 +46,8 @@ const playlistID = (url) => {
   if (match !== null) return match[1];
 }
 
-
+let userInteracted = false;
+if (!params.get('s')) userInteracted = true;
 
 const audioSRC = (bitrates, urls) => {
   let DBR;
@@ -58,11 +59,8 @@ const audioSRC = (bitrates, urls) => {
   const index = bitrates.indexOf(DBR);
   $('audio').src = urls[index];
   $('#bitrateSelector').selectedIndex = index;
-
-  params.get('s') ?
-    $('#playButton').classList.add('on') :
-    $('audio').play();
-
+  $('#playButton').classList.add('on');
+  if (userInteracted) $('audio').play();
 }
 
 $('#bitrateSelector').addEventListener('change', () => {
