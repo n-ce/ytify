@@ -1,5 +1,5 @@
 {
-  "short_name": "YTIFY",
+  "short_name": "Ytify",
   "icons": [
     {
       "src": "Assets/maskable_icon_x192.png",
@@ -15,7 +15,16 @@
 	}
 	],
   "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#000"
+  "display": "minimal-ui",
+  "background_color": "#000",
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 
 }
