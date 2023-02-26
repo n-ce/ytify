@@ -34,8 +34,8 @@ const play = (url) => {
       );
 
       // extracting opus streams
-      const bitrates = [];
-      const urls = [];
+      let bitrates = [];
+      let urls = [];
       let bitrateOptions;
 
       for (const value of data.audioStreams) {
@@ -45,8 +45,18 @@ const play = (url) => {
           bitrateOptions += `<option value=${value.url}>${value.quality}</option>`;
         }
       }
-      $('#bitrateSelector').innerHTML = bitrateOptions;
 
+      // finding lowest available stream when low opus bitrate unavailable
+      if(!getSaved('quality') && Math.min(...bitrates)>64){
+        bitrates=urls=[],bitrateOptions='';
+        for (const value of data.audioStreams) {
+          bitrates.push(parseInt(value.quality));
+          urls.push(value.url);
+          bitrateOptions += `<option value=${value.url}>${value.quality}</option>`;
+        }
+      }
+
+      $('#bitrateSelector').innerHTML = bitrateOptions;
       audioSRC(bitrates, urls);
 
       history.pushState('', '', location.origin + '/?s=' + id);
@@ -165,6 +175,7 @@ if (params.get('p')) {
   playlistLoad(params.get('p'))
 }
 // pwa share param
+
 if (params.get('url')) {
   play(params.get('url'));
 }
