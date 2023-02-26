@@ -1,5 +1,5 @@
 {
-  "short_name": "YTIFY",
+  "short_name": "Ytify",
   "icons": [
     {
       "src": "Assets/maskable_icon_x192.png",
@@ -22,7 +22,7 @@
     "method": "GET",
     "params": {
       "title": "title",
-      "text": "url",
+      "text": "text",
       "url": "url"
     }
   }
