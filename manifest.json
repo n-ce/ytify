@@ -18,11 +18,11 @@
   "display": "minimal-ui",
   "background_color": "#000",
   "share_target": {
-    "action": "/share-target/",
+    "action": "/",
     "method": "GET",
     "params": {
       "title": "title",
-      "text": "text",
+      "text": "url",
       "url": "url"
     }
   }
