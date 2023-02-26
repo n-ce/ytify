@@ -164,3 +164,7 @@ if (params.get('t')) {
 if (params.get('p')) {
   playlistLoad(params.get('p'))
 }
+// pwa share param
+if (params.get('url')) {
+  play(params.get('url'));
+}
