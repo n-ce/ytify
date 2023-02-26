@@ -15,7 +15,7 @@
 	}
 	],
   "start_url": "index.html",
-  "display": "browser",
+  "display": "minimal-ui",
   "background_color": "#000",
   "share_target": {
     "action": "/share-target/",
