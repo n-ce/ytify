@@ -79,11 +79,9 @@ footer {
   align-items: center;
 }
 
-footer a {
-  text-decoration: none;
-  color: var(--bg);
-  background: var(--text);
-  border-radius: 0.3rem;
+
+footer a{
+  color: inherit;
 }
 
 span {

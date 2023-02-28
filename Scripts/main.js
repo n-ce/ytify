@@ -33,28 +33,33 @@ const play = (url) => {
         data.uploaderUrl
       );
 
+      if (data.audioStreams.length === 0) {
+        alert('NO AUDIO STREAMS AVAILABLE.');
+        return;
+      }
       // extracting opus streams and storing m4a streams
       let bitrates = [];
       let urls = [];
       let bitrateOptions;
       const m4aBitrates = [];
       const m4aUrls = [];
+      let m4aOptions;
 
       for (const value of data.audioStreams) {
         if (Object.values(value).includes('opus')) {
           bitrates.push(parseInt(value.quality));
           urls.push(value.url);
-          bitrateOptions += `<option value=${value.url}>${value.quality} opus</option>`;
+          bitrateOptions += `<option value=${value.url}>${value.quality}</option>`;
         } else {
           m4aBitrates.push(parseInt(value.quality));
           m4aUrls.push(value.url);
+          m4aOptions += `<option value=${value.url}>${value.quality}</option>`;
         }
       }
 
       // finding lowest available stream when low opus bitrate unavailable
       if (!getSaved('quality') && Math.min(...bitrates) > 64) {
-        for (let i = 0; i < m4aBitrates.length; i++)
-          bitrateOptions += `<option value=${m4aUrls[i]}>${m4aBitrates[i]} kbps m4a</option>`;
+        bitrateOptions += m4aOptions;
         bitrates = bitrates.concat(m4aBitrates);
         urls = urls.concat(m4aUrls)
       }
@@ -62,8 +67,8 @@ const play = (url) => {
       $('#bitrateSelector').innerHTML = bitrateOptions;
       audioSRC(bitrates, urls);
 
-      history.pushState('', '', location.origin + '/?s=' + id);
-      history.replaceState('', '', location.origin + '/?s=' + id);
+      params.set('s', id);
+      history.pushState({}, '', '?' + params);
     })
     .catch(err => {
       instance < 4 ?
@@ -139,8 +144,8 @@ const playlistLoad = (id) => {
 
       instance++;
     });
-  history.pushState('', '', location.origin + '/?p=' + id);
-  history.replaceState('', '', location.origin + '/?p=' + id);
+  params.set('p', id);
+  history.pushState({}, '', '?' + params);
 
 }
 

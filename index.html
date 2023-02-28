@@ -32,9 +32,9 @@
   <link rel="stylesheet" href="Stylesheets/player.css">
   <link rel="stylesheet" href="Assets/Icons/remixicon.css">
 
-  <script type="module" src="Scripts/main.js"></script>
-  <script type="module" src="Scripts/buttons.js"></script>
-  <script src="Scripts/service-worker.js"></script>
+  <script defer type="module" src="Scripts/main.js"></script>
+  <script defer type="module" src="Scripts/buttons.js"></script>
+  <script defer src="Scripts/service-worker.js"></script>
 
 </head>
 
@@ -58,15 +58,11 @@
       <label for="qualityButton">HighQuality</label>
     </span>
     <span>
-      <button class="ri-github-fill" id="githubButton"></button>
-      <label for="githubButton">Github</label>
-    </span>
-    <span>
-      <button class="ri-delete-bin-7-fill" id="deleteDataButton"></button>
-      <label for="deleteDataButton">Clear Data</label>
+      <button class="ri-delete-bin-7-fill" onclick="localStorage.clear();location.replace(location.origin);"></button>
+      <label>Clear Data</label>
     </span>
   </div>
-  
+
   <div id="dataContainer">
 
     <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
@@ -133,9 +129,8 @@
   </div>
 
   <footer>
-    ytify v5.7, a&nbsp;
-    <a href="https://github.com/n-ce" target="_blank">n-ce</a>
-    &nbsp;project.
+    <a href="https://github.com/n-ce/ytify" target="_blank">ytify</a>&nbsp;v5.7, a&nbsp;
+    <a href="https://github.com/n-ce" target="_blank">n-ce</a>&nbsp;project.
   </footer>
 
 </body>

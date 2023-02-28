@@ -106,7 +106,8 @@ const themer = () => {
 
 $('img').addEventListener('load', themer);
 
-if (!params.get('s')) $('img').src = 'Assets/default_thumbnail.avif'
+if (!params.get('s') && !params.get('text'))
+  $('img').src = 'Assets/default_thumbnail.avif'
 
 
 const setMetadata = (thumbnail, id, title, author, authorUrl) => {

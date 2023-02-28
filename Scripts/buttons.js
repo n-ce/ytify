@@ -93,21 +93,6 @@ $('#qualityButton').addEventListener('click', () => {
 
 
 
-// github
-
-$('#githubButton').addEventListener('click', () =>
-  open("https://github.com/n-ce/ytify"));
-
-
-// delete all saved data
-
-$('#deleteDataButton').addEventListener('click', () => {
-  if (confirm('Are you sure you want to clear all saved data ?')) {
-    localStorage.clear();
-    location.replace(location.origin);
-  }
-});
-
 
 
 // play button and events
