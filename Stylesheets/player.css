@@ -1,6 +1,4 @@
 #playerContainer {
-  height: auto;
-  width: auto;
   padding: 0.3rem;
   background: var(--accent);
   border: 0.1px solid var(--border);
@@ -9,6 +7,7 @@
   border-radius: 0.7rem;
 }
 
+
 #playerControls {
   display: flex;
   -webkit-box-pack: justify;
@@ -16,6 +15,7 @@
   justify-content: space-between;
   align-items: center;
 }
+
 
 #playSpeed {
   color: var(--border);
@@ -43,8 +43,7 @@
   padding: 0.3rem;
 }
 
-#queueButton{
-  border-radius: 0.5rem;
+#queueButton i{
   min-width: 3rem;
   display:flex;
   align-items: center;
@@ -68,11 +67,12 @@
 }
 
 
-#settingsButton {
+#settingsButton i {
+  border-radius: 50%;
   box-shadow: none;
-    -webkit-transition-duration: 1s;
-    -o-transition-duration: 1s;
-    transition-duration: 1s;
+  -webkit-transition-duration: 1s;
+  -o-transition-duration: 1s;
+  transition-duration: 1s;
 }
 
 input[type="url"] {
@@ -167,4 +167,3 @@ input[type="range"]::-ms-thumb {
   border-radius: 1rem;
   margin-top: -0.35rem;
 }
-

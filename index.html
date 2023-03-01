@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="none">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="keywords" content="ytify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
+  <meta name="keywords" content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
 
   <title>ytify</title>
 
@@ -24,7 +24,7 @@
   <link rel="canonical" href="https://ytify.netlify.app/">
   <link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
   <link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="manifest.webmanifest" />
 
   <link rel="stylesheet" href="Stylesheets/main.css">
   <link rel="stylesheet" href="Stylesheets/settings.css">
@@ -41,26 +41,32 @@
 <body>
 
   <div id="settingsContainer" class="hide">
-    <span>
-      <button class="ri-moon-fill" id="themeButton"></button>
-      <label for="themeButton">Dark Mode</label>
-    </span>
-    <span>
-      <button class="ri-fullscreen-fill" id="fullscreenButton"></button>
-      <label for="fullscreenButton">FullScreen</label>
-    </span>
-    <span>
-      <button class="ri-landscape-fill on" id="thumbnailButton"></button>
-      <label for="thumbnailButton">Thumbnail</label>
-    </span>
-    <span>
-      <button class="ri-hq-fill" id="qualityButton"></button>
-      <label for="qualityButton">HighQuality</label>
-    </span>
-    <span>
-      <button class="ri-delete-bin-7-fill" onclick="localStorage.clear();location.replace(location.origin);"></button>
-      <label>Clear Data</label>
-    </span>
+
+    <button type="button" id="themeButton">
+      <i class="ri-moon-fill"></i>
+      <p>Dark Mode</p>
+    </button>
+
+    <button type="button" id="fullscreenButton">
+      <i class="ri-fullscreen-fill"></i>
+      <p>Fullscreen</p>
+    </button>
+
+    <button type="button" id="thumbnailButton">
+      <i class="ri-landscape-fill on"></i>
+      <p>Thumbnail</p>
+    </button>
+
+    <button type="button" id="qualityButton">
+      <i class="ri-hq-fill"></i>
+      <p>High Quality</p>
+    </button>
+
+    <button type="button" onclick="localStorage.clear();location.replace(location.origin);">
+      <i class="ri-delete-bin-7-fill"></i>
+      <p>Clear Data</p>
+    </button>
+
   </div>
 
   <div id="dataContainer">
@@ -68,12 +74,15 @@
     <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
     <div id="metadata">
-      <br>
-      <a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
-      <br>
-      <a id="author" href="#" target="_blank">Paste it in the Input Box</a>
+
+      <br><a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
+
+      <br><a id="author" href="#" target="_blank">Paste it in the Input Box</a>
+
       <select id="bitrateSelector"></select>
+
     </div>
+
   </div>
 
   <audio></audio>
@@ -81,7 +90,9 @@
   <div id="playerContainer">
 
     <div id="playerControls">
+
       <button class="ri-play-fill" id="playButton"></button>
+
       <select id="playSpeed">
         <option value="0.25">0.25x</option>
         <option value="0.50">0.50x</option>
@@ -93,44 +104,55 @@
         <option value="2.00">2.00x</option>
         <option value="4.00">4.00x</option>
       </select>
+
       <p id="currentDuration">00:00</p>
+
       <input type="range" min="0" max="100" value="0" id="progress" />
+
       <p id="fullDuration">00:00</p>
+
     </div>
 
     <div id="playerProfiles">
-      <span>
-        <button class="ri-rewind-fill" id="seekBwdButton"></button>
-        <label for="seekBwdButton">Seek Bwd</label>
-      </span>
-      <span>
-        <button class="ri-speed-fill" id="seekFwdButton"></button>
-        <label for="seekFwdButton">Seek Fwd</label>
-      </span>
-      <span>
-        <button class="ri-play-list-add-fill" id="queueButton"></button>
-        <label for="queueButton">Queue</label>
-      </span>
-      <span class="hide" id="qnbSpan">
-        <button class="ri-skip-forward-fill" id="queueNextButton"></button>
-        <label for="queueNextButton">Skip Next</label>
-      </span>
-      <span id="loopSpan">
-        <button class="ri-repeat-fill" id="loopButton"></button>
-        <label for="loopButton">Loop</label>
-      </span>
-      <span>
-        <button class="ri-settings-4-fill" id="settingsButton"></button>
-        <label for="settingsButton">Settings</label>
-      </span>
+
+      <button type="button" id="seekBwdButton">
+        <i class="ri-rewind-fill"></i>
+        <p>Backward</p>
+      </button>
+
+      <button type="button" id="seekFwdButton">
+        <i class="ri-speed-fill"></i>
+        <p>Forward</p>
+      </button>
+
+      <button type="button" id="queueButton">
+        <i class="ri-play-list-add-fill"></i>
+        <p>Queue</p>
+      </button>
+
+      <button type="button" class="hide" id="queueNextButton">
+        <i class="ri-skip-forward-fill"></i>
+        <p>Skip Next</p>
+      </button>
+
+      <button type="button" id="loopButton">
+        <i class="ri-repeat-fill"></i>
+        <p>Loop</p>
+      </button>
+
+      <button type="button" id="settingsButton">
+        <i class="ri-settings-4-fill"></i>
+        <p>Settings</p>
+      </button>
+
       <input type="url" placeholder="Input Link Here">
     </div>
 
   </div>
 
   <footer>
-    <a href="https://github.com/n-ce/ytify" target="_blank">ytify</a>&nbsp;v5.7, a&nbsp;
-    <a href="https://github.com/n-ce" target="_blank">n-ce</a>&nbsp;project.
+    <a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.7, a
+    <a href="https://github.com/n-ce" target="_blank">n-ce</a> project.
   </footer>
 
 </body>

@@ -46,22 +46,7 @@ const playlistID = (url) => {
   if (match !== null) return match[1];
 }
 
-let userInteracted = false;
-if (!params.get('s')) userInteracted = true;
 
-const audioSRC = (bitrates, urls) => {
-  let DBR;
-
-  getSaved('quality') ?
-    DBR = Math.max(...bitrates) :
-    DBR = Math.min(...bitrates);
-
-  const index = bitrates.indexOf(DBR);
-  $('audio').src = urls[index];
-  $('#bitrateSelector').selectedIndex = index;
-  $('#playButton').classList.add('on');
-  if (userInteracted) $('audio').play();
-}
 
 $('#bitrateSelector').addEventListener('change', () => {
   const ct = $('audio').currentTime;
@@ -116,7 +101,7 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
     save('thumbnail', thumbnail) :
     $('img').src = thumbnail;
 
-  $('#title').href = `https://youtu.be/${id}`;
+  $('#title').href = `https://youtube.com/watch?v=${id}`;
   $('#title').innerText = title;
   $('#author').href = `https://youtube.com${authorUrl}`;
   $('#author').innerText = author;
@@ -154,7 +139,6 @@ export {
   getSaved,
   streamID,
   playlistID,
-  audioSRC,
   themer,
   setMetadata,
   convertSStoMMSS

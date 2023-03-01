@@ -58,20 +58,8 @@ Take a look at some Screenshots here ->
   <img src="Assets/Screenshots/landscape_music.avif" width="45%">
 </p>
 
-## Licence 📝
-```
-Copyright 2022-2023, Animesh Nath
-ytify is licensed under the GNU General Public License v3.0.
-```
-see [LICENSE](https://github.com/n-ce/ytify/blob/main/LICENSE) for more information.
-
 ## Contributing 📋
-```
-This project is open to contributions!
-Since v4 & v5 we have refactored the
-entire project such that it is highly 
-contributable and understandable.
-```
+
 See [contributing](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md) for more information.
 
 ## Acknowledgements 🙏

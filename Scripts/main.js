@@ -6,21 +6,24 @@ import {
   getSaved,
   save,
   api,
-  params,
-  audioSRC
+  params
 } from './constants.js'
 
 const input = $('input[type="url"]');
 let oldURL;
 let queueCount = 0;
 let queueNow = 1;
-let queueList = [];
+// let queueList = [];
 let queue = false;
 let array = [];
 let instance = 0;
+let userInteracted = false;
+let desiredBitrate;
 
-const play = (url) => {
-  let id = streamID(url);
+if (!params.get('s')) userInteracted = true;
+
+
+const play = (id) => {
   fetch(api[instance] + 'streams/' + id)
     .then(res => res.json())
     .then(data => {
@@ -40,10 +43,10 @@ const play = (url) => {
       // extracting opus streams and storing m4a streams
       let bitrates = [];
       let urls = [];
-      let bitrateOptions;
+      let bitrateOptions = '';
       const m4aBitrates = [];
       const m4aUrls = [];
-      let m4aOptions;
+      let m4aOptions = '';
 
       for (const value of data.audioStreams) {
         if (Object.values(value).includes('opus')) {
@@ -64,15 +67,26 @@ const play = (url) => {
         urls = urls.concat(m4aUrls)
       }
 
+      getSaved('quality') ?
+        desiredBitrate = Math.max(...bitrates) :
+        desiredBitrate = Math.min(...bitrates);
+
+      const index = bitrates.indexOf(desiredBitrate);
+      $('audio').src = urls[index];
+
       $('#bitrateSelector').innerHTML = bitrateOptions;
-      audioSRC(bitrates, urls);
+      $('#bitrateSelector').selectedIndex = index;
+
+      $('#playButton').classList.add('on');
+
+      if (userInteracted) $('audio').play();
 
       params.set('s', id);
       history.pushState({}, '', '?' + params);
     })
     .catch(err => {
       instance < 4 ?
-        play(url) :
+        play(id) :
         alert(err);
 
       instance++;
@@ -85,7 +99,7 @@ const play = (url) => {
 const next = () => {
   if ((queueCount - queueNow) > -1) {
     play(array[queueNow]);
-    $('#queueButton').setAttribute('data-badge', queueCount - queueNow);
+    $('#queueButton i').setAttribute('data-badge', queueCount - queueNow);
     queueNow++;
   }
 }
@@ -93,13 +107,11 @@ const next = () => {
 
 // link queuing algorithm
 
-const queueIt = url => {
+const queueIt = id => {
   queueCount++;
-  $('#queueButton').setAttribute('data-badge', queueCount - queueNow + 1);
-  array[queueCount] = oldURL = url;
-  $('audio').onended = () => {
-    next();
-  }
+  $('#queueButton i').setAttribute('data-badge', queueCount - queueNow + 1);
+  array[queueCount] = oldURL = id;
+  $('audio').onended = () => { next() };
 }
 
 
@@ -108,14 +120,13 @@ const queueIt = url => {
 
 const queueFx = () => {
   queue = !queue;
-  if (queue)
-    queueCount = 0;
+  if (queue) queueCount = 0;
 
-  $('#qnbSpan').classList.toggle('hide');
-  $('#queueButton').classList.toggle('on');
-  $('#loopSpan').classList.toggle('hide')
-  $('#loopButton').classList.remove('on');
-
+  $('#queueNextButton').classList.toggle('hide');
+  $('#queueButton i').classList.toggle('on');
+  $('#loopButton').classList.toggle('hide')
+  $('#loopButton i').classList.remove('on');
+  userInteracted = true;
 }
 $('#queueButton').addEventListener('click', queueFx);
 
@@ -124,10 +135,10 @@ $('#queueNextButton').addEventListener('click', next)
 
 
 const playlistLoad = (id) => {
-  queueFx();
   fetch(api[instance] + 'playlists/' + id)
     .then(res => res.json())
     .then(data => {
+      queueFx();
       setMetadata(
         data.thumbnailUrl,
         id,
@@ -135,7 +146,7 @@ const playlistLoad = (id) => {
         'Click on Next Button to start',
         '');
       for (const i of data.relatedStreams)
-        queueIt('https://youtube.com' + i.url);
+        queueIt(i.url.slice(9))
     })
     .catch(err => {
       instance < 4 ?
@@ -150,40 +161,38 @@ const playlistLoad = (id) => {
 }
 
 
-const validator = (inputValue) => {
-  const pID = playlistID(inputValue);
-  if (streamID(inputValue)) play(inputValue);
+const validator = (val) => {
+  const pID = playlistID(val);
+  const sID = streamID(val);
 
-  else if (pID) playlistLoad(pID)
+  if (sID)
+    queue ? queueIt(sID) : play(sID);
+  else if (pID)
+    queue ? queueIt(pID) : playlistLoad(pID);
+
   // so that it does not run again for the same link
-  oldURL = inputValue;
+  oldURL = val;
 }
 
 // input text player
 
 input.addEventListener('input', () => {
   if (oldURL != input.value)
-    queue ?
-    queueIt(input.value) :
     validator(input.value);
-
 });
 
 
-// stream param
-if (params.get('s')) {
-  play('https://youtu.be/' + params.get('s'));
-}
-// timestamp param
-if (params.get('t')) {
-  $('audio').currentTime = params.get('t')
-}
-// playlist param
-if (params.get('p')) {
+// url params 
+if (params.get('p')) // playlist
   playlistLoad(params.get('p'))
-}
+else if (params.get('s')) // stream
+  validator('https://youtu.be/' + params.get('s'));
+
+if (params.get('t')) // timestamp
+  $('audio').currentTime = params.get('t')
+
 // pwa share param
 if (params.get('url'))
-  play(params.get('url'));
+  validator(params.get('url'))
 else if (params.get('text'))
-  play(params.get('text'));
+  validator(params.get('text'));

@@ -19,9 +19,9 @@ $('#settingsButton').addEventListener('click',
     settingsPanel ?
       style = ['rotate(180deg) scale(0.9)', 'flex'] :
       style = ['rotate(0deg)', 'none'];
-    $('#settingsButton').style.transform = style[0];
+    $('#settingsButton i').style.transform = style[0];
     $('#settingsContainer').style.display = style[1];
-    $('#settingsButton').classList.toggle('on');
+    $('#settingsButton i').classList.toggle('on');
     settingsPanel = !settingsPanel;
   });
 
@@ -29,13 +29,13 @@ $('#settingsButton').addEventListener('click',
 
 // Theme toggle
 
-if (getSaved('theme')) $('#themeButton').classList.add('on');
+if (getSaved('theme')) $('#themeButton i').classList.add('on');
 
 $('#themeButton').addEventListener('click', () => {
   getSaved('theme') ?
     localStorage.removeItem('theme') :
     save('theme', 'dark');
-  $('#themeButton').classList.toggle('on');
+  $('#themeButton i').classList.toggle('on');
   themer();
 });
 
@@ -47,10 +47,10 @@ $('#fullscreenButton').addEventListener('click',
   () => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
-      $('#fullscreenButton').classList.remove('on');
+      $('#fullscreenButton i').classList.remove('on');
     } else {
       document.documentElement.requestFullscreen();
-      $('#fullscreenButton').classList.add('on');
+      $('#fullscreenButton i').classList.add('on');
     }
   });
 
@@ -68,7 +68,7 @@ $('#thumbnailButton').addEventListener('click', () => {
     localStorage.removeItem('thumbnail');
   }
   thumbnail = !thumbnail;
-  $('#thumbnailButton').classList.toggle('on');
+  $('#thumbnailButton i').classList.toggle('on');
   $('img').classList.toggle('hide');
 });
 
@@ -77,11 +77,11 @@ $('#thumbnailButton').addEventListener('click', () => {
 // quality
 
 if (getSaved('quality') == 'hq')
-  $('#qualityButton').classList.add('on');
+  $('#qualityButton i').classList.add('on');
 
 $('#qualityButton').addEventListener('click', () => {
 
-  $('#qualityButton').classList.toggle('on');
+  $('#qualityButton i').classList.toggle('on');
 
   getSaved('quality') ?
     localStorage.removeItem('quality') : // low
@@ -90,8 +90,6 @@ $('#qualityButton').addEventListener('click', () => {
   if (params.get('s'))
     location.href += '&t=' + Math.floor($('audio').currentTime);
 });
-
-
 
 
 
@@ -169,17 +167,15 @@ $('audio').addEventListener('loadedmetadata', () => {
 
 let loop = false;
 
-$('audio').addEventListener('ended', () => {
-  if (loop) {
-    $('audio').play();
-  }
+$('audio').onended = () => {
+  if (loop) $('audio').play();
   else {
     $('#playButton').classList.replace('ri-play-fill', 'ri-stop-fill');
     playback = true;
   }
-});
+};
 
 $('#loopButton').addEventListener('click', () => {
-  $('#loopButton').classList.toggle('on');
+  $('#loopButton i').classList.toggle('on');
   loop = !loop;
 });

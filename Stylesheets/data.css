@@ -28,8 +28,9 @@ img {
 
 #metadata {
   width: 100%;
-  overflow: scroll;
-  padding: 0 0.5rem 0 1.5rem;
+  overflow: break-word;
+  padding-left: 2rem;
+  padding-right: 1.5rem;
 }
 
 #title {
@@ -42,7 +43,7 @@ img {
 }
 
 #metadata a{
-  text-decoration: none;
+  text-decoration:none;
   color: inherit;
 }
 
@@ -74,6 +75,4 @@ img {
   #author,#bitrateSelector {
     font-size: 0.9rem;
   }
-
-
 }

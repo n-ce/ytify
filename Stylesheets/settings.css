@@ -1,24 +1,31 @@
 #settingsContainer {
-  height: auto;
-  width: auto;
-  padding: 0.3rem;
   background: var(--accent);
   border: 1px solid var(--border);
+  padding: 0.3rem;
   border-radius: 0.7rem;
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
   -webkit-animation: fade 1s;
-  animation: fade 1s ;
+  animation: fade 1s;
 }
+
+
 
 @keyframes fade {
   from {
     transform: translateX(-100%);
   }
 }
+
 @media (min-width:600px) {
-  #settingsContainer span{
+  #settingsContainer button {
+    display: flex;
     flex-direction: row;
+    align-items: center;
+  }
+
+  #settingsContainer button p {
+    font-size: 0.7rem;
     margin-right: 1rem;
   }
 }

@@ -1,5 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
-
+@font-face{
+  font-family: 'Noto Sans';
+  src: url("/Assets/NotoSans.woff2") format("woff2");
+  font-display: swap;
+}
 
 :root {
   --bg: none;
@@ -37,24 +40,39 @@ body {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'Noto Sans',sans-serif;
 }
 
 button {
   font-size: 1.5rem;
-  height: 3rem;
-  width: 3rem;
+  padding: 0;
   background: none;
   color: var(--border);
   border: none;
-  border-radius: 50%;
-  outline: none;
+}
+
+button i,
+#playButton {
+  height: 3rem;
+  width: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
   -webkit-transition: all 0.5s;
   -o-transition: all 0.5s;
   transition: all 0.5s;
 }
 
-button:active {
+button p {
+  margin: 0;
+  font-weight: bold;
+  font-size: 0.5rem;
+  font-family:'Noto Sans',sans-serif;;
+}
+
+button:active i,
+#playButton:active {
   background: var(--accent);
   color: var(--text);
 }
@@ -74,26 +92,6 @@ button:active {
   display: none;
 }
 
-footer {
-  display: flex;
-  align-items: center;
-}
-
-
-footer a{
+footer a {
   color: inherit;
-}
-
-span {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-label {
-  opacity: 75%;
-  color: var(--border);
-  font-size: 0.5rem;
-  font-weight: bold;
 }
