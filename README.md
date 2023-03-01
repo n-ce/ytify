@@ -7,20 +7,19 @@
 - [**Description 🦚**](#description-)
 - [**File Structure** 📂](#file-structure-)
 - [**Getting Started** 🖼](#getting-started-)
-- [**Licence** 📝](#licence-)
-- [**Contributing** 📋](#contributing-)
+- [**Licence** 📝](https://github.com/n-ce/ytify/blob/main/LICENSE)
+- [**Contributing** 📋](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md)
 - [**Acknowledegments** 🙏](#acknowledgements-)
 
 
 ## Description 🦚
-**ytify**, a portmanteau for YouTube & spotIFY, is a minimal audio streaming application which takes youtube links as input 
-to provide the user with a stream of audio. ytify allows users to listen without worrying about low bandwidth or metered 
+**ytify**, is a fast & simple audio streaming web application which takes youtube links as input and outputs a stream of audio. ytify allows users to listen without worrying about slow internet speeds or 
 data consumption. It also provides a smooth and personalised user experience with features including:
 
  - **Queue** : Always have something coming up next. ytify lets you add multiple links to keep your music going. 
  - **Playlist Support** : Drop the link to a youtube playlist to fill up your queue without having to copy and paste each link. 
  - **Theming** : ytify personalizes itself using colours selected from the thumbnail of your youtube stream. 
-
+ - **PWA** : Can be installed as an app in your device, then you can directly open youtube links with ytify through your OS share menu.
 
 ## File Structure 📂
 ```
@@ -38,7 +37,7 @@ ytify
 │    └─── settings.css
 ├─── index.html
 ├─── 404.html
-├─── manifest.json
+├─── manifest.webmanifest
 ├─── README.md
 └─── LICENSE
 ```
@@ -58,9 +57,6 @@ Take a look at some Screenshots here ->
   <img src="Assets/Screenshots/landscape_music.avif" width="45%">
 </p>
 
-## Contributing 📋
-
-See [contributing](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md) for more information.
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)
