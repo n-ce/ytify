@@ -7,7 +7,10 @@ import {
   convertSStoMMSS
 } from './constants.js';
 
-
+$('#feedbackButton').addEventListener('click', () => {
+  const feedback = prompt('Enter your feedback (bugs, feature request) here:');
+  if (feedback) $('form').submit();
+})
 
 // settings panel toggle
 
