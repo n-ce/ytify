@@ -70,7 +70,7 @@ const play = (id) => {
         desiredBitrate = Math.min(...bitrates);
 
       const index = bitrates.indexOf(desiredBitrate);
-      $('audio').src = urls[index];
+      $('audio').src = "https://corsproxy.io?"+ urls[index];
 
       $('#bitrateSelector').innerHTML = bitrateOptions;
       $('#bitrateSelector').selectedIndex = index;
