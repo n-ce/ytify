@@ -94,9 +94,8 @@ $('#qualityButton').addEventListener('click', () => {
 // Feedback Button
 
 $('#feedbackButton').addEventListener('click', async () => {
-  $('form input').value = await prompt('Enter your feedback (bugs, feature requests) here:');
- alert($('form input').value)
- // if ($('form input').value) $('form').submit();
+  $('form input').value = await prompt('Enter your feedback (bugs, feature requests) here:");
+  if ($('form input').value) $('form').submit();
 })
 
 
