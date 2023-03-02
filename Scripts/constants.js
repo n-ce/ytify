@@ -18,6 +18,7 @@ const palette = {
 };
 
 const api = [
+  'https://piped-api.garudalinux.org/',
   'https://pipedapi.kavin.rocks/',
   'https://pipedapi-libre.kavin.rocks/',
   'https://pipedapi.tokhmi.xyz/',
