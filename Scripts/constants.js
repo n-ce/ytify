@@ -19,7 +19,7 @@ const palette = {
 
 
 const api = [
-  'https://pipedapi.esmailelbob.xyz',
+  'https://pipedapi.esmailelbob.xyz/',
   'https://pipedapi.kavin.rocks/',
   'https://pipedapi-libre.kavin.rocks/',
   'https://pipedapi.tokhmi.xyz/',
