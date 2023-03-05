@@ -134,6 +134,7 @@ $('audio').addEventListener('pause', () => {
 
 $('audio').addEventListener('loadeddata', () => {
   $('#playButton').classList.replace('spinner', 'ri-play-fill');
+  $('#playButton').classList.add('on');
   if ($('input[type="url"]').value) $('audio').play();
 })
 

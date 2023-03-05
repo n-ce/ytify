@@ -17,13 +17,16 @@ const palette = {
   }
 };
 
+
 const api = [
+  'https://pipedapi.esmailelbob.xyz',
   'https://pipedapi.kavin.rocks/',
   'https://pipedapi-libre.kavin.rocks/',
   'https://pipedapi.tokhmi.xyz/',
   'https://api-piped.mha.fi/',
   'https://pipedapi.moomoo.me/'
   ];
+
 
 const params = (new URL(document.location)).searchParams;
 
@@ -66,10 +69,8 @@ const themer = () => {
     theme = 'light';
 
   const ct = c[0] + c[1] + c[2];
-  if (ct < 100)
-    c[0] += 34,
-    c[1] += 34,
-    c[2] += 34;
+
+  if (ct < 85 || ct > 680) c[0] = c[1] = c[2] = 127;
 
   palette['light'].bg = palette['dark'].border = `rgb(${c[0]},${c[1]},${c[2]})`;
 

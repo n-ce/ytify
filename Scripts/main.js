@@ -17,9 +17,7 @@ let queueNow = 1;
 let queue = false;
 let array = [];
 let instance = 0;
-
-let desiredBitrate;
-
+let index = 0;
 
 const play = (id) => {
   fetch(api[instance] + 'streams/' + id)
@@ -66,23 +64,21 @@ const play = (id) => {
       }
 
       getSaved('quality') ?
-        desiredBitrate = Math.max(...bitrates) :
-        desiredBitrate = Math.min(...bitrates);
+        index = bitrates.indexOf(Math.max(...bitrates)) :
+        index = bitrates.indexOf(Math.min(...bitrates));
 
-      const index = bitrates.indexOf(desiredBitrate);
       $('audio').src = urls[index];
 
       $('#bitrateSelector').innerHTML = bitrateOptions;
       $('#bitrateSelector').selectedIndex = index;
-      
-      $('#playButton').classList.replace($('#playButton').classList[0],'spinner')
-      $('#playButton').classList.add('on');
-     
+
+      $('#playButton').classList.replace($('#playButton').classList[0], 'spinner');
+
       params.set('s', id);
       history.pushState({}, '', '?' + params);
     })
     .catch(err => {
-      instance < 4 ?
+      instance < 5 ?
         play(id) :
         alert(err);
 
