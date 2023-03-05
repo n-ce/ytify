@@ -4,7 +4,7 @@ import {
   themer,
   getSaved,
   save,
-  convertSStoMMSS
+  convertSStoHHMMSS
 } from './constants.js';
 
 
@@ -91,6 +91,23 @@ $('#qualityButton').addEventListener('click', () => {
     location.href += '&t=' + Math.floor($('audio').currentTime);
 });
 
+// Feedback Button
+
+$('#feedbackButton').addEventListener('click', async () => {
+  $('input[type="text"]').value = await prompt('Enter your feedback (bugs, feature requests) here:');
+  if ($('input[type="text"]').value) document.forms[0].submit();
+})
+
+
+
+// bitrate selector
+
+$('#bitrateSelector').addEventListener('change', () => {
+  const ct = $('audio').currentTime;
+  $('audio').src = $('#bitrateSelector').value;
+  $('audio').currentTime = ct;
+  $('audio').play();
+});
 
 
 // play button and events
@@ -105,7 +122,6 @@ $('#playButton').addEventListener('click', () => {
 });
 
 $('audio').addEventListener('playing', () => {
-  $('#playButton').classList.add('on');
   $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill')
   playback = false;
 });
@@ -116,6 +132,10 @@ $('audio').addEventListener('pause', () => {
 });
 
 
+$('audio').addEventListener('loadeddata', () => {
+  $('#playButton').classList.replace('spinner', 'ri-play-fill');
+  if ($('input[type="url"]').value) $('audio').play();
+})
 
 // PLAYBACK SPEED
 
@@ -152,14 +172,14 @@ $('audio').addEventListener('timeupdate', () => {
   if ($('#progress') === document.activeElement) return;
 
   $('#progress').value = Math.floor($('audio').currentTime);
-  $('#currentDuration').innerText = convertSStoMMSS($('audio').currentTime);
+  $('#currentDuration').innerText = convertSStoHHMMSS($('audio').currentTime);
 });
 
 $('audio').addEventListener('loadedmetadata', () => {
   $('#progress').value = 0;
   $('#progress').min = 0;
   $('#progress').max = Math.floor($('audio').duration);
-  $('#fullDuration').innerText = convertSStoMMSS($('audio').duration);
+  $('#fullDuration').innerText = convertSStoHHMMSS($('audio').duration);
 });
 
 // Loop

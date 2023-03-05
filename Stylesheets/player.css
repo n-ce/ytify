@@ -16,6 +16,26 @@
   align-items: center;
 }
 
+.spinner::after {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  border: 0.2rem solid transparent;
+  border-top-color: var(--border);
+  border-radius: 50%;
+  animation: spinner 1s ease-out infinite;
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0turn)
+  }
+  to {
+    transform: rotate(1turn)
+  }
+}
+
+
 
 #playSpeed {
   color: var(--border);
@@ -43,9 +63,9 @@
   padding: 0.3rem;
 }
 
-#queueButton i{
+#queueButton i {
   min-width: 3rem;
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 }

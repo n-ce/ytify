@@ -53,7 +53,7 @@
     </button>
 
     <button type="button" id="thumbnailButton">
-      <i class="ri-landscape-fill on"></i>
+      <i class="ri-image-fill on"></i>
       <p>Thumbnail</p>
     </button>
 
@@ -63,11 +63,20 @@
     </button>
 
     <button type="button" onclick="localStorage.clear();location.replace(location.origin);">
-      <i class="ri-delete-bin-7-fill"></i>
+      <i class="ri-delete-bin-fill"></i>
       <p>Clear Data</p>
     </button>
 
+    <button type="button" id="feedbackButton">
+      <i class="ri-feedback-fill"></i>
+      <p>Feedback</p>
+    </button>
+
   </div>
+
+  <form netlify name='feedback' method='POST' class='hide'>
+    <input type="text" name="v5.7" />
+  </form>
 
   <div id="dataContainer">
 
@@ -91,7 +100,7 @@
 
     <div id="playerControls">
 
-      <button class="ri-play-fill" id="playButton"></button>
+      <button id="playButton" class="ri-stop-fill"></button>
 
       <select id="playSpeed">
         <option value="0.25">0.25x</option>
@@ -116,12 +125,12 @@
     <div id="playerProfiles">
 
       <button type="button" id="seekBwdButton">
-        <i class="ri-rewind-fill"></i>
+        <i class="ri-rewind-mini-fill"></i>
         <p>Backward</p>
       </button>
 
       <button type="button" id="seekFwdButton">
-        <i class="ri-speed-fill"></i>
+        <i class="ri-speed-mini-fill"></i>
         <p>Forward</p>
       </button>
 
@@ -131,7 +140,7 @@
       </button>
 
       <button type="button" class="hide" id="queueNextButton">
-        <i class="ri-skip-forward-fill"></i>
+        <i class="ri-skip-forward-mini-fill"></i>
         <p>Skip Next</p>
       </button>
 
@@ -141,7 +150,7 @@
       </button>
 
       <button type="button" id="settingsButton">
-        <i class="ri-settings-4-fill"></i>
+        <i class="ri-settings-3-fill"></i>
         <p>Settings</p>
       </button>
 

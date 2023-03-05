@@ -17,10 +17,8 @@ let queueNow = 1;
 let queue = false;
 let array = [];
 let instance = 0;
-let userInteracted = false;
-let desiredBitrate;
 
-if (!params.get('s')) userInteracted = true;
+let desiredBitrate;
 
 
 const play = (id) => {
@@ -76,11 +74,10 @@ const play = (id) => {
 
       $('#bitrateSelector').innerHTML = bitrateOptions;
       $('#bitrateSelector').selectedIndex = index;
-
+      
+      $('#playButton').classList.replace($('#playButton').classList[0],'spinner')
       $('#playButton').classList.add('on');
-
-      if (userInteracted) $('audio').play();
-
+     
       params.set('s', id);
       history.pushState({}, '', '?' + params);
     })
@@ -126,7 +123,6 @@ const queueFx = () => {
   $('#queueButton i').classList.toggle('on');
   $('#loopButton').classList.toggle('hide')
   $('#loopButton i').classList.remove('on');
-  userInteracted = true;
 }
 $('#queueButton').addEventListener('click', queueFx);
 
@@ -183,10 +179,12 @@ input.addEventListener('input', () => {
 
 
 // url params 
+
+if (params.get('s')) // stream
+  validator('https://youtu.be/' + params.get('s'));
+
 if (params.get('p')) // playlist
   playlistLoad(params.get('p'))
-else if (params.get('s')) // stream
-  validator('https://youtu.be/' + params.get('s'));
 
 if (params.get('t')) // timestamp
   $('audio').currentTime = params.get('t')

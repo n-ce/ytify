@@ -48,14 +48,6 @@ const playlistID = (url) => {
 
 
 
-$('#bitrateSelector').addEventListener('change', () => {
-  const ct = $('audio').currentTime;
-  $('audio').src = $('#bitrateSelector').value;
-  $('audio').currentTime = ct;
-  $('audio').play();
-});
-
-
 let theme;
 
 const themer = () => {
@@ -123,11 +115,14 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
 
 }
 
-const convertSStoMMSS = (seconds) => {
+const convertSStoHHMMSS = (seconds) => {
+  const hh = Math.floor(seconds / 3600);
+  seconds %= 3600;
   let mm = Math.floor(seconds / 60);
   let ss = Math.floor(seconds % 60);
   if (mm < 10) mm = `0${mm}`;
   if (ss < 10) ss = `0${ss}`;
+  if (hh > 0) return `${hh}:${mm}:${ss}`;
   return `${mm}:${ss}`;
 }
 
@@ -141,5 +136,5 @@ export {
   playlistID,
   themer,
   setMetadata,
-  convertSStoMMSS
+  convertSStoHHMMSS
 }
