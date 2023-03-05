@@ -81,7 +81,7 @@ const play = (id) => {
       instance < 5 ?
         play(id) :
         alert(err);
-
+      alert(`${api[instance]}failed with error : ${err}`);
       instance++;
     })
 }
