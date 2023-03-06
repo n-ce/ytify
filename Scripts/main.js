@@ -7,7 +7,7 @@ import {
   save,
   api,
   params
-} from './constants.js'
+} from './constants.js';
 
 const input = $('input[type="url"]');
 let oldURL;
@@ -58,7 +58,7 @@ const play = (id) => {
       if (!getSaved('quality') && Math.min(...bitrates) > 64) {
         $('bitrateSelector').innerHTML += m4aOptions;
         bitrates = bitrates.concat(m4aBitrates);
-        urls = urls.concat(m4aUrls)
+        urls = urls.concat(m4aUrls);
       }
 
       let index = 0;
@@ -71,7 +71,7 @@ const play = (id) => {
       $('#bitrateSelector').selectedIndex = index;
 
       $('#playButton').classList.replace($('#playButton').classList[0], 'spinner');
-      
+
       params.set('s', id);
       history.pushState({}, '', '?' + params);
     })
@@ -80,7 +80,7 @@ const play = (id) => {
         play(id) :
         alert(err);
       instance++;
-    })
+    });
 }
 
 
@@ -101,7 +101,7 @@ const queueIt = id => {
   queueCount++;
   $('#queueButton i').setAttribute('data-badge', queueCount - queueNow + 1);
   array[queueCount] = oldURL = id;
-  $('audio').onended = () => { next() };
+  $('audio').onended = () => next();
 }
 
 
@@ -119,7 +119,7 @@ const queueFx = () => {
 }
 $('#queueButton').addEventListener('click', queueFx);
 
-$('#queueNextButton').addEventListener('click', next)
+$('#queueNextButton').addEventListener('click', next);
 
 
 const playlistLoad = (id) => {
@@ -134,7 +134,7 @@ const playlistLoad = (id) => {
         'Click on Next Button to start',
         '');
       for (const i of data.relatedStreams)
-        queueIt(i.url.slice(9))
+        queueIt(i.url.slice(9));
     })
     .catch(err => {
       instance < api.length - 1 ?
@@ -175,14 +175,14 @@ if (params.get('s')) // stream
   validator('https://youtube.com/watch?v=' + params.get('s'));
 
 if (params.get('p')) // playlist
-  validator('https://youtube.com/playlist?list=' + params.get('p'))
+  validator('https://youtube.com/playlist?list=' + params.get('p'));
 
 if (params.get('t')) // timestamp
   $('audio').currentTime = params.get('t');
 
-if (params.get('url')) // PWA
-  validator(params.get('url'))
-else if (params.get('text')) {
+if (params.get('url')) { // PWA
+  validator(params.get('url'));
+} else if (params.get('text')) {
   validator(params.get('text'));
   $('audio').play();
 }

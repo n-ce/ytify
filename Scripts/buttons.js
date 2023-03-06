@@ -142,13 +142,13 @@ $('#playButton').addEventListener('click', () => {
 });
 
 $('audio').addEventListener('playing', () => {
-  $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill')
+  $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill');
   playback = false;
 });
 
 $('audio').addEventListener('pause', () => {
-  playback = true;
   $('#playButton').classList.replace('ri-pause-fill', 'ri-play-fill');
+  playback = true;
 });
 
 $('audio').addEventListener('loadeddata', () => {
@@ -177,12 +177,11 @@ $('#playSpeed').addEventListener('change', () => {
 
 // Seek Forward && Backward
 
-$('#seekFwdButton').addEventListener('click', () => {
-  $('audio').currentTime += 10;
-});
-$('#seekBwdButton').addEventListener('click', () => {
-  $('audio').currentTime -= 10;
-});
+$('#seekFwdButton').addEventListener('click', 
+() => $('audio').currentTime += 10);
+
+$('#seekBwdButton').addEventListener('click',
+() => $('audio').currentTime -= 10);
 
 
 

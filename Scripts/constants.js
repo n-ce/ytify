@@ -38,14 +38,14 @@ const save = (key, pair) => {
 const getSaved = (key) => localStorage.getItem(key);
 
 
-if (getSaved('thumbnail')) localStorage.removeItem('thumbnail')
+if (getSaved('thumbnail')) localStorage.removeItem('thumbnail');
 
 const streamID = (url) => {
   const match = url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i);
   if (match !== null) return match[7];
 }
 const playlistID = (url) => {
-  const match = url.match(/[&?]list=([^&]+)/i)
+  const match = url.match(/[&?]list=([^&]+)/i);
   if (match !== null) return match[1];
 }
 
@@ -62,17 +62,15 @@ const themer = () => {
   canvas.height = $('img').height;
   context.drawImage($('img'), 0, 0, 1, 1);
 
-  const c = context.getImageData(0, 0, 1, 1).data;
+  const [r,g,b] = context.getImageData(0, 0, 1, 1).data;
 
   getSaved('theme') ?
     theme = 'dark' :
     theme = 'light';
 
-  const ct = c[0] + c[1] + c[2];
+  if (r+g+b < 85 || r+g+b > 680) r = g = b = 127;
 
-  if (ct < 85 || ct > 680) c[0] = c[1] = c[2] = 127;
-
-  palette['light'].bg = palette['dark'].border = `rgb(${c[0]},${c[1]},${c[2]})`;
+  palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})`;
 
   $(':root').style.setProperty('--bg', palette[theme].bg);
   $(':root').style.setProperty('--accent', palette[theme].accent);
@@ -85,7 +83,7 @@ const themer = () => {
 $('img').addEventListener('load', themer);
 
 if (!params.get('s') && !params.get('text'))
-  $('img').src = 'Assets/default_thumbnail.avif'
+  $('img').src = 'Assets/default_thumbnail.avif';
 
 
 const setMetadata = (thumbnail, id, title, author, authorUrl) => {
@@ -99,7 +97,7 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
   $('#author').href = `https://youtube.com${authorUrl}`;
   $('#author').innerText = author;
 
-  if ('mediaSession' in navigator) {
+  if ('mediaSession' in navigator)
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title,
       artist: author,
@@ -111,8 +109,7 @@ const setMetadata = (thumbnail, id, title, author, authorUrl) => {
         { src: thumbnail, sizes: '384x384' },
         { src: thumbnail, sizes: '512x512' },
               ]
-    })
-  }
+    });
 
 }
 
