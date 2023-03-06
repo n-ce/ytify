@@ -91,6 +91,8 @@ $('#qualityButton').addEventListener('click', () => {
     location.href += '&t=' + Math.floor($('audio').currentTime);
 });
 
+
+
 // Feedback Button
 
 $('#feedbackButton').addEventListener('click', async () => {
@@ -110,6 +112,7 @@ $('#bitrateSelector').addEventListener('change', () => {
 });
 
 
+
 // play button and events
 
 let playback = true;
@@ -122,14 +125,20 @@ $('#playButton').addEventListener('click', () => {
 });
 
 $('audio').addEventListener('playing', () => {
-  $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill')
+  $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill');
   playback = false;
 });
 
 $('audio').addEventListener('pause', () => {
-  playback = true;
   $('#playButton').classList.replace('ri-pause-fill', 'ri-play-fill');
+  playback = true;
 });
+
+$('audio').addEventListener('loadeddata', () => {
+  $('#playButton').classList.replace('spinner', 'ri-play-fill');
+  $('#playButton').classList.add('on');
+  if ($('input[type="url"]').value) $('audio').play();
+})
 
 
 $('audio').addEventListener('loadeddata', () => {
@@ -148,14 +157,15 @@ $('#playSpeed').addEventListener('change', () => {
 });
 
 
+
 // Seek Forward && Backward
 
-$('#seekFwdButton').addEventListener('click', () => {
-  $('audio').currentTime += 10;
-});
-$('#seekBwdButton').addEventListener('click', () => {
-  $('audio').currentTime -= 10;
-});
+$('#seekFwdButton').addEventListener('click', 
+() => $('audio').currentTime += 10);
+
+$('#seekBwdButton').addEventListener('click',
+() => $('audio').currentTime -= 10);
+
 
 
 // PROGRESS Bar event
@@ -182,8 +192,9 @@ $('audio').addEventListener('loadedmetadata', () => {
   $('#fullDuration').innerText = convertSStoHHMMSS($('audio').duration);
 });
 
-// Loop
 
+
+// Loop
 
 let loop = false;
 

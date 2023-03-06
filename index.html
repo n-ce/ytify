@@ -5,10 +5,10 @@
 
   <meta charset="UTF-8">
 
-  <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website.">
+  <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="none">
+  <meta name="theme-color" content="white">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="keywords" content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
 
@@ -24,13 +24,14 @@
   <link rel="canonical" href="https://ytify.netlify.app/">
   <link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
   <link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
+  <link rel="apple-touch-icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
   <link rel="manifest" href="manifest.webmanifest" />
 
-  <link rel="stylesheet" href="Stylesheets/main.css">
-  <link rel="stylesheet" href="Stylesheets/settings.css">
-  <link rel="stylesheet" href="Stylesheets/data.css">
-  <link rel="stylesheet" href="Stylesheets/player.css">
-  <link rel="stylesheet" href="Assets/Icons/remixicon.css">
+  <link defer rel="stylesheet" href="Stylesheets/main.css">
+  <link defer rel="stylesheet" href="Stylesheets/settings.css">
+  <link defer rel="stylesheet" href="Stylesheets/data.css">
+  <link defer rel="stylesheet" href="Stylesheets/player.css">
+  <link defer rel="stylesheet" href="Assets/Icons/remixicon.css">
 
   <script defer type="module" src="Scripts/main.js"></script>
   <script defer type="module" src="Scripts/buttons.js"></script>
@@ -83,13 +84,11 @@
     <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
     <div id="metadata">
-
-      <br><a id="title" href="#" target="_blank">Copy a YouTube Video/Playlist Link</a>
-
-      <br><a id="author" href="#" target="_blank">Paste it in the Input Box</a>
-
+      <br>
+      <a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
+      <br>
+      <a id="author" target="_blank">Paste it in the Input Box</a>
       <select id="bitrateSelector"></select>
-
     </div>
 
   </div>
@@ -161,9 +160,8 @@
 
   <footer>
     <a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.7, a
-    <a href="https://github.com/n-ce" target="_blank">n-ce</a> project.
+    <a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
   </footer>
-
 </body>
 
 </html>

@@ -7,7 +7,7 @@ import {
   save,
   api,
   params
-} from './constants.js'
+} from './constants.js';
 
 const input = $('input[type="url"]');
 let oldURL;
@@ -17,9 +17,6 @@ let queueNow = 1;
 let queue = false;
 let array = [];
 let instance = 0;
-
-let desiredBitrate;
-
 
 const play = (id) => {
   fetch(api[instance] + 'streams/' + id)
@@ -41,7 +38,6 @@ const play = (id) => {
       // extracting opus streams and storing m4a streams
       let bitrates = [];
       let urls = [];
-      let bitrateOptions = '';
       const m4aBitrates = [];
       const m4aUrls = [];
       let m4aOptions = '';
@@ -50,7 +46,7 @@ const play = (id) => {
         if (Object.values(value).includes('opus')) {
           bitrates.push(parseInt(value.quality));
           urls.push(value.url);
-          bitrateOptions += `<option value=${value.url}>${value.quality}</option>`;
+          $('#bitrateSelector').innerHTML += `<option value=${value.url}>${value.quality}</option>`;
         } else {
           m4aBitrates.push(parseInt(value.quality));
           m4aUrls.push(value.url);
@@ -60,34 +56,31 @@ const play = (id) => {
 
       // finding lowest available stream when low opus bitrate unavailable
       if (!getSaved('quality') && Math.min(...bitrates) > 64) {
-        bitrateOptions += m4aOptions;
+        $('bitrateSelector').innerHTML += m4aOptions;
         bitrates = bitrates.concat(m4aBitrates);
-        urls = urls.concat(m4aUrls)
+        urls = urls.concat(m4aUrls);
       }
 
+      let index = 0;
       getSaved('quality') ?
-        desiredBitrate = Math.max(...bitrates) :
-        desiredBitrate = Math.min(...bitrates);
+        index = bitrates.indexOf(Math.max(...bitrates)) :
+        index = bitrates.indexOf(Math.min(...bitrates));
 
-      const index = bitrates.indexOf(desiredBitrate);
       $('audio').src = urls[index];
 
-      $('#bitrateSelector').innerHTML = bitrateOptions;
       $('#bitrateSelector').selectedIndex = index;
-      
-      $('#playButton').classList.replace($('#playButton').classList[0],'spinner')
-      $('#playButton').classList.add('on');
-     
+
+      $('#playButton').classList.replace($('#playButton').classList[0], 'spinner');
+
       params.set('s', id);
       history.pushState({}, '', '?' + params);
     })
     .catch(err => {
-      instance < 4 ?
+      instance < api.length - 1 ?
         play(id) :
         alert(err);
-
       instance++;
-    })
+    });
 }
 
 
@@ -108,7 +101,7 @@ const queueIt = id => {
   queueCount++;
   $('#queueButton i').setAttribute('data-badge', queueCount - queueNow + 1);
   array[queueCount] = oldURL = id;
-  $('audio').onended = () => { next() };
+  $('audio').onended = () => next();
 }
 
 
@@ -126,8 +119,7 @@ const queueFx = () => {
 }
 $('#queueButton').addEventListener('click', queueFx);
 
-// queue Next
-$('#queueNextButton').addEventListener('click', next)
+$('#queueNextButton').addEventListener('click', next);
 
 
 const playlistLoad = (id) => {
@@ -142,13 +134,12 @@ const playlistLoad = (id) => {
         'Click on Next Button to start',
         '');
       for (const i of data.relatedStreams)
-        queueIt(i.url.slice(9))
+        queueIt(i.url.slice(9));
     })
     .catch(err => {
-      instance < 4 ?
+      instance < api.length - 1 ?
         playlistLoad(id) :
         alert(err);
-
       instance++;
     });
   params.set('p', id);
@@ -178,19 +169,20 @@ input.addEventListener('input', () => {
 });
 
 
-// url params 
+// URL params 
 
 if (params.get('s')) // stream
-  validator('https://youtu.be/' + params.get('s'));
+  validator('https://youtube.com/watch?v=' + params.get('s'));
 
 if (params.get('p')) // playlist
-  playlistLoad(params.get('p'))
+  validator('https://youtube.com/playlist?list=' + params.get('p'));
 
 if (params.get('t')) // timestamp
-  $('audio').currentTime = params.get('t')
+  $('audio').currentTime = params.get('t');
 
-// pwa share param
-if (params.get('url'))
-  validator(params.get('url'))
-else if (params.get('text'))
+if (params.get('url')) { // PWA
+  validator(params.get('url'));
+} else if (params.get('text')) {
   validator(params.get('text'));
+  $('audio').play();
+}
