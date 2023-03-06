@@ -38,6 +38,7 @@ const play = (id) => {
       // extracting opus streams and storing m4a streams
       let bitrates = [];
       let urls = [];
+      $('#bitrateSelector').innerHTML ='';
       const m4aBitrates = [];
       const m4aUrls = [];
       let m4aOptions = '';
