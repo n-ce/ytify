@@ -1,13 +1,53 @@
-import {
-  $,
-  setMetadata,
-  streamID,
-  playlistID,
-  getSaved,
-  save,
-  api,
-  params
-} from './constants.js';
+
+
+// Constants
+
+const setMetadata = (thumbnail, id, title, author, authorUrl) => {
+
+  getSaved('thumbnail') ?
+    save('thumbnail', thumbnail) :
+    $('img').src = thumbnail;
+
+  $('#title').href = `https://youtube.com/watch?v=${id}`;
+  $('#title').innerText = title;
+  $('#author').href = `https://youtube.com${authorUrl}`;
+  $('#author').innerText = author;
+
+  if ('mediaSession' in navigator)
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: author,
+      artwork: [
+        { src: thumbnail, sizes: '96x96' },
+        { src: thumbnail, sizes: '128x128' },
+        { src: thumbnail, sizes: '192x192' },
+        { src: thumbnail, sizes: '256x256' },
+        { src: thumbnail, sizes: '384x384' },
+        { src: thumbnail, sizes: '512x512' },
+              ]
+    });
+
+}
+
+const api = [
+  'https://pipedapi.kavin.rocks/',
+  'https://watchapi.whatever.social',
+  'https://pipedapi.tokhmi.xyz/',
+  'https://pipedapi.syncpundit.io/',
+  'https://piped-api.garudalinux.org',
+  'https://pipedapi.moomoo.me/'
+  ];
+  
+  const streamID = (url) => {
+    const match = url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i);
+    if (match !== null) return match[7];
+  }
+  const playlistID = (url) => {
+    const match = url.match(/[&?]list=([^&]+)/i);
+    if (match !== null) return match[1];
+  }
+
+
 
 const input = $('input[type="url"]');
 let oldURL;

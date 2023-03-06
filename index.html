@@ -33,8 +33,8 @@
   <link defer rel="stylesheet" href="Stylesheets/player.css">
   <link defer rel="stylesheet" href="Assets/Icons/remixicon.css">
 
-  <script defer type="module" src="Scripts/main.js"></script>
-  <script defer type="module" src="Scripts/buttons.js"></script>
+  <script defer src="Scripts/player.js"></script>
+  <script defer src="Scripts/ui.js"></script>
   <script defer src="Scripts/service-worker.js"></script>
 
 </head>
@@ -162,6 +162,14 @@
     <a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.7, a
     <a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
   </footer>
+
+  <script>
+    const $ = document.querySelector.bind(document);
+    const params = (new URL(document.location)).searchParams;
+    const save = (key, pair) => localStorage.setItem(key, pair);
+    const getSaved = (key) => localStorage.getItem(key);
+  </script>
+
 </body>
 
 </html>

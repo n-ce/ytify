@@ -1,11 +1,65 @@
-import {
-  $,
-  params,
-  themer,
-  getSaved,
-  save,
-  convertSStoHHMMSS
-} from './constants.js';
+
+
+// constants
+
+const convertSStoHHMMSS = (seconds) => {
+  const hh = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  let mm = Math.floor(seconds / 60);
+  let ss = Math.floor(seconds % 60);
+  if (mm < 10) mm = `0${mm}`;
+  if (ss < 10) ss = `0${ss}`;
+  if (hh > 0) return `${hh}:${mm}:${ss}`;
+  return `${mm}:${ss}`;
+}
+
+const palette = {
+  'light': {
+    bg: 'none',
+    accent: '#fff5',
+    text: '#000b',
+    border: '#000b'
+  },
+  'dark': {
+    bg: '#000',
+    accent: '#000',
+    text: '#fff',
+    border: 'none'
+  }
+};
+let theme;
+
+const themer = () => {
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  canvas.width = $('img').width;
+  canvas.height = $('img').height;
+  context.drawImage($('img'), 0, 0, 1, 1);
+
+  const [r,g,b] = context.getImageData(0, 0, 1, 1).data;
+
+  getSaved('theme') ?
+    theme = 'dark' :
+    theme = 'light';
+
+  if (r+g+b < 85 || r+g+b > 680) r = g = b = 127;
+
+  palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})`;
+
+  $(':root').style.setProperty('--bg', palette[theme].bg);
+  $(':root').style.setProperty('--accent', palette[theme].accent);
+  $(':root').style.setProperty('--text', palette[theme].text);
+  $(':root').style.setProperty('--border', palette[theme].border);
+  $('meta[name="theme-color"]').setAttribute("content", palette[theme].bg);
+
+}
+
+$('img').addEventListener('load', themer);
+
+if (!params.get('s') && !params.get('text'))
+  $('img').src = 'Assets/default_thumbnail.avif';
 
 
 
@@ -59,6 +113,8 @@ $('#fullscreenButton').addEventListener('click',
 // thumbnail toggle
 
 let thumbnail = true;
+
+if (getSaved('thumbnail')) localStorage.removeItem('thumbnail');
 
 $('#thumbnailButton').addEventListener('click', () => {
   if (thumbnail) {
