@@ -1,5 +1,5 @@
 //Progressive Web App
-const staticLoader = "YTIFY"
+const staticLoader = "ytify"
 const assets = [
   "/",
   "/Stylesheets/main.css",
@@ -29,8 +29,8 @@ self.addEventListener("fetch", fetchEvent => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker
-      .register("Scripts/service-worker.js")
-      .then(res => console.log("service worker registered"))
+      .register("./Scripts/service-worker.js")
+      .then(res => console.log(res))
       .catch(err => console.log("service worker not registered", err))
   })
 }

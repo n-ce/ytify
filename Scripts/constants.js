@@ -19,11 +19,11 @@ const palette = {
 
 
 const api = [
-  'https://pipedapi.esmailelbob.xyz/',
   'https://pipedapi.kavin.rocks/',
-  'https://pipedapi-libre.kavin.rocks/',
+  'https://watchapi.whatever.social',
   'https://pipedapi.tokhmi.xyz/',
-  'https://api-piped.mha.fi/',
+  'https://pipedapi.syncpundit.io/',
+  'https://piped-api.garudalinux.org',
   'https://pipedapi.moomoo.me/'
   ];
 

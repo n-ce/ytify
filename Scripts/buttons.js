@@ -91,6 +91,8 @@ $('#qualityButton').addEventListener('click', () => {
     location.href += '&t=' + Math.floor($('audio').currentTime);
 });
 
+
+
 // Feedback Button
 
 $('#feedbackButton').addEventListener('click', async () => {
@@ -108,6 +110,7 @@ $('#bitrateSelector').addEventListener('change', () => {
   $('audio').currentTime = ct;
   $('audio').play();
 });
+
 
 
 // play button and events
@@ -131,12 +134,13 @@ $('audio').addEventListener('pause', () => {
   $('#playButton').classList.replace('ri-pause-fill', 'ri-play-fill');
 });
 
-
 $('audio').addEventListener('loadeddata', () => {
   $('#playButton').classList.replace('spinner', 'ri-play-fill');
   $('#playButton').classList.add('on');
   if ($('input[type="url"]').value) $('audio').play();
 })
+
+
 
 // PLAYBACK SPEED
 
@@ -149,6 +153,7 @@ $('#playSpeed').addEventListener('change', () => {
 });
 
 
+
 // Seek Forward && Backward
 
 $('#seekFwdButton').addEventListener('click', () => {
@@ -157,6 +162,7 @@ $('#seekFwdButton').addEventListener('click', () => {
 $('#seekBwdButton').addEventListener('click', () => {
   $('audio').currentTime -= 10;
 });
+
 
 
 // PROGRESS Bar event
@@ -183,8 +189,9 @@ $('audio').addEventListener('loadedmetadata', () => {
   $('#fullDuration').innerText = convertSStoHHMMSS($('audio').duration);
 });
 
-// Loop
 
+
+// Loop
 
 let loop = false;
 

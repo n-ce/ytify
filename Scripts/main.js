@@ -17,7 +17,6 @@ let queueNow = 1;
 let queue = false;
 let array = [];
 let instance = 0;
-let index = 0;
 
 const play = (id) => {
   fetch(api[instance] + 'streams/' + id)
@@ -63,6 +62,7 @@ const play = (id) => {
         urls = urls.concat(m4aUrls)
       }
 
+      let index = 0;
       getSaved('quality') ?
         index = bitrates.indexOf(Math.max(...bitrates)) :
         index = bitrates.indexOf(Math.min(...bitrates));
@@ -78,10 +78,9 @@ const play = (id) => {
       history.pushState({}, '', '?' + params);
     })
     .catch(err => {
-      instance < 5 ?
+      instance < api.length - 1 ?
         play(id) :
         alert(err);
-      alert(`${api[instance]}failed with error : ${err}`);
       instance++;
     })
 }
@@ -122,7 +121,6 @@ const queueFx = () => {
 }
 $('#queueButton').addEventListener('click', queueFx);
 
-// queue Next
 $('#queueNextButton').addEventListener('click', next)
 
 
@@ -141,10 +139,9 @@ const playlistLoad = (id) => {
         queueIt(i.url.slice(9))
     })
     .catch(err => {
-      instance < 4 ?
+      instance < api.length - 1 ?
         playlistLoad(id) :
         alert(err);
-
       instance++;
     });
   params.set('p', id);
@@ -174,19 +171,20 @@ input.addEventListener('input', () => {
 });
 
 
-// url params 
+// URL params 
 
 if (params.get('s')) // stream
-  validator('https://youtu.be/' + params.get('s'));
+  validator('https://youtube.com/watch?v=' + params.get('s'));
 
 if (params.get('p')) // playlist
-  playlistLoad(params.get('p'))
+  validator('https://youtube.com/playlist?list=' + params.get('p'))
 
 if (params.get('t')) // timestamp
-  $('audio').currentTime = params.get('t')
+  $('audio').currentTime = params.get('t');
 
-// pwa share param
-if (params.get('url'))
+if (params.get('url')) // PWA
   validator(params.get('url'))
-else if (params.get('text'))
+else if (params.get('text')) {
   validator(params.get('text'));
+  $('audio').play();
+}
