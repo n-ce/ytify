@@ -91,6 +91,23 @@ $('#qualityButton').addEventListener('click', () => {
     location.href += '&t=' + Math.floor($('audio').currentTime);
 });
 
+// Feedback Button
+
+$('#feedbackButton').addEventListener('click', async () => {
+  $('input[type="text"]').value = await prompt('Enter your feedback (bugs, feature requests) here:');
+  if ($('input[type="text"]').value) document.forms[0].submit();
+})
+
+
+
+// bitrate selector
+
+$('#bitrateSelector').addEventListener('change', () => {
+  const ct = $('audio').currentTime;
+  $('audio').src = $('#bitrateSelector').value;
+  $('audio').currentTime = ct;
+  $('audio').play();
+});
 
 
 // Feedback Button
@@ -141,6 +158,10 @@ $('audio').addEventListener('loadeddata', () => {
 })
 
 
+$('audio').addEventListener('loadeddata', () => {
+  $('#playButton').classList.replace('spinner', 'ri-play-fill');
+  if ($('input[type="url"]').value) $('audio').play();
+})
 
 // PLAYBACK SPEED
 

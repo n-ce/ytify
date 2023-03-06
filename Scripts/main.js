@@ -71,7 +71,7 @@ const play = (id) => {
       $('#bitrateSelector').selectedIndex = index;
 
       $('#playButton').classList.replace($('#playButton').classList[0], 'spinner');
-
+      
       params.set('s', id);
       history.pushState({}, '', '?' + params);
     })
