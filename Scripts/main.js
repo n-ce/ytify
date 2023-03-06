@@ -38,7 +38,6 @@ const play = (id) => {
       // extracting opus streams and storing m4a streams
       let bitrates = [];
       let urls = [];
-      let bitrateOptions = '';
       const m4aBitrates = [];
       const m4aUrls = [];
       let m4aOptions = '';
@@ -47,7 +46,7 @@ const play = (id) => {
         if (Object.values(value).includes('opus')) {
           bitrates.push(parseInt(value.quality));
           urls.push(value.url);
-          bitrateOptions += `<option value=${value.url}>${value.quality}</option>`;
+          $('#bitrateSelector').innerHTML += `<option value=${value.url}>${value.quality}</option>`;
         } else {
           m4aBitrates.push(parseInt(value.quality));
           m4aUrls.push(value.url);
@@ -57,7 +56,7 @@ const play = (id) => {
 
       // finding lowest available stream when low opus bitrate unavailable
       if (!getSaved('quality') && Math.min(...bitrates) > 64) {
-        bitrateOptions += m4aOptions;
+        $('bitrateSelector').innerHTML += m4aOptions;
         bitrates = bitrates.concat(m4aBitrates);
         urls = urls.concat(m4aUrls)
       }
@@ -69,7 +68,6 @@ const play = (id) => {
 
       $('audio').src = urls[index];
 
-      $('#bitrateSelector').innerHTML = bitrateOptions;
       $('#bitrateSelector').selectedIndex = index;
 
       $('#playButton').classList.replace($('#playButton').classList[0], 'spinner');
