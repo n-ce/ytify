@@ -1,5 +1,6 @@
 {
   "short_name": "ytify",
+  "name":"Share Links From YouTube & Enjoy a Free Background Audio Experience.",
   "icons": [
     {
       "src": "Assets/maskable_icon_x192.png",
@@ -14,8 +15,9 @@
       "purpose": "any maskable"
 	}
 	],
-  "start_url": "index.html",
+  "start_url": "/",
   "display": "minimal-ui",
+  "theme_color":"#00bfff",
   "background_color": "#00bfff",
   "share_target": {
     "action": "/",
