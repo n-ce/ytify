@@ -38,7 +38,7 @@ const play = (id) => {
       // extracting opus streams and storing m4a streams
       let bitrates = [];
       let urls = [];
-      $('#bitrateSelector').innerHTML ='';
+      $('#bitrateSelector').innerHTML = '';
       const m4aBitrates = [];
       const m4aUrls = [];
       let m4aOptions = '';
@@ -57,7 +57,7 @@ const play = (id) => {
 
       // finding lowest available stream when low opus bitrate unavailable
       if (!getSaved('quality') && Math.min(...bitrates) > 64) {
-        $('bitrateSelector').innerHTML += m4aOptions;
+        $('#bitrateSelector').innerHTML += m4aOptions;
         bitrates = bitrates.concat(m4aBitrates);
         urls = urls.concat(m4aUrls);
       }
