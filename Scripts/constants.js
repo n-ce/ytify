@@ -53,8 +53,10 @@ const playlistID = (url) => {
 
 let theme;
 
-const themer = () => {
+const themer = async () => {
 
+  const [r, g, b] = await colorjs.average($('img'));
+  /*
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
 
@@ -62,15 +64,17 @@ const themer = () => {
   canvas.height = $('img').height;
   context.drawImage($('img'), 0, 0, 1, 1);
 
-  const [r,g,b] = context.getImageData(0, 0, 1, 1).data;
+  const [r, g, b] = context.getImageData(0, 0, 1, 1).data;
+  */
+
+  (r + g + b) > 85 ?
+    palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})` :
+    palette['light'].bg = palette['dark'].border = `rgb(${r+34},${g+34},${b+34})`;
+
 
   getSaved('theme') ?
     theme = 'dark' :
     theme = 'light';
-
-  if (r+g+b < 85 || r+g+b > 680) r = g = b = 127;
-
-  palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})`;
 
   $(':root').style.setProperty('--bg', palette[theme].bg);
   $(':root').style.setProperty('--accent', palette[theme].accent);
