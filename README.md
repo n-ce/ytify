@@ -1,6 +1,6 @@
 <div align="center">
  <h1> 💠 YTIFY 💠 </h1>
- <img src="Assets/default_thumbnail.avif" width="60%">
+ <img src="Assets/default_thumbnail.jpg" width="60%">
 </div>
 
 ## Table of Contents
@@ -45,16 +45,16 @@ ytify
 To use ytify, simply navigate to our website, paste a youtube link, and press play!
 Take a look at some Screenshots here ->
 <p align="center">
-  <img src="Assets/Screenshots/landscape_dark-mode.avif" width="45%">
-  <img src="Assets/Screenshots/landscape_light-mode.avif" width="45%">
-  <img src="Assets/Screenshots/portrait_light-mode.avif" width="30%">
-  <img src="Assets/Screenshots/portrait_dark-mode.avif" width="30%">
-  <img src="Assets/Screenshots/portrait_automatic_dark-mode.avif" width="30%">
-  <img src="Assets/Screenshots/portrait_music.avif" width="45%">
-  <img src="Assets/Screenshots/portrait_audiobook.avif" width="45%">
-  <img src="Assets/Screenshots/landscape_thoughts.avif" width="90%">
-  <img src="Assets/Screenshots/landscape_trends.avif" width="45%">
-  <img src="Assets/Screenshots/landscape_music.avif" width="45%">
+  <img src="Assets/Screenshots/landscape_dark-mode.jpg" width="45%">
+  <img src="Assets/Screenshots/landscape_light-mode.jpg" width="45%">
+  <img src="Assets/Screenshots/portrait_light-mode.jpg" width="30%">
+  <img src="Assets/Screenshots/portrait_dark-mode.jpg" width="30%">
+  <img src="Assets/Screenshots/portrait_automatic_dark-mode.jpg" width="30%">
+  <img src="Assets/Screenshots/portrait_music.jpg" width="45%">
+  <img src="Assets/Screenshots/portrait_audiobook.jpg" width="45%">
+  <img src="Assets/Screenshots/landscape_thoughts.jpg" width="90%">
+  <img src="Assets/Screenshots/landscape_trends.jpg" width="45%">
+  <img src="Assets/Screenshots/landscape_music.jpg" width="45%">
 </p>
 
 
