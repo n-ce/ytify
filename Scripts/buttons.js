@@ -14,14 +14,14 @@ import {
 let settingsPanel = true;
 let style;
 
-$('#settingsButton').addEventListener('click',
+$('settingsButton').addEventListener('click',
   () => {
     settingsPanel ?
       style = ['rotate(180deg) scale(0.9)', 'flex'] :
       style = ['rotate(0deg)', 'none'];
-    $('#settingsButton i').style.transform = style[0];
-    $('#settingsContainer').style.display = style[1];
-    $('#settingsButton i').classList.toggle('on');
+    $('settings_i').style.transform = style[0];
+    $('settingsContainer').style.display = style[1];
+    $('settings_i').classList.toggle('on');
     settingsPanel = !settingsPanel;
   });
 
@@ -29,13 +29,13 @@ $('#settingsButton').addEventListener('click',
 
 // Theme toggle
 
-if (getSaved('theme')) $('#themeButton i').classList.add('on');
+if (getSaved('theme')) $('theme_i').classList.add('on');
 
-$('#themeButton').addEventListener('click', () => {
+$('themeButton').addEventListener('click', () => {
   getSaved('theme') ?
     localStorage.removeItem('theme') :
     save('theme', 'dark');
-  $('#themeButton i').classList.toggle('on');
+  $('theme_i').classList.toggle('on');
   themer();
 });
 
@@ -43,14 +43,14 @@ $('#themeButton').addEventListener('click', () => {
 
 // fullscreen
 
-$('#fullscreenButton').addEventListener('click',
+$('fullscreenButton').addEventListener('click',
   () => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
-      $('#fullscreenButton i').classList.remove('on');
+      $('fullscreen_i').classList.remove('on');
     } else {
       document.documentElement.requestFullscreen();
-      $('#fullscreenButton i').classList.add('on');
+      $('fullscreen_i').classList.add('on');
     }
   });
 
@@ -60,7 +60,7 @@ $('#fullscreenButton').addEventListener('click',
 
 let thumbnail = true;
 
-$('#thumbnailButton').addEventListener('click', () => {
+$('thumbnailButton').addEventListener('click', () => {
   if (thumbnail) {
     save('thumbnail', $('img').src);
   } else {
@@ -68,7 +68,7 @@ $('#thumbnailButton').addEventListener('click', () => {
     localStorage.removeItem('thumbnail');
   }
   thumbnail = !thumbnail;
-  $('#thumbnailButton i').classList.toggle('on');
+  $('thumbnail_i').classList.toggle('on');
   $('img').classList.toggle('hide');
 });
 
@@ -77,11 +77,11 @@ $('#thumbnailButton').addEventListener('click', () => {
 // quality
 
 if (getSaved('quality') == 'hq')
-  $('#qualityButton i').classList.add('on');
+  $('quality_i').classList.add('on');
 
-$('#qualityButton').addEventListener('click', () => {
+$('qualityButton').addEventListener('click', () => {
 
-  $('#qualityButton i').classList.toggle('on');
+  $('quality_i').classList.toggle('on');
 
   getSaved('quality') ?
     localStorage.removeItem('quality') : // low
@@ -95,7 +95,7 @@ $('#qualityButton').addEventListener('click', () => {
 
 // Feedback Button
 
-$('#feedbackButton').addEventListener('click', async () => {
+$('feedbackButton').addEventListener('click', async () => {
   $('input[type="text"]').value = await prompt('Enter your feedback (bugs, feature requests) here:');
   if ($('input[type="text"]').value) document.forms[0].submit();
 })
@@ -104,9 +104,9 @@ $('#feedbackButton').addEventListener('click', async () => {
 
 // bitrate selector
 
-$('#bitrateSelector').addEventListener('change', () => {
+$('bitrateSelector').addEventListener('change', () => {
   const ct = $('audio').currentTime;
-  $('audio').src = $('#bitrateSelector').value;
+  $('audio').src = $('bitrateSelector').value;
   $('audio').currentTime = ct;
   $('audio').play();
 });
@@ -117,7 +117,7 @@ $('#bitrateSelector').addEventListener('change', () => {
 
 let playback = true;
 
-$('#playButton').addEventListener('click', () => {
+$('playButton').addEventListener('click', () => {
   playback ?
     $('audio').play() :
     $('audio').pause();
@@ -125,71 +125,71 @@ $('#playButton').addEventListener('click', () => {
 });
 
 $('audio').addEventListener('playing', () => {
-  $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill');
+  $('playButton').classList.replace($('playButton').classList[0], 'ri-pause-fill');
   playback = false;
 });
 
 $('audio').addEventListener('pause', () => {
-  $('#playButton').classList.replace('ri-pause-fill', 'ri-play-fill');
+  $('playButton').classList.replace('ri-pause-fill', 'ri-play-fill');
   playback = true;
 });
 
 $('audio').addEventListener('loadeddata', () => {
-  $('#playButton').classList.replace('spinner', 'ri-play-fill');
-  $('#playButton').classList.add('on');
-  if ($('input[type="url"]').value) $('audio').play();
+  $('playButton').classList.replace('spinner', 'ri-play-fill');
+  $('playButton').classList.add('on');
+  if ($('inputUrl').value) $('audio').play();
 })
 
 
 $('audio').addEventListener('loadeddata', () => {
-  $('#playButton').classList.replace('spinner', 'ri-play-fill');
-  if ($('input[type="url"]').value) $('audio').play();
+  $('playButton').classList.replace('spinner', 'ri-play-fill');
+  if ($('inputUrl').value) $('audio').play();
 })
 
 // PLAYBACK SPEED
 
-$('#playSpeed').addEventListener('change', () => {
-  if ($('#playSpeed').value < 0 || $('#playSpeed').value > 4) {
+$('playSpeed').addEventListener('change', () => {
+  if ($('playSpeed').value < 0 || $('playSpeed').value > 4) {
     return;
   }
   $('audio').playbackRate = playSpeed.value;
-  $('#playSpeed').blur();
+  $('playSpeed').blur();
 });
 
 
 
 // Seek Forward && Backward
 
-$('#seekFwdButton').addEventListener('click', 
+$('seekFwdButton').addEventListener('click', 
 () => $('audio').currentTime += 10);
 
-$('#seekBwdButton').addEventListener('click',
+$('seekBwdButton').addEventListener('click',
 () => $('audio').currentTime -= 10);
 
 
 
 // PROGRESS Bar event
 
-$('#progress').addEventListener('change', () => {
-  if ($('#progress').value < 0 || $('#progress').value > $('audio').duration) {
+$('progress').addEventListener('change', () => {
+  if ($('progress').value < 0 || $('progress').value > $('audio').duration) {
     return;
   }
-  $('audio').currentTime = $('#progress').value;
-  $('#progress').blur();
+  $('audio').currentTime = $('progress').value;
+  $('progress').blur();
 });
 
 $('audio').addEventListener('timeupdate', () => {
-  if ($('#progress') === document.activeElement) return;
+  if ($('progress') === document.activeElement) return;
 
-  $('#progress').value = Math.floor($('audio').currentTime);
-  $('#currentDuration').innerText = convertSStoHHMMSS($('audio').currentTime);
+  $('progress').value = Math.floor($('audio').currentTime);
+  $('currentDuration').textContent = convertSStoHHMMSS($('audio').currentTime);
 });
 
 $('audio').addEventListener('loadedmetadata', () => {
-  $('#progress').value = 0;
-  $('#progress').min = 0;
-  $('#progress').max = Math.floor($('audio').duration);
-  $('#fullDuration').innerText = convertSStoHHMMSS($('audio').duration);
+  $('progress').value = 0;
+  $('progress').min = 0;
+  $('progress').max = Math.floor($('audio').duration);
+  $('fullDuration').textContent = convertSStoHHMMSS($('audio').duration);
 });
 
 
@@ -201,12 +201,12 @@ let loop = false;
 $('audio').onended = () => {
   if (loop) $('audio').play();
   else {
-    $('#playButton').classList.replace('ri-play-fill', 'ri-stop-fill');
+    $('playButton').classList.replace('ri-play-fill', 'ri-stop-fill');
     playback = true;
   }
 };
 
-$('#loopButton').addEventListener('click', () => {
-  $('#loopButton i').classList.toggle('on');
+$('loopButton').addEventListener('click', () => {
+  $('loop_i').classList.toggle('on');
   loop = !loop;
 });

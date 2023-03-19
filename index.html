@@ -8,7 +8,7 @@
   <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="white">
+  <meta name="theme-color" content="white" id="tabColor">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="keywords" content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
 
@@ -33,7 +33,6 @@
   <link defer rel="stylesheet" href="Stylesheets/player.css">
   <link defer rel="stylesheet" href="Assets/Icons/remixicon.css">
   
-  <script defer src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
   <script defer type="module" src="Scripts/main.js"></script>
   <script defer type="module" src="Scripts/buttons.js"></script>
   <script defer src="Scripts/service-worker.js"></script>
@@ -45,22 +44,22 @@
   <div id="settingsContainer" class="hide">
 
     <button type="button" id="themeButton">
-      <i class="ri-moon-fill"></i>
+      <i class="ri-moon-fill" id="theme_i"></i>
       <p>Dark Mode</p>
     </button>
 
     <button type="button" id="fullscreenButton">
-      <i class="ri-fullscreen-fill"></i>
+      <i class="ri-fullscreen-fill" id="fullscreen_i"></i>
       <p>Fullscreen</p>
     </button>
 
     <button type="button" id="thumbnailButton">
-      <i class="ri-image-fill on"></i>
+      <i class="ri-image-fill on" id="thumbnail_i"></i>
       <p>Thumbnail</p>
     </button>
 
     <button type="button" id="qualityButton">
-      <i class="ri-hq-fill"></i>
+      <i class="ri-hq-fill" id="quality_i"></i>
       <p>High Quality</p>
     </button>
 
@@ -82,7 +81,7 @@
 
   <div id="dataContainer">
 
-    <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
+    <img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
     <div id="metadata">
       <br>
@@ -94,7 +93,7 @@
 
   </div>
 
-  <audio></audio>
+  <audio id="audio"></audio>
 
   <div id="playerContainer">
 
@@ -135,7 +134,7 @@
       </button>
 
       <button type="button" id="queueButton">
-        <i class="ri-play-list-add-fill"></i>
+        <i class="ri-play-list-add-fill" id="queue_i"></i>
         <p>Queue</p>
       </button>
 
@@ -145,16 +144,16 @@
       </button>
 
       <button type="button" id="loopButton">
-        <i class="ri-repeat-fill"></i>
+        <i class="ri-repeat-fill" id="loop_i"></i>
         <p>Loop</p>
       </button>
 
       <button type="button" id="settingsButton">
-        <i class="ri-settings-3-fill"></i>
+        <i class="ri-settings-3-fill" id="settings_i"></i>
         <p>Settings</p>
       </button>
 
-      <input type="url" placeholder="Input Link Here">
+      <input id="inputUrl" type="url" placeholder="Input Link Here">
     </div>
 
   </div>
