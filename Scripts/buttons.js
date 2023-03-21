@@ -50,6 +50,7 @@ fullscreenButton.addEventListener('click', () => {
 let thumbnail = true;
 
 thumbnailButton.addEventListener('click', () => {
+
 	thumbnail ?
 		img.dataset.src = img.src :
 		img.src = img.dataset.src;
@@ -134,6 +135,7 @@ audio.addEventListener('loadeddata', () => {
 	playButton.classList.add('on');
 	if (inputUrl.value) audio.play();
 });
+
 
 
 // PLAYBACK SPEED
