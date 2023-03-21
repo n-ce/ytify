@@ -51,10 +51,12 @@ let thumbnail = true;
 
 thumbnailButton.addEventListener('click', () => {
 
-	thumbnail ?
-		img.dataset.src = img.src :
+	if (thumbnail)
+		img.dataset.src = img.src;
+	else {
 		img.src = img.dataset.src;
-
+		img.dataset.src = '';
+	}
 	thumbnail = !thumbnail;
 	thumbnailButton.firstElementChild.classList.toggle('on');
 	img.classList.toggle('hide');
