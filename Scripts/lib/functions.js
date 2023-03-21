@@ -6,8 +6,6 @@ const save = localStorage.setItem.bind(localStorage);
 
 const getSaved = localStorage.getItem.bind(localStorage);
 
-if (getSaved('thumbnail')) localStorage.removeItem('thumbnail');
-
 const streamID = (url) => {
 	const match = url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i);
 	if (match) return match[7];

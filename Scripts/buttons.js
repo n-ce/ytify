@@ -50,12 +50,10 @@ fullscreenButton.addEventListener('click', () => {
 let thumbnail = true;
 
 thumbnailButton.addEventListener('click', () => {
-	if (thumbnail) {
-		save('thumbnail', img.src);
-	} else {
-		img.src = getSaved('thumbnail');
-		localStorage.removeItem('thumbnail');
-	}
+	thumbnail ?
+		img.dataset.src = img.src :
+		img.src = img.dataset.src;
+
 	thumbnail = !thumbnail;
 	thumbnailButton.firstElementChild.classList.toggle('on');
 	img.classList.toggle('hide');
