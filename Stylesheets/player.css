@@ -1,6 +1,6 @@
 #playerContainer {
   padding: 0.3rem;
-  background: var(--accent);
+  background-color: var(--accent);
   border: 0.1px solid var(--border);
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
@@ -86,20 +86,11 @@
   display: none;
 }
 
-
-#settingsButton i {
-  border-radius: 50%;
-  box-shadow: none;
-  -webkit-transition-duration: 1s;
-  -o-transition-duration: 1s;
-  transition-duration: 1s;
-}
-
 input[type="url"] {
-  height: 3.5rem;
-  width: 7rem;
+  height: 3.55rem;
+  width: 5.8rem;
 
-  background: var(--accent);
+  background-color: var(--accent);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;

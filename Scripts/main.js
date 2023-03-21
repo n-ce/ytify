@@ -1,22 +1,37 @@
 import {
-	$,
 	setMetadata,
 	streamID,
 	playlistID,
 	getSaved,
 	save,
-	api,
 	params
-} from './constants.js';
+} from './lib/functions.js';
 
+import {
+	bitrateSelector,
+	audio,
+	inputUrl,
+	playButton,
+	queueButton,
+	queueNextButton,
+	loopButton
+} from './lib/DOM.js';
 
-let oldURL;
+let instance = 0;
 let queueCount = 0;
 let queueNow = 1;
-// let queueList = [];
+let oldURL;
 let queue = false;
-let array = [];
-let instance = 0;
+// const queueList = new Map();
+const array = [];
+const api = [
+  'https://pipedapi.kavin.rocks/',
+  'https://watchapi.whatever.social',
+  'https://pipedapi.tokhmi.xyz/',
+  'https://pipedapi.syncpundit.io/',
+  'https://piped-api.garudalinux.org',
+  'https://pipedapi.moomoo.me/'
+  ];
 
 const play = (id) => {
 	fetch(api[instance] + 'streams/' + id)
@@ -38,7 +53,7 @@ const play = (id) => {
 			// extracting opus streams and storing m4a streams
 			let bitrates = [];
 			let urls = [];
-			$('bitrateSelector').innerHTML = '';
+			bitrateSelector.innerHTML = '';
 			const m4aBitrates = [];
 			const m4aUrls = [];
 			const m4aOptions = [];
@@ -47,7 +62,7 @@ const play = (id) => {
 				if (Object.values(value).includes('opus')) {
 					bitrates.push(parseInt(value.quality));
 					urls.push(value.url);
-					$('bitrateSelector').add(new Option(value.quality, value.url));
+					bitrateSelector.add(new Option(value.quality, value.url));
 				} else {
 					m4aBitrates.push(parseInt(value.quality));
 					m4aUrls.push(value.url);
@@ -57,7 +72,7 @@ const play = (id) => {
 
 			// finding lowest available stream when low opus bitrate unavailable
 			if (!getSaved('quality') && Math.min(...bitrates) > 64) {
-				m4aOptions.map(opts => $('bitrateSelector').add(opts));
+				m4aOptions.map(opts => bitrateSelector.add(opts));
 				bitrates = bitrates.concat(m4aBitrates);
 				urls = urls.concat(m4aUrls);
 			}
@@ -67,11 +82,13 @@ const play = (id) => {
 				index = bitrates.indexOf(Math.max(...bitrates)) :
 				index = bitrates.indexOf(Math.min(...bitrates));
 
-			$('audio').src = urls[index];
+			audio.src = urls[index];
 
-			$('bitrateSelector').selectedIndex = index;
-			
-			$('playButton').classList.replace($('playButton').classList[0], 'spinner');
+			audio.dataset.seconds = 0;
+
+			bitrateSelector.selectedIndex = index;
+
+			playButton.classList.replace(playButton.classList[0], 'spinner');
 
 			params.set('s', id);
 			history.pushState({}, '', '?' + params);
@@ -90,7 +107,7 @@ const play = (id) => {
 const next = () => {
 	if ((queueCount - queueNow) > -1) {
 		play(array[queueNow]);
-		$('queue_i').setAttribute('data-badge', queueCount - queueNow);
+		queueButton.firstElementChild.dataset.badge = queueCount - queueNow;
 		queueNow++;
 	}
 }
@@ -100,10 +117,25 @@ const next = () => {
 
 const queueIt = id => {
 	queueCount++;
-	$('queue_i').setAttribute('data-badge', queueCount - queueNow + 1);
+	queueButton.firstElementChild.dataset.badge = queueCount - queueNow + 1;
 	array[queueCount] = oldURL = id;
-	$('audio').onended = () => next();
 }
+
+// playback on end strategy
+audio.addEventListener('ended', () => {
+	if (queue)
+		next(); // queue = on
+	else { // queue = off
+
+		if (loopButton.dataset.state) // loop = on
+			audio.play();
+		else { // loop = off
+			playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
+			playButton.dataset.state = '1';
+		}
+
+	}
+})
 
 
 
@@ -112,15 +144,14 @@ const queueIt = id => {
 const queueFx = () => {
 	queue = !queue;
 	if (queue) queueCount = 0;
-
-	$('queueNextButton').classList.toggle('hide');
-	$('queue_i').classList.toggle('on');
-	$('loopButton').classList.toggle('hide')
-	$('loop_i').classList.remove('on');
+	queueNextButton.classList.toggle('hide');
+	queueButton.firstElementChild.classList.toggle('on');
+	loopButton.classList.toggle('hide')
+	loopButton.firstElementChild.classList.remove('on');
 }
-$('queueButton').addEventListener('click', queueFx);
+queueButton.addEventListener('click', queueFx);
 
-$('queueNextButton').addEventListener('click', next);
+queueNextButton.addEventListener('click', next);
 
 
 const playlistLoad = (id) => {
@@ -164,9 +195,9 @@ const validator = (val) => {
 
 // input text player
 
-$('inputUrl').addEventListener('input', () => {
-	if (oldURL != $('inputUrl').value)
-		validator($('inputUrl').value);
+inputUrl.addEventListener('input', () => {
+	if (oldURL != inputUrl.value)
+		validator(inputUrl.value);
 });
 
 
@@ -175,15 +206,23 @@ $('inputUrl').addEventListener('input', () => {
 if (params.get('s')) // stream
 	validator('https://youtube.com/watch?v=' + params.get('s'));
 
-if (params.get('p')) // playlist
+if (params.get('p')) { // playlist
 	validator('https://youtube.com/playlist?list=' + params.get('p'));
+	params.delete('p'); // stop param from interferring rest of the program
+}
+if (params.get('t')) { // timestamp
+	audio.currentTime = params.get('t');
+	params.delete('t');
+}
 
-if (params.get('t')) // timestamp
-	$('audio').currentTime = params.get('t');
-
-if (params.get('url')) { // PWA
+// PWA Params
+if (params.get('url')) {
 	validator(params.get('url'));
+	params.delete('url');
+	audio.play();
+
 } else if (params.get('text')) {
 	validator(params.get('text'));
-	$('audio').play();
+	params.delete('text');
+	audio.play();
 }

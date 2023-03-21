@@ -1,11 +1,10 @@
 <div align="center">
- <h1> 💠 YTIFY 💠 </h1>
+ <h1> 💠 [YTIFY](https://ytify.netlify.app) 💠 </h1>
  <img src="Assets/default_thumbnail.avif" width="60%">
 </div>
 
 ## Table of Contents
 - [**Description 🦚**](#description-)
-- [**File Structure** 📂](#file-structure-)
 - [**Getting Started** 🖼](#getting-started-)
 - [**Licence** 📝](https://github.com/n-ce/ytify/blob/main/LICENSE)
 - [**Contributing** 📋](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md)
@@ -21,26 +20,7 @@ data consumption. It also provides a smooth and personalised user experience wit
  - **Theming** : ytify personalizes itself using colours selected from the thumbnail of your youtube stream. 
  - **PWA** : Can be installed as an app in your device, then you can directly open youtube links with ytify through your OS share menu.
 
-## File Structure 📂
-```
-ytify
-├─── Assets/.. 
-├─── Scripts
-│    ├─── constants.js
-│    ├─── main.js
-│    ├─── buttons.js
-│    └─── service-worker.js
-├─── Stylesheets
-│    ├─── main.css
-│    ├─── data.css
-│    ├─── player.css
-│    └─── settings.css
-├─── index.html
-├─── 404.html
-├─── manifest.webmanifest
-├─── README.md
-└─── LICENSE
-```
+
 ## Getting Started 🖼
 To use ytify, simply navigate to our website, paste a youtube link, and press play!
 Take a look at some Screenshots here ->
