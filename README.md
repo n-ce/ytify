@@ -1,5 +1,7 @@
 <div align="center">
- <h1> 💠 [YTIFY](https://ytify.netlify.app) 💠 </h1>
+
+ # 💠 [YTIFY](https://ytify.netlify.app) 💠 
+ 
  <img src="Assets/default_thumbnail.avif" width="60%">
 </div>
 
