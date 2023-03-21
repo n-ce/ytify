@@ -83,10 +83,10 @@ if (!params.get('s') && !params.get('text'))
 
 const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
 
-	getSaved('thumbnail') ?
-		save('thumbnail', thumbnail) :
+	img.dataset.src ?
+		img.dataset.src = thumbnail :
 		img.src = thumbnail;
-
+			
 	title.href = `https://youtube.com/watch?v=${id}`;
 	title.textContent = streamName;
 	author.href = `https://youtube.com${authorUrl}`;
