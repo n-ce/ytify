@@ -1,58 +1,47 @@
-import {
-  $,
-  params,
-  themer,
-  getSaved,
-  save,
-  convertSStoHHMMSS
-} from './constants.js';
-
+import { params, themer, getSaved, save, convertSStoHHMMSS } from './lib/functions.js';
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, cssVar, tabColor } from './lib/DOM.js';
 
 
 // settings panel toggle
 
-let settingsPanel = true;
-let style;
+settingsButton.addEventListener('click', () => {
+		[themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl
+		].map(e => e.classList.toggle('hide'));
 
-$('#settingsButton').addEventListener('click',
-  () => {
-    settingsPanel ?
-      style = ['rotate(180deg) scale(0.9)', 'flex'] :
-      style = ['rotate(0deg)', 'none'];
-    $('#settingsButton i').style.transform = style[0];
-    $('#settingsContainer').style.display = style[1];
-    $('#settingsButton i').classList.toggle('on');
-    settingsPanel = !settingsPanel;
-  });
+	if (queueButton.firstElementChild.classList[1] === 'on') {
+		loopButton.classList.toggle('hide');
+		queueNextButton.classList.toggle('hide');
+	}
+});
 
 
 
 // Theme toggle
 
-if (getSaved('theme')) $('#themeButton i').classList.add('on');
+if (getSaved('theme'))
+	themeButton.firstElementChild.classList.add('on');
 
-$('#themeButton').addEventListener('click', () => {
-  getSaved('theme') ?
-    localStorage.removeItem('theme') :
-    save('theme', 'dark');
-  $('#themeButton i').classList.toggle('on');
-  themer();
+themeButton.addEventListener('click', () => {
+	getSaved('theme') ?
+		localStorage.removeItem('theme') :
+		save('theme', 'dark');
+	themeButton.firstElementChild.classList.toggle('on');
+	themer();
 });
 
 
 
 // fullscreen
 
-$('#fullscreenButton').addEventListener('click',
-  () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-      $('#fullscreenButton i').classList.remove('on');
-    } else {
-      document.documentElement.requestFullscreen();
-      $('#fullscreenButton i').classList.add('on');
-    }
-  });
+fullscreenButton.addEventListener('click', () => {
+	if (document.fullscreenElement) {
+		document.exitFullscreen();
+		fullscreenButton.firstElementChild.classList.remove('on');
+	} else {
+		document.documentElement.requestFullscreen();
+		fullscreenButton.firstElementChild.classList.add('on');
+	}
+});
 
 
 
@@ -60,16 +49,16 @@ $('#fullscreenButton').addEventListener('click',
 
 let thumbnail = true;
 
-$('#thumbnailButton').addEventListener('click', () => {
-  if (thumbnail) {
-    save('thumbnail', $('img').src);
-  } else {
-    $('img').src = getSaved('thumbnail');
-    localStorage.removeItem('thumbnail');
-  }
-  thumbnail = !thumbnail;
-  $('#thumbnailButton i').classList.toggle('on');
-  $('img').classList.toggle('hide');
+thumbnailButton.addEventListener('click', () => {
+	if (thumbnail) {
+		save('thumbnail', img.src);
+	} else {
+		img.src = getSaved('thumbnail');
+		localStorage.removeItem('thumbnail');
+	}
+	thumbnail = !thumbnail;
+	thumbnailButton.firstElementChild.classList.toggle('on');
+	img.classList.toggle('hide');
 });
 
 
@@ -77,136 +66,139 @@ $('#thumbnailButton').addEventListener('click', () => {
 // quality
 
 if (getSaved('quality') == 'hq')
-  $('#qualityButton i').classList.add('on');
+	qualityButton.firstElementChild.classList.add('on');
 
-$('#qualityButton').addEventListener('click', () => {
+qualityButton.addEventListener('click', () => {
 
-  $('#qualityButton i').classList.toggle('on');
+	qualityButton.firstElementChild.classList.toggle('on');
 
-  getSaved('quality') ?
-    localStorage.removeItem('quality') : // low
-    save('quality', 'hq'); // high
+	getSaved('quality') ?
+		localStorage.removeItem('quality') : // low
+		save('quality', 'hq'); // high
 
-  if (params.get('s'))
-    location.href += '&t=' + Math.floor($('audio').currentTime);
+	if (params.get('s')) {
+		params.set('t', audio.dataset.seconds);
+		location.href = location.origin + '/?' + params;
+	}
 });
 
+// Delete Button
 
+deleteButton.addEventListener('click', () => {
+	localStorage.clear();
+	location.replace(location.origin);
+})
 
 // Feedback Button
 
-$('#feedbackButton').addEventListener('click', async () => {
-  $('input[type="text"]').value = await prompt('Enter your feedback (bugs, feature requests) here:');
-  if ($('input[type="text"]').value) document.forms[0].submit();
+feedbackButton.addEventListener('click', async () => {
+	formInput.value = await prompt('Enter your feedback (bugs, feature requests) here:');
+	if (formInput.value) document.forms[0].submit();
 })
 
 
 
 // bitrate selector
 
-$('#bitrateSelector').addEventListener('change', () => {
-  const ct = $('audio').currentTime;
-  $('audio').src = $('#bitrateSelector').value;
-  $('audio').currentTime = ct;
-  $('audio').play();
+bitrateSelector.addEventListener('change', () => {
+	const timeOfSwitch = audio.dataset.seconds;
+	audio.src = bitrateSelector.value;
+	audio.currentTime = timeOfSwitch;
+	audio.play();
 });
 
 
 
 // play button and events
 
-let playback = true;
-
-$('#playButton').addEventListener('click', () => {
-  playback ?
-    $('audio').play() :
-    $('audio').pause();
-  playback = !playback;
+playButton.addEventListener('click', () => {
+	if (playButton.dataset.state) {
+		audio.play();
+		playButton.dataset.state = '';
+	} else {
+		audio.pause();
+		playButton.dataset.state = '1';
+	}
 });
 
-$('audio').addEventListener('playing', () => {
-  $('#playButton').classList.replace($('#playButton').classList[0], 'ri-pause-fill');
-  playback = false;
+audio.addEventListener('playing', () => {
+	playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
+	playButton.dataset.state = '';
 });
 
-$('audio').addEventListener('pause', () => {
-  $('#playButton').classList.replace('ri-pause-fill', 'ri-play-fill');
-  playback = true;
+audio.addEventListener('pause', () => {
+	playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
+	playButton.dataset.state = '1';
 });
 
-$('audio').addEventListener('loadeddata', () => {
-  $('#playButton').classList.replace('spinner', 'ri-play-fill');
-  $('#playButton').classList.add('on');
-  if ($('input[type="url"]').value) $('audio').play();
-})
+audio.addEventListener('loadeddata', () => {
+	playButton.classList.replace('spinner', 'ri-play-fill');
+	playButton.classList.add('on');
+	if (inputUrl.value) audio.play();
+});
 
-
-$('audio').addEventListener('loadeddata', () => {
-  $('#playButton').classList.replace('spinner', 'ri-play-fill');
-  if ($('input[type="url"]').value) $('audio').play();
-})
 
 // PLAYBACK SPEED
 
-$('#playSpeed').addEventListener('change', () => {
-  if ($('#playSpeed').value < 0 || $('#playSpeed').value > 4) {
-    return;
-  }
-  $('audio').playbackRate = playSpeed.value;
-  $('#playSpeed').blur();
+playSpeed.addEventListener('change', () => {
+	if (playSpeed.value < 0 || playSpeed.value > 4) {
+		return;
+	}
+	audio.playbackRate = playSpeed.value;
+	playSpeed.blur();
 });
 
 
 
 // Seek Forward && Backward
 
-$('#seekFwdButton').addEventListener('click', 
-() => $('audio').currentTime += 10);
+seekFwdButton.addEventListener('click', () =>
+	audio.currentTime += 10);
 
-$('#seekBwdButton').addEventListener('click',
-() => $('audio').currentTime -= 10);
+seekBwdButton.addEventListener('click', () =>
+	audio.currentTime -= 10);
 
 
 
 // PROGRESS Bar event
 
-$('#progress').addEventListener('change', () => {
-  if ($('#progress').value < 0 || $('#progress').value > $('audio').duration) {
-    return;
-  }
-  $('audio').currentTime = $('#progress').value;
-  $('#progress').blur();
+progress.addEventListener('change', () => {
+	if (progress.value < 0 || progress.value > audio.duration)
+		return;
+
+	audio.currentTime = progress.value;
+	progress.blur();
 });
 
-$('audio').addEventListener('timeupdate', () => {
-  if ($('#progress') === document.activeElement) return;
+audio.addEventListener('timeupdate', () => {
+	if (progress === document.activeElement)
+		return;
 
-  $('#progress').value = Math.floor($('audio').currentTime);
-  $('#currentDuration').innerText = convertSStoHHMMSS($('audio').currentTime);
+	const seconds = Math.floor(audio.currentTime);
+	// only update every second
+	if (seconds > audio.dataset.seconds) {
+		progress.value = seconds;
+		currentDuration.textContent = convertSStoHHMMSS(seconds);
+	}
+	audio.dataset.seconds = seconds;
+
 });
 
-$('audio').addEventListener('loadedmetadata', () => {
-  $('#progress').value = 0;
-  $('#progress').min = 0;
-  $('#progress').max = Math.floor($('audio').duration);
-  $('#fullDuration').innerText = convertSStoHHMMSS($('audio').duration);
+
+audio.addEventListener('loadedmetadata', () => {
+	progress.value = 0;
+	progress.min = 0;
+	progress.max = Math.floor(audio.duration);
+	fullDuration.textContent = convertSStoHHMMSS(audio.duration);
 });
 
 
 
 // Loop
 
-let loop = false;
-
-$('audio').onended = () => {
-  if (loop) $('audio').play();
-  else {
-    $('#playButton').classList.replace('ri-play-fill', 'ri-stop-fill');
-    playback = true;
-  }
-};
-
-$('#loopButton').addEventListener('click', () => {
-  $('#loopButton i').classList.toggle('on');
-  loop = !loop;
+loopButton.addEventListener('click', () => {
+	loopButton.firstElementChild.classList.toggle('on');
+	loopButton.dataset.state ?
+		loopButton.dataset.state = '' :
+		loopButton.dataset.state = '1';
 });

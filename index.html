@@ -3,166 +3,163 @@
 
 <head>
 
-  <meta charset="UTF-8">
+	<meta charset="UTF-8">
 
-  <meta name="description" content="32kbps, 64kbps, 128kbps youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
-  <meta name="author" content="Animesh Nath">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="white">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="keywords" content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
+	<meta name="description" content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
+	<meta name="author" content="Animesh Nath">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="white" id="tabColor">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="keywords" content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
 
-  <title>ytify</title>
+	<title>ytify</title>
 
-  <meta property="og:title" content="YTIFY">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ytify.netlify.app">
-  <meta property="og:description" content="50kbps Opus YouTube Audio Streaming Web App.">
-  <meta property="og:image" content="Assets/maskable_icon_x512.png">
+	<meta property="og:title" content="YTIFY">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://ytify.netlify.app">
+	<meta property="og:description" content="50kbps Opus YouTube Audio Streaming Web App.">
+	<meta property="og:image" content="Assets/maskable_icon_x512.png">
 
-  <!-- tells google that this url is most important (e.g. not http (without s = secure))-->
-  <link rel="canonical" href="https://ytify.netlify.app/">
-  <link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
-  <link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
-  <link rel="apple-touch-icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
-  <link rel="manifest" href="manifest.webmanifest" />
+	<!-- tells google that this url is most important (e.g. not http (without s = secure))-->
+	<link rel="canonical" href="https://ytify.netlify.app/">
+	<link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
+	<link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
+	<link rel="apple-touch-icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
+	<link rel="manifest" href="manifest.webmanifest" />
 
-  <link defer rel="stylesheet" href="Stylesheets/main.css">
-  <link defer rel="stylesheet" href="Stylesheets/settings.css">
-  <link defer rel="stylesheet" href="Stylesheets/data.css">
-  <link defer rel="stylesheet" href="Stylesheets/player.css">
-  <link defer rel="stylesheet" href="Assets/Icons/remixicon.css">
-  
-  <script defer src="https://unpkg.com/color.js@1.2.0/dist/color.js"></script>
-  <script defer type="module" src="Scripts/main.js"></script>
-  <script defer type="module" src="Scripts/buttons.js"></script>
-  <script defer src="Scripts/service-worker.js"></script>
+	<link defer rel="stylesheet" href="Stylesheets/main.css">
+	<link defer rel="stylesheet" href="Stylesheets/player.css">
+	<link defer rel="stylesheet" href="Stylesheets/data.css">
+	<link defer rel="stylesheet" href="Assets/Icons/remixicon.css">
+
+	<script defer type="module" src="Scripts/main.js"></script>
+	<script defer type="module" src="Scripts/buttons.js"></script>
+	<script defer src="Scripts/service-worker.js"></script>
 
 </head>
 
 <body>
 
-  <div id="settingsContainer" class="hide">
+	<form netlify name='feedback' method='POST' class='hide'>
+		<input type="text" name="v5.7" id="formInput" />
+	</form>
 
-    <button type="button" id="themeButton">
-      <i class="ri-moon-fill"></i>
-      <p>Dark Mode</p>
-    </button>
+	<div id="dataContainer">
 
-    <button type="button" id="fullscreenButton">
-      <i class="ri-fullscreen-fill"></i>
-      <p>Fullscreen</p>
-    </button>
+		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
-    <button type="button" id="thumbnailButton">
-      <i class="ri-image-fill on"></i>
-      <p>Thumbnail</p>
-    </button>
+		<div id="metadata">
+			<br>
+			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
+			<br>
+			<a id="author" target="_blank">Paste it in the Input Box</a>
+			<select id="bitrateSelector"></select>
+		</div>
 
-    <button type="button" id="qualityButton">
-      <i class="ri-hq-fill"></i>
-      <p>High Quality</p>
-    </button>
+	</div>
 
-    <button type="button" onclick="localStorage.clear();location.replace(location.origin);">
-      <i class="ri-delete-bin-fill"></i>
-      <p>Clear Data</p>
-    </button>
+	<audio id="audio" data-seconds="0"></audio>
 
-    <button type="button" id="feedbackButton">
-      <i class="ri-feedback-fill"></i>
-      <p>Feedback</p>
-    </button>
+	<div id="playerContainer">
 
-  </div>
+		<div id="playerControls">
 
-  <form netlify name='feedback' method='POST' class='hide'>
-    <input type="text" name="v5.7" />
-  </form>
+			<button id="playButton" class="ri-stop-fill" data-state="1"></button>
 
-  <div id="dataContainer">
+			<select id="playSpeed">
+				<option value="0.25">0.25x</option>
+				<option value="0.50">0.50x</option>
+				<option value="0.75">0.75x</option>
+				<option value="1.00" selected>1.00x</option>
+				<option value="1.25">1.25x</option>
+				<option value="1.50">1.50x</option>
+				<option value="1.75">1.75x</option>
+				<option value="2.00">2.00x</option>
+				<option value="4.00">4.00x</option>
+			</select>
 
-    <img height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
+			<p id="currentDuration">00:00</p>
 
-    <div id="metadata">
-      <br>
-      <a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
-      <br>
-      <a id="author" target="_blank">Paste it in the Input Box</a>
-      <select id="bitrateSelector"></select>
-    </div>
+			<input type="range" min="0" max="100" value="0" id="progress" />
 
-  </div>
+			<p id="fullDuration">00:00</p>
 
-  <audio></audio>
+		</div>
 
-  <div id="playerContainer">
+		<div id="playerProfiles">
+			<!-- <settings buttons> -->
+			<button type="button" id="themeButton" class="hide">
+				<i class="ri-moon-fill" ></i>
+				<p>Dark Mode</p>
+			</button>
 
-    <div id="playerControls">
+			<button type="button" id="fullscreenButton" class="hide">
+				<i class="ri-fullscreen-fill" ></i>
+				<p>Fullscreen</p>
+			</button>
 
-      <button id="playButton" class="ri-stop-fill"></button>
+			<button type="button" id="thumbnailButton" class="hide">
+				<i class="ri-image-fill on"></i>
+				<p>Thumbnail</p>
+			</button>
 
-      <select id="playSpeed">
-        <option value="0.25">0.25x</option>
-        <option value="0.50">0.50x</option>
-        <option value="0.75">0.75x</option>
-        <option value="1.00" selected>1.00x</option>
-        <option value="1.25">1.25x</option>
-        <option value="1.50">1.50x</option>
-        <option value="1.75">1.75x</option>
-        <option value="2.00">2.00x</option>
-        <option value="4.00">4.00x</option>
-      </select>
+			<button type="button" id="qualityButton" class="hide">
+				<i class="ri-hq-fill"></i>
+				<p>High Quality</p>
+			</button>
+			<!-- </settings buttons> -->
+			<!-- <functions buttons> -->
+			<button type="button" id="seekBwdButton">
+				<i class="ri-rewind-mini-fill"></i>
+				<p>Backward</p>
+			</button>
 
-      <p id="currentDuration">00:00</p>
+			<button type="button" id="seekFwdButton">
+				<i class="ri-speed-mini-fill"></i>
+				<p>Forward</p>
+			</button>
 
-      <input type="range" min="0" max="100" value="0" id="progress" />
+			<button type="button" id="queueButton">
+				<i class="ri-play-list-add-fill" data-badge="0"></i>
+				<p>Queue</p>
+			</button>
 
-      <p id="fullDuration">00:00</p>
+			<button type="button" class="hide" id="queueNextButton">
+				<i class="ri-skip-forward-mini-fill"></i>
+				<p>Skip Next</p>
+			</button>
 
-    </div>
+			<button type="button" id="loopButton" data-state="">
+				<i class="ri-repeat-fill"></i>
+				<p>Loop</p>
+			</button>
 
-    <div id="playerProfiles">
+			<button type="button" id="settingsButton">
+				<i class="ri-settings-3-fill"></i>
+				<p>Settings</p>
+			</button>
 
-      <button type="button" id="seekBwdButton">
-        <i class="ri-rewind-mini-fill"></i>
-        <p>Backward</p>
-      </button>
+			<input id="inputUrl" type="url" placeholder="Input Link Here">
+			<!-- </functions buttons> -->
+			<!-- <settings buttons> -->
+			<button type="button" id="deleteButton" class="hide">
+				<i class="ri-delete-bin-fill"></i>
+				<p>Clear Data</p>
+			</button>
 
-      <button type="button" id="seekFwdButton">
-        <i class="ri-speed-mini-fill"></i>
-        <p>Forward</p>
-      </button>
+			<button type="button" id="feedbackButton" class="hide">
+				<i class="ri-feedback-fill"></i>
+				<p>Feedback</p>
+			</button>
+			<!-- </settings buttons> -->
+		</div>
 
-      <button type="button" id="queueButton">
-        <i class="ri-play-list-add-fill"></i>
-        <p>Queue</p>
-      </button>
+	</div>
 
-      <button type="button" class="hide" id="queueNextButton">
-        <i class="ri-skip-forward-mini-fill"></i>
-        <p>Skip Next</p>
-      </button>
-
-      <button type="button" id="loopButton">
-        <i class="ri-repeat-fill"></i>
-        <p>Loop</p>
-      </button>
-
-      <button type="button" id="settingsButton">
-        <i class="ri-settings-3-fill"></i>
-        <p>Settings</p>
-      </button>
-
-      <input type="url" placeholder="Input Link Here">
-    </div>
-
-  </div>
-
-  <footer>
-    <a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.7, a
-    <a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
-  </footer>
+	<footer>
+		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.8, a
+		<a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
+	</footer>
 </body>
 
 </html>
