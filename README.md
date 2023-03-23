@@ -24,10 +24,12 @@ data consumption. It also provides a smooth and personalised user experience wit
 
 
 ## Getting Started 🖼
-To use ytify, simply navigate to our website, paste a youtube link, and press play!
 
 <p align="center">
 <img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_home.webp" width="40%">
+
+To use ytify, simply navigate to our website, paste a youtube link, and press play!
+
 <img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_playing.webp" width="75%">
 
 <details>
