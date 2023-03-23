@@ -25,8 +25,14 @@ data consumption. It also provides a smooth and personalised user experience wit
 
 ## Getting Started 🖼
 To use ytify, simply navigate to our website, paste a youtube link, and press play!
-Take a look at some Screenshots here ->
+
 <p align="center">
+<img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_home.webp" width="40%">
+<img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_playing.webp" width="75%">
+
+<details>
+<summary>More Screenshots (requires Avif support)</summary>
+
   <img src="Assets/Screenshots/landscape_dark-mode.avif" width="45%">
   <img src="Assets/Screenshots/landscape_light-mode.avif" width="45%">
   <img src="Assets/Screenshots/portrait_light-mode.avif" width="30%">
@@ -37,8 +43,9 @@ Take a look at some Screenshots here ->
   <img src="Assets/Screenshots/landscape_thoughts.avif" width="90%">
   <img src="Assets/Screenshots/landscape_trends.avif" width="45%">
   <img src="Assets/Screenshots/landscape_music.avif" width="45%">
-</p>
 
+</details>
+</p>
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)
