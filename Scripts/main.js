@@ -146,8 +146,11 @@ const queueFx = () => {
 	if (queue) queueCount = 0;
 	queueNextButton.classList.toggle('hide');
 	queueButton.firstElementChild.classList.toggle('on');
-	loopButton.classList.toggle('hide')
+	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
+	loopButton.dataset.state ?
+		loopButton.dataset.state = '':
+		loopButton.dataset.state = '1';
 }
 queueButton.addEventListener('click', queueFx);
 
