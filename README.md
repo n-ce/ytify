@@ -1,8 +1,5 @@
 <div align="center">
-
- # 💠 [YTIFY](https://ytify.netlify.app) 💠 
- 
- <img src="Assets/ytify_thumbnail_max.webp" width="60%">
+ <a href="https://ytify.netlify.app"><img src="Assets/ytify_thumbnail_max.webp" width="70%"></a>
 </div>
 
 ## Table of Contents
@@ -27,16 +24,12 @@ data consumption. It also provides a smooth and personalised user experience wit
 
 <p align="center">
 
-<img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_home.webp" width="40%"/>
+<img src="https://github.com/n-ce/ytify/blob/main/Assets/Screenshots/ytify_screenshot_home.webp" width="40%"/>
 
-```
-Simply navigate to the ytify
-website, paste a youtube link,
-and it will start playing.
-```
+Simply navigate to the ytify website, paste a youtube link, and it will start playing.
 </p>
 <p align="center">
-<img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_playing.webp" width="75%"/>
+<img src="https://github.com/n-ce/ytify/blob/main/Assets/Screenshots/ytify_screenshot_playing.webp" width="75%"/>
 </p>
 <details>
 <summary>More Screenshots (requires Avif support)</summary>
