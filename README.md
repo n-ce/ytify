@@ -2,7 +2,7 @@
 
  # 💠 [YTIFY](https://ytify.netlify.app) 💠 
  
- <img src="Assets/default_thumbnail.avif" width="60%">
+ <img src="Assets/ytify_thumbnail_max.webp" width="60%">
 </div>
 
 ## Table of Contents
@@ -24,10 +24,24 @@ data consumption. It also provides a smooth and personalised user experience wit
 
 
 ## Getting Started 🖼
-To use ytify, simply navigate to our website, paste a youtube link, and press play!
-Take a look at some Screenshots here ->
+
 <p align="center">
-  <img src="Assets/Screenshots/landscape_dark-mode.avif" width="45%">
+
+<img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_home.webp" width="40%"/>
+
+```
+Simply navigate to the ytify
+website, paste a youtube link,
+and it will start playing.
+```
+</p>
+<p align="center">
+<img src="https://github.com/n-ce/ytify/blob/n-ce-patch-1/Assets/Screenshots/ytify_screenshot_playing.webp" width="75%"/>
+</p>
+<details>
+<summary>More Screenshots (requires Avif support)</summary>
+<p align="center">
+  <img src="Assets/Screenshots/landscape_dark-mode.avif" width="45%"/>
   <img src="Assets/Screenshots/landscape_light-mode.avif" width="45%">
   <img src="Assets/Screenshots/portrait_light-mode.avif" width="30%">
   <img src="Assets/Screenshots/portrait_dark-mode.avif" width="30%">
@@ -38,6 +52,7 @@ Take a look at some Screenshots here ->
   <img src="Assets/Screenshots/landscape_trends.avif" width="45%">
   <img src="Assets/Screenshots/landscape_music.avif" width="45%">
 </p>
+</details>
 
 
 ## Acknowledgements 🙏

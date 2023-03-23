@@ -78,7 +78,7 @@ img.addEventListener('load', themer);
 
 
 if (!params.get('s') && !params.get('text'))
-	img.src = 'Assets/default_thumbnail.avif';
+	img.src = 'Assets/ytify_thumbnail_min.webp';
 
 
 const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
