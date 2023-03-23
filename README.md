@@ -2,7 +2,7 @@
 
  # 💠 [YTIFY](https://ytify.netlify.app) 💠 
  
- <img src="Assets/default_thumbnail.avif" width="60%">
+ <img src="Assets/ytify_thumbnail_max.webp" width="60%">
 </div>
 
 ## Table of Contents
