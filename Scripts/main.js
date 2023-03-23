@@ -1,21 +1,5 @@
-import {
-	setMetadata,
-	streamID,
-	playlistID,
-	getSaved,
-	save,
-	params
-} from './lib/functions.js';
-
-import {
-	bitrateSelector,
-	audio,
-	inputUrl,
-	playButton,
-	queueButton,
-	queueNextButton,
-	loopButton
-} from './lib/DOM.js';
+import {setMetadata,streamID,playlistID,getSaved,save,params} from './lib/functions.js';
+import {bitrateSelector,audio,inputUrl,playButton,queueButton,queueNextButton,loopButton} from './lib/DOM.js';
 
 let instance = 0;
 let queueCount = 0;
@@ -148,9 +132,7 @@ const queueFx = () => {
 	queueButton.firstElementChild.classList.toggle('on');
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
-	loopButton.dataset.state ?
-		loopButton.dataset.state = '':
-		loopButton.dataset.state = '1';
+	loopButton.dataset.state = '';
 }
 queueButton.addEventListener('click', queueFx);
 
