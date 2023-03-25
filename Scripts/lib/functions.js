@@ -81,8 +81,8 @@ if (!params.get('s') && !params.get('text'))
 	img.src = 'Assets/ytify_thumbnail_min.webp';
 
 
-const socialPreviewImage = document.head.children.namedItem('og:image');
-const socialPreviewTitle = document.head.children.namedItem('og:title');
+const socialPreviewImage = document.getElementById('socialPreviewImage');
+const socialPreviewTitle = document.getElementById('socialPreviewTitle');
 
 const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
 
@@ -97,7 +97,7 @@ const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
 
 	document.title = streamName + ' - ytify';
 	socialPreviewTitle.content = streamName;
-		socialPreviewImage.content = thumbnail;
+	socialPreviewImage.content = thumbnail;
 
 	if ('mediaSession' in navigator)
 		navigator.mediaSession.metadata = new MediaMetadata({
