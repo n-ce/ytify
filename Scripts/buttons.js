@@ -1,19 +1,14 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS } from './lib/functions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, cssVar, tabColor } from './lib/DOM.js';
-
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img } from './lib/DOM.js';
 
 // settings panel toggle
 
 settingsButton.addEventListener('click', () => {
-		[themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl
-		].map(e => e.classList.toggle('hide'));
 
-	if (queueButton.firstElementChild.classList[1] === 'on') {
-		loopButton.classList.toggle('hide');
-		queueNextButton.classList.toggle('hide');
-	}
+ [themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, queueButton.firstElementChild.classList.length === 2 ? queueNextButton : loopButton, inputUrl]
+	.map(e => e.classList.toggle('hide'));
+
 });
-
 
 
 // Theme toggle
@@ -88,14 +83,14 @@ qualityButton.addEventListener('click', () => {
 deleteButton.addEventListener('click', () => {
 	localStorage.clear();
 	location.replace(location.origin);
-})
+});
 
 // Feedback Button
 
 feedbackButton.addEventListener('click', async () => {
 	formInput.value = await prompt('Enter your feedback (bugs, feature requests) here:');
 	if (formInput.value) document.forms[0].submit();
-})
+});
 
 
 
@@ -200,7 +195,5 @@ audio.addEventListener('loadedmetadata', () => {
 
 loopButton.addEventListener('click', () => {
 	loopButton.firstElementChild.classList.toggle('on');
-	loopButton.dataset.state ?
-		loopButton.dataset.state = '' :
-		loopButton.dataset.state = '1';
+	audio.loop = !audio.loop;
 });

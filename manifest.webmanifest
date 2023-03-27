@@ -1,6 +1,7 @@
 {
   "short_name": "ytify",
-  "name":"Share links From YouTube & enjoy a free background audio experience.",
+  "name": "audio streaming with ytify",
+  "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
   "icons": [
     {
       "src": "Assets/maskable_icon_x192.png",
@@ -28,5 +29,4 @@
       "url": "url"
     }
   }
-
 }

@@ -37,7 +37,7 @@ const themer = () => {
 	const context = canvas.getContext('2d');
 
 	const canvasImg = new Image();
-	
+
 	canvasImg.onload = () => new Promise((resolve, reject) => {
 			canvas.height = canvasImg.height;
 			canvas.width = canvasImg.width;
@@ -45,8 +45,11 @@ const themer = () => {
 			resolve(context.getImageData(0, 0, canvasImg.width, canvasImg.height).data);
 		})
 		.then(data => {
-			
-			// this data processing algorithm was taken from
+
+			/* this [r-g-b from raw data] processing 
+			algorithm was taken from color.js,
+			https://github.com/luukdv/color.js */
+
 			const amount = data.length / 40;
 			const rgb = { r: 0, g: 0, b: 0 };
 			for (let i = 0; i < data.length; i += 40) {
@@ -56,8 +59,7 @@ const themer = () => {
 			}
 			const list = [[Math.round(rgb.r / amount), Math.round(rgb.g / amount), Math.round(rgb.b / amount)]].map(val => Array.isArray(val) ? val : val.split(',').map(Number));
 			const [r, g, b] = list.length === 1 ? list[0] : list;
-			// color.js, https://github.com/luukdv/color.js
-			
+
 			(r + g + b) > 85 || !r ?
 				palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})` :
 				palette['light'].bg = palette['dark'].border = `rgb(${r+34},${g+34},${b+34})`;
@@ -68,7 +70,7 @@ const themer = () => {
 			cssVar('--accent', palette[theme].accent);
 			cssVar('--text', palette[theme].text);
 			cssVar('--border', palette[theme].border);
-			tabColor.setAttribute("content", palette[theme].bg);
+			tabColor.content = palette[theme].bg;
 		});
 	canvasImg.crossOrigin = '';
 	canvasImg.src = img.src;
@@ -86,7 +88,7 @@ const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
 	img.dataset.src ?
 		img.dataset.src = thumbnail :
 		img.src = thumbnail;
-			
+
 	title.href = `https://youtube.com/watch?v=${id}`;
 	title.textContent = streamName;
 	author.href = `https://youtube.com${authorUrl}`;

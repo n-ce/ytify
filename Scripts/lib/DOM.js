@@ -1,56 +1,27 @@
-const settingsButton = document.getElementById('settingsButton');
-const themeButton = document.getElementById('themeButton');
-const fullscreenButton = document.getElementById('fullscreenButton');
-const thumbnailButton = document.getElementById('thumbnailButton');
-const qualityButton = document.getElementById('qualityButton');
-const deleteButton = document.getElementById('deleteButton');
-const feedbackButton = document.getElementById('feedbackButton');
-const seekBwdButton = document.getElementById('seekBwdButton');
-const seekFwdButton = document.getElementById('seekFwdButton');
-const queueButton = document.getElementById('queueButton');
-const queueNextButton = document.getElementById('queueNextButton');
-const loopButton = document.getElementById('loopButton');
-const inputUrl = document.getElementById('inputUrl');
-const formInput = document.getElementById('formInput');
-const bitrateSelector = document.getElementById('bitrateSelector');
-const audio = document.getElementById('audio');
-const playButton = document.getElementById('playButton');
-const playSpeed = document.getElementById('playSpeed');
-const progress = document.getElementById('progress');
-const currentDuration = document.getElementById('currentDuration');
-const fullDuration = document.getElementById('fullDuration');
-const x = document.documentElement.style;
-const cssVar = x.setProperty.bind(x);
-const tabColor = document.getElementById('tabColor');
-const img = document.getElementById('img');
-const title = document.getElementById('title');
-const author = document.getElementById('author');
-
-export {
-	settingsButton,
-	themeButton,
-	fullscreenButton,
-	thumbnailButton,
-	qualityButton,
-	deleteButton,
-	feedbackButton,
-	seekBwdButton,
-	seekFwdButton,
-	queueButton,
-	queueNextButton,
-	loopButton,
-	inputUrl,
-	formInput,
-	bitrateSelector,
-	audio,
-	playButton,
-	playSpeed,
-	progress,
-	currentDuration,
-	fullDuration,
-	cssVar,
-	tabColor,
-	img,
-	title,
-	author
-};
+export const settingsButton = document.getElementById('settingsButton');
+export const themeButton = document.getElementById('themeButton');
+export const fullscreenButton = document.getElementById('fullscreenButton');
+export const thumbnailButton = document.getElementById('thumbnailButton');
+export const qualityButton = document.getElementById('qualityButton');
+export const deleteButton = document.getElementById('deleteButton');
+export const feedbackButton = document.getElementById('feedbackButton');
+export const seekBwdButton = document.getElementById('seekBwdButton');
+export const seekFwdButton = document.getElementById('seekFwdButton');
+export const queueButton = document.getElementById('queueButton');
+export const queueNextButton = document.getElementById('queueNextButton');
+export const loopButton = document.getElementById('loopButton');
+export const inputUrl = document.getElementById('inputUrl');
+export const formInput = document.getElementById('formInput');
+export const bitrateSelector = document.getElementById('bitrateSelector');
+export const audio = document.getElementById('audio');
+export const playButton = document.getElementById('playButton');
+export const playSpeed = document.getElementById('playSpeed');
+export const progress = document.getElementById('progress');
+export const currentDuration = document.getElementById('currentDuration');
+export const fullDuration = document.getElementById('fullDuration');
+       const x = document.documentElement.style;
+export const cssVar = x.setProperty.bind(x);
+export const tabColor = document.head.children.namedItem('theme-color');
+export const img = document.getElementById('img');
+export const title = document.getElementById('title');
+export const author = document.getElementById('author');

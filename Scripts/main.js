@@ -1,13 +1,13 @@
-import {setMetadata,streamID,playlistID,getSaved,save,params} from './lib/functions.js';
-import {bitrateSelector,audio,inputUrl,playButton,queueButton,queueNextButton,loopButton} from './lib/DOM.js';
+import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib/functions.js';
+import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton } from './lib/DOM.js';
 
 let instance = 0;
 let queueCount = 0;
 let queueNow = 1;
-let oldURL;
+let previous_ID;
 let queue = false;
 // const queueList = new Map();
-const array = [];
+const queueArray = [];
 const api = [
   'https://pipedapi.kavin.rocks/',
   'https://watchapi.whatever.social',
@@ -17,7 +17,9 @@ const api = [
   'https://pipedapi.moomoo.me/'
   ];
 
-const play = (id) => {
+
+
+const play = id => {
 	fetch(api[instance] + 'streams/' + id)
 		.then(res => res.json())
 		.then(data => {
@@ -61,10 +63,9 @@ const play = (id) => {
 				urls = urls.concat(m4aUrls);
 			}
 
-			let index = 0;
-			getSaved('quality') ?
-				index = bitrates.indexOf(Math.max(...bitrates)) :
-				index = bitrates.indexOf(Math.min(...bitrates));
+			const index = getSaved('quality') ?
+				bitrates.indexOf(Math.max(...bitrates)) :
+				bitrates.indexOf(Math.min(...bitrates));
 
 			audio.src = urls[index];
 
@@ -89,11 +90,11 @@ const play = (id) => {
 
 // next track 
 const next = () => {
-	if ((queueCount - queueNow) > -1) {
-		play(array[queueNow]);
-		queueButton.firstElementChild.dataset.badge = queueCount - queueNow;
-		queueNow++;
-	}
+	if ((queueCount - queueNow) < 0) return;
+
+	play(queueArray[queueNow]);
+	queueButton.firstElementChild.dataset.badge = queueCount - queueNow;
+	queueNow++;
 }
 
 
@@ -102,22 +103,16 @@ const next = () => {
 const queueIt = id => {
 	queueCount++;
 	queueButton.firstElementChild.dataset.badge = queueCount - queueNow + 1;
-	array[queueCount] = oldURL = id;
+	queueArray[queueCount] = previous_ID = id;
 }
 
 // playback on end strategy
 audio.addEventListener('ended', () => {
-	if (queue)
-		next(); // queue = on
-	else { // queue = off
-
-		if (loopButton.dataset.state) // loop = on
-			audio.play();
-		else { // loop = off
-			playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
-			playButton.dataset.state = '1';
-		}
-
+	if (queue) {
+		next();
+	} else {
+		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
+		playButton.dataset.state = '1'
 	}
 })
 
@@ -127,19 +122,21 @@ audio.addEventListener('ended', () => {
 
 const queueFx = () => {
 	queue = !queue;
-	if (queue) queueCount = 0;
+	queue ?
+		queueCount = 0 :
+		queueButton.firstElementChild.dataset.badge = 0;
 	queueNextButton.classList.toggle('hide');
 	queueButton.firstElementChild.classList.toggle('on');
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
-	loopButton.dataset.state = '';
+	audio.loop = false;
 }
 queueButton.addEventListener('click', queueFx);
 
 queueNextButton.addEventListener('click', next);
 
 
-const playlistLoad = (id) => {
+const playlistLoad = id => {
 	fetch(api[instance] + 'playlists/' + id)
 		.then(res => res.json())
 		.then(data => {
@@ -175,13 +172,13 @@ const validator = (val) => {
 		queue ? queueIt(pID) : playlistLoad(pID);
 
 	// so that it does not run again for the same link
-	oldURL = val;
+	previous_ID = pID || sID;
 }
 
 // input text player
 
 inputUrl.addEventListener('input', () => {
-	if (oldURL != inputUrl.value)
+	if (!inputUrl.value.includes(previous_ID))
 		validator(inputUrl.value);
 });
 
