@@ -38,17 +38,27 @@ img {
   font-weight: bold;
 }
 
-#author {
-  font-size: 0.7rem;
+@media (min-width:1650px) {
+  #title {
+    font-size: 3.5rem;
+  }
+
+  #author,
+  #bitrateSelector {
+    font-size: 1.7rem;
+    line-height: 3;
+  }
 }
 
-#metadata a{
-  text-decoration:none;
+
+
+#metadata a {
+  text-decoration: none;
   color: inherit;
 }
 
 #bitrateSelector {
-  font-size: 0.7rem;
+  /* font-size: 0.7rem; */
   color: inherit;
   border: none;
   background: none;
@@ -68,11 +78,33 @@ img {
     height: 22.5vw;
   }
 
+  /* #title {
+    font-size: 3rem;
+  } */
+
+
+}
+
+@media (min-width:1220px) and (max-width:1650px) {
   #title {
-    font-size: 1.5rem;
+    font-size: 2.5rem;
   }
 
-  #author,#bitrateSelector {
-    font-size: 0.9rem;
+  #author,
+  #bitrateSelector {
+    font-size: 1.2rem;
+    line-height: 3;
+  }
+}
+
+@media (min-width:600px) and (max-width:1220px) {
+  #title {
+    font-size: 1.3rem;
+  }
+
+  #author,
+  #bitrateSelector {
+    font-size: 1rem;
+    line-height: 3;
   }
 }
