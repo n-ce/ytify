@@ -48,7 +48,6 @@
 
 #playerProfiles {
   display: -webkit-box;
-  display: -ms-grid;
   -webkit-box-pack: justify;
   -webkit-box-align: center;
   -ms-grid-row-align: center;
