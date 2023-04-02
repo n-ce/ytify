@@ -50,16 +50,22 @@ const themer = () => {
 			algorithm was taken from color.js,
 			https://github.com/luukdv/color.js */
 
-			const amount = data.length / 40;
-			const rgb = { r: 0, g: 0, b: 0 };
-			for (let i = 0; i < data.length; i += 40) {
-				rgb.r += data[i];
-				rgb.g += data[i + 1];
-				rgb.b += data[i + 2];
+			const len = data.length;
+			const nthPixel = 40;
+			let r = 0;
+			let g = 0;
+			let b = 0;
+			for (let i = 0; i < len; i += nthPixel) {
+				r += data[i];
+				g += data[i + 1];
+				b += data[i + 2];
 			}
-			const list = [[Math.round(rgb.r / amount), Math.round(rgb.g / amount), Math.round(rgb.b / amount)]].map(val => Array.isArray(val) ? val : val.split(',').map(Number));
-			const [r, g, b] = list.length === 1 ? list[0] : list;
-
+			
+			const amount = len / nthPixel;
+			r = Math.round(r / amount);
+			g = Math.round(g / amount);
+			b = Math.round(b / amount);
+			
 			(r + g + b) > 85 || !r ?
 				palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})` :
 				palette['light'].bg = palette['dark'].border = `rgb(${r+34},${g+34},${b+34})`;
