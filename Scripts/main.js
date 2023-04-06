@@ -79,10 +79,12 @@ const play = id => {
 			history.pushState({}, '', '?' + params);
 		})
 		.catch(err => {
-			instance < api.length - 1 ?
-				play(id) :
-				alert(err);
 			instance++;
+			if (instance >= api.length) {
+				alert(err);
+				return;
+			}
+			play(id);
 		});
 }
 
@@ -151,16 +153,19 @@ const playlistLoad = id => {
 				queueIt(i.url.slice(9));
 		})
 		.catch(err => {
-			instance < api.length - 1 ?
-				playlistLoad(id) :
-				alert(err);
 			instance++;
+			if (instance >= api.length) {
+				alert(err);
+				return;
+			}
+			playlistLoad(id);
 		});
 	params.set('p', id);
 	history.pushState({}, '', '?' + params);
 
 }
 
+// link validator
 
 const validator = (val) => {
 	const pID = playlistID(val);
