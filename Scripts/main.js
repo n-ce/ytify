@@ -1,26 +1,64 @@
 import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib/functions.js';
-import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton } from './lib/DOM.js';
+import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer } from './lib/DOM.js';
 
-let instance = 0;
+fetch('https://piped-instances.kavin.rocks')
+	.then(res => res.json())
+	.then(data => sessionStorage.setItem('apis', JSON.stringify(data.map(e => e.api_url))));
+const api = JSON.parse(sessionStorage.getItem('apis')) || ['https://pipedapi.kavin.rocks'];
+
+let instance = 2;
 let queueCount = 0;
 let queueNow = 1;
 let previous_ID;
 let queue = false;
 // const queueList = new Map();
 const queueArray = [];
-const api = [
-  'https://pipedapi.kavin.rocks/',
-  'https://watchapi.whatever.social',
-  'https://pipedapi.tokhmi.xyz/',
-  'https://pipedapi.syncpundit.io/',
-  'https://piped-api.garudalinux.org',
-  'https://pipedapi.moomoo.me/'
-  ];
 
+const subtitleContainer = document.getElementById('captions');
+const ccBtn = document.getElementById('subtitleButton');
+
+if (getSaved('subtitles'))
+	ccBtn.firstElementChild.classList.add('on');
+
+ccBtn.addEventListener('click', () => {
+	getSaved('subtitles') ?
+		localStorage.removeItem('subtitles') :
+		save('subtitles', 'on');
+	ccBtn.firstElementChild.classList.toggle('on');
+	subtitleContainer.classList.toggle('hide');
+})
+
+function initTTML() {
+	const myTrack = audio.textTracks[0];
+	const ttmlUrl = audio.firstElementChild.src;
+	myTrack.mode = "hidden";
+
+	fetch(ttmlUrl)
+		.then(res => res.text())
+		.then(text => {
+			const imscDoc = imsc.fromXML(text);
+			const timeEvents = imscDoc.getMediaTimeEvents();
+			for (let i = 0; i < timeEvents.length; i++) {
+				const myCue = new VTTCue(timeEvents[i], (i < (timeEvents.length - 1)) ? timeEvents[i + 1] : audio.duration, "");
+
+				function clearSubFromScreen() {
+					const subtitleActive = subtitleContainer.getElementsByTagName("div")[0];
+					if (subtitleActive)
+						subtitleContainer.removeChild(subtitleActive);
+				}
+				myCue.onenter = () => {
+					clearSubFromScreen();
+					imsc.renderHTML(imsc.generateISD(imscDoc, myCue.startTime), subtitleContainer, '', '4rem');
+				};
+				myCue.onexit = clearSubFromScreen();
+				let r = myTrack.addCue(myCue);
+			}
+		});
+}
 
 
 const play = id => {
-	fetch(api[instance] + 'streams/' + id)
+	fetch(api[instance] + '/streams/' + id)
 		.then(res => res.json())
 		.then(data => {
 
@@ -32,10 +70,13 @@ const play = id => {
 				data.uploaderUrl
 			);
 
+
 			if (data.audioStreams.length === 0) {
 				alert('NO AUDIO STREAMS AVAILABLE.');
 				return;
 			}
+
+
 			// extracting opus streams and storing m4a streams
 			let bitrates = [];
 			let urls = [];
@@ -69,20 +110,45 @@ const play = id => {
 
 			audio.src = urls[index];
 
+			if (data.subtitles.length !== 0 && getSaved('subtitles')) {
+				audio.firstElementChild.src = data.subtitles[0].url;
+				initTTML();
+			}
 			audio.dataset.seconds = 0;
 
 			bitrateSelector.selectedIndex = index;
 
 			playButton.classList.replace(playButton.classList[0], 'spinner');
 
+
+			// setting related streams
+			
+			relatedStreamsContainer.innerHTML = '';
+
+			for (const stream of data.relatedStreams) {
+				const listItem = document.createElement('list-item');
+				listItem.textContent = stream.title;
+				listItem.dataset.author = stream.uploaderName;
+				listItem.addEventListener('click', () => {
+					queue ?
+						queueIt(stream.url.slice(9)) :
+						play(stream.url.slice(9));
+				});
+				listItem.dataset.thumbnail = stream.thumbnail;
+				relatedStreamsContainer.appendChild(listItem);
+			}
+
 			params.set('s', id);
 			history.pushState({}, '', '?' + params);
 		})
 		.catch(err => {
-			instance < api.length - 1 ?
-				play(id) :
-				alert(err);
 			instance++;
+			console.log(err)
+			if (instance >= api.length) {
+				alert(err);
+				return;
+			}
+			play(id);
 		});
 }
 
@@ -137,7 +203,7 @@ queueNextButton.addEventListener('click', next);
 
 
 const playlistLoad = id => {
-	fetch(api[instance] + 'playlists/' + id)
+	fetch(api[instance] + '/playlists/' + id)
 		.then(res => res.json())
 		.then(data => {
 			queueFx();

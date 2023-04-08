@@ -1,11 +1,12 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS } from './lib/functions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img } from './lib/DOM.js';
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer } from './lib/DOM.js';
+
 
 // settings panel toggle
 
 settingsButton.addEventListener('click', () => {
 
- [themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, queueButton.firstElementChild.classList.length === 2 ? queueNextButton : loopButton, inputUrl]
+ [themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, queueButton.firstElementChild.classList.length === 2 ? queueNextButton : loopButton, relatedStreamsButton, subtitleButton]
 	.map(e => e.classList.toggle('hide'));
 
 });
@@ -47,10 +48,10 @@ let thumbnail = true;
 thumbnailButton.addEventListener('click', () => {
 
 	if (thumbnail)
-		img.dataset.src = img.src;
+		sessionStorage.setItem('img', img.src);
 	else {
-		img.src = img.dataset.src;
-		img.dataset.src = '';
+		img.src = sessionStorage.getItem('img');
+		sessionStorage.removeItem('img');
 	}
 	thumbnail = !thumbnail;
 	thumbnailButton.firstElementChild.classList.toggle('on');
@@ -196,4 +197,21 @@ audio.addEventListener('loadedmetadata', () => {
 loopButton.addEventListener('click', () => {
 	loopButton.firstElementChild.classList.toggle('on');
 	audio.loop = !audio.loop;
+});
+
+// streams service button
+
+const relatedStreamsButton = document.getElementById('relatedStreamsButton')
+const dataContainer = document.getElementById('dataContainer');
+
+relatedStreamsButton.addEventListener('click', () => {
+	dataContainer.classList.toggle('show');
+	dataContainer.classList.toggle('hide');
+	relatedStreamsContainer.classList.toggle('list-show');
+
+	relatedStreamsButton.firstElementChild.classList.toggle('on');
+
+	sessionStorage.getItem('streams') ?
+		sessionStorage.removeItem('streams') :
+		sessionStorage.setItem('streams', 'on');
 });

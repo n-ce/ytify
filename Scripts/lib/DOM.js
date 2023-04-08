@@ -25,3 +25,5 @@ export const tabColor = document.head.children.namedItem('theme-color');
 export const img = document.getElementById('img');
 export const title = document.getElementById('title');
 export const author = document.getElementById('author');
+export const relatedStreamsContainer = document.getElementById('relatedStreamsContainer');
+			

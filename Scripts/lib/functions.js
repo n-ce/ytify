@@ -1,5 +1,6 @@
 import { cssVar, tabColor, img, title, author } from './DOM.js';
 
+
 const params = (new URL(document.location)).searchParams;
 
 const save = localStorage.setItem.bind(localStorage);
@@ -26,8 +27,8 @@ const palette = {
 	'dark': {
 		bg: '#000',
 		accent: '#000',
-		text: '#fff',
-		border: 'none'
+		text: '#fffb',
+		border: '#fff7'
 	}
 };
 
@@ -60,11 +61,15 @@ const themer = () => {
 			const list = [[Math.round(rgb.r / amount), Math.round(rgb.g / amount), Math.round(rgb.b / amount)]].map(val => Array.isArray(val) ? val : val.split(',').map(Number));
 			const [r, g, b] = list.length === 1 ? list[0] : list;
 
-			(r + g + b) > 85 || !r ?
-				palette['light'].bg = palette['dark'].border = `rgb(${r},${g},${b})` :
-				palette['light'].bg = palette['dark'].border = `rgb(${r+34},${g+34},${b+34})`;
 
 			const theme = getSaved('theme') ? 'dark' : 'light';
+
+			palette['dark'].border =
+				palette['light'].bg =
+				(r + g + b) > 85 || !r ?
+				`rgb(${r},${g},${b})` :
+				`rgb(${r+34},${g+34},${b+34})`;
+
 
 			cssVar('--bg', palette[theme].bg);
 			cssVar('--accent', palette[theme].accent);
@@ -85,8 +90,8 @@ if (!params.get('s') && !params.get('text'))
 
 const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
 
-	img.dataset.src ?
-		img.dataset.src = thumbnail :
+	sessionStorage.getItem('img') ?
+		sessionStorage.setItem('img', thumbnail) :
 		img.src = thumbnail;
 
 	title.href = `https://youtube.com/watch?v=${id}`;
@@ -125,6 +130,8 @@ const convertSStoHHMMSS = (seconds) => {
 		`${hh}:${mm}:${ss}` :
 		`${mm}:${ss}`;
 }
+
+
 
 export {
 	params,

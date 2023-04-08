@@ -54,12 +54,6 @@ Simply clone this repository and set up index.html as default run command.
 As this is a vanillaJS project, There are no build tools required other than a modern browser.
 For JavaScript runtime based development, like in Node.js , ES6 modules might have to be rewritten in commonjs format.
 
-- ** SVL** : 
-  - <Major.Minor> : Semantic Versioning Lite is an unofficial minimal versioning system based off the standard Semantic Versioning system.
-  - Major versioning updates when large refactoring and or heavy design change is applied.
-  - Minor versioning updates when there are bunch of changes and additions being made internally and or a design change has been made externally.
-  - No updates are considered for minimal changes : no perfomance change, no significant design change or coding structure change. However in some cases internally a build number may be maintained like <Major.minor.build_no>.
-
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)

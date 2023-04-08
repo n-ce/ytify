@@ -1,180 +1,165 @@
 #playerContainer {
-  padding: 0.3rem;
-  background-color: var(--accent);
-  border: 0.1px solid var(--border);
-  -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-  box-shadow: 0 0.1rem 0.3rem #0003;
-  border-radius: 0.7rem;
+	padding: 0.3rem;
+	background-color: var(--accent);
+	border: 0.1px solid var(--border);
+	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	border-radius: 0.7rem;
 }
 
 
 #playerControls {
-  display: flex;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  align-items: center;
+	display: flex;
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .spinner::after {
-  content: "";
-  width: 1rem;
-  height: 1rem;
-  border: 0.2rem solid transparent;
-  border-top-color: var(--border);
-  border-radius: 50%;
-  animation: spinner 1s ease-out infinite;
+	content: "";
+	width: 1rem;
+	height: 1rem;
+	border: 0.2rem solid transparent;
+	border-top-color: var(--border);
+	border-radius: 50%;
+	animation: spinner 1s ease-out infinite;
 }
 
 @keyframes spinner {
-  from {
-    transform: rotate(0turn)
-  }
-  to {
-    transform: rotate(1turn)
-  }
+	from {
+		transform: rotate(0turn)
+	}
+
+	to {
+		transform: rotate(1turn)
+	}
 }
 
 
 
 #playSpeed {
-  color: var(--border);
-  border: none;
-  background: none;
-  outline: none;
+	color: var(--border);
+	border: none;
+	background: none;
+	outline: none;
 }
 
 #playerProfiles {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
 }
 
 #currentDuration,
 #fullDuration {
-  color: var(--border);
-  font-size: 0.7rem;
-  padding: 0.3rem;
+	color: var(--border);
+	font-size: 0.7rem;
+	padding: 0.3rem;
 }
 
 #queueButton i {
-  min-width: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	min-width: 3rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 [data-badge]:after {
-  font-family: 'Noto Sans';
-  content: attr(data-badge);
-  font-size: 1rem;
-  font-weight: bold;
-  -webkit-transition: background 0.5s, color 1s;
-  -o-transition: background 0.5s, color 1s;
-  transition: background 0.5s, color 1s;
+	font-family: 'Noto Sans';
+	content: attr(data-badge);
+	font-size: 1rem;
+	font-weight: bold;
+	-webkit-transition: background 0.5s, color 1s;
+	-o-transition: background 0.5s, color 1s;
+	transition: background 0.5s, color 1s;
 }
 
 [data-badge^="-"]:after,
 [data-badge=""]:after,
 [data-badge="0"]:after {
-  display: none;
+	display: none;
 }
 
-input[type="url"] {
-  height: 3.55rem;
-  width: 5.8rem;
-
-  background-color: var(--accent);
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-  box-shadow: 0 0.1rem 0.3rem #0003;
-  color: var(--text);
-
-  font-family: 'Noto Sans';
-  outline: none;
-  text-align: center;
-  font-weight: bold;
-}
 
 @media (min-width:600px) {
-  #playerContainer {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-  }
+	#playerContainer {
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+	}
 }
 
 
 input[type="range"] {
-  -webkit-appearance: none;
-  background-color: transparent;
-  width: calc(100% - 12rem);
-  cursor: pointer;
+	-webkit-appearance: none;
+	background-color: transparent;
+	width: calc(100% - 12rem);
+	cursor: pointer;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 0.5rem;
-  background-color: var(--accent);
-  border-radius: 1rem;
-  border: 0.1rem solid var(--border);
+	-webkit-appearance: none;
+	width: 100%;
+	height: 0.5rem;
+	background-color: var(--accent);
+	border-radius: 1rem;
+	border: 0.1rem solid var(--border);
 }
 
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  height: 1rem;
-  width: 1rem;
-  background-color: var(--accent);
-  border: 0.1rem solid var(--border);
-  border-radius: 1rem;
-  margin-top: -0.35rem
+	-webkit-appearance: none;
+	height: 1rem;
+	width: 1rem;
+	background-color: var(--accent);
+	border: 0.1rem solid var(--border);
+	border-radius: 1rem;
+	margin-top: -0.35rem
 }
 
 input[type="range"]::-moz-range-progress,
 input[type="range"]::-moz-range-track {
-  background-color: var(--accent);
-  height: 0.5rem;
-  border-radius: 1rem;
-  border: solid 0.1rem var(--border);
+	background-color: var(--accent);
+	height: 0.5rem;
+	border-radius: 1rem;
+	border: solid 0.1rem var(--border);
 }
 
 input[type="range"]::-moz-range-thumb {
-  height: 1rem;
-  width: 1rem;
-  background-color: var(--accent);
-  border: solid 0.1rem var(--border);
-  border-radius: 1rem;
-  margin-top: -0.35rem
+	height: 1rem;
+	width: 1rem;
+	background-color: var(--accent);
+	border: solid 0.1rem var(--border);
+	border-radius: 1rem;
+	margin-top: -0.35rem
 }
 
 input[type="range"]::-ms-track {
-  width: 100%;
-  height: 0.5rem;
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
+	width: 100%;
+	height: 0.5rem;
+	background: transparent;
+	border-color: transparent;
+	color: transparent;
 }
 
 input[type="range"]::-ms-fill-lower,
 input[type="range"]::-ms-fill-upper {
-  background-color: var(--accent);
-  border: 0.1rem solid var(--border);
-  border-radius: 1rem;
+	background-color: var(--accent);
+	border: 0.1rem solid var(--border);
+	border-radius: 1rem;
 }
 
 input[type="range"]::-ms-thumb {
-  height: 1rem;
-  width: 1rem;
-  background-color: var(--accent);
-  border: 0.1rem solid var(--border);
-  border-radius: 1rem;
-  margin-top: -0.35rem;
+	height: 1rem;
+	width: 1rem;
+	background-color: var(--accent);
+	border: 0.1rem solid var(--border);
+	border-radius: 1rem;
+	margin-top: -0.35rem;
 }

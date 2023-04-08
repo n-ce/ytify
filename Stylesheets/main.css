@@ -1,6 +1,6 @@
 @font-face{
   font-family: 'Noto Sans';
-  src: url("/Assets/NotoSans.woff2") format("woff2");
+  src: url("Assets/Fonts/NotoSans.woff2") format("woff2");
   font-display: swap;
 }
 
@@ -96,13 +96,15 @@ button:active{
 .hide {
   display: none;
 }
+.show{
+	display:flex;
+}
 
 footer a {
   color: inherit;
 }
-#inputUrl{
-	animation: appear 0.5s;
-}
+
+
 @keyframes appear{
 	from{
 		opacity: 0;
