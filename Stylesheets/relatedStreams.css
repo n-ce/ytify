@@ -19,7 +19,4 @@ list-item{
 		#relatedStreamsContainer{
 		grid-template-columns: auto auto;
 	}
-	list-item{
-		width: 50%;
-	}
 }
