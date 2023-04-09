@@ -25,22 +25,22 @@ body {
 }
 
 body {
-	background-color: var(--bg);
-	color: var(--text);
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-orient: vertical;
-	-webkit-box-direction: normal;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-box-pack: space-evenly;
-	-ms-flex-pack: space-evenly;
-	justify-content: space-evenly;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center;
-	font-family: 'Noto Sans', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: space-evenly;
+  -ms-flex-pack: space-evenly;
+  justify-content: space-evenly;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-family: 'Noto Sans', sans-serif;
 }
 
 button {
@@ -55,23 +55,26 @@ button {
 
 button i,
 #playButton {
-	height: 3rem;
-	width: 3rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 1rem;
-	-webkit-transition: all 0.5s;
-	-o-transition: all 0.5s;
-	transition: all 0.5s;
+  height: 3rem;
+  width: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 1rem;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+button i {
+  width: 5rem;
 }
 
 button p {
-	margin: 0;
-	font-weight: bold;
-	font-size: 0.5rem;
-	font-family: 'Noto Sans', sans-serif;
-	;
+  margin: 0;
+  font-weight: bold;
+  font-size: 0.7rem;
+  font-family: 'Noto Sans', sans-serif;
 }
 
 button:active i,
@@ -125,4 +128,64 @@ footer a {
 	#subtitles {
 		width: 50%;
 	}
+
+#inputUrl {
+  margin-right: -14%;
+  padding: 0px 0%;
+  margin-top: 7%;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(1rem)
+  }
+}
+
+@media (min-width: 1650px) {
+  button p {
+    font-size: 1.1rem;
+  }
+
+  #inputUrl {
+    margin-right: 5%;
+    padding: 5px 17%;
+    margin-top: 2%;
+  }
+}
+
+@media (min-width:1220px) and (max-width:1650px) {
+  #inputUrl {
+    margin-right: 5%;
+    padding: 5px 0%;
+    margin-top: 1%;
+  }
+
+  button p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width:600px) and (max-width:1220px) {
+  #inputUrl {
+    padding: 5px 11%;
+    margin-right: 2px;
+    margin-top: 0;
+  }
+
+  button p {
+    font-size: 0.6rem;
+  }
+
+  button i,
+  #playButton {
+    width: 3rem;
+  }
+}
+
+@media (max-width: 390px) {
+  #inputUrl {
+    margin-top: 10%;
+    margin-right: 2%;
+  }
 }

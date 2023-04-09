@@ -63,7 +63,19 @@ img {
 	border-radius: 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	outline: none;
+
+@media (min-width:1650px) {
+  #title {
+    font-size: 3.5rem;
+  }
+
+  #author,
+  #bitrateSelector {
+    font-size: 1.7rem;
+    line-height: 3;
+  }
 }
+
 
 input[type="url"] {
 	height: 2rem;
@@ -100,12 +112,32 @@ input[type="url"] {
 		height: 22.5vw;
 	}
 
-	#title {
-		font-size: 1.5rem;
-	}
+  /* #title {
+    font-size: 3rem;
+  } */
+}
 
-	#author,
-	#bitrateSelector {
-		font-size: 0.9rem;
-	}
+@media (min-width:1220px) and (max-width:1650px) {
+  #title {
+    font-size: 2.5rem;
+  }
+
+  #author,
+  #bitrateSelector {
+    font-size: 1.2rem;
+    line-height: 3;
+  }
+}
+
+@media (min-width:600px) and (max-width:1220px) {
+  #title {
+    font-size: 1.3rem;
+  }
+
+  #author,
+  #bitrateSelector {
+    font-size: 1rem;
+    line-height: 3;
+  }
+
 }
