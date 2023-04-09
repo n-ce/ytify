@@ -1,12 +1,15 @@
 import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib/functions.js';
-import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer } from './lib/DOM.js';
+import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer,subtitleContainer } from './lib/DOM.js';
 
-fetch('https://piped-instances.kavin.rocks')
-	.then(res => res.json())
-	.then(data => sessionStorage.setItem('apis', JSON.stringify(data.map(e => e.api_url))));
-const api = JSON.parse(sessionStorage.getItem('apis')) || ['https://pipedapi.kavin.rocks'];
 
-let instance = 2;
+const api = [
+   'https://pipedapi.kavin.rocks',
+   'https://watchapi.whatever.social',
+   'https://pipedapi.tokhmi.xyz',
+   'https://pipedapi.syncpundit.io',
+   'https://piped-api.garudalinux.org',
+   'https://pipedapi.moomoo.me'
+   ];
 let queueCount = 0;
 let queueNow = 1;
 let previous_ID;
@@ -14,50 +17,9 @@ let queue = false;
 // const queueList = new Map();
 const queueArray = [];
 
-const subtitleContainer = document.getElementById('captions');
-const ccBtn = document.getElementById('subtitleButton');
 
-if (getSaved('subtitles'))
-	ccBtn.firstElementChild.classList.add('on');
+const play = (id, instance = 0) => {
 
-ccBtn.addEventListener('click', () => {
-	getSaved('subtitles') ?
-		localStorage.removeItem('subtitles') :
-		save('subtitles', 'on');
-	ccBtn.firstElementChild.classList.toggle('on');
-	subtitleContainer.classList.toggle('hide');
-})
-
-function initTTML() {
-	const myTrack = audio.textTracks[0];
-	const ttmlUrl = audio.firstElementChild.src;
-	myTrack.mode = "hidden";
-
-	fetch(ttmlUrl)
-		.then(res => res.text())
-		.then(text => {
-			const imscDoc = imsc.fromXML(text);
-			const timeEvents = imscDoc.getMediaTimeEvents();
-			for (let i = 0; i < timeEvents.length; i++) {
-				const myCue = new VTTCue(timeEvents[i], (i < (timeEvents.length - 1)) ? timeEvents[i + 1] : audio.duration, "");
-
-				function clearSubFromScreen() {
-					const subtitleActive = subtitleContainer.getElementsByTagName("div")[0];
-					if (subtitleActive)
-						subtitleContainer.removeChild(subtitleActive);
-				}
-				myCue.onenter = () => {
-					clearSubFromScreen();
-					imsc.renderHTML(imsc.generateISD(imscDoc, myCue.startTime), subtitleContainer, '', '4rem');
-				};
-				myCue.onexit = clearSubFromScreen();
-				let r = myTrack.addCue(myCue);
-			}
-		});
-}
-
-
-const play = id => {
 	fetch(api[instance] + '/streams/' + id)
 		.then(res => res.json())
 		.then(data => {
@@ -110,10 +72,9 @@ const play = id => {
 
 			audio.src = urls[index];
 
-			if (data.subtitles.length !== 0 && getSaved('subtitles')) {
+			if (data.subtitles.length !== 0)
 				audio.firstElementChild.src = data.subtitles[0].url;
-				initTTML();
-			}
+
 			audio.dataset.seconds = 0;
 
 			bitrateSelector.selectedIndex = index;
@@ -122,7 +83,7 @@ const play = id => {
 
 
 			// setting related streams
-			
+
 			relatedStreamsContainer.innerHTML = '';
 
 			for (const stream of data.relatedStreams) {
@@ -140,15 +101,16 @@ const play = id => {
 
 			params.set('s', id);
 			history.pushState({}, '', '?' + params);
+
 		})
 		.catch(err => {
-			instance++;
-			if (instance >= api.length) {
-				alert(err);
+			if (instance < api.length - 1) {
+				play(id, instance + 1);
 				return;
 			}
-			play(id);
+			alert(err);
 		});
+
 }
 
 
@@ -201,7 +163,7 @@ queueButton.addEventListener('click', queueFx);
 queueNextButton.addEventListener('click', next);
 
 
-const playlistLoad = id => {
+const playlistLoad = (id, instance = 0) => {
 	fetch(api[instance] + '/playlists/' + id)
 		.then(res => res.json())
 		.then(data => {
@@ -214,17 +176,17 @@ const playlistLoad = id => {
 				'');
 			for (const i of data.relatedStreams)
 				queueIt(i.url.slice(9));
+
+			params.set('p', id);
+			history.pushState({}, '', '?' + params);
 		})
 		.catch(err => {
-			instance++;
-			if (instance >= api.length) {
-				alert(err);
+			if (instance < api.length - 1) {
+				playlistLoad(id, instance + 1);
 				return;
 			}
-			playlistLoad(id);
+			alert(err);
 		});
-	params.set('p', id);
-	history.pushState({}, '', '?' + params);
 
 }
 

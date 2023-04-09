@@ -19,11 +19,6 @@ export const playSpeed = document.getElementById('playSpeed');
 export const progress = document.getElementById('progress');
 export const currentDuration = document.getElementById('currentDuration');
 export const fullDuration = document.getElementById('fullDuration');
-       const x = document.documentElement.style;
-export const cssVar = x.setProperty.bind(x);
-export const tabColor = document.head.children.namedItem('theme-color');
 export const img = document.getElementById('img');
-export const title = document.getElementById('title');
-export const author = document.getElementById('author');
 export const relatedStreamsContainer = document.getElementById('relatedStreamsContainer');
-			
+export const subtitleContainer = document.getElementById('subtitles');

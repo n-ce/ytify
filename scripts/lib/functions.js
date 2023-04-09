@@ -1,4 +1,4 @@
-import { cssVar, tabColor, img, title, author } from './DOM.js';
+import { img, audio, subtitleContainer } from './DOM.js';
 
 
 const params = (new URL(document.location)).searchParams;
@@ -7,14 +7,10 @@ const save = localStorage.setItem.bind(localStorage);
 
 const getSaved = localStorage.getItem.bind(localStorage);
 
-const streamID = (url) => {
-	const match = url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i);
-	if (match) return match[7];
-}
-const playlistID = (url) => {
-	const match = url.match(/[&?]list=([^&]+)/i);
-	if (match) return match[1];
-}
+const streamID = url => url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
+const playlistID = url => url.match(/[&?]list=([^&]+)/i)?.[1];
+
 
 
 const palette = {
@@ -31,8 +27,13 @@ const palette = {
 		border: '#fff7'
 	}
 };
+const light = { name: 2 }
 
-const themer = () => {
+const x = document.documentElement.style;
+const cssVar = x.setProperty.bind(x);
+const tabColor = document.head.children.namedItem('theme-color');
+
+function themer() {
 
 	const canvas = document.createElement('canvas');
 	const context = canvas.getContext('2d');
@@ -61,11 +62,10 @@ const themer = () => {
 				g += data[i + 1];
 				b += data[i + 2];
 			}
-			
 			const amount = len / nthPixel;
-			r = Math.round(r / amount);
-			g = Math.round(g / amount);
-			b = Math.round(b / amount);
+			r /= amount;
+			g /= amount;
+			b /= amount;
 
 			const theme = getSaved('theme') ? 'dark' : 'light';
 
@@ -74,7 +74,6 @@ const themer = () => {
 				(r + g + b) > 85 || !r ?
 				`rgb(${r},${g},${b})` :
 				`rgb(${r+34},${g+34},${b+34})`;
-
 
 			cssVar('--bg', palette[theme].bg);
 			cssVar('--accent', palette[theme].accent);
@@ -92,8 +91,10 @@ img.addEventListener('load', themer);
 if (!params.get('s') && !params.get('text'))
 	img.src = 'Assets/ytify_thumbnail_min.webp';
 
+const title = document.getElementById('title');
+const author = document.getElementById('author');
 
-const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
+function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 
 	sessionStorage.getItem('img') ?
 		sessionStorage.setItem('img', thumbnail) :
@@ -124,7 +125,7 @@ const setMetadata = (thumbnail, id, streamName, authorName, authorUrl) => {
 
 
 
-const convertSStoHHMMSS = (seconds) => {
+function convertSStoHHMMSS(seconds) {
 	const hh = Math.floor(seconds / 3600);
 	seconds %= 3600;
 	let mm = Math.floor(seconds / 60);
@@ -138,6 +139,37 @@ const convertSStoHHMMSS = (seconds) => {
 
 
 
+function clearSubFromScreen() {
+	const subtitleActive = subtitleContainer.firstChild;
+	if (subtitleActive)
+		subtitleContainer.removeChild(subtitleActive)
+}
+
+function parseTTML() {
+	const myTrack = audio.textTracks[0];
+	myTrack.mode = "hidden";
+
+	fetch(audio.firstElementChild.src)
+		.then(res => res.text())
+		.then(text => {
+			const imscDoc = imsc.fromXML(text);
+			const timeEvents = imscDoc.getMediaTimeEvents();
+			const telen = timeEvents.length;
+
+			for (let i = 0; i < telen; i++) {
+				const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, "");
+
+				myCue.onenter = () => {
+					clearSubFromScreen();
+					imsc.renderHTML(imsc.generateISD(imscDoc, myCue.startTime), subtitleContainer,'','4rem');
+				}
+				myCue.onexit = () => clearSubFromScreen();
+				myTrack.addCue(myCue);
+			}
+		});
+}
+
+
 export {
 	params,
 	save,
@@ -146,5 +178,6 @@ export {
 	playlistID,
 	themer,
 	setMetadata,
-	convertSStoHHMMSS
+	convertSStoHHMMSS,
+	parseTTML
 }

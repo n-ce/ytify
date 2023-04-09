@@ -1,5 +1,5 @@
-import { params, themer, getSaved, save, convertSStoHHMMSS } from './lib/functions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer } from './lib/DOM.js';
+import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML } from './lib/functions.js';
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 
 // settings panel toggle
@@ -214,4 +214,17 @@ relatedStreamsButton.addEventListener('click', () => {
 	sessionStorage.getItem('streams') ?
 		sessionStorage.removeItem('streams') :
 		sessionStorage.setItem('streams', 'on');
+});
+
+// subtitles 
+
+
+const subtitleButton = document.getElementById('subtitleButton');
+let subtitleState = true;
+subtitleButton.addEventListener('click', () => {
+	if (subtitleState)
+		parseTTML();
+	subtitleButton.firstElementChild.classList.toggle('on');
+	subtitleContainer.classList.toggle('hide');
+	subtitleState = !subtitleState;
 });

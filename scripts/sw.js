@@ -1,20 +1,20 @@
-const cacheName = 'ytify_5.9.1';
+const cacheName = 'ytify_5.9.2';
 const contentToCache = [
     "/",
     "/index.html",
-    "/Stylesheets/main.css",
-    "/Stylesheets/player.css",
-    "/Stylesheets/data.css",
-    "/Scripts/main.js",
-    "/Scripts/buttons.js",
-    "/Scripts/lib/DOM.js",
-    "/Scripts/lib/functions.js",
-    "/Assets/Icons/remixicon.css",
-    "/Assets/Icons/remixicon.ttf",
-    "/Assets/Icons/remixicon.woff",
-    "/Assets/Icons/remixicon.woff2",
-    "/Assets/NotoSans.woff2",
-    "/Assets/ytify_thumbnail_max.webp"
+    "/stylesheets/main.css",
+    "/stylesheets/player.css",
+    "/stylesheets/data.css",
+    "/stylesheets/relatedStreams.css",
+    "/scripts/main.js",
+    "/scripts/buttons.js",
+    "/scripts/lib/DOM.js",
+    "/scripts/lib/functions.js",
+    "/components/ListItem.js",
+    "/assets/Fonts/remixicon.css",
+    "/assets/Fonts/remixicon.woff2",
+    "/assets/Fonts/NotoSans.woff2",
+    "/assets/ytify_thumbnail_min.webp"
   ];
 
 // Installing Service Worker

@@ -28,24 +28,24 @@
 	<link rel="apple-touch-icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
 	<link rel="manifest" href="manifest.webmanifest" />
 
-	<link defer rel="stylesheet" href="Stylesheets/main.css">
-	<link defer rel="stylesheet" href="Stylesheets/player.css">
-	<link defer rel="stylesheet" href="Stylesheets/data.css">
-	<link defer rel="stylesheet" href="Assets/Fonts/remixicon.css">
-	<link defer rel="stylesheet" href="Stylesheets/relatedStreams.css">
+	<link defer rel="stylesheet" href="stylesheets/main.css">
+	<link defer rel="stylesheet" href="stylesheets/player.css">
+	<link defer rel="stylesheet" href="stylesheets/data.css">
+	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
+	<link defer rel="stylesheet" href="stylesheets/relatedStreams.css">
 
-	<script defer type="module" src="Scripts/buttons.js"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/sax@latest/lib/sax.min.js"></script>
-	<script defer src="https://unpkg.com/imsc@latest/dist/imsc.min.js"></script>
-	<script defer src="Scripts/components/list-item.js"></script>
-	<script defer type="module" src="Scripts/main.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js"></script>  <!-- 20KiloBytes -->
+	<script defer src="https://unpkg.com/imsc/dist/imsc.min.js"></script> <!-- 56 KiloBytes -->
+	<script defer src="components/ListItem.js"></script>
+	<script defer type="module" src="scripts/main.js"></script>
+	<script defer type="module" src="scripts/buttons.js"></script>
 
 </head>
 
 <body>
 
 	<form netlify name='feedback' method='POST' class='hide'>
-		<input type="text" name="v5.9_alpha1" id="formInput" />
+		<input type="text" name="v5.9" id="formInput" />
 	</form>
 
 	<div id="dataContainer" class="show">
@@ -173,16 +173,16 @@
 		</div>
 	</div>
 
-	<div id="captions" style="width:80vw;position:relative;pointer-events:none"></div>
+	<div id="subtitles" class="hide"></div>
 
 	<footer>
-		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.9_alpha1, a
+		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.9_beta, a
 		<a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
 	</footer>
 
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("./Scripts/sw.js");
+			navigator.serviceWorker.register("./scripts/sw.js");
 	</script>
 </body>
 
