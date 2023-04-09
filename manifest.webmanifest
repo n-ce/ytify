@@ -4,20 +4,20 @@
   "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
   "icons": [
     {
-      "src": "Assets/maskable_icon_x192.png",
+      "src": "assets/maskable_icon_x192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
 	},
     {
-      "src": "Assets/maskable_icon_x512.png",
+      "src": "assets/maskable_icon_x512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
 	}
 	],
   "start_url": "/",
-  "display": "minimal-ui",
+  "display": "standalone",
   "theme_color":"#00bfff",
   "background_color": "#00bfff",
   "share_target": {

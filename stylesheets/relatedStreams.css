@@ -1,0 +1,22 @@
+#relatedStreamsContainer{
+	background-color: var(--accent);
+	border: 1px solid var(--border);
+	width:80vw;
+	height:50vh;
+	border-radius: 0.5rem;
+	overflow: scroll;
+	animation : appear 0.5s ease-out;
+}
+list-item{
+	width:100%;
+	margin-top: 2rem;
+}
+.list-show{
+	display: grid;
+}
+
+@media (min-width:600px) {
+		#relatedStreamsContainer{
+		grid-template-columns: auto auto;
+	}
+}

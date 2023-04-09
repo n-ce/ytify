@@ -1,26 +1,26 @@
 import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib/functions.js';
-import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton } from './lib/DOM.js';
+import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer,subtitleContainer } from './lib/DOM.js';
 
-let instance = 0;
+
+const api = [
+   'https://pipedapi.kavin.rocks',
+   'https://watchapi.whatever.social',
+   'https://pipedapi.tokhmi.xyz',
+   'https://pipedapi.syncpundit.io',
+   'https://piped-api.garudalinux.org',
+   'https://pipedapi.moomoo.me'
+   ];
 let queueCount = 0;
 let queueNow = 1;
 let previous_ID;
 let queue = false;
 // const queueList = new Map();
 const queueArray = [];
-const api = [
-  'https://pipedapi.kavin.rocks/',
-  'https://watchapi.whatever.social',
-  'https://pipedapi.tokhmi.xyz/',
-  'https://pipedapi.syncpundit.io/',
-  'https://piped-api.garudalinux.org',
-  'https://pipedapi.moomoo.me/'
-  ];
 
 
+const play = (id, instance = 0) => {
 
-const play = id => {
-	fetch(api[instance] + 'streams/' + id)
+	fetch(api[instance] + '/streams/' + id)
 		.then(res => res.json())
 		.then(data => {
 
@@ -32,10 +32,13 @@ const play = id => {
 				data.uploaderUrl
 			);
 
+
 			if (data.audioStreams.length === 0) {
 				alert('NO AUDIO STREAMS AVAILABLE.');
 				return;
 			}
+
+
 			// extracting opus streams and storing m4a streams
 			let bitrates = [];
 			let urls = [];
@@ -69,23 +72,45 @@ const play = id => {
 
 			audio.src = urls[index];
 
+			if (data.subtitles.length !== 0)
+				audio.firstElementChild.src = data.subtitles[0].url;
+
 			audio.dataset.seconds = 0;
 
 			bitrateSelector.selectedIndex = index;
 
 			playButton.classList.replace(playButton.classList[0], 'spinner');
 
+
+			// setting related streams
+
+			relatedStreamsContainer.innerHTML = '';
+
+			for (const stream of data.relatedStreams) {
+				const listItem = document.createElement('list-item');
+				listItem.textContent = stream.title;
+				listItem.dataset.author = stream.uploaderName;
+				listItem.addEventListener('click', () => {
+					queue ?
+						queueIt(stream.url.slice(9)) :
+						play(stream.url.slice(9));
+				});
+				listItem.dataset.thumbnail = stream.thumbnail;
+				relatedStreamsContainer.appendChild(listItem);
+			}
+
 			params.set('s', id);
 			history.pushState({}, '', '?' + params);
+
 		})
 		.catch(err => {
-			instance++;
-			if (instance >= api.length) {
-				alert(err);
+			if (instance < api.length - 1) {
+				play(id, instance + 1);
 				return;
 			}
-			play(id);
+			alert(err);
 		});
+
 }
 
 
@@ -138,8 +163,8 @@ queueButton.addEventListener('click', queueFx);
 queueNextButton.addEventListener('click', next);
 
 
-const playlistLoad = id => {
-	fetch(api[instance] + 'playlists/' + id)
+const playlistLoad = (id, instance = 0) => {
+	fetch(api[instance] + '/playlists/' + id)
 		.then(res => res.json())
 		.then(data => {
 			queueFx();
@@ -151,17 +176,17 @@ const playlistLoad = id => {
 				'');
 			for (const i of data.relatedStreams)
 				queueIt(i.url.slice(9));
+
+			params.set('p', id);
+			history.pushState({}, '', '?' + params);
 		})
 		.catch(err => {
-			instance++;
-			if (instance >= api.length) {
-				alert(err);
+			if (instance < api.length - 1) {
+				playlistLoad(id, instance + 1);
 				return;
 			}
-			playlistLoad(id);
+			alert(err);
 		});
-	params.set('p', id);
-	history.pushState({}, '', '?' + params);
 
 }
 

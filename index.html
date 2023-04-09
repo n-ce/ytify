@@ -5,12 +5,14 @@
 
 	<meta charset="UTF-8">
 
-	<meta name="description" content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
+	<meta name="description"
+		content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
 	<meta name="author" content="Animesh Nath">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="theme-color" content="white">
 	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="keywords" content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
+	<meta name="keywords"
+		content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
 
 	<title>ytify</title>
 
@@ -19,48 +21,56 @@
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="https://ytify.netlify.app">
 	<meta property="og:description" content="32-128kbps Opus YouTube Audio Streaming Web App.">
-	<meta property="og:image" content="https://ytify.netlify.app/Assets/ytify_thumbnail_min.webp">
+	<meta property="og:image" content="https://ytify.netlify.app/assets/ytify_thumbnail_min.webp">
 
 	<!-- tells google that this url is most important (e.g. not http (without s = secure))-->
 	<link rel="canonical" href="https://ytify.netlify.app/">
-	<link rel="icon" href="Assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
-	<link rel="icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
-	<link rel="apple-touch-icon" href="Assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
+	<link rel="icon" href="assets/maskable_icon_x512.png" type="image/png" alt="Main image" sizes="512x512" />
+	<link rel="icon" href="assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192" />
+	<link rel="apple-touch-icon" href="assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
 	<link rel="manifest" href="manifest.webmanifest" />
 
-	<link defer rel="stylesheet" href="Stylesheets/main.css">
-	<link defer rel="stylesheet" href="Stylesheets/player.css">
-	<link defer rel="stylesheet" href="Stylesheets/data.css">
-	<link defer rel="stylesheet" href="Assets/Icons/remixicon.css">
+	<link defer rel="stylesheet" href="stylesheets/main.css">
+	<link defer rel="stylesheet" href="stylesheets/player.css">
+	<link defer rel="stylesheet" href="stylesheets/data.css">
+	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
+	<link defer rel="stylesheet" href="stylesheets/relatedStreams.css">
 
-	<script defer type="module" src="Scripts/main.js"></script>
-	<script defer type="module" src="Scripts/buttons.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js"></script>  <!-- 20KiloBytes -->
+	<script defer src="https://unpkg.com/imsc/dist/imsc.min.js"></script> <!-- 56 KiloBytes -->
+	<script defer src="components/ListItem.js"></script>
+	<script defer type="module" src="scripts/main.js"></script>
+	<script defer type="module" src="scripts/buttons.js"></script>
 
 </head>
 
 <body>
 
 	<form netlify name='feedback' method='POST' class='hide'>
-		<input type="text" name="v5.7" id="formInput" />
+		<input type="text" name="v5.9" id="formInput" />
 	</form>
 
-	<div id="dataContainer">
-
-
-		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail" data-src="">
-
+	<div id="dataContainer" class="show">
+		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
-			<br>
 			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
 			<br>
 			<a id="author" target="_blank">Paste it in the Input Box</a>
-			<select id="bitrateSelector"></select>
+			<select id="bitrateSelector"></select><br>
+			<input id="inputUrl" type="url" placeholder="Input Link Here">
 		</div>
 
 	</div>
 
-	<audio id="audio" data-seconds="0"></audio>
+	<audio id="audio" data-seconds="0">
+		<track src="ttml/subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
+	</audio>
+
+	<div id="relatedStreamsContainer" class="hide">
+		<h1>Streams related to your current playing stream show up here.</h1>
+	</div>
+
 
 	<div id="playerContainer">
 
@@ -112,12 +122,12 @@
 			<!-- </settings buttons> -->
 			<!-- <functions buttons> -->
 			<button type="button" id="seekBwdButton">
-				<i class="ri-rewind-mini-fill"></i>
+				<i class="ri-rewind-fill"></i>
 				<p>Backward</p>
 			</button>
 
 			<button type="button" id="seekFwdButton">
-				<i class="ri-speed-mini-fill"></i>
+				<i class="ri-speed-fill"></i>
 				<p>Forward</p>
 			</button>
 
@@ -127,7 +137,7 @@
 			</button>
 
 			<button type="button" class="hide" id="queueNextButton">
-				<i class="ri-skip-forward-mini-fill"></i>
+				<i class="ri-skip-forward-fill"></i>
 				<p>Skip Next</p>
 			</button>
 
@@ -135,13 +145,21 @@
 				<i class="ri-repeat-fill"></i>
 				<p>Loop</p>
 			</button>
-
 			<button type="button" id="settingsButton">
-				<i class="ri-settings-3-fill"></i>
+				<i class="ri-settings-fill"></i>
 				<p>Settings</p>
 			</button>
 
-			<input id="inputUrl" type="url" placeholder="Input Link Here">
+			<button type="button" id="relatedStreamsButton">
+				<i class="ri-menu-4-fill"></i>
+				<p>Related</p>
+			</button>
+
+			<button type="button" id="subtitleButton">
+				<i class="ri-closed-captioning-fill"></i>
+				<p>Subtitle</p>
+			</button>
+
 			<!-- </functions buttons> -->
 			<!-- <settings buttons> -->
 			<button type="button" id="deleteButton" class="hide">
@@ -155,16 +173,18 @@
 			</button>
 			<!-- </settings buttons> -->
 		</div>
-
 	</div>
 
+	<div id="subtitles" class="hide"></div>
+
 	<footer>
-		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.8, a
+		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.9_beta, a
 		<a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
 	</footer>
+
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("./Scripts/sw.js");
+			navigator.serviceWorker.register("./scripts/sw.js");
 	</script>
 </body>
 
