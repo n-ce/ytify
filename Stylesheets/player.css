@@ -5,6 +5,7 @@
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
   border-radius: 0.7rem;
+  width: 80vw;
 }
 
 
@@ -30,6 +31,7 @@
   from {
     transform: rotate(0turn)
   }
+
   to {
     transform: rotate(1turn)
   }
@@ -46,14 +48,14 @@
 
 #playerProfiles {
   display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
   -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
   -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -ms-grid-row-align: center;
+  display: grid;
+  /* grid-template-columns: 12% 12% 12% 12% 12% 40%; */
+  grid-template-columns: 23.33% 35.33% 35.33%;
+  justify-items: end;
+  align-items: start;
 }
 
 #currentDuration,
@@ -87,17 +89,16 @@
 }
 
 input[type="url"] {
-  height: 3.55rem;
-  width: 5.8rem;
-
+  height: 3.3rem;
+  width: 8rem;
   background-color: var(--accent);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   -webkit-box-shadow: 0 0.1rem 0.3rem #0003;
   box-shadow: 0 0.1rem 0.3rem #0003;
   color: var(--text);
-
   font-family: 'Noto Sans';
+  font-size: small;
   outline: none;
   text-align: center;
   font-weight: bold;
@@ -107,7 +108,9 @@ input[type="url"] {
   #playerContainer {
     display: -webkit-box;
     display: -ms-flexbox;
-    display: flex;
+    display: grid;
+    grid-template-columns: 49% 51%;
+    width: 80vw;
   }
 }
 
@@ -177,4 +180,47 @@ input[type="range"]::-ms-thumb {
   border: 0.1rem solid var(--border);
   border-radius: 1rem;
   margin-top: -0.35rem;
+}
+
+@media (min-width: 1650px) {
+  #playerProfiles {
+    grid-template-columns: 13% 13% 13% 13% 13% 35%;
+  }
+
+  input[type="url"] {
+    font-size: larger;
+    width: 9rem;
+  }
+}
+
+@media (min-width:1220px) and (max-width:1650px) {
+  input[type="url"] {
+    font-size: large;
+    width: 9rem;
+  }
+
+  #playerProfiles {
+    grid-template-columns: 14% 14% 14% 14% 14% 30%;
+  }
+}
+
+@media (min-width:600px) and (max-width:1220px) {
+  #playerProfiles {
+    grid-template-columns: 16% 16% 16% 16% 16% 20%;
+  }
+
+  input[type="url"] {
+    width: 2.8rem;
+  }
+}
+
+@media (max-width: 390px) {
+  input[type="url"] {
+    width: 5rem;
+    font-size: x-small;
+  }
+
+  #playerProfiles {
+    grid-template-columns: 29.33% 35.33% 34.33%;
+  }
 }
