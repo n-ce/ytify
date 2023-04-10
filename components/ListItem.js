@@ -14,9 +14,9 @@ template.innerHTML = `
   }
   img {
   	border-radius:0.5rem;
+	width:50%;
   	margin: 0.1rem 0.4rem 0.1rem 0.4rem;
   }
-  
   div {
   	height:100%;
   	overflow:scroll;
@@ -25,9 +25,8 @@ template.innerHTML = `
   	height:75%;
   	overflow:scroll;
   }
-  
   </style>
-  <img width="50%" loading="lazy">
+  <img loading="lazy">
   <div>
   	<h3>
   		<slot><slot>
@@ -39,14 +38,12 @@ template.innerHTML = `
 class ListItem extends HTMLElement {
 	constructor() {
 		super();
-
 		this.attachShadow({ mode: "open" })
 		this.shadowRoot.appendChild(template.content.cloneNode(true));
 	}
 	connectedCallback() {
-		if(sessionStorage.getItem('streams'))
-			this.shadowRoot.querySelector('img').src = this.dataset.thumbnail ;
-			this.shadowRoot.querySelector('h6').textContent = this.dataset.author;
+		this.shadowRoot.querySelector('img').src = this.dataset.thumbnail;
+		this.shadowRoot.querySelector('h6').textContent = this.dataset.author;
 	}
 }
-window.customElements.define("list-item", ListItem)
+customElements.define("list-item", ListItem)
