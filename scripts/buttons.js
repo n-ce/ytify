@@ -208,23 +208,16 @@ relatedStreamsButton.addEventListener('click', () => {
 	dataContainer.classList.toggle('show');
 	dataContainer.classList.toggle('hide');
 	relatedStreamsContainer.classList.toggle('list-show');
-
 	relatedStreamsButton.firstElementChild.classList.toggle('on');
-
-	sessionStorage.getItem('streams') ?
-		sessionStorage.removeItem('streams') :
-		sessionStorage.setItem('streams', 'on');
 });
 
 // subtitles 
 
 
 const subtitleButton = document.getElementById('subtitleButton');
-let subtitleState = true;
 subtitleButton.addEventListener('click', () => {
-	if (subtitleState)
+	if (subtitleContainer.classList[0])
 		parseTTML();
 	subtitleButton.firstElementChild.classList.toggle('on');
 	subtitleContainer.classList.toggle('hide');
-	subtitleState = !subtitleState;
 });
