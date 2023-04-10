@@ -1,21 +1,12 @@
 import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib/functions.js';
-import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer,subtitleContainer } from './lib/DOM.js';
+import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
-
-const api = [
-   'https://pipedapi.kavin.rocks',
-   'https://watchapi.whatever.social',
-   'https://pipedapi.tokhmi.xyz',
-   'https://pipedapi.syncpundit.io',
-   'https://piped-api.garudalinux.org',
-   'https://pipedapi.moomoo.me'
-   ];
+const api = await fetch("https://piped-instances.kavin.rocks").then(res => res.json()).then(data => data.map(e => e.api_url)).catch(e => 'https://pipedapi.kavin.rocks');
+const queueArray = [];
 let queueCount = 0;
+let queue = false;
 let queueNow = 1;
 let previous_ID;
-let queue = false;
-// const queueList = new Map();
-const queueArray = [];
 
 
 const play = (id, instance = 0) => {
@@ -72,8 +63,12 @@ const play = (id, instance = 0) => {
 
 			audio.src = urls[index];
 
-			if (data.subtitles.length !== 0)
+			if (data.subtitles.length) {
+				subtitleButton.disabled = false;
 				audio.firstElementChild.src = data.subtitles[0].url;
+			} else {
+				subtitleButton.disabled = true;
+			}
 
 			audio.dataset.seconds = 0;
 

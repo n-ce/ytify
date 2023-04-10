@@ -199,6 +199,8 @@ loopButton.addEventListener('click', () => {
 	audio.loop = !audio.loop;
 });
 
+
+
 // streams service button
 
 const relatedStreamsButton = document.getElementById('relatedStreamsButton')
@@ -211,10 +213,10 @@ relatedStreamsButton.addEventListener('click', () => {
 	relatedStreamsButton.firstElementChild.classList.toggle('on');
 });
 
+
+
 // subtitles 
 
-
-const subtitleButton = document.getElementById('subtitleButton');
 subtitleButton.addEventListener('click', () => {
 	if (subtitleContainer.classList[0])
 		parseTTML();

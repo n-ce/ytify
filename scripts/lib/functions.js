@@ -1,6 +1,5 @@
 import { img, audio, subtitleContainer } from './DOM.js';
 
-
 const params = (new URL(document.location)).searchParams;
 
 const save = localStorage.setItem.bind(localStorage);
@@ -27,63 +26,60 @@ const palette = {
 		border: '#fff7'
 	}
 };
-const light = { name: 2 }
 
 const x = document.documentElement.style;
 const cssVar = x.setProperty.bind(x);
 const tabColor = document.head.children.namedItem('theme-color');
+const canvas = document.createElement('canvas');
+const context = canvas.getContext('2d');
 
 function themer() {
 
-	const canvas = document.createElement('canvas');
-	const context = canvas.getContext('2d');
-
 	const canvasImg = new Image();
 
-	canvasImg.onload = () => new Promise((resolve, reject) => {
-			canvas.height = canvasImg.height;
-			canvas.width = canvasImg.width;
-			context.drawImage(canvasImg, 0, 0);
-			resolve(context.getImageData(0, 0, canvasImg.width, canvasImg.height).data);
-		})
-		.then(data => {
+	canvasImg.onload = () => {
+		canvas.height = canvasImg.height;
+		canvas.width = canvasImg.width;
+		context.drawImage(canvasImg, 0, 0);
+		const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
 
-			/* this [r-g-b from raw data] processing 
-			algorithm was taken from color.js,
-			https://github.com/luukdv/color.js */
+		/* [r-g-b from raw data] processing 
+		algorithm was taken from color.js,
+		https://github.com/luukdv/color.js */
 
-			const len = data.length;
-			const nthPixel = 40;
-			let r = 0;
-			let g = 0;
-			let b = 0;
-			for (let i = 0; i < len; i += nthPixel) {
-				r += data[i];
-				g += data[i + 1];
-				b += data[i + 2];
-			}
-			const amount = len / nthPixel;
-			r /= amount;
-			g /= amount;
-			b /= amount;
+		const len = data.length;
+		const nthPixel = 40;
+		let r = 0;
+		let g = 0;
+		let b = 0;
+		for (let i = 0; i < len; i += nthPixel) {
+			r += data[i];
+			g += data[i + 1];
+			b += data[i + 2];
+		}
+		const amount = len / nthPixel;
+		r /= amount;
+		g /= amount;
+		b /= amount;
 
-			const theme = getSaved('theme') ? 'dark' : 'light';
+		const theme = getSaved('theme') ? 'dark' : 'light';
 
-			palette['dark'].border =
-				palette['light'].bg =
-				(r + g + b) > 85 || !r ?
-				`rgb(${r},${g},${b})` :
-				`rgb(${r+34},${g+34},${b+34})`;
+		palette['dark'].border = palette['light'].bg =
+			(r + g + b) > 85 || !r ?
+			`rgb(${r},${g},${b})` :
+			`rgb(${r+34},${g+34},${b+34})`;
 
-			cssVar('--bg', palette[theme].bg);
-			cssVar('--accent', palette[theme].accent);
-			cssVar('--text', palette[theme].text);
-			cssVar('--border', palette[theme].border);
-			tabColor.content = palette[theme].bg;
-		});
+		cssVar('--bg', palette[theme].bg);
+		cssVar('--accent', palette[theme].accent);
+		cssVar('--text', palette[theme].text);
+		cssVar('--border', palette[theme].border);
+		tabColor.content = palette[theme].bg;
+	}
+
 	canvasImg.crossOrigin = '';
 	canvasImg.src = img.src;
 }
+
 
 img.addEventListener('load', themer);
 
@@ -139,12 +135,6 @@ function convertSStoHHMMSS(seconds) {
 
 
 
-function clearSubFromScreen() {
-	const subtitleActive = subtitleContainer.firstChild;
-	if (subtitleActive)
-		subtitleContainer.removeChild(subtitleActive)
-}
-
 function parseTTML() {
 	const myTrack = audio.textTracks[0];
 	myTrack.mode = "hidden";
@@ -160,10 +150,16 @@ function parseTTML() {
 				const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, "");
 
 				myCue.onenter = () => {
-					clearSubFromScreen();
-					imsc.renderHTML(imsc.generateISD(imscDoc, myCue.startTime), subtitleContainer,'','4rem');
+					const subtitleActive = subtitleContainer.firstChild;
+					if (subtitleActive)
+						subtitleContainer.removeChild(subtitleActive)
+					imsc.renderHTML(imsc.generateISD(imscDoc, myCue.startTime), subtitleContainer, '', '4rem');
 				}
-				myCue.onexit = () => clearSubFromScreen();
+				myCue.onexit = () => {
+					const subtitleActive = subtitleContainer.firstChild;
+					if (subtitleActive)
+						subtitleContainer.removeChild(subtitleActive)
+				}
 				myTrack.addCue(myCue);
 			}
 		});
