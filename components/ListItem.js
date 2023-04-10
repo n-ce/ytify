@@ -36,8 +36,8 @@ class ListItem extends HTMLElement {
 		`;
 	}
 	connectedCallback() {
-		this.shadowRoot.children[1].src = this.dataset.thumbnail;
-		this.shadowRoot.lastElementChild.lastElementChild.textContent = this.dataset.author;
+		this.shadowRoot.querySelector('img').src = this.dataset.thumbnail;
+		this.shadowRoot.querySelector('p').textContent = this.dataset.author;
 	}
 }
 customElements.define("list-item", ListItem)
