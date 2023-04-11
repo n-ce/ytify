@@ -1,4 +1,5 @@
 #playerContainer {
+	min-width: calc(90% - 0.6rem);
 	padding: 0.3rem;
 	background-color: var(--accent);
 	border: 0.1px solid var(--border);
@@ -14,6 +15,7 @@
 	-ms-flex-pack: justify;
 	justify-content: space-between;
 	align-items: center;
+	width:100%;
 }
 
 .spinner::after {
@@ -30,7 +32,6 @@
 	from {
 		transform: rotate(0turn)
 	}
-
 	to {
 		transform: rotate(1turn)
 	}

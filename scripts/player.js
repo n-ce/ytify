@@ -205,6 +205,7 @@ const validator = (val) => {
 inputUrl.addEventListener('input', () => {
 	if (!inputUrl.value.includes(previous_ID))
 		validator(inputUrl.value);
+	inputUrl.style.width = inputUrl.value.length + 'ch';
 });
 
 

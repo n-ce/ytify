@@ -52,7 +52,7 @@ button {
 	animation: appear 0.5s;
 	transition: transform 0.4s;
 }
-button:disabled{
+button:disabled i{
 	opacity: 50%;
 }
 button i,
@@ -73,7 +73,6 @@ button p {
 	font-weight: bold;
 	font-size: 0.5rem;
 	font-family: 'Noto Sans', sans-serif;
-	;
 }
 
 button:active i,

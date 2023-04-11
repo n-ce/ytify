@@ -1,26 +1,32 @@
-#relatedStreamsContainer{
+#relatedStreamsContainer {
 	background-color: var(--accent);
 	border: 1px solid var(--border);
-	width:80%;
-	height:50%;
-	border-radius: 0.5rem;
+	width: 90%;
+	height: calc(100% - 10rem);
+	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	border-radius: 0.7rem;
 	overflow: scroll;
-	animation : appear 0.5s ease-out;
+	animation: appear 0.5s ease-out;
 }
-list-item{
-	width:100%;
+
+list-item {
+	width: 100%;
 	margin-top: 0.3rem;
 	margin-bottom: 0.4rem;
 }
-list-item:hover,list-item:focus{
+
+list-item:hover,
+list-item:focus {
 	background-color: var(--accent);
 }
-.list-show{
+
+.list-show {
 	display: grid;
 }
 
 @media (min-width:600px) {
-		#relatedStreamsContainer{
+	#relatedStreamsContainer {
 		grid-template-columns: auto auto;
 	}
 }

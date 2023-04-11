@@ -37,26 +37,27 @@
 	<script defer src="https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js"></script> <!-- 20KiloBytes -->
 	<script defer src="https://unpkg.com/imsc/dist/imsc.min.js"></script> <!-- 56 KiloBytes -->
 	<script defer src="components/ListItem.js"></script>
-	<script defer type="module" src="scripts/main.js"></script>
-	<script defer type="module" src="scripts/buttons.js"></script>
+	<script defer src="scripts/player.js" type="module"></script>
+	<script defer src="scripts/buttons.js" type="module"></script>
 
 </head>
 
 <body>
 
 	<form netlify name='feedback' method='POST' class='hide'>
-		<input type="text" name="v5.9" id="formInput" />
+		<input type="text" name="->" id="formInput" />
 	</form>
 
 	<div id="dataContainer" class="show">
-		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
+		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail" >
 
 		<div id="metadata">
 			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
 			<br>
 			<a id="author" target="_blank">Paste it in the Input Box</a>
-			<select id="bitrateSelector"></select><br>
-			<input id="inputUrl" type="url" placeholder="Input Link Here">
+			<select id="bitrateSelector"></select>
+			<br>
+			<input id="inputUrl" type="url" placeholder="Input URL here">
 		</div>
 
 	</div>

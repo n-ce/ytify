@@ -1,5 +1,5 @@
 #dataContainer {
-	width: 80vw;
+	width: 90%;
 	-webkit-box-orient: vertical;
 	-webkit-box-direction: normal;
 	-ms-flex-direction: column;
@@ -10,18 +10,18 @@
 }
 
 img {
-	height: 45vw;
+	height: auto;
+	aspect-ratio: 16/9;
 	border-radius: 0.5rem;
 	border: 1px solid var(--border);
 	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 }
 
+
 #metadata {
 	width: 100%;
 	overflow: auto;
-	padding-left: 1.5rem;
-	padding-right: 1.5rem;
 	margin-top: 1rem;
 }
 
@@ -49,14 +49,16 @@ img {
 	border: 1px solid var(--border);
 }
 
+
 #metadata a {
 	text-decoration: none;
 	color: inherit;
 }
 
+
 #bitrateSelector {
 	font-size: 0.7rem;
-	padding: 0.35rem;
+	padding: 0.35rem 0;
 	background-color: var(--accent);
 	color: var(--border);
 	border: 1px solid var(--border);
@@ -67,13 +69,16 @@ img {
 
 input[type="url"] {
 	height: 2rem;
-	margin-top: 0.5rem; margin-bottom:0.5rem;
+	display:block;
+	box-sizing: border-box;
+	min-width:13ch;
+	text-align: center;
+	margin: 0.5rem 0;
 	color: var(--border);
-	background: var(--accent);
+	background-color: var(--accent);
 	border-radius: 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border: 1px solid var(--border);
-	text-align: center;
 	font-family: 'Noto Sans';
 	outline: none;
 }
@@ -93,11 +98,12 @@ input[type="url"] {
 
 	#metadata {
 		margin-top: 0;
+		margin-left: 0.5rem;
 	}
 
 	img,
 	#metadata {
-		height: 22.5vw;
+		width: 50%;
 	}
 
 	#title {
