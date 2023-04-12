@@ -1,7 +1,14 @@
 import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib/functions.js';
 import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
-const api = await fetch("https://piped-instances.kavin.rocks").then(res => res.json()).then(data => data.map(e => e.api_url)).catch(e => 'https://pipedapi.kavin.rocks');
+const api = [
+   'https://pipedapi.kavin.rocks',
+   'https://watchapi.whatever.social',
+   'https://pipedapi.tokhmi.xyz',
+   'https://pipedapi.syncpundit.io',
+   'https://piped-api.garudalinux.org',
+   'https://pipedapi.moomoo.me'
+   ];
 const queueArray = [];
 let queueCount = 0;
 let queue = false;
@@ -9,7 +16,7 @@ let queueNow = 1;
 let previous_ID;
 
 
-const play = (id, instance = 0) => {
+const play = (id, instance = 2) => {
 
 	fetch(api[instance] + '/streams/' + id)
 		.then(res => res.json())
@@ -158,7 +165,7 @@ queueButton.addEventListener('click', queueFx);
 queueNextButton.addEventListener('click', next);
 
 
-const playlistLoad = (id, instance = 0) => {
+const playlistLoad = (id, instance = 2) => {
 	fetch(api[instance] + '/playlists/' + id)
 		.then(res => res.json())
 		.then(data => {
