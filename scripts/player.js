@@ -35,12 +35,12 @@ const getEnglishSubs=(array)=>{
 
 
 const play = (id, instance = 0) => {
-	// console.log(id,"idd");
+	
 
 	fetch(api[instance] + '/streams/' + id)
 		.then(res => res.json())
 		.then(data => {
-			console.log(data)
+			
 			setMetadata(
 				data.thumbnailUrl,
 				id,
