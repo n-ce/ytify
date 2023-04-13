@@ -2,13 +2,14 @@ import { setMetadata, streamID, playlistID, getSaved, save, params } from './lib
 import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 const api = [
-   'https://watchapi.whatever.social',
-   'https://api-piped.mha.fi',
-   'https://pipedapi.syncpundit.io',
-   'https://piped-api.garudalinux.org',
-   'https://pipedapi.moomoo.me',
-   'https://pipedapi.kavin.rocks'
-   ];
+	'https://pipedapi.kavin.rocks',
+	'https://pipedapi.in.projectsegfau.lt',
+	'https://watchapi.whatever.social',
+	'https://api-piped.mha.fi',
+	'https://pipedapi.syncpundit.io',
+	'https://piped-api.garudalinux.org',
+	'https://pipedapi.moomoo.me'
+];
 const queueArray = [];
 let queueCount = 0;
 let queue = false;
