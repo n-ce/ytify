@@ -1,23 +1,18 @@
-const cacheName = 'ytify_5.9.4';
+const cacheName = 'ytify_5.9.7';
 const contentToCache = [
-    "./",
-    "./index.html",
-    "./stylesheets/main.css",
-    "./stylesheets/player.css",
-    "./stylesheets/data.css",
-    "./stylesheets/relatedStreams.css",
-    "https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js",
-    "https://unpkg.com/imsc/dist/imsc.min.js",
-    "./scripts/player.js",
-    "./scripts/buttons.js",
-    "./scripts/lib/DOM.js",
-    "./scripts/lib/functions.js",
-    "./components/ListItem.js",
-    "./assets/Fonts/remixicon.css",
-    "./assets/Fonts/remixicon.woff2",
-    "./assets/Fonts/NotoSans.woff2",
-    "./assets/ytify_thumbnail_min.webp"
-  ];
+    "/",
+    "/index.html",
+    "/stylesheets/main.css",
+    "/stylesheets/data.css",
+    "/stylesheets/player.css",
+    "/stylesheets/relatedStreams.css",
+    "/assets/Fonts/remixicon.css",
+    "/components/ListItem.js",
+    "scripts/buttons.js",
+    "scripts/player.js",
+    "scripts/lib/sax.min.js",
+    "scripts/lib/imsc.min.js"
+    ];
 
 // Installing Service Worker
 self.addEventListener('install', (e) => {
@@ -31,7 +26,6 @@ self.addEventListener('install', (e) => {
 
 // Fetching content using Service Worker
 self.addEventListener('fetch', (e) => {
-	// Cache http and https only, skip unsupported chrome-extension:// and file://...
 	if (!(
 			e.request.url.startsWith('http:') || e.request.url.startsWith('https:')
 		)) {
@@ -49,3 +43,4 @@ self.addEventListener('fetch', (e) => {
 		return response;
 	})());
 });
+

@@ -34,11 +34,11 @@
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
 	<link defer rel="stylesheet" href="stylesheets/relatedStreams.css">
 
-	<script defer src="https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js"></script> <!-- 20KiloBytes -->
-	<script defer src="https://unpkg.com/imsc/dist/imsc.min.js"></script> <!-- 56 KiloBytes -->
 	<script defer src="components/ListItem.js"></script>
 	<script defer src="scripts/player.js" type="module"></script>
 	<script defer src="scripts/buttons.js" type="module"></script>
+	<script defer src="scripts/lib/sax.min.js"></script> <!-- 20 KiloBytes -->
+	<script defer src="scripts/lib/imsc.min.js"></script> <!-- 56 KiloBytes -->
 
 </head>
 
@@ -49,7 +49,7 @@
 	</form>
 
 	<div id="dataContainer" class="show">
-		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail" >
+		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
 			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
@@ -180,10 +180,9 @@
 		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.9, a
 		<a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
 	</footer>
-
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("./scripts/sw.js");
+			navigator.serviceWorker.register("scripts/sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 
