@@ -71,7 +71,7 @@ input[type="url"] {
 	height: 2rem;
 	display:block;
 	box-sizing: border-box;
-	width:13ch;
+	min-width:13ch;
 	text-align: center;
 	margin: 0.5rem 0;
 	color: var(--border);
