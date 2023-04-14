@@ -130,6 +130,15 @@ const next = () => {
 	queueNow++;
 }
 
+if('mediaSession' in navigator){
+	navigator.mediaSession.setActionHandler("seekforward", () => {
+		audio.currentTime += 10;
+	});
+	navigator.mediaSession.setActionHandler("seekbackward", () => {
+		audio.currentTime -= 10;
+	});
+	navigator.mediaSession.setActionHandler("nexttrack", next);
+}
 
 // link queuing algorithm
 
