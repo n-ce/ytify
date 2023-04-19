@@ -1,5 +1,3 @@
-import { img, audio, subtitleContainer } from './DOM.js';
-
 const params = (new URL(document.location)).searchParams;
 
 const save = localStorage.setItem.bind(localStorage);
@@ -35,13 +33,10 @@ const context = canvas.getContext('2d');
 
 function themer() {
 
-	const canvasImg = new Image();
-
-	canvasImg.onload = () => {
-		canvas.height = canvasImg.height;
-		canvas.width = canvasImg.width;
-		context.drawImage(canvasImg, 0, 0);
-		const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
+		canvas.height = img.height;
+		canvas.width = img.width;
+		context.drawImage(img, 0, 0);
+		const data = context.getImageData(0, 0, img.width, img.height).data;
 
 		/* [r-g-b from raw data] processing 
 		algorithm was taken from color.js,
@@ -74,10 +69,7 @@ function themer() {
 		cssVar('--text', palette[theme].text);
 		cssVar('--border', palette[theme].border);
 		tabColor.content = palette[theme].bg;
-	}
-
-	canvasImg.crossOrigin = '';
-	canvasImg.src = img.src;
+		
 }
 
 
@@ -90,6 +82,7 @@ if (!params.get('s') && !params.get('text'))
 
 const title = document.getElementById('title');
 const author = document.getElementById('author');
+
 
 function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 

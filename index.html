@@ -28,24 +28,25 @@
 	<link rel="apple-touch-icon" href="assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
 	<link rel="manifest" href="manifest.webmanifest" />
 
-	<link defer rel="stylesheet" href="stylesheets/main.css">
-	<link defer rel="stylesheet" href="stylesheets/player.css">
-	<link defer rel="stylesheet" href="stylesheets/data.css">
+	<link defer rel="stylesheet" href="src/stylesheets/main.css">
+	<link defer rel="stylesheet" href="src/stylesheets/player.css">
+	<link defer rel="stylesheet" href="src/stylesheets/data.css">
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
-	<link defer rel="stylesheet" href="stylesheets/relatedStreams.css">
-
-	<script defer src="components/ListItem.js"></script>
-	<script defer src="scripts/player.js" type="module"></script>
-	<script defer src="scripts/buttons.js" type="module"></script>
-	<script defer src="scripts/lib/sax.min.js"></script> <!-- 20 KiloBytes -->
-	<script defer src="scripts/lib/imsc.min.js"></script> <!-- 56 KiloBytes -->
+	<link defer rel="stylesheet" href="src/stylesheets/relatedStreams.css">
+	
+	<script defer src="src/scripts/lib/DOM.js"></script>
+	<script defer src="src/components/ListItem.js"></script>
+	<script defer src="src/scripts/player.js" type="module"></script>
+	<script defer src="src/scripts/buttons.js" type="module"></script>
+	<script defer src="src/scripts/lib/sax.min.js"></script> <!-- 20 KiloBytes -->
+	<script defer src="src/scripts/lib/imsc.min.js"></script> <!-- 56 KiloBytes -->
 
 </head>
 
 <body>
 
 	<form netlify name='feedback' method='POST' class='hide'>
-		<input type="text" name="->" id="formInput" />
+		<input type="text" name="->" id="netlifyForm" />
 	</form>
 
 	<div id="dataContainer" class="show">
@@ -182,7 +183,7 @@
 	</footer>
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("scripts/sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+			navigator.serviceWorker.register("src/scripts/sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

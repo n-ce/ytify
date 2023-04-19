@@ -1,5 +1,4 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML } from './lib/functions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 
 // settings panel toggle
@@ -83,14 +82,19 @@ qualityButton.addEventListener('click', () => {
 
 deleteButton.addEventListener('click', () => {
 	localStorage.clear();
+	
+	// developer use only 
+	self.caches.keys().then(s => s.forEach(k => self.caches.delete(k)))
+	navigator.serviceWorker.getRegistrations().then(s => s.forEach(r => r.unregister()))
+
 	location.replace(location.origin);
 });
 
 // Feedback Button
 
 feedbackButton.addEventListener('click', async () => {
-	formInput.value = await prompt('Enter your feedback (bugs, feature requests) here:');
-	if (formInput.value) document.forms[0].submit();
+	netlifyForm.value = await prompt('Enter your feedback (bugs, feature requests) here:');
+	if (netlifyForm.value) document.forms[0].submit();
 });
 
 

@@ -10,6 +10,7 @@ const contentToCache = [
     "/components/ListItem.js",
     "/scripts/buttons.js",
     "/scripts/player.js",
+    "/scripts/lib/DOM.js",
     "/scripts/lib/sax.min.js",
     "/scripts/lib/imsc.min.js",
     "/assets/ytify_thumbnail_min.webp"
