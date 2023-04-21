@@ -1,5 +1,5 @@
 import { setMetadata, streamID, playlistID, getSaved, save, params, getBestSub, updatePositionState } from './lib/helperFunctions.js';
-import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
+import { bitrateSelector, audio, superInput, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 const api = [
 	'https://pipedapi.kavin.rocks',
@@ -209,11 +209,11 @@ const validator = (val) => {
 
 // input text player
 
-inputUrl.addEventListener('input', () => {
-if (!inputUrl.value.includes(previous_ID))
-		validator(inputUrl.value);
+superInput.addEventListener('input', () => {
+if (!superInput.value.includes(previous_ID))
+		validator(superInput.value);
 });
-input.addEventListener('keypress', e =>{
+superInput.addEventListener('keypress', e =>{
 	if (e.key === 'Enter') searchLoader();
 });
 
@@ -224,7 +224,7 @@ const searchLoader = async () => {
 	relatedStreamsButton.click();
 	relatedStreamsContainer.innerHTML = '';
 
-	const searchResults = await fetch(api[0] + '/search?q=' + inputUrl.value + '&filter=all').then(res => res.json())
+	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=all').then(res => res.json())
 
 	for (const stream of searchResults.items) {
 		const listItem = document.createElement('list-item');
@@ -239,7 +239,7 @@ const searchLoader = async () => {
 		relatedStreamsContainer.appendChild(listItem);
 	}
 }
-inputUrl.nextElementSibling.addEventListener('click', searchLoader);
+superInput.nextElementSibling.addEventListener('click', searchLoader);
 
 
 // URL params 

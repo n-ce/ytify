@@ -1,5 +1,5 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, netlifyForm, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, superInput, netlifyForm, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 // settings panel toggle
 
@@ -137,7 +137,7 @@ audio.addEventListener('pause', () => {
 audio.addEventListener('loadeddata', () => {
 	playButton.classList.replace('spinner', 'ri-play-fill');
 	playButton.classList.add('on');
-	if (inputUrl.value) audio.play();
+	if (superInput.value) audio.play();
 });
 
 
