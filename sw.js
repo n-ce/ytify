@@ -1,23 +1,23 @@
 const cacheName = 'ytify_5.10.10';
 const contentToCache = [
     "/",
-    "./src/stylesheets/main.css",
-    "./src/stylesheets/data.css",
-    "./src/stylesheets/player.css",
-    "./src/stylesheets/relatedStreams.css",
-    "./src/scripts/buttons.js",
-    "./src/scripts/player.js",
-    "./src/scripts/lib/DOM.js",
-    "./src/scripts/lib/helperFunctions.js",
-    "./src/scripts/lib/sax.min.js",
-    "./src/scripts/lib/imsc.min.js",
-    "./src/components/ListItem.js",
-    "./assets/ytify_thumbnail_min.webp",
-    "./assets/maskable_icon_x192.png",
-    "./assets/maskable_icon_x512.png",
-    "./assets/Fonts/remixicon.css",
-    "./assets/Fonts/NotoSans.woff2",
-    "./assets/Fonts/remixicon.woff2"
+    "/src/stylesheets/main.css",
+    "/src/stylesheets/data.css",
+    "/src/stylesheets/player.css",
+    "/src/stylesheets/relatedStreams.css",
+    "/src/scripts/buttons.js",
+    "/src/scripts/player.js",
+    "/src/scripts/lib/DOM.js",
+    "/src/scripts/lib/helperFunctions.js",
+    "/src/scripts/lib/sax.min.js",
+    "/src/scripts/lib/imsc.min.js",
+    "/src/components/ListItem.js",
+    "/assets/ytify_thumbnail_min.webp",
+    "/assets/maskable_icon_x192.png",
+    "/assets/maskable_icon_x512.png",
+    "/assets/Fonts/remixicon.css",
+    "/assets/Fonts/NotoSans.woff2",
+    "/assets/Fonts/remixicon.woff2"
     ];
 
 // Installing Service Worker

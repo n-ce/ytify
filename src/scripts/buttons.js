@@ -84,10 +84,11 @@ deleteButton.addEventListener('click', () => {
 	localStorage.clear();
 
 	// developer use only 
-	self.caches.keys().then(s => s.forEach(k => self.caches.delete(k)))
-	navigator.serviceWorker.getRegistrations().then(s => s.forEach(r => r.unregister()))
-
-	location.replace(location.origin);
+	self.caches.keys()
+		.then(s => s.forEach(k => self.caches.delete(k)))
+		.then(s => s.forEach(r => r.unregister()))
+		.then(e => navigator.serviceWorker.getRegistrations())
+		.then(e => location.replace(location.origin));
 });
 
 // Feedback Button
