@@ -33,10 +33,13 @@ const context = canvas.getContext('2d');
 
 function themer() {
 
-		canvas.height = img.height;
-		canvas.width = img.width;
-		context.drawImage(img, 0, 0);
-		const data = context.getImageData(0, 0, img.width, img.height).data;
+	const canvasImg = new Image();
+
+	canvasImg.onload = () => {
+		canvas.height = canvasImg.height;
+		canvas.width = canvasImg.width;
+		context.drawImage(canvasImg, 0, 0);
+		const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
 
 		/* [r-g-b from raw data] processing 
 		algorithm was taken from color.js,
@@ -69,7 +72,10 @@ function themer() {
 		cssVar('--text', palette[theme].text);
 		cssVar('--border', palette[theme].border);
 		tabColor.content = palette[theme].bg;
-		
+	}
+
+	canvasImg.crossOrigin = '';
+	canvasImg.src = img.src;
 }
 
 
@@ -98,6 +104,7 @@ function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 	document.title = streamName + ' - ytify';
 
 	if ('mediaSession' in navigator) {
+		navigator.mediaSession.setPositionState(null);
 		navigator.mediaSession.metadata = new MediaMetadata({
 			title: streamName,
 			artist: authorName,
@@ -110,7 +117,6 @@ function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 				{ src: thumbnail, sizes: '512x512' },
               ]
 		});
-		
 	}
 }
 
@@ -160,8 +166,7 @@ function parseTTML() {
 		});
 }
 
-const getBestSub = (sublist) => {
-	let subindex = sublist[0];
+function getBestSub(sublist, subindex = sublist[0]) {
 	for (const sub of sublist) {
 		if (sub.code.startsWith("en")) {
 			subindex = sub;
@@ -170,6 +175,17 @@ const getBestSub = (sublist) => {
 		}
 	}
 	return subindex;
+}
+
+
+function updatePositionState() {
+	if ('setPositionState' in navigator.mediaSession) {
+		navigator.mediaSession.setPositionState({
+			duration: audio.duration,
+			playbackRate: audio.playbackRate,
+			position: audio.currentTime,
+		});
+	}
 }
 
 export {
@@ -182,5 +198,6 @@ export {
 	setMetadata,
 	convertSStoHHMMSS,
 	parseTTML,
-	getBestSub
+	getBestSub,
+	updatePositionState
 }

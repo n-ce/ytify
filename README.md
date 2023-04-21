@@ -15,7 +15,7 @@
 
 **ytify** is a fast and simple web app that streams audio from YouTube links. With ytify, you can enjoy listening without worrying about slow internet or data usage. It also comes with features like :
 
-- **Queue** : Add multiple links to keep your music going. 🎵
+- **Queue** : Add multiple links to keep your audio streams going. 🎵
 - **Playlist Support** : Stream a whole YouTube playlist with one link. 🎧
 - **Theming** : Customize your app with colors from your YouTube stream's thumbnail. 🎨
 - **PWA** : Install ytify as an app on your device and open YouTube links with it from your OS share menu. 📱
@@ -33,7 +33,7 @@ Simply navigate to the ytify website, paste a youtube link, and it will start pl
 <img src="https://github.com/n-ce/ytify/blob/main/assets/Screenshots/ytify_screenshot_playing.webp" width="75%"/>
 </p>
 <details>
-<summary>More Screenshots (requires Avif support)</summary>
+<summary>More Screenshots ( requires AVIF support ).</summary>
 <p align="center">
   <img src="assets/Screenshots/landscape_dark-mode.avif" width="45%"/>
   <img src="assets/Screenshots/landscape_light-mode.avif" width="45%">
@@ -51,9 +51,7 @@ Simply navigate to the ytify website, paste a youtube link, and it will start pl
 ## Development `</>`
 
 Simply clone this repository and set up index.html as default run command.
-As this is a vanillaJS project, There are no build tools required other than a modern browser.
-For JavaScript runtime based development, like in Node.js , ES6 modules might have to be rewritten in commonjs format.
-
+No specific build tools are required.
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)

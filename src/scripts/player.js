@@ -1,4 +1,5 @@
-import { setMetadata, streamID, playlistID, getSaved, save, params, getBestSub } from './lib/functions.js';
+import { setMetadata, streamID, playlistID, getSaved, save, params, getBestSub, updatePositionState } from './lib/helperFunctions.js';
+import { bitrateSelector, audio, inputUrl, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 const api = [
 	'https://pipedapi.kavin.rocks',
@@ -76,6 +77,8 @@ const play = async (id, instance = 0) => {
 
 	audio.src = urls[index];
 
+
+
 	// Subtitle Injection
 
 	if (data.subtitles.length) {
@@ -93,7 +96,7 @@ const play = async (id, instance = 0) => {
 	// setting related streams
 
 	relatedStreamsContainer.innerHTML = '';
-	
+
 	for (const stream of data.relatedStreams) {
 		const listItem = document.createElement('list-item');
 		listItem.textContent = stream.title;
@@ -173,14 +176,14 @@ const playlistLoad = async (id, instance = 0) => {
 	});
 
 	queueFx();
-	
+
 	setMetadata(
 		data.thumbnailUrl,
 		id,
 		data.name,
 		'Click on Next Button to start',
 		'');
-		
+
 	for (const i of data.relatedStreams)
 		queueIt(i.url.slice(9));
 
@@ -239,15 +242,27 @@ if (params.get('url')) {
 	audio.play();
 }
 
+
 if ('mediaSession' in navigator) {
+	navigator.mediaSession.setActionHandler('play', () => {
+		audio.play();
+		updatePositionState();
+	});
+	navigator.mediaSession.setActionHandler('pause', () => {
+		audio.pause();
+		updatePositionState();
+	});
 	navigator.mediaSession.setActionHandler("seekforward", () => {
 		audio.currentTime += 10;
+		updatePositionState();
 	});
 	navigator.mediaSession.setActionHandler("seekbackward", () => {
 		audio.currentTime -= 10;
+		updatePositionState();
 	});
 	navigator.mediaSession.setActionHandler("seekto", e => {
 		audio.currentTime = e.seekTime;
+		updatePositionState();
 	});
 	navigator.mediaSession.setActionHandler("nexttrack", next);
 }

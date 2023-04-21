@@ -1,5 +1,5 @@
-import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML } from './lib/functions.js';
-
+import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, netlifyForm, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 // settings panel toggle
 
@@ -82,7 +82,7 @@ qualityButton.addEventListener('click', () => {
 
 deleteButton.addEventListener('click', () => {
 	localStorage.clear();
-	
+
 	// developer use only 
 	self.caches.keys().then(s => s.forEach(k => self.caches.delete(k)))
 	navigator.serviceWorker.getRegistrations().then(s => s.forEach(r => r.unregister()))
@@ -106,6 +106,7 @@ bitrateSelector.addEventListener('change', () => {
 	audio.src = bitrateSelector.value;
 	audio.currentTime = timeOfSwitch;
 	audio.play();
+	updatePositionState();
 });
 
 
@@ -120,6 +121,7 @@ playButton.addEventListener('click', () => {
 		audio.pause();
 		playButton.dataset.state = '1';
 	}
+	updatePositionState();
 });
 
 audio.addEventListener('playing', () => {
@@ -147,6 +149,7 @@ playSpeed.addEventListener('change', () => {
 		return;
 	}
 	audio.playbackRate = playSpeed.value;
+	updatePositionState();
 	playSpeed.blur();
 });
 
@@ -154,11 +157,16 @@ playSpeed.addEventListener('change', () => {
 
 // Seek Forward && Backward
 
-seekFwdButton.addEventListener('click', () =>
-	audio.currentTime += 10);
+seekFwdButton.addEventListener('click', () => {
+	audio.currentTime += 10;
+	updatePositionState();
+});
 
-seekBwdButton.addEventListener('click', () =>
-	audio.currentTime -= 10);
+
+seekBwdButton.addEventListener('click', () => {
+	audio.currentTime -= 10;
+	updatePositionState();
+});
 
 
 
