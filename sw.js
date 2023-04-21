@@ -12,7 +12,7 @@ const contentToCache = [
     "/src/scripts/lib/helperFunctions.js",
     "/src/scripts/lib/sax.min.js",
     "/src/scripts/lib/imsc.min.js",
-    "/components/ListItem.js",
+    "/src/components/ListItem.js",
     "/assets/ytify_thumbnail_min.webp",
     "/assets/maskable_icon_x192.png",
     "/assets/maskable_icon_x512.png",
