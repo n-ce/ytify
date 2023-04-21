@@ -6,15 +6,19 @@ const contentToCache = [
     "/src/stylesheets/data.css",
     "/src/stylesheets/player.css",
     "/src/stylesheets/relatedStreams.css",
-    "/assets/Fonts/remixicon.css",
-    "/components/ListItem.js",
     "/src/scripts/buttons.js",
     "/src/scripts/player.js",
     "/src/scripts/lib/DOM.js",
     "/src/scripts/lib/helperFunctions.js",
     "/src/scripts/lib/sax.min.js",
     "/src/scripts/lib/imsc.min.js",
-    "/assets/ytify_thumbnail_min.webp"
+    "/components/ListItem.js",
+    "/assets/ytify_thumbnail_min.webp",
+    "/assets/maskable_icon_x192.png",
+    "/assets/maskable_icon_x512.png",
+    "/assets/Fonts/remixicon.css",
+    "/assets/Fonts/NotoSans.woff2",
+    "/assets/Fonts/remixicon.woff2"
     ];
 
 // Installing Service Worker
