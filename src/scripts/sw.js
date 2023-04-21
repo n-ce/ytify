@@ -1,4 +1,4 @@
-const cacheName = 'ytify_5.10.8';
+const cacheName = 'ytify_5.10.9';
 const contentToCache = [
     "/",
     "/index.html",

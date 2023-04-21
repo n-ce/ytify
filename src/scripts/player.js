@@ -210,10 +210,36 @@ const validator = (val) => {
 // input text player
 
 inputUrl.addEventListener('input', () => {
-	if (!inputUrl.value.includes(previous_ID))
+if (!inputUrl.value.includes(previous_ID))
 		validator(inputUrl.value);
-	inputUrl.style.maxWidth = inputUrl.value.length + 'ch';
 });
+input.addEventListener('keypress', e =>{
+	if (e.key === 'Enter') searchLoader();
+});
+
+// search button
+
+const relatedStreamsButton = document.getElementById('relatedStreamsButton');
+const searchLoader = async () => {
+	relatedStreamsButton.click();
+	relatedStreamsContainer.innerHTML = '';
+
+	const searchResults = await fetch(api[0] + '/search?q=' + inputUrl.value + '&filter=all').then(res => res.json())
+
+	for (const stream of searchResults.items) {
+		const listItem = document.createElement('list-item');
+		listItem.textContent = stream.title;
+		listItem.dataset.author = stream.uploaderName;
+		listItem.addEventListener('click', () => {
+			queue ?
+				queueIt(stream.url.slice(9)) :
+				play(stream.url.slice(9));
+		});
+		listItem.dataset.thumbnail = stream.thumbnail;
+		relatedStreamsContainer.appendChild(listItem);
+	}
+}
+inputUrl.nextElementSibling.addEventListener('click', searchLoader);
 
 
 // URL params 

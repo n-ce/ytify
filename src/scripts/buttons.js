@@ -214,8 +214,7 @@ loopButton.addEventListener('click', () => {
 
 
 // streams service button
-
-const relatedStreamsButton = document.getElementById('relatedStreamsButton')
+const relatedStreamsButton = document.getElementById('relatedStreamsButton');
 const dataContainer = document.getElementById('dataContainer');
 
 relatedStreamsButton.addEventListener('click', () => {
