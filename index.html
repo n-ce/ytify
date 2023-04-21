@@ -28,28 +28,28 @@
 	<link rel="apple-touch-icon" href="assets/maskable_icon_x192.png" type="image/png" alt="Main image" sizes="192x192">
 	<link rel="manifest" href="manifest.webmanifest" />
 
-	<link defer rel="stylesheet" href="stylesheets/main.css">
-	<link defer rel="stylesheet" href="stylesheets/player.css">
-	<link defer rel="stylesheet" href="stylesheets/data.css">
+	<link defer rel="stylesheet" href="src/stylesheets/main.css">
+	<link defer rel="stylesheet" href="src/stylesheets/player.css">
+	<link defer rel="stylesheet" href="src/stylesheets/data.css">
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
-	<link defer rel="stylesheet" href="stylesheets/relatedStreams.css">
+	<link defer rel="stylesheet" href="src/stylesheets/relatedStreams.css">
 
-	<script defer src="https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js"></script> <!-- 20KiloBytes -->
-	<script defer src="https://unpkg.com/imsc/dist/imsc.min.js"></script> <!-- 56 KiloBytes -->
-	<script defer src="components/ListItem.js"></script>
-	<script defer src="scripts/player.js" type="module"></script>
-	<script defer src="scripts/buttons.js" type="module"></script>
+	<script defer src="src/components/ListItem.js"></script>
+	<script defer src="src/scripts/player.js" type="module"></script>
+	<script defer src="src/scripts/buttons.js" type="module"></script>
+	<script defer src="src/scripts/lib/sax.min.js"></script> <!-- 20 KiloBytes -->
+	<script defer src="src/scripts/lib/imsc.min.js"></script> <!-- 56 KiloBytes -->
 
 </head>
 
 <body>
 
 	<form netlify name='feedback' method='POST' class='hide'>
-		<input type="text" name="->" id="formInput" />
+		<input type="text" name="->" id="netlifyForm" />
 	</form>
 
 	<div id="dataContainer" class="show">
-		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail" >
+		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
 			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
@@ -57,7 +57,12 @@
 			<a id="author" target="_blank">Paste it in the Input Box</a>
 			<select id="bitrateSelector"></select>
 			<br>
-			<input id="inputUrl" type="url" placeholder="Input URL here">
+			<span>
+				<input type="search" id="superInput" placeholder='Input URL or Search Here'/>
+				<svg aria-label="search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path fill="currentColor" d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
+				</svg>
+			</span>
 		</div>
 
 	</div>
@@ -177,13 +182,12 @@
 	<div id="subtitles" class="hide"></div>
 
 	<footer>
-		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.9, a
+		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.10, a
 		<a href="https://n-ce.github.io" target="_blank">n-ce</a> project.
 	</footer>
-
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("./scripts/sw.js");
+			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

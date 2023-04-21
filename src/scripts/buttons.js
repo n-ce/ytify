@@ -1,6 +1,5 @@
-import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML } from './lib/functions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, inputUrl, formInput, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
-
+import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
+import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, superInput, netlifyForm, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 // settings panel toggle
 
@@ -83,14 +82,20 @@ qualityButton.addEventListener('click', () => {
 
 deleteButton.addEventListener('click', () => {
 	localStorage.clear();
-	location.replace(location.origin);
+
+	// developer use only 
+	self.caches.keys()
+		.then(s => s.forEach(k => self.caches.delete(k)))
+		.then(s => s.forEach(r => r.unregister()))
+		.then(e => navigator.serviceWorker.getRegistrations())
+		.then(e => location.replace(location.origin));
 });
 
 // Feedback Button
 
 feedbackButton.addEventListener('click', async () => {
-	formInput.value = await prompt('Enter your feedback (bugs, feature requests) here:');
-	if (formInput.value) document.forms[0].submit();
+	netlifyForm.value = await prompt('Enter your feedback (bugs, feature requests) here:');
+	if (netlifyForm.value) document.forms[0].submit();
 });
 
 
@@ -102,6 +107,7 @@ bitrateSelector.addEventListener('change', () => {
 	audio.src = bitrateSelector.value;
 	audio.currentTime = timeOfSwitch;
 	audio.play();
+	updatePositionState();
 });
 
 
@@ -116,6 +122,7 @@ playButton.addEventListener('click', () => {
 		audio.pause();
 		playButton.dataset.state = '1';
 	}
+	updatePositionState();
 });
 
 audio.addEventListener('playing', () => {
@@ -131,7 +138,7 @@ audio.addEventListener('pause', () => {
 audio.addEventListener('loadeddata', () => {
 	playButton.classList.replace('spinner', 'ri-play-fill');
 	playButton.classList.add('on');
-	if (inputUrl.value) audio.play();
+	if (superInput.value) audio.play();
 });
 
 
@@ -143,6 +150,7 @@ playSpeed.addEventListener('change', () => {
 		return;
 	}
 	audio.playbackRate = playSpeed.value;
+	updatePositionState();
 	playSpeed.blur();
 });
 
@@ -150,11 +158,16 @@ playSpeed.addEventListener('change', () => {
 
 // Seek Forward && Backward
 
-seekFwdButton.addEventListener('click', () =>
-	audio.currentTime += 10);
+seekFwdButton.addEventListener('click', () => {
+	audio.currentTime += 10;
+	updatePositionState();
+});
 
-seekBwdButton.addEventListener('click', () =>
-	audio.currentTime -= 10);
+
+seekBwdButton.addEventListener('click', () => {
+	audio.currentTime -= 10;
+	updatePositionState();
+});
 
 
 
@@ -202,8 +215,7 @@ loopButton.addEventListener('click', () => {
 
 
 // streams service button
-
-const relatedStreamsButton = document.getElementById('relatedStreamsButton')
+const relatedStreamsButton = document.getElementById('relatedStreamsButton');
 const dataContainer = document.getElementById('dataContainer');
 
 relatedStreamsButton.addEventListener('click', () => {

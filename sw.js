@@ -1,23 +1,24 @@
-const cacheName = 'ytify_5.9.4';
+const cacheName = 'ytify_5.10.10';
 const contentToCache = [
-    "./",
-    "./index.html",
-    "./stylesheets/main.css",
-    "./stylesheets/player.css",
-    "./stylesheets/data.css",
-    "./stylesheets/relatedStreams.css",
-    "https://cdn.jsdelivr.net/npm/sax/lib/sax.min.js",
-    "https://unpkg.com/imsc/dist/imsc.min.js",
-    "./scripts/player.js",
-    "./scripts/buttons.js",
-    "./scripts/lib/DOM.js",
-    "./scripts/lib/functions.js",
-    "./components/ListItem.js",
-    "./assets/Fonts/remixicon.css",
-    "./assets/Fonts/remixicon.woff2",
-    "./assets/Fonts/NotoSans.woff2",
-    "./assets/ytify_thumbnail_min.webp"
-  ];
+    "/",
+    "/src/stylesheets/main.css",
+    "/src/stylesheets/data.css",
+    "/src/stylesheets/player.css",
+    "/src/stylesheets/relatedStreams.css",
+    "/src/scripts/buttons.js",
+    "/src/scripts/player.js",
+    "/src/scripts/lib/DOM.js",
+    "/src/scripts/lib/helperFunctions.js",
+    "/src/scripts/lib/sax.min.js",
+    "/src/scripts/lib/imsc.min.js",
+    "/src/components/ListItem.js",
+    "/assets/ytify_thumbnail_min.webp",
+    "/assets/maskable_icon_x192.png",
+    "/assets/maskable_icon_x512.png",
+    "/assets/Fonts/remixicon.css",
+    "/assets/Fonts/NotoSans.woff2",
+    "/assets/Fonts/remixicon.woff2"
+    ];
 
 // Installing Service Worker
 self.addEventListener('install', (e) => {
@@ -31,7 +32,6 @@ self.addEventListener('install', (e) => {
 
 // Fetching content using Service Worker
 self.addEventListener('fetch', (e) => {
-	// Cache http and https only, skip unsupported chrome-extension:// and file://...
 	if (!(
 			e.request.url.startsWith('http:') || e.request.url.startsWith('https:')
 		)) {
@@ -49,3 +49,4 @@ self.addEventListener('fetch', (e) => {
 		return response;
 	})());
 });
+

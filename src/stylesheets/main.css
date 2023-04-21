@@ -55,8 +55,11 @@ button {
 button:disabled i{
 	opacity: 50%;
 }
+
+
+
 button i,
-#playButton {
+#playButton, #metadata button{
 	height: 3rem;
 	width: 3rem;
 	display: flex;
