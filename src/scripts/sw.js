@@ -2,18 +2,18 @@ const cacheName = 'ytify_5.10.9';
 const contentToCache = [
     "/",
     "/index.html",
-    "/stylesheets/main.css",
-    "/stylesheets/data.css",
-    "/stylesheets/player.css",
-    "/stylesheets/relatedStreams.css",
+    "/src/stylesheets/main.css",
+    "/src/stylesheets/data.css",
+    "/src/stylesheets/player.css",
+    "/src/stylesheets/relatedStreams.css",
     "/assets/Fonts/remixicon.css",
     "/components/ListItem.js",
-    "/scripts/buttons.js",
-    "/scripts/player.js",
-    "/scripts/lib/DOM.js",
-    "/scripts/lib/helperFunctions.js",
-    "/scripts/lib/sax.min.js",
-    "/scripts/lib/imsc.min.js",
+    "/src/scripts/buttons.js",
+    "/src/scripts/player.js",
+    "/src/scripts/lib/DOM.js",
+    "/src/scripts/lib/helperFunctions.js",
+    "/src/scripts/lib/sax.min.js",
+    "/src/scripts/lib/imsc.min.js",
     "/assets/ytify_thumbnail_min.webp"
     ];
 
