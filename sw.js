@@ -1,4 +1,4 @@
-const cacheName = 'ytify_5.10.10';
+const cacheName = 'ytify_5.11.1';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",

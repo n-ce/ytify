@@ -1,5 +1,5 @@
-import { setMetadata, streamID, playlistID, getSaved, save, params, getBestSub, updatePositionState } from './lib/helperFunctions.js';
-import { bitrateSelector, audio, superInput, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
+import { setMetadata, streamID, playlistID, getSaved, save, params, updatePositionState } from './lib/helperFunctions.js';
+import { bitrateSelector, audio, superInput, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer } from './lib/DOM.js';
 
 const api = [
 	'https://pipedapi.kavin.rocks',
@@ -81,12 +81,11 @@ const play = async (id, instance = 0) => {
 
 	// Subtitle Injection
 
-	if (data.subtitles.length) {
-		subtitleButton.disabled = false;
-		audio.firstElementChild.src = getBestSub(data.subtitles).url;
-	} else {
-		subtitleButton.disabled = true;
-	}
+	subtitleSelector.innerHTML = '<option>subtitles</option>';
+	if (data.subtitles.length)
+		for (const subtitles of data.subtitles)
+			subtitleSelector.add(new Option(subtitles.name, subtitles.url));
+
 
 	audio.dataset.seconds = 0;
 
@@ -210,10 +209,10 @@ const validator = (val) => {
 // input text player
 
 superInput.addEventListener('input', () => {
-if (!superInput.value.includes(previous_ID))
+	if (!superInput.value.includes(previous_ID))
 		validator(superInput.value);
 });
-superInput.addEventListener('keypress', e =>{
+superInput.addEventListener('keypress', e => {
 	if (e.key === 'Enter') searchLoader();
 });
 
@@ -223,8 +222,9 @@ const relatedStreamsButton = document.getElementById('relatedStreamsButton');
 const searchLoader = async () => {
 	relatedStreamsButton.click();
 	relatedStreamsContainer.innerHTML = '';
+	const filter = document.getElementById('musicSearch').getAttribute('filter');
 
-	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=all').then(res => res.json())
+	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=' + filter).then(res => res.json())
 
 	for (const stream of searchResults.items) {
 		const listItem = document.createElement('list-item');

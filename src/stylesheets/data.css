@@ -56,7 +56,7 @@
 }
 
 
-#bitrateSelector {
+#bitrateSelector,#subtitleSelector {
 	font-size: 0.7rem;
 	padding: 0.35rem 0;
 	background-color: var(--accent);
@@ -67,7 +67,7 @@
 	outline: none;
 }
 
-#metadata span {
+#superInputContainer {
 	display: flex;
 	align-items: center;
 	height: 2rem;
@@ -87,7 +87,7 @@
 	height: 100%;
 	text-align: center;
 	color: var(--text);
-	outline:none;
+	outline: none;
 }
 
 #superInput::placeholder {
@@ -99,6 +99,7 @@ svg {
 	width: 2rem;
 	color: var(--border);
 }
+
 
 @media (min-width:600px) {
 	#dataContainer {

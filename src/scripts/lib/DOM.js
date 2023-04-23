@@ -22,4 +22,4 @@ export const fullDuration            = document.getElementById('fullDuration');
 export const img                     = document.getElementById('img');
 export const relatedStreamsContainer = document.getElementById('relatedStreamsContainer');
 export const subtitleContainer       = document.getElementById('subtitles');
-export const subtitleButton          = document.getElementById('subtitleButton');
+export const subtitleSelector = document.getElementById('subtitleSelector');

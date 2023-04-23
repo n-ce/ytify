@@ -34,6 +34,7 @@
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
 	<link defer rel="stylesheet" href="src/stylesheets/relatedStreams.css">
 
+	<script defer src="src/components/ToggleSwitch.js"></script>
 	<script defer src="src/components/ListItem.js"></script>
 	<script defer src="src/scripts/player.js" type="module"></script>
 	<script defer src="src/scripts/buttons.js" type="module"></script>
@@ -55,14 +56,16 @@
 			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
 			<br>
 			<a id="author" target="_blank">Paste it in the Input Box</a>
-			<select id="bitrateSelector"></select>
+			<select id="bitrateSelector"><option>Bitrate</option></select>
+			<select id="subtitleSelector"><option>Subtitles</option></select>
 			<br>
-			<span>
-				<input type="search" id="superInput" placeholder='Input URL or Search Here'/>
+			<span id="superInputContainer">
+				<input type="search" id="superInput" placeholder='Input URL or Search Here' />
 				<svg aria-label="search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 					<path fill="currentColor" d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
 				</svg>
 			</span>
+			<toggle-switch id="musicSearch" filter="all">&nbsp;Search Music only </toggle-switch>
 		</div>
 
 	</div>
@@ -74,7 +77,6 @@
 	<div id="relatedStreamsContainer" class="hide">
 		<h1>Streams related to your current playing stream show up here.</h1>
 	</div>
-
 
 	<div id="playerContainer">
 
@@ -157,11 +159,6 @@
 			<button type="button" id="relatedStreamsButton">
 				<i class="ri-menu-4-fill"></i>
 				<p>Related</p>
-			</button>
-
-			<button type="button" id="subtitleButton" disabled>
-				<i class="ri-closed-captioning-fill"></i>
-				<p>Subtitle</p>
 			</button>
 
 			<!-- </functions buttons> -->

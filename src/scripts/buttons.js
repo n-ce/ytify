@@ -5,7 +5,7 @@ import { settingsButton, themeButton, fullscreenButton, thumbnailButton, quality
 
 settingsButton.addEventListener('click', () => {
 
- [themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, queueButton.firstElementChild.classList.length === 2 ? queueNextButton : loopButton, relatedStreamsButton, subtitleButton]
+ [themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, queueButton.firstElementChild.classList.length === 2 ? queueNextButton : loopButton, relatedStreamsButton]
 	.map(e => e.classList.toggle('hide'));
 
 });
@@ -85,9 +85,9 @@ deleteButton.addEventListener('click', () => {
 
 	// developer use only 
 	self.caches.keys()
-		.then(s => s.forEach(k => self.caches.delete(k)))
-		.then(s => s.forEach(r => r.unregister()))
+		.then(s => s.forEach(k => { self.caches.delete(k) }))
 		.then(e => navigator.serviceWorker.getRegistrations())
+		.then(s => s.forEach(r => { r.unregister() }))
 		.then(e => location.replace(location.origin));
 });
 
@@ -110,7 +110,20 @@ bitrateSelector.addEventListener('change', () => {
 	updatePositionState();
 });
 
+// subtitle selector
 
+const subtitleSelector = document.getElementById('subtitleSelector');
+subtitleSelector.addEventListener('change', () => {
+	audio.firstElementChild.src = subtitleSelector.value;
+
+	if (!subtitleSelector.value) {
+		subtitleContainer.classList.add('hide');
+		return;
+	}
+	audio.firstElementChild.src = subtitleSelector.value;
+	parseTTML();
+	subtitleContainer.classList.remove('hide');
+})
 
 // play button and events
 
@@ -223,15 +236,4 @@ relatedStreamsButton.addEventListener('click', () => {
 	dataContainer.classList.toggle('hide');
 	relatedStreamsContainer.classList.toggle('list-show');
 	relatedStreamsButton.firstElementChild.classList.toggle('on');
-});
-
-
-
-// subtitles 
-
-subtitleButton.addEventListener('click', () => {
-	if (subtitleContainer.classList[0])
-		parseTTML();
-	subtitleButton.firstElementChild.classList.toggle('on');
-	subtitleContainer.classList.toggle('hide');
 });
