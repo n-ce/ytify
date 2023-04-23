@@ -2,6 +2,14 @@
  <a href="https://ytify.netlify.app"><img src="assets/ytify_thumbnail_max.webp" width="70%"></a>
 </div>
 
+## The story of ytify
+- I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
+- I noticed it wasn't able to stream under low network conditions which would occur when my daily data quota would expire.
+- I noticed newpipe allows downloading audio of the stream in multiple bitrates (50kbps, 90kbps, 130kbps) but it only provides the best one when streaming. So i decided to create an [issue](https://github.com/TeamNewPipe/NewPipe/issues/5838).
+- At the time I used to download audio, video streams from https://projectlounge.pw/ytdl. The streams could easily be downloadable in required format by just modifying the site link , without any CORS issues.
+- Things clicked in my mind, and I created this project, this was [the first build](https://github.com/n-ce/ytify/blob/bf129e573c56e99f88b51f679077cb9f8a9a6b3c/index.html) on Jan 2022.
+- Months later the 5th Major version was released with its own backend which was then replaced by the piped API which is itself based off newpipe, so we came #fullCircle.
+
 ## Table of Contents
 - [**Description 🦚**](#description-)
 - [**Getting Started** 🖼](#getting-started-)
