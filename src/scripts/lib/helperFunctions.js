@@ -1,5 +1,3 @@
-import {subtitleContainer} from './DOM.js';
-
 const params = (new URL(document.location)).searchParams;
 
 const save = localStorage.setItem.bind(localStorage);
@@ -170,14 +168,65 @@ function parseTTML() {
 
 
 function updatePositionState() {
-	if ('setPositionState' in navigator.mediaSession) {
-		navigator.mediaSession.setPositionState({
-			duration: audio.duration,
-			playbackRate: audio.playbackRate,
-			position: audio.currentTime,
-		});
+	if ('mediaSession' in navigator) {
+		if ('setPositionState' in navigator.mediaSession) {
+			navigator.mediaSession.setPositionState({
+				duration: audio.duration,
+				playbackRate: audio.playbackRate,
+				position: audio.currentTime,
+			});
+		}
 	}
 }
+
+function setAudio(data) {
+	// extracting opus streams and storing m4a streams
+
+	const opus = { urls: [], bitrates: [] }
+	const m4a = { urls: [], bitrates: [], options: [] }
+	bitrateSelector.innerHTML = '';
+
+	for (const value of data) {
+		if (value.codec === 'opus') {
+			opus.urls.push(value.url);
+			opus.bitrates.push(parseInt(value.quality));
+			bitrateSelector.add(new Option(value.quality, value.url));
+		} else {
+			m4a.urls.push(value.url);
+			m4a.bitrates.push(parseInt(value.quality));
+			m4a.options.push(new Option(value.quality, value.url));
+		}
+	}
+
+	// finding lowest available stream when low opus bitrate unavailable
+	if (!getSaved('quality') && Math.min(...opus.bitrates) > 64) {
+		opus.urls = opus.urls.concat(m4a.urls);
+		opus.bitrates = opus.bitrates.concat(m4a.bitrates);
+		for (const opts of m4a.options) bitrateSelector.add(opts);
+	}
+
+	bitrateSelector.selectedIndex = opus.bitrates.indexOf(getSaved('quality') ? Math.max(...opus.bitrates) : Math.min(...opus.bitrates));
+	audio.src = opus.urls[bitrateSelector.selectedIndex];
+	audio.dataset.seconds = 0;
+}
+
+function populateContainerWith(items) {
+	relatedStreamsContainer.innerHTML = '';
+	for (const stream of items) {
+		const listItem = document.createElement('list-item');
+		listItem.textContent = stream.title;
+		listItem.dataset.author = stream.uploaderName;
+		listItem.addEventListener('click', () => {
+			queue ?
+				queueIt(stream.url.slice(9)) :
+				play(stream.url.slice(9));
+		});
+		listItem.dataset.thumbnail = stream.thumbnail;
+		relatedStreamsContainer.appendChild(listItem);
+	}
+}
+
+
 
 export {
 	params,
@@ -189,5 +238,7 @@ export {
 	setMetadata,
 	convertSStoHHMMSS,
 	parseTTML,
-	updatePositionState
+	updatePositionState,
+	setAudio,
+	populateContainerWith
 }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="black">
+	<title>ytify Max</title>
+</head>
+<style>
+	body {
+		background-color: black;
+		color: white;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+		align-items: center;
+	}
+
+	h1 {
+		font-style: italic;
+		font-family: sans-serif;
+	}
+
+	input {
+		background: none;
+		border: 0.1rem solid white;
+		color: white;
+		margin-bottom: 1rem;
+	}
+
+	li {
+		user-select: none;
+	}
+
+	li:hover {
+		border:0.1rem solid white;
+	}
+</style>
+
+<body>
+	<h1>ytify Max</h1>
+	<span>
+		<input id="input" type="text" placeholder="Enter Link Or Search -->">
+		<button id="button">Search</button>
+	</span>
+	<audio controls id="audio"></audio>
+	<ul id="list">
+		<li>Enter ↩ - plays the input.</li>
+		<li>Search 🔍 - searches the input.</li>
+		<li>Click on a search list item to play it.</li>
+	</ul>
+	<script type="module">
+		const url = await fetch('https://piped-instances.kavin.rocks').then(res => res.json()).then(data => data[Math.floor(Math.random() * 10)].api_url).catch(err => location.reload());
+
+		button.onclick = async () => {
+			const data = await fetch(url + '/search?q=' + input.value + '&filter=all').then(res => res.json()).catch(err => location.reload());
+			list.innerHTML = '';
+			for (const stream of data.items) {
+
+				const paragraph = document.createElement('p');
+				paragraph.textContent = `${new Date(stream.duration * 1000).toISOString().slice(stream.duration >= 3600 ? 11 : 14, 19)||stream.duration} ${stream.uploaderName}`;
+
+				const b = document.createElement('b');
+				b.textContent = stream.title;
+
+				const li = document.createElement('li');
+				li.onclick = () => play('https://youtube.com' + stream.url);
+				li.append(paragraph, b);
+
+				list.appendChild(li);
+			}
+		}
+
+		const play = async link => {
+			const data = await fetch(url + '/streams/' + link.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7]).then(res => res.json()).catch(err => err);
+			const streams = {};
+			for (const stream of data.audioStreams)
+				if (Object.values(stream).includes('opus'))
+					streams[parseInt(stream.quality)] = stream.url;
+			audio.src = streams[Math.min(...Object.keys(streams))];
+			audio.play();
+		}
+
+		input.onkeydown = e => {
+			if (e.key === 'Enter') play(input.value)
+		}
+	</script>
+</body>
+
+</html>

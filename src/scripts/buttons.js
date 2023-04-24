@@ -1,5 +1,4 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, superInput, netlifyForm, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 // settings panel toggle
 
@@ -115,7 +114,6 @@ bitrateSelector.addEventListener('change', () => {
 const subtitleSelector = document.getElementById('subtitleSelector');
 subtitleSelector.addEventListener('change', () => {
 	audio.firstElementChild.src = subtitleSelector.value;
-
 	if (!subtitleSelector.value) {
 		subtitleContainer.classList.add('hide');
 		return;

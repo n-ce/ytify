@@ -1,5 +1,4 @@
-import { setMetadata, streamID, playlistID, getSaved, save, params, updatePositionState } from './lib/helperFunctions.js';
-import { bitrateSelector, audio, superInput, playButton, queueButton, queueNextButton, loopButton, relatedStreamsContainer } from './lib/DOM.js';
+import { setMetadata, streamID, playlistID, getSaved, save, params, updatePositionState, setAudio, populateContainerWith } from './lib/helperFunctions.js';
 
 const api = [
 	'https://pipedapi.kavin.rocks',
@@ -38,76 +37,24 @@ const play = async (id, instance = 0) => {
 	);
 
 
-	if (data.audioStreams.length === 0) {
+	if (!data.audioStreams.length) {
 		alert('NO AUDIO STREAMS AVAILABLE.');
 		return;
 	}
 
-
-	// extracting opus streams and storing m4a streams
-	let bitrates = [];
-	let urls = [];
-	bitrateSelector.innerHTML = '';
-	const m4aBitrates = [];
-	const m4aUrls = [];
-	const m4aOptions = [];
-
-	for (const value of data.audioStreams) {
-		if (Object.values(value).includes('opus')) {
-			bitrates.push(parseInt(value.quality));
-			urls.push(value.url);
-			bitrateSelector.add(new Option(value.quality, value.url));
-		} else {
-			m4aBitrates.push(parseInt(value.quality));
-			m4aUrls.push(value.url);
-			m4aOptions.push(new Option(value.quality, value.url));
-		}
-	}
-
-	// finding lowest available stream when low opus bitrate unavailable
-	if (!getSaved('quality') && Math.min(...bitrates) > 64) {
-		m4aOptions.map(opts => bitrateSelector.add(opts));
-		bitrates = bitrates.concat(m4aBitrates);
-		urls = urls.concat(m4aUrls);
-	}
-
-	const index = getSaved('quality') ?
-		bitrates.indexOf(Math.max(...bitrates)) :
-		bitrates.indexOf(Math.min(...bitrates));
-
-	audio.src = urls[index];
+	setAudio(data.audioStreams);
 
 
+	// Subtitle data Injection into dom
 
-	// Subtitle Injection
-
-	subtitleSelector.innerHTML = '<option>subtitles</option>';
+	subtitleSelector.innerHTML = '<option value="">Subtitles - Off</option>';
 	if (data.subtitles.length)
 		for (const subtitles of data.subtitles)
 			subtitleSelector.add(new Option(subtitles.name, subtitles.url));
 
 
-	audio.dataset.seconds = 0;
-
-	bitrateSelector.selectedIndex = index;
-
-
 	// setting related streams
-
-	relatedStreamsContainer.innerHTML = '';
-
-	for (const stream of data.relatedStreams) {
-		const listItem = document.createElement('list-item');
-		listItem.textContent = stream.title;
-		listItem.dataset.author = stream.uploaderName;
-		listItem.addEventListener('click', () => {
-			queue ?
-				queueIt(stream.url.slice(9)) :
-				play(stream.url.slice(9));
-		});
-		listItem.dataset.thumbnail = stream.thumbnail;
-		relatedStreamsContainer.appendChild(listItem);
-	}
+	populateContainerWith(data.relatedStreams);
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);
@@ -193,7 +140,7 @@ const playlistLoad = async (id, instance = 0) => {
 
 // link validator
 
-const validator = (val) => {
+const validator = val => {
 	const pID = playlistID(val);
 	const sID = streamID(val);
 
@@ -218,28 +165,15 @@ superInput.addEventListener('keypress', e => {
 
 // search button
 
+const searchFilters = document.getElementById('searchFilters');
+
 const relatedStreamsButton = document.getElementById('relatedStreamsButton');
 const searchLoader = async () => {
 	relatedStreamsButton.click();
-	relatedStreamsContainer.innerHTML = '';
-	const filter = document.getElementById('musicSearch').getAttribute('filter');
-
-	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=' + filter).then(res => res.json())
-
-	for (const stream of searchResults.items) {
-		const listItem = document.createElement('list-item');
-		listItem.textContent = stream.title;
-		listItem.dataset.author = stream.uploaderName;
-		listItem.addEventListener('click', () => {
-			queue ?
-				queueIt(stream.url.slice(9)) :
-				play(stream.url.slice(9));
-		});
-		listItem.dataset.thumbnail = stream.thumbnail;
-		relatedStreamsContainer.appendChild(listItem);
-	}
+	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=' + searchFilters.value).then(res => res.json())
+	populateContainerWith(searchResults.items)
 }
-superInput.nextElementSibling.addEventListener('click', searchLoader);
+searchFilters.nextElementSibling.addEventListener('click', searchLoader);
 
 
 // URL params 

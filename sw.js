@@ -1,4 +1,4 @@
-const cacheName = 'ytify_5.11.1';
+const cacheName = 'ytify_5.11.2';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",
@@ -7,7 +7,6 @@ const contentToCache = [
     "/src/stylesheets/relatedStreams.css",
     "/src/scripts/buttons.js",
     "/src/scripts/player.js",
-    "/src/scripts/lib/DOM.js",
     "/src/scripts/lib/helperFunctions.js",
     "/src/scripts/lib/sax.min.js",
     "/src/scripts/lib/imsc.min.js",

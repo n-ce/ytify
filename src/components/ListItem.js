@@ -39,7 +39,8 @@ class ListItem extends HTMLElement {
 		this.shadowRoot.append(style, img, div);
 	}
 	connectedCallback() {
-		this.shadowRoot.querySelector('img').src = this.dataset.thumbnail;
+		if (!sessionStorage.getItem('img'))
+			this.shadowRoot.querySelector('img').src = this.dataset.thumbnail;
 		this.shadowRoot.querySelector('p').textContent = this.dataset.author;
 	}
 }
