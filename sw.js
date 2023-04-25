@@ -1,10 +1,11 @@
-const cacheName = 'ytify_5.11.2';
+const cacheName = 'ytify_5.11.3';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",
     "/src/stylesheets/data.css",
     "/src/stylesheets/player.css",
     "/src/stylesheets/relatedStreams.css",
+    "/src/stylesheets/settingsContainer.css",
     "/src/scripts/buttons.js",
     "/src/scripts/player.js",
     "/src/scripts/lib/helperFunctions.js",

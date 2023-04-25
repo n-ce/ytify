@@ -33,6 +33,8 @@
 	<link defer rel="stylesheet" href="src/stylesheets/data.css">
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
 	<link defer rel="stylesheet" href="src/stylesheets/relatedStreams.css">
+	<link defer rel="stylesheet" href="src/stylesheets/settingsContainer.css">
+	
 
 	<script defer src="src/components/ToggleSwitch.js"></script>
 	<script defer src="src/components/ListItem.js"></script>
@@ -201,8 +203,8 @@
 	<div id="subtitleContainer" class="hide"></div>
 
 	<script>
-		//		if ('serviceWorker' in navigator)
-		//	navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		if ('serviceWorker' in navigator)
+		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 
