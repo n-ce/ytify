@@ -68,6 +68,10 @@
 	outline: none;
 }
 
+#subtitleSelector{
+	width:15ch;
+}
+
 #superInputContainer {
 	display: flex;
 	align-items: center;
@@ -96,12 +100,6 @@
 	color: var(--border)
 }
 
-svg {
-	height: 2rem;
-	width: 2rem;
-	color: var(--border);
-}
-
 #searchFilters {
 	font-size: 0.7rem;
 	padding: 0;
@@ -109,8 +107,9 @@ svg {
 	border: none;
 	color: var(--border);
 	outline: none;
-	width: 10ch;
+	width: 9ch;
 }
+
 
 @media (min-width:600px) {
 	#dataContainer {
@@ -135,7 +134,8 @@ svg {
 	}
 
 	#author,
-	#bitrateSelector {
+	#bitrateSelector,
+	#subtitleSelector {
 		font-size: 0.9rem;
 	}
 }

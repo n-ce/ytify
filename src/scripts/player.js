@@ -1,4 +1,4 @@
-import { setMetadata, streamID, playlistID, getSaved, save, params, updatePositionState, setAudio, populateContainerWith } from './lib/helperFunctions.js';
+import { setMetadata, streamID, playlistID, getSaved, save, params, updatePositionState, setAudio } from './lib/helperFunctions.js';
 
 const api = [
 	'https://pipedapi.kavin.rocks',
@@ -18,7 +18,8 @@ let previous_ID;
 
 const play = async (id, instance = 0) => {
 
-	playButton.classList.replace(playButton.classList[0], 'spinner');
+	playButton.firstElementChild.classList.add('hide');
+	playButton.classList.add('spinner');
 
 	const data = await fetch(api[instance] + '/streams/' + id).then(res => res.json()).catch(err => {
 		if (instance < api.length - 1) {
@@ -48,13 +49,26 @@ const play = async (id, instance = 0) => {
 	// Subtitle data Injection into dom
 
 	subtitleSelector.innerHTML = '<option value="">Subtitles - Off</option>';
+	subtitleSelector.classList.remove('hide');
 	if (data.subtitles.length)
-		for (const subtitles of data.subtitles)
-			subtitleSelector.add(new Option(subtitles.name, subtitles.url));
-
+		for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
+	else
+		subtitleSelector.classList.add('hide');
 
 	// setting related streams
-	populateContainerWith(data.relatedStreams);
+	relatedStreamsContainer.innerHTML = '';
+	for (const stream of data.relatedStreams) {
+		const listItem = document.createElement('list-item');
+		listItem.textContent = stream.title;
+		listItem.dataset.author = stream.uploaderName;
+		listItem.addEventListener('click', () => {
+			queue ?
+				queueIt(stream.url.slice(9)) :
+				play(stream.url.slice(9));
+		});
+		listItem.dataset.thumbnail = stream.thumbnail;
+		relatedStreamsContainer.appendChild(listItem);
+	}
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);
@@ -81,12 +95,14 @@ const queueIt = id => {
 	queueArray[queueCount] = previous_ID = id;
 }
 
+const stopIcon = 'M6 5H18C18.5523 5 19 5.44772 19 6V18C19 18.5523 18.5523 19 18 19H6C5.44772 19 5 18.5523 5 18V6C5 5.44772 5.44772 5 6 5Z';
+
 // playback on end strategy
 audio.addEventListener('ended', () => {
 	if (queue) {
 		next();
 	} else {
-		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
+		playButtonIcon.setAttribute('d', stopIcon);
 		playButton.dataset.state = '1'
 	}
 })
@@ -169,9 +185,26 @@ const searchFilters = document.getElementById('searchFilters');
 
 const relatedStreamsButton = document.getElementById('relatedStreamsButton');
 const searchLoader = async () => {
+
 	relatedStreamsButton.click();
+
 	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=' + searchFilters.value).then(res => res.json())
-	populateContainerWith(searchResults.items)
+
+	relatedStreamsContainer.innerHTML = '';
+
+	for (const stream of searchResults.items) {
+		const listItem = document.createElement('list-item');
+		listItem.textContent = stream.title;
+		listItem.dataset.author = stream.uploaderName;
+		listItem.addEventListener('click', () => {
+			queue ?
+				queueIt(stream.url.slice(9)) :
+				play(stream.url.slice(9));
+		});
+		listItem.dataset.thumbnail = stream.thumbnail;
+		relatedStreamsContainer.appendChild(listItem);
+	}
+
 }
 searchFilters.nextElementSibling.addEventListener('click', searchLoader);
 

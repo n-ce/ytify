@@ -2,10 +2,10 @@ const stylesheet = `
 		:host{
 			display:flex;
 			align-items:center;
+			justify-content:space-between;
 			font-weight:bold;
 			font-size:0.8rem;
 			color : var(--border);
-			border-radius: 2rem 1rem 1rem 2rem;
 		}
 		
     label {
@@ -72,19 +72,22 @@ class ToggleSwitch extends HTMLElement {
 
 		const slot = document.createElement('slot');
 
-		this.shadowRoot.append(style, label, slot);
+		this.shadowRoot.append(style, slot, label);
+	}
+	static get observedAttributes() {
+		return ['checked']
 	}
 
 	connectedCallback() {
 		this.shadowRoot.lastChild.onslotchange = () => {
 			this.style.width = `calc(2.5rem + 1px + ${this.innerText.length}ch)`;
 		}
-		const checkbox = this.shadowRoot.querySelector('input');
-		checkbox.oninput = () => {
-			checkbox.checked ?
-				this.setAttribute('filter','music_songs') :
-				this.setAttribute('filter','all') ;
-		}
+		this.shadowRoot.querySelector('input').oninput = () => { this.click() }
+		
+	}
+
+	attributeChangedCallback() {
+		this.shadowRoot.querySelector('input').toggleAttribute('checked');
 	}
 
 }

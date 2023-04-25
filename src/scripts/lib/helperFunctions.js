@@ -210,21 +210,6 @@ function setAudio(data) {
 	audio.dataset.seconds = 0;
 }
 
-function populateContainerWith(items) {
-	relatedStreamsContainer.innerHTML = '';
-	for (const stream of items) {
-		const listItem = document.createElement('list-item');
-		listItem.textContent = stream.title;
-		listItem.dataset.author = stream.uploaderName;
-		listItem.addEventListener('click', () => {
-			queue ?
-				queueIt(stream.url.slice(9)) :
-				play(stream.url.slice(9));
-		});
-		listItem.dataset.thumbnail = stream.thumbnail;
-		relatedStreamsContainer.appendChild(listItem);
-	}
-}
 
 
 
@@ -239,6 +224,5 @@ export {
 	convertSStoHHMMSS,
 	parseTTML,
 	updatePositionState,
-	setAudio,
-	populateContainerWith
+	setAudio
 }

@@ -45,23 +45,19 @@
 
 <body>
 
-	<form netlify name='feedback' method='POST' class='hide'>
-		<input type="text" name="->" id="netlifyForm" />
-	</form>
+
 
 	<div id="dataContainer" class="show">
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
-			<a id="title" target="_blank">Copy a YouTube Video/Playlist Link</a>
+			<a id="title" target="_blank">ytify</a>
 			<br>
-			<a id="author" target="_blank">Paste it in the Input Box</a>
+			<a id="author" target="_blank">Channel</a>
 			<select id="bitrateSelector">
 				<option>Bitrate</option>
 			</select>
-			<select id="subtitleSelector">
-				<option>Subtitles</option>
-			</select>
+			<select id="subtitleSelector" class="hide"></select>
 			<br>
 
 			<span id="superInputContainer">
@@ -82,12 +78,11 @@
 						<option value="music_playlits">Playlists</option>
 					</optgroup>
 				</select>
-
 				<svg aria-label="search" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-					<path fill="currentColor" d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
+					<path d="M11 2C15.968 2 20 6.032 20 11C20 15.968 15.968 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2ZM11 18C14.8675 18 18 14.8675 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18ZM19.4853 18.0711L22.3137 20.8995L20.8995 22.3137L18.0711 19.4853L19.4853 18.0711Z"></path>
 				</svg>
-			</span>
 
+			</span>
 
 		</div>
 
@@ -97,6 +92,25 @@
 		<track src="ttml/subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
 	</audio>
 
+	<div id="settingsContainer" class="hide">
+		<toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
+		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
+		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
+		<toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
+
+		<span>
+			<button id="deleteButton">Clear All Stored Data</button>
+			<a href="https://t.me/encetg" target="_blank">Contact on Telegram</a>
+		</span>
+		<br>
+		<form netlify name='feedback' method='POST'>
+			<input type="text" name="->" id="netlifyForm" placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
+		</form>
+		<br>
+		<a align="center" href="https://github.com/n-ce/ytify" target="_blank">ytify v5.11</a>
+	</div>
+
+
 	<div id="relatedStreamsContainer" class="hide">
 		<h1>Streams related to your current playing stream show up here.</h1>
 	</div>
@@ -105,7 +119,11 @@
 
 		<div id="playerControls">
 
-			<button id="playButton" class="ri-stop-fill" data-state="1"></button>
+			<button id="playButton" data-state="1">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path id="playButtonIcon" d="M6 5H18C18.5523 5 19 5.44772 19 6V18C19 18.5523 18.5523 19 18 19H6C5.44772 19 5 18.5523 5 18V6C5 5.44772 5.44772 5 6 5Z"></path>
+				</svg>
+			</button>
 
 			<select id="playSpeed">
 				<option value="0.25">0.25x</option>
@@ -128,86 +146,63 @@
 		</div>
 
 		<div id="playerProfiles">
-			<!-- <settings buttons> -->
-			<button type="button" id="themeButton" class="hide">
-				<i class="ri-moon-fill"></i>
-				<p>Dark Mode</p>
-			</button>
 
-			<button type="button" id="fullscreenButton" class="hide">
-				<i class="ri-fullscreen-fill"></i>
-				<p>Fullscreen</p>
-			</button>
-
-			<button type="button" id="thumbnailButton" class="hide">
-				<i class="ri-image-fill on"></i>
-				<p>Thumbnail</p>
-			</button>
-
-			<button type="button" id="qualityButton" class="hide">
-				<i class="ri-hq-fill"></i>
-				<p>High Quality</p>
-			</button>
-			<!-- </settings buttons> -->
-			<!-- <functions buttons> -->
 			<button type="button" id="seekBwdButton">
-				<i class="ri-rewind-fill"></i>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M12.001 10.6665L21.2237 4.51811C21.4534 4.36493 21.7639 4.42702 21.917 4.65679C21.9718 4.73892 22.001 4.83542 22.001 4.93414V19.0656C22.001 19.3418 21.7772 19.5656 21.501 19.5656C21.4023 19.5656 21.3058 19.5364 21.2237 19.4816L12.001 13.3332V19.0656C12.001 19.3418 11.7772 19.5656 11.501 19.5656C11.4023 19.5656 11.3058 19.5364 11.2237 19.4816L0.625047 12.4159C0.395282 12.2627 0.333196 11.9523 0.486372 11.7225C0.522989 11.6676 0.570121 11.6205 0.625047 11.5839L11.2237 4.51811C11.4534 4.36493 11.7639 4.42702 11.917 4.65679C11.9718 4.73892 12.001 4.83542 12.001 4.93414V10.6665Z"></path>
+				</svg>
 				<p>Backward</p>
 			</button>
 
 			<button type="button" id="seekFwdButton">
-				<i class="ri-speed-fill"></i>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M12 13.3332L2.77735 19.4816C2.54759 19.6348 2.23715 19.5727 2.08397 19.3429C2.02922 19.2608 2 19.1643 2 19.0656V4.93408C2 4.65794 2.22386 4.43408 2.5 4.43408C2.59871 4.43408 2.69522 4.4633 2.77735 4.51806L12 10.6665V4.93408C12 4.65794 12.2239 4.43408 12.5 4.43408C12.5987 4.43408 12.6952 4.4633 12.7774 4.51806L23.376 11.5838C23.6057 11.737 23.6678 12.0474 23.5146 12.2772C23.478 12.3321 23.4309 12.3792 23.376 12.4158L12.7774 19.4816C12.5476 19.6348 12.2372 19.5727 12.084 19.3429C12.0292 19.2608 12 19.1643 12 19.0656V13.3332Z"></path>
+				</svg>
 				<p>Forward</p>
 			</button>
 
 			<button type="button" id="queueButton">
-				<i class="ri-play-list-add-fill" data-badge="0"></i>
+				<svg data-badge="0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M2 18H12V20H2V18ZM2 11H22V13H2V11ZM2 4H22V6H2V4ZM18 18V15H20V18H23V20H20V23H18V20H15V18H18Z"></path>
+				</svg>
 				<p>Queue</p>
 			</button>
 
 			<button type="button" class="hide" id="queueNextButton">
-				<i class="ri-skip-forward-fill"></i>
-				<p>Skip Next</p>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M16 12.6667L5.77735 19.4818C5.54759 19.6349 5.23715 19.5729 5.08397 19.3431C5.02922 19.261 5 19.1645 5 19.0657V4.93426C5 4.65812 5.22386 4.43426 5.5 4.43426C5.59871 4.43426 5.69522 4.46348 5.77735 4.51823L16 11.3333V5C16 4.44772 16.4477 4 17 4C17.5523 4 18 4.44772 18 5V19C18 19.5523 17.5523 20 17 20C16.4477 20 16 19.5523 16 19V12.6667Z"></path>
+				</svg>
+				<p>SkipNext</p>
 			</button>
 
 			<button type="button" id="loopButton">
-				<i class="ri-repeat-fill"></i>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M6 4H21C21.5523 4 22 4.44772 22 5V12H20V6H6V9L1 5L6 1V4ZM18 20H3C2.44772 20 2 19.5523 2 19V12H4V18H18V15L23 19L18 23V20Z"></path>
+				</svg>
 				<p>Loop</p>
 			</button>
 			<button type="button" id="settingsButton">
-				<i class="ri-settings-fill"></i>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M12 1L21.5 6.5V17.5L12 23L2.5 17.5V6.5L12 1ZM12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"></path>
+				</svg>
 				<p>Settings</p>
 			</button>
 
 			<button type="button" id="relatedStreamsButton">
-				<i class="ri-menu-4-fill"></i>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+					<path d="M16 18V20H5V18H16ZM21 11V13H3V11H21ZM19 4V6H8V4H19Z"></path>
+				</svg>
 				<p>Related</p>
 			</button>
 
-			<!-- </functions buttons> -->
-			<!-- <settings buttons> -->
-			<button type="button" id="deleteButton" class="hide">
-				<i class="ri-delete-bin-fill"></i>
-				<p>Clear Data</p>
-			</button>
-
-			<button type="button" id="feedbackButton" class="hide">
-				<i class="ri-feedback-fill"></i>
-				<p>Feedback</p>
-			</button>
-			<!-- </settings buttons> -->
 		</div>
 	</div>
 
 	<div id="subtitleContainer" class="hide"></div>
 
-	<footer>
-		<a href="https://github.com/n-ce/ytify" target="_blank">ytify</a> v5.10, a
-		<a href="https://t.me/encetg" target="_blank">n-ce</a> project.
-	</footer>
 	<script>
-			if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		//		if ('serviceWorker' in navigator)
+		//	navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

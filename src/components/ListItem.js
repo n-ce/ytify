@@ -8,7 +8,7 @@ class ListItem extends HTMLElement {
 		const slot = document.createElement('slot');
 		const p = document.createElement('p');
 		const div = document.createElement('div');
-		div.append(slot, p);
+		div.append(slot,p);
 
 		const style = document.createElement('style');
 		style.textContent = `

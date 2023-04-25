@@ -88,6 +88,68 @@
 	display: none;
 }
 
+button{
+	background: none;
+	border:none;
+	color: var(--border);
+	margin-bottom: 0.5rem;
+	animation: appear 0.5s;
+	transition: transform 0.4s;
+}
+
+
+button svg,
+#playButton {
+	height: 1.5rem;
+	width: 1.5rem;
+	padding:0.7rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1rem;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+#playButton{
+	width: 3rem;
+	height:3rem;
+	padding: 0;
+}
+
+button p {
+	margin: 0;
+	font-weight: bold;
+	font-size: 0.7rem;
+	font-family: 'Noto Sans', sans-serif;
+}
+
+button:active svg,
+#playButton:active {
+	background-color: var(--accent);
+	color: var(--text);
+}
+
+button:active {
+	transform: scale(0.9);
+}
+
+.on {
+	background-color: var(--accent);
+	color: var(--text);
+	border: 1px solid var(--border);
+	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	-webkit-transform: scale(0.9);
+	-ms-transform: scale(0.9);
+	transform: scale(0.9);
+}
+
+
+
+
+
 
 @media (min-width:600px) {
 	#playerContainer {

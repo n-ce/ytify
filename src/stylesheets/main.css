@@ -1,6 +1,6 @@
 @font-face {
 	font-family: 'Noto Sans';
-	src: url("assets/Fonts/NotoSans.woff2") format("woff2");
+	src: url("assets/NotoSans.woff2") format("woff2");
 	font-display: swap;
 }
 
@@ -42,62 +42,10 @@ body {
 	align-items: center;
 	font-family: 'Noto Sans', sans-serif;
 }
-
-button {
-	font-size: 1.5rem;
-	padding: 0;
-	background: none;
-	color: var(--border);
-	border: none;
-	animation: appear 0.5s;
-	transition: transform 0.4s;
-}
-button:disabled i{
-	opacity: 50%;
+path {
+	fill: currentColor;
 }
 
-
-
-button i,
-#playButton, #metadata button{
-	height: 3rem;
-	width: 3rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 1rem;
-	-webkit-transition: all 0.5s;
-	-o-transition: all 0.5s;
-	transition: all 0.5s;
-}
-
-button p {
-	margin: 0;
-	font-weight: bold;
-	font-size: 0.5rem;
-	font-family: 'Noto Sans', sans-serif;
-}
-
-button:active i,
-#playButton:active {
-	background-color: var(--accent);
-	color: var(--text);
-}
-
-button:active {
-	transform: scale(0.9);
-}
-
-.on {
-	background-color: var(--accent);
-	color: var(--text);
-	border: 1px solid var(--border);
-	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-	-webkit-transform: scale(0.9);
-	-ms-transform: scale(0.9);
-	transform: scale(0.9);
-}
 
 .hide {
 	display: none;
@@ -105,6 +53,10 @@ button:active {
 
 .show {
 	display: flex;
+}
+
+footer {
+	margin-top: 1rem;
 }
 
 footer a {
@@ -119,14 +71,14 @@ footer a {
 	}
 }
 
-#subtitles {
+#subtitleContainer {
 	width: 80%;
 	position: relative;
 	pointer-events: none;
 }
 
 @media (min-width:600px) {
-	#subtitles {
+	#subtitleContainer {
 		width: 50%;
 	}
 }

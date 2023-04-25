@@ -14,9 +14,7 @@ const contentToCache = [
     "/assets/ytify_thumbnail_min.webp",
     "/assets/maskable_icon_x192.png",
     "/assets/maskable_icon_x512.png",
-    "/assets/Fonts/remixicon.css",
-    "/assets/Fonts/NotoSans.woff2",
-    "/assets/Fonts/remixicon.woff2"
+    "/assets/NotoSans.woff2"
     ];
 
 // Installing Service Worker
