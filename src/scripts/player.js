@@ -216,7 +216,7 @@ superInput.addEventListener('keypress', e => {
 	if (e.key === 'Enter') searchLoader();
 });
 
-searchFilters.nextElementSibling.onclick = () => searchLoader();
+document.querySelector('.ri-search-2-line').onclick = () => searchLoader();
 
 
 // URL params 

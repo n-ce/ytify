@@ -66,6 +66,7 @@ class ToggleSwitch extends HTMLElement {
 
 		const input = document.createElement('input');
 		input.type = 'checkbox';
+		input.oninput = () => { this.click() }
 
 		const span = document.createElement('span');
 		label.append(input, span);
@@ -76,14 +77,6 @@ class ToggleSwitch extends HTMLElement {
 	}
 	static get observedAttributes() {
 		return ['checked']
-	}
-
-	connectedCallback() {
-		this.shadowRoot.lastChild.onslotchange = () => {
-			this.style.width = `calc(2.5rem + 1px + ${this.innerText.length}ch)`;
-		}
-		this.shadowRoot.querySelector('input').oninput = () => { this.click() }
-		
 	}
 
 	attributeChangedCallback() {

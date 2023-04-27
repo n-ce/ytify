@@ -69,9 +69,9 @@ body {
 	-webkit-box-direction: normal;
 	-ms-flex-direction: column;
 	flex-direction: column;
-	-webkit-box-pack: space-evenly;
-	-ms-flex-pack: space-evenly;
-	justify-content: space-evenly;
+	-webkit-box-pack: space-around;
+	-ms-flex-pack: space-around;
+	justify-content: space-around;
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
@@ -87,13 +87,6 @@ body {
 	display: flex;
 }
 
-footer {
-	margin-top: 1rem;
-}
-
-footer a {
-	color: inherit;
-}
 
 
 @keyframes appear {
