@@ -16,11 +16,53 @@ let queueNow = 1;
 let previous_ID;
 
 
+// link validator
+
+const validator = (val, pID, sID) => {
+	if (val) {
+		pID = playlistID(val);
+		sID = streamID(val);
+	}
+	if (sID)
+		queue ? queueIt(sID) : play(sID);
+	else if (pID)
+		queue ? queueIt(pID) : playlistLoad(pID);
+
+	// so that it does not run again for the same link
+	previous_ID = pID || sID;
+}
+
+// Loads streams into related streams container
+
+const streamsLoader = streamsArray => {
+	for (const stream of streamsArray) {
+		const listItem = document.createElement('list-item');
+		listItem.textContent = stream.title || stream.name;
+		listItem.dataset.author = stream.uploaderName || stream.description;
+		listItem.addEventListener('click', () => {
+			switch (stream.type) {
+				case 'stream':
+					validator(null, null, stream.url.slice(9));
+					break;
+				case 'playlist':
+					validator(null, stream.url.slice(15), null);
+					break;
+				case 'channel':
+					open('https://youtube.com' + stream.url);
+					//		fetch(api[0] + stream.url).then(res => res.json()).then(channel => streamsLoader(channel.relatedStreams));
+					break;
+			}
+		});
+		listItem.dataset.thumbnail = stream.thumbnail;
+		relatedStreamsContainer.appendChild(listItem);
+	}
+}
+
+// The main player function
+
 const play = async (id, instance = 0) => {
 
-	playButton.firstElementChild.classList.add('hide');
-	playButton.classList.add('spinner');
-
+	playButton.classList.replace(playButton.classList[0], 'spinner')
 	const data = await fetch(api[instance] + '/streams/' + id).then(res => res.json()).catch(err => {
 		if (instance < api.length - 1) {
 			play(id, instance + 1);
@@ -57,18 +99,7 @@ const play = async (id, instance = 0) => {
 
 	// setting related streams
 	relatedStreamsContainer.innerHTML = '';
-	for (const stream of data.relatedStreams) {
-		const listItem = document.createElement('list-item');
-		listItem.textContent = stream.title;
-		listItem.dataset.author = stream.uploaderName;
-		listItem.addEventListener('click', () => {
-			queue ?
-				queueIt(stream.url.slice(9)) :
-				play(stream.url.slice(9));
-		});
-		listItem.dataset.thumbnail = stream.thumbnail;
-		relatedStreamsContainer.appendChild(listItem);
-	}
+	streamsLoader(data.relatedStreams);
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);
@@ -95,14 +126,13 @@ const queueIt = id => {
 	queueArray[queueCount] = previous_ID = id;
 }
 
-const stopIcon = 'M6 5H18C18.5523 5 19 5.44772 19 6V18C19 18.5523 18.5523 19 18 19H6C5.44772 19 5 18.5523 5 18V6C5 5.44772 5.44772 5 6 5Z';
 
 // playback on end strategy
 audio.addEventListener('ended', () => {
 	if (queue) {
 		next();
 	} else {
-		playButtonIcon.setAttribute('d', stopIcon);
+		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
 		playButton.dataset.state = '1'
 	}
 })
@@ -154,20 +184,6 @@ const playlistLoad = async (id, instance = 0) => {
 
 }
 
-// link validator
-
-const validator = val => {
-	const pID = playlistID(val);
-	const sID = streamID(val);
-
-	if (sID)
-		queue ? queueIt(sID) : play(sID);
-	else if (pID)
-		queue ? queueIt(pID) : playlistLoad(pID);
-
-	// so that it does not run again for the same link
-	previous_ID = pID || sID;
-}
 
 // input text player
 
@@ -175,47 +191,41 @@ superInput.addEventListener('input', () => {
 	if (!superInput.value.includes(previous_ID))
 		validator(superInput.value);
 });
+
+
+
+const searchLoader = (instance = 0) => {
+
+	relatedStreamsContainer.innerHTML = '';
+
+	fetch(api[instance] + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
+		.then(res => res.json())
+		.then(searchResults => streamsLoader(searchResults.items))
+		.catch(err => {
+			if (instance < api.length - 1) {
+				searchLoader(id, instance + 1);
+				return;
+			}
+			alert(err)
+		});
+
+	relatedStreamsButton.click();
+}
+
 superInput.addEventListener('keypress', e => {
 	if (e.key === 'Enter') searchLoader();
 });
 
-// search button
-
-const searchFilters = document.getElementById('searchFilters');
-
-const relatedStreamsButton = document.getElementById('relatedStreamsButton');
-const searchLoader = async () => {
-
-	relatedStreamsButton.click();
-
-	const searchResults = await fetch(api[0] + '/search?q=' + superInput.value + '&filter=' + searchFilters.value).then(res => res.json())
-
-	relatedStreamsContainer.innerHTML = '';
-
-	for (const stream of searchResults.items) {
-		const listItem = document.createElement('list-item');
-		listItem.textContent = stream.title;
-		listItem.dataset.author = stream.uploaderName;
-		listItem.addEventListener('click', () => {
-			queue ?
-				queueIt(stream.url.slice(9)) :
-				play(stream.url.slice(9));
-		});
-		listItem.dataset.thumbnail = stream.thumbnail;
-		relatedStreamsContainer.appendChild(listItem);
-	}
-
-}
-searchFilters.nextElementSibling.addEventListener('click', searchLoader);
+searchFilters.nextElementSibling.onclick = () => searchLoader();
 
 
 // URL params 
 
 if (params.get('s')) // stream
-	validator('https://youtube.com/watch?v=' + params.get('s'));
+	validator(null, null, params.get('s'));
 
 if (params.get('p')) { // playlist
-	validator('https://youtube.com/playlist?list=' + params.get('p'));
+	validator(null, params.get('p'));
 	params.delete('p'); // stop param from interferring rest of the program
 }
 if (params.get('t')) { // timestamp

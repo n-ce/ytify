@@ -8,22 +8,13 @@
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border-radius: 0.7rem;
 	animation: appear 0.5s ease-out;
+	user-select: none;
+
 }
 
 toggle-switch {
 	margin-bottom: 1rem;
 	font-size: 1rem;
-}
-
-#deleteButton {
-	margin: 0;
-	background-color: #f007;
-	font-size: 1rem;
-	font-weight: bold;
-	padding: 0.5rem;
-	border: 1px solid var(--border);
-	border-radius: 0.7rem;
-	color: white;
 }
 
 
@@ -35,6 +26,7 @@ toggle-switch {
 	border-radius: 0.7rem;
 	color: var(--text);
 	outline: none;
+	font-family: 'Noto Sans';
 }
 
 #netlifyForm::placeholder {
@@ -43,23 +35,44 @@ toggle-switch {
 
 #settingsContainer span {
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-evenly;
 	align-items: center;
 }
 
-#settingsContainer span a {
+#settingsContainer span button {
+	margin: 0;
+	background-color: var(--accent);
 	font-weight: bold;
-	background-color: #08c;
-	color: white;
-	text-decoration: none;
 	padding: 0.5rem;
 	border: 1px solid var(--border);
 	border-radius: 0.7rem;
-	text-align: center;
+	animation: none;
+	color: var(--border);
+	font-family: 'Noto Sans';
+}
+
+#settingsContainer span button:hover {
+	background-color: #f007;
+	color: #ddd;
 }
 
 #settingsContainer a {
-	display: block;
-	font-weight: bold;
+	text-decoration: none;
+	width: 2rem;
+	text-align: center;
+	transition: all 0.4s;
+	border-radius: 0.7rem;
+	border: 1px solid var(--border);
+	background-color: var(--accent);
 	color: var(--border);
+}
+
+#settingsContainer span .ri-telegram-line:hover {
+	background-color: #08c;
+	color: #ddd;
+}
+
+#settingsContainer span .ri-github-fill:hover {
+	background-color: #333;
+	color: #ddd;
 }

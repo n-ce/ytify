@@ -77,23 +77,12 @@ qualityButton.click = () => {
 // Delete Button
 
 deleteButton.addEventListener('click', () => {
+	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
 	localStorage.clear();
-
-	// developer use only 
-	self.caches.keys()
-		.then(s => s.forEach(k => { self.caches.delete(k) }))
-		.then(e => navigator.serviceWorker.getRegistrations())
-		.then(s => s.forEach(r => { r.unregister() }))
-		.then(e => location.replace(location.origin));
+	location.replace(location.origin);
 });
 
-// Feedback Button
-/*
-feedbackButton.addEventListener('click', async () => {
-	netlifyForm.value = await prompt();
-	if (netlifyForm.value) document.forms[0].submit();
-});
-*/
 
 
 // bitrate selector
@@ -108,7 +97,6 @@ bitrateSelector.addEventListener('change', () => {
 
 // subtitle selector
 
-const subtitleSelector = document.getElementById('subtitleSelector');
 subtitleSelector.addEventListener('change', () => {
 	audio.firstElementChild.src = subtitleSelector.value;
 	if (!subtitleSelector.value) {
@@ -138,19 +126,17 @@ playButton.addEventListener('click', () => {
 });
 
 audio.addEventListener('playing', () => {
-	playButtonIcon.setAttribute('d',pauseIcon);
+playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
 	playButton.dataset.state = '';
 });
 
 audio.addEventListener('pause', () => {
-	playButtonIcon.setAttribute('d',playIcon);
+playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
 	playButton.dataset.state = '1';
 });
 
 audio.addEventListener('loadeddata', () => {
-	playButton.classList.remove('spinner');
-	playButton.firstElementChild.classList.remove('hide');
-	playButtonIcon.setAttribute('d',playIcon);
+	playButton.classList.replace('spinner', 'ri-play-fill');
 	playButton.classList.add('on');
 	if (superInput.value) audio.play();
 });
@@ -229,8 +215,6 @@ loopButton.addEventListener('click', () => {
 
 
 // streams service button
-const relatedStreamsButton = document.getElementById('relatedStreamsButton');
-const dataContainer = document.getElementById('dataContainer');
 
 relatedStreamsButton.addEventListener('click', () => {
 	dataContainer.classList.toggle('show');

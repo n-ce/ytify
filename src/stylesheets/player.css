@@ -15,8 +15,41 @@
 	-ms-flex-pack: justify;
 	justify-content: space-between;
 	align-items: center;
-	width:100%;
+	width: 100%;
 }
+
+button {
+	background: none;
+	border:none;
+}
+
+#playButton {
+	color: var(--border);
+	animation: appear 0.5s;
+	transition: transform 0.4s;
+	padding: none;
+	height: 3rem;
+	width: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1rem;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+
+button:active i,
+#playButton:active {
+	background-color: var(--accent);
+	color: var(--text);
+}
+
+button:active {
+	transform: scale(0.9);
+}
+
 
 .spinner::after {
 	content: "";
@@ -32,6 +65,7 @@
 	from {
 		transform: rotate(0turn)
 	}
+
 	to {
 		transform: rotate(1turn)
 	}
@@ -44,7 +78,16 @@
 	border: none;
 	background: none;
 	outline: none;
+	font-family: 'Noto Sans';
 }
+
+#currentDuration,
+#fullDuration {
+	color: var(--border);
+	font-size: 0.7rem;
+	padding: 0.3rem;
+}
+
 
 #playerProfiles {
 	display: -webkit-box;
@@ -58,15 +101,37 @@
 	align-items: center;
 }
 
-#currentDuration,
-#fullDuration {
+
+#playerProfiles button {
 	color: var(--border);
-	font-size: 0.7rem;
-	padding: 0.3rem;
+	animation: appear 0.5s;
+	transition: transform 0.4s;
+	padding: none;
 }
 
+
+#playerProfiles button i {
+	height: 2.5rem;
+	width: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1rem;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+#playerProfiles button p {
+	margin: 0;
+	font-weight: bold;
+	font-size: 0.7rem;
+	font-family: 'Noto Sans', sans-serif;
+}
+
+
 #queueButton i {
-	min-width: 3rem;
+	min-width: 3.1rem;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -88,55 +153,11 @@
 	display: none;
 }
 
-button{
-	background: none;
-	border:none;
-	color: var(--border);
-	margin-bottom: 0.5rem;
-	animation: appear 0.5s;
-	transition: transform 0.4s;
-}
 
 
-button svg,
-#playButton {
-	height: 1.5rem;
-	width: 1.5rem;
-	padding:0.7rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 1rem;
-	-webkit-transition: all 0.5s;
-	-o-transition: all 0.5s;
-	transition: all 0.5s;
-}
-
-#playButton{
-	width: 3rem;
-	height:3rem;
-	padding: 0;
-}
-
-button p {
-	margin: 0;
-	font-weight: bold;
-	font-size: 0.7rem;
-	font-family: 'Noto Sans', sans-serif;
-}
-
-button:active svg,
-#playButton:active {
-	background-color: var(--accent);
-	color: var(--text);
-}
-
-button:active {
-	transform: scale(0.9);
-}
 
 .on {
-	background-color: var(--accent);
+	background: var(--accent);
 	color: var(--text);
 	border: 1px solid var(--border);
 	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;

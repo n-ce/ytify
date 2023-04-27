@@ -1,4 +1,4 @@
-const cacheName = 'ytify_5.11.3';
+const cacheName = 'ytify_5.11.4';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",
@@ -12,10 +12,12 @@ const contentToCache = [
     "/src/scripts/lib/sax.min.js",
     "/src/scripts/lib/imsc.min.js",
     "/src/components/ListItem.js",
+    "/src/components/ToggleSwitch.js",
     "/assets/ytify_thumbnail_min.webp",
     "/assets/maskable_icon_x192.png",
     "/assets/maskable_icon_x512.png",
-    "/assets/NotoSans.woff2"
+    "/assets/NotoSans.woff2",
+    "/assets/remixicon.woff2"
     ];
 
 // Installing Service Worker

@@ -86,9 +86,6 @@ if (!params.get('s') && !params.get('text'))
 	img.src = 'assets/ytify_thumbnail_min.webp';
 
 
-const title = document.getElementById('title');
-const author = document.getElementById('author');
-
 
 function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 
@@ -209,8 +206,6 @@ function setAudio(data) {
 	audio.src = opus.urls[bitrateSelector.selectedIndex];
 	audio.dataset.seconds = 0;
 }
-
-
 
 
 export {
