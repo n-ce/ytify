@@ -35,3 +35,6 @@ No specific build tools are required.
 - [Netlify](https://www.netlify.com)
 - [Remix Icons](https://github.com/Remix-Design/RemixIcon)
 - [Google Fonts](https://fonts.google.com)
+
+![jamstack](https://user-images.githubusercontent.com/69345507/234927416-f846bd9f-db2b-4b06-9aa2-921163a76f24.png)
+
