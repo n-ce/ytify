@@ -1,5 +1,9 @@
 <div align="center">
  <a href="https://ytify.netlify.app"><img src="assets/ytify_thumbnail_max.webp" width="70%"></a>
+
+![](https://img.shields.io/github/repo-size/n-ce/ytify?style=for-the-badge)
+![](https://img.shields.io/tokei/lines/github/n-ce/ytify?style=for-the-badge)
+ 
 </div>
 
 #
