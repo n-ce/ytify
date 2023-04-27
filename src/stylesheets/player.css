@@ -123,14 +123,15 @@ button:active {
 
 #playerProfiles button p {
 	margin: 0;
+	padding:0;
 	font-weight: bold;
-	font-size: 0.7rem;
+	font-size: 0.6rem;
 	font-family: 'Noto Sans', sans-serif;
 }
 
 
 #queueButton i {
-	min-width: 3.1rem;
+	min-width: 3rem;
 	display: flex;
 	align-items: center;
 	justify-content: center;

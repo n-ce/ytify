@@ -53,7 +53,7 @@
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
-			<a id="title" target="_blank">Title</a>
+			<a id="title" target="_blank">ytify v5.11</a>
 			<br>
 			<a id="author" target="_blank">Channel</a>
 			<select id="bitrateSelector">
@@ -183,8 +183,8 @@
 	<div id="subtitleContainer" class="hide"></div>
 
 	<script>
-		//if ('serviceWorker' in navigator)
-		//		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		if ('serviceWorker' in navigator)
+		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 
