@@ -26,7 +26,6 @@ button {
 #playButton {
 	color: var(--border);
 	animation: appear 0.5s;
-	transition: transform 0.4s;
 	padding: none;
 	height: 3rem;
 	width: 3rem;
