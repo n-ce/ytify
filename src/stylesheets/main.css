@@ -1,8 +1,43 @@
 @font-face {
 	font-family: 'Noto Sans';
-	src: url("assets/Fonts/NotoSans.woff2") format("woff2");
+	src: url("/assets/NotoSans.woff2") format("woff2");
 	font-display: swap;
 }
+
+@font-face {
+	font-family: "remixicon";
+	src: url("/assets/remixicon.woff2") format("woff2");
+	font-display: swap;
+}
+
+[class^="ri-"],
+[class*="ri-"] {
+	font-family: 'remixicon' !important;
+	font-style: normal;
+	font-size:1.5rem;
+	color:var(--border);
+	padding-bottom: 0.5rem;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+
+.ri-pause-fill:before { content: "\efd7"; }
+.ri-stop-fill:before { content: "\f1a0"; }
+.ri-repeat-fill:before { content: "\f073"; }
+.ri-play-list-add-fill:before { content: "\f00e"; }
+.ri-play-fill:before { content: "\f00a"; }
+.ri-rewind-fill:before { content: "\f085"; }
+.ri-speed-fill:before { content: "\f176"; }
+.ri-skip-forward-fill:before { content: "\f143"; }
+.ri-settings-fill:before { content: "\f0ed"; }
+.ri-menu-4-fill:before { content: "\ef35"; }
+.ri-search-2-line:before { content: "\f0cd"; }
+.ri-github-fill:before { content: "\edca"; }
+.ri-play-list-2-fill:before { content: "\f00c"; }
+.ri-telegram-line:before { content: "\f1f0"; }
+
+
 
 :root {
 	--bg: none;
@@ -34,70 +69,15 @@ body {
 	-webkit-box-direction: normal;
 	-ms-flex-direction: column;
 	flex-direction: column;
-	-webkit-box-pack: space-evenly;
-	-ms-flex-pack: space-evenly;
-	justify-content: space-evenly;
+	-webkit-box-pack: space-around;
+	-ms-flex-pack: space-around;
+	justify-content: space-around;
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
 	font-family: 'Noto Sans', sans-serif;
 }
 
-button {
-	font-size: 1.5rem;
-	padding: 0;
-	background: none;
-	color: var(--border);
-	border: none;
-	animation: appear 0.5s;
-	transition: transform 0.4s;
-}
-button:disabled i{
-	opacity: 50%;
-}
-
-
-
-button i,
-#playButton, #metadata button{
-	height: 3rem;
-	width: 3rem;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	border-radius: 1rem;
-	-webkit-transition: all 0.5s;
-	-o-transition: all 0.5s;
-	transition: all 0.5s;
-}
-
-button p {
-	margin: 0;
-	font-weight: bold;
-	font-size: 0.5rem;
-	font-family: 'Noto Sans', sans-serif;
-}
-
-button:active i,
-#playButton:active {
-	background-color: var(--accent);
-	color: var(--text);
-}
-
-button:active {
-	transform: scale(0.9);
-}
-
-.on {
-	background-color: var(--accent);
-	color: var(--text);
-	border: 1px solid var(--border);
-	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-	-webkit-transform: scale(0.9);
-	-ms-transform: scale(0.9);
-	transform: scale(0.9);
-}
 
 .hide {
 	display: none;
@@ -107,9 +87,6 @@ button:active {
 	display: flex;
 }
 
-footer a {
-	color: inherit;
-}
 
 
 @keyframes appear {
@@ -119,14 +96,14 @@ footer a {
 	}
 }
 
-#subtitles {
+#subtitleContainer {
 	width: 80%;
 	position: relative;
 	pointer-events: none;
 }
 
 @media (min-width:600px) {
-	#subtitles {
+	#subtitleContainer {
 		width: 50%;
 	}
 }

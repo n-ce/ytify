@@ -15,8 +15,40 @@
 	-ms-flex-pack: justify;
 	justify-content: space-between;
 	align-items: center;
-	width:100%;
+	width: 100%;
 }
+
+button {
+	background: none;
+	border:none;
+}
+
+#playButton {
+	color: var(--border);
+	animation: appear 0.5s;
+	padding: none;
+	height: 3rem;
+	width: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1rem;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+
+button:active i,
+#playButton:active {
+	background-color: var(--accent);
+	color: var(--text);
+}
+
+button:active {
+	transform: scale(0.9);
+}
+
 
 .spinner::after {
 	content: "";
@@ -32,6 +64,7 @@
 	from {
 		transform: rotate(0turn)
 	}
+
 	to {
 		transform: rotate(1turn)
 	}
@@ -44,7 +77,16 @@
 	border: none;
 	background: none;
 	outline: none;
+	font-family: 'Noto Sans';
 }
+
+#currentDuration,
+#fullDuration {
+	color: var(--border);
+	font-size: 0.7rem;
+	padding: 0.3rem;
+}
+
 
 #playerProfiles {
 	display: -webkit-box;
@@ -58,12 +100,35 @@
 	align-items: center;
 }
 
-#currentDuration,
-#fullDuration {
+
+#playerProfiles button {
 	color: var(--border);
-	font-size: 0.7rem;
-	padding: 0.3rem;
+	animation: appear 0.5s;
+	transition: transform 0.4s;
+	padding: none;
 }
+
+
+#playerProfiles button i {
+	height: 2.5rem;
+	width: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 1rem;
+	-webkit-transition: all 0.5s;
+	-o-transition: all 0.5s;
+	transition: all 0.5s;
+}
+
+#playerProfiles button p {
+	margin: 0;
+	padding:0;
+	font-weight: bold;
+	font-size: 0.6rem;
+	font-family: 'Noto Sans', sans-serif;
+}
+
 
 #queueButton i {
 	min-width: 3rem;
@@ -87,6 +152,24 @@
 [data-badge="0"]:after {
 	display: none;
 }
+
+
+
+
+.on {
+	background: var(--accent);
+	color: var(--text);
+	border: 1px solid var(--border);
+	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	-webkit-transform: scale(0.9);
+	-ms-transform: scale(0.9);
+	transform: scale(0.9);
+}
+
+
+
+
 
 
 @media (min-width:600px) {

@@ -1,42 +1,41 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
-import { settingsButton, themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, loopButton, superInput, netlifyForm, audio, progress, playSpeed, playButton, currentDuration, fullDuration, img, relatedStreamsContainer, subtitleContainer } from './lib/DOM.js';
 
 // settings panel toggle
 
-settingsButton.addEventListener('click', () => {
 
- [themeButton, fullscreenButton, thumbnailButton, qualityButton, deleteButton, feedbackButton, seekBwdButton, seekFwdButton, queueButton, queueButton.firstElementChild.classList.length === 2 ? queueNextButton : loopButton, relatedStreamsButton, subtitleButton]
-	.map(e => e.classList.toggle('hide'));
+settingsButton.addEventListener('click', () => {
+	settingsButton.firstElementChild.classList.toggle('on');
+	settingsContainer.classList.toggle('hide');
+	dataContainer.classList.toggle('show');
+	dataContainer.classList.toggle('hide');
 
 });
 
 
 // Theme toggle
 
-if (getSaved('theme'))
-	themeButton.firstElementChild.classList.add('on');
+if (getSaved('theme')) {
+	themeButton.toggleAttribute('checked')
+}
 
-themeButton.addEventListener('click', () => {
+themeButton.click = () => {
 	getSaved('theme') ?
 		localStorage.removeItem('theme') :
 		save('theme', 'dark');
-	themeButton.firstElementChild.classList.toggle('on');
 	themer();
-});
+}
+
+
 
 
 
 // fullscreen
 
-fullscreenButton.addEventListener('click', () => {
-	if (document.fullscreenElement) {
-		document.exitFullscreen();
-		fullscreenButton.firstElementChild.classList.remove('on');
-	} else {
+fullscreenButton.click = () => {
+	document.fullscreenElement ?
+		document.exitFullscreen() :
 		document.documentElement.requestFullscreen();
-		fullscreenButton.firstElementChild.classList.add('on');
-	}
-});
+}
 
 
 
@@ -44,7 +43,7 @@ fullscreenButton.addEventListener('click', () => {
 
 let thumbnail = true;
 
-thumbnailButton.addEventListener('click', () => {
+thumbnailButton.click = () => {
 
 	if (thumbnail)
 		sessionStorage.setItem('img', img.src);
@@ -53,20 +52,17 @@ thumbnailButton.addEventListener('click', () => {
 		sessionStorage.removeItem('img');
 	}
 	thumbnail = !thumbnail;
-	thumbnailButton.firstElementChild.classList.toggle('on');
 	img.classList.toggle('hide');
-});
+}
 
 
 
 // quality
 
 if (getSaved('quality') == 'hq')
-	qualityButton.firstElementChild.classList.add('on');
+	qualityButton.toggleAttribute('checked');
 
-qualityButton.addEventListener('click', () => {
-
-	qualityButton.firstElementChild.classList.toggle('on');
+qualityButton.click = () => {
 
 	getSaved('quality') ?
 		localStorage.removeItem('quality') : // low
@@ -76,26 +72,15 @@ qualityButton.addEventListener('click', () => {
 		params.set('t', audio.dataset.seconds);
 		location.href = location.origin + '/?' + params;
 	}
-});
+}
 
 // Delete Button
 
 deleteButton.addEventListener('click', () => {
+	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
 	localStorage.clear();
-
-	// developer use only 
-	self.caches.keys()
-		.then(s => s.forEach(k => self.caches.delete(k)))
-		.then(s => s.forEach(r => r.unregister()))
-		.then(e => navigator.serviceWorker.getRegistrations())
-		.then(e => location.replace(location.origin));
-});
-
-// Feedback Button
-
-feedbackButton.addEventListener('click', async () => {
-	netlifyForm.value = await prompt('Enter your feedback (bugs, feature requests) here:');
-	if (netlifyForm.value) document.forms[0].submit();
+	location.replace(location.origin);
 });
 
 
@@ -110,9 +95,24 @@ bitrateSelector.addEventListener('change', () => {
 	updatePositionState();
 });
 
+// subtitle selector
 
+subtitleSelector.addEventListener('change', () => {
+	audio.firstElementChild.src = subtitleSelector.value;
+	if (!subtitleSelector.value) {
+		subtitleContainer.classList.add('hide');
+		return;
+	}
+	audio.firstElementChild.src = subtitleSelector.value;
+	parseTTML();
+	subtitleContainer.classList.remove('hide');
+})
 
 // play button and events
+
+const pauseIcon = 'M6 5H8V19H6V5ZM16 5H18V19H16V5Z';
+const playIcon = 'M19.376 12.4158L8.77735 19.4816C8.54759 19.6348 8.23715 19.5727 8.08397 19.3429C8.02922 19.2608 8 19.1643 8 19.0656V4.93408C8 4.65794 8.22386 4.43408 8.5 4.43408C8.59871 4.43408 8.69522 4.4633 8.77735 4.51806L19.376 11.5838C19.6057 11.737 19.6678 12.0474 19.5146 12.2772C19.478 12.3321 19.4309 12.3792 19.376 12.4158Z';
+
 
 playButton.addEventListener('click', () => {
 	if (playButton.dataset.state) {
@@ -126,12 +126,12 @@ playButton.addEventListener('click', () => {
 });
 
 audio.addEventListener('playing', () => {
-	playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
+playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
 	playButton.dataset.state = '';
 });
 
 audio.addEventListener('pause', () => {
-	playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
+playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
 	playButton.dataset.state = '1';
 });
 
@@ -215,23 +215,10 @@ loopButton.addEventListener('click', () => {
 
 
 // streams service button
-const relatedStreamsButton = document.getElementById('relatedStreamsButton');
-const dataContainer = document.getElementById('dataContainer');
 
 relatedStreamsButton.addEventListener('click', () => {
 	dataContainer.classList.toggle('show');
 	dataContainer.classList.toggle('hide');
 	relatedStreamsContainer.classList.toggle('list-show');
 	relatedStreamsButton.firstElementChild.classList.toggle('on');
-});
-
-
-
-// subtitles 
-
-subtitleButton.addEventListener('click', () => {
-	if (subtitleContainer.classList[0])
-		parseTTML();
-	subtitleButton.firstElementChild.classList.toggle('on');
-	subtitleContainer.classList.toggle('hide');
 });

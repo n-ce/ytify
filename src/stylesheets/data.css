@@ -56,7 +56,8 @@
 }
 
 
-#bitrateSelector {
+#bitrateSelector,
+#subtitleSelector {
 	font-size: 0.7rem;
 	padding: 0.35rem 0;
 	background-color: var(--accent);
@@ -65,20 +66,24 @@
 	border-radius: 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	outline: none;
+	font-family: 'Noto Sans';
 }
 
-#metadata span {
+#subtitleSelector{
+	width:15ch;
+}
+
+#superInputContainer {
 	display: flex;
 	align-items: center;
 	height: 2rem;
-	width: calc(21ch + 2rem);
+	width: calc(27ch + 2rem);
 	margin: 0.5rem 0;
 	color: var(--border);
 	background-color: var(--accent);
 	border-radius: 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border: 1px solid var(--border);
-	font-family: 'Noto Sans';
 }
 
 #superInput {
@@ -87,18 +92,34 @@
 	height: 100%;
 	text-align: center;
 	color: var(--text);
-	outline:none;
+	outline: none;
+	width: 24ch;
+	font-family: 'Noto Sans';
 }
 
 #superInput::placeholder {
 	color: var(--border)
 }
 
-svg {
-	height: 2rem;
-	width: 2rem;
+#searchFilters {
+	font-size: 0.7rem;
+	padding: 0;
+	background-color: transparent;
+	border: none;
 	color: var(--border);
+	outline: none;
+	width: 9ch;
+	font-family: 'Noto Sans';
 }
+
+button.ri-search-2-line{
+	background: none;
+	border:none;
+	font-size:2.1rem;
+	padding-bottom: 0.7rem;
+}
+
+
 
 @media (min-width:600px) {
 	#dataContainer {
@@ -123,7 +144,8 @@ svg {
 	}
 
 	#author,
-	#bitrateSelector {
+	#bitrateSelector,
+	#subtitleSelector {
 		font-size: 0.9rem;
 	}
 }
