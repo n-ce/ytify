@@ -89,9 +89,10 @@ if (!params.get('s') && !params.get('text'))
 
 function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 
-	sessionStorage.getItem('img') ?
-		sessionStorage.setItem('img', thumbnail) :
-		img.src = thumbnail;
+	if (sessionStorage.getItem('img')) {
+		sessionStorage.setItem('img', thumbnail)
+		thumbnail = null;
+	} else img.src = thumbnail;
 
 	title.href = `https://youtube.com/watch?v=${id}`;
 	title.textContent = streamName;
@@ -177,6 +178,7 @@ function updatePositionState() {
 }
 
 function setAudio(data) {
+	
 	// extracting opus streams and storing m4a streams
 
 	const opus = { urls: [], bitrates: [] }

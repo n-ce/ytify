@@ -1,89 +1,5 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
 
-// settings panel toggle
-
-
-settingsButton.addEventListener('click', () => {
-	settingsButton.firstElementChild.classList.toggle('on');
-	settingsContainer.classList.toggle('hide');
-	dataContainer.classList.toggle('show');
-	dataContainer.classList.toggle('hide');
-
-});
-
-
-// Theme toggle
-
-if (getSaved('theme')) {
-	themeButton.toggleAttribute('checked')
-}
-
-themeButton.click = () => {
-	getSaved('theme') ?
-		localStorage.removeItem('theme') :
-		save('theme', 'dark');
-	themer();
-}
-
-
-
-
-
-// fullscreen
-
-fullscreenButton.click = () => {
-	document.fullscreenElement ?
-		document.exitFullscreen() :
-		document.documentElement.requestFullscreen();
-}
-
-
-
-// thumbnail toggle
-
-let thumbnail = true;
-
-thumbnailButton.click = () => {
-
-	if (thumbnail)
-		sessionStorage.setItem('img', img.src);
-	else {
-		img.src = sessionStorage.getItem('img');
-		sessionStorage.removeItem('img');
-	}
-	thumbnail = !thumbnail;
-	img.classList.toggle('hide');
-}
-
-
-
-// quality
-
-if (getSaved('quality') == 'hq')
-	qualityButton.toggleAttribute('checked');
-
-qualityButton.click = () => {
-
-	getSaved('quality') ?
-		localStorage.removeItem('quality') : // low
-		save('quality', 'hq'); // high
-
-	if (params.get('s')) {
-		params.set('t', audio.dataset.seconds);
-		location.href = location.origin + '/?' + params;
-	}
-}
-
-// Delete Button
-
-deleteButton.addEventListener('click', () => {
-	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-	localStorage.clear();
-	location.replace(location.origin);
-});
-
-
 
 // bitrate selector
 
@@ -126,12 +42,12 @@ playButton.addEventListener('click', () => {
 });
 
 audio.addEventListener('playing', () => {
-playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
+	playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
 	playButton.dataset.state = '';
 });
 
 audio.addEventListener('pause', () => {
-playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
+	playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
 	playButton.dataset.state = '1';
 });
 
@@ -214,11 +130,98 @@ loopButton.addEventListener('click', () => {
 
 
 
+// settings panel toggle
+
+
+settingsButton.addEventListener('click', () => {
+	if (!relatedStreamsButton.firstElementChild.classList.contains('on')) {
+		settingsButton.firstElementChild.classList.toggle('on');
+		settingsContainer.classList.toggle('hide');
+		dataContainer.classList.toggle('show');
+		dataContainer.classList.toggle('hide');
+	}
+});
+
+
+
 // streams service button
 
 relatedStreamsButton.addEventListener('click', () => {
-	dataContainer.classList.toggle('show');
-	dataContainer.classList.toggle('hide');
-	relatedStreamsContainer.classList.toggle('list-show');
-	relatedStreamsButton.firstElementChild.classList.toggle('on');
+	if (!settingsButton.firstElementChild.classList.contains('on')) {
+		dataContainer.classList.toggle('show');
+		dataContainer.classList.toggle('hide');
+		relatedStreamsContainer.classList.toggle('list-show');
+		relatedStreamsButton.firstElementChild.classList.toggle('on');
+	}
+});
+
+
+
+// Theme toggle
+
+if (getSaved('theme')) {
+	themeButton.toggleAttribute('checked')
+}
+
+themeButton.click = () => {
+	getSaved('theme') ?
+		localStorage.removeItem('theme') :
+		save('theme', 'dark');
+	themer();
+}
+
+
+
+// fullscreen
+
+fullscreenButton.click = () => {
+	document.fullscreenElement ?
+		document.exitFullscreen() :
+		document.documentElement.requestFullscreen();
+}
+
+
+
+// thumbnail toggle
+
+let thumbnail = true;
+
+thumbnailButton.click = () => {
+
+	if (thumbnail)
+		sessionStorage.setItem('img', img.src);
+	else {
+		img.src = sessionStorage.getItem('img');
+		sessionStorage.removeItem('img');
+	}
+	thumbnail = !thumbnail;
+	img.classList.toggle('hide');
+}
+
+
+
+// quality
+
+if (getSaved('quality') == 'hq')
+	qualityButton.toggleAttribute('checked');
+
+qualityButton.click = () => {
+
+	getSaved('quality') ?
+		localStorage.removeItem('quality') : // low
+		save('quality', 'hq'); // high
+
+	if (params.get('s')) {
+		params.set('t', audio.dataset.seconds);
+		location.href = location.origin + '/?' + params;
+	}
+}
+
+// Delete Button
+
+deleteButton.addEventListener('click', () => {
+	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
+	localStorage.clear();
+	location.replace(location.origin);
 });

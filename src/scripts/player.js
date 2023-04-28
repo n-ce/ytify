@@ -35,6 +35,7 @@ const validator = (val, pID, sID) => {
 // Loads streams into related streams container
 
 const streamsLoader = streamsArray => {
+	const fragment = document.createDocumentFragment();
 	for (const stream of streamsArray) {
 		const listItem = document.createElement('list-item');
 		listItem.textContent = stream.title || stream.name;
@@ -54,8 +55,10 @@ const streamsLoader = streamsArray => {
 			}
 		});
 		listItem.dataset.thumbnail = stream.thumbnail;
-		relatedStreamsContainer.appendChild(listItem);
+		fragment.appendChild(listItem);
 	}
+	relatedStreamsContainer.innerHTML = '';
+	relatedStreamsContainer.appendChild(fragment);
 }
 
 // The main player function
@@ -71,6 +74,12 @@ const play = async (id, instance = 0) => {
 		alert(err);
 	});
 
+	if (!data.audioStreams.length) {
+		alert('NO AUDIO STREAMS AVAILABLE.');
+		return;
+	}
+
+	setAudio(data.audioStreams);
 	setMetadata(
 		data.thumbnailUrl,
 		id,
@@ -78,14 +87,6 @@ const play = async (id, instance = 0) => {
 		data.uploader,
 		data.uploaderUrl
 	);
-
-
-	if (!data.audioStreams.length) {
-		alert('NO AUDIO STREAMS AVAILABLE.');
-		return;
-	}
-
-	setAudio(data.audioStreams);
 
 
 	// Subtitle data Injection into dom
@@ -98,7 +99,6 @@ const play = async (id, instance = 0) => {
 		subtitleSelector.classList.add('hide');
 
 	// setting related streams
-	relatedStreamsContainer.innerHTML = '';
 	streamsLoader(data.relatedStreams);
 
 	params.set('s', id);
@@ -195,8 +195,6 @@ superInput.addEventListener('input', () => {
 
 
 const searchLoader = (instance = 0) => {
-
-	relatedStreamsContainer.innerHTML = '';
 
 	fetch(api[instance] + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
 		.then(res => res.json())
