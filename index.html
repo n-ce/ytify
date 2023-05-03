@@ -99,6 +99,12 @@
 		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
 		<toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
 
+		<span>
+			<label for="pipedInstanceSelector">Select Piped Instance</label>
+			<select name="pipedInstanceSelector" id="pipedInstances"></select>
+		</span>
+
+		<br>
 		<form netlify name='feedback' method='POST'>
 			<input type="text" name="->" id="netlifyForm" placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
 		</form>
@@ -184,7 +190,7 @@
 
 	<script>
 		if ('serviceWorker' in navigator)
-		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

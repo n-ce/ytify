@@ -57,7 +57,8 @@
 
 
 #bitrateSelector,
-#subtitleSelector {
+#subtitleSelector,
+#pipedInstances{
 	font-size: 0.7rem;
 	padding: 0.35rem 0;
 	background-color: var(--accent);
@@ -115,8 +116,6 @@
 button.ri-search-2-line{
 	background: none;
 	border:none;
-	font-size:2.1rem;
-	padding-bottom: 0.7rem;
 }
 
 

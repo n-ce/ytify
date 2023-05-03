@@ -4,11 +4,6 @@ const save = localStorage.setItem.bind(localStorage);
 
 const getSaved = localStorage.getItem.bind(localStorage);
 
-const streamID = url => url.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
-
-const playlistID = url => url.match(/[&?]list=([^&]+)/i)?.[1];
-
-
 
 const palette = {
 	'light': {
@@ -87,7 +82,7 @@ if (!params.get('s') && !params.get('text'))
 
 
 
-function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
+function setMetaData(thumbnail, id, streamName, authorName, authorUrl) {
 
 	if (sessionStorage.getItem('img')) {
 		sessionStorage.setItem('img', thumbnail)
@@ -113,7 +108,7 @@ function setMetadata(thumbnail, id, streamName, authorName, authorUrl) {
 				{ src: thumbnail, sizes: '256x256' },
 				{ src: thumbnail, sizes: '384x384' },
 				{ src: thumbnail, sizes: '512x512' },
-              ]
+	              ]
 		});
 	}
 }
@@ -177,49 +172,14 @@ function updatePositionState() {
 	}
 }
 
-function setAudio(data) {
-	
-	// extracting opus streams and storing m4a streams
-
-	const opus = { urls: [], bitrates: [] }
-	const m4a = { urls: [], bitrates: [], options: [] }
-	bitrateSelector.innerHTML = '';
-
-	for (const value of data) {
-		if (value.codec === 'opus') {
-			opus.urls.push(value.url);
-			opus.bitrates.push(parseInt(value.quality));
-			bitrateSelector.add(new Option(value.quality, value.url));
-		} else {
-			m4a.urls.push(value.url);
-			m4a.bitrates.push(parseInt(value.quality));
-			m4a.options.push(new Option(value.quality, value.url));
-		}
-	}
-
-	// finding lowest available stream when low opus bitrate unavailable
-	if (!getSaved('quality') && Math.min(...opus.bitrates) > 64) {
-		opus.urls = opus.urls.concat(m4a.urls);
-		opus.bitrates = opus.bitrates.concat(m4a.bitrates);
-		for (const opts of m4a.options) bitrateSelector.add(opts);
-	}
-
-	bitrateSelector.selectedIndex = opus.bitrates.indexOf(getSaved('quality') ? Math.max(...opus.bitrates) : Math.min(...opus.bitrates));
-	audio.src = opus.urls[bitrateSelector.selectedIndex];
-	audio.dataset.seconds = 0;
-}
-
 
 export {
 	params,
 	save,
 	getSaved,
-	streamID,
-	playlistID,
 	themer,
-	setMetadata,
+	setMetaData,
 	convertSStoHHMMSS,
 	parseTTML,
 	updatePositionState,
-	setAudio
 }

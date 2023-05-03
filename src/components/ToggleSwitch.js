@@ -34,8 +34,8 @@ const stylesheet = `
     span,
     span:before{
       position: absolute;
-      -webkit-transition: 0.5s;
-      transition: 0.5s;
+      -webkit-transition: 0.3s;
+      transition: 0.3s;
       border-radius: 1rem;
       border:1px solid var(--border);
     }
@@ -54,13 +54,16 @@ const stylesheet = `
       transform: translateX(1rem);
     }`;
 
-class ToggleSwitch extends HTMLElement {
+
+customElements.define('toggle-switch', class extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({ mode: "open" });
 
 		const style = document.createElement('style');
 		style.textContent = stylesheet;
+
+		const slot = document.createElement('slot');
 
 		const label = document.createElement('label');
 
@@ -71,10 +74,9 @@ class ToggleSwitch extends HTMLElement {
 		const span = document.createElement('span');
 		label.append(input, span);
 
-		const slot = document.createElement('slot');
-
 		this.shadowRoot.append(style, slot, label);
 	}
+
 	static get observedAttributes() {
 		return ['checked']
 	}
@@ -83,6 +85,4 @@ class ToggleSwitch extends HTMLElement {
 		this.shadowRoot.querySelector('input').toggleAttribute('checked');
 	}
 
-}
-
-customElements.define('toggle-switch', ToggleSwitch);
+});

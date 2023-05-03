@@ -1,14 +1,15 @@
-import { setMetadata, streamID, playlistID, getSaved, save, params, updatePositionState, setAudio } from './lib/helperFunctions.js';
+import { setMetaData, getSaved, save, params, updatePositionState } from './lib/helperFunctions.js';
 
-const api = [
-	'https://pipedapi.kavin.rocks',
-	'https://pipedapi.in.projectsegfau.lt',
-	'https://watchapi.whatever.social',
-	'https://api-piped.mha.fi',
-	'https://pipedapi.syncpundit.io',
-	'https://piped-api.garudalinux.org',
-	'https://pipedapi.moomoo.me'
-];
+await fetch('https://piped-instances.kavin.rocks')
+	.then(res => res.json())
+	.then(data => {
+		for (const instance of data)
+			pipedInstances.add(new Option(instance.name, instance.api_url));
+	})
+	.catch(err => {
+		alert('Reload app because fetching piped instances failed with error: ' + err)
+	})
+
 const queueArray = [];
 let queueCount = 0;
 let queue = false;
@@ -18,18 +19,18 @@ let previous_ID;
 
 // link validator
 
-const validator = (val, pID, sID) => {
+const validator = (val, playlistID, streamID) => {
 	if (val) {
-		pID = playlistID(val);
-		sID = streamID(val);
+		playlistID = val.match(/[&?]list=([^&]+)/i)?.[1];
+		streamID = val.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 	}
-	if (sID)
-		queue ? queueIt(sID) : play(sID);
-	else if (pID)
-		queue ? queueIt(pID) : playlistLoad(pID);
+	if (streamID)
+		queue ? queueIt(streamID) : play(streamID);
+	else if (playlistID)
+		queue ? queueIt(playlistID) : playlistLoad(playlistID);
 
 	// so that it does not run again for the same link
-	previous_ID = pID || sID;
+	previous_ID = playlistID || streamID;
 }
 
 // Loads streams into related streams container
@@ -40,6 +41,7 @@ const streamsLoader = streamsArray => {
 		const listItem = document.createElement('list-item');
 		listItem.textContent = stream.title || stream.name;
 		listItem.dataset.author = stream.uploaderName || stream.description;
+		listItem.dataset.thumbnail = stream.thumbnail;
 		listItem.addEventListener('click', () => {
 			switch (stream.type) {
 				case 'stream':
@@ -54,7 +56,6 @@ const streamsLoader = streamsArray => {
 					break;
 			}
 		});
-		listItem.dataset.thumbnail = stream.thumbnail;
 		fragment.appendChild(listItem);
 	}
 	relatedStreamsContainer.innerHTML = '';
@@ -65,10 +66,12 @@ const streamsLoader = streamsArray => {
 
 const play = async (id, instance = 0) => {
 
-	playButton.classList.replace(playButton.classList[0], 'spinner')
-	const data = await fetch(api[instance] + '/streams/' + id).then(res => res.json()).catch(err => {
-		if (instance < api.length - 1) {
-			play(id, instance + 1);
+	playButton.classList.replace(playButton.classList[0], 'spinner');
+
+	const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
+		if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+			pipedInstances.selectedIndex++;
+			play(id);
 			return;
 		}
 		alert(err);
@@ -79,8 +82,39 @@ const play = async (id, instance = 0) => {
 		return;
 	}
 
-	setAudio(data.audioStreams);
-	setMetadata(
+	audio.dataset.seconds = 0;
+
+
+	// extracting opus streams and storing m4a streams
+
+	const opus = { urls: [], bitrates: [] }
+	const m4a = { urls: [], bitrates: [], options: [] }
+	bitrateSelector.innerHTML = '';
+
+	for (const value of data.audioStreams) {
+		if (value.codec === 'opus') {
+			opus.urls.push(value.url);
+			opus.bitrates.push(parseInt(value.quality));
+			bitrateSelector.add(new Option(value.quality, value.url));
+		} else {
+			m4a.urls.push(value.url);
+			m4a.bitrates.push(parseInt(value.quality));
+			m4a.options.push(new Option(value.quality, value.url));
+		}
+	}
+
+	// finding lowest available stream when low opus bitrate unavailable
+	if (!getSaved('quality') && Math.min(...opus.bitrates) > 64) {
+		opus.urls = opus.urls.concat(m4a.urls);
+		opus.bitrates = opus.bitrates.concat(m4a.bitrates);
+		for (const opts of m4a.options) bitrateSelector.add(opts);
+	}
+
+	bitrateSelector.selectedIndex = opus.bitrates.indexOf(getSaved('quality') ? Math.max(...opus.bitrates) : Math.min(...opus.bitrates));
+	audio.src = opus.urls[bitrateSelector.selectedIndex];
+
+
+	setMetaData(
 		data.thumbnailUrl,
 		id,
 		data.title,
@@ -91,7 +125,7 @@ const play = async (id, instance = 0) => {
 
 	// Subtitle data Injection into dom
 
-	subtitleSelector.innerHTML = '<option value="">Subtitles - Off</option>';
+	subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
 	subtitleSelector.classList.remove('hide');
 	if (data.subtitles.length)
 		for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
@@ -111,7 +145,6 @@ const play = async (id, instance = 0) => {
 // next track 
 const next = () => {
 	if ((queueCount - queueNow) < 0) return;
-	audio.currentTime = 0;
 	play(queueArray[queueNow]);
 	queueButton.firstElementChild.dataset.badge = queueCount - queueNow;
 	queueNow++;
@@ -143,9 +176,11 @@ audio.addEventListener('ended', () => {
 
 const queueFx = () => {
 	queue = !queue;
-	queue ?
-		queueCount = 0 :
-		queueButton.firstElementChild.dataset.badge = 0;
+	if (queue) {
+		queueCount = 0;
+		queueArray.length = 0;
+	}
+	else queueButton.firstElementChild.dataset.badge = 0;
 	queueNextButton.classList.toggle('hide');
 	queueButton.firstElementChild.classList.toggle('on');
 	loopButton.classList.toggle('hide');
@@ -159,9 +194,10 @@ queueNextButton.addEventListener('click', next);
 
 const playlistLoad = async (id, instance = 0) => {
 
-	const data = await fetch(api[instance] + '/playlists/' + id).then(res => res.json()).catch(err => {
-		if (instance < api.length - 1) {
-			playlistLoad(id, instance + 1);
+	const data = await fetch(pipedInstances.value + '/playlists/' + id).then(res => res.json()).catch(err => {
+		if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+			pipedInstances.selectedIndex++;
+			playlistLoad(id);
 			return;
 		}
 		alert(err);
@@ -169,7 +205,7 @@ const playlistLoad = async (id, instance = 0) => {
 
 	queueFx();
 
-	setMetadata(
+	setMetaData(
 		data.thumbnailUrl,
 		id,
 		data.name,
@@ -194,14 +230,15 @@ superInput.addEventListener('input', () => {
 
 
 
-const searchLoader = (instance = 0) => {
+const searchLoader = () => {
 
-	fetch(api[instance] + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
+	fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
 		.then(res => res.json())
 		.then(searchResults => streamsLoader(searchResults.items))
 		.catch(err => {
-			if (instance < api.length - 1) {
-				searchLoader(id, instance + 1);
+			if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+				pipedInstances.selectedIndex++;
+				searchLoader(id);
 				return;
 			}
 			alert(err)
@@ -214,35 +251,40 @@ superInput.addEventListener('keypress', e => {
 	if (e.key === 'Enter') searchLoader();
 });
 
-document.querySelector('.ri-search-2-line').onclick = () => searchLoader();
+document.querySelector('.ri-search-2-line').addEventListener('click', searchLoader);
 
 
 // URL params 
 
-if (params.get('s')) // stream
-	validator(null, null, params.get('s'));
-
 if (params.get('p')) { // playlist
-	validator(null, params.get('p'));
-	params.delete('p'); // stop param from interferring rest of the program
+	const storedID = params.get('s');
+	params.delete('s');
+	playlistLoad(params.get('p'));
+	const interval = setInterval(() => {
+		storedID === params.get('s') ?
+			clearInterval(interval) :
+			next();
+	}, 500);
 }
-if (params.get('t')) { // timestamp
-	audio.currentTime = params.get('t');
-	params.delete('t');
+else {
+	if (params.get('s')) // stream
+		play(params.get('s'));
+
+	if (params.get('t')) { // timestamp
+		audio.currentTime = params.get('t');
+	}
+
+	// PWA Params
+	if (params.get('url')) {
+		validator(params.get('url'));
+		audio.play();
+
+	} else if (params.get('text')) {
+		validator(params.get('text'));
+		audio.play();
+	}
+
 }
-
-// PWA Params
-if (params.get('url')) {
-	validator(params.get('url'));
-	params.delete('url');
-	audio.play();
-
-} else if (params.get('text')) {
-	validator(params.get('text'));
-	params.delete('text');
-	audio.play();
-}
-
 
 if ('mediaSession' in navigator) {
 	navigator.mediaSession.setActionHandler('play', () => {
@@ -265,5 +307,8 @@ if ('mediaSession' in navigator) {
 		audio.currentTime = e.seekTime;
 		updatePositionState();
 	});
-	navigator.mediaSession.setActionHandler("nexttrack", next);
+	navigator.mediaSession.setActionHandler("nexttrack", () => {
+		next();
+		updatePositionState();
+	});
 }

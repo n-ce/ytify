@@ -35,9 +35,15 @@ toggle-switch {
 
 #settingsContainer span {
 	display: flex;
-	justify-content: space-evenly;
+	justify-content: space-between;
 	align-items: center;
 }
+
+#settingsContainer label {
+	font-weight: bold;
+	color: var(--border);
+}
+
 
 #settingsContainer span button {
 	margin: 0;
