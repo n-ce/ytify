@@ -4,15 +4,14 @@ const save = localStorage.setItem.bind(localStorage);
 
 const getSaved = localStorage.getItem.bind(localStorage);
 
-
 const palette = {
-	'light': {
+	light: {
 		bg: 'none',
 		accent: '#fff5',
 		text: '#000b',
 		border: '#000b'
 	},
-	'dark': {
+	dark: {
 		bg: '#000',
 		accent: '#000',
 		text: '#fffb',
@@ -57,10 +56,11 @@ function themer() {
 
 		const theme = getSaved('theme') ? 'dark' : 'light';
 
-		palette['dark'].border = palette['light'].bg =
-			(r + g + b) > 85 || !r ?
+		palette.dark.border = palette.light.bg =
+			(r + g + b) > 85 || !r || !g || !b ?
 			`rgb(${r},${g},${b})` :
 			`rgb(${r+34},${g+34},${b+34})`;
+
 
 		cssVar('--bg', palette[theme].bg);
 		cssVar('--accent', palette[theme].accent);

@@ -140,6 +140,11 @@ const play = async (id, instance = 0) => {
 
 }
 
+// Instance Selector change event
+
+pipedInstances.addEventListener('change', () => {
+	play(previous_ID, pipedInstances.selectedIndex);
+});
 
 
 // next track 
@@ -166,7 +171,7 @@ audio.addEventListener('ended', () => {
 		next();
 	} else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
-		playButton.dataset.state = '1'
+		playButton.dataset.state = '1';
 	}
 })
 

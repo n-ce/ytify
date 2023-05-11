@@ -4,7 +4,8 @@ const stylesheet = `
 			align-items:center;
 			justify-content:space-between;
 			font-weight:bold;
-			font-size:0.8rem;
+			font-size:1rem;
+			margin-bottom:1rem;
 			color : var(--border);
 		}
 		
