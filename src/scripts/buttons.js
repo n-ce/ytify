@@ -214,6 +214,19 @@ qualityButton.click = () => {
 	}
 }
 
+// suggestions button
+
+suggestionsButton.click = () => {
+	getSaved('search_suggestions') ?
+		localStorage.removeItem('search_suggestions') :
+		save('search_suggestions', 'off');
+		suggestions.style.display='none';
+}
+
+if (getSaved('search_suggestions'))
+	suggestionsButton.removeAttribute('checked')
+
+
 // Delete Button
 
 deleteButton.addEventListener('click', () => {

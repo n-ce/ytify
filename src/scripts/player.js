@@ -3,12 +3,17 @@ import { setMetaData, getSaved, save, params, updatePositionState } from './lib/
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
 	.then(data => {
-		for (const instance of data)
-			pipedInstances.add(new Option(instance.name, instance.api_url));
+		for (const instance of data) {
+			const name = instance.name + ' ' + instance.locations;
+			pipedInstances.add(new Option(name, instance.api_url));
+			if (getSaved('pipedInstance') === name)
+				pipedInstances.lastElementChild.selected = true;
+		}
 	})
 	.catch(err => {
 		alert('Reload app because fetching piped instances failed with error: ' + err)
 	})
+
 
 const queueArray = [];
 let queueCount = 0;
@@ -64,7 +69,7 @@ const streamsLoader = streamsArray => {
 
 // The main player function
 
-const play = async (id, instance = 0) => {
+const play = async id => {
 
 	playButton.classList.replace(playButton.classList[0], 'spinner');
 
@@ -143,7 +148,10 @@ const play = async (id, instance = 0) => {
 // Instance Selector change event
 
 pipedInstances.addEventListener('change', () => {
-	play(previous_ID, pipedInstances.selectedIndex);
+	const index = pipedInstances.selectedIndex;
+	save('pipedInstance', pipedInstances.options[index].textContent)
+	if (previous_ID)
+		play(previous_ID);
 });
 
 
@@ -197,7 +205,7 @@ queueButton.addEventListener('click', queueFx);
 queueNextButton.addEventListener('click', next);
 
 
-const playlistLoad = async (id, instance = 0) => {
+const playlistLoad = async id => {
 
 	const data = await fetch(pipedInstances.value + '/playlists/' + id).then(res => res.json()).catch(err => {
 		if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -228,9 +236,35 @@ const playlistLoad = async (id, instance = 0) => {
 
 // input text player
 
+
 superInput.addEventListener('input', () => {
 	if (!superInput.value.includes(previous_ID))
 		validator(superInput.value);
+
+	if (getSaved('search_suggestions')) return;
+	
+	suggestions.innerHTML = '';
+	suggestions.style.display = 'none';
+	if (superInput.value.length > 3) {
+		suggestions.style.display = 'block';
+		fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value)
+			.then(res => res.json())
+			.then(data => {
+				const fragment = document.createDocumentFragment();
+				for (const suggestion of data) {
+					const li = document.createElement('li');
+					li.textContent = suggestion;
+					li.onclick = () => {
+						superInput.value = suggestion;
+						searchLoader();
+					}
+					fragment.appendChild(li);
+				}
+				suggestions.appendChild(fragment);
+			});
+	}
+
+
 });
 
 
@@ -243,12 +277,12 @@ const searchLoader = () => {
 		.catch(err => {
 			if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
 				pipedInstances.selectedIndex++;
-				searchLoader(id);
+				searchLoader();
 				return;
 			}
 			alert(err)
 		});
-
+	suggestions.style.display = 'none';
 	relatedStreamsButton.click();
 }
 

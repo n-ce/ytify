@@ -58,7 +58,7 @@
 
 #bitrateSelector,
 #subtitleSelector,
-#pipedInstances{
+#pipedInstances {
 	font-size: 0.7rem;
 	padding: 0.35rem 0;
 	background-color: var(--accent);
@@ -70,8 +70,8 @@
 	font-family: 'Noto Sans';
 }
 
-#subtitleSelector{
-	width:15ch;
+#subtitleSelector {
+	width: 15ch;
 }
 
 #superInputContainer {
@@ -113,12 +113,40 @@
 	font-family: 'Noto Sans';
 }
 
-button.ri-search-2-line{
+button.ri-search-2-line {
 	background: none;
-	border:none;
+	border: none;
 }
 
+#suggestions {
+	max-height: 12rem;
+	overflow: scroll;
+	position: absolute;
+	z-index: 2;
+	width: calc(22.5ch + 2rem);
+	background-color: var(--bg);
+	margin: -0.5rem 0 0 1rem;
+	list-style-type: none;
+	padding: 0;
+	border-radius: 0 0 0.5rem 0.5rem;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	border: 1px solid var(--border);
+	display: none;
+	user-select: none;
+}
 
+#suggestions li {
+	background-color: var(--accent);
+	font-weight: bold;
+	padding: 0.2rem 0 0.2rem 1rem;
+	margin-top: 0.1rem;
+}
+
+#suggestions li:hover,
+#suggestions li:focus {
+	background-color: #39FC;
+	color:#9CFC
+}
 
 @media (min-width:600px) {
 	#dataContainer {

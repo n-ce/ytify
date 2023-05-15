@@ -53,7 +53,7 @@
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
-			<a id="title" target="_blank">ytify v5.11</a>
+			<a id="title" target="_blank">ytify v5.12</a>
 			<br>
 			<a id="author" target="_blank">Channel</a>
 			<select id="bitrateSelector">
@@ -64,8 +64,7 @@
 
 			<span id="superInputContainer">
 
-				<input type="search" id="superInput" placeholder='Input URL or Search Here' />
-
+				<input type="search" id="superInput" autocomplete="off" placeholder='Input URL or Search Here' />
 				<select id="searchFilters">
 					<optgroup label="YouTube">
 						<option value="all">All</option>
@@ -80,11 +79,10 @@
 						<option value="music_playlists">Playlists</option>
 					</optgroup>
 				</select>
-
 				<button aria-label="search" class="ri-search-2-line"></button>
 
 			</span>
-
+			<ul id="suggestions"></ul>
 		</div>
 
 	</div>
@@ -98,9 +96,9 @@
 		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
 		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
 		<toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
-
+		<toggle-switch id="suggestionsButton" checked>Display Search Suggestions</toggle-switch>
 		<span>
-			<label for="pipedInstanceSelector">Select Piped Instance</label>
+			<label for="pipedInstanceSelector">Piped Instance</label>
 			<select name="pipedInstanceSelector" id="pipedInstances"></select>
 		</span>
 
