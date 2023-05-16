@@ -60,7 +60,7 @@ body {
 }
 
 body {
-	background-color: var(--bg);
+	background: var(--bg);
 	color: var(--text);
 	display: -webkit-box;
 	display: -ms-flexbox;

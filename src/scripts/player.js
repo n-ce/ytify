@@ -5,9 +5,10 @@ await fetch('https://piped-instances.kavin.rocks')
 	.then(data => {
 		for (const instance of data) {
 			const name = instance.name + ' ' + instance.locations;
-			pipedInstances.add(new Option(name, instance.api_url));
-			if (getSaved('pipedInstance') === name)
-				pipedInstances.lastElementChild.selected = true;
+			pipedInstances.add(new Option(
+				name, instance.api_url, '',
+				getSaved('pipedInstance') === name
+			));
 		}
 	})
 	.catch(err => {
@@ -36,6 +37,7 @@ const validator = (val, playlistID, streamID) => {
 
 	// so that it does not run again for the same link
 	previous_ID = playlistID || streamID;
+	return previous_ID;
 }
 
 // Loads streams into related streams container
@@ -237,33 +239,33 @@ const playlistLoad = async id => {
 // input text player
 
 
-superInput.addEventListener('input', () => {
-	if (!superInput.value.includes(previous_ID))
-		validator(superInput.value);
+superInput.addEventListener('input', async () => {
 
-	if (getSaved('search_suggestions')) return;
-	
 	suggestions.innerHTML = '';
 	suggestions.style.display = 'none';
-	if (superInput.value.length > 3) {
-		suggestions.style.display = 'block';
-		fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value)
-			.then(res => res.json())
-			.then(data => {
-				const fragment = document.createDocumentFragment();
-				for (const suggestion of data) {
-					const li = document.createElement('li');
-					li.textContent = suggestion;
-					li.onclick = () => {
-						superInput.value = suggestion;
-						searchLoader();
-					}
-					fragment.appendChild(li);
-				}
-				suggestions.appendChild(fragment);
-			});
+
+	if (!superInput.value.includes(previous_ID)) {
+		if (validator(superInput.value))
+			return;
 	}
 
+	if (superInput.value.length < 3 || getSaved('search_suggestions')) return;
+
+	suggestions.style.display = 'block';
+
+	const data = await fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value).then(res => res.json());
+	const fragment = document.createDocumentFragment();
+
+	for (const suggestion of data) {
+		const li = document.createElement('li');
+		li.textContent = suggestion;
+		li.onclick = () => {
+			superInput.value = suggestion;
+			searchLoader();
+		}
+		fragment.appendChild(li);
+	}
+	suggestions.appendChild(fragment);
 
 });
 

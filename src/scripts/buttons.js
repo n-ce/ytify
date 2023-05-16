@@ -181,17 +181,24 @@ fullscreenButton.click = () => {
 
 // thumbnail toggle
 
-let thumbnail = true;
+const image1x1 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+if (getSaved('img')) {
+	thumbnailButton.removeAttribute('checked');
+	img.src = image1x1;
+	img.classList.toggle('hide');
+}
 
 thumbnailButton.click = () => {
 
-	if (thumbnail)
-		sessionStorage.setItem('img', img.src);
-	else {
-		img.src = sessionStorage.getItem('img');
-		sessionStorage.removeItem('img');
+	if (getSaved('img')) {
+		img.src = getSaved('img');
+		localStorage.removeItem('img');
 	}
-	thumbnail = !thumbnail;
+	else {
+		save('img', img.src);
+		img.src = image1x1;
+	}
 	img.classList.toggle('hide');
 }
 
@@ -214,13 +221,15 @@ qualityButton.click = () => {
 	}
 }
 
+
+
 // suggestions button
 
 suggestionsButton.click = () => {
 	getSaved('search_suggestions') ?
 		localStorage.removeItem('search_suggestions') :
 		save('search_suggestions', 'off');
-		suggestions.style.display='none';
+	suggestions.style.display = 'none';
 }
 
 if (getSaved('search_suggestions'))

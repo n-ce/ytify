@@ -25,6 +25,7 @@ const tabColor = document.head.children.namedItem('theme-color');
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
 
+
 function themer() {
 
 	const canvasImg = new Image();
@@ -61,12 +62,16 @@ function themer() {
 			`rgb(${r},${g},${b})` :
 			`rgb(${r+34},${g+34},${b+34})`;
 
-
+		if (getSaved('img')) {
+			palette.dark.border = 'palevioletred';
+			palette.light.bg = 'linear-gradient(15deg, #13547a 0%, #80d0c7 100%)';
+		}
 		cssVar('--bg', palette[theme].bg);
 		cssVar('--accent', palette[theme].accent);
 		cssVar('--text', palette[theme].text);
 		cssVar('--border', palette[theme].border);
 		tabColor.content = palette[theme].bg;
+
 	}
 
 	canvasImg.crossOrigin = '';
@@ -77,15 +82,15 @@ function themer() {
 img.addEventListener('load', themer);
 
 
-if (!params.get('s') && !params.get('text'))
+if (!getSaved('img') && !params.get('s') && !params.get('text'))
 	img.src = 'assets/ytify_thumbnail_min.webp';
 
 
 
 function setMetaData(thumbnail, id, streamName, authorName, authorUrl) {
 
-	if (sessionStorage.getItem('img')) {
-		sessionStorage.setItem('img', thumbnail)
+	if (getSaved('img')) {
+		save('img', thumbnail)
 		thumbnail = null;
 	} else img.src = thumbnail;
 
