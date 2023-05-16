@@ -34,8 +34,8 @@
 .ri-menu-4-fill:before { content: "\ef35"; }
 .ri-search-2-line:before { content: "\f0cd"; }
 .ri-github-fill:before { content: "\edca"; }
-.ri-play-list-2-fill:before { content: "\f00c"; }
 .ri-telegram-line:before { content: "\f1f0"; }
+.ri-magic-fill:before { content: "\eee9"; }
 
 
 
@@ -54,13 +54,15 @@
 
 html,
 body {
-	height: 100%;
+	height:200vh;
 	margin: 0;
 	padding: 0;
 }
-
-body {
+body{
 	background: var(--bg);
+}
+main {
+	height:100vh;
 	color: var(--text);
 	display: -webkit-box;
 	display: -ms-flexbox;

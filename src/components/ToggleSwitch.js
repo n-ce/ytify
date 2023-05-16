@@ -6,7 +6,7 @@ const stylesheet = `
 			font-weight:bold;
 			font-size:1rem;
 			margin-bottom:1rem;
-			color : var(--border);
+			color : var(--text);
 		}
 		
     label {

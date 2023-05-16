@@ -127,29 +127,15 @@ loopButton.addEventListener('click', () => {
 
 
 
-// settings panel toggle
-
-
-settingsButton.addEventListener('click', () => {
-	if (!relatedStreamsButton.firstElementChild.classList.contains('on')) {
-		settingsButton.firstElementChild.classList.toggle('on');
-		settingsContainer.classList.toggle('hide');
-		dataContainer.classList.toggle('show');
-		dataContainer.classList.toggle('hide');
-	}
-});
-
 
 
 // streams service button
 
 relatedStreamsButton.addEventListener('click', () => {
-	if (!settingsButton.firstElementChild.classList.contains('on')) {
-		dataContainer.classList.toggle('show');
-		dataContainer.classList.toggle('hide');
-		relatedStreamsContainer.classList.toggle('list-show');
-		relatedStreamsButton.firstElementChild.classList.toggle('on');
-	}
+	dataContainer.classList.toggle('show');
+	dataContainer.classList.toggle('hide');
+	relatedStreamsContainer.classList.toggle('list-show');
+	relatedStreamsButton.firstElementChild.classList.toggle('on');
 });
 
 

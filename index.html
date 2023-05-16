@@ -47,51 +47,127 @@
 
 <body>
 
+	<main>
 
 
-	<div id="dataContainer" class="show">
-		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
+		<div id="dataContainer" class="show">
+			<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
-		<div id="metadata">
-			<a id="title" target="_blank">ytify v5.12</a>
-			<br>
-			<a id="author" target="_blank">Channel</a>
-			<select id="bitrateSelector">
-				<option value="">Bitrate</option>
-			</select>
-			<select id="subtitleSelector" class="hide"></select>
-			<br>
-
-			<span id="superInputContainer">
-
-				<input type="search" id="superInput" autocomplete="off" placeholder='Input URL or Search Here' />
-				<select id="searchFilters">
-					<optgroup label="YouTube">
-						<option value="all">All</option>
-						<option value="videos" selected>Videos</option>
-						<option value="channels">Channels</option>
-						<option value="playlists">Playlists</option>
-					</optgroup>
-					<optgroup label="YouTube Music">
-						<option value="music_songs">Songs</option>
-						<option value="music_videos">Videos</option>
-						<option value="music_albums">Albums</option>
-						<option value="music_playlists">Playlists</option>
-					</optgroup>
+			<div id="metadata">
+				<a id="title" target="_blank">ytify v5.13</a>
+				<br>
+				<a id="author" target="_blank">Channel</a>
+				<select id="bitrateSelector">
+					<option value="">Bitrate</option>
 				</select>
-				<button aria-label="search" class="ri-search-2-line"></button>
+				<select id="subtitleSelector" class="hide"></select>
+				<br>
 
-			</span>
-			<ul id="suggestions"></ul>
+				<span id="superInputContainer">
+
+					<input type="search" id="superInput" autocomplete="off" placeholder='Input URL or Search Here' />
+					<select id="searchFilters">
+						<optgroup label="YouTube">
+							<option value="all">All</option>
+							<option value="videos" selected>Videos</option>
+							<option value="channels">Channels</option>
+							<option value="playlists">Playlists</option>
+						</optgroup>
+						<optgroup label="YouTube Music">
+							<option value="music_songs">Songs</option>
+							<option value="music_videos">Videos</option>
+							<option value="music_albums">Albums</option>
+							<option value="music_playlists">Playlists</option>
+						</optgroup>
+					</select>
+					<button aria-label="search" class="ri-search-2-line"></button>
+
+				</span>
+				<ul id="suggestions"></ul>
+			</div>
+
 		</div>
 
-	</div>
+		<audio id="audio" data-seconds="0">
+			<track src="ttml/subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
+		</audio>
 
-	<audio id="audio" data-seconds="0">
-		<track src="ttml/subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
-	</audio>
 
-	<div id="settingsContainer" class="hide">
+		<div id="relatedStreamsContainer" class="hide">
+			<h1>Streams related to your current playing stream show up here.</h1>
+		</div>
+
+		<div id="playerContainer">
+
+			<div id="playerControls">
+
+				<button id="playButton" data-state="1" class="ri-stop-fill"></button>
+
+				<select id="playSpeed">
+					<option value="0.25">0.25x</option>
+					<option value="0.50">0.50x</option>
+					<option value="0.75">0.75x</option>
+					<option value="1.00" selected>1.00x</option>
+					<option value="1.25">1.25x</option>
+					<option value="1.50">1.50x</option>
+					<option value="1.75">1.75x</option>
+					<option value="2.00">2.00x</option>
+					<option value="4.00">4.00x</option>
+				</select>
+
+				<p id="currentDuration">00:00</p>
+
+				<input type="range" min="0" max="100" value="0" id="progress" />
+
+				<p id="fullDuration">00:00</p>
+
+			</div>
+
+			<div id="playerProfiles">
+
+				<button type="button" id="seekBwdButton">
+					<i class="ri-rewind-fill"></i>
+					<p>Backward</p>
+				</button>
+
+				<button type="button" id="seekFwdButton">
+					<i class="ri-speed-fill"></i>
+					<p>Forward</p>
+				</button>
+
+				<button type="button" id="queueButton">
+					<i class="ri-play-list-add-fill" data-badge="0"></i>
+					<p>Queue</p>
+				</button>
+
+				<button type="button" class="hide" id="queueNextButton">
+					<i class="ri-skip-forward-fill"></i>
+					<p>SkipNext</p>
+				</button>
+
+				<button type="button" id="loopButton">
+					<i class="ri-repeat-fill"></i>
+					<p>Loop</p>
+				</button>
+				<button type="button" id="autoplayButton">
+					<i class="ri-magic-fill"></i>
+					<p>Autoplay</p>
+				</button>
+
+				<button type="button" id="relatedStreamsButton">
+					<i class="ri-menu-4-fill"></i>
+					<p>Related</p>
+				</button>
+
+			</div>
+		</div>
+
+		<div id="subtitleContainer" class="hide"></div>
+	</main>
+
+	<footer id="settingsContainer">
+		<h1>Settings</h1>
+		<br>
 		<toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
 		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
 		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
@@ -112,84 +188,13 @@
 			<a class="ri-github-fill" href="https://github.com/n-ce/ytify" target="_blank"></a>
 			<a class="ri-telegram-line" href="https://t.me/encetg" target="_blank"></a>
 		</span>
-	</div>
-
-
-	<div id="relatedStreamsContainer" class="hide">
-		<h1>Streams related to your current playing stream show up here.</h1>
-	</div>
-
-	<div id="playerContainer">
-
-		<div id="playerControls">
-
-			<button id="playButton" data-state="1" class="ri-stop-fill"></button>
-
-			<select id="playSpeed">
-				<option value="0.25">0.25x</option>
-				<option value="0.50">0.50x</option>
-				<option value="0.75">0.75x</option>
-				<option value="1.00" selected>1.00x</option>
-				<option value="1.25">1.25x</option>
-				<option value="1.50">1.50x</option>
-				<option value="1.75">1.75x</option>
-				<option value="2.00">2.00x</option>
-				<option value="4.00">4.00x</option>
-			</select>
-
-			<p id="currentDuration">00:00</p>
-
-			<input type="range" min="0" max="100" value="0" id="progress" />
-
-			<p id="fullDuration">00:00</p>
-
-		</div>
-
-		<div id="playerProfiles">
-
-			<button type="button" id="seekBwdButton">
-				<i class="ri-rewind-fill"></i>
-				<p>Backward</p>
-			</button>
-
-			<button type="button" id="seekFwdButton">
-				<i class="ri-speed-fill"></i>
-				<p>Forward</p>
-			</button>
-
-			<button type="button" id="queueButton">
-				<i class="ri-play-list-add-fill" data-badge="0"></i>
-				<p>Queue</p>
-			</button>
-
-			<button type="button" class="hide" id="queueNextButton">
-				<i class="ri-skip-forward-fill"></i>
-				<p>SkipNext</p>
-			</button>
-
-			<button type="button" id="loopButton">
-				<i class="ri-repeat-fill"></i>
-				<p>Loop</p>
-			</button>
-			<button type="button" id="settingsButton">
-				<i class="ri-settings-fill"></i>
-				<p>Settings</p>
-			</button>
-
-			<button type="button" id="relatedStreamsButton">
-				<i class="ri-menu-4-fill"></i>
-				<p>Related</p>
-			</button>
-
-		</div>
-	</div>
-
-	<div id="subtitleContainer" class="hide"></div>
+	</footer>
 
 	<script>
-		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		// if ('serviceWorker' in navigator)
+		// navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
+
 
 </html>

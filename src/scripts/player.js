@@ -40,10 +40,32 @@ const validator = (val, playlistID, streamID) => {
 	return previous_ID;
 }
 
+
+
+autoplayButton.addEventListener('click', () => {
+	queueFx();
+	autoplayButton.firstElementChild.classList.toggle('on');
+});
+
+// autoplay algorithm randomized recommender
+
+const autoplayFX = streamsArray => {
+	const depth = Math.floor(Math.random() * 20);
+	const index = Math.floor(Math.random() * depth);
+	const stream = streamsArray[index];
+	stream.duration > 600 ||
+		stream.type !== 'stream' ?
+		autoplayFX(streamsArray) :
+		queueIt(stream.url.slice(9))
+}
+
+
 // Loads streams into related streams container
 
 const streamsLoader = streamsArray => {
+
 	const fragment = document.createDocumentFragment();
+
 	for (const stream of streamsArray) {
 		const listItem = document.createElement('list-item');
 		listItem.textContent = stream.title || stream.name;
@@ -67,6 +89,7 @@ const streamsLoader = streamsArray => {
 	}
 	relatedStreamsContainer.innerHTML = '';
 	relatedStreamsContainer.appendChild(fragment);
+
 }
 
 // The main player function
@@ -141,6 +164,9 @@ const play = async id => {
 
 	// setting related streams
 	streamsLoader(data.relatedStreams);
+	
+	if (autoplayButton.firstElementChild.classList.contains('on'))
+		autoplayFX(data.relatedStreams);
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);
@@ -293,6 +319,9 @@ superInput.addEventListener('keypress', e => {
 });
 
 document.querySelector('.ri-search-2-line').addEventListener('click', searchLoader);
+
+
+
 
 
 // URL params 

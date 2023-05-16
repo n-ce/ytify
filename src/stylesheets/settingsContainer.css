@@ -1,19 +1,17 @@
 #settingsContainer {
+	height:calc(100vh - 2rem);
 	background-color: var(--accent);
-	border: 1px solid var(--border);
-	width: calc(90% - 2rem);
-	height: auto;
-	padding: 1rem;
-	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-	border-radius: 0.7rem;
+	color:var(--text);
+	width: calc(100% - 2rem);
 	animation: appear 0.5s ease-out;
 	user-select: none;
-
+	padding: 1rem;
+	
 }
 
 #pipedInstances{
 	box-shadow: none;
+	color:var(--text)
 }
 
 
@@ -29,7 +27,7 @@
 }
 
 #netlifyForm::placeholder {
-	color: var(--border)
+	color: var(--text)
 }
 
 #settingsContainer span {
@@ -40,7 +38,7 @@
 
 #settingsContainer label {
 	font-weight: bold;
-	color: var(--border);
+	
 }
 
 
@@ -52,7 +50,7 @@
 	border: 1px solid var(--border);
 	border-radius: 0.7rem;
 	animation: none;
-	color: var(--border);
+	color: var(--text);
 	font-family: 'Noto Sans';
 }
 
@@ -69,7 +67,7 @@
 	border-radius: 0.7rem;
 	border: 1px solid var(--border);
 	background-color: var(--accent);
-	color: var(--border);
+	color: var(--text);
 }
 
 #settingsContainer span .ri-telegram-line:hover {
