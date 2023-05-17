@@ -1,17 +1,17 @@
 #settingsContainer {
-	height:calc(100vh - 2rem);
+	height: calc(100vh - 2rem);
 	background-color: var(--accent);
-	color:var(--text);
+	color: var(--text);
 	width: calc(100% - 2rem);
 	animation: appear 0.5s ease-out;
 	user-select: none;
 	padding: 1rem;
-	
+
 }
 
-#pipedInstances{
+#pipedInstances {
 	box-shadow: none;
-	color:var(--text)
+	color: var(--text)
 }
 
 
@@ -38,7 +38,7 @@
 
 #settingsContainer label {
 	font-weight: bold;
-	
+
 }
 
 
@@ -78,4 +78,27 @@
 #settingsContainer span .ri-github-fill:hover {
 	background-color: #333;
 	color: #ddd;
+}
+
+#autoplayConfig {
+	font-weight: bold;
+	margin-top: 0.8rem;
+}
+
+#autoplayConfig label {
+	font-size: 0.8rem;
+}
+
+input[type="radio"],
+input[type="radio"]:checked {
+	display: none
+}
+
+
+#autoplayConfig input[type="radio"]:checked+label {
+	background-color: var(--accent);
+	border: 1px solid var(--border);
+	padding: 0.4rem;
+	border-radius: 0.5rem;
+	color: var(--border);
 }

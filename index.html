@@ -173,12 +173,27 @@
 		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
 		<toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
 		<toggle-switch id="suggestionsButton" checked>Display Search Suggestions</toggle-switch>
+
+
 		<span>
 			<label for="pipedInstanceSelector">Piped Instance</label>
 			<select name="pipedInstanceSelector" id="pipedInstances"></select>
 		</span>
-
-		<br>
+		
+		<span id="autoplayConfig">
+			Autoplay Depth
+			<input type="radio" name="AutoplayDepth" id="low" value="4,2">
+			<label for="low">low</label>
+			<input type="radio" name="AutoplayDepth" id="normal" value="7,3" checked>
+			<label for="normal">normal</label>
+			<input type="radio" name="AutoplayDepth" id="high" value="10,4">
+			<label for="high">high</label>
+			<input type="radio" name="AutoplayDepth" id="max" value="20,6">
+			<label for="max">max</label>
+		</span>
+		
+		<code>costs 0.2MB, 0.3MB, 0.5MB, 1MB per stream in order of depth.</code>
+		<hr>
 		<form netlify name='feedback' method='POST'>
 			<input type="text" name="->" id="netlifyForm" placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
 		</form>
@@ -192,7 +207,7 @@
 
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

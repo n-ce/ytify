@@ -28,7 +28,6 @@
 #title {
 	font-size: 1rem;
 	font-weight: bold;
-	overflow: scroll;
 	background-color: var(--accent);
 	color: var(--border);
 	border-radius: 0.5rem;
@@ -154,6 +153,7 @@ button.ri-search-2-line {
 		-webkit-box-direction: normal;
 		-ms-flex-direction: row;
 		flex-direction: row;
+		justify-content: space-around;
 	}
 
 	#metadata {
@@ -173,6 +173,6 @@ button.ri-search-2-line {
 	#author,
 	#bitrateSelector,
 	#subtitleSelector {
-		font-size: 0.9rem;
+		font-size: 1rem;
 	}
 }

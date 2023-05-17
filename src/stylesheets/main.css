@@ -14,8 +14,8 @@
 [class*="ri-"] {
 	font-family: 'remixicon' !important;
 	font-style: normal;
-	font-size:1.5rem;
-	color:var(--border);
+	font-size: 1.5rem;
+	color: var(--border);
 	padding-bottom: 0.5rem;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -54,15 +54,17 @@
 
 html,
 body {
-	height:200vh;
 	margin: 0;
 	padding: 0;
 }
-body{
+
+body {
 	background: var(--bg);
+	font-family: 'Noto Sans', sans-serif;
 }
+
 main {
-	height:100vh;
+	height: 100vh;
 	color: var(--text);
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -77,7 +79,6 @@ main {
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
-	font-family: 'Noto Sans', sans-serif;
 }
 
 

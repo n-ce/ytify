@@ -47,16 +47,59 @@ autoplayButton.addEventListener('click', () => {
 	autoplayButton.firstElementChild.classList.toggle('on');
 });
 
+
+function orderByFrequency(array, minFreqLimit) {
+	const frequency = {};
+	// compute frequencies of each value
+	for (const value of array)
+		value in frequency ?
+		frequency[value]++ :
+		frequency[value] = 1;
+	// make array from the frequency object to de-duplicate
+	const uniques = [];
+	for (const value in frequency)
+		if (frequency[value] >= minFreqLimit)
+			uniques.push(value);
+
+	// sort the uniques array in descending order by frequency
+
+	return uniques.sort((a, b) => frequency[b] - frequency[a]);
+}
+
+function distinctRandomNumbersArray(length, upperlimit) {
+	const array = [];
+	const randomNo = () => {
+		const num = Math.floor(Math.random() * upperlimit);
+		return array.includes(num) ?
+			randomNo() : num;
+	}
+	for (let i = 0; i < length; i++)
+		array.push(randomNo());
+	return array;
+}
+
 // autoplay algorithm randomized recommender
 
-const autoplayFX = streamsArray => {
-	const depth = Math.floor(Math.random() * 20);
-	const index = Math.floor(Math.random() * depth);
-	const stream = streamsArray[index];
-	stream.duration > 600 ||
-		stream.type !== 'stream' ?
-		autoplayFX(streamsArray) :
-		queueIt(stream.url.slice(9))
+const autoplayFX = async streamsArray => {
+	let relatives = [];
+	const [depth, freq] = document.querySelector('[name="AutoplayDepth"]:checked').value.split(',');
+
+	const indices = distinctRandomNumbersArray(depth, streamsArray.length);
+	for (const index of indices) {
+		const luckyID = streamsArray[index].url.slice(9);
+		const relatedStreams = await fetch(pipedInstances.value + '/streams/' + luckyID).then(res => res.json()).then(data => data.relatedStreams);
+		for (const stream of relatedStreams)
+			if (stream.duration < 600 && stream.type === 'stream')
+				relatives.push(stream.url.slice(9));
+	}
+
+	queueIt(
+		orderByFrequency(
+			relatives, freq
+		)
+		[Math.floor(Math.random() * 2)]
+	);
+
 }
 
 
@@ -164,9 +207,10 @@ const play = async id => {
 
 	// setting related streams
 	streamsLoader(data.relatedStreams);
-	
+
 	if (autoplayButton.firstElementChild.classList.contains('on'))
 		autoplayFX(data.relatedStreams);
+
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);

@@ -2,7 +2,7 @@
 	background-color: var(--accent);
 	border: 1px solid var(--border);
 	width: 90%;
-	height: calc(100% - 10rem);
+	height: calc(100vh - 10rem);
 	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border-radius: 0.7rem;
