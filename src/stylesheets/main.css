@@ -56,9 +56,6 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-}
-
-body {
 	background: var(--bg);
 	font-family: 'Noto Sans', sans-serif;
 }

@@ -178,6 +178,39 @@ function updatePositionState() {
 }
 
 
+
+function orderByFrequency(array, minFreqLimit) {
+	const frequency = {};
+	// compute frequencies of each value
+	for (const value of array)
+		value in frequency ?
+		frequency[value]++ :
+		frequency[value] = 1;
+	// make array from the frequency object to de-duplicate
+	const uniques = [];
+	for (const value in frequency)
+		if (frequency[value] >= minFreqLimit)
+			uniques.push(value);
+
+	// sort the uniques array in descending order by frequency
+
+	return uniques.sort((a, b) => frequency[b] - frequency[a]);
+}
+
+function distinctRandomNumbersArray(length, upperlimit) {
+	const array = [];
+	const randomNo = () => {
+		const num = Math.floor(Math.random() * upperlimit);
+		return array.includes(num) ?
+			randomNo() : num;
+	}
+	for (let i = 0; i < length; i++)
+		array.push(randomNo());
+	return array;
+}
+
+
+
 export {
 	params,
 	save,
@@ -187,4 +220,6 @@ export {
 	convertSStoHHMMSS,
 	parseTTML,
 	updatePositionState,
+	orderByFrequency,
+	distinctRandomNumbersArray
 }

@@ -1,4 +1,4 @@
-import { setMetaData, getSaved, save, params, updatePositionState } from './lib/helperFunctions.js';
+import { setMetaData, getSaved, save, params, updatePositionState, orderByFrequency, distinctRandomNumbersArray } from './lib/helperFunctions.js';
 
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
@@ -23,6 +23,7 @@ let queueNow = 1;
 let previous_ID;
 
 
+
 // link validator
 
 const validator = (val, playlistID, streamID) => {
@@ -41,50 +42,41 @@ const validator = (val, playlistID, streamID) => {
 }
 
 
-
+let autoplay = false;
 autoplayButton.addEventListener('click', () => {
-	queueFx();
+	if (autoplay) {
+		audio.onended = () => {
+			if (queue) {
+				next();
+			} else {
+				playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
+				playButton.dataset.state = '1';
+			}
+		}
+	}
+
+	autoplay = !autoplay;
+	loopButton.classList.toggle('hide');
+	loopButton.firstElementChild.classList.remove('on');
+	audio.loop = false;
+	queueButton.classList.toggle('hide');
 	autoplayButton.firstElementChild.classList.toggle('on');
 });
 
-
-function orderByFrequency(array, minFreqLimit) {
-	const frequency = {};
-	// compute frequencies of each value
-	for (const value of array)
-		value in frequency ?
-		frequency[value]++ :
-		frequency[value] = 1;
-	// make array from the frequency object to de-duplicate
-	const uniques = [];
-	for (const value in frequency)
-		if (frequency[value] >= minFreqLimit)
-			uniques.push(value);
-
-	// sort the uniques array in descending order by frequency
-
-	return uniques.sort((a, b) => frequency[b] - frequency[a]);
-}
-
-function distinctRandomNumbersArray(length, upperlimit) {
-	const array = [];
-	const randomNo = () => {
-		const num = Math.floor(Math.random() * upperlimit);
-		return array.includes(num) ?
-			randomNo() : num;
-	}
-	for (let i = 0; i < length; i++)
-		array.push(randomNo());
-	return array;
-}
+autoplayNextButton.addEventListener('click', () => {
+	audio.onended();
+});
 
 // autoplay algorithm randomized recommender
 
 const autoplayFX = async streamsArray => {
+	autoplayNextButton.classList.add('hide');
+	autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
+
 	let relatives = [];
 	const [depth, freq] = document.querySelector('[name="AutoplayDepth"]:checked').value.split(',');
 
-	const indices = distinctRandomNumbersArray(depth, streamsArray.length);
+	const indices = distinctRandomNumbersArray(parseInt(depth), streamsArray.length);
 	for (const index of indices) {
 		const luckyID = streamsArray[index].url.slice(9);
 		const relatedStreams = await fetch(pipedInstances.value + '/streams/' + luckyID).then(res => res.json()).then(data => data.relatedStreams);
@@ -93,12 +85,20 @@ const autoplayFX = async streamsArray => {
 				relatives.push(stream.url.slice(9));
 	}
 
-	queueIt(
-		orderByFrequency(
-			relatives, freq
-		)
-		[Math.floor(Math.random() * 2)]
-	);
+	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
+
+	relatives = orderByFrequency(relatives, parseInt(freq));
+	if (relatives.length === 0) {
+		audio.onended = () => {
+			playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
+			playButton.dataset.state = '1';
+		}
+		return;
+	}
+	audio.onended = () =>
+		play(relatives[Math.floor(Math.random() * relatives.length)])
+
+	autoplayNextButton.classList.remove('hide');
 
 }
 
@@ -246,14 +246,14 @@ const queueIt = id => {
 
 
 // playback on end strategy
-audio.addEventListener('ended', () => {
+audio.onended = () => {
 	if (queue) {
 		next();
 	} else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
 		playButton.dataset.state = '1';
 	}
-})
+}
 
 
 
@@ -271,6 +271,7 @@ const queueFx = () => {
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
 	audio.loop = false;
+	autoplayButton.classList.toggle('hide');
 }
 queueButton.addEventListener('click', queueFx);
 
@@ -323,7 +324,11 @@ superInput.addEventListener('input', async () => {
 
 	suggestions.style.display = 'block';
 
+
 	const data = await fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value).then(res => res.json());
+
+	if (!data.length) return;
+
 	const fragment = document.createDocumentFragment();
 
 	for (const suggestion of data) {
@@ -342,6 +347,8 @@ superInput.addEventListener('input', async () => {
 
 
 const searchLoader = () => {
+
+	if (!superInput.value) return;
 
 	fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
 		.then(res => res.json())

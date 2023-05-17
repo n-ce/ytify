@@ -1,4 +1,4 @@
-const cacheName = '5.13.3';
+const cacheName = '5.13.4';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",

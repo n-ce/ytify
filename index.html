@@ -149,9 +149,15 @@
 					<i class="ri-repeat-fill"></i>
 					<p>Loop</p>
 				</button>
+
 				<button type="button" id="autoplayButton">
 					<i class="ri-magic-fill"></i>
 					<p>Autoplay</p>
+				</button>
+
+				<button type="button" class="hide" id="autoplayNextButton">
+					<i class="ri-skip-forward-fill"></i>
+					<p>SkipNext</p>
 				</button>
 
 				<button type="button" id="relatedStreamsButton">
@@ -179,7 +185,7 @@
 			<label for="pipedInstanceSelector">Piped Instance</label>
 			<select name="pipedInstanceSelector" id="pipedInstances"></select>
 		</span>
-		
+
 		<span id="autoplayConfig">
 			Autoplay Depth
 			<input type="radio" name="AutoplayDepth" id="low" value="4,2">
@@ -191,9 +197,9 @@
 			<input type="radio" name="AutoplayDepth" id="max" value="20,6">
 			<label for="max">max</label>
 		</span>
-		
+
 		<code>costs 0.2MB, 0.3MB, 0.5MB, 1MB per stream in order of depth.</code>
-		<hr>
+		<br><br>
 		<form netlify name='feedback' method='POST'>
 			<input type="text" name="->" id="netlifyForm" placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
 		</form>
@@ -207,7 +213,7 @@
 
 	<script>
 		if ('serviceWorker' in navigator)
-		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 
