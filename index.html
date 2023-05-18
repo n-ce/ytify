@@ -152,12 +152,12 @@
 
 				<button type="button" id="autoplayButton">
 					<i class="ri-magic-fill"></i>
-					<p>Autoplay</p>
+					<p>AutoMusic</p>
 				</button>
 
 				<button type="button" class="hide" id="autoplayNextButton">
 					<i class="ri-skip-forward-fill"></i>
-					<p>SkipNext</p>
+					<p>PlayNext</p>
 				</button>
 
 				<button type="button" id="relatedStreamsButton">
@@ -187,18 +187,11 @@
 		</span>
 
 		<span id="autoplayConfig">
-			Autoplay Depth
-			<input type="radio" name="AutoplayDepth" id="low" value="4,2">
-			<label for="low">low</label>
-			<input type="radio" name="AutoplayDepth" id="normal" value="7,3" checked>
-			<label for="normal">normal</label>
-			<input type="radio" name="AutoplayDepth" id="high" value="10,4">
-			<label for="high">high</label>
-			<input type="radio" name="AutoplayDepth" id="max" value="20,6">
-			<label for="max">max</label>
+			<label for="AutoplayDepth">Autoplay Depth</label>
+			<input type="range" name="AutoplayDepth" id="autoplayDepth" min="2" max="20" value="8" step="3">
 		</span>
 
-		<code>costs 0.2MB, 0.3MB, 0.5MB, 1MB per stream in order of depth.</code>
+		<code>costs ~ 40KB at min to 200KB at max per stream in order of depth.</code>
 		<br><br>
 		<form netlify name='feedback' method='POST'>
 			<input type="text" name="->" id="netlifyForm" placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />

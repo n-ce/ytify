@@ -84,21 +84,3 @@
 	font-weight: bold;
 	margin-top: 0.8rem;
 }
-
-#autoplayConfig label {
-	font-size: 0.8rem;
-}
-
-input[type="radio"],
-input[type="radio"]:checked {
-	display: none
-}
-
-
-#autoplayConfig input[type="radio"]:checked+label {
-	background-color: var(--accent);
-	border: 1px solid var(--border);
-	padding: 0.4rem;
-	border-radius: 0.5rem;
-	color: var(--border);
-}

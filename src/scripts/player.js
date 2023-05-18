@@ -1,4 +1,4 @@
-import { setMetaData, getSaved, save, params, updatePositionState, orderByFrequency, distinctRandomNumbersArray } from './lib/helperFunctions.js';
+import { setMetaData, getSaved, save, params, updatePositionState, orderByFrequency, similarStreamsCollector } from './lib/helperFunctions.js';
 
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
@@ -69,35 +69,33 @@ autoplayNextButton.addEventListener('click', () => {
 
 // autoplay algorithm randomized recommender
 
-const autoplayFX = async streamsArray => {
-	autoplayNextButton.classList.add('hide');
-	autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
+/*
+1. searches the stream title with playlist filter
+2. fetches streams of first (depth) no of playlists
+3. orders all streams by frequency
+4. gets most frequent streams 
+5. plays one of them randomly
+*/
 
-	let relatives = [];
-	const [depth, freq] = document.querySelector('[name="AutoplayDepth"]:checked').value.split(',');
+const streamHistory = [];
+let relativesHistory = [];
 
-	const indices = distinctRandomNumbersArray(parseInt(depth), streamsArray.length);
-	for (const index of indices) {
-		const luckyID = streamsArray[index].url.slice(9);
-		const relatedStreams = await fetch(pipedInstances.value + '/streams/' + luckyID).then(res => res.json()).then(data => data.relatedStreams);
-		for (const stream of relatedStreams)
-			if (stream.duration < 600 && stream.type === 'stream')
-				relatives.push(stream.url.slice(9));
-	}
-
+const autoplayFX = (relatives, musicCheck) => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
+	relativesHistory = relativesHistory.concat(relatives);
+	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
 
-	relatives = orderByFrequency(relatives, parseInt(freq));
-	if (relatives.length === 0) {
-		audio.onended = () => {
-			playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
-			playButton.dataset.state = '1';
-		}
+	if (!relatives.length)
+		relatives = relativesHistory.filter(stream => !streamHistory.includes(stream));
+
+	const id = relatives[Math.floor(Math.random() * relatives.length)];
+	
+	if (musicCheck === 'Music')
+		audio.onended = () => { play(id) }
+	else {
+		play(id)
 		return;
 	}
-	audio.onended = () =>
-		play(relatives[Math.floor(Math.random() * relatives.length)])
-
 	autoplayNextButton.classList.remove('hide');
 
 }
@@ -155,6 +153,7 @@ const play = async id => {
 		return;
 	}
 
+
 	audio.dataset.seconds = 0;
 
 
@@ -208,9 +207,13 @@ const play = async id => {
 	// setting related streams
 	streamsLoader(data.relatedStreams);
 
-	if (autoplayButton.firstElementChild.classList.contains('on'))
-		autoplayFX(data.relatedStreams);
-
+	// autoplay init
+	if (autoplay) {
+		autoplayNextButton.classList.add('hide');
+		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
+		streamHistory.push(id);
+		autoplayFX(await similarStreamsCollector(data.title, id), data.category);
+	}
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);

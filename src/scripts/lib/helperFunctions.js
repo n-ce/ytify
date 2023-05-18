@@ -179,7 +179,7 @@ function updatePositionState() {
 
 
 
-function orderByFrequency(array, minFreqLimit) {
+function orderByFrequency(array) {
 	const frequency = {};
 	// compute frequencies of each value
 	for (const value of array)
@@ -187,14 +187,19 @@ function orderByFrequency(array, minFreqLimit) {
 		frequency[value]++ :
 		frequency[value] = 1;
 	// make array from the frequency object to de-duplicate
+
+	const maxFreq = Math.max(...Object.values(frequency));
+	/*
 	const uniques = [];
 	for (const value in frequency)
 		if (frequency[value] >= minFreqLimit)
 			uniques.push(value);
-
+	*/
 	// sort the uniques array in descending order by frequency
 
-	return uniques.sort((a, b) => frequency[b] - frequency[a]);
+	return Object.keys(frequency)
+		.filter(key => frequency[key] === maxFreq)
+		.sort((a, b) => frequency[b] - frequency[a]);
 }
 
 function distinctRandomNumbersArray(length, upperlimit) {
@@ -209,6 +214,20 @@ function distinctRandomNumbersArray(length, upperlimit) {
 	return array;
 }
 
+async function similarStreamsCollector(streamTitle, currentStream) {
+	const streamsArray = await fetch(pipedInstances.value + '/search?q=' + streamTitle + '&filter=playlists').then(res => res.json()).then(data => data.items);
+	const relatives = [];
+	const depth = autoplayDepth.value;
+	//	const indices = distinctRandomNumbersArray(depth, streamsArray.length);
+	for (let index = 0; index < depth; index++) {
+		const luckyID = streamsArray[index].url.slice(15);
+		const playlistItems = await fetch(pipedInstances.value + '/playlists/' + luckyID).then(res => res.json()).then(data => data.relatedStreams);
+		for (const stream of playlistItems)
+			if (stream.duration < 600 && stream.url !== `/watch?v=${currentStream}`)
+				relatives.push(stream.url.slice(9));
+	}
+	return relatives;
+}
 
 
 export {
@@ -221,5 +240,5 @@ export {
 	parseTTML,
 	updatePositionState,
 	orderByFrequency,
-	distinctRandomNumbersArray
+	similarStreamsCollector
 }
