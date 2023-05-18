@@ -80,7 +80,7 @@ autoplayNextButton.addEventListener('click', () => {
 const streamHistory = [];
 let relativesHistory = [];
 
-const autoplayFX = (relatives, musicCheck) => {
+const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
 	relativesHistory = relativesHistory.concat(relatives);
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
@@ -90,12 +90,8 @@ const autoplayFX = (relatives, musicCheck) => {
 
 	const id = relatives[Math.floor(Math.random() * relatives.length)];
 	
-	if (musicCheck === 'Music')
-		audio.onended = () => { play(id) }
-	else {
-		play(id)
-		return;
-	}
+	audio.onended = () => { play(id) }
+	
 	autoplayNextButton.classList.remove('hide');
 
 }
@@ -212,7 +208,7 @@ const play = async id => {
 		autoplayNextButton.classList.add('hide');
 		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
 		streamHistory.push(id);
-		autoplayFX(await similarStreamsCollector(data.title, id), data.category);
+		autoplayFX(await similarStreamsCollector(data.title, id));
 	}
 
 	params.set('s', id);
