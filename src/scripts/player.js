@@ -53,7 +53,9 @@ autoplayButton.addEventListener('click', () => {
 				playButton.dataset.state = '1';
 			}
 		}
-	}
+		autoplayNextButton.classList.add('hide');
+		relativesHistory = [];
+	} 
 
 	autoplay = !autoplay;
 	loopButton.classList.toggle('hide');
