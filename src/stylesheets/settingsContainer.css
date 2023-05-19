@@ -1,12 +1,25 @@
 #settingsContainer {
-	height: calc(100vh - 2rem);
-	background-color: var(--accent);
+	height: calc(100% - 2rem);
+	background-color:var(--secondary);
 	color: var(--text);
-	width: calc(100% - 2rem);
 	animation: appear 0.5s ease-out;
 	user-select: none;
 	padding: 1rem;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	overflow-x: hidden;
+	transition: 0.5s;
+}
 
+.settingsHide {
+	left: -2rem;
+	width: 0;
+}
+
+.settingsShow {
+	left: 0;
+	width: calc(100% - 2rem);
 }
 
 #pipedInstances {
@@ -78,9 +91,4 @@
 #settingsContainer span .ri-github-fill:hover {
 	background-color: #333;
 	color: #ddd;
-}
-
-#autoplayConfig {
-	font-weight: bold;
-	margin-top: 0.8rem;
 }

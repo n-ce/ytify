@@ -42,61 +42,6 @@ const validator = (val, playlistID, streamID) => {
 }
 
 
-let autoplay = false;
-autoplayButton.addEventListener('click', () => {
-	if (autoplay) {
-		audio.onended = () => {
-			if (queue) {
-				next();
-			} else {
-				playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
-				playButton.dataset.state = '1';
-			}
-		}
-		autoplayNextButton.classList.add('hide');
-		relativesHistory = [];
-	} 
-
-	autoplay = !autoplay;
-	loopButton.classList.toggle('hide');
-	loopButton.firstElementChild.classList.remove('on');
-	audio.loop = false;
-	queueButton.classList.toggle('hide');
-	autoplayButton.firstElementChild.classList.toggle('on');
-});
-
-autoplayNextButton.addEventListener('click', () => {
-	audio.onended();
-});
-
-// autoplay algorithm randomized recommender
-
-/*
-1. searches the stream title with playlist filter
-2. fetches streams of first (depth) no of playlists
-3. orders all streams by frequency
-4. gets most frequent streams 
-5. plays one of them randomly
-*/
-
-const streamHistory = [];
-let relativesHistory = [];
-
-const autoplayFX = relatives => {
-	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
-	relativesHistory = relativesHistory.concat(relatives);
-	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-
-	if (!relatives.length)
-		relatives = relativesHistory.filter(stream => !streamHistory.includes(stream));
-
-	const id = relatives[Math.floor(Math.random() * relatives.length)];
-	
-	audio.onended = () => { play(id) }
-	
-	autoplayNextButton.classList.remove('hide');
-
-}
 
 
 // Loads streams into related streams container
@@ -130,6 +75,55 @@ const streamsLoader = streamsArray => {
 	relatedStreamsContainer.appendChild(fragment);
 
 }
+
+// Autoplay Button
+
+let autoplay = false;
+autoplayButton.addEventListener('click', () => {
+	if (autoplay) {
+		autoplayNextButton.classList.add('hide');
+		relativesHistory.length = 0;
+	}
+	autoplay = !autoplay;
+	loopButton.classList.toggle('hide');
+	loopButton.firstElementChild.classList.remove('on');
+	audio.loop = false;
+	queueButton.classList.toggle('hide');
+	autoplayButton.firstElementChild.classList.toggle('on');
+});
+
+autoplayNextButton.addEventListener('click', () => {
+	audio.onended();
+});
+
+
+/*
+-  autoplay algorithm
+1. searches the stream title with playlist filter
+2. fetches streams of first (depth) no of playlists
+3. orders all streams by frequency
+4. gets most frequent streams 
+5. plays one of them randomly
+*/
+
+const streamHistory = [];
+let relativesHistory = [];
+let autoplayID;
+
+const autoplayFX = relatives => {
+	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
+	relativesHistory = relativesHistory.concat(relatives);
+	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
+
+	if (!relatives.length)
+		relatives = relativesHistory.filter(stream => !streamHistory.includes(stream));
+
+	autoplayID = relatives[Math.floor(Math.random() * relatives.length)];
+
+	autoplayNextButton.classList.remove('hide');
+
+}
+
 
 // The main player function
 
@@ -248,9 +242,11 @@ const queueIt = id => {
 
 // playback on end strategy
 audio.onended = () => {
-	if (queue) {
+	if (queue)
 		next();
-	} else {
+	else if (autoplay)
+		validator(null, null, autoplayID);
+	else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
 		playButton.dataset.state = '1';
 	}

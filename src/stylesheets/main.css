@@ -36,11 +36,14 @@
 .ri-github-fill:before { content: "\edca"; }
 .ri-telegram-line:before { content: "\f1f0"; }
 .ri-magic-fill:before { content: "\eee9"; }
+.ri-skip-back-fill:before { content: "\f13f"; }
+.ri-close-fill:before { content: "\eb98"; }
 
 
 
 :root {
 	--bg: none;
+	--secondary:none;
 	--accent: none;
 	--text: none;
 	--border: none;
@@ -56,12 +59,12 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	background: var(--bg);
-	font-family: 'Noto Sans', sans-serif;
+	height:100%;
 }
 
-main {
-	height: 100vh;
+body {
+	background: var(--bg);
+	font-family: 'Noto Sans', sans-serif;
 	color: var(--text);
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -94,6 +97,18 @@ main {
 		opacity: 0;
 		transform: translateY(1rem)
 	}
+}
+
+.ri-settings-fill{
+	background-color: var(--accent);
+	position: fixed;
+	top:0;
+	right:0;
+	z-index:1;
+	border-bottom:1px solid var(--border);
+	border-left:1px solid var(--border);
+	border-bottom-left-radius: 2rem;
+	padding:0 0 1rem 1rem;
 }
 
 #subtitleContainer {

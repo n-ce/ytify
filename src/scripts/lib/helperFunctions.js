@@ -9,13 +9,15 @@ const palette = {
 		bg: 'none',
 		accent: '#fff5',
 		text: '#000b',
-		border: '#000b'
+		border: '#000b',
+		secondary:'#bbbe'
 	},
 	dark: {
 		bg: '#000',
 		accent: '#000',
 		text: '#fffb',
-		border: '#fff7'
+		border: '#fff7',
+		secondary:'#000'
 	}
 };
 
@@ -70,6 +72,7 @@ function themer() {
 		cssVar('--accent', palette[theme].accent);
 		cssVar('--text', palette[theme].text);
 		cssVar('--border', palette[theme].border);
+		cssVar('--secondary', palette[theme].secondary);
 		tabColor.content = palette[theme].bg;
 
 	}
@@ -201,7 +204,7 @@ function orderByFrequency(array) {
 		.filter(key => frequency[key] === maxFreq)
 		.sort((a, b) => frequency[b] - frequency[a]);
 }
-
+/*
 function distinctRandomNumbersArray(length, upperlimit) {
 	const array = [];
 	const randomNo = () => {
@@ -213,6 +216,7 @@ function distinctRandomNumbersArray(length, upperlimit) {
 		array.push(randomNo());
 	return array;
 }
+*/
 
 async function similarStreamsCollector(streamTitle, currentStream) {
 	const streamsArray = await fetch(pipedInstances.value + '/search?q=' + streamTitle + '&filter=playlists').then(res => res.json()).then(data => data.items);
