@@ -112,10 +112,15 @@ let autoplayID;
 
 const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
+	// merge current relatives with previous ones
 	relativesHistory = relativesHistory.concat(relatives);
+	// get most appearing relatives
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-
-	if (!relatives.length)
+	
+	if (!relatives.length) // offset maxfreq by 1
+		relatives = orderByFrequency(relativesHistory,1).filter(stream => !streamHistory.includes(stream));
+		
+	if (!relatives.length) // give up finding best and return all relatives
 		relatives = relativesHistory.filter(stream => !streamHistory.includes(stream));
 
 	autoplayID = relatives[Math.floor(Math.random() * relatives.length)];
@@ -145,9 +150,7 @@ const play = async id => {
 		return;
 	}
 
-
 	audio.dataset.seconds = 0;
-
 
 	// extracting opus streams and storing m4a streams
 
@@ -196,8 +199,11 @@ const play = async id => {
 	else
 		subtitleSelector.classList.add('hide');
 
-	// setting related streams
+	// load related streams
 	streamsLoader(data.relatedStreams);
+
+	params.set('s', id);
+	history.pushState({}, '', '?' + params);
 
 	// autoplay init
 	if (autoplay) {
@@ -206,9 +212,6 @@ const play = async id => {
 		streamHistory.push(id);
 		autoplayFX(await similarStreamsCollector(data.title, id));
 	}
-
-	params.set('s', id);
-	history.pushState({}, '', '?' + params);
 
 }
 
@@ -426,7 +429,7 @@ if ('mediaSession' in navigator) {
 		updatePositionState();
 	});
 	navigator.mediaSession.setActionHandler("nexttrack", () => {
-		next();
+		audio.onended();
 		updatePositionState();
 	});
 }
