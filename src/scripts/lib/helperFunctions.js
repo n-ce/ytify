@@ -182,7 +182,7 @@ function updatePositionState() {
 
 
 
-function orderByFrequency(array) {
+function orderByFrequency(array, offset = 0) {
 	const frequency = {};
 	// compute frequencies of each value
 	for (const value of array)
@@ -191,7 +191,7 @@ function orderByFrequency(array) {
 		frequency[value] = 1;
 	// make array from the frequency object to de-duplicate
 
-	const maxFreq = Math.max(...Object.values(frequency));
+	const maxFreq = Math.max(...Object.values(frequency)) - offset;
 	/*
 	const uniques = [];
 	for (const value in frequency)
