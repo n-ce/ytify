@@ -205,8 +205,7 @@ const play = async id => {
 		autoplayFX(
 			await similarStreamsCollector(
 				data.title + (data.uploader.includes(' - Topic') ? ' ' + data.uploader.replace(' - Topic', '') : ''),
-				id,
-				data.relatedStreams
+				id
 			)
 		);
 	}

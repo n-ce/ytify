@@ -219,7 +219,7 @@ function distinctRandomNumbersArray(length, upperlimit) {
 }
 */
 
-async function similarStreamsCollector(streamTitle, currentStream, currentRelatives) {
+async function similarStreamsCollector(streamTitle, currentStream) {
 	const relatives = [];
 	const searchPlaylists = await fetch(pipedInstances.value + '/search?q=' + streamTitle + '&filter=playlists').then(res => res.json()).then(data => data.items);
 	const depth = autoplayDepth.value;
