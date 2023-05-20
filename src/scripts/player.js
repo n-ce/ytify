@@ -16,15 +16,10 @@ await fetch('https://piped-instances.kavin.rocks')
 	})
 
 
-const queueArray = [];
-let queueCount = 0;
-let queue = false;
-let queueNow = 1;
-let previous_ID;
-
-
 
 // link validator
+
+let previous_ID;
 
 const validator = (val, playlistID, streamID) => {
 	if (val) {
@@ -77,24 +72,20 @@ const streamsLoader = streamsArray => {
 
 // Autoplay Button
 
-let autoplay = false;
+const autoplay = autoplayButton.firstElementChild.classList;
 autoplayButton.addEventListener('click', () => {
-	if (autoplay) {
-		autoplayNextButton.classList.add('hide');
-		relativesHistory.length = 0;
-	}
-	autoplay = !autoplay;
+	relativesHistory.length = 0;
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
 	audio.loop = false;
 	queueButton.classList.toggle('hide');
 	autoplayButton.firstElementChild.classList.toggle('on');
+	autoplayNextButton.classList.toggle('hide');
 });
 
 autoplayNextButton.addEventListener('click', () => {
 	audio.onended();
 });
-
 
 /*
 -  autoplay algorithm
@@ -111,31 +102,25 @@ let autoplayQueue = [];
 
 const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
-	relativesHistory = relativesHistory.concat(relatives).filter(relative => !relativesHistory.includes(relative));
+	relativesHistory = relativesHistory.concat(relatives.filter(relative => !relativesHistory.includes(relative)));
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
+	autoplayQueue.shift();
+	queuelist.removeChild(queuelist.firstElementChild)
 	if (relatives.length) {
 		autoplayQueue = autoplayQueue.concat(relatives);
-		appendToQueuelistContainer(autoplayQueue);
+		for (const id of relatives)
+			appendToQueuelist(id);
 	}
-	autoplayNextButton.classList.remove('hide');
 }
 
-const appendToQueuelistContainer = async ids => {
-
-	queuelistContainer.innerHTML = '';
-	const h1 = document.createElement('h1');
-	h1.textContent = 'Upcoming';
-	const fragment = document.createDocumentFragment();
-	for (const id of ids) {
-		const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json())
-		const listItem = document.createElement('list-item');
-		listItem.textContent = data.title;
-		listItem.dataset.author = data.author_name;
-		listItem.dataset.thumbnail = data.thumbnail_url;
-		listItem.addEventListener('click', () => play(id));
-		fragment.appendChild(listItem);
-	}
-	queuelistContainer.append(h1, fragment);
+const appendToQueuelist = async id => {
+	const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json());
+	const listItem = document.createElement('list-item');
+	listItem.textContent = data.title;
+	listItem.dataset.author = data.author_name;
+	listItem.dataset.thumbnail = data.thumbnail_url;
+	listItem.addEventListener('click', () => play(id));
+	queuelist.appendChild(listItem);
 }
 
 // The main player function
@@ -214,20 +199,19 @@ const play = async id => {
 	history.pushState({}, '', '?' + params);
 
 	// autoplay init
-	if (autoplay) {
-		autoplayNextButton.classList.add('hide');
+	if (autoplay.contains('on')) {
 		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
 		streamHistory.push(id);
-		autoplayQueue.shift();
 		autoplayFX(
 			await similarStreamsCollector(
 				data.title + (data.uploader.includes(' - Topic') ? ' ' + data.uploader.replace(' - Topic', '') : ''),
-				id
+				id,
+				data.relatedStreams
 			)
 		);
 	}
-
 }
+
 
 // Instance Selector change event
 
@@ -239,29 +223,27 @@ pipedInstances.addEventListener('change', () => {
 });
 
 
-// next track 
-const next = () => {
-	if ((queueCount - queueNow) < 0) return;
-	play(queueArray[queueNow]);
-	queueButton.firstElementChild.dataset.badge = queueCount - queueNow;
-	queueNow++;
-}
-
-
 // link queuing algorithm
+const queueArray = [];
 
 const queueIt = id => {
-	queueCount++;
-	queueButton.firstElementChild.dataset.badge = queueCount - queueNow + 1;
-	queueArray[queueCount] = previous_ID = id;
+	queueArray.push(id);
+	queueButton.firstElementChild.dataset.badge = queueArray.length;
+	appendToQueuelist(id);
 }
 
 
 // playback on end strategy
+let queue = false;
+
 audio.onended = () => {
-	if (queue)
-		next();
-	else if (autoplay)
+	if (queue && queueArray.length) {
+		play(queueArray[0]);
+		queueArray.shift();
+		queueButton.firstElementChild.dataset.badge = queueArray.length;
+		queuelist.removeChild(queuelist.firstElementChild);
+	}
+	else if (autoplay.contains('on'))
 		validator(null, null, autoplayQueue[0]);
 	else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
@@ -276,10 +258,10 @@ audio.onended = () => {
 const queueFx = () => {
 	queue = !queue;
 	if (queue) {
-		queueCount = 0;
 		queueArray.length = 0;
 	}
 	else queueButton.firstElementChild.dataset.badge = 0;
+	queuelist.innerHTML = '';
 	queueNextButton.classList.toggle('hide');
 	queueButton.firstElementChild.classList.toggle('on');
 	loopButton.classList.toggle('hide');
@@ -289,7 +271,9 @@ const queueFx = () => {
 }
 queueButton.addEventListener('click', queueFx);
 
-queueNextButton.addEventListener('click', next);
+queueNextButton.addEventListener('click', () => {
+	audio.onended();
+});
 
 
 const playlistLoad = async id => {
@@ -403,9 +387,9 @@ else {
 	if (params.get('s')) // stream
 		play(params.get('s'));
 
-	if (params.get('t')) { // timestamp
+	if (params.get('t')) // timestamp
 		audio.currentTime = params.get('t');
-	}
+
 
 	// PWA Params
 	if (params.get('url')) {

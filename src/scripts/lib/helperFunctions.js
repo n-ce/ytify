@@ -218,7 +218,8 @@ function distinctRandomNumbersArray(length, upperlimit) {
 	return array;
 }
 */
-async function similarStreamsCollector(streamTitle, currentStream) {
+
+async function similarStreamsCollector(streamTitle, currentStream, currentRelatives) {
 	const relatives = [];
 	const searchPlaylists = await fetch(pipedInstances.value + '/search?q=' + streamTitle + '&filter=playlists').then(res => res.json()).then(data => data.items);
 	const depth = autoplayDepth.value;
@@ -229,6 +230,11 @@ async function similarStreamsCollector(streamTitle, currentStream) {
 			if (stream.duration < 600 && stream.url !== `/watch?v=${currentStream}`)
 				relatives.push(stream.url.slice(9));
 	}
+	/*
+	for (const stream of currentRelatives)
+		if (stream.duration < 600 && stream.type === 'stream')
+			relatives.push(stream.url.slice(9));
+	*/
 	return relatives;
 }
 
