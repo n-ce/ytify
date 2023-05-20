@@ -113,8 +113,10 @@ const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
 	relativesHistory = relativesHistory.concat(relatives).filter(relative => !relativesHistory.includes(relative));
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-	autoplayQueue = autoplayQueue.concat(relatives);
-	appendToQueuelistContainer(autoplayQueue);
+	if (relatives.length) {
+		autoplayQueue = autoplayQueue.concat(relatives);
+		appendToQueuelistContainer(autoplayQueue);
+	}
 	autoplayNextButton.classList.remove('hide');
 }
 
