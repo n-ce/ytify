@@ -210,7 +210,7 @@ const play = async id => {
 		autoplayNextButton.classList.add('hide');
 		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
 		streamHistory.push(id);
-		autoplayFX(await similarStreamsCollector(data.title, id));
+		autoplayFX(await similarStreamsCollector(data.title + ' ' + data.uploader, id));
 	}
 
 }
