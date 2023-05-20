@@ -22,28 +22,28 @@
 }
 
 
-.ri-pause-fill:before { content: "\efd7"; }
-.ri-stop-fill:before { content: "\f1a0"; }
-.ri-repeat-fill:before { content: "\f073"; }
-.ri-play-list-add-fill:before { content: "\f00e"; }
-.ri-play-fill:before { content: "\f00a"; }
-.ri-rewind-fill:before { content: "\f085"; }
-.ri-speed-fill:before { content: "\f176"; }
-.ri-skip-forward-fill:before { content: "\f143"; }
-.ri-settings-fill:before { content: "\f0ed"; }
-.ri-menu-4-fill:before { content: "\ef35"; }
-.ri-search-2-line:before { content: "\f0cd"; }
-.ri-github-fill:before { content: "\edca"; }
-.ri-telegram-line:before { content: "\f1f0"; }
-.ri-magic-fill:before { content: "\eee9"; }
-.ri-skip-back-fill:before { content: "\f13f"; }
-.ri-close-fill:before { content: "\eb98"; }
+.ri-pause-fill:before {content: "\efd7"}
+.ri-stop-fill:before {content: "\f1a0"}
+.ri-repeat-fill:before {content: "\f073"}
+.ri-play-list-add-fill:before {content: "\f00e"}
+.ri-play-fill:before {content: "\f00a"}
+.ri-rewind-fill:before {content: "\f085"}
+.ri-speed-fill:before {content: "\f176"}
+.ri-skip-forward-fill:before {content: "\f143"}
+.ri-settings-fill:before {content: "\f0ed"}
+.ri-menu-4-fill:before {content: "\ef35"}
+.ri-search-2-line:before {content: "\f0cd"}
+.ri-github-fill:before {content: "\edca"}
+.ri-telegram-line:before {content: "\f1f0"}
+.ri-magic-fill:before {content: "\eee9"}
+.ri-skip-back-fill:before {content: "\f13f"}
+.ri-close-fill:before {content: "\eb98"}
 
 
 
 :root {
 	--bg: none;
-	--secondary:none;
+	--secondary: none;
 	--accent: none;
 	--text: none;
 	--border: none;
@@ -59,7 +59,7 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	height:100%;
+	height: 100%;
 }
 
 body {
@@ -90,7 +90,21 @@ body {
 	display: flex;
 }
 
-
+#queuelistContainer {
+	height: calc(100% - 2rem);
+	background-color: var(--secondary);
+	color: var(--text);
+	animation: appear 0.5s ease-out;
+	user-select: none;
+	padding: 1rem;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	left: -2rem;
+	width: 0;
+	overflow-x: hidden;
+	transition: 0.5s;
+}
 
 @keyframes appear {
 	from {
@@ -99,16 +113,30 @@ body {
 	}
 }
 
-.ri-settings-fill{
+#settingsButton {
 	background-color: var(--accent);
 	position: fixed;
-	top:0;
-	right:0;
-	z-index:1;
-	border-bottom:1px solid var(--border);
-	border-left:1px solid var(--border);
+	top: 0;
+	right: 0;
+	z-index: 4;
+	border-bottom: 1px solid var(--border);
+	border-left: 1px solid var(--border);
 	border-bottom-left-radius: 2rem;
-	padding:0 0 1rem 1rem;
+	padding: 0 0 1rem 1rem;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+}
+
+#queuelistButton{
+	background-color: var(--accent);
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	border-bottom: 1px solid var(--border);
+	border-right: 1px solid var(--border);
+	border-bottom-right-radius: 2rem;
+	padding: 0 1rem 1rem 0;
+	box-shadow: 0 0.1rem 0.3rem #0003;
 }
 
 #subtitleContainer {

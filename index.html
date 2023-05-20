@@ -48,18 +48,13 @@
 <body>
 
 	<div id="settingsContainer" class="settingsHide">
-		<span>
-			<h1>Settings</h1>
-			<button aria-label="close settings" class="ri-close-fill" style="border:none;background: none" onclick="settingsContainer.classList.replace('settingsShow','settingsHide')"></button>
-		</span>
+		<h1>Settings</h1>
 		<br>
 		<toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
 		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
 		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
 		<toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
 		<toggle-switch id="suggestionsButton" checked>Display Search Suggestions</toggle-switch>
-
-
 		<span>
 			<label for="pipedInstanceSelector">Piped Instance</label>
 			<select name="pipedInstanceSelector" id="pipedInstances"></select>
@@ -69,7 +64,6 @@
 			<label for="AutoplayDepth">Autoplay Depth</label>10%
 			<input type="range" name="AutoplayDepth" id="autoplayDepth" min="2" max="20" value="8" step="3">100%
 		</span>
-
 		<code>Higher depth may or may not increase accuracy but definitely costs more bandwidth. 100% costs extra ~ 256KB/stream.</code>
 		<br><br>
 		<form netlify name='feedback' method='POST'>
@@ -82,10 +76,12 @@
 			<a class="ri-telegram-line" href="https://t.me/encetg" target="_blank"></a>
 		</span>
 	</div>
-
-
-	<button aria-label="open settings" class="ri-settings-fill" onclick="settingsContainer.classList.replace('settingsHide','settingsShow')"></button>
-
+	<div id="queuelistContainer">
+		<h1>Your Upcoming Tracks Show Here</h1>
+	</div>
+	
+	<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
+	<button aria-label="queuelist toggle" class="ri-magic-fill" id="queuelistButton"></button>
 
 	<div id="dataContainer" class="show">
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
@@ -187,7 +183,6 @@
 				<p>Loop</p>
 			</button>
 
-
 			<button type="button" id="autoplayButton">
 				<i class="ri-magic-fill"></i>
 				<p>AutoPlay</p>
@@ -209,8 +204,8 @@
 	<div id="subtitleContainer" class="hide"></div>
 
 	<script>
-			if ('serviceWorker' in navigator)
-				navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		if ('serviceWorker' in navigator)
+			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

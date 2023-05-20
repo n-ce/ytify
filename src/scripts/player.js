@@ -73,7 +73,6 @@ const streamsLoader = streamsArray => {
 	}
 	relatedStreamsContainer.innerHTML = '';
 	relatedStreamsContainer.appendChild(fragment);
-
 }
 
 // Autoplay Button
@@ -108,27 +107,34 @@ autoplayNextButton.addEventListener('click', () => {
 
 const streamHistory = [];
 let relativesHistory = [];
-let autoplayID;
+let autoplayQueue = [];
 
 const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
-	// merge current relatives with previous ones
-	relativesHistory = relativesHistory.concat(relatives);
-	// get most appearing relatives
+	relativesHistory = relativesHistory.concat(relatives).filter(relative => !relativesHistory.includes(relative));
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-	
-	if (!relatives.length) // offset maxfreq by 1
-		relatives = orderByFrequency(relativesHistory,1).filter(stream => !streamHistory.includes(stream));
-		
-	if (!relatives.length) // give up finding best and return all relatives
-		relatives = relativesHistory.filter(stream => !streamHistory.includes(stream));
-
-	autoplayID = relatives[Math.floor(Math.random() * relatives.length)];
-
+	autoplayQueue = autoplayQueue.concat(relatives);
+	appendToQueuelistContainer(autoplayQueue);
 	autoplayNextButton.classList.remove('hide');
-
 }
 
+const appendToQueuelistContainer = async ids => {
+
+	queuelistContainer.innerHTML = '';
+	const h1 = document.createElement('h1');
+	h1.textContent = 'Upcoming';
+	const fragment = document.createDocumentFragment();
+	for (const id of ids) {
+		const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json())
+		const listItem = document.createElement('list-item');
+		listItem.textContent = data.title;
+		listItem.dataset.author = data.author_name;
+		listItem.dataset.thumbnail = data.thumbnail_url;
+		listItem.addEventListener('click', () => play(id));
+		fragment.appendChild(listItem);
+	}
+	queuelistContainer.append(h1, fragment);
+}
 
 // The main player function
 
@@ -210,7 +216,13 @@ const play = async id => {
 		autoplayNextButton.classList.add('hide');
 		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
 		streamHistory.push(id);
-		autoplayFX(await similarStreamsCollector(data.title + ' ' + data.uploader, id));
+		autoplayQueue.shift();
+		autoplayFX(
+			await similarStreamsCollector(
+				data.title + (data.uploader.includes(' - Topic') ? ' ' + data.uploader.replace(' - Topic', '') : ''),
+				id
+			)
+		);
 	}
 
 }
@@ -248,7 +260,7 @@ audio.onended = () => {
 	if (queue)
 		next();
 	else if (autoplay)
-		validator(null, null, autoplayID);
+		validator(null, null, autoplayQueue[0]);
 	else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
 		playButton.dataset.state = '1';
@@ -370,8 +382,6 @@ superInput.addEventListener('keypress', e => {
 });
 
 document.querySelector('.ri-search-2-line').addEventListener('click', searchLoader);
-
-
 
 
 

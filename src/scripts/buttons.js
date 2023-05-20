@@ -1,5 +1,18 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
 
+// settings button
+
+let settings = true;
+settingsButton.addEventListener('click', () => {
+	[settingsContainer.style.right, settingsContainer.style.width] = settings ? ['0', 'calc(100% - 2rem)'] : ['-2rem', '0'];
+	settings = !settings;
+});
+let queuelist = true;
+queuelistButton.addEventListener('click', () => {
+	[queuelistContainer.style.left, queuelistContainer.style.width] = queuelist ? ['0', 'calc(100% - 2rem)'] : ['-2rem', '0'];
+	queuelist = !queuelist;
+});
+
 
 // bitrate selector
 

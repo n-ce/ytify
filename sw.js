@@ -1,4 +1,4 @@
-const cacheName = '5.13.6';
+const version = '5.13.8';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",
@@ -20,33 +20,62 @@ const contentToCache = [
     "/assets/remixicon.woff2"
     ];
 
-// Installing Service Worker
-self.addEventListener('install', (e) => {
-	console.log('[Service Worker] Install');
-	e.waitUntil((async () => {
-		const cache = await caches.open(cacheName);
-		console.log('[Service Worker] Caching all: app shell and content');
-		await cache.addAll(contentToCache);
-	})());
+
+
+// Install the service worker and cache the assets
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(version)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(contentToCache);
+      })
+  );
 });
 
-// Fetching content using Service Worker
-self.addEventListener('fetch', (e) => {
-	if (!(
-			e.request.url.startsWith('http:') || e.request.url.startsWith('https:')
-		)) {
-		return;
-	}
-
-	e.respondWith((async () => {
-		const r = await caches.match(e.request);
-		console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
-		if (r) return r;
-		const response = await fetch(e.request);
-		const cache = await caches.open(cacheName);
-		console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
-		cache.put(e.request, response.clone());
-		return response;
-	})());
+// Fetch the assets from the cache or the network
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+        // Network fetch - update the cache with the new response
+        return fetch(event.request).then(
+          response => {
+            // Check if we received a valid response
+            if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+            // Clone the response to use it in cache and browser
+            const responseToCache = response.clone();
+            caches.open(version)
+              .then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+            return response;
+          }
+        );
+      })
+  );
 });
 
+// Activate the service worker and delete old caches
+self.addEventListener('activate', event => {
+  const expectedCacheNames = [version];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (expectedCacheNames.indexOf(cacheName) === -1) {
+            // Delete old cache
+            console.log('Deleting out of date cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
