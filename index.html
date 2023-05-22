@@ -34,7 +34,7 @@
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
 	<link defer rel="stylesheet" href="src/stylesheets/relatedStreams.css">
 	<link defer rel="stylesheet" href="src/stylesheets/settingsContainer.css">
-
+	<link defer rel="stylesheet" href="src/stylesheets/containers.css">
 
 	<script defer src="src/components/ToggleSwitch.js"></script>
 	<script defer src="src/components/ListItem.js"></script>
@@ -46,6 +46,32 @@
 </head>
 
 <body>
+
+	<nav>
+		<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
+		<div>
+			<span id="superInputContainer">
+				<input type="search" id="superInput" autocomplete="off" placeholder='Input URL or Search Here' />
+				<select id="searchFilters">
+					<optgroup label="YouTube">
+						<option value="all">All</option>
+						<option value="videos" selected>Videos</option>
+						<option value="channels">Channels</option>
+						<option value="playlists">Playlists</option>
+					</optgroup>
+					<optgroup label="YouTube Music">
+						<option value="music_songs">Songs</option>
+						<option value="music_videos">Videos</option>
+						<option value="music_albums">Albums</option>
+						<option value="music_playlists">Playlists</option>
+					</optgroup>
+				</select>
+				<button aria-label="search" class="ri-search-2-line"></button>
+			</span>
+			<ul id="suggestions"></ul>
+		</div>
+		<button aria-label="queuelist toggle" class="ri-play-list-2-fill" id="queuelistButton"></button>
+	</nav>
 
 	<div id="settingsContainer" class="settingsHide">
 		<h1>Settings</h1>
@@ -81,8 +107,15 @@
 		<ul id="queuelist"></ul>
 	</div>
 
-	<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
-	<button aria-label="queuelist toggle" class="ri-play-list-2-fill" id="queuelistButton"></button>
+	<div id="searchContainer" class="hide">
+		<h1>
+		<button><</button>
+			Search</h1>
+		<div id="searchlistContainer">
+			<h1>search results show here</h1>
+		</div>
+	</div>
+
 
 	<div id="dataContainer" class="show">
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
@@ -95,29 +128,6 @@
 				<option value="">Bitrate</option>
 			</select>
 			<select id="subtitleSelector" class="hide"></select>
-			<br>
-
-			<span id="superInputContainer">
-
-				<input type="search" id="superInput" autocomplete="off" placeholder='Input URL or Search Here' />
-				<select id="searchFilters">
-					<optgroup label="YouTube">
-						<option value="all">All</option>
-						<option value="videos" selected>Videos</option>
-						<option value="channels">Channels</option>
-						<option value="playlists">Playlists</option>
-					</optgroup>
-					<optgroup label="YouTube Music">
-						<option value="music_songs">Songs</option>
-						<option value="music_videos">Videos</option>
-						<option value="music_albums">Albums</option>
-						<option value="music_playlists">Playlists</option>
-					</optgroup>
-				</select>
-				<button aria-label="search" class="ri-search-2-line"></button>
-
-			</span>
-			<ul id="suggestions"></ul>
 		</div>
 
 	</div>
@@ -132,9 +142,7 @@
 	</div>
 
 	<div id="playerContainer">
-
 		<div id="playerControls">
-
 			<button id="playButton" data-state="1" class="ri-stop-fill"></button>
 
 			<select id="playSpeed">
@@ -149,14 +157,13 @@
 				<option value="4.00">4.00x</option>
 			</select>
 
+
 			<p id="currentDuration">00:00</p>
-
 			<input type="range" min="0" max="100" value="0" id="progress" />
-
 			<p id="fullDuration">00:00</p>
 
-		</div>
 
+		</div>
 		<div id="playerProfiles">
 
 			<button type="button" id="seekBwdButton">
@@ -174,11 +181,6 @@
 				<p>Queue</p>
 			</button>
 
-			<button type="button" class="hide" id="queueNextButton">
-				<i class="ri-skip-forward-fill"></i>
-				<p>SkipNext</p>
-			</button>
-
 			<button type="button" id="loopButton">
 				<i class="ri-repeat-fill"></i>
 				<p>Loop</p>
@@ -189,9 +191,9 @@
 				<p>AutoPlay</p>
 			</button>
 
-			<button type="button" class="hide" id="autoplayNextButton">
+			<button type="button" class="hide" id="playNextButton">
 				<i class="ri-skip-forward-fill"></i>
-				<p>PlayNext</p>
+				<p>SkipNext</p>
 			</button>
 
 			<button type="button" id="relatedStreamsButton">
@@ -205,8 +207,8 @@
 	<div id="subtitleContainer" class="hide"></div>
 
 	<script>
-		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		// if ('serviceWorker' in navigator)
+		// navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

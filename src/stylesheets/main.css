@@ -37,7 +37,7 @@
 .ri-telegram-line:before {content: "\f1f0"}
 .ri-magic-fill:before {content: "\eee9"}
 .ri-skip-back-fill:before {content: "\f13f"}
-.ri-play-list-2-fill:before { content: "\f00c"; }
+.ri-play-list-2-fill:before {content: "\f00c";}
 
 
 
@@ -73,9 +73,6 @@ body {
 	-webkit-box-direction: normal;
 	-ms-flex-direction: column;
 	flex-direction: column;
-	-webkit-box-pack: space-around;
-	-ms-flex-pack: space-around;
-	justify-content: space-around;
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
@@ -113,31 +110,17 @@ body {
 	}
 }
 
-#settingsButton {
+
+nav {
+	display:flex;
+	justify-content: space-evenly;
+	z-index:5;
+	width:calc(100% - 1rem);
 	background-color: var(--accent);
-	position: fixed;
-	top: 0;
-	right: 0;
-	z-index: 4;
-	border-bottom: 1px solid var(--border);
-	border-left: 1px solid var(--border);
-	border-bottom-left-radius: 2rem;
-	padding: 0 0 1rem 1rem;
-	box-shadow: 0 0.1rem 0.3rem #0003;
+	padding: 0.5rem;
 }
 
-#queuelistButton{
-	background-color: var(--accent);
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 2;
-	border-bottom: 1px solid var(--border);
-	border-right: 1px solid var(--border);
-	border-bottom-right-radius: 2rem;
-	padding: 0 1rem 1rem 0;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-}
+
 
 #subtitleContainer {
 	width: 80%;

@@ -1,12 +1,11 @@
 #playerContainer {
-	min-width: calc(90% - 0.6rem);
-	padding: 0.3rem;
+	width:100%;
+	position:absolute;
+	bottom:0;
+	z-index:2;
 	background-color: var(--accent);
-	border: 0.1px solid var(--border);
-	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-	border-radius: 0.7rem;
 }
+
 
 
 #playerControls {

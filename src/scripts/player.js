@@ -20,16 +20,16 @@ await fetch('https://piped-instances.kavin.rocks')
 // link validator
 
 let previous_ID;
-
 const validator = (val, playlistID, streamID) => {
+
 	if (val) {
 		playlistID = val.match(/[&?]list=([^&]+)/i)?.[1];
 		streamID = val.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 	}
 	if (streamID)
-		queue ? queueIt(streamID) : play(streamID);
+		queueState.contains('on') ? queueIt(streamID) : play(streamID);
 	else if (playlistID)
-		queue ? queueIt(playlistID) : playlistLoad(playlistID);
+		queueState.contains('on') ? queueIt(playlistID) : playlistLoad(playlistID);
 
 	// so that it does not run again for the same link
 	previous_ID = playlistID || streamID;
@@ -66,13 +66,12 @@ const streamsLoader = streamsArray => {
 		});
 		fragment.appendChild(listItem);
 	}
-	relatedStreamsContainer.innerHTML = '';
-	relatedStreamsContainer.appendChild(fragment);
+	return fragment;
 }
 
 // Autoplay Button
 
-const autoplay = autoplayButton.firstElementChild.classList;
+const autoplayState = autoplayButton.firstElementChild.classList;
 autoplayButton.addEventListener('click', () => {
 	relativesHistory.length = 0;
 	loopButton.classList.toggle('hide');
@@ -80,10 +79,10 @@ autoplayButton.addEventListener('click', () => {
 	audio.loop = false;
 	queueButton.classList.toggle('hide');
 	autoplayButton.firstElementChild.classList.toggle('on');
-	autoplayNextButton.classList.toggle('hide');
+	playNextButton.classList.toggle('hide');
 });
 
-autoplayNextButton.addEventListener('click', () => {
+playNextButton.addEventListener('click', () => {
 	audio.onended();
 });
 
@@ -93,23 +92,26 @@ autoplayNextButton.addEventListener('click', () => {
 2. fetches streams of first (depth) no of playlists
 3. orders all streams by frequency
 4. gets most frequent streams 
-5. plays one of them randomly
+5. appends them to autoplayqueue
 */
 
 const streamHistory = [];
+const autoplayQueue = [];
 let relativesHistory = [];
-let autoplayQueue = [];
 
 const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
 	relativesHistory = relativesHistory.concat(relatives.filter(relative => !relativesHistory.includes(relative)));
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-	autoplayQueue.shift();
-	queuelist.removeChild(queuelist.firstElementChild)
+	if (autoplayButton.length) {
+		autoplayQueue.shift();
+		queuelist.removeChild(queuelist.firstElementChild)
+	}
 	if (relatives.length) {
-		autoplayQueue = autoplayQueue.concat(relatives);
-		for (const id of relatives)
+		for (const id of relatives) {
+			autoplayQueue.push(id);
 			appendToQueuelist(id);
+		}
 	}
 }
 
@@ -126,7 +128,10 @@ const appendToQueuelist = async id => {
 // The main player function
 
 const play = async id => {
-
+	if (id.length > 13) {
+		playlistLoad(id);
+		return;
+	}
 	playButton.classList.replace(playButton.classList[0], 'spinner');
 
 	const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
@@ -193,13 +198,14 @@ const play = async id => {
 		subtitleSelector.classList.add('hide');
 
 	// load related streams
-	streamsLoader(data.relatedStreams);
+	relatedStreamsContainer.innerHTML = '';
+	relatedStreamsContainer.appendChild(streamsLoader(data.relatedStreams));
 
 	params.set('s', id);
 	history.pushState({}, '', '?' + params);
 
 	// autoplay init
-	if (autoplay.contains('on')) {
+	if (autoplayState.contains('on')) {
 		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
 		streamHistory.push(id);
 		autoplayFX(
@@ -233,17 +239,17 @@ const queueIt = id => {
 
 
 // playback on end strategy
-let queue = false;
+const queueState = queueButton.firstElementChild.classList;
 
 audio.onended = () => {
-	if (queue && queueArray.length) {
+	if (queueState.contains('on') && queueArray.length) {
 		play(queueArray[0]);
 		queueArray.shift();
 		queueButton.firstElementChild.dataset.badge = queueArray.length;
 		queuelist.removeChild(queuelist.firstElementChild);
 	}
-	else if (autoplay.contains('on'))
-		validator(null, null, autoplayQueue[0]);
+	else if (autoplayState.contains('on'))
+		play(autoplayQueue[0]);
 	else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
 		playButton.dataset.state = '1';
@@ -255,14 +261,11 @@ audio.onended = () => {
 // queue functions and toggle
 
 const queueFx = () => {
-	queue = !queue;
-	if (queue) {
-		queueArray.length = 0;
-	}
-	else queueButton.firstElementChild.dataset.badge = 0;
-	queuelist.innerHTML = '';
-	queueNextButton.classList.toggle('hide');
+	queueArray.length = 0;
+	queueButton.firstElementChild.dataset.badge = 0;
 	queueButton.firstElementChild.classList.toggle('on');
+	queuelist.innerHTML = '';
+	playNextButton.classList.toggle('hide');
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
 	audio.loop = false;
@@ -270,9 +273,6 @@ const queueFx = () => {
 }
 queueButton.addEventListener('click', queueFx);
 
-queueNextButton.addEventListener('click', () => {
-	audio.onended();
-});
 
 
 const playlistLoad = async id => {
@@ -286,7 +286,8 @@ const playlistLoad = async id => {
 		alert(err);
 	});
 
-	queueFx();
+	if (!queueState.contains('on'))
+		queueFx();
 
 	setMetaData(
 		data.thumbnailUrl,
@@ -294,7 +295,6 @@ const playlistLoad = async id => {
 		data.name,
 		'Click on Next Button to start',
 		'');
-
 	for (const i of data.relatedStreams)
 		queueIt(i.url.slice(9));
 
@@ -312,10 +312,10 @@ superInput.addEventListener('input', async () => {
 	suggestions.innerHTML = '';
 	suggestions.style.display = 'none';
 
-	if (!superInput.value.includes(previous_ID)) {
+	if (!superInput.value.includes(previous_ID))
 		if (validator(superInput.value))
 			return;
-	}
+
 
 	if (superInput.value.length < 3 || getSaved('search_suggestions')) return;
 
@@ -347,9 +347,11 @@ const searchLoader = () => {
 
 	if (!superInput.value) return;
 
+	searchlistContainer.innerHTML = '';
+
 	fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
 		.then(res => res.json())
-		.then(searchResults => streamsLoader(searchResults.items))
+		.then(searchResults => searchlistContainer.appendChild(streamsLoader(searchResults.items)))
 		.catch(err => {
 			if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
 				pipedInstances.selectedIndex++;
@@ -359,7 +361,11 @@ const searchLoader = () => {
 			alert(err)
 		});
 	suggestions.style.display = 'none';
-	relatedStreamsButton.click();
+	
+	dataContainer.classList.toggle('show');
+	dataContainer.classList.toggle('hide');
+	searchContainer.classList.toggle('hide');
+
 }
 
 superInput.addEventListener('keypress', e => {
@@ -367,7 +373,6 @@ superInput.addEventListener('keypress', e => {
 });
 
 document.querySelector('.ri-search-2-line').addEventListener('click', searchLoader);
-
 
 
 // URL params 
@@ -391,12 +396,8 @@ else {
 
 
 	// PWA Params
-	if (params.get('url')) {
-		validator(params.get('url'));
-		audio.play();
-
-	} else if (params.get('text')) {
-		validator(params.get('text'));
+	if (params.get('url') || params.get('text')) {
+		validator(params.get('url') || params.get('text'));
 		audio.play();
 	}
 

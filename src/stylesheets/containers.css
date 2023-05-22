@@ -1,0 +1,47 @@
+#searchContainer,
+#relatedStreamsContainer {
+	background-color: var(--accent);
+	width: calc(100% - 2rem);
+	padding: 1rem;
+	height: calc(100% - 12rem - 1px);
+	overflow: scroll;
+}
+
+
+
+/* settings */
+/* upcoming */
+/* search */
+
+
+
+/* related streams */
+
+list-item {
+	width: 100%;
+	margin-top: 0.3rem;
+	margin-bottom: 0.4rem;
+	overflow: auto
+}
+
+list-item:hover,
+list-item:focus {
+	background-color: var(--accent);
+}
+
+.list-show {
+	display: grid;
+}
+
+
+
+/* media rules */
+
+@media (min-width:600px) {
+
+	#relatedStreamsContainer,
+	#searchContainer{
+		height: calc(100% - 9rem - 1px);
+		grid-template-columns: auto auto;
+	}
+}
