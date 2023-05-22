@@ -104,8 +104,10 @@ const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
 	relativesHistory = relativesHistory.concat(relatives.filter(relative => !relativesHistory.includes(relative)));
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-	autoplayQueue.shift();
-	queuelist.removeChild(queuelist.firstElementChild)
+	if (autoplayQueue.length) {
+		autoplayQueue.shift();
+		queuelist.removeChild(queuelist.firstElementChild);
+	}
 	if (relatives.length) {
 		autoplayQueue = autoplayQueue.concat(relatives);
 		for (const id of relatives)
