@@ -97,8 +97,8 @@ autoplayNextButton.addEventListener('click', () => {
 */
 
 const streamHistory = [];
+const autoplayQueue = [];
 let relativesHistory = [];
-let autoplayQueue = [];
 
 const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
@@ -109,9 +109,10 @@ const autoplayFX = relatives => {
 		queuelist.removeChild(queuelist.firstElementChild);
 	}
 	if (relatives.length) {
-		autoplayQueue = autoplayQueue.concat(relatives);
-		for (const id of relatives)
+		for (const id of relatives){
+			autoplayQueue.push(id);
 			appendToQueuelist(id);
+		}
 	}
 }
 
