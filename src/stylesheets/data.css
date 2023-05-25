@@ -12,7 +12,7 @@
 #img {
 	height: auto;
 	aspect-ratio: 16/9;
-	border-radius: 0.5rem;
+	border-radius: 0.7rem;
 	border: 1px solid var(--border);
 	-webkit-box-shadow: 0 0.1rem 0.3rem #0003;
 	box-shadow: 0 0.1rem 0.3rem #0003;
@@ -76,14 +76,10 @@
 #superInputContainer {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	height: 2rem;
 	width: calc(27ch + 2rem);
-	margin: 0.5rem 0;
 	color: var(--border);
-	background-color: var(--accent);
-	border-radius: 0.5rem;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-	border: 1px solid var(--border);
 }
 
 #superInput {
@@ -121,12 +117,11 @@ button.ri-search-2-line {
 	max-height: 12rem;
 	overflow: scroll;
 	position: absolute;
-	z-index: 2;
-	width: calc(22.5ch + 2rem);
+	width: calc(27ch + 2rem);
 	background-color: var(--bg);
-	margin: -0.5rem 0 0 1rem;
 	list-style-type: none;
 	padding: 0;
+	margin-top: 0.6rem;
 	border-radius: 0 0 0.5rem 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border: 1px solid var(--border);
@@ -144,7 +139,7 @@ button.ri-search-2-line {
 #suggestions li:hover,
 #suggestions li:focus {
 	background-color: #39FC;
-	color:#9CFC
+	color: #9CFC
 }
 
 @media (min-width:600px) {

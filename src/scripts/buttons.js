@@ -1,4 +1,4 @@
-import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/helperFunctions.js';
+import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/utils.js';
 
 // settings button
 
@@ -6,6 +6,8 @@ let settings = true;
 settingsButton.addEventListener('click', () => {
 	[settingsContainer.style.right, settingsContainer.style.width] = settings ? ['0', 'calc(100% - 2rem)'] : ['-2rem', '0'];
 	settings = !settings;
+	location.href += '#Settings'
+	history.pushState({}, '', '#Settings');
 });
 let queuelist = true;
 queuelistButton.addEventListener('click', () => {
@@ -141,12 +143,15 @@ loopButton.addEventListener('click', () => {
 
 
 
-
 // streams service button
 
 relatedStreamsButton.addEventListener('click', () => {
-	dataContainer.classList.toggle('show');
-	dataContainer.classList.toggle('hide');
+	if (!searchContainer.classList.contains('hide'))
+		searchContainer.classList.toggle('hide');
+	else {
+		dataContainer.classList.toggle('show');
+		dataContainer.classList.toggle('hide');
+	}
 	relatedStreamsContainer.classList.toggle('list-show');
 	relatedStreamsButton.firstElementChild.classList.toggle('on');
 });

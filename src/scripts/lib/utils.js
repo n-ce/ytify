@@ -7,7 +7,7 @@ const getSaved = localStorage.getItem.bind(localStorage);
 const palette = {
 	light: {
 		bg: 'none',
-		accent: '#fff5',
+		accent: '#fff4',
 		text: '#000b',
 		border: '#000b',
 		secondary: '#bbbe'
@@ -28,6 +28,7 @@ const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
 
 
+
 function themer() {
 
 	const canvasImg = new Image();
@@ -36,12 +37,8 @@ function themer() {
 		canvas.height = canvasImg.height;
 		canvas.width = canvasImg.width;
 		context.drawImage(canvasImg, 0, 0);
+
 		const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
-
-		/* [r-g-b from raw data] processing 
-		algorithm was taken from color.js,
-		https://github.com/luukdv/color.js */
-
 		const len = data.length;
 		const nthPixel = 40;
 		let r = 0;
@@ -53,17 +50,16 @@ function themer() {
 			b += data[i + 2];
 		}
 		const amount = len / nthPixel;
-		r /= amount;
-		g /= amount;
-		b /= amount;
+		r /= amount, g /= amount, b /= amount;
+
 
 		const theme = getSaved('theme') ? 'dark' : 'light';
-
+		
 		palette.dark.border = palette.light.bg =
 			(r + g + b) > 85 || !r || !g || !b ?
 			`rgb(${r},${g},${b})` :
 			`rgb(${r+34},${g+34},${b+34})`;
-
+		
 		if (getSaved('img')) {
 			palette.dark.border = 'palevioletred';
 			palette.light.bg = 'linear-gradient(15deg, #13547a 0%, #80d0c7 100%)';

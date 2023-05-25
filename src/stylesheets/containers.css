@@ -1,6 +1,23 @@
+#searchContainer,
+#relatedStreamsContainer {
+	background-color: var(--accent);
+	width: calc(90% - 2rem);
+	padding: 1rem;
+	height: calc(90% - 12rem - 1px);
+	overflow: scroll;
+	border-radius: 0.5rem;
+	border:1px solid var(--border);
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	
+}
+
+
+
+/* settings */
+
 #settingsContainer {
 	height: calc(100% - 2rem);
-	background-color:var(--secondary);
+	background-color: var(--secondary);
 	color: var(--text);
 	animation: appear 0.5s ease-out;
 	user-select: none;
@@ -84,4 +101,61 @@
 #settingsContainer span .ri-github-fill:hover {
 	background-color: #333;
 	color: #ddd;
+}
+
+
+
+/* upcoming */
+#queuelistContainer {
+	height: calc(100% - 2rem);
+	background-color: var(--secondary);
+	color: var(--text);
+	animation: appear 0.5s ease-out;
+	user-select: none;
+	padding: 1rem;
+	position: fixed;
+	z-index: 2;
+	top: 0;
+	left: -2rem;
+	width: 0;
+	overflow-x: hidden;
+	transition: 0.5s;
+}
+
+/* search */
+#searchContainer h1{
+	position : sticky;
+	top:0;
+}
+
+
+/* related streams */
+
+list-item {
+	width: 100%;
+	margin-top: 0.3rem;
+	margin-bottom: 0.4rem;
+	overflow: auto
+}
+
+list-item:hover,
+list-item:focus {
+	background-color: var(--accent);
+}
+
+.list-show {
+	display: grid;
+}
+
+
+
+/* media rules */
+
+@media (min-width:600px) {
+
+	#relatedStreamsContainer,
+	#searchContainer{
+		height: calc(90% - 9rem - 1px);
+		grid-template-columns: auto auto;
+	}
 }
