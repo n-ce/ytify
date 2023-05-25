@@ -43,6 +43,7 @@
 .ri-arrow-left-fill{
 	font-size: inherit;
 	font-weight: inherit;
+	color: inherit;
 	transform: translateX(-1rem);
 }
 
