@@ -32,8 +32,6 @@
 	<link defer rel="stylesheet" href="src/stylesheets/player.css">
 	<link defer rel="stylesheet" href="src/stylesheets/data.css">
 	<link defer rel="stylesheet" href="assets/Fonts/remixicon.css">
-	<link defer rel="stylesheet" href="src/stylesheets/relatedStreams.css">
-	<link defer rel="stylesheet" href="src/stylesheets/settingsContainer.css">
 	<link defer rel="stylesheet" href="src/stylesheets/containers.css">
 
 	<script defer src="src/components/ToggleSwitch.js"></script>
@@ -48,7 +46,7 @@
 <body>
 
 	<nav>
-		<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
+		<button aria-label="queuelist toggle" class="ri-play-list-2-fill" id="queuelistButton"></button>
 		<div>
 			<span id="superInputContainer">
 				<input type="search" id="superInput" autocomplete="off" placeholder='Input URL or Search Here' />
@@ -70,11 +68,13 @@
 			</span>
 			<ul id="suggestions"></ul>
 		</div>
-		<button aria-label="queuelist toggle" class="ri-play-list-2-fill" id="queuelistButton"></button>
+		<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
 	</nav>
 
 	<div id="settingsContainer" class="settingsHide">
-		<h1>Settings</h1>
+		<h1 onclick="settingsButton.click()">
+			<button class="ri-arrow-left-fill"> Settings</button>
+		</h1>
 		<br>
 		<toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
 		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
@@ -103,14 +103,16 @@
 		</span>
 	</div>
 	<div id="queuelistContainer">
-		<h1>Upcoming</h1>
+		<h1 onclick="queuelistButton.click()" align="right">
+			<button class="ri-arrow-left-fill"> Upcoming</button>
+		</h1>
 		<ul id="queuelist"></ul>
 	</div>
 
 	<div id="searchContainer" class="hide">
 		<h1>
-		<button><</button>
-			Search</h1>
+			<button class="ri-arrow-left-fill"> Search</button>
+		</h1>
 		<div id="searchlistContainer">
 			<h1>search results show here</h1>
 		</div>
@@ -121,7 +123,7 @@
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata">
-			<a id="title" target="_blank">ytify v5.13</a>
+			<a id="title" target="_blank">ytify v5.14</a>
 			<br>
 			<a id="author" target="_blank">Channel</a>
 			<select id="bitrateSelector">
@@ -140,6 +142,9 @@
 	<div id="relatedStreamsContainer" class="hide">
 		<h1>Streams related to your current playing stream show up here.</h1>
 	</div>
+
+	<div id="subtitleContainer" class="hide"></div>
+
 
 	<div id="playerContainer">
 		<div id="playerControls">
@@ -167,12 +172,12 @@
 		<div id="playerProfiles">
 
 			<button type="button" id="seekBwdButton">
-				<i class="ri-rewind-fill"></i>
+				<i class="ri-replay-10-fill"></i>
 				<p>Backward</p>
 			</button>
 
 			<button type="button" id="seekFwdButton">
-				<i class="ri-speed-fill"></i>
+				<i class="ri-forward-10-fill"></i>
 				<p>Forward</p>
 			</button>
 
@@ -204,7 +209,6 @@
 		</div>
 	</div>
 
-	<div id="subtitleContainer" class="hide"></div>
 
 	<script>
 		// if ('serviceWorker' in navigator)

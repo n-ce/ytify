@@ -1,14 +1,13 @@
-const version = '5.13.9';
+const version = '5.14.1';
 const contentToCache = [
     "/",
     "/src/stylesheets/main.css",
     "/src/stylesheets/data.css",
     "/src/stylesheets/player.css",
-    "/src/stylesheets/relatedStreams.css",
-    "/src/stylesheets/settingsContainer.css",
+    "/src/stylesheets/containers.css",
     "/src/scripts/buttons.js",
     "/src/scripts/player.js",
-    "/src/scripts/lib/helperFunctions.js",
+    "/src/scripts/lib/utils.js",
     "/src/scripts/lib/sax.min.js",
     "/src/scripts/lib/imsc.min.js",
     "/src/components/ListItem.js",

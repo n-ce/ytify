@@ -1,9 +1,10 @@
 #playerContainer {
-	width:100%;
-	position:absolute;
-	bottom:0;
-	z-index:2;
+	width:90%;
 	background-color: var(--accent);
+	border-radius: 0.5rem;
+	border:1px solid var(--border);
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	
 }
 
 

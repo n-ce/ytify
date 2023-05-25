@@ -7,7 +7,6 @@
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
-	margin-top: 5%;
 }
 
 #img {
@@ -123,7 +122,7 @@ button.ri-search-2-line {
 	background-color: var(--bg);
 	list-style-type: none;
 	padding: 0;
-	margin-top: 0.3rem;
+	margin-top: 0.6rem;
 	border-radius: 0 0 0.5rem 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border: 1px solid var(--border);

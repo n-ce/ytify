@@ -1,4 +1,4 @@
-import { setMetaData, getSaved, save, params, updatePositionState, orderByFrequency, similarStreamsCollector } from './lib/helperFunctions.js';
+import { setMetaData, getSaved, save, params, updatePositionState, orderByFrequency, similarStreamsCollector } from './lib/utils.js';
 
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
@@ -97,16 +97,16 @@ playNextButton.addEventListener('click', () => {
 
 const streamHistory = [];
 const autoplayQueue = [];
-let relativesHistory = [];
+const relativesHistory = [];
 
 const autoplayFX = relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
-	relativesHistory = relativesHistory.concat(relatives.filter(relative => !relativesHistory.includes(relative)));
-	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream));
-	if (autoplayButton.length) {
-		autoplayQueue.shift();
-		queuelist.removeChild(queuelist.firstElementChild)
-	}
+
+	for (const relative of relatives)
+		relativesHistory.push(relative);
+
+	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream) && !autoplayQueue.includes(stream));
+
 	if (relatives.length) {
 		for (const id of relatives) {
 			autoplayQueue.push(id);
@@ -128,7 +128,7 @@ const appendToQueuelist = async id => {
 // The main player function
 
 const play = async id => {
-	if (id.length > 13) {
+	if (id.length !== 11) {
 		playlistLoad(id);
 		return;
 	}
@@ -242,14 +242,17 @@ const queueIt = id => {
 const queueState = queueButton.firstElementChild.classList;
 
 audio.onended = () => {
-	if (queueState.contains('on') && queueArray.length) {
+	if (queueArray.length) {
 		play(queueArray[0]);
 		queueArray.shift();
 		queueButton.firstElementChild.dataset.badge = queueArray.length;
 		queuelist.removeChild(queuelist.firstElementChild);
 	}
-	else if (autoplayState.contains('on'))
+	else if (autoplayQueue.length) {
 		play(autoplayQueue[0]);
+		autoplayQueue.shift();
+		queuelist.removeChild(queuelist.firstElementChild);
+	}
 	else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
 		playButton.dataset.state = '1';
@@ -342,10 +345,20 @@ superInput.addEventListener('input', async () => {
 });
 
 
+let previousSearchTerm;
 
 const searchLoader = () => {
 
-	if (!superInput.value) return;
+	if (relatedStreamsButton.firstElementChild.classList.contains('on')) {
+		relatedStreamsContainer.classList.toggle('list-show');
+		relatedStreamsButton.firstElementChild.classList.toggle('on');
+	} else {
+		dataContainer.classList.toggle('show');
+		dataContainer.classList.toggle('hide');
+	}
+	searchContainer.classList.toggle('hide');
+
+	if (!superInput.value || superInput.value === previousSearchTerm) return;
 
 	searchlistContainer.innerHTML = '';
 
@@ -361,19 +374,16 @@ const searchLoader = () => {
 			alert(err)
 		});
 	suggestions.style.display = 'none';
-	
-	dataContainer.classList.toggle('show');
-	dataContainer.classList.toggle('hide');
-	searchContainer.classList.toggle('hide');
 
+	previousSearchTerm = superInput.value;
 }
 
 superInput.addEventListener('keypress', e => {
 	if (e.key === 'Enter') searchLoader();
 });
 
-document.querySelector('.ri-search-2-line').addEventListener('click', searchLoader);
-
+superInputContainer.lastElementChild.addEventListener('click', searchLoader);
+searchContainer.firstElementChild.addEventListener('click', searchLoader)
 
 // URL params 
 
