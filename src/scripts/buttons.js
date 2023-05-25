@@ -6,8 +6,6 @@ let settings = true;
 settingsButton.addEventListener('click', () => {
 	[settingsContainer.style.right, settingsContainer.style.width] = settings ? ['0', 'calc(100% - 2rem)'] : ['-2rem', '0'];
 	settings = !settings;
-	location.href += '#Settings'
-	history.pushState({}, '', '#Settings');
 });
 let queuelist = true;
 queuelistButton.addEventListener('click', () => {
