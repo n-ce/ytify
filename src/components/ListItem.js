@@ -18,6 +18,7 @@ const styles = `
 		}
 		p {
 			font-size: 0.8rem;
+			height: 1rem;
 			margin: 0;
 			overflow: hidden;
 		}`;
