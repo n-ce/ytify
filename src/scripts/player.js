@@ -353,10 +353,10 @@ const searchLoader = () => {
 		relatedStreamsContainer.classList.toggle('list-show');
 		relatedStreamsButton.firstElementChild.classList.toggle('on');
 	} else {
-		dataContainer.classList.toggle('show');
-		dataContainer.classList.toggle('hide');
+		dataContainer.classList.remove('show');
+		dataContainer.classList.add('hide');
 	}
-	searchContainer.classList.toggle('hide');
+	searchContainer.classList.remove('hide');
 
 	if (!superInput.value || superInput.value === previousSearchTerm) return;
 
@@ -383,7 +383,17 @@ superInput.addEventListener('keypress', e => {
 });
 
 superInputContainer.lastElementChild.addEventListener('click', searchLoader);
-searchContainer.firstElementChild.addEventListener('click', searchLoader)
+searchContainer.firstElementChild.addEventListener('click', ()=>{
+	if (relatedStreamsButton.firstElementChild.classList.contains('on')) {
+		relatedStreamsContainer.classList.toggle('list-show');
+		relatedStreamsButton.firstElementChild.classList.toggle('on');
+	} else {
+		dataContainer.classList.add('show');
+		dataContainer.classList.remove('hide');
+	}
+	searchContainer.classList.add('hide');
+
+})
 
 // URL params 
 
