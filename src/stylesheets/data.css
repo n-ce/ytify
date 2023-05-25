@@ -80,7 +80,6 @@
 	height: 2rem;
 	width: calc(27ch + 2rem);
 	color: var(--border);
-	width:100%;
 }
 
 #superInput {
