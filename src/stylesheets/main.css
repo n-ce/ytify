@@ -39,13 +39,6 @@
 .ri-replay-10-fill:before { content: "\f351"; }
 .ri-arrow-left-fill:before { content: "\ea5f"; }
 
-/* back button */
-.ri-arrow-left-fill{
-	font-size: inherit;
-	font-weight: inherit;
-	color: inherit;
-	transform: translateX(-1rem);
-}
 
 :root {
 	--bg: none;
@@ -108,12 +101,15 @@ nav {
 	justify-content: space-evenly;
 	width:calc(90% - 1rem);
 	background-color: var(--accent);
-	padding: 0.5rem;
+	padding: 0.4rem;
 	border-radius: 0.5rem;
 	border:1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
 }
 
+nav button.on{
+	border-radius: 0.3rem;
+}
 
 
 #subtitleContainer {

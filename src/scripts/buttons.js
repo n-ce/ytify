@@ -1,16 +1,22 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/utils.js';
 
 // settings button
+const containers = [settingsContainer, queuelistContainer, searchContainer, relatedStreamsContainer];
 
-let settings = true;
 settingsButton.addEventListener('click', () => {
-	[settingsContainer.style.right, settingsContainer.style.width] = settings ? ['0', 'calc(100% - 2rem)'] : ['-2rem', '0'];
-	settings = !settings;
+	settingsContainer.classList.toggle('hide');
+	settingsButton.classList.toggle('on')
+	dataContainer.classList.toggle('show');
+	dataContainer.classList.toggle('hide');
+
 });
-let queuelist = true;
+
 queuelistButton.addEventListener('click', () => {
-	[queuelistContainer.style.left, queuelistContainer.style.width] = queuelist ? ['0', 'calc(100% - 2rem)'] : ['-2rem', '0'];
-	queuelist = !queuelist;
+	queuelistContainer.classList.toggle('hide');
+	queuelistButton.classList.toggle('on')
+	dataContainer.classList.toggle('show');
+	dataContainer.classList.toggle('hide');
+
 });
 
 

@@ -39,7 +39,6 @@ const validator = (val, playlistID, streamID) => {
 
 
 
-
 // Loads streams into related streams container
 
 const streamsLoader = streamsArray => {
@@ -69,6 +68,8 @@ const streamsLoader = streamsArray => {
 	}
 	return fragment;
 }
+
+
 
 // Autoplay Button
 

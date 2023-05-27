@@ -71,11 +71,7 @@
 		<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
 	</nav>
 
-	<div id="settingsContainer" class="settingsHide">
-		<h1 onclick="settingsButton.click()">
-			<button class="ri-arrow-left-fill"> Settings</button>
-		</h1>
-		<br>
+	<div id="settingsContainer" class="hide">
 		<toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
 		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
 		<toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
@@ -102,17 +98,16 @@
 			<a class="ri-telegram-line" href="https://t.me/encetg" target="_blank"></a>
 		</span>
 	</div>
-	<div id="queuelistContainer">
-		<h1 onclick="queuelistButton.click()" align="right">
-			<button class="ri-arrow-left-fill"> Upcoming</button>
-		</h1>
+
+	<div id="queuelistContainer" class="hide">
+		<h1>Upcoming</h1>
 		<ul id="queuelist"></ul>
 	</div>
 
 	<div id="searchContainer" class="hide">
-		<h1>
-			<button class="ri-arrow-left-fill"> Search</button>
-		</h1>
+
+		<button class="ri-arrow-left-fill"></button>
+
 		<div id="searchlistContainer">
 			<h1>search results show here</h1>
 		</div>
