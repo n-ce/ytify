@@ -12,7 +12,8 @@ await fetch('https://piped-instances.kavin.rocks')
 		}
 	})
 	.catch(err => {
-		alert('Reload app because fetching piped instances failed with error: ' + err)
+		if (confirm('Reload app because fetching piped instances failed with error: ' + err))
+			location.reload();
 	})
 
 
@@ -88,6 +89,8 @@ playNextButton.addEventListener('click', () => {
 	audio.onended();
 });
 
+
+
 /*
 -  autoplay algorithm
 1. searches the stream title with playlist filter
@@ -101,7 +104,7 @@ const streamHistory = [];
 const autoplayQueue = [];
 const relativesHistory = [];
 
-const autoplayFX = relatives => {
+const autoplayFX = async relatives => {
 	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
 
 	for (const relative of relatives)
@@ -110,12 +113,13 @@ const autoplayFX = relatives => {
 	relatives = orderByFrequency(relativesHistory).filter(stream => !streamHistory.includes(stream) && !autoplayQueue.includes(stream));
 
 	if (relatives.length) {
-		for (const id of relatives) {
+		for await (const id of relatives) {
+			await appendToQueuelist(id);
 			autoplayQueue.push(id);
-			appendToQueuelist(id);
 		}
 	}
 }
+
 
 const appendToQueuelist = async id => {
 	const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json());
@@ -123,7 +127,12 @@ const appendToQueuelist = async id => {
 	listItem.textContent = data.title;
 	listItem.dataset.author = data.author_name;
 	listItem.dataset.thumbnail = data.thumbnail_url;
-	listItem.addEventListener('click', () => play(id));
+	listItem.addEventListener('click', () => {
+		play(id);
+		const index = autoplayQueue.indexOf(id);
+		autoplayQueue.splice(index, 1);
+		queuelist.removeChild(queuelist.getElementsByTagName('list-item')[index]);
+	});
 	queuelist.appendChild(listItem);
 }
 
@@ -245,14 +254,12 @@ const queueState = queueButton.firstElementChild.classList;
 
 audio.onended = () => {
 	if (queueArray.length) {
-		play(queueArray[0]);
-		queueArray.shift();
+		play(queueArray.shift());
 		queueButton.firstElementChild.dataset.badge = queueArray.length;
 		queuelist.removeChild(queuelist.firstElementChild);
 	}
 	else if (autoplayQueue.length) {
-		play(autoplayQueue[0]);
-		autoplayQueue.shift();
+		play(autoplayQueue.shift());
 		queuelist.removeChild(queuelist.firstElementChild);
 	}
 	else {
@@ -385,7 +392,7 @@ superInput.addEventListener('keypress', e => {
 });
 
 superInputContainer.lastElementChild.addEventListener('click', searchLoader);
-searchContainer.firstElementChild.addEventListener('click', ()=>{
+searchContainer.firstElementChild.addEventListener('click', () => {
 	if (relatedStreamsButton.firstElementChild.classList.contains('on')) {
 		relatedStreamsContainer.classList.toggle('list-show');
 		relatedStreamsButton.firstElementChild.classList.toggle('on');
