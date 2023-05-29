@@ -53,6 +53,7 @@ function themer() {
 
 		if ((r + g + b) < 85 || !r || !g || !b)
 			r += 34, g += 34, b += 34;
+		
 		const theme = getSaved('theme') ? 'dark' : 'light';
 		
 		palette.dark.border = palette.light.bg = `rgb(${r},${g},${b})`;
@@ -65,7 +66,6 @@ function themer() {
 		cssVar('--accent', palette[theme].accent);
 		cssVar('--text', palette[theme].text);
 		cssVar('--border', palette[theme].border);
-		cssVar('--opposite', `rgb(${Math.abs(255 - r)},${Math.abs(255 - g)},${Math.abs(255 - b)})`)
 		tabColor.content = palette[theme].bg;
 	}
 
