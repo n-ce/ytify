@@ -65,9 +65,9 @@ subtitleSelector.addEventListener('change', () => {
 	subtitleContainer.classList.remove('hide');
 })
 
+
+
 // play button and events
-
-
 
 playButton.addEventListener('click', () => {
 	if (playButton.dataset.state) {
@@ -167,10 +167,15 @@ loopButton.addEventListener('click', () => {
 	audio.loop = !audio.loop;
 });
 
+// play next 
+playNextButton.addEventListener('click', () => {
+	audio.onended();
+});
 
+
+// Settings
 
 // Theme toggle
-
 if (getSaved('theme')) {
 	themeButton.toggleAttribute('checked')
 }
@@ -182,20 +187,14 @@ themeButton.click = () => {
 	themer();
 }
 
-
-
 // fullscreen
-
 fullscreenButton.click = () => {
 	document.fullscreenElement ?
 		document.exitFullscreen() :
 		document.documentElement.requestFullscreen();
 }
 
-
-
 // thumbnail toggle
-
 const image1x1 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 if (getSaved('img')) {
@@ -217,10 +216,7 @@ thumbnailButton.click = () => {
 	img.classList.toggle('hide');
 }
 
-
-
 // quality
-
 if (getSaved('quality') == 'hq')
 	qualityButton.toggleAttribute('checked');
 
@@ -236,10 +232,7 @@ qualityButton.click = () => {
 	}
 }
 
-
-
 // suggestions button
-
 suggestionsButton.click = () => {
 	getSaved('search_suggestions') ?
 		localStorage.removeItem('search_suggestions') :
@@ -250,9 +243,7 @@ suggestionsButton.click = () => {
 if (getSaved('search_suggestions'))
 	suggestionsButton.removeAttribute('checked')
 
-
 // Delete Button
-
 deleteButton.addEventListener('click', () => {
 	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
 	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });

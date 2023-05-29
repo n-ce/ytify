@@ -1,4 +1,4 @@
-import { setMetaData, getSaved, save, params, updatePositionState, orderByFrequency, similarStreamsCollector } from './lib/utils.js';
+import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector} from './lib/utils.js';
 
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
@@ -15,7 +15,7 @@ await fetch('https://piped-instances.kavin.rocks')
 		if (confirm('Reload app because fetching piped instances failed with error: ' + err))
 			location.reload();
 	});
-	
+
 // Instance Selector change event
 
 pipedInstances.addEventListener('change', () => {
@@ -76,6 +76,66 @@ const streamsLoader = streamsArray => {
 	return fragment;
 }
 
+// Get search results of input
+
+const searchLoader = () => {
+	if (!superInput.value) return;
+
+	searchlistContainer.innerHTML = '';
+
+	fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
+		.then(res => res.json())
+		.then(searchResults => searchlistContainer.appendChild(streamsLoader(searchResults.items)))
+		.catch(err => {
+			if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+				pipedInstances.selectedIndex++;
+				searchLoader();
+				return;
+			}
+			alert(err)
+		});
+	suggestions.style.display = 'none';
+}
+
+// super input supports both searching and direct link, also loads suggestions
+
+superInput.addEventListener('input', async () => {
+
+	suggestions.innerHTML = '';
+	suggestions.style.display = 'none';
+
+	if (!superInput.value.includes(previous_ID))
+		if (validator(superInput.value))
+			return;
+
+	if (superInput.value.length < 3 || getSaved('search_suggestions')) return;
+
+	suggestions.style.display = 'block';
+
+	const data = await fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value).then(res => res.json());
+
+	if (!data.length) return;
+
+	const fragment = document.createDocumentFragment();
+
+	for (const suggestion of data) {
+		const li = document.createElement('li');
+		li.textContent = suggestion;
+		li.onclick = () => {
+			superInput.value = suggestion;
+			searchLoader();
+		}
+		fragment.appendChild(li);
+	}
+	suggestions.appendChild(fragment);
+});
+
+superInput.addEventListener('keypress', e => {
+	if (e.key === 'Enter') searchLoader();
+});
+
+superInputContainer.lastElementChild.addEventListener('click', searchLoader);
+
 
 
 // Autoplay Button
@@ -93,9 +153,6 @@ autoplayButton.addEventListener('click', () => {
 	playNextButton.classList.toggle('hide');
 });
 
-playNextButton.addEventListener('click', () => {
-	audio.onended();
-});
 
 
 
@@ -315,72 +372,6 @@ const playlistLoad = async id => {
 }
 
 
-// input text player
-
-
-superInput.addEventListener('input', async () => {
-
-	suggestions.innerHTML = '';
-	suggestions.style.display = 'none';
-
-	if (!superInput.value.includes(previous_ID))
-		if (validator(superInput.value))
-			return;
-
-
-	if (superInput.value.length < 3 || getSaved('search_suggestions')) return;
-
-	suggestions.style.display = 'block';
-
-
-	const data = await fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value).then(res => res.json());
-
-	if (!data.length) return;
-
-	const fragment = document.createDocumentFragment();
-
-	for (const suggestion of data) {
-		const li = document.createElement('li');
-		li.textContent = suggestion;
-		li.onclick = () => {
-			superInput.value = suggestion;
-			searchLoader();
-		}
-		fragment.appendChild(li);
-	}
-	suggestions.appendChild(fragment);
-
-});
-
-
-
-const searchLoader = () => {
-
-	
-	if (!superInput.value) return;
-
-	searchlistContainer.innerHTML = '';
-
-	fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
-		.then(res => res.json())
-		.then(searchResults => searchlistContainer.appendChild(streamsLoader(searchResults.items)))
-		.catch(err => {
-			if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-				pipedInstances.selectedIndex++;
-				searchLoader();
-				return;
-			}
-			alert(err)
-		});
-	suggestions.style.display = 'none';
-
-}
-
-superInput.addEventListener('keypress', e => {
-	if (e.key === 'Enter') searchLoader();
-});
-
-superInputContainer.lastElementChild.addEventListener('click', searchLoader);
 
 // URL params 
 
@@ -408,31 +399,4 @@ else {
 		audio.play();
 	}
 
-}
-
-if ('mediaSession' in navigator) {
-	navigator.mediaSession.setActionHandler('play', () => {
-		audio.play();
-		updatePositionState();
-	});
-	navigator.mediaSession.setActionHandler('pause', () => {
-		audio.pause();
-		updatePositionState();
-	});
-	navigator.mediaSession.setActionHandler("seekforward", () => {
-		audio.currentTime += 10;
-		updatePositionState();
-	});
-	navigator.mediaSession.setActionHandler("seekbackward", () => {
-		audio.currentTime -= 10;
-		updatePositionState();
-	});
-	navigator.mediaSession.setActionHandler("seekto", e => {
-		audio.currentTime = e.seekTime;
-		updatePositionState();
-	});
-	navigator.mediaSession.setActionHandler("nexttrack", () => {
-		audio.onended();
-		updatePositionState();
-	});
 }

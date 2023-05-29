@@ -172,6 +172,32 @@ function updatePositionState() {
 	}
 }
 
+if ('mediaSession' in navigator) {
+	navigator.mediaSession.setActionHandler('play', () => {
+		audio.play();
+		updatePositionState();
+	});
+	navigator.mediaSession.setActionHandler('pause', () => {
+		audio.pause();
+		updatePositionState();
+	});
+	navigator.mediaSession.setActionHandler("seekforward", () => {
+		audio.currentTime += 10;
+		updatePositionState();
+	});
+	navigator.mediaSession.setActionHandler("seekbackward", () => {
+		audio.currentTime -= 10;
+		updatePositionState();
+	});
+	navigator.mediaSession.setActionHandler("seekto", e => {
+		audio.currentTime = e.seekTime;
+		updatePositionState();
+	});
+	navigator.mediaSession.setActionHandler("nexttrack", () => {
+		audio.onended();
+		updatePositionState();
+	});
+}
 
 
 function orderByFrequency(array) {
