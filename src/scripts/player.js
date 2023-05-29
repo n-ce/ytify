@@ -139,7 +139,7 @@ const appendToQueuelist = async id => {
 		play(id);
 		const index = autoplayQueue.indexOf(id);
 		autoplayQueue.splice(index, 1);
-		queuelist.removeChild(queuelist.getElementsByTagName('list-item')[index]);
+		queuelistContainer.removeChild(queuelistContainer.getElementsByTagName('list-item')[index]);
 	});
 	queuelistContainer.appendChild(listItem);
 }
@@ -255,11 +255,11 @@ audio.onended = () => {
 	if (queueArray.length) {
 		play(queueArray.shift());
 		queueButton.firstElementChild.dataset.badge = queueArray.length;
-		queuelist.removeChild(queuelist.firstElementChild);
+		queuelistContainer.removeChild(queuelist.firstElementChild);
 	}
 	else if (autoplayQueue.length) {
 		play(autoplayQueue.shift());
-		queuelist.removeChild(queuelist.firstElementChild);
+		queuelistContainer.removeChild(queuelistContainer.firstElementChild);
 	}
 	else {
 		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
@@ -275,7 +275,7 @@ const queueFx = () => {
 	queueArray.length = 0;
 	queueButton.firstElementChild.dataset.badge = 0;
 	queueButton.firstElementChild.classList.toggle('on');
-	queuelist.innerHTML = '';
+	queuelistContainer.innerHTML = '';
 	playNextButton.classList.toggle('hide');
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
