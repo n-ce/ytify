@@ -88,7 +88,7 @@ autoplayButton.addEventListener('click', () => {
 	audio.loop = false;
 	queueButton.classList.toggle('hide');
 	autoplayButton.firstElementChild.classList.toggle('on');
-	queuelist.innerHTML = '';
+	queuelistContainer.innerHTML = '';
 	autoplayQueue.length = 0;
 	playNextButton.classList.toggle('hide');
 });
