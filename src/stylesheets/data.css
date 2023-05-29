@@ -7,6 +7,7 @@
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
+	height: calc(90% - 10rem);
 }
 
 #img {
@@ -73,74 +74,6 @@
 	width: 15ch;
 }
 
-#superInputContainer {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 2rem;
-	width: calc(27ch + 2rem);
-	color: var(--border);
-}
-
-#superInput {
-	border: none;
-	background: none;
-	height: 100%;
-	text-align: center;
-	color: var(--text);
-	outline: none;
-	width: 24ch;
-	font-family: 'Noto Sans';
-}
-
-#superInput::placeholder {
-	color: var(--border)
-}
-
-#searchFilters {
-	font-size: 0.7rem;
-	padding: 0;
-	background-color: transparent;
-	border: none;
-	color: var(--border);
-	outline: none;
-	width: 9ch;
-	font-family: 'Noto Sans';
-}
-
-button.ri-search-2-line {
-	background: none;
-	border: none;
-}
-
-#suggestions {
-	max-height: 12rem;
-	overflow: scroll;
-	position: absolute;
-	width: calc(27ch + 2rem);
-	background-color: var(--bg);
-	list-style-type: none;
-	padding: 0;
-	margin-top: 0.6rem;
-	border-radius: 0 0 0.5rem 0.5rem;
-	box-shadow: 0 0.1rem 0.3rem #0003;
-	border: 1px solid var(--border);
-	display: none;
-	user-select: none;
-}
-
-#suggestions li {
-	background-color: var(--accent);
-	font-weight: bold;
-	padding: 0.2rem 0 0.2rem 1rem;
-	margin-top: 0.1rem;
-}
-
-#suggestions li:hover,
-#suggestions li:focus {
-	background-color: #39FC;
-	color: #9CFC
-}
 
 @media (min-width:600px) {
 	#dataContainer {
@@ -148,7 +81,7 @@ button.ri-search-2-line {
 		-webkit-box-direction: normal;
 		-ms-flex-direction: row;
 		flex-direction: row;
-		justify-content: space-around;
+		height: calc(90% - 7rem);
 	}
 
 	#metadata {

@@ -1,23 +1,46 @@
 import { params, themer, getSaved, save, convertSStoHHMMSS, parseTTML, updatePositionState } from './lib/utils.js';
 
-// settings button
-const containers = [settingsContainer, queuelistContainer, searchContainer, relatedStreamsContainer];
+// container state management
+
+const containerBtns = [homeButton, settingsButton, queuelistButton, searchlistButton, relatedStreamsButton]
+
+function hideAllContainers(show) {
+	for (const btn of containerBtns)
+		btn === show ? btn.classList.add('on') : btn.classList.remove('on');
+	dataContainer.classList.replace('show', 'hide');
+	settingsContainer.classList.add('hide');
+	queuelistContainer.classList.add('hide');
+	searchContainer.classList.add('hide');
+	relatedStreamsContainer.classList.replace('list-show', 'hide');
+}
+
+
+homeButton.addEventListener('click', () => {
+	hideAllContainers(homeButton);
+	dataContainer.classList.replace('hide', 'show');
+});
 
 settingsButton.addEventListener('click', () => {
-	settingsContainer.classList.toggle('hide');
-	settingsButton.classList.toggle('on')
-	dataContainer.classList.toggle('show');
-	dataContainer.classList.toggle('hide');
-
+	hideAllContainers(settingsButton);
+	settingsContainer.classList.remove('hide');
 });
 
 queuelistButton.addEventListener('click', () => {
-	queuelistContainer.classList.toggle('hide');
-	queuelistButton.classList.toggle('on')
-	dataContainer.classList.toggle('show');
-	dataContainer.classList.toggle('hide');
-
+	hideAllContainers(queuelistButton);
+	queuelistContainer.classList.remove('hide');
 });
+
+searchlistButton.addEventListener('click', () => {
+	hideAllContainers(searchlistButton);
+	searchContainer.classList.remove('hide');
+});
+
+relatedStreamsButton.addEventListener('click', () => {
+	hideAllContainers(relatedStreamsButton);
+	relatedStreamsContainer.classList.replace('hide', 'list-show');
+});
+
+
 
 
 // bitrate selector
@@ -142,22 +165,6 @@ audio.addEventListener('loadedmetadata', () => {
 loopButton.addEventListener('click', () => {
 	loopButton.firstElementChild.classList.toggle('on');
 	audio.loop = !audio.loop;
-});
-
-
-
-
-// streams service button
-
-relatedStreamsButton.addEventListener('click', () => {
-	if (!searchContainer.classList.contains('hide'))
-		searchContainer.classList.toggle('hide');
-	else {
-		dataContainer.classList.toggle('show');
-		dataContainer.classList.toggle('hide');
-	}
-	relatedStreamsContainer.classList.toggle('list-show');
-	relatedStreamsButton.firstElementChild.classList.toggle('on');
 });
 
 

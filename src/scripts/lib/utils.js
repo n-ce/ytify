@@ -9,15 +9,13 @@ const palette = {
 		bg: 'none',
 		accent: '#fff4',
 		text: '#000b',
-		border: '#000b',
-		secondary: '#bbbe'
+		border: '#000b'
 	},
 	dark: {
 		bg: '#000',
 		accent: '#000',
 		text: '#fffb',
-		border: '#fff7',
-		secondary: '#000'
+		border: '#fff7'
 	}
 };
 
@@ -50,16 +48,15 @@ function themer() {
 			b += data[i + 2];
 		}
 		const amount = len / nthPixel;
-		r /= amount, g /= amount, b /= amount;
+		r = Math.floor(r / amount), g = Math.floor(g / amount), b = Math.floor(b / amount);
 
 
+		if ((r + g + b) < 85 || !r || !g || !b)
+			r += 34, g += 34, b += 34;
 		const theme = getSaved('theme') ? 'dark' : 'light';
 		
-		palette.dark.border = palette.light.bg =
-			(r + g + b) > 85 || !r || !g || !b ?
-			`rgb(${r},${g},${b})` :
-			`rgb(${r+34},${g+34},${b+34})`;
-		
+		palette.dark.border = palette.light.bg = `rgb(${r},${g},${b})`;
+
 		if (getSaved('img')) {
 			palette.dark.border = 'palevioletred';
 			palette.light.bg = 'linear-gradient(15deg, #13547a 0%, #80d0c7 100%)';
@@ -68,9 +65,8 @@ function themer() {
 		cssVar('--accent', palette[theme].accent);
 		cssVar('--text', palette[theme].text);
 		cssVar('--border', palette[theme].border);
-		cssVar('--secondary', palette[theme].secondary);
+		cssVar('--opposite', `rgb(${Math.abs(255 - r)},${Math.abs(255 - g)},${Math.abs(255 - b)})`)
 		tabColor.content = palette[theme].bg;
-
 	}
 
 	canvasImg.crossOrigin = '';
@@ -201,19 +197,6 @@ function orderByFrequency(array) {
 		.filter(key => frequency[key] === maxFreq)
 		.sort((a, b) => frequency[b] - frequency[a]);
 }
-/*
-function distinctRandomNumbersArray(length, upperlimit) {
-	const array = [];
-	const randomNo = () => {
-		const num = Math.floor(Math.random() * upperlimit);
-		return array.includes(num) ?
-			randomNo() : num;
-	}
-	for (let i = 0; i < length; i++)
-		array.push(randomNo());
-	return array;
-}
-*/
 
 async function similarStreamsCollector(streamTitle, currentStream) {
 	const relatives = [];
@@ -226,11 +209,7 @@ async function similarStreamsCollector(streamTitle, currentStream) {
 			if (stream.duration < 600 && stream.url !== `/watch?v=${currentStream}`)
 				relatives.push(stream.url.slice(9));
 	}
-	/*
-	for (const stream of currentRelatives)
-		if (stream.duration < 600 && stream.type === 'stream')
-			relatives.push(stream.url.slice(9));
-	*/
+
 	return relatives;
 }
 

@@ -90,19 +90,78 @@
 
 
 /* search */
-#searchContainer button {
+
+#superInputContainer {
+	height: 2rem;
+	width: calc(100% - 1px);
 	position: sticky;
 	top: 0;
-	font-size: 2rem;
-	height: 3rem;
-	width: 3rem;
-	font-weight: bold;
-	color: var(--border);
 	background-color: var(--accent);
-	border-radius: 50%;
+	border-radius: 0.5rem;
 	border:1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
+	display:flex;
 }
+
+#superInput {
+	border: none;
+	height: 100%;
+	width:100%;
+	text-align: center;
+	color: var(--text);
+	outline: none;
+	font-family: 'Noto Sans';
+	font-weight: bold;
+	background: none;
+}
+
+#superInput::placeholder {
+	color: var(--border)
+}
+
+#searchFilters {
+	font-size: 0.7rem;
+	padding: 0;
+	border: none;
+	color: var(--border);
+	outline: none;
+	font-family: 'Noto Sans';
+	font-weight: bold;
+	background: none;
+}
+
+
+#suggestions {
+	max-height: 12rem;
+	overflow: scroll;
+	position: absolute;
+	width: calc(90% - 4rem);
+	background-color: var(--accent);
+	list-style-type: none;
+	padding: 0;
+	margin-top:-1px;
+	margin-left: 1rem;
+	border-radius: 0 0 0.5rem 0.5rem;
+	box-shadow: 0 0.1rem 0.3rem #0003;
+	border: 1px solid var(--border);
+	display: none;
+	user-select: none;
+}
+
+#suggestions li {
+	background-color: var(--accent);
+	font-weight: bold;
+	padding: 0.2rem 0 0.2rem 1rem;
+	margin-top: 0.1rem;
+}
+
+#suggestions li:hover,
+#suggestions li:focus {
+	background-color: #39FC;
+	color: #9CFC;
+}
+
+
 
 /* related streams */
 
@@ -116,6 +175,8 @@ list-item {
 list-item:hover,
 list-item:focus {
 	background-color: var(--accent);
+	border-radius: 0.5rem;
+	border: 1px solid var(--border);
 }
 
 .list-show {

@@ -16,33 +16,31 @@
 	font-style: normal;
 	font-size: 1.5rem;
 	color: var(--border);
-	padding-bottom: 0.5rem;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
 
-.ri-pause-fill:before { content: "\efd7"; }
-.ri-stop-fill:before { content: "\f1a0"; }
-.ri-repeat-fill:before { content: "\f073"; }
-.ri-play-list-add-fill:before { content: "\f00e"; }
-.ri-play-fill:before { content: "\f00a"; }
-.ri-skip-forward-fill:before { content: "\f143"; }
-.ri-settings-fill:before { content: "\f0ed"; }
-.ri-menu-4-fill:before { content: "\ef35"; }
-.ri-search-2-line:before { content: "\f0cd"; }
-.ri-github-fill:before { content: "\edca"; }
-.ri-telegram-line:before { content: "\f1f0"; }
-.ri-magic-fill:before { content: "\eee9"; }
-.ri-play-list-2-fill:before { content: "\f00c"; }
-.ri-forward-10-fill:before { content: "\f32a"; }
-.ri-replay-10-fill:before { content: "\f351"; }
-.ri-arrow-left-fill:before { content: "\ea5f"; }
+.ri-pause-fill:before{content: "\efd7"}
+.ri-stop-fill:before{content: "\f1a0"}
+.ri-repeat-fill:before{content: "\f073"}
+.ri-play-list-add-fill:before{content: "\f00e"}
+.ri-play-fill:before{content: "\f00a"}
+.ri-skip-forward-fill:before{content: "\f143"}
+.ri-settings-fill:before{content: "\f0ed"}
+.ri-menu-4-fill:before{content: "\ef35"}
+.ri-search-2-line:before{content: "\f0cd"}
+.ri-github-fill:before{content: "\edca"}
+.ri-telegram-line:before{content: "\f1f0"}
+.ri-magic-fill:before{content: "\eee9"}
+.ri-play-list-2-fill:before{content: "\f00c"}
+.ri-forward-10-fill:before{content: "\f32a"}
+.ri-replay-10-fill:before{content: "\f351"}
+.ri-home-fill:before{content: "\ee26"}
 
 
 :root {
 	--bg: none;
-	--secondary: none;
 	--accent: none;
 	--text: none;
 	--border: none;
@@ -58,12 +56,12 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	height:100%;
+	height: 100%;
 }
 
 body {
 	background: var(--bg);
-	font-family: 'Noto Sans', sans-serif;
+	font-family:'Noto Sans', sans-serif;
 	color: var(--text);
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -95,26 +93,24 @@ body {
 	}
 }
 
-
 nav {
-	display:flex;
-	justify-content: space-evenly;
-	width:calc(90% - 1rem);
 	background-color: var(--accent);
-	padding: 0.4rem;
 	border-radius: 0.5rem;
-	border:1px solid var(--border);
+	border: 1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
 }
 
-nav button.on{
-	border-radius: 0.3rem;
+nav button {
+	padding: 0.5rem;
+	width: 3.5rem;
+	border-radius: 0.5rem;
 }
 
 
 #subtitleContainer {
 	width: 80%;
 	position: relative;
+	bottom:10%;
 	pointer-events: none;
 }
 

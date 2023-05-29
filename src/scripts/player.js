@@ -14,8 +14,15 @@ await fetch('https://piped-instances.kavin.rocks')
 	.catch(err => {
 		if (confirm('Reload app because fetching piped instances failed with error: ' + err))
 			location.reload();
-	})
+	});
+	
+// Instance Selector change event
 
+pipedInstances.addEventListener('change', () => {
+	save('pipedInstance', pipedInstances.options[pipedInstances.selectedIndex].textContent)
+	if (previous_ID)
+		play(previous_ID);
+});
 
 
 // link validator
@@ -134,7 +141,7 @@ const appendToQueuelist = async id => {
 		autoplayQueue.splice(index, 1);
 		queuelist.removeChild(queuelist.getElementsByTagName('list-item')[index]);
 	});
-	queuelist.appendChild(listItem);
+	queuelistContainer.appendChild(listItem);
 }
 
 // The main player function
@@ -229,15 +236,6 @@ const play = async id => {
 	}
 }
 
-
-// Instance Selector change event
-
-pipedInstances.addEventListener('change', () => {
-	const index = pipedInstances.selectedIndex;
-	save('pipedInstance', pipedInstances.options[index].textContent)
-	if (previous_ID)
-		play(previous_ID);
-});
 
 
 // link queuing algorithm
@@ -355,20 +353,11 @@ superInput.addEventListener('input', async () => {
 });
 
 
-let previousSearchTerm;
 
 const searchLoader = () => {
 
-	if (relatedStreamsButton.firstElementChild.classList.contains('on')) {
-		relatedStreamsContainer.classList.toggle('list-show');
-		relatedStreamsButton.firstElementChild.classList.toggle('on');
-	} else {
-		dataContainer.classList.remove('show');
-		dataContainer.classList.add('hide');
-	}
-	searchContainer.classList.remove('hide');
-
-	if (!superInput.value || superInput.value === previousSearchTerm) return;
+	
+	if (!superInput.value) return;
 
 	searchlistContainer.innerHTML = '';
 
@@ -385,7 +374,6 @@ const searchLoader = () => {
 		});
 	suggestions.style.display = 'none';
 
-	previousSearchTerm = superInput.value;
 }
 
 superInput.addEventListener('keypress', e => {
@@ -393,17 +381,6 @@ superInput.addEventListener('keypress', e => {
 });
 
 superInputContainer.lastElementChild.addEventListener('click', searchLoader);
-searchContainer.firstElementChild.addEventListener('click', () => {
-	if (relatedStreamsButton.firstElementChild.classList.contains('on')) {
-		relatedStreamsContainer.classList.toggle('list-show');
-		relatedStreamsButton.firstElementChild.classList.toggle('on');
-	} else {
-		dataContainer.classList.add('show');
-		dataContainer.classList.remove('hide');
-	}
-	searchContainer.classList.add('hide');
-
-})
 
 // URL params 
 

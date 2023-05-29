@@ -1,7 +1,7 @@
 #playerContainer {
 	width:90%;
 	background-color: var(--accent);
-	border-radius: 0.5rem;
+	border-radius:0.5rem;
 	border:1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	
@@ -115,7 +115,7 @@ button:active {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border-radius: 1rem;
+	border-radius: 0.5rem;
 	-webkit-transition: all 0.5s;
 	-o-transition: all 0.5s;
 	transition: all 0.5s;
