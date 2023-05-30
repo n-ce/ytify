@@ -1,16 +1,15 @@
-
-- Since v4 & v5 we have refactored the entire project such that it is highly contributable and understandable.
-- To add to our repository, check out our issues. We have a number of features on the way, and tag some issues as "good first issue" to signal that they are good for newcomers.
+- To add to our repository, check out our issues or the [development list](https://github.com/n-ce/ytify/edit/main/CONTRIBUTING.md#development-list)
 - To contribute, fork the repository, make a branch, commit your changes, and make a pull request. 
 - Considering to fix a bug or add a new feature? Make sure to increment the version number in the sw.js file if you do so.
 
 # Development List
 
 - **Future**
-  - PlayPrevious button (requires storing streamHistory)
+  - PlayPrevious button (requires globally storing streamHistory)
   - Favorites button (saves favorites to localStorage as map)
+  - use a topic/subject/data extraction from stream title algorithm to get better autoplay recommendations (maybe using compromise/one nlp library)
   - Recommendations feed using indexedDB & related streams averages of favorites
-  - Material You colors with material color utilities
+  - Material You colors with material color utilities using c++/wasm
   - rewrite cleaner / efficient CSS
   - Github Actions
     - Vite : compile js modules and css into one and minify it
