@@ -46,11 +46,11 @@
 <body>
 
 	<nav>
-		<button aria-label="home toggle" class="ri-home-fill on" id="homeButton"></button>
-		<button aria-label="queuelist toggle" class="ri-play-list-2-fill" id="queuelistButton"></button>
-		<button aria-label="searchlist toggle" class="ri-search-2-line" id="searchlistButton"></button>
-		<button aria-label="relatedStreams toggle" class="ri-menu-4-fill" id="relatedStreamsButton"></button>
-		<button aria-label="settings toggle" class="ri-settings-fill" id="settingsButton"></button>
+		<button aria-label="home" class="ri-home-fill on" id="homeButton"></button>
+		<button aria-label="queuelist" class="ri-play-list-2-fill" id="queuelistButton" data-badge="0"></button>
+		<button aria-label="search" class="ri-search-2-line" id="searchlistButton"></button>
+		<button aria-label="relatedStreams" class="ri-menu-4-fill" id="relatedStreamsButton"></button>
+		<button aria-label="settings" class="ri-settings-fill" id="settingsButton"></button>
 	</nav>
 
 	<div id="dataContainer" class="show">
@@ -171,7 +171,7 @@
 			</button>
 
 			<button type="button" id="queueButton">
-				<i class="ri-play-list-add-fill" data-badge="0"></i>
+				<i class="ri-play-list-add-fill"></i>
 				<p>Queue</p>
 			</button>
 
@@ -194,8 +194,8 @@
 
 
 	<script>
-		if ('serviceWorker' in navigator)
-		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+	if ('serviceWorker' in navigator)
+navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

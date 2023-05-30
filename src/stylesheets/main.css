@@ -95,15 +95,32 @@ body {
 
 nav {
 	background-color: var(--accent);
-	border-radius: 0.5rem;
+	border-radius: 0.6rem;
 	border: 1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
 }
 
 nav button {
-	padding: 0.5rem;
-	width: 3.5rem;
+	padding:0.5rem;
+	margin: 1px 0;
+	width: 4rem;
 	border-radius: 0.5rem;
+}
+
+
+[data-badge]:after {
+	font-family: 'Noto Sans';
+	content: attr(data-badge);
+	line-height: 1rem;
+	-webkit-transition: background 0.5s, color 1s;
+	-o-transition: background 0.5s, color 1s;
+	transition: background 0.5s, color 1s;
+}
+
+[data-badge^="-"]:after,
+[data-badge=""]:after,
+[data-badge="0"]:after {
+	display: none;
 }
 
 

@@ -130,31 +130,6 @@ button:active {
 }
 
 
-#queueButton i {
-	min-width: 3rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-[data-badge]:after {
-	font-family: 'Noto Sans';
-	content: attr(data-badge);
-	font-size: 1rem;
-	font-weight: bold;
-	-webkit-transition: background 0.5s, color 1s;
-	-o-transition: background 0.5s, color 1s;
-	transition: background 0.5s, color 1s;
-}
-
-[data-badge^="-"]:after,
-[data-badge=""]:after,
-[data-badge="0"]:after {
-	display: none;
-}
-
-
-
 
 .on {
 	background: var(--accent);

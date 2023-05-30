@@ -1,4 +1,4 @@
-import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector} from './lib/utils.js';
+import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector } from './lib/utils.js';
 
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
@@ -182,9 +182,9 @@ const autoplayFX = async relatives => {
 			await appendToQueuelist(id);
 			autoplayQueue.push(id);
 		}
+		queuelistButton.dataset.badge = autoplayQueue.length;
 	}
 }
-
 
 const appendToQueuelist = async id => {
 	const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json());
@@ -194,8 +194,10 @@ const appendToQueuelist = async id => {
 	listItem.dataset.thumbnail = data.thumbnail_url;
 	listItem.addEventListener('click', () => {
 		play(id);
-		const index = autoplayQueue.indexOf(id);
-		autoplayQueue.splice(index, 1);
+		const queue = queueArray.length ? queueArray : autoplayQueue;
+		const index = queue.indexOf(id);
+		queue.splice(index, 1);
+		queuelistButton.dataset.badge = queue.length;
 		queuelistContainer.removeChild(queuelistContainer.getElementsByTagName('list-item')[index]);
 	});
 	queuelistContainer.appendChild(listItem);
@@ -298,10 +300,10 @@ const play = async id => {
 // link queuing algorithm
 const queueArray = [];
 
-const queueIt = id => {
+const queueIt = async id => {
 	queueArray.push(id);
-	queueButton.firstElementChild.dataset.badge = queueArray.length;
-	appendToQueuelist(id);
+	await appendToQueuelist(id);
+	queuelistButton.dataset.badge = queueArray.length;
 }
 
 
@@ -311,11 +313,12 @@ const queueState = queueButton.firstElementChild.classList;
 audio.onended = () => {
 	if (queueArray.length) {
 		play(queueArray.shift());
-		queueButton.firstElementChild.dataset.badge = queueArray.length;
-		queuelistContainer.removeChild(queuelist.firstElementChild);
+		queuelistButton.dataset.badge = queueArray.length;
+		queuelistContainer.removeChild(queuelistContainer.firstElementChild);
 	}
 	else if (autoplayQueue.length) {
 		play(autoplayQueue.shift());
+		queuelistButton.dataset.badge = autoplayQueue.length;
 		queuelistContainer.removeChild(queuelistContainer.firstElementChild);
 	}
 	else {
@@ -330,7 +333,7 @@ audio.onended = () => {
 
 const queueFx = () => {
 	queueArray.length = 0;
-	queueButton.firstElementChild.dataset.badge = 0;
+	queuelistButton.dataset.badge = 0;
 	queueButton.firstElementChild.classList.toggle('on');
 	queuelistContainer.innerHTML = '';
 	playNextButton.classList.toggle('hide');
@@ -363,8 +366,8 @@ const playlistLoad = async id => {
 		data.name,
 		'Click on Next Button to start',
 		'');
-	for (const i of data.relatedStreams)
-		queueIt(i.url.slice(9));
+	for await (const i of data.relatedStreams)
+	await queueIt(i.url.slice(9));
 
 	params.set('p', id);
 	history.pushState({}, '', '?' + params);
