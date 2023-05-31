@@ -149,6 +149,7 @@ autoplayButton.addEventListener('click', () => {
 	queueButton.classList.toggle('hide');
 	autoplayButton.firstElementChild.classList.toggle('on');
 	queuelistContainer.innerHTML = '';
+	queuelistButton.dataset.badge = 0;
 	autoplayQueue.length = 0;
 	playNextButton.classList.toggle('hide');
 });
@@ -341,6 +342,8 @@ const queueFx = () => {
 	loopButton.firstElementChild.classList.remove('on');
 	audio.loop = false;
 	autoplayButton.classList.toggle('hide');
+	params.delete('p');
+	history.pushState({}, '', '?' + params);
 }
 queueButton.addEventListener('click', queueFx);
 
@@ -379,21 +382,15 @@ const playlistLoad = async id => {
 // URL params 
 
 if (params.get('p')) { // playlist
-	const storedID = params.get('s');
-	params.delete('s');
-	playlistLoad(params.get('p'));
-	const interval = setInterval(() => {
-		storedID === params.get('s') ?
-			clearInterval(interval) :
-			next();
-	}, 500);
+	await playlistLoad(params.get('p'));
+	queuelistContainer.getElementsByTagName('list-item')[queueArray.indexOf(params.get('s'))].click();
 }
 else {
 	if (params.get('s')) // stream
 		play(params.get('s'));
 
 	if (params.get('t')) // timestamp
-		audio.currentTime = params.get('t');
+		audio.currentTime = parseInt(params.get('t'));
 
 
 	// PWA Params
