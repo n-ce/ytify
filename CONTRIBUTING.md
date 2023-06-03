@@ -4,18 +4,17 @@
 
 # Development List
 
-- **Future**
-  - PlayPrevious button (requires globally storing streamHistory)
-  - Favorites button (saves favorites to localStorage as map)
-  - use a topic/subject/data extraction from stream title algorithm to get better autoplay recommendations (maybe using compromise/one nlp library)
-  - Recommendations feed using indexedDB & related streams averages of favorites
-  - Material You colors with material color utilities using c++/wasm
-  - rewrite cleaner / efficient CSS
-  - Github Actions
-    - Vite : compile js modules and css into one and minify it
-    - Autoprefixer : removes need for manually adding css prefix
+- PlayPrevious button (requires globally storing streamHistory)
+- Favorites button (saves favorites to localStorage as map)
+- stream title topic/subject/data extraction to get better autoplay recommendations (maybe using compromise/one nlp library)
+- Recommendations feed using indexedDB & related streams averages of favorites
+- Material You colors with material color utilities using C++ / WASM
+- rewrite cleaner / efficient CSS
+- Github Actions
+  - Vite : combine js and css files into one and minify it
+  - Autoprefixer : removes need for manually adding css prefix
 
-### View older versions here only for reference : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/)
+*Deployments for older versions : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/)*
 
 ## Changelog
 
