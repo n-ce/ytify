@@ -180,19 +180,19 @@ if (getSaved('theme')) {
 	themeButton.toggleAttribute('checked')
 }
 
-themeButton.click = () => {
+themeButton.addEventListener('click', () => {
 	getSaved('theme') ?
 		localStorage.removeItem('theme') :
 		save('theme', 'dark');
 	themer();
-}
+});
 
 // fullscreen
-fullscreenButton.click = () => {
+fullscreenButton.addEventListener('click', () => {
 	document.fullscreenElement ?
 		document.exitFullscreen() :
 		document.documentElement.requestFullscreen();
-}
+});
 
 // thumbnail toggle
 const image1x1 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -203,7 +203,7 @@ if (getSaved('img')) {
 	img.classList.toggle('hide');
 }
 
-thumbnailButton.click = () => {
+thumbnailButton.addEventListener('click', () => {
 
 	if (getSaved('img')) {
 		img.src = getSaved('img');
@@ -214,13 +214,13 @@ thumbnailButton.click = () => {
 		img.src = image1x1;
 	}
 	img.classList.toggle('hide');
-}
+});
 
 // quality
 if (getSaved('quality') == 'hq')
 	qualityButton.toggleAttribute('checked');
 
-qualityButton.click = () => {
+qualityButton.addEventListener('click', () => {
 
 	getSaved('quality') ?
 		localStorage.removeItem('quality') : // low
@@ -230,23 +230,23 @@ qualityButton.click = () => {
 		params.set('t', audio.dataset.seconds);
 		location.href = location.origin + '/?' + params;
 	}
-}
+})
 
 // suggestions button
-suggestionsButton.click = () => {
+suggestionsButton.addEventListener('click', () => {
 	getSaved('search_suggestions') ?
 		localStorage.removeItem('search_suggestions') :
 		save('search_suggestions', 'off');
 	suggestions.style.display = 'none';
-}
+});
 
 if (getSaved('search_suggestions'))
 	suggestionsButton.removeAttribute('checked')
+
 
 // Delete Button
 deleteButton.addEventListener('click', () => {
 	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
 	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
 	localStorage.clear();
-	location.replace(location.origin);
 });

@@ -100,7 +100,7 @@
 	<div id="relatedStreamsContainer" class="hide">
 		<h1>Streams related to your current playing stream show up here.</h1>
 	</div>
-	
+
 	<div id="settingsContainer" class="hide">
 		<toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
 		<toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
@@ -121,12 +121,11 @@
 		<form netlify name='feedback' method='POST'>
 			<input type="text" name="->" id="netlifyForm" placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
 		</form>
-		<br>
-		<span>
-			<button id="deleteButton">Clear All Stored Data</button>
-			<a class="ri-github-fill" href="https://github.com/n-ce/ytify" target="_blank"></a>
-			<a class="ri-telegram-line" href="https://t.me/encetg" target="_blank"></a>
-		</span>
+
+		<a href="/" id="deleteButton">Clear All Stored Data</a>
+		<a href="https://github.com/n-ce/ytify" target="_blank">Contribute on Github</a>
+		<a href="https://t.me/encetg" target="_blank">Contact Developer on Telegram</a>
+
 	</div>
 
 	<article id="subtitleContainer" class="hide"></article>
@@ -194,8 +193,8 @@
 
 
 	<script>
-	if ('serviceWorker' in navigator)
-navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		if ('serviceWorker' in navigator)
+			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 </body>
 

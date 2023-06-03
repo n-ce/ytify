@@ -8,6 +8,7 @@
 	-ms-flex-align: center;
 	align-items: center;
 	height: calc(90% - 10rem);
+	justify-content: center;
 }
 
 #img {

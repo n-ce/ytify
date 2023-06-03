@@ -45,48 +45,37 @@
 
 #settingsContainer label {
 	font-weight: bold;
-
-}
-
-
-#settingsContainer span button {
-	margin: 0;
-	background-color: var(--accent);
-	font-weight: bold;
-	padding: 0.5rem;
-	border: 1px solid var(--border);
-	border-radius: 0.7rem;
-	animation: none;
-	color: var(--text);
-	font-family: 'Noto Sans';
-}
-
-#settingsContainer span button:hover {
-	background-color: #f007;
-	color: #ddd;
 }
 
 #settingsContainer a {
+	display:inline-block;
 	text-decoration: none;
-	width: 2rem;
-	text-align: center;
+	font-weight: bold;
+	padding: 0.2rem;
+	line-height:2rem;
 	transition: all 0.4s;
 	border-radius: 0.7rem;
 	border: 1px solid var(--border);
 	background-color: var(--accent);
 	color: var(--text);
+	margin-top: 1rem;
 }
 
-#settingsContainer span .ri-telegram-line:hover {
-	background-color: #08c;
-	color: #ddd;
+#settingsContainer a:hover {
+	color: #ddd
 }
 
-#settingsContainer span .ri-github-fill:hover {
-	background-color: #333;
-	color: #ddd;
+#settingsContainer a:nth-of-type(1):hover {
+	background-color: #f007
 }
 
+#settingsContainer a:nth-of-type(2):hover {
+	background-color: #333
+}
+
+#settingsContainer a:nth-of-type(3):hover {
+	background-image: linear-gradient(#2ae, #08c)
+}
 
 
 /* search */
@@ -98,15 +87,15 @@
 	top: 0;
 	background-color: var(--accent);
 	border-radius: 0.5rem;
-	border:1px solid var(--border);
+	border: 1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
-	display:flex;
+	display: flex;
 }
 
 #superInput {
 	border: none;
 	height: 100%;
-	width:100%;
+	width: 100%;
 	text-align: center;
 	color: var(--text);
 	outline: none;
@@ -136,10 +125,10 @@
 	overflow: scroll;
 	position: absolute;
 	width: calc(90% - 4rem);
-	background-color: var(--accent);
+	background-color: var(--bg);
 	list-style-type: none;
 	padding: 0;
-	margin-top:-1px;
+	margin-top: -1px;
 	margin-left: 1rem;
 	border-radius: 0 0 0.5rem 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;

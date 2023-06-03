@@ -53,9 +53,9 @@ function themer() {
 
 		if ((r + g + b) < 85 || !r || !g || !b)
 			r += 34, g += 34, b += 34;
-		
+
 		const theme = getSaved('theme') ? 'dark' : 'light';
-		
+
 		palette.dark.border = palette.light.bg = `rgb(${r},${g},${b})`;
 
 		if (getSaved('img')) {
@@ -96,6 +96,9 @@ function setMetaData(thumbnail, id, streamName, authorName, authorUrl) {
 
 	document.title = streamName + ' - ytify';
 
+	if (thumbnail.includes('maxres'))
+		thumbnail = thumbnail.replace('maxres', 'hq');
+		
 	if ('mediaSession' in navigator) {
 		navigator.mediaSession.setPositionState(null);
 		navigator.mediaSession.metadata = new MediaMetadata({
