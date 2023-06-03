@@ -1,4 +1,4 @@
-- To add to our repository, check out our issues or the [development list](https://github.com/n-ce/ytify/edit/main/CONTRIBUTING.md#development-list)
+- To add to our repository, check out our issues or the [development list](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md#development-list)
 - To contribute, fork the repository, make a branch, commit your changes, and make a pull request. 
 - Considering to fix a bug or add a new feature? Make sure to increment the version number in the sw.js file if you do so.
 
