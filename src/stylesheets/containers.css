@@ -48,11 +48,11 @@
 }
 
 #settingsContainer a {
-	display:inline-block;
+	display: inline-block;
 	text-decoration: none;
 	font-weight: bold;
 	padding: 0.2rem;
-	line-height:2rem;
+	line-height: 2rem;
 	transition: all 0.4s;
 	border-radius: 0.7rem;
 	border: 1px solid var(--border);
@@ -83,10 +83,12 @@
 #superInputContainer {
 	height: 2rem;
 	width: calc(100% - 1px);
+	padding: 0.5rem 1rem;
 	position: sticky;
-	top: 0;
+	top: -1rem;
+	backdrop-filter: blur(1rem);
+	margin: -1rem -1rem 1rem -1rem;
 	background-color: var(--accent);
-	backdrop-filter: blur(0.5rem);
 	border-radius: 0.5rem;
 	border: 1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
@@ -97,20 +99,22 @@
 	border: none;
 	height: 100%;
 	width: 100%;
-	text-align: center;
 	color: var(--text);
 	outline: none;
+	font-size: 1rem;
 	font-family: 'Noto Sans';
 	font-weight: bold;
 	background: none;
 }
 
 #superInput::placeholder {
-	color: var(--border)
+	color: var(--border);
+	opacity: 75%;
 }
 
 #searchFilters {
-	font-size: 0.7rem;
+	font-size: 1rem;
+	width: 10ch;
 	padding: 0;
 	border: none;
 	color: var(--border);
@@ -129,8 +133,7 @@
 	background-color: var(--bg);
 	list-style-type: none;
 	padding: 0;
-	margin-top: -1px;
-	margin-left: 1rem;
+	margin: -1rem 0 0 1rem;
 	border-radius: 0 0 0.5rem 0.5rem;
 	box-shadow: 0 0.1rem 0.3rem #0003;
 	border: 1px solid var(--border);

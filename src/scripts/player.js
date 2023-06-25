@@ -136,6 +136,7 @@ superInput.addEventListener('keypress', e => {
 
 superInputContainer.lastElementChild.addEventListener('click', searchLoader);
 
+searchFilters.addEventListener('change',searchLoader);
 
 
 // Autoplay Button
