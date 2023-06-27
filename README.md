@@ -15,9 +15,7 @@
 - **PWA** : Install ytify as an app on your device and open YouTube links with it from your OS share menu. 📱
 - **Autoplay** : Plays related streams, great for music listeners on ytify.
 
-![chrome_screenshot_1687334928676](https://github.com/n-ce/ytify/assets/69345507/5589352e-3295-4310-b528-3f9ae8c90e2b)
-
-
+[![chrome_screenshot_1687843035105](https://github.com/n-ce/ytify/assets/69345507/7f54fa3a-83ff-44d1-ac29-504097996378)](https://ytify.netlify.app/?s=9p5Oi4wPVVo)
 
 ## WHY / The story of ytify
 - I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
