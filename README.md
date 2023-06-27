@@ -15,7 +15,8 @@
 - **PWA** : Install ytify as an app on your device and open YouTube links with it from your OS share menu. 📱
 - **Autoplay** : Plays related streams, great for music listeners on ytify.
 
-![Screenshot_20230427-213445_Chrome](https://user-images.githubusercontent.com/69345507/234921327-0e747f63-07d5-47da-857a-56d5edfce874.jpg)
+![chrome_screenshot_1687334928676](https://github.com/n-ce/ytify/assets/69345507/5589352e-3295-4310-b528-3f9ae8c90e2b)
+
 
 
 ## WHY / The story of ytify
