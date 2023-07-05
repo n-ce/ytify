@@ -37,6 +37,8 @@
 .ri-forward-10-fill:before{content: "\f32a"}
 .ri-replay-10-fill:before{content: "\f351"}
 .ri-home-fill:before{content: "\ee26"}
+.ri-volume-up-line:before {content: "\F2A2"}
+.ri-volume-mute-line:before {content: "\F29E"}
 
 
 :root {

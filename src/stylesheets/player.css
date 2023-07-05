@@ -143,17 +143,48 @@ button:active {
 }
 
 
-
-
-
-
-@media (min-width:600px) {
-	#playerContainer {
-		display: -webkit-box;
-		display: -ms-flexbox;
-		display: flex;
-	}
-}
+.volumeControl {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem;
+    
+  }
+  
+  #volumeIcon {
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  #volumeInput {
+    width: 80px;
+  }
+  
+  
+  
+  @media (max-width: 800px) {
+    #playerControls {
+      flex-wrap: wrap;
+    }
+  
+    .volumeControl{
+      order: 5;
+      margin-left: 7.5rem;
+    }
+  
+    #volumeInput {
+      width: 35vw;
+    }
+  
+  
+  }
+  
+  @media (min-width: 800px) {
+    #playerContainer {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+    }
+  }
 
 
 input[type="range"] {

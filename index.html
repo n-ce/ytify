@@ -149,8 +149,19 @@
 				<option value="2.00">2.00x</option>
 				<option value="4.00">4.00x</option>
 			</select>
-
-
+			<div class="volumeControl">
+				<button type="button" id="volumeIcon">
+				  <i class="ri-volume-up-line"></i>
+				</button>
+				<input
+				  id="volumeInput"
+				  type="range"
+				  class="volume-range"
+				  min="0"
+				  max="100"
+				  value="100"
+				/>
+			</div>
 			<p id="currentDuration">00:00</p>
 			<input type="range" min="0" max="100" value="0" id="progress" />
 			<p id="fullDuration">00:00</p>
