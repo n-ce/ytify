@@ -111,42 +111,20 @@ playSpeed.addEventListener('change', () => {
 });
 
 //Volume Control
-volumeInput.addEventListener("input", () => {
-	const volume = volumeInput.value;
-	audio.volume = volume / 100;
-	audio.volume = volume;
+volumeSelect.addEventListener("input", () => {
+	audio.volume = volumeSelect.value;
   });
   
 //Audio Mute & Icon Change  
 volumeIcon.addEventListener("click", () => {
 	if (audio.volume === 0) {
-	  audio.volume = parseFloat(volumeInput.value) / 100;
+	  audio.volume = 1;
 	  volumeIcon.innerHTML = '<i class="ri-volume-up-line"></i>';
 	} else {
 	  audio.volume = 0;
 	  volumeIcon.innerHTML = '<i class="ri-volume-mute-line"></i>';
 	}
 });
-
-document.addEventListener("DOMContentLoaded", function() {
-	var volumeInput = document.getElementById("volumeInput");
-	var playerContainer = document.getElementById("playerContainer");
-	var volumeController = document.querySelector(".volumeControl");
-  
-	if (window.innerWidth > 800){
-	  playerContainer.addEventListener("mouseleave", function() {
-	  volumeInput.style.display = "none"; // Hide the volumeRange
-	
-  });
-  volumeController.addEventListener("mouseenter", function() {
-	  volumeInput.style.display = "block"; // Show the volumeRange
-  
-  });
-	}else{
-	  volumeInput.style.display = "block"; 
-	}
-   
-});  
 
 // Seek Forward && Backward
 

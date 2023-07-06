@@ -153,14 +153,13 @@
 				<button type="button" id="volumeIcon">
 				  <i class="ri-volume-up-line"></i>
 				</button>
-				<input
-				  id="volumeInput"
-				  type="range"
-				  class="volume-range"
-				  min="0"
-				  max="100"
-				  value="100"
-				/>
+			<select id="volumeSelect">
+				<option value="0">Mute</option>
+				<option value="0.25">25%</option>
+				<option value="0.5">50%</option>
+				<option value="0.75">75%</option>
+				<option value="1" selected>100%</option>
+			</select>
 			</div>
 			<p id="currentDuration">00:00</p>
 			<input type="range" min="0" max="100" value="0" id="progress" />

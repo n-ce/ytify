@@ -72,13 +72,16 @@ button:active {
 
 
 
-#playSpeed {
+#playSpeed,
+#volumeSelect {
 	color: var(--border);
 	border: none;
 	background: none;
 	outline: none;
 	font-family: 'Noto Sans';
 }
+
+
 
 #currentDuration,
 #fullDuration {
