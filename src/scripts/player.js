@@ -260,8 +260,9 @@ const play = async id => {
 		for (const opts of m4a.options) bitrateSelector.add(opts);
 	}
 	
-	bitrateSelector.selectedIndex = (isSafari ? m4a : opus).bitrates.indexOf(getSaved('quality') ? Math.max(...opus.bitrates) : Math.min(...opus.bitrates));
-	audio.src = (isSafari ? m4a : opus).urls[bitrateSelector.selectedIndex];
+	const codec =  (isSafari ? m4a : opus);
+	bitrateSelector.selectedIndex = codec.bitrates.indexOf(getSaved('quality') ? Math.max(...codec.bitrates) : Math.min(...codec.bitrates));
+	audio.src = codec.urls[bitrateSelector.selectedIndex];
 
 
 	setMetaData(
