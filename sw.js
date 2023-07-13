@@ -1,4 +1,4 @@
-const version = '5.14.9';
+const version = '5.14.10';
 const contentToCache = [
 	"/",
 	"/src/stylesheets/main.css",
