@@ -241,7 +241,7 @@ const play = async id => {
 	bitrateSelector.innerHTML = '';
 
 	for (const value of data.audioStreams) {
-		if (value.codec === 'opus' && isSafari) {
+		if (value.codec === 'opus' && !isSafari) {
 			opus.urls.push(value.url);
 			opus.bitrates.push(parseInt(value.quality));
 			bitrateSelector.add(new Option(value.quality, value.url));
@@ -254,7 +254,7 @@ const play = async id => {
 	}
 
 	// finding lowest available stream when low opus bitrate unavailable
-	if (!getSaved('quality') && Math.min(...opus.bitrates) > 64 && isSafari) {
+	if (!getSaved('quality') && Math.min(...opus.bitrates) > 64 && !isSafari) {
 		opus.urls = opus.urls.concat(m4a.urls);
 		opus.bitrates = opus.bitrates.concat(m4a.bitrates);
 		for (const opts of m4a.options) bitrateSelector.add(opts);
