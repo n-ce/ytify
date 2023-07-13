@@ -208,7 +208,6 @@ const appendToQueuelist = async id => {
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
-
 // The main player function
 
 const play = async id => {
@@ -241,16 +240,19 @@ const play = async id => {
 	bitrateSelector.innerHTML = '';
 
 	for (const value of data.audioStreams) {
-		if (value.codec === 'opus' && !isSafari) {
+		if (value.codec === "opus") {
+			if (isSafari) continue;
 			opus.urls.push(value.url);
 			opus.bitrates.push(parseInt(value.quality));
 			bitrateSelector.add(new Option(value.quality, value.url));
-		} else {
+		}
+		else {
 			m4a.urls.push(value.url);
 			m4a.bitrates.push(parseInt(value.quality));
-			m4a.options.push(new Option(value.quality, value.url));
+			isSafari ?
+				bitrateSelector.add(new Option(value.quality, value.url)) :
+				m4a.options.push(new Option(value.quality, value.url));
 		}
-
 	}
 
 	// finding lowest available stream when low opus bitrate unavailable
@@ -259,8 +261,8 @@ const play = async id => {
 		opus.bitrates = opus.bitrates.concat(m4a.bitrates);
 		for (const opts of m4a.options) bitrateSelector.add(opts);
 	}
-	
-	const codec =  (isSafari ? m4a : opus);
+
+	const codec = (isSafari ? m4a : opus);
 	bitrateSelector.selectedIndex = codec.bitrates.indexOf(getSaved('quality') ? Math.max(...codec.bitrates) : Math.min(...codec.bitrates));
 	audio.src = codec.urls[bitrateSelector.selectedIndex];
 
