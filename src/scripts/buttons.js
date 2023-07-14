@@ -250,3 +250,27 @@ deleteButton.addEventListener('click', () => {
 	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
 	localStorage.clear();
 });
+
+//Volume Control Toggle
+volumeIcon.addEventListener("click", function () {
+	volumeControl.classList.toggle("show");
+  });
+  
+  //Volume Control
+  volumeInput.addEventListener("input", () => {
+	const volume = volumeInput.value / 100;
+	audio.volume = volume;
+  });
+  
+  // Audio Mute & Icons Change
+  volumeIconUpper.addEventListener("click", function () {
+	audio.volume = audio.volume === 0 ? parseFloat(volumeInput.value) / 100 : 0;
+	volumeIconUpper.innerHTML =
+	  audio.volume === 0
+		? '<i class="ri-volume-mute-line"></i>'
+		: '<i class="ri-volume-up-line"></i>';
+	volumeIcon.innerHTML =
+	  audio.volume === 0
+		? '<i class="ri-volume-mute-line"></i>'
+		: '<i class="ri-volume-up-line"></i>';
+  });

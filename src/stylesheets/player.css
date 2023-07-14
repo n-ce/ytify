@@ -222,3 +222,45 @@ input[type="range"]::-ms-thumb {
 	border-radius: 1rem;
 	margin-top: -0.35rem;
 }
+
+#volumeControl {
+  position: absolute;
+  background-color: var(--accent);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  padding: 0.5rem;
+  left: 10vw;
+  bottom: 5rem;
+  animation: appear 0.5s;
+}
+
+#volumeIcon {
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+#volumeInput {
+  width: 10rem;
+}
+
+@media (max-width: 600px) {
+  #volumeControl {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 0.5rem 0;
+    width: 90%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  #volumeInput {
+    width: 100%;
+  }
+
+  #volumeIcon {
+    display: none;
+  }
+}

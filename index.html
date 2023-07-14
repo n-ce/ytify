@@ -133,6 +133,19 @@
 	<audio id="audio" data-seconds="0">
 		<track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
 	</audio>
+	<div id="volumeControl" class="hide">
+		<button type="button" id="volumeIconUpper">
+		  <i class="ri-volume-up-line"></i>
+		</button>
+		<input
+		  id="volumeInput"
+		  type="range"
+		  class="volume-range"
+		  min="0"
+		  max="100"
+		  value="100"
+		/>
+	</div>
 
 	<footer id="playerContainer">
 		<section id="playerControls">
@@ -149,7 +162,9 @@
 				<option value="2.00">2.00x</option>
 				<option value="4.00">4.00x</option>
 			</select>
-
+			<button type="button" id="volumeIcon">
+				<i class="ri-volume-up-line"></i>
+			</button>
 
 			<p id="currentDuration">00:00</p>
 			<input type="range" min="0" max="100" value="0" id="progress" />
