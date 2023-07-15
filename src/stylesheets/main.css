@@ -21,24 +21,25 @@
 }
 
 
-.ri-pause-fill:before{content: "\efd7"}
-.ri-stop-fill:before{content: "\f1a0"}
-.ri-repeat-fill:before{content: "\f073"}
-.ri-play-list-add-fill:before{content: "\f00e"}
-.ri-play-fill:before{content: "\f00a"}
-.ri-skip-forward-fill:before{content: "\f143"}
-.ri-settings-fill:before{content: "\f0ed"}
-.ri-menu-4-fill:before{content: "\ef35"}
-.ri-search-2-line:before{content: "\f0cd"}
-.ri-github-fill:before{content: "\edca"}
-.ri-telegram-line:before{content: "\f1f0"}
-.ri-magic-fill:before{content: "\eee9"}
-.ri-play-list-2-fill:before{content: "\f00c"}
-.ri-forward-10-fill:before{content: "\f32a"}
-.ri-replay-10-fill:before{content: "\f351"}
-.ri-home-fill:before{content: "\ee26"}
-.ri-volume-up-line:before {content: "\F2A2"}
-.ri-volume-mute-line:before {content: "\F29E"}
+.ri-pause-fill:before { content: "\efd7"; }
+.ri-stop-fill:before { content: "\f1a0"; }
+.ri-repeat-fill:before { content: "\f073"; }
+.ri-play-list-add-fill:before { content: "\f00e"; }
+.ri-play-fill:before { content: "\f00a"; }
+.ri-skip-forward-fill:before { content: "\f143"; }
+.ri-menu-4-fill:before { content: "\ef35"; }
+.ri-search-2-line:before { content: "\f0cd"; }
+.ri-play-list-2-fill:before { content: "\f00c"; }
+.ri-forward-10-fill:before { content: "\f32a"; }
+.ri-replay-10-fill:before { content: "\f351"; }
+.ri-skip-back-fill:before { content: "\f13f"; }
+.ri-home-line:before { content: "\ee2b"; }
+.ri-settings-line:before { content: "\f0ee"; }
+.ri-magic-line:before { content: "\eeea"; }
+.ri-volume-up-line:before { content: "\f2a2"; }
+.ri-volume-mute-line:before { content: "\f29e"; }
+
+
 
 
 :root {
