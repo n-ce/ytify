@@ -26,13 +26,13 @@ button {
 #playButton {
 	color: var(--border);
 	animation: appear 0.5s;
-	padding: none;
+	padding:none;
 	height: 3rem;
 	width: 3rem;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border-radius: 1rem;
+	border-radius: 0.7rem;
 	-webkit-transition: all 0.5s;
 	-o-transition: all 0.5s;
 	transition: all 0.5s;
@@ -159,7 +159,7 @@ button:active {
 input[type="range"] {
 	-webkit-appearance: none;
 	background-color: transparent;
-	width: calc(100% - 12rem);
+	width: calc(100% - 15rem);
 	cursor: pointer;
 }
 
@@ -221,4 +221,38 @@ input[type="range"]::-ms-thumb {
 	border: 0.1rem solid var(--border);
 	border-radius: 1rem;
 	margin-top: -0.35rem;
+}
+
+#volumeControl {
+  position: absolute;
+  background-color: var(--accent);
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 0.1rem 0.3rem #0003;
+  padding: 0.5rem;
+  left: 10vw;
+  bottom: 5rem;
+  animation: appear 0.5s;
+}
+
+#volumeIcon {
+  cursor: pointer;
+}
+
+#volumeInput {
+  width: 10rem;
+}
+
+@media (max-width: 600px) {
+  #volumeControl {
+    position: relative;
+    padding: 0.5rem 5vw;
+    width: calc(90% - 10vw);
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  #volumeInput {
+    width: 100%;
+  }
 }

@@ -46,18 +46,18 @@
 <body>
 
 	<nav>
-		<button aria-label="home" class="ri-home-fill on" id="homeButton"></button>
+		<button aria-label="home" class="ri-home-line on" id="homeButton"></button>
 		<button aria-label="queuelist" class="ri-play-list-2-fill" id="queuelistButton" data-badge="0"></button>
 		<button aria-label="search" class="ri-search-2-line" id="searchlistButton"></button>
 		<button aria-label="relatedStreams" class="ri-menu-4-fill" id="relatedStreamsButton"></button>
-		<button aria-label="settings" class="ri-settings-fill" id="settingsButton"></button>
+		<button aria-label="settings" class="ri-settings-line" id="settingsButton"></button>
 	</nav>
 
 	<div id="dataContainer" class="show">
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata" align="center">
-			<a id="title" target="_blank">ytify v5.14</a>
+			<a id="title" target="_blank">ytify v5.15</a>
 			<br>
 			<a id="author" target="_blank">Channel</a>
 			<select id="bitrateSelector">
@@ -133,11 +133,22 @@
 	<audio id="audio" data-seconds="0">
 		<track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
 	</audio>
+	
+	<div id="volumeControl" class="hide">
+		<button type="button" id="volumeIconUpper">
+			<i class="ri-volume-up-line"></i>
+		</button>
+		<input id="volumeInput" type="range" class="volume-range" min="0" max="100" value="100" />
+	</div>
 
 	<footer id="playerContainer">
 		<section id="playerControls">
 			<button id="playButton" data-state="1" class="ri-stop-fill"></button>
 
+			<button type="button" id="volumeIcon">
+				<i class="ri-volume-up-line"></i>
+			</button>
+			
 			<select id="playSpeed">
 				<option value="0.25">0.25x</option>
 				<option value="0.50">0.50x</option>
@@ -149,6 +160,7 @@
 				<option value="2.00">2.00x</option>
 				<option value="4.00">4.00x</option>
 			</select>
+
 
 
 			<p id="currentDuration">00:00</p>
@@ -180,7 +192,7 @@
 			</button>
 
 			<button type="button" id="autoplayButton">
-				<i class="ri-magic-fill"></i>
+				<i class="ri-magic-line"></i>
 				<p>AutoPlay</p>
 			</button>
 
@@ -191,12 +203,12 @@
 		</section>
 	</footer>
 
-<!-- comment out the script in development -->
+	<!-- comment out the script in development -->
 	<script>
 		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
-<!-- to avoid pwa caching behaviour -->
+	<!-- to avoid pwa caching behaviour -->
 </body>
 
 
