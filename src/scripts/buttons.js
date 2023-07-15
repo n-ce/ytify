@@ -252,25 +252,26 @@ deleteButton.addEventListener('click', () => {
 });
 
 //Volume Control Toggle
-volumeIcon.addEventListener("click", function () {
+volumeIcon.addEventListener("click", function() {
 	volumeControl.classList.toggle("show");
-  });
-  
-  //Volume Control
-  volumeInput.addEventListener("input", () => {
-	const volume = volumeInput.value / 100;
-	audio.volume = volume;
-  });
-  
-  // Audio Mute & Icons Change
-  volumeIconUpper.addEventListener("click", function () {
-	audio.volume = audio.volume === 0 ? parseFloat(volumeInput.value) / 100 : 0;
-	volumeIconUpper.innerHTML =
-	  audio.volume === 0
-		? '<i class="ri-volume-mute-line"></i>'
-		: '<i class="ri-volume-up-line"></i>';
-	volumeIcon.innerHTML =
-	  audio.volume === 0
-		? '<i class="ri-volume-mute-line"></i>'
-		: '<i class="ri-volume-up-line"></i>';
-  });
+});
+
+//Volume Control
+volumeInput.addEventListener("input", () => {
+	audio.volume = volumeInput.value / 100;
+});
+
+// Audio Mute & Icons Change
+const iconStates = ["ri-volume-mute-line", "ri-volume-up-line"];
+
+volumeIconUpper.addEventListener("click", function() {
+
+	volumeInput.value = audio.volume ? 0 : 100;
+	audio.volume = !audio.volume ? 1 : 0;
+
+
+	volumeIconUpper.firstElementChild.classList.replace(iconStates[1], iconStates[0]);
+	volumeIcon.firstElementChild.classList.replace(iconStates[1], iconStates[0]);
+	iconStates.reverse();
+
+});

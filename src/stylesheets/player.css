@@ -13,7 +13,7 @@
 	display: flex;
 	-webkit-box-pack: justify;
 	-ms-flex-pack: justify;
-	justify-content: space-between;
+	justify-content: space-around;
 	align-items: center;
 	width: 100%;
 }
@@ -26,13 +26,13 @@ button {
 #playButton {
 	color: var(--border);
 	animation: appear 0.5s;
-	padding: none;
+	padding:none;
 	height: 3rem;
 	width: 3rem;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border-radius: 1rem;
+	border-radius: 0.7rem;
 	-webkit-transition: all 0.5s;
 	-o-transition: all 0.5s;
 	transition: all 0.5s;
@@ -159,7 +159,7 @@ button:active {
 input[type="range"] {
 	-webkit-appearance: none;
 	background-color: transparent;
-	width: calc(100% - 12rem);
+	width: calc(100% - 15rem);
 	cursor: pointer;
 }
 
@@ -236,7 +236,6 @@ input[type="range"]::-ms-thumb {
 }
 
 #volumeIcon {
-  margin-right: 1rem;
   cursor: pointer;
 }
 
@@ -247,8 +246,8 @@ input[type="range"]::-ms-thumb {
 @media (max-width: 600px) {
   #volumeControl {
     position: relative;
-    padding: 0.5rem 0;
-    width: 90%;
+    padding: 0.5rem 5vw;
+    width: calc(90% - 10vw);
     left: 0;
     right: 0;
     bottom: 0;

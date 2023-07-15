@@ -133,24 +133,22 @@
 	<audio id="audio" data-seconds="0">
 		<track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
 	</audio>
+	
 	<div id="volumeControl" class="hide">
 		<button type="button" id="volumeIconUpper">
-		  <i class="ri-volume-up-line"></i>
+			<i class="ri-volume-up-line"></i>
 		</button>
-		<input
-		  id="volumeInput"
-		  type="range"
-		  class="volume-range"
-		  min="0"
-		  max="100"
-		  value="100"
-		/>
+		<input id="volumeInput" type="range" class="volume-range" min="0" max="100" value="100" />
 	</div>
 
 	<footer id="playerContainer">
 		<section id="playerControls">
 			<button id="playButton" data-state="1" class="ri-stop-fill"></button>
 
+			<button type="button" id="volumeIcon">
+				<i class="ri-volume-up-line"></i>
+			</button>
+			
 			<select id="playSpeed">
 				<option value="0.25">0.25x</option>
 				<option value="0.50">0.50x</option>
@@ -162,9 +160,8 @@
 				<option value="2.00">2.00x</option>
 				<option value="4.00">4.00x</option>
 			</select>
-			<button type="button" id="volumeIcon">
-				<i class="ri-volume-up-line"></i>
-			</button>
+
+
 
 			<p id="currentDuration">00:00</p>
 			<input type="range" min="0" max="100" value="0" id="progress" />
@@ -206,12 +203,12 @@
 		</section>
 	</footer>
 
-<!-- comment out the script in development -->
+	<!-- comment out the script in development -->
 	<script>
-		if ('serviceWorker' in navigator)
-			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		// if ('serviceWorker' in navigator)
+		// navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
-<!-- to avoid pwa caching behaviour -->
+	<!-- to avoid pwa caching behaviour -->
 </body>
 
 
