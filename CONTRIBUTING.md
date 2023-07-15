@@ -18,8 +18,12 @@
 
 ## Changelog
 
+**v5.15**:
+- Volume Controls
+
 **v5.14**:
 - Tabbed Navigation
+- Safari Playback Support
 
 **v5.13**:
 - Autoplay
