@@ -1,4 +1,4 @@
-import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector } from './lib/utils.js';
+import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector, shuffleArray } from './lib/utils.js';
 
 await fetch('https://piped-instances.kavin.rocks')
 	.then(res => res.json())
@@ -386,6 +386,15 @@ const playlistLoad = async id => {
 
 }
 
+// Shuffle Play
+
+shuffleQueueButton.addEventListener('click', () => {
+	const shuffledQueue = shuffleArray(queueArray);
+	queueArray.length = 0;
+	queuelist.innerHTML = '';
+	for (const item of shuffledQueue)
+		queueIt(item);
+});
 
 
 // URL params 
