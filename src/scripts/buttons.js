@@ -81,17 +81,17 @@ playButton.addEventListener('click', () => {
 });
 
 audio.addEventListener('playing', () => {
-	playButton.classList.replace(playButton.classList[0], 'ri-pause-fill');
+	playButton.classList.replace(playButton.classList[0], 'ri-pause-line');
 	playButton.dataset.state = '';
 });
 
 audio.addEventListener('pause', () => {
-	playButton.classList.replace('ri-pause-fill', 'ri-play-fill');
+	playButton.classList.replace('ri-pause-line', 'ri-play-line');
 	playButton.dataset.state = '1';
 });
 
 audio.addEventListener('loadeddata', () => {
-	playButton.classList.replace('spinner', 'ri-play-fill');
+	playButton.classList.replace('spinner', 'ri-play-line');
 	playButton.classList.add('on');
 	if (superInput.value || relatedStreamsContainer.classList.contains('list-show'))
 		audio.play();

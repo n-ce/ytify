@@ -95,8 +95,8 @@ function setMetaData(thumbnail, id, streamName, authorName, authorUrl) {
 	author.textContent = authorName;
 
 	document.title = streamName + ' - ytify';
-
-	if (thumbnail.includes('maxres'))
+	
+	if (thumbnail?.includes('maxres'))
 		thumbnail = thumbnail.replace('maxres', 'hq');
 		
 	if ('mediaSession' in navigator) {
@@ -243,6 +243,16 @@ async function similarStreamsCollector(streamTitle, currentStream) {
 }
 
 
+function shuffleArray(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		const temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
+	}
+}
+
+
 export {
 	params,
 	save,
@@ -253,5 +263,6 @@ export {
 	parseTTML,
 	updatePositionState,
 	orderByFrequency,
-	similarStreamsCollector
+	similarStreamsCollector,
+	shuffleArray
 }

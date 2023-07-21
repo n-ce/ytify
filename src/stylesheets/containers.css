@@ -177,6 +177,20 @@ list-item:focus {
 }
 
 
+/* queuelist container */
+#shuffleQueueButton {
+	position: sticky;
+	top: calc(100% - 2.5rem);
+	left: 100%;
+}
+
+#shuffleQueueButton i {
+	border: 1px solid var(--border);
+	background: var(--accent);
+	border-radius: 0.5rem 1rem;
+	padding: 0.5rem;
+}
+
 
 /* media rules */
 
