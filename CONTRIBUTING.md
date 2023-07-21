@@ -18,6 +18,9 @@
 
 ## Changelog
 
+**v5.16**:
+- Shuffle Queue
+
 **v5.15**:
 - Volume Controls
 
