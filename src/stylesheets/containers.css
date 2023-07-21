@@ -178,10 +178,9 @@ list-item:focus {
 
 
 /* queuelist container */
-
 #shuffleQueueButton {
 	position: sticky;
-	bottom: 1rem;
+	top: calc(100% - 2.5rem);
 	left: 100%;
 }
 

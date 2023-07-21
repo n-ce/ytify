@@ -388,12 +388,12 @@ const playlistLoad = async id => {
 
 // Shuffle Play
 
+
 shuffleQueueButton.addEventListener('click', () => {
-	const shuffledQueue = shuffleArray(queueArray);
-	queueArray.length = 0;
+	shuffleArray(queueArray);
 	queuelist.innerHTML = '';
-	for (const item of shuffledQueue)
-		queueIt(item);
+	for (const item of queueArray)
+		appendToQueuelist(item);
 });
 
 

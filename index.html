@@ -57,7 +57,7 @@
 		<img id="img" height="100%" width="100%" crossorigin="anonymous" alt="current playing media thumbnail">
 
 		<div id="metadata" align="center">
-			<a id="title" target="_blank">ytify v5.15</a>
+			<a id="title" target="_blank">ytify v5.16</a>
 			<br>
 			<a id="author" target="_blank">Channel</a>
 			<select id="bitrateSelector">
@@ -69,12 +69,13 @@
 	</div>
 
 	<div id="queuelistContainer" class="hide">
-		<div id="queuelist">
-			<h1>Upcoming streams on your queue or autoplay show up here.</h1>
-		</div>
 		<button id="shuffleQueueButton">
 			<i class="ri-shuffle-line"></i>
 		</button>
+		<div id="queuelist">
+			<h1>Upcoming streams on your queue or autoplay show up here.</h1>
+		</div>
+
 	</div>
 
 	<div id="searchContainer" class="hide">
@@ -210,8 +211,8 @@
 
 	<!-- comment out the script in development -->
 	<script>
-		// if ('serviceWorker' in navigator)
-		// navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		if ('serviceWorker' in navigator)
+			navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 	<!-- to avoid pwa caching behaviour -->
 </body>
