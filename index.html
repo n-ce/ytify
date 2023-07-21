@@ -47,9 +47,9 @@
 
 	<nav>
 		<button aria-label="home" class="ri-home-line on" id="homeButton"></button>
-		<button aria-label="queuelist" class="ri-play-list-2-fill" id="queuelistButton" data-badge="0"></button>
+		<button aria-label="queuelist" class="ri-play-list-2-line" id="queuelistButton" data-badge="0"></button>
 		<button aria-label="search" class="ri-search-2-line" id="searchlistButton"></button>
-		<button aria-label="relatedStreams" class="ri-menu-4-fill" id="relatedStreamsButton"></button>
+		<button aria-label="relatedStreams" class="ri-menu-4-line" id="relatedStreamsButton"></button>
 		<button aria-label="settings" class="ri-settings-line" id="settingsButton"></button>
 	</nav>
 
@@ -69,7 +69,12 @@
 	</div>
 
 	<div id="queuelistContainer" class="hide">
-		<h1>Upcoming streams on your queue or autoplay show up here.</h1>
+		<div id="queuelist">
+			<h1>Upcoming streams on your queue or autoplay show up here.</h1>
+		</div>
+		<button id="shuffleQueueButton">
+			<i class="ri-shuffle-line"></i>
+		</button>
 	</div>
 
 	<div id="searchContainer" class="hide">
@@ -133,7 +138,7 @@
 	<audio id="audio" data-seconds="0">
 		<track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
 	</audio>
-	
+
 	<div id="volumeControl" class="hide">
 		<button type="button" id="volumeIconUpper">
 			<i class="ri-volume-up-line"></i>
@@ -143,12 +148,12 @@
 
 	<footer id="playerContainer">
 		<section id="playerControls">
-			<button id="playButton" data-state="1" class="ri-stop-fill"></button>
+			<button id="playButton" data-state="1" class="ri-stop-line"></button>
 
 			<button type="button" id="volumeIcon">
 				<i class="ri-volume-up-line"></i>
 			</button>
-			
+
 			<select id="playSpeed">
 				<option value="0.25">0.25x</option>
 				<option value="0.50">0.50x</option>
@@ -172,22 +177,22 @@
 		<section id="playerProfiles">
 
 			<button type="button" id="seekBwdButton">
-				<i class="ri-replay-10-fill"></i>
+				<i class="ri-replay-10-line"></i>
 				<p>Backward</p>
 			</button>
 
 			<button type="button" id="seekFwdButton">
-				<i class="ri-forward-10-fill"></i>
+				<i class="ri-forward-10-line"></i>
 				<p>Forward</p>
 			</button>
 
 			<button type="button" id="queueButton">
-				<i class="ri-play-list-add-fill"></i>
+				<i class="ri-play-list-add-line"></i>
 				<p>Queue</p>
 			</button>
 
 			<button type="button" id="loopButton">
-				<i class="ri-repeat-fill"></i>
+				<i class="ri-repeat-line"></i>
 				<p>Loop</p>
 			</button>
 
@@ -197,7 +202,7 @@
 			</button>
 
 			<button type="button" class="hide" id="playNextButton">
-				<i class="ri-skip-forward-fill"></i>
+				<i class="ri-skip-forward-line"></i>
 				<p>SkipNext</p>
 			</button>
 		</section>
@@ -205,8 +210,8 @@
 
 	<!-- comment out the script in development -->
 	<script>
-		if ('serviceWorker' in navigator)
-		navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
+		// if ('serviceWorker' in navigator)
+		// navigator.serviceWorker.register("sw.js").then(res => console.log("service worker registered")).catch(err => console.log("service worker not registered", err));
 	</script>
 	<!-- to avoid pwa caching behaviour -->
 </body>

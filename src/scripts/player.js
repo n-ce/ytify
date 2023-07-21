@@ -149,7 +149,7 @@ autoplayButton.addEventListener('click', () => {
 	audio.loop = false;
 	queueButton.classList.toggle('hide');
 	autoplayButton.firstElementChild.classList.toggle('on');
-	queuelistContainer.innerHTML = '';
+	queuelist.innerHTML = '';
 	queuelistButton.dataset.badge = 0;
 	autoplayQueue.length = 0;
 	playNextButton.classList.toggle('hide');
@@ -172,7 +172,7 @@ const autoplayQueue = [];
 const relativesHistory = [];
 
 const autoplayFX = async relatives => {
-	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-fill');
+	autoplayButton.firstElementChild.classList.replace('spinner', 'ri-magic-line');
 
 	for (const relative of relatives)
 		relativesHistory.push(relative);
@@ -200,9 +200,9 @@ const appendToQueuelist = async id => {
 		const index = queue.indexOf(id);
 		queue.splice(index, 1);
 		queuelistButton.dataset.badge = queue.length;
-		queuelistContainer.removeChild(queuelistContainer.getElementsByTagName('list-item')[index]);
+		queuelist.removeChild(queuelist.getElementsByTagName('list-item')[index]);
 	});
-	queuelistContainer.appendChild(listItem);
+	queuelist.appendChild(listItem);
 }
 
 
@@ -294,7 +294,7 @@ const play = async id => {
 
 	// autoplay init
 	if (autoplayState.contains('on')) {
-		autoplayButton.firstElementChild.classList.replace('ri-magic-fill', 'spinner');
+		autoplayButton.firstElementChild.classList.replace('ri-magic-line', 'spinner');
 		streamHistory.push(id);
 		autoplayFX(
 			await similarStreamsCollector(
@@ -324,15 +324,15 @@ audio.onended = () => {
 	if (queueArray.length) {
 		play(queueArray.shift());
 		queuelistButton.dataset.badge = queueArray.length;
-		queuelistContainer.removeChild(queuelistContainer.firstElementChild);
+		queuelist.removeChild(queuelist.firstElementChild);
 	}
 	else if (autoplayQueue.length) {
 		play(autoplayQueue.shift());
 		queuelistButton.dataset.badge = autoplayQueue.length;
-		queuelistContainer.removeChild(queuelistContainer.firstElementChild);
+		queuelist.removeChild(queuelist.firstElementChild);
 	}
 	else {
-		playButton.classList.replace('ri-play-fill', 'ri-stop-fill');
+		playButton.classList.replace('ri-play-line', 'ri-stop-line');
 		playButton.dataset.state = '1';
 	}
 }
@@ -345,7 +345,7 @@ const queueFx = () => {
 	queueArray.length = 0;
 	queuelistButton.dataset.badge = 0;
 	queueButton.firstElementChild.classList.toggle('on');
-	queuelistContainer.innerHTML = '';
+	queuelist.innerHTML = '';
 	playNextButton.classList.toggle('hide');
 	loopButton.classList.toggle('hide');
 	loopButton.firstElementChild.classList.remove('on');
@@ -392,7 +392,7 @@ const playlistLoad = async id => {
 
 if (params.get('p')) { // playlist
 	await playlistLoad(params.get('p'));
-	queuelistContainer.getElementsByTagName('list-item')[queueArray.indexOf(params.get('s'))].click();
+	queuelist.getElementsByTagName('list-item')[queueArray.indexOf(params.get('s'))].click();
 }
 else {
 	if (params.get('s')) // stream
