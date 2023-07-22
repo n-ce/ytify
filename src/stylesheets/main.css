@@ -1,12 +1,12 @@
 @font-face {
 	font-family: 'Noto Sans';
-	src: url("/assets/NotoSans.woff2") format("woff2");
+	src: url("../../assets/NotoSans.woff2") format("woff2");
 	font-display: swap;
 }
 
 @font-face {
 	font-family: "remixicon";
-	src: url("/assets/remixicon.woff2") format("woff2");
+	src: url("../../assets/remixicon.woff2") format("woff2");
 	font-display: swap;
 }
 
