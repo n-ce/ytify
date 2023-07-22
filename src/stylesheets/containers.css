@@ -178,19 +178,33 @@ list-item:focus {
 
 
 /* queuelist container */
-#shuffleQueueButton {
+#queueTools {
 	position: sticky;
 	top: calc(100% - 2.5rem);
-	left: 100%;
-}
-
-#shuffleQueueButton i {
+	width: 8.28rem;
+	background-color: var(--accent);
+	border-radius: 0.4rem;
 	border: 1px solid var(--border);
-	background: var(--accent);
-	border-radius: 0.5rem 1rem;
-	padding: 0.5rem;
+	overflow: hidden;
 }
 
+#queueTools button {
+	height: 2rem;
+	width: 4rem;
+	background-color: var(--accent);
+	font-weight: bold;
+}
+
+#queueTools button:active i {
+	background: none;
+}
+
+#deleteModeButton.active{
+	background-color: black;
+}
+.active i{
+	color:red;
+}
 
 /* media rules */
 

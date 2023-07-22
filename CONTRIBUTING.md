@@ -20,6 +20,7 @@
 
 **v5.16**:
 - Shuffle Queue
+- Remove From Queue Button
 
 **v5.15**:
 - Volume Controls

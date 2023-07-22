@@ -195,7 +195,8 @@ const appendToQueuelist = async id => {
 	listItem.dataset.author = data.author_name;
 	listItem.dataset.thumbnail = data.thumbnail_url;
 	listItem.addEventListener('click', () => {
-		play(id);
+		if (removefromQueueState === false)
+			play(id);
 		const queue = queueArray.length ? queueArray : autoplayQueue;
 		const index = queue.indexOf(id);
 		queue.splice(index, 1);
@@ -396,6 +397,11 @@ shuffleQueueButton.addEventListener('click', () => {
 		appendToQueuelist(item);
 });
 
+let removefromQueueState = false;
+deleteModeButton.addEventListener('click', () => {
+	deleteModeButton.classList.toggle('active');
+	removefromQueueState = !removefromQueueState;
+})
 
 // URL params 
 
