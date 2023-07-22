@@ -46,11 +46,25 @@
 <body>
 
 	<nav>
-		<button aria-label="home" class="ri-home-line on" id="homeButton"></button>
-		<button aria-label="queuelist" class="ri-play-list-2-line" id="queuelistButton" data-badge="0"></button>
-		<button aria-label="search" class="ri-search-2-line" id="searchlistButton"></button>
-		<button aria-label="relatedStreams" class="ri-menu-4-line" id="relatedStreamsButton"></button>
-		<button aria-label="settings" class="ri-settings-line" id="settingsButton"></button>
+		<span data-tooltip="Home" class="tooltip">
+			<button aria-label="home" class="ri-home-line on" id="homeButton"></button>
+		</span>
+
+		<span data-tooltip="Queue" class="tooltip">
+			<button aria-label="queuelist" class="ri-play-list-2-line" id="queuelistButton" data-badge="0"></button>
+		</span>
+		<span data-tooltip="Search" class="tooltip">
+			<button aria-label="search" class="ri-search-2-line" id="searchlistButton"></button>
+		</span>
+
+		<span data-tooltip="Related Streams" class="tooltip">
+			<button aria-label="relatedStreams" class="ri-menu-4-line" id="relatedStreamsButton"></button>
+		</span>
+
+		<span data-tooltip="Settings" class="tooltip">
+			<button aria-label="settings" class="ri-settings-line" id="settingsButton"></button>
+		</span>
+		
 	</nav>
 
 	<div id="dataContainer" class="show">
@@ -177,32 +191,32 @@
 		</section>
 		<section id="playerProfiles">
 
-			<button type="button" id="seekBwdButton">
+			<button class="control" type="button" id="seekBwdButton">
 				<i class="ri-replay-10-line"></i>
 				<p>Backward</p>
 			</button>
 
-			<button type="button" id="seekFwdButton">
+			<button class="control" type="button" id="seekFwdButton">
 				<i class="ri-forward-10-line"></i>
 				<p>Forward</p>
 			</button>
 
-			<button type="button" id="queueButton">
+			<button class="control" type="button" id="queueButton">
 				<i class="ri-play-list-add-line"></i>
 				<p>Queue</p>
 			</button>
 
-			<button type="button" id="loopButton">
+			<button class="control" type="button" id="loopButton">
 				<i class="ri-repeat-line"></i>
 				<p>Loop</p>
 			</button>
 
-			<button type="button" id="autoplayButton">
+			<button class="control" type="button" id="autoplayButton">
 				<i class="ri-magic-line"></i>
 				<p>AutoPlay</p>
 			</button>
 
-			<button type="button" class="hide" id="playNextButton">
+			<button class="control" type="button" class="hide" id="playNextButton">
 				<i class="ri-skip-forward-line"></i>
 				<p>SkipNext</p>
 			</button>

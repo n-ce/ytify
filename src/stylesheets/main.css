@@ -111,6 +111,24 @@ nav button {
 	border-radius: 0.5rem;
 }
 
+nav button, .control {
+	cursor: pointer;
+	transition: ease-in-out 100ms color !important;
+}
+
+nav button:hover, .control:hover, .control:hover>*, .tooltip:hover::after {
+	color: rgb(223, 223, 223);
+}
+
+.tooltip:hover::after {
+	content: attr(data-tooltip);
+	position: absolute;
+	top:4.0rem;
+	width: max-content;
+	left:50%;
+	right:50%;
+	transform: translateX(-50%);
+}
 
 [data-badge]:after {
 	font-family: 'Noto Sans';
