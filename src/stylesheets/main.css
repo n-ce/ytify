@@ -102,7 +102,6 @@ nav {
 	border-radius: 0.6rem;
 	border: 1px solid var(--border);
 	box-shadow: 0 0.1rem 0.3rem #0003;
-	margin-bottom: 1.5rem;
 }
 
 nav button {
@@ -119,6 +118,11 @@ nav button, .control {
 
 nav button:hover, .control:hover, .control:hover>*, .tooltip:hover::after {
 	color: rgb(223, 223, 223);
+}
+
+#tooltipLabel{
+	color: rgb(223, 223, 223);
+	text-align: center;
 }
 
 [data-badge]:after {
@@ -142,15 +146,6 @@ nav button:hover, .control:hover, .control:hover>*, .tooltip:hover::after {
 	position: relative;
 	bottom:10%;
 	pointer-events: none;
-}
-.tooltip:hover::after {
-	content: attr(data-tooltip);
-	position: absolute;
-	top:4.0rem;
-	width: max-content;
-	left:50%;
-	right:50%;
-	transform: translateX(-50%);
 }
 
 @media (min-width:600px) {
