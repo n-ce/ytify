@@ -187,7 +187,10 @@ const autoplayFX = async relatives => {
 		queuelistButton.dataset.badge = autoplayQueue.length;
 	}
 }
-const queueNodes = queuelist.getElementsByTagName('list-item');
+
+
+const queueArray = [];
+const queueNodes = queuelist.children;
 
 const appendToQueuelist = async id => {
 	const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json());
@@ -310,7 +313,6 @@ const play = async id => {
 
 
 // link queuing algorithm
-const queueArray = [];
 
 const queueIt = async id => {
 	queueArray.push(id);
@@ -393,10 +395,10 @@ const playlistLoad = async id => {
 
 shuffleQueueButton.addEventListener('click', () => {
 	const queue = queueArray.length ? queueArray : autoplayQueue;
+	const oldQueue = queue.slice(0);
 	shuffleArray(queue);
-	queuelist.innerHTML = '';
 	for (const item of queue)
-		appendToQueuelist(item);
+		queuelist.appendChild(queueNodes[oldQueue.indexOf(item)]);
 });
 
 let removefromQueueState = false;
@@ -409,7 +411,7 @@ deleteModeButton.addEventListener('click', () => {
 
 if (params.get('p')) { // playlist
 	await playlistLoad(params.get('p'));
-	queuelist.getElementsByTagName('list-item')[queueArray.indexOf(params.get('s'))].click();
+	queueNodes[queueArray.indexOf(params.get('s'))].click();
 }
 else {
 	if (params.get('s')) // stream
