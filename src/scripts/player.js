@@ -187,6 +187,7 @@ const autoplayFX = async relatives => {
 		queuelistButton.dataset.badge = autoplayQueue.length;
 	}
 }
+const queueNodes = queuelist.getElementsByTagName('list-item');
 
 const appendToQueuelist = async id => {
 	const data = await fetch('https://noembed.com/embed?dataType=json&url=https://youtu.be/' + id).then(res => res.json());
@@ -201,7 +202,7 @@ const appendToQueuelist = async id => {
 		const index = queue.indexOf(id);
 		queue.splice(index, 1);
 		queuelistButton.dataset.badge = queue.length;
-		queuelist.removeChild(queuelist.getElementsByTagName('list-item')[index]);
+		queuelist.removeChild(queueNodes[index]);
 	});
 	queuelist.appendChild(listItem);
 }
@@ -391,9 +392,10 @@ const playlistLoad = async id => {
 
 
 shuffleQueueButton.addEventListener('click', () => {
-	shuffleArray(queueArray);
+	const queue = queueArray.length ? queueArray : autoplayQueue;
+	shuffleArray(queue);
 	queuelist.innerHTML = '';
-	for (const item of queueArray)
+	for (const item of queue)
 		appendToQueuelist(item);
 });
 
