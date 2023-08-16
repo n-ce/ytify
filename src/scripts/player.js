@@ -1,18 +1,17 @@
 import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector, shuffleArray } from './lib/utils.js';
 
-await fetch('https://piped-instances.kavin.rocks')
+await fetch('https://cdn.jsdelivr.net/gh/n-ce/ytify@main/api-list.json')
 	.then(res => res.json())
 	.then(data => {
 		for (const instance of data) {
-			const name = instance.name + ' ' + instance.locations;
 			pipedInstances.add(new Option(
-				name, instance.api_url, '',
-				getSaved('pipedInstance') === name
+				instance, instance, '',
+				getSaved('pipedInstance') === instance
 			));
 		}
 	})
 	.catch(err => {
-		if (confirm('Reload app because fetching piped instances failed with error: ' + err))
+		if (confirm('Reload app because fetching api list failed with error: ' + err))
 			location.reload();
 	});
 
