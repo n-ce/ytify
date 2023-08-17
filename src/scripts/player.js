@@ -1,6 +1,6 @@
 import { setMetaData, getSaved, save, params, orderByFrequency, similarStreamsCollector, shuffleArray } from './lib/utils.js';
 
-await fetch('https://cdn.jsdelivr.net/gh/n-ce/ytify/api-list.json')
+await fetch('../api-list.json')
 	.then(res => res.json())
 	.then(data => {
 		for (const instance of data) {
