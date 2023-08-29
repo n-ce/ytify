@@ -11,6 +11,7 @@
   "devDependencies": {
     "eruda": "^3.0.1",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vite-plugin-pwa": "^0.16.4"
   }
 }
