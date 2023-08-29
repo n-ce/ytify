@@ -67,11 +67,15 @@ export default defineConfig(({ command }) => {
       VitePWA({
         registerType: 'autoUpdate',
         devOptions: {
-          enabled: true
+          // enabled: true
         },
 
         manifest: manifest
       })
-    ] : []
+    ] : [
+      VitePWA({
+        registerType: 'autoUpdate',
+        manifest: manifest
+      })]
   }
 });
