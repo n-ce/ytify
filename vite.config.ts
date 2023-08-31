@@ -3,7 +3,7 @@ import type { PluginOption } from 'vite'
 import { VitePWA } from "vite-plugin-pwa";
 
 // Set to false to disable eruda during development
-const eruda = true;
+const eruda = true; // false
 
 const erudaInjector: PluginOption = {
   name: 'erudaInjector',
@@ -62,20 +62,9 @@ const manifest = {
 
 export default defineConfig(({ command }) => {
   return {
-    plugins: (eruda && command === 'serve') ? [
-      erudaInjector,
-      VitePWA({
-        registerType: 'autoUpdate',
-        devOptions: {
-          // enabled: true
-        },
-
-        manifest: manifest
-      })
-    ] : [
-      VitePWA({
-        registerType: 'autoUpdate',
-        manifest: manifest
-      })]
+    plugins: (eruda && command === 'serve') ? [erudaInjector] : [VitePWA({
+      registerType: 'autoUpdate',
+      manifest: manifest
+    })]
   }
 });

@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 
   <meta name="description"
-    content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
+    content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link or search a video up and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="white">
@@ -21,7 +21,29 @@
 </head>
 
 <body>
-  ytify 6
+  <div id="navFG"></div>
+  <input id="navButton" type="checkbox" />
+  <label for="navButton">
+    <div></div>
+    <div></div>
+    <div></div>
+  </label>
+  <nav>
+    <a class="selected" href="#home">Home</a>
+    <a href="#queue">Queue</a>
+    <a href="#search">Search</a>
+    <a href="#related">Related</a>
+    <a href="#settings">Settings</a>
+    <a href="#library">Library</a>
+  </nav>
+  <main>
+    <section id="home">Home</section>
+    <section id="queue">Queue</section>
+    <section id="search">Search</section>
+    <section id="related">Related</section>
+    <section id="settings">Settings</section>
+    <section id="library">Library</section>
+  </main>
   <script type="module" src="/src/main.ts"></script>
 </body>
 

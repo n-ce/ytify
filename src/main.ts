@@ -1,5 +1,8 @@
 import './style.css'
 import './nav.css'
+import nav from './nav';
+nav();
+
 
 document.getElementsByTagName('section')[4].addEventListener('click', () => {
   if (confirm('clear pwa cache ?')) {
