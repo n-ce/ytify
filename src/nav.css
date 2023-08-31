@@ -5,7 +5,7 @@ nav {
   flex-direction: column;
 }
 
-a {
+nav a {
   color: inherit;
   text-decoration: none;
   width: 80%;
@@ -15,11 +15,11 @@ a {
   cursor: none;
 }
 
-a:hover {
+nav a:hover {
   background-color: var(--hover);
 }
 
-a.selected {
+nav a.selected {
   background-color: var(--linkBg);
   color: var(--onLinkBg);
 }
@@ -36,11 +36,11 @@ a.selected {
     transition: transform 0.3s ease-in-out;
   }
 
-  a:nth-child(1) {
+  nav a:nth-child(1) {
     margin-top: 20%;
   }
 
-  a {
+  nav a {
     padding: 5%;
   }
 
@@ -58,13 +58,13 @@ a.selected {
     justify-content: center;
   }
 
-  a {
+  nav a {
     width: 70%;
     padding: 5% 0 5% 5vw;
   }
 
   /* for disabling navBtn & navFG */
-  label,
+  #navButton+label,
   #navFG {
     display: none !important;
   }
@@ -75,18 +75,19 @@ a.selected {
 /*nav body foreground */
 #navFG {
   position: absolute;
-  width: 100%;
+  width: 0;
   height: 100%;
   transition: background-color 0.5s;
 }
 
 #navFG.active {
   background-color: #0007;
+  width: 100%;
 }
 
 /* Navigation Button */
 
-label {
+#navButton+label {
   position: absolute;
   top: 3vh;
   left: 10%;
@@ -98,7 +99,7 @@ label {
   justify-content: space-evenly;
 }
 
-label div {
+#navButton+label div {
   width: 100%;
   height: 10%;
   background-color: var(--text);
@@ -106,21 +107,21 @@ label div {
 }
 
 
-input {
+#navButton {
   display: none;
 }
 
-input:checked+label div:nth-child(2) {
+#navButton:checked+label div:nth-child(2) {
   opacity: 0;
   transform: translateX(50%);
 }
 
-input:checked+label div:nth-child(1) {
+#navButton:checked+label div:nth-child(1) {
   transform: rotate(45deg);
   transform-origin: 0.5vmax 100%;
 }
 
-input:checked+label div:nth-child(3) {
+#navButton:checked+label div:nth-child(3) {
   transform: rotate(-45deg);
   transform-origin: 0.5vmax 0%;
 }
