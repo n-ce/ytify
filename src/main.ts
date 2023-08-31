@@ -1,5 +1,9 @@
 import './style.css'
-document.body.addEventListener('click', () => {
+import './nav.css'
+
+document.body.addEventListener('click', (e) => {
+  if (!e.target?.matches('body'))
+    return;
   if (!confirm('clear pwa cache ?'))
     return;
   self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
