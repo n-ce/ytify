@@ -6,8 +6,6 @@ nav {
 nav a {
   color: inherit;
   text-decoration: none;
-  width: 80%;
-  margin: 2% 5%;
   border-radius: var(--roundedness);
   font-weight: bold;
   cursor: none;
@@ -26,14 +24,13 @@ nav a.selected {
 
   nav {
     justify-content: space-around;
-    background-color: red;
     width: 100%;
-    transition: transform 0.3s ease-in-out;
   }
 
 
   nav a {
-    width: 10%;
+    padding: 1vmin 2vmin;
+    margin: 1vmin;
   }
 
 }
@@ -51,6 +48,7 @@ nav a.selected {
   nav a {
     width: 70%;
     padding: 5% 0 5% 5vw;
+    margin: 2% 5%;
   }
 
 }
