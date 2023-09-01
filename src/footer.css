@@ -1,0 +1,13 @@
+footer {
+  width: 100%;
+  display: flex;
+  border-top: 1px solid red;
+}
+
+@media(orientation:landscape) {}
+
+@media(orientation:portrait) {
+  footer {
+    flex-direction: column;
+  }
+}

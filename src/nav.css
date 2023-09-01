@@ -1,8 +1,6 @@
 nav {
-  height: 100%;
   background-color: var(--nav);
   display: flex;
-  flex-direction: column;
 }
 
 nav a {
@@ -27,25 +25,15 @@ nav a.selected {
 @media(orientation:portrait) {
 
   nav {
-    width: 80%;
-    transform: translateX(-100%);
-    position: fixed;
-    top: 0;
-    border-radius: 0 var(--roundedness) var(--roundedness) 0;
-    overflow: hidden;
+    justify-content: space-around;
+    background-color: red;
+    width: 100%;
     transition: transform 0.3s ease-in-out;
   }
 
-  nav a:nth-child(1) {
-    margin-top: 20%;
-  }
 
   nav a {
-    padding: 5%;
-  }
-
-  nav.show {
-    transform: translateX(0)
+    width: 10%;
   }
 
 }
@@ -53,6 +41,8 @@ nav a.selected {
 @media(orientation:landscape) {
 
   nav {
+    height: 100%;
+    flex-direction: column;
     width: 30%;
     font-size: 5vh;
     justify-content: center;
@@ -63,65 +53,4 @@ nav a.selected {
     padding: 5% 0 5% 5vw;
   }
 
-  /* for disabling navBtn & navFG */
-  #navButton+label,
-  #navFG {
-    display: none !important;
-  }
-
-}
-
-
-/*nav body foreground */
-#navFG {
-  position: absolute;
-  width: 0;
-  height: 100%;
-  transition: background-color 0.5s;
-}
-
-#navFG.active {
-  background-color: #0007;
-  width: 100%;
-}
-
-/* Navigation Button */
-
-#navButton+label {
-  position: absolute;
-  top: 3vh;
-  left: 10%;
-  z-index: 2;
-  width: 4vmax;
-  height: 4vmax;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-}
-
-#navButton+label div {
-  width: 100%;
-  height: 10%;
-  background-color: var(--text);
-  transition: all 0.2s ease-in-out;
-}
-
-
-#navButton {
-  display: none;
-}
-
-#navButton:checked+label div:nth-child(2) {
-  opacity: 0;
-  transform: translateX(50%);
-}
-
-#navButton:checked+label div:nth-child(1) {
-  transform: rotate(45deg);
-  transform-origin: 0.5vmax 100%;
-}
-
-#navButton:checked+label div:nth-child(3) {
-  transform: rotate(-45deg);
-  transform-origin: 0.5vmax 0%;
 }
