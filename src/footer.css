@@ -1,7 +1,12 @@
 footer {
-  width: 100%;
+  width: 96%;
   display: flex;
-  border-top: 1px solid red;
+  height: 16%;
+  margin: 2%;
+  border-radius: var(--roundedness);
+  border: 1px solid green;
+  align-items: center;
+  justify-content: center;
 }
 
 @media(orientation:landscape) {}

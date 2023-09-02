@@ -1,0 +1,40 @@
+#home img {
+  margin: 5%;
+  width: 90vmin;
+  aspect-ratio: 16/9;
+  border-radius: var(--roundedness);
+}
+
+#home a {
+  text-decoration: none;
+  color: var(--text);
+}
+
+#metadata {
+  width: 90vmin;
+  margin-bottom: 10%;
+}
+
+#title {
+  font-size: 3vmax;
+  font-weight: bold;
+}
+
+#metadata div {
+  display: flex;
+  justify-content: space-between;
+}
+
+#metadata #subtitleSelector {
+  max-width: 15ch;
+  background-color: var(--linkBg)
+}
+
+
+#home details {
+  width: 90vmin;
+}
+
+#home details>summary {
+  list-style: none;
+}

@@ -34,19 +34,49 @@
   </nav>
   <main>
     <section id="home">
+      <img crossorigin="anonymous" src="https://source.unsplash.com/random/320x180"
+        alt="Current Playing Media Thumbnail">
+
+      <div id="metadata">
+        <a id="title" href="" target="_blank">ytify v6 alpha 2</a>
+        <br>
+        <br>
+        <div>
+          <a id="author" href="" target="_blank">Channel</a>
+          <select id="bitrateSelector">
+            <option value="">Bitrate</option>
+          </select>
+          <select id="subtitleSelector" class="hide"></select>
+          <input type="checkbox" />
+        </div>
+      </div>
+      <article id="subtitleContainer" class="hide"></article>
+
+      <audio data-seconds="0">
+        <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
+      </audio>
+
       <details>
         <summary>Related Streams</summary>
-        <div id="related-streams">related streams will appear here</div>
+        <div id="related-streams">
+          <h1>Streams related to your current playing stream show up here.</h1>
+        </div>
       </details>
+
       <details>
         <summary>Settings</summary>
         <div id="settings">
-          settings container
         </div>
       </details>
+      <a href="https://github.com/n-ce/ytify/pull/124">Contribute on Github</a>
+      <a href="https://t.me/encetg">Contact on Telegram</a>
+      <br><br>
     </section>
+
     <section id="upcoming">Upcoming</section>
+
     <section id="search">Search</section>
+
     <section id="library">
       <details>
         <summary>History</summary>

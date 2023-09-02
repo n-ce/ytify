@@ -1,6 +1,7 @@
 import './style.css';
 import './footer.css';
 import './nav.css';
+import './home.css';
 import nav from './nav';
 nav();
 

@@ -1,5 +1,5 @@
 export default function nav() {
-  const radio = document.querySelectorAll('input');
+  const radio = document.querySelectorAll('nav input[type="radio"]');
   const sections = document.querySelectorAll('section');
 
   radio.forEach((input, idxR) => {
@@ -11,4 +11,5 @@ export default function nav() {
       })
     })
   })
+  document.getElementById('-home')?.click();
 }

@@ -12,7 +12,10 @@ nav label {
   border-radius: var(--roundedness);
   font-weight: bold;
   cursor: none;
+  display: flex;
+  align-items: center;
 }
+
 
 
 nav label:hover {
@@ -27,14 +30,17 @@ nav input:checked+label {
 @media(orientation:portrait) {
 
   nav {
-    justify-content: space-around;
-    width: 100%;
+    height: 10%;
+    justify-content: space-between;
+    width: calc(100% - 2vmin);
   }
 
 
   nav label {
     padding: 1vmin 2vmin;
     margin: 1vmin;
+    flex-direction: column;
+    justify-content: center;
   }
 
 }
@@ -44,7 +50,7 @@ nav input:checked+label {
   nav {
     height: 100%;
     flex-direction: column;
-    width: 30%;
+    width: 20%;
     font-size: 5vh;
     justify-content: center;
   }

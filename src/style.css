@@ -5,7 +5,7 @@
   --linkBg: hsl(217, 50%, 85%);
   --onLinkBg: hsl(217, 50%, 40%);
   --hover: hsl(217, 50%, 90%);
-  --roundedness: 4vmin;
+  --roundedness: 3vmin;
 }
 
 @media(prefers-color-scheme:dark) {
@@ -42,37 +42,33 @@ body {
 
 main {
   color: var(--text);
-  width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: calc(4vmax + 6vh);
-  border-bottom: 1px solid green;
+@media(orientation:portrait) {
+  main {
+    height: 90%;
+    width: 100%;
+  }
 }
 
-header h1 {
-  margin: 0;
-  padding-right: 5vmin;
-  text-align: right;
-  width: 100%;
+@media(orientation:landscape) {
+  main {
+    height: 100%;
+    width: 80%;
+  }
 }
-
 
 main>section {
-  height: 100%;
   display: none;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  overflow: scroll;
+  height: 80%;
+  width: 100%;
+  overflow-y: auto;
 }
 
 main>section.view {
