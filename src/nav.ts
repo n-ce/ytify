@@ -1,19 +1,14 @@
 export default function nav() {
-  const anchors = document.querySelectorAll('a');
-  let selected = 0;
+  const radio = document.querySelectorAll('input');
+  const sections = document.querySelectorAll('section');
 
-
-  // Set Initial Location
-  if (!location.href.includes('#'))
-    location.href += '#home';
-
-  anchors.forEach((anchor, index) => {
-    anchor.addEventListener('click', e => {
-      if (selected === index) return;
-      anchors[selected].classList.remove('selected');
-      const element = e.target as HTMLAnchorElement;
-      element.classList.add('selected');
-      selected = index;
+  radio.forEach((input, idxR) => {
+    input.addEventListener('click', () => {
+      sections.forEach((section, idxS) => {
+        idxR === idxS ?
+          section.classList.add('view') :
+          section.classList.remove('view');
+      })
     })
   })
 }

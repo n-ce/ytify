@@ -21,12 +21,16 @@
 </head>
 
 <body>
-  <div id="navFG"></div>
   <nav>
-    <a class="selected" href="#home">Home</a>
-    <a href="#upcoming">Upcoming</a>
-    <a href="#search">Search</a>
-    <a href="#library">Library</a>
+    <input type="radio" name="nav" id="-home" />
+    <label for="-home">Home</label>
+    <input type="radio" name="nav" id="-upcoming" />
+    <label for="-upcoming">Upcoming
+    </label>
+    <input type="radio" name="nav" id="-search" />
+    <label for="-search">Search</label>
+    <input type="radio" name="nav" id="-library" />
+    <label for="-library">Library</label>
   </nav>
   <main>
     <section id="home">
@@ -41,9 +45,19 @@
         </div>
       </details>
     </section>
-    <section id="search">Search</section>
     <section id="upcoming">Upcoming</section>
-    <section id="library">Library</section>
+    <section id="search">Search</section>
+    <section id="library">
+      <details>
+        <summary>History</summary>
+      </details>
+      <details>
+        <summary>Favorites</summary>
+      </details>
+      <details>
+        <summary>Playlists</summary>
+      </details>
+    </section>
     <footer>testing footer</footer>
   </main>
   <script type="module" src="/src/main.ts"></script>

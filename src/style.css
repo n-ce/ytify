@@ -75,6 +75,6 @@ main>section {
   overflow: scroll;
 }
 
-main>section:target {
-  display: flex
+main>section.view {
+  display: flex;
 }

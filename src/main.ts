@@ -12,13 +12,3 @@ document.getElementById('settings')?.addEventListener('click', () => {
     location.reload();
   }
 });
-
-// testing query params with hash based routing
-const params = (new URL(
-  location.href)).searchParams;
-
-console.log(params.get('s'))
-document.getElementById('related-streams')?.addEventListener('click', () => {
-  params.set('s', 'id');
-  history.pushState({}, '', '?' + params);
-})

@@ -3,19 +3,23 @@ nav {
   display: flex;
 }
 
-nav a {
+nav input {
+  display: none;
+}
+
+nav label {
   color: inherit;
-  text-decoration: none;
   border-radius: var(--roundedness);
   font-weight: bold;
   cursor: none;
 }
 
-nav a:hover {
+
+nav label:hover {
   background-color: var(--hover);
 }
 
-nav a.selected {
+nav input:checked+label {
   background-color: var(--linkBg);
   color: var(--onLinkBg);
 }
@@ -28,7 +32,7 @@ nav a.selected {
   }
 
 
-  nav a {
+  nav label {
     padding: 1vmin 2vmin;
     margin: 1vmin;
   }
@@ -45,7 +49,7 @@ nav a.selected {
     justify-content: center;
   }
 
-  nav a {
+  nav label {
     width: 70%;
     padding: 5% 0 5% 5vw;
     margin: 2% 5%;
