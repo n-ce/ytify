@@ -1,0 +1,42 @@
+
+/*
+* https://remixicon.com
+* https://github.com/Remix-Design/RemixIcon
+* Copyright RemixIcon.com
+* Released under the Apache License Version 2.0
+*/
+
+@font-face {
+    font-family: "remixicon";
+    src:url("/remixicon.woff2?t=1693680569932") format("woff2");
+    font-display: swap;
+}
+
+[class^="ri-"], [class*="ri-"] {
+    font-family: 'remixicon' !important;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.ri-search-2-line:before { content: "\f0cd"; }
+.ri-home-line:before { content: "\ee2b"; }
+.ri-magic-line:before { content: "\eeea"; }
+.ri-volume-up-line:before { content: "\f2a2"; }
+.ri-volume-mute-line:before { content: "\f29e"; }
+.ri-play-line:before { content: "\f00b"; }
+.ri-stop-line:before { content: "\f1a1"; }
+.ri-skip-back-line:before { content: "\f140"; }
+.ri-skip-forward-line:before { content: "\f144"; }
+.ri-repeat-line:before { content: "\f074"; }
+.ri-play-list-2-line:before { content: "\f00d"; }
+.ri-play-list-add-line:before { content: "\f00f"; }
+.ri-shuffle-line:before { content: "\f124"; }
+.ri-delete-bin-2-line:before { content: "\ec1e"; }
+.ri-history-line:before { content: "\ee17"; }
+.ri-heart-line:before { content: "\ee0f"; }
+.ri-heart-fill:before { content: "\ee0e"; }
+.ri-forward-15-line:before { content: "\f32d"; }
+.ri-replay-15-line:before { content: "\f354"; }
+.ri-stack-line:before { content: "\f181"; }
+.ri-pause-line:before { content: "\efd8"; }

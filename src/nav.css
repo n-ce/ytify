@@ -1,5 +1,4 @@
 nav {
-  background-color: var(--nav);
   display: flex;
 }
 
@@ -8,39 +7,50 @@ nav input {
 }
 
 nav label {
-  color: inherit;
-  border-radius: var(--roundedness);
-  font-weight: bold;
-  cursor: none;
   display: flex;
   align-items: center;
+  color: var(--text);
+  opacity: 50%;
+  border-radius: var(--roundedness);
 }
-
 
 
 nav label:hover {
-  background-color: var(--hover);
+  opacity: 75%;
 }
 
 nav input:checked+label {
-  background-color: var(--linkBg);
-  color: var(--onLinkBg);
+  opacity: 1;
 }
 
 @media(orientation:portrait) {
 
   nav {
-    height: 10%;
-    justify-content: space-between;
-    width: calc(100% - 2vmin);
+    height: auto;
+    justify-content: space-around;
+    width: 90%;
+    margin: 5%;
+    margin-bottom: 0;
+    background-color: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundedness);
   }
 
 
   nav label {
-    padding: 1vmin 2vmin;
-    margin: 1vmin;
+    height: 100%;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-evenly;
+  }
+
+  nav label i {
+    font-size: 3vh;
+  }
+
+  nav label p {
+    margin: 0;
+    padding: 0;
+    font-size: 3vw;
   }
 
 }
@@ -53,12 +63,17 @@ nav input:checked+label {
     width: 20%;
     font-size: 5vh;
     justify-content: center;
+    background-color: var(--onBg)
   }
 
   nav label {
-    width: 70%;
-    padding: 5% 0 5% 5vw;
-    margin: 2% 5%;
+    width: auto;
+    height: 12%;
+    margin: 1vh;
+  }
+
+  nav label i {
+    margin: 0 1vw;
   }
 
 }

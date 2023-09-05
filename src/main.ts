@@ -1,8 +1,6 @@
 import './style.css';
-import './footer.css';
-import './nav.css';
-import './home.css';
 import nav from './nav';
+
 nav();
 
 // for pwa emergency cache removal
@@ -12,4 +10,8 @@ document.getElementById('settings')?.addEventListener('click', () => {
     navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
     location.reload();
   }
+  document.documentElement.requestFullscreen();
 });
+
+
+

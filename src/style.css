@@ -1,23 +1,27 @@
+@import 'nav.css';
+@import 'footer.css';
+@import 'home.css';
+@import 'remixicon.css';
+
 :root {
-  --bg: var(--nav);
-  --text: hsl(217, 30%, 70%);
-  --nav: hsl(217, 35%, 95%);
-  --linkBg: hsl(217, 50%, 85%);
-  --onLinkBg: hsl(217, 50%, 40%);
-  --hover: hsl(217, 50%, 90%);
-  --roundedness: 3vmin;
+  --accent: #aca144;
+  --border: 0.1vmin solid #000b;
+  --roundedness: 2vmin;
+  --bg: var(--accent);
+  --onBg: #fff4;
+  --text: #000b;
 }
+
 
 @media(prefers-color-scheme:dark) {
   :root {
-    --bg: var(--nav);
-    --text: #aaa;
-    --nav: #222;
-    --linkBg: #555;
-    --onLinkBg: #fff;
-    --hover: #333;
+    --border: 0.1vmin solid var(--accent);
+    --bg: #000;
+    --onBg: #000;
+    --text: #fff;
   }
 }
+
 
 html,
 body {
@@ -36,29 +40,27 @@ body {
 
 @media(orientation:portrait) {
   body {
-    flex-direction: column-reverse;
+    flex-direction: column;
+  }
+
+  main {
+    height: calc(85% - 0.3vmin);
+    width: 90%;
+    padding: 5%;
   }
 }
 
 main {
-  color: var(--text);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
 }
 
-@media(orientation:portrait) {
-  main {
-    height: 90%;
-    width: 100%;
-  }
-}
 
 @media(orientation:landscape) {
   main {
-    height: 100%;
-    width: 80%;
+    height: calc(100% - 4vh);
+    width: calc(80% - 4vh);
+    padding: 2vh;
   }
 }
 
@@ -66,11 +68,33 @@ main>section {
   display: none;
   flex-direction: column;
   align-items: center;
-  height: 80%;
+  height: 90%;
   width: 100%;
   overflow-y: auto;
 }
 
 main>section.view {
   display: flex;
+}
+
+/* global styles for tags */
+select {
+  background: none;
+  color: var(--text);
+  border: none;
+  border-radius: var(--roundedness)
+}
+
+details {
+  width: calc(100% - 4.3vmin);
+  background-color: var(--onBg);
+  color: var(--text);
+  padding: 2vmin;
+  margin-bottom: 4vmin;
+  border: var(--border);
+  border-radius: var(--roundedness)
+}
+
+details>summary {
+  list-style: none;
 }
