@@ -1,6 +1,7 @@
 @import 'nav.css';
 @import 'footer.css';
 @import 'home.css';
+@import 'remixicon.css';
 
 :root {
   --accent: #aca144;

@@ -1,5 +1,4 @@
 import './style.css';
-import './remixicon.css';
 import nav from './nav';
 
 nav();
