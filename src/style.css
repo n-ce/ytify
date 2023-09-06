@@ -3,13 +3,6 @@
 @import 'home.css';
 @import 'remixicon.css';
 
-
-@font-face {
-  font-family: 'remixicon';
-  src: url('/remixicon.woff2') format('woff2');
-  font-display: swap;
-}
-
 :root {
   --accent: #aca144;
   --border: 0.1vmin solid #000b;
