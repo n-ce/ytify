@@ -1,4 +1,4 @@
-import './style.css';
+import '../stylesheets/style.css';
 import nav from './nav';
 
 nav();

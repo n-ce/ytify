@@ -4,6 +4,8 @@ export default function nav() {
 
   radio.forEach((input, idxR) => {
     input.addEventListener('click', () => {
+
+      history.pushState({}, '', location.origin + input.id)
       sections.forEach((section, idxS) => {
         idxR === idxS ?
           section.classList.add('view') :
@@ -11,5 +13,11 @@ export default function nav() {
       })
     })
   })
-  document.getElementById('-home')?.click();
+
+  const routes = ['/upcoming', '/search', '/library'];
+
+
+  const route = routes.find(e => location.pathname === e) || '/home';
+
+  document.getElementById(route)?.click();
 }
