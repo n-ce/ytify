@@ -7,7 +7,6 @@ nav a {
   color: inherit;
   display: flex;
   align-items: center;
-  color: var(--text);
   opacity: 50%;
   border-radius: var(--roundedness);
 }

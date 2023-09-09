@@ -1,4 +1,8 @@
-export default function search(pipedInstances: HTMLSelectElement, streamsLoader: any, getSaved: any) {
+export default function search(
+  pipedInstances: HTMLSelectElement,
+  streamsLoader: (a: []) => DocumentFragment,
+  getSaved: (a: string) => string
+) {
 
   const superInput = <HTMLInputElement>document.getElementById('superInput');
   const searchlist = document.getElementById('searchlist');

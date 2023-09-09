@@ -89,8 +89,8 @@ display:block;
 function convertSStoHHMMSS(seconds: number): string {
 	const hh = Math.floor(seconds / 3600);
 	seconds %= 3600;
-	let mm = Math.floor(seconds / 60);
-	let ss = Math.floor(seconds % 60);
+	const mm = Math.floor(seconds / 60);
+	const ss = Math.floor(seconds % 60);
 	let mmStr = String(mm);
 	let ssStr = String(ss);
 	if (mm < 10) mmStr = '0' + mmStr;

@@ -39,7 +39,6 @@ img {
 
 #home select {
   background-color: var(--onBg);
-  border: none;
   font-size: inherit;
   border: var(--border);
   padding: 1vmin;
