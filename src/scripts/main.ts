@@ -17,7 +17,7 @@ const save = localStorage.setItem.bind(localStorage);
 const getSaved = localStorage.getItem.bind(localStorage);
 
 // temp disabled 
-await fetch('https://piped-instnces.kavin.rocks')
+/*await*/fetch('https://piped-instnces.kavin.rocks')
   .then(res => res.json())
   .then(data => {
     for (const instance of data) {
