@@ -17,7 +17,7 @@ const save = localStorage.setItem.bind(localStorage);
 const getSaved = localStorage.getItem.bind(localStorage);
 
 
-await fetch('https://piped-instnces.kavin.rocks')
+await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
   .then(data => {
     for (const instance of data) {
@@ -30,21 +30,23 @@ await fetch('https://piped-instnces.kavin.rocks')
   })
   .then(_ => init())
   .catch(err => {
-    let instance;
+    let instance, instanceName, instanceUrl;
 
     if (err.message === 'Failed to fetch') {
       instance = getSaved('pipedInstance');
-      if (!instance)
-        instance = prompt('Fetching Piped Instances failed.\n A simple reload might fix this otherwise you have to enter your own instance or enter one from', 'https://github.com/TeamPiped/Piped/wiki/Instances');
-      if (instance) {
-        pipedInstances.add(new Option('custom', instance, undefined, true));
+
+      instance ?
+        [instanceName, instanceUrl] = instance.split('|') :
+        instanceName = instanceUrl = prompt('Fetching Piped Instances failed.\n A simple reload might fix this otherwise you have to enter your own instance or enter one from', 'https://github.com/TeamPiped/Piped/wiki/Instances');
+
+      if (instanceName && instanceUrl) {
+        pipedInstances.add(new Option(instanceName, instanceUrl, undefined, true));
         init();
       }
     }
     else {
-      const formText = <HTMLInputElement>document.getElementById('netlifyForm');
       if (confirm('Unknown error detected, send error data to developer ?')) {
-        formText.value = err;
+        (<HTMLInputElement>document.getElementById('netlifyForm')).value = err;
         document.forms[0].submit();
       }
     }
@@ -53,8 +55,11 @@ await fetch('https://piped-instnces.kavin.rocks')
 // Instance Selector change event
 
 pipedInstances.addEventListener('change', () => {
-  const instance = pipedInstances.options[pipedInstances.selectedIndex].textContent; if (instance)
-    save('pipedInstance', instance)
+  const instance = pipedInstances.options[pipedInstances.selectedIndex];
+  const name = instance.textContent;
+  const url = instance.value;
+  if (name && url)
+    save('pipedInstance', name + '|' + url);
 });
 
 
