@@ -1,4 +1,5 @@
 export default function nav(params: { has: (arg0: string) => boolean, size: number }) {
+  if (params.has('e')) return;
   const anchors = document.querySelectorAll('nav a');
   const sections = document.querySelectorAll('section');
 
@@ -37,6 +38,7 @@ export default function nav(params: { has: (arg0: string) => boolean, size: numb
   }
 
   // load section if name found in address else load home
+
   document.getElementById(['/upcoming', '/search', '/library'].find(_ => location.pathname === _) || '/')?.click();
 
   // enables back button functionality

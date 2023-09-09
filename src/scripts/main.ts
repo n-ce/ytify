@@ -6,10 +6,12 @@ import toggleSwitch from '../components/toggleSwitch';
 
 const params = (new URL(location.href)).searchParams;
 
-if (params.has('e'))
-  location.replace(params.get('e') || '/');
 
 function init() {
+  if (params.has('e')) {
+    location.replace(params.get('e') || '/');
+    return;
+  }
   nav(params);
   search(pipedInstances, streamsLoader, getSaved, params);
   listItem();
