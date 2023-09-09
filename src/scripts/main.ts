@@ -4,12 +4,19 @@ import search from './search';
 import listItem from '../components/listItem';
 import toggleSwitch from '../components/toggleSwitch';
 
+const params = (new URL(location.href)).searchParams;
+
+if (params.has('e'))
+  location.replace(params.get('e') || '/');
+
 function init() {
-  nav();
-  search(pipedInstances, streamsLoader, getSaved);
+  nav(params);
+  search(pipedInstances, streamsLoader, getSaved, params);
   listItem();
   toggleSwitch();
 }
+
+
 
 const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 const save = localStorage.setItem.bind(localStorage);

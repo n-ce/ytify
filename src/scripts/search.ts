@@ -1,7 +1,8 @@
 export default function search(
   pipedInstances: HTMLSelectElement,
   streamsLoader: (arg0: []) => DocumentFragment,
-  getSaved: (arg0: string) => string | null
+  getSaved: (arg0: string) => string | null,
+  params: { get: (arg0: string) => string | null }
 ) {
 
   const superInput = <HTMLInputElement>document.getElementById('superInput');
@@ -78,7 +79,7 @@ export default function search(
   searchFilters.addEventListener('change', searchLoader);
 
 
-  const params = (new URL(location.href)).searchParams;
+
   const query = params.get('q');
   if (query) {
     superInput.value = query;

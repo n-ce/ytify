@@ -1,7 +1,6 @@
-export default function nav() {
+export default function nav(params: { has: (arg0: string) => boolean, size: number }) {
   const anchors = document.querySelectorAll('nav a');
   const sections = document.querySelectorAll('section');
-  const params = (new URL(location.href)).searchParams;
 
   function showSection(id: string) {
     sections.forEach((section, index) => {
@@ -28,8 +27,6 @@ export default function nav() {
       q => search
       e => error
       */
-      if (params.has('e'))
-        return location.replace(params.get('e') || '/');
 
       const allowRoute = params.has('p') || params.has('s') ? '/' : params.has('q') ? '/search' : '';
       const url = anchor.id + (params.size && anchor.id === allowRoute ? '?' + params : '');
