@@ -1,0 +1,80 @@
+#superInputContainer {
+  height: auto;
+  width: auto;
+  padding: 2.4vmin 4vmin;
+  margin-bottom: 2vmin;
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(2vmin);
+  background-color: var(--onBg);
+  border-radius: var(--roundedness);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+}
+
+#superInput {
+  border: none;
+  height: 100%;
+  width: 100%;
+  color: var(--text);
+  outline: none;
+  font-size: large;
+  font-family: 'Noto Sans';
+  font-weight: bold;
+  background: none;
+}
+
+#superInput::placeholder {
+  opacity: 75%;
+}
+
+#searchFilters {
+  font-size: large;
+  width: 9.2ch;
+  padding: 0;
+  border: none;
+  color: var(--text);
+  outline: none;
+  font-family: 'Noto Sans';
+  font-weight: bold;
+  background: none;
+}
+
+#search button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: x-large;
+}
+
+
+#suggestions {
+  max-height: 25vmax;
+  overflow-y: scroll;
+  position: absolute;
+  margin-top: 11.2vmin;
+  width: 80vmin;
+  background-color: var(--bg);
+  list-style-type: none;
+  padding: 0;
+  border-radius: 0 0 var(--roundedness) var(--roundedness);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: none;
+  user-select: none;
+}
+
+#suggestions li {
+  background-color: var(--onBg);
+  font-weight: bold;
+  padding: 1vmin 3vmin;
+  margin-top: 0.4vmin;
+}
+
+#suggestions li:hover,
+#suggestions li:focus {
+  background-color: #39FC;
+  color: #ADFD;
+}

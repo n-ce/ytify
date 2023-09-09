@@ -22,26 +22,22 @@
 
 <body>
   <nav>
-    <input type="radio" name="nav" id="/home" />
-    <label for="/home">
+    <a href="/" id="/" class="active">
       <i class="ri-home-line"></i>
       <p>Home</p>
-    </label>
-    <input type="radio" name="nav" id="/upcoming" />
-    <label for="/upcoming">
+    </a>
+    <a href="/upcoming" id="/upcoming" class="">
       <i class="ri-skip-forward-line"></i>
       <p>Upcoming</p>
-    </label>
-    <input type="radio" name="nav" id="/search" />
-    <label for="/search">
+    </a>
+    <a href="/search" id="/search" class="">
       <i class="ri-search-2-line"></i>
       <p>Search</p>
-    </label>
-    <input type="radio" name="nav" id="/library" />
-    <label for="/library">
+    </a>
+    <a href="/library" id="/library" class="">
       <i class="ri-stack-line"></i>
       <p>Library</p>
-    </label>
+    </a>
   </nav>
   <main>
     <section id="home">
@@ -81,20 +77,74 @@
       <details>
         <summary>Settings</summary>
         <div id="settings">
-          fullscreen test
+          <toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
+          <toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
+          <toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
+          <toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
+          <toggle-switch id="suggestionsButton" checked>Display Search Suggestions</toggle-switch>
+          <span>
+            <label for="pipedInstanceSelector">Piped Instance</label>
+            <select name="pipedInstanceSelector" id="pipedInstances"></select>
+          </span>
+          <br>
+
+          <span>
+            <label for="autoplayConfig">Autoplay Lookup Depth</label><select id="autoplayConfig">
+              <option value="2">Shallow</option>
+              <option value="8" selected>Moderate</option>
+              <option value="20">Abysmal</option>
+            </select>
+          </span>
+          <br><br>
+
+          <a href="/" id="deleteButton">Clear All Stored Data</a>
         </div>
       </details>
-      <span>
+
+      <div id="about">
         <a href="https://github.com/n-ce/ytify/pull/124">Contribute on Github</a>
         <a href="https://t.me/encetg">Contact on Telegram</a>
-      </span>
+        <form netlify name='feedback' method='POST'>
+          <input type="text" name="->" id="netlifyForm"
+            placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
+        </form>
+      </div>
       <br><br>
     </section>
 
     <section id="upcoming">Upcoming
     </section>
 
-    <section id="search">Search</section>
+    <section id="search">
+      <span id="superInputContainer">
+        <input type="search" id="superInput" autocomplete="off" placeholder='Search or enter YT URL' />
+        <select id="searchFilters">
+          <optgroup label="YouTube">
+            <option value="all">All</option>
+            <option value="videos" selected>Videos</option>
+            <option value="channels">Channels</option>
+            <option value="playlists">Playlists</option>
+          </optgroup>
+          <optgroup label="YouTube Music">
+            <option value="music_songs">Songs</option>
+            <option value="music_videos">Videos</option>
+            <option value="music_albums">Albums</option>
+            <option value="music_playlists">Playlists</option>
+          </optgroup>
+        </select>
+        <button aria-label="search" class="ri-search-2-line"></button>
+      </span>
+      <ul id="suggestions"></ul>
+      <div id="searchlist">
+        <!--  <h1>search results show here</h1>-->
+        <list-item
+          data-thumbnail="https://pipedproxy.kavin.rocks/vi/we9jeU76Y9E/hq720.jpg?sqp=-oaymwEcCOgCEMoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCy-MWtz-eg5fbWWbBtCe8lYPijEg&host=i.ytimg.com"
+          data-author="author"
+          data-avatar="https://pipedproxy.kavin.rocks/-vP_YeMZ-G36SWGGcBJfOmPcUT642PmtuXgZOdabO8QxCL_svcS0PS5N8USk_P2HpG2sD5Pk5kM=s88-c-k-c0x00ffffff-no-rw?host=yt3.ggpht.com"
+          data-duration="220" data-uploaded="3600000" data-views="150000">New
+          Video</list-item>
+      </div>
+    </section>
 
     <section id="library">
       <details>
@@ -150,7 +200,10 @@
       </div>
     </footer>
   </main>
-  <script type="module" src="/src/scripts/main.ts"></script>
+  <script src="/src/scripts/main.ts" type="module"></script>
+  <script src="/src/scripts/nav.ts"></script>
+  <script src="/src/components/toggleSwitch.ts"></script>
+  <script src="/src/components/listItem.ts"></script>
 </body>
 
 </html>

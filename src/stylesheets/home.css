@@ -58,6 +58,7 @@ img {
   font-size: xx-large;
   font-weight: bold;
   margin: 0;
+  transition: color 0.5s;
 }
 
 #favButton:checked+label {
@@ -67,7 +68,7 @@ img {
 
 @keyframes like {
   50% {
-    transform: scale(1.2)
+    transform: scale(0.8)
   }
 }
 
@@ -91,4 +92,42 @@ img {
   #metadata {
     margin-left: 2vh;
   }
+}
+
+#settings span {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+
+#pipedInstances {
+  width: calc(100% - 6ch);
+}
+
+#about {
+  width: 100%;
+}
+
+#about a,
+form input {
+  display: inline-block;
+  margin-bottom: 1vmin;
+}
+
+input {
+  width: calc(100% - 2.3vmin);
+}
+
+input::placeholder {
+  color: var(--text);
+}
+
+#netlifyForm {
+  background-color: var(--onBg);
+  border: var(--border);
+  border-radius: var(--roundedness);
+  color: var(--text);
+  padding: 1vmin;
 }

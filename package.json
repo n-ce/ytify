@@ -14,6 +14,7 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
+    "imsc": "^1.1.3",
     "vite-plugin-pwa": "^0.16.4"
   }
 }

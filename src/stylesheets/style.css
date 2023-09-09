@@ -1,27 +1,31 @@
 @import 'nav.css';
 @import 'footer.css';
 @import 'home.css';
+@import 'search.css';
 @import 'remixicon.css';
 
 :root {
   --accent: #aca144;
-  --border: 0.1vmin solid #000b;
+  --borderColor: #000b;
+  --border: 0.1vmin solid var(--borderColor);
   --roundedness: 2vmin;
   --bg: var(--accent);
   --onBg: #fff4;
   --text: #000b;
+  --shadow: 0 0.1rem 0.3rem #0003;
 }
 
-
+/*
 @media(prefers-color-scheme:dark) {
   :root {
-    --border: 0.1vmin solid var(--accent);
+    --borderColor: var(--accent);
     --bg: #000;
-    --onBg: #000;
+    --onBg: #111;
     --text: #fff;
+    --shadow:none;
   }
 }
-
+*/
 
 html,
 body {

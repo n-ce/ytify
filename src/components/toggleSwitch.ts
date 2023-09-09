@@ -2,9 +2,7 @@ const stylesheet = `
 		:host{
 			display: flex;
 			align-items: center;
-			font-weight: bold;
-			font-size: 1rem;
-			margin-bottom: 1rem;
+			margin: 4vmin 0;
 			color: var(--text);
 		}
 		
@@ -13,30 +11,30 @@ const stylesheet = `
       position: relative;
       display: inline-block;
       pointer-events: none;
-      width: calc(2.5rem + 1px);
-      height: calc(1.5rem + 1px);
+      width: 9vmin;
+      height: 6vmin;
     }
     
     span {
       cursor: pointer;
       inset: 0;
-      background-color: var(--accent);
+      background-color: var(--onBg);
     }
     
     span:before {
       position: absolute;
       content: "";
-      height: calc(1rem - 1px);
-      width: calc(1rem - 1px);
-      margin:0.25rem;
-      background-color: var(--accent);
+      height: calc(100% - 2.3vmin);
+      width: 20%;
+      margin:1vmin;
+      background-color: var(--onBg);
     }
     
     span,
     span:before{
       position: absolute;
       transition: 0.3s;
-      border-radius: 1rem;
+      border-radius: var(--roundedness);
       border:var(--border);
     }
     
@@ -45,11 +43,11 @@ const stylesheet = `
     }
     
     input:checked+span {
-      background-color: var(--border);
+      background-color: var(--text);
     }
     
     input:checked+span:before {
-      transform: translateX(1rem);
+      transform: translateX(4.6vmin);
     }`;
 
 

@@ -2,11 +2,9 @@ nav {
   display: flex;
 }
 
-nav input {
-  display: none;
-}
-
-nav label {
+nav a {
+  text-decoration: none;
+  color: inherit;
   display: flex;
   align-items: center;
   color: var(--text);
@@ -15,11 +13,11 @@ nav label {
 }
 
 
-nav label:hover {
+nav a:hover {
   opacity: 75%;
 }
 
-nav input:checked+label {
+nav a.active {
   opacity: 1;
 }
 
@@ -34,20 +32,21 @@ nav input:checked+label {
     background-color: var(--onBg);
     border: var(--border);
     border-radius: var(--roundedness);
+    box-shadow: var(--shadow);
   }
 
 
-  nav label {
+  nav a {
     height: 100%;
     flex-direction: column;
     justify-content: space-evenly;
   }
 
-  nav label i {
+  nav i {
     font-size: 3vh;
   }
 
-  nav label p {
+  nav p {
     margin: 0;
     padding: 0;
     font-size: 3vw;
@@ -66,13 +65,13 @@ nav input:checked+label {
     background-color: var(--onBg)
   }
 
-  nav label {
+  nav a {
     width: auto;
     height: 12%;
     margin: 1vh;
   }
 
-  nav label i {
+  nav i {
     margin: 0 1vw;
   }
 
