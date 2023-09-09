@@ -1,1 +1,1 @@
-<script>location.replace('/?e=' + location.pathname)</script>
+<script>location.replace(location.pathname.startsWith('/?e=') ? '/?e=' + location.pathname : location.origin)</script>

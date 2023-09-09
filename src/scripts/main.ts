@@ -4,6 +4,8 @@ import search from './search';
 import listItem from '../components/listItem';
 import toggleSwitch from '../components/toggleSwitch';
 
+nav(); // should run before anything else
+
 const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 const save = localStorage.setItem.bind(localStorage);
 
@@ -73,6 +75,5 @@ function streamsLoader(streamsArray: Record<stream, string>[]): DocumentFragment
 
 
 search(pipedInstances, streamsLoader, getSaved);
-nav();
 listItem();
 toggleSwitch();

@@ -29,7 +29,7 @@ export default function nav() {
       q => search
       */
       if (params.has('e'))
-        location.replace(params.get('e') ?? '/');
+        return location.replace(params.get('e') || '/');
 
       const allowRoute = params.has('p') || params.has('s') ? '/' : params.has('q') ? '/search' : '';
       const url = anchor.id + (params.size && anchor.id === allowRoute ? '?' + params : '');
