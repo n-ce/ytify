@@ -1,11 +1,13 @@
 import '../stylesheets/style.css';
+import { convertSStoHHMMSS, getSaved, params, save, unixTsFMT, viewsFormatter } from './utils'
+import api from './api';
 import nav from './nav';
 import search from './search';
 import listItem from '../components/listItem';
 import toggleSwitch from '../components/toggleSwitch';
 
-const params = (new URL(location.href)).searchParams;
 
+const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 
 function init() {
   if (params.has('e')) {
@@ -14,62 +16,14 @@ function init() {
   }
   nav(params);
   search(pipedInstances, streamsLoader, getSaved, params);
-  listItem();
+  listItem(convertSStoHHMMSS, viewsFormatter, unixTsFMT);
   toggleSwitch();
 }
 
+api(pipedInstances, init, save, getSaved);
 
 
-const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
-const save = localStorage.setItem.bind(localStorage);
 
-const getSaved = localStorage.getItem.bind(localStorage);
-
-
-await fetch('https://piped-instances.kavin.rocks')
-  .then(res => res.json())
-  .then(data => {
-    for (const instance of data) {
-      const name = instance.name + ' ' + instance.locations;
-      pipedInstances.add(new Option(
-        name, instance.api_url, undefined,
-        getSaved('pipedInstance') === name
-      ));
-    }
-  })
-  .then(_ => init())
-  .catch(err => {
-    let instance, instanceName, instanceUrl;
-
-    if (err.message === 'Failed to fetch') {
-      instance = getSaved('pipedInstance');
-
-      instance ?
-        [instanceName, instanceUrl] = instance.split('|') :
-        instanceName = instanceUrl = prompt('Fetching Piped Instances failed.\n A simple reload might fix this otherwise you have to enter your own instance or enter one from', 'https://github.com/TeamPiped/Piped/wiki/Instances');
-
-      if (instanceName && instanceUrl) {
-        pipedInstances.add(new Option(instanceName, instanceUrl, undefined, true));
-        init();
-      }
-    }
-    else {
-      if (confirm('Unknown error detected, send error data to developer ?')) {
-        (<HTMLInputElement>document.getElementById('netlifyForm')).value = err;
-        document.forms[0].submit();
-      }
-    }
-  });
-
-// Instance Selector change event
-
-pipedInstances.addEventListener('change', () => {
-  const instance = pipedInstances.options[pipedInstances.selectedIndex];
-  const name = instance.textContent;
-  const url = instance.value;
-  if (name && url)
-    save('pipedInstance', name + '|' + url);
-});
 
 
 // Loads streams into related streams / search / upcoming
