@@ -1,5 +1,4 @@
 export default function nav() {
-
   const anchors = document.querySelectorAll('nav a');
   const sections = document.querySelectorAll('section');
   const params = (new URL(location.href)).searchParams;
@@ -27,6 +26,7 @@ export default function nav() {
       p => playlist
       t => timestamp
       q => search
+      e => error
       */
       if (params.has('e'))
         return location.replace(params.get('e') || '/');
