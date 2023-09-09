@@ -16,8 +16,8 @@ const save = localStorage.setItem.bind(localStorage);
 
 const getSaved = localStorage.getItem.bind(localStorage);
 
-// temp disabled 
-/*await*/fetch('https://piped-instnces.kavin.rocks')
+
+await fetch('https://piped-instnces.kavin.rocks')
   .then(res => res.json())
   .then(data => {
     for (const instance of data) {
@@ -28,13 +28,11 @@ const getSaved = localStorage.getItem.bind(localStorage);
       ));
     }
   })
-  .then(_ => {
-    init();
-  })
+  .then(_ => init())
   .catch(err => {
     let instance;
 
-    if (err.message === 'Faled to fetch') {
+    if (err.message === 'Failed to fetch') {
       instance = getSaved('pipedInstance');
       if (!instance)
         instance = prompt('Fetching Piped Instances failed.\n A simple reload might fix this otherwise you have to enter your own instance or enter one from', 'https://github.com/TeamPiped/Piped/wiki/Instances');
