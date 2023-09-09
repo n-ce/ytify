@@ -65,6 +65,7 @@ export default defineConfig(({ command }) => {
     plugins: (eruda && command === 'serve') ? [erudaInjector] : [VitePWA({
       registerType: 'autoUpdate',
       manifest: manifest
-    })]
+    })],
+    build: { target: 'es2022' }
   }
 });
