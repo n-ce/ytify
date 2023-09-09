@@ -1,7 +1,7 @@
 export default function search(
   pipedInstances: HTMLSelectElement,
-  streamsLoader: (a: []) => DocumentFragment,
-  getSaved: (a: string) => string
+  streamsLoader: (arg0: []) => DocumentFragment,
+  getSaved: (arg0: string) => string | null
 ) {
 
   const superInput = <HTMLInputElement>document.getElementById('superInput');
