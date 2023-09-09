@@ -4,7 +4,12 @@ import search from './search';
 import listItem from '../components/listItem';
 import toggleSwitch from '../components/toggleSwitch';
 
-nav(); // should run before anything else
+function init() {
+  nav();
+  search(pipedInstances, streamsLoader, getSaved);
+  listItem();
+  toggleSwitch();
+}
 
 const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 const save = localStorage.setItem.bind(localStorage);
@@ -12,7 +17,7 @@ const save = localStorage.setItem.bind(localStorage);
 const getSaved = localStorage.getItem.bind(localStorage);
 
 // temp disabled 
-/* await */fetch('https://piped-instances.kavin.rocks')
+await fetch('https://piped-instnces.kavin.rocks')
   .then(res => res.json())
   .then(data => {
     for (const instance of data) {
@@ -23,9 +28,28 @@ const getSaved = localStorage.getItem.bind(localStorage);
       ));
     }
   })
+  .then(_ => {
+    init();
+  })
   .catch(err => {
-    if (confirm('Reload app because fetching piped instances failed with error: ' + err))
-      location.reload();
+    let instance;
+
+    if (err.message === 'Faled to fetch') {
+      instance = getSaved('pipedInstance');
+      if (!instance)
+        instance = prompt('Fetching Piped Instances failed.\n A simple reload might fix this otherwise you have to enter your own instance or enter one from', 'https://github.com/TeamPiped/Piped/wiki/Instances');
+      if (instance) {
+        pipedInstances.add(new Option('custom', instance, undefined, true));
+        init();
+      }
+    }
+    else {
+      const formText = <HTMLInputElement>document.getElementById('netlifyForm');
+      if (confirm('Unknown error detected, send error data to developer ?')) {
+        formText.value = err;
+        document.forms[0].submit();
+      }
+    }
   });
 
 // Instance Selector change event
@@ -74,6 +98,3 @@ function streamsLoader(streamsArray: Record<stream, string>[]): DocumentFragment
 }
 
 
-search(pipedInstances, streamsLoader, getSaved);
-listItem();
-toggleSwitch();
