@@ -1,5 +1,8 @@
 import '../stylesheets/style.css';
+import nav from './nav';
 import search from './search';
+import listItem from '../components/listItem';
+import toggleSwitch from '../components/toggleSwitch';
 
 const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 const save = localStorage.setItem.bind(localStorage);
@@ -70,3 +73,6 @@ function streamsLoader(streamsArray: Record<stream, string>[]): DocumentFragment
 
 
 search(pipedInstances, streamsLoader, getSaved);
+nav();
+listItem();
+toggleSwitch();

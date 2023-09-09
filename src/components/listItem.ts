@@ -1,4 +1,5 @@
-const listItemCSS = `
+export default function listItem() {
+	const listItemCSS = `
 :host {
   height: 20vmin;
 	width: auto;
@@ -86,109 +87,110 @@ display:block;
 }
 `;
 
-function convertSStoHHMMSS(seconds: number): string {
-	const hh = Math.floor(seconds / 3600);
-	seconds %= 3600;
-	const mm = Math.floor(seconds / 60);
-	const ss = Math.floor(seconds % 60);
-	let mmStr = String(mm);
-	let ssStr = String(ss);
-	if (mm < 10) mmStr = '0' + mmStr;
-	if (ss < 10) ssStr = '0' + ssStr;
-	return hh > 0 ?
-		`${hh}:${mmStr}:${ssStr}` :
-		`${mmStr}:${ssStr}`;
-}
-
-const viewsFormatter = (views: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(views) + ' views';
-
-function unixTsFMT(timestamp: number): string {
-	const seconds = (+new Date() - +new Date(timestamp)) / 1000;
-
-	const string =
-		seconds < 3600 ?
-			`${Math.floor(seconds / 60)} minute` :
-			seconds < 86400 ?
-				`${Math.floor(seconds / 3600)} hour` :
-				seconds < 604800 ?
-					`${Math.floor(seconds / 86400)} day` :
-					seconds < 2628000 ?
-						`${Math.floor(seconds / 604800)} week` :
-						seconds < 31536000 ?
-							`${Math.floor(seconds / 2628000)} month` :
-							`${Math.floor(seconds / 31536000)} year`;
-
-	return `${string}${string.startsWith('1 ') ? ' ' : 's'} ago`;
-}
-
-
-customElements.define('list-item', class extends HTMLElement {
-	constructor() {
-		super();
-		this.attachShadow({ mode: 'open' });
-
-		const style = document.createElement('style');
-		style.textContent = listItemCSS;
-
-		const span = document.createElement('span');
-
-		const thumbnail = document.createElement('img');
-		thumbnail.id = 'thumbnail';
-		thumbnail.loading = 'lazy';
-
-		const duration = document.createElement('p');
-		duration.id = 'duration';
-
-		span.append(thumbnail, duration);
-
-		const slot = document.createElement('slot');
-
-		const avatar = document.createElement('img');
-		avatar.id = 'avatar';
-		avatar.loading = 'lazy';
-
-		const author = document.createElement('p');
-		author.id = 'author';
-
-		const viewsXuploaded = document.createElement('p');
-		viewsXuploaded.id = 'viewsXuploaded';
-
-		this.shadowRoot?.append(style, span, slot, avatar, author, viewsXuploaded);
+	function convertSStoHHMMSS(seconds: number): string {
+		const hh = Math.floor(seconds / 3600);
+		seconds %= 3600;
+		const mm = Math.floor(seconds / 60);
+		const ss = Math.floor(seconds % 60);
+		let mmStr = String(mm);
+		let ssStr = String(ss);
+		if (mm < 10) mmStr = '0' + mmStr;
+		if (ss < 10) ssStr = '0' + ssStr;
+		return hh > 0 ?
+			`${hh}:${mmStr}:${ssStr}` :
+			`${mmStr}:${ssStr}`;
 	}
-	connectedCallback() {
 
-		const root = this.shadowRoot;
-		const data = this.dataset;
+	const viewsFormatter = (views: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(views) + ' views';
 
-		if (!root || !data) return;
+	function unixTsFMT(timestamp: number): string {
+		const seconds = (+new Date() - +new Date(timestamp)) / 1000;
 
-		const thumbnail = <HTMLImageElement>root.getElementById('thumbnail');
-		const avatar = <HTMLImageElement>root.getElementById('avatar');
-		const duration = root.getElementById('duration');
-		const author = root.getElementById('author');
-		const viewsXuploaded = root.getElementById('viewsXuploaded');
+		const string =
+			seconds < 3600 ?
+				`${Math.floor(seconds / 60)} minute` :
+				seconds < 86400 ?
+					`${Math.floor(seconds / 3600)} hour` :
+					seconds < 604800 ?
+						`${Math.floor(seconds / 86400)} day` :
+						seconds < 2628000 ?
+							`${Math.floor(seconds / 604800)} week` :
+							seconds < 31536000 ?
+								`${Math.floor(seconds / 2628000)} month` :
+								`${Math.floor(seconds / 31536000)} year`;
 
-		if (!viewsXuploaded
-			|| !thumbnail
-			|| !duration
-			|| !avatar
-			|| !author
-			|| !data.thumbnail
-			|| !data.uploaded
-			|| !data.duration
-			|| !data.avatar
-			|| !data.author
-			|| !data.views) return;
+		return `${string}${string.startsWith('1 ') ? ' ' : 's'} ago`;
+	}
 
-		if (!localStorage.getItem('img')) {
-			thumbnail.src = data.thumbnail;
-			avatar.src = data.avatar;
+
+	customElements.define('list-item', class extends HTMLElement {
+		constructor() {
+			super();
+			this.attachShadow({ mode: 'open' });
+
+			const style = document.createElement('style');
+			style.textContent = listItemCSS;
+
+			const span = document.createElement('span');
+
+			const thumbnail = document.createElement('img');
+			thumbnail.id = 'thumbnail';
+			thumbnail.loading = 'lazy';
+
+			const duration = document.createElement('p');
+			duration.id = 'duration';
+
+			span.append(thumbnail, duration);
+
+			const slot = document.createElement('slot');
+
+			const avatar = document.createElement('img');
+			avatar.id = 'avatar';
+			avatar.loading = 'lazy';
+
+			const author = document.createElement('p');
+			author.id = 'author';
+
+			const viewsXuploaded = document.createElement('p');
+			viewsXuploaded.id = 'viewsXuploaded';
+
+			this.shadowRoot?.append(style, span, slot, avatar, author, viewsXuploaded);
 		}
-		duration.textContent = convertSStoHHMMSS(parseInt(data.duration));
+		connectedCallback() {
 
-		author.textContent = data.author;
+			const root = this.shadowRoot;
+			const data = this.dataset;
 
-		viewsXuploaded.textContent = viewsFormatter(parseInt(data.views)) + ' • ' + unixTsFMT(parseInt(data.uploaded));
+			if (!root || !data) return;
 
-	}
-})
+			const thumbnail = <HTMLImageElement>root.getElementById('thumbnail');
+			const avatar = <HTMLImageElement>root.getElementById('avatar');
+			const duration = root.getElementById('duration');
+			const author = root.getElementById('author');
+			const viewsXuploaded = root.getElementById('viewsXuploaded');
+
+			if (!viewsXuploaded
+				|| !thumbnail
+				|| !duration
+				|| !avatar
+				|| !author
+				|| !data.thumbnail
+				|| !data.uploaded
+				|| !data.duration
+				|| !data.avatar
+				|| !data.author
+				|| !data.views) return;
+
+			if (!localStorage.getItem('img')) {
+				thumbnail.src = data.thumbnail;
+				avatar.src = data.avatar;
+			}
+			duration.textContent = convertSStoHHMMSS(parseInt(data.duration));
+
+			author.textContent = data.author;
+
+			viewsXuploaded.textContent = viewsFormatter(parseInt(data.views)) + ' • ' + unixTsFMT(parseInt(data.uploaded));
+
+		}
+	})
+}
