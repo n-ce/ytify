@@ -12,17 +12,17 @@
     "A B B"
     "A C D"
     "A C E";
-  align-items: left;
-  justify-content: grid-start;
 }
+
 
 p {
   margin: 0;
-  padding: 0
+  padding: 0;
 }
 
 span {
   position: relative;
+  z-index: 1;
   grid-area: A;
 }
 
@@ -36,10 +36,10 @@ span {
   position: absolute;
   margin: 0;
   padding: 0.5vmin 1vmin;
-  bottom: 1vmin;
-  right: calc(100% - 24.3vmin);
+  bottom: 2vmin;
+  right: calc(100% - 34.8vmin);
   background-color: #0007;
-  color: #fffa;
+  color: #fffc;
   font-weight: bold;
   font-size: small;
   border-radius: 1vmin;

@@ -4,6 +4,7 @@
   padding: 2.4vmin 4vmin;
   margin-bottom: 2vmin;
   position: sticky;
+  z-index: 2;
   top: 0;
   backdrop-filter: blur(2vmin);
   background-color: var(--onBg);
