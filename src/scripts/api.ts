@@ -5,8 +5,6 @@ export default async function api(
   getSaved: (key: string) => string | null
 ) {
 
-
-
   await fetch('https://piped-instances.kavin.rocks')
     .then(res => res.json())
     .then(data => {
@@ -14,7 +12,7 @@ export default async function api(
         const name = instance.name + ' ' + instance.locations;
         pipedInstances.add(new Option(
           name, instance.api_url, undefined,
-          getSaved('pipedInstance') === name
+          getSaved('pipedInstance')?.split('|')[0] === name
         ));
       }
     })

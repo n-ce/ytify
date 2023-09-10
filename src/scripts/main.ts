@@ -1,10 +1,12 @@
 import '../stylesheets/style.css';
-import { convertSStoHHMMSS, getSaved, params, save, unixTsFMT, viewsFormatter } from './utils'
+import { convertSStoHHMMSS, getSaved, params, save, unixTsFMT, viewsFormatter } from './utils';
 import api from './api';
 import nav from './nav';
 import search from './search';
 import listItem from '../components/listItem';
+import listItemCSS from '../components/listItem.css?inline';
 import toggleSwitch from '../components/toggleSwitch';
+import toggleSwitchCSS from '../components/toggleSwitch.css?inline';
 
 
 const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
@@ -16,8 +18,8 @@ function init() {
   }
   nav(params);
   search(pipedInstances, streamsLoader, getSaved, params);
-  listItem(convertSStoHHMMSS, viewsFormatter, unixTsFMT);
-  toggleSwitch();
+  listItem(convertSStoHHMMSS, viewsFormatter, unixTsFMT, listItemCSS);
+  toggleSwitch(toggleSwitchCSS);
 }
 
 api(pipedInstances, init, save, getSaved);
