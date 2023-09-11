@@ -2,6 +2,7 @@ import '../stylesheets/style.css';
 import { convertSStoHHMMSS, getSaved, params, save, unixTsFMT, viewsFormatter } from './utils';
 import api from './api';
 import nav from './nav';
+import theme from './theme';
 import search from './search';
 import listItem from '../components/listItem';
 import listItemCSS from '../components/listItem.css?inline';
@@ -10,6 +11,7 @@ import toggleSwitchCSS from '../components/toggleSwitch.css?inline';
 
 
 const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
+const img = document.querySelector('img');
 
 function init() {
   if (params.has('e')) {
@@ -17,6 +19,8 @@ function init() {
     return;
   }
   nav(params);
+  if (img)
+    theme(img, getSaved, save);
   search(pipedInstances, streamsLoader, getSaved, params);
   listItem(convertSStoHHMMSS, viewsFormatter, unixTsFMT, listItemCSS);
   toggleSwitch(toggleSwitchCSS);

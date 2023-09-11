@@ -33,7 +33,7 @@ export default async function api(
         }
       }
       else {
-        if (confirm('Unknown error detected, send error data to developer ?')) {
+        if (confirm(`Unknown Error Detected \n${err}\n send data to developer ?`)) {
           (<HTMLInputElement>document.getElementById('netlifyForm')).value = err;
           document.forms[0].submit();
         }

@@ -26,7 +26,7 @@ span:before {
   height: calc(100% - 2.3vmin);
   width: 20%;
   margin: 1vmin;
-  background-color: var(--onBg);
+  background-color: var(--text);
 }
 
 span,
@@ -42,7 +42,7 @@ input {
 }
 
 input:checked+span {
-  background-color: var(--text);
+  background-color: var(--onBg);
 }
 
 input:checked+span:before {

@@ -5,24 +5,32 @@
 @import 'remixicon.css';
 
 :root {
-  --accent: #aca144;
-  --borderColor: #000b;
-  --border: 0.1vmin solid var(--borderColor);
-  --roundedness: 2vmin;
+  /* dynamic */
+  --accent: transparent;
+  --accentDark: transparent;
+  --bgDark: transparent;
+  /* static */
   --bg: var(--accent);
   --onBg: #fff4;
   --text: #000b;
-  --shadow: 0 0.1rem 0.3rem #0003;
+  --onBgDark: #fff1;
+  --textDark: #fffb;
+  --borderColor: #000b;
+  --border: 0.1vmin solid var(--borderColor);
+  --shadowColor: #0002;
+  --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
+  --roundedness: 2vmin;
 }
 
 /*
+
 @media(prefers-color-scheme:dark) {
   :root {
-    --borderColor: var(--accent);
-    --bg: #000;
-    --onBg: #111;
-    --text: #fff;
-    --shadow:none;
+    --bg: var(--bgDark);
+    --onBg: var(--onBgDark);
+    --text: var(--textDark);
+    --borderColor: var(--accentDark);
+    --shadowColor: transparent;
   }
 }
 */
@@ -84,6 +92,7 @@ main>section.view {
 /* global styles for tags */
 select {
   background: none;
+  outline: none;
   color: var(--text);
   border: none;
   border-radius: var(--roundedness)

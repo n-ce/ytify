@@ -77,26 +77,30 @@
       <details>
         <summary>Settings</summary>
         <div id="settings">
-          <toggle-switch id="themeButton">Enable Dark Mode</toggle-switch>
-          <toggle-switch id="fullscreenButton">Enable Fullscreen</toggle-switch>
-          <toggle-switch id="thumbnailButton" checked>Load Thumbnails</toggle-switch>
-          <toggle-switch id="qualityButton">Highest Quality Audio</toggle-switch>
-          <toggle-switch id="suggestionsButton" checked>Display Search Suggestions</toggle-switch>
           <span>
-            <label for="pipedInstanceSelector">Piped Instance</label>
-            <select name="pipedInstanceSelector" id="pipedInstances"></select>
+            <label for="pipedInstances">Piped Instance</label>
+            <select id="pipedInstances"></select>
           </span>
-          <br>
-
           <span>
-            <label for="autoplayConfig">Autoplay Lookup Depth</label><select id="autoplayConfig">
+            <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </span>
+          <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
+          <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+          <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
+          <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
+          <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
+          <span>
+            <label for="autoplayConfig">Autoplay Lookup Depth</label>
+            <select id="autoplayConfig">
               <option value="2">Shallow</option>
               <option value="8" selected>Moderate</option>
               <option value="20">Abysmal</option>
             </select>
           </span>
-          <br><br>
-
           <a href="/" id="deleteButton">Clear All Stored Data</a>
         </div>
       </details>

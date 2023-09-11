@@ -99,6 +99,7 @@ img {
   justify-content: space-between;
   align-items: center;
   overflow: hidden;
+  margin: 4vmin 0;
 }
 
 #pipedInstances {

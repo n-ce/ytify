@@ -4,12 +4,12 @@
   padding: 2.4vmin 4vmin;
   margin-bottom: 2vmin;
   position: sticky;
-  z-index: 2;
+  z-index: 1;
   top: 0;
   backdrop-filter: blur(2vmin);
   background-color: var(--onBg);
   border-radius: var(--roundedness);
-  border: var(--border);
+  /* border: var(--border);*/
   box-shadow: var(--shadow);
   display: flex;
 }
@@ -18,7 +18,7 @@
   border: none;
   height: 100%;
   width: 100%;
-  color: var(--text);
+  color: inherit;
   outline: none;
   font-size: large;
   font-family: 'Noto Sans';
@@ -35,7 +35,7 @@
   width: 9.2ch;
   padding: 0;
   border: none;
-  color: var(--text);
+  color: inherit;
   outline: none;
   font-family: 'Noto Sans';
   font-weight: bold;
@@ -44,6 +44,7 @@
 
 #search button {
   background: none;
+  color: inherit;
   border: none;
   padding: 0;
   margin: 0;
@@ -55,6 +56,7 @@
   max-height: 25vmax;
   overflow-y: scroll;
   position: absolute;
+  z-index: 1;
   margin-top: 11.2vmin;
   width: 80vmin;
   background-color: var(--bg);
