@@ -16,7 +16,7 @@ export default async function api(
         ));
       }
     })
-    .then(_ => init())
+    .then(() => init())
     .catch(err => {
       let instance, instanceName, instanceUrl;
 

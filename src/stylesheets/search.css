@@ -9,7 +9,7 @@
   backdrop-filter: blur(2vmin);
   background-color: var(--onBg);
   border-radius: var(--roundedness);
-  /* border: var(--border);*/
+  border: var(--border);
   box-shadow: var(--shadow);
   display: flex;
 }
@@ -27,6 +27,7 @@
 }
 
 #superInput::placeholder {
+  color: inherit;
   opacity: 75%;
 }
 

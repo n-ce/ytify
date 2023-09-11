@@ -11,10 +11,10 @@ img {
   border-radius: var(--roundedness);
 }
 
-#home a {
-  text-decoration: none;
+#settings a,
+#metadata a,
+#metadata select {
   background-color: var(--onBg);
-  color: var(--text);
   padding: 1vmin;
   border: var(--border);
   border-radius: var(--roundedness);
@@ -22,30 +22,38 @@ img {
 
 #metadata {
   width: 100%;
-  margin-top: calc(1vh + 0.2vmin);
+  text-align: center;
+  margin-top: 1.2vmin;
 }
+
+
 
 #title {
-  font-size: 3vmax;
+  display: inline-block;
+  font-size: larger;
   font-weight: bold;
+  margin-bottom: 1vmin;
 }
 
-#metadata div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 2vmax;
+#author {
+  font-size: small
 }
 
-#home select {
-  background-color: var(--onBg);
-  font-size: inherit;
-  border: var(--border);
-  padding: 1vmin;
+#metadata select {
+  padding: 0.9vmin;
+  font-size: small;
+}
+
+#bitrateSelector {
+  font-size: 100%;
 }
 
 #subtitleSelector {
   max-width: 15ch;
+}
+
+#subtitleSelector.hide {
+  display: none;
 }
 
 #favButton {
@@ -53,11 +61,11 @@ img {
 }
 
 #favButton+label {
-  padding: 0.4vmin;
-  font-size: xx-large;
+  display: inline-block;
+  font-size: x-large;
   font-weight: bold;
-  margin: 0;
   transition: color 0.5s;
+  transform: translateY(1vmin);
 }
 
 #favButton:checked+label {
@@ -85,13 +93,15 @@ img {
 
 @media(orientation:landscape) {
   img {
-    height: 40vh;
+    height: 40dvh;
   }
 
   #metadata {
     margin-left: 2vh;
   }
 }
+
+
 
 #settings span {
   width: 100%;
@@ -102,32 +112,38 @@ img {
   margin: 4vmin 0;
 }
 
+#settings select {
+  background-color: var(--onBg);
+  font-size: inherit;
+  border: var(--border);
+  padding: 1vmin;
+}
+
+#settings a {
+  display: inline-block;
+  margin-bottom: 4vmin;
+}
+
 #pipedInstances {
   width: calc(100% - 6ch);
 }
 
-#about {
-  width: 100%;
+#deleteButton:hover {
+  background-color: orangered;
+  color: black;
 }
 
-#about a,
-form input {
-  display: inline-block;
-  margin-bottom: 1vmin;
-}
-
-input {
-  width: calc(100% - 2.3vmin);
-}
-
-input::placeholder {
-  color: var(--text);
-}
 
 #netlifyForm {
+  font-size: medium;
   background-color: var(--onBg);
   border: var(--border);
   border-radius: var(--roundedness);
   color: var(--text);
   padding: 1vmin;
+  width: calc(100% - 2.3vmin);
+}
+
+#netlifyForm::placeholder {
+  color: var(--text);
 }

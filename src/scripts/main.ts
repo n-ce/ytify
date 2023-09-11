@@ -21,7 +21,7 @@ function init() {
   nav(params);
   if (img)
     theme(img, getSaved, save);
-  search(pipedInstances, streamsLoader, getSaved, params);
+  search(pipedInstances, streamsLoader, getSaved, save, params);
   listItem(convertSStoHHMMSS, viewsFormatter, unixTsFMT, listItemCSS);
   toggleSwitch(toggleSwitchCSS);
 }
@@ -49,6 +49,8 @@ function streamsLoader(streamsArray: Record<stream, string>[]): DocumentFragment
     listItem.dataset.uploaded = stream.uploaded;
     listItem.dataset.avatar = stream.uploaderAvatar;
     listItem.addEventListener('click', () => {
+      if (img)
+        img.src = stream.thumbnail;
       /*
       switch (stream.type) {
         case 'stream':

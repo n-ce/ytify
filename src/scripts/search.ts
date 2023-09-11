@@ -1,7 +1,8 @@
 export default function search(
   pipedInstances: HTMLSelectElement,
-  streamsLoader: (arg0: []) => DocumentFragment,
-  getSaved: (arg0: string) => string | null,
+  streamsLoader: (streams: []) => DocumentFragment,
+  getSaved: (key: string) => string | null,
+  save: (key: string, value: string) => void,
   params: { get: (arg0: string) => string | null }
 ) {
 
@@ -9,6 +10,7 @@ export default function search(
   const searchlist = document.getElementById('searchlist');
   const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
   const suggestions = <HTMLUListElement>document.getElementById('suggestions');
+  const suggestionsSwitch = document.getElementById('suggestionsSwitch');
 
   // Get search results of input
 
@@ -78,6 +80,15 @@ export default function search(
 
   searchFilters.addEventListener('change', searchLoader);
 
+  suggestionsSwitch?.addEventListener('click', () => {
+    getSaved('search_suggestions') ?
+      localStorage.removeItem('search_suggestions') :
+      save('search_suggestions', 'off');
+    suggestions.style.display = 'none';
+
+  });
+  if (getSaved('search_suggestions') && suggestionsSwitch)
+    suggestionsSwitch.removeAttribute('checked')
 
 
   const query = params.get('q');

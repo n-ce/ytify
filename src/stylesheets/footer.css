@@ -14,7 +14,7 @@ footer {
 
 
 footer span {
-  height: 1rem;
+  height: 4vmin;
   display: flex;
   width: 100%;
   justify-content: space-around;

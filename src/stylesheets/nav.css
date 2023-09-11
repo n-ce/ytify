@@ -56,10 +56,10 @@ nav a.active {
 @media(orientation:landscape) {
 
   nav {
-    height: 100%;
+    height: 100dvh;
     flex-direction: column;
     width: 20%;
-    font-size: 5vh;
+    font-size: 5dvh;
     justify-content: center;
     background-color: var(--onBg)
   }
@@ -67,7 +67,7 @@ nav a.active {
   nav a {
     width: auto;
     height: 12%;
-    margin: 1vh;
+    margin: 1dvh;
   }
 
   nav i {

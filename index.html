@@ -49,18 +49,16 @@
         <div id="metadata">
           <a id="title" href="" target="_blank">ytify v6 alpha 5</a>
           <br>
-          <br>
-          <div>
-            <a id="author" href="" target="_blank">Channel</a>
-            <select id="bitrateSelector">
-              <option value="">Bitrate</option>
-            </select>
-            <select id="subtitleSelector" class="hide"></select>
-            <input type="checkbox" id="favButton" />
-            <label for="favButton" class="ri-heart-line"></label>
-          </div>
+          <a id="author" href="" target="_blank">Channel</a>
+          <select id="bitrateSelector">
+            <option value="">Bitrate</option>
+          </select>
+          <select id="subtitleSelector" class="hide"></select>
+          <input type="checkbox" id="favButton" />
+          <label for="favButton" class="ri-heart-line"></label>
         </div>
       </div>
+
       <article id="subtitleContainer" class="hide"></article>
 
       <audio data-seconds="0">
@@ -83,7 +81,7 @@
           </span>
           <span>
             <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
-              <option value="auto">Auto</option>
+              <option value="auto">System</option>
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </select>
@@ -101,19 +99,16 @@
               <option value="20">Abysmal</option>
             </select>
           </span>
+
           <a href="/" id="deleteButton">Clear All Stored Data</a>
+          <a href="https://github.com/n-ce/ytify/pull/124">Contribute on Github</a>
+          <a href="https://t.me/encetg">Contact on Telegram</a>
+          <form netlify name='feedback' method='POST'>
+            <input type="text" name="->" id="netlifyForm"
+              placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
+          </form>
         </div>
       </details>
-
-      <div id="about">
-        <a href="https://github.com/n-ce/ytify/pull/124">Contribute on Github</a>
-        <a href="https://t.me/encetg">Contact on Telegram</a>
-        <form netlify name='feedback' method='POST'>
-          <input type="text" name="->" id="netlifyForm"
-            placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
-        </form>
-      </div>
-      <br><br>
     </section>
 
     <section id="upcoming">Upcoming

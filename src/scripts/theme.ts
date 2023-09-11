@@ -8,40 +8,36 @@ export default function theme(
   // dynamic values
 
   const accent = (r: number, g: number, b: number) => `rgb(${r},${g},${b})`;
-  const bgDark = (r: number, g: number, b: number) => {
-    const [rd, gd, bd] = accentDarkener(r, g, b);
-    return `rgb(${rd},${gd},${bd})`;
-  }
-  const accentDark = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
+  const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
   // for now type:any due to complex type structure requirement
   const palette: any = {
     light: {
-      bg: accent,
-      onBg: '#fff4',
+      bg: accentLightener,
+      onBg: '#fff3',
       text: '#000b',
-      borderColor: () => '#000b',
+      borderColor: translucent,
       shadowColor: '#0002'
     },
     dark: {
-      bg: bgDark,
+      bg: accentDarkener,
       onBg: '#fff1',
       text: '#fffb',
-      borderColor: accentDark,
+      borderColor: translucent,
       shadowColor: 'transparent'
     },
     white: {
       bg: () => '#fff',
       onBg: 'transparent',
       text: '#000',
-      borderColor: accent,
+      borderColor: accentDarkener,
       shadowColor: '#0002'
     },
     black: {
       bg: () => '#000',
       onBg: 'transparent',
       text: '#fff',
-      borderColor: accent,
+      borderColor: accentLightener,
       shadowColor: 'transparent'
     }
   };
@@ -64,9 +60,14 @@ export default function theme(
 
   function accentDarkener(
     r: number, g: number, b: number
-  ): number[] {
+  ): string {
     const min = Math.min(r, g, b);
-    return [r - min, g - min, b - min]
+    return `rgb(${r - min}, ${g - min},${b - min})`;
+  }
+
+  function accentLightener(r: number, g: number, b: number): string {
+    const max = Math.floor((255 - Math.max(r, g, b)) / 2);
+    return `rgb(${r + max}, ${g + max},${b + max})`;
   }
 
   function schemeResolver() {
@@ -109,11 +110,6 @@ export default function theme(
       r = Math.floor(r / amount),
         g = Math.floor(g / amount),
         b = Math.floor(b / amount);
-
-
-      // lighten color if too dark
-      if ((r + g + b) < 85 || !r || !g || !b)
-        r += 34, g += 34, b += 34;
 
       cssVar('--bg', palette[scheme].bg(r, g, b));
       cssVar('--onBg', palette[scheme].onBg);
