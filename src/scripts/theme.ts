@@ -5,9 +5,6 @@ export default function theme(
 ) {
 
 
-  // dynamic values
-
-  const accent = (r: number, g: number, b: number) => `rgb(${r},${g},${b})`;
   const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
   // for now type:any due to complex type structure requirement
@@ -50,47 +47,22 @@ export default function theme(
   const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
   const highContrastSwitch = document.getElementById('highContrastSwitch');
 
-  if (getSaved('highContrast'))
-    highContrastSwitch?.toggleAttribute('checked');
-
-
-  const lst = getSaved('theme');
-  if (lst)
-    themeSelector.options[['auto', 'light', 'dark'].indexOf(lst)].selected = true;
-
   function accentDarkener(
     r: number, g: number, b: number
-  ): string {
+  ) {
     const min = Math.min(r, g, b);
     return `rgb(${r - min}, ${g - min},${b - min})`;
   }
 
-  function accentLightener(r: number, g: number, b: number): string {
+  function accentLightener(r: number, g: number, b: number) {
     const max = Math.floor((255 - Math.max(r, g, b)) / 2);
     return `rgb(${r + max}, ${g + max},${b + max})`;
   }
 
-  function schemeResolver() {
-    const theme = themeSelector.selectedOptions[0].value;
-    let light = 'light', dark = 'dark';
-    if (getSaved('highContrast'))
-      light = 'white', dark = 'black'
-    return theme === 'auto' ?
-      (matchMedia('(prefers-color-scheme:dark') ? dark : light) :
-      theme === 'light' ? light : dark;
-  }
-
   function themer() {
-
-    const scheme = schemeResolver();
-
-    if (!context || !tabColor) return;
-
+    if (!context) return;
     const canvasImg = new Image();
-
-
     canvasImg.onload = () => {
-
       canvas.height = canvasImg.height;
       canvas.width = canvasImg.width;
       context.drawImage(canvasImg, 0, 0);
@@ -111,6 +83,15 @@ export default function theme(
         g = Math.floor(g / amount),
         b = Math.floor(b / amount);
 
+      const theme = themeSelector.selectedOptions[0].value;
+      let light = 'light', dark = 'dark';
+      if (getSaved('highContrast'))
+        light = 'white', dark = 'black';
+
+      const scheme = theme === 'auto' ?
+        (matchMedia('(prefers-color-scheme:dark') ? dark : light) :
+        theme === 'light' ? light : dark;
+
       cssVar('--bg', palette[scheme].bg(r, g, b));
       cssVar('--onBg', palette[scheme].onBg);
       cssVar('--text', palette[scheme].text);
@@ -121,7 +102,6 @@ export default function theme(
 
     canvasImg.crossOrigin = '';
     canvasImg.src = img.src;
-
   }
 
   highContrastSwitch?.addEventListener('click', () => {
@@ -131,10 +111,17 @@ export default function theme(
     themer();
   })
 
+  if (getSaved('highContrast') && highContrastSwitch)
+    highContrastSwitch.toggleAttribute('checked');
+
+
+
   themeSelector.addEventListener('change', () => {
     themer();
     save('theme', themeSelector.value);
   });
+
+  themeSelector.options[['auto', 'light', 'dark'].indexOf(getSaved('theme') || 'auto')].selected = true;
 
   img.addEventListener('load', themer);
 
