@@ -26,12 +26,7 @@ nav a.active {
     height: auto;
     justify-content: space-around;
     width: 90%;
-    margin: 5%;
-    margin-bottom: 0;
-    background-color: var(--onBg);
-    border: var(--border);
-    border-radius: var(--roundedness);
-    box-shadow: var(--shadow);
+    padding: 5% 5% 0 5%;
   }
 
 
@@ -42,13 +37,13 @@ nav a.active {
   }
 
   nav i {
-    font-size: 3vh;
+    font-size: larger;
   }
 
   nav p {
     margin: 0;
     padding: 0;
-    font-size: 3vw;
+    font-size: small;
   }
 
 }
@@ -59,10 +54,11 @@ nav a.active {
     height: 100dvh;
     flex-direction: column;
     width: 20%;
-    font-size: 5dvh;
+    font-size: large;
     justify-content: center;
-    background-color: var(--onBg)
+    background-image: linear-gradient(to right, var(--onBg), transparent);
   }
+
 
   nav a {
     width: auto;

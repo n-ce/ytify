@@ -5,7 +5,7 @@ export default function nav(params: { has: (arg0: string) => boolean, size: numb
 
   function showSection(id: string) {
     sections.forEach((section, index) => {
-      if (index > 3) return;
+      if (index > 5) return;
       if (id === '/') id += 'home';
       if (section.id === id.substring(1)) {
         section.classList.add('view');
@@ -39,7 +39,7 @@ export default function nav(params: { has: (arg0: string) => boolean, size: numb
 
   // load section if name found in address else load home
 
-  document.getElementById(['/upcoming', '/search', '/library'].find(_ => location.pathname === _) || '/')?.click();
+  document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => location.pathname === _) || '/')?.click();
 
   // enables back button functionality
   addEventListener('popstate', () => {

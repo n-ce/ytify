@@ -6,11 +6,10 @@
 */
 
 @font-face {
-  font-family: 'remixicon';
-  src: url('/remixicon.woff2') format('woff2');
+  font-family: "remixicon";
+  src: url("/remixicon.woff2") format("woff2");
   font-display: swap;
 }
-
 
 [class^="ri-"],
 [class*="ri-"] {
@@ -26,18 +25,6 @@
 
 .ri-home-line:before {
   content: "\ee2b";
-}
-
-.ri-magic-line:before {
-  content: "\eeea";
-}
-
-.ri-volume-up-line:before {
-  content: "\f2a2";
-}
-
-.ri-volume-mute-line:before {
-  content: "\f29e";
 }
 
 .ri-play-line:before {
@@ -58,26 +45,6 @@
 
 .ri-repeat-line:before {
   content: "\f074";
-}
-
-.ri-play-list-2-line:before {
-  content: "\f00d";
-}
-
-.ri-play-list-add-line:before {
-  content: "\f00f";
-}
-
-.ri-shuffle-line:before {
-  content: "\f124";
-}
-
-.ri-delete-bin-2-line:before {
-  content: "\ec1e";
-}
-
-.ri-history-line:before {
-  content: "\ee17";
 }
 
 .ri-heart-line:before {
@@ -102,4 +69,12 @@
 
 .ri-pause-line:before {
   content: "\efd8";
+}
+
+.ri-settings-line:before {
+  content: "\f0ee";
+}
+
+.ri-node-tree:before {
+  content: "\ef90";
 }

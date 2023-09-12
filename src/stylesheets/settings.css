@@ -1,0 +1,60 @@
+#settings {
+  background-color: var(--onBg);
+  width: 90%;
+  padding: 0 5%;
+  border-radius: var(--roundedness);
+}
+
+#settings.view {
+  display: block;
+}
+
+#settings span {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  margin: 4vmin 0;
+}
+
+#settings select {
+  background-color: var(--onBg);
+  font-size: inherit;
+  border: var(--border);
+  padding: 1vmin;
+}
+
+#settings a {
+  background-color: var(--onBg);
+  padding: 1vmin;
+  border: var(--border);
+  border-radius: var(--roundedness);
+  display: inline-block;
+  margin-bottom: 4vmin;
+}
+
+#pipedInstances {
+  width: calc(100% - 6ch);
+}
+
+#deleteButton:hover {
+  background-color: orangered;
+  color: black;
+}
+
+
+#netlifyForm {
+  font-size: medium;
+  background-color: var(--onBg);
+  border: var(--border);
+  border-radius: var(--roundedness);
+  color: var(--text);
+  padding: 1vmin;
+  width: calc(100% - 2.3vmin);
+  margin-bottom: 5%;
+}
+
+#netlifyForm::placeholder {
+  color: var(--text);
+}
