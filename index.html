@@ -26,37 +26,42 @@
       <i class="ri-home-line"></i>
       <p>Home</p>
     </a>
-    <a href="/upcoming" id="/upcoming" class="">
+    <a href="/upcoming" id="/upcoming">
       <i class="ri-skip-forward-line"></i>
       <p>Upcoming</p>
     </a>
-    <a href="/search" id="/search" class="">
+    <a href="/search" id="/search">
       <i class="ri-search-2-line"></i>
       <p>Search</p>
     </a>
-    <a href="/library" id="/library" class="">
+    <a href="/related" id="/related">
+      <i class="ri-node-tree"></i>
+      <p>Related</p>
+    </a>
+    <a href="/library" id="/library">
       <i class="ri-stack-line"></i>
       <p>Library</p>
+    </a>
+    <a href="/settings" id="/settings">
+      <i class="ri-settings-line"></i>
+      <p>Settings</p>
     </a>
   </nav>
   <main>
     <section id="home">
-      <div id="streamInfo">
-        <img crossorigin="anonymous"
-          src="https://raw.githubusercontent.com/n-ce/ytify/main/assets/ytify_thumbnail_min.webp"
-          alt="Current Playing Media Thumbnail">
+      <img height="100%" width="100%" crossorigin="anonymous"
+        src="https://raw.githubusercontent.com/n-ce/ytify/main/assets/ytify_thumbnail_min.webp"
+        alt="Current Playing Media Thumbnail">
 
-        <div id="metadata">
-          <a id="title" href="" target="_blank">ytify v6 alpha 5</a>
-          <br>
-          <a id="author" href="" target="_blank">Channel</a>
-          <select id="bitrateSelector">
-            <option value="">Bitrate</option>
-          </select>
-          <select id="subtitleSelector" class="hide"></select>
-          <input type="checkbox" id="favButton" />
-          <label for="favButton" class="ri-heart-line"></label>
-        </div>
+      <div id="metadata">
+        <a id="title" href="" target="_blank">ytify v6 alpha 5</a>
+        <a id="author" href="" target="_blank">Channel</a>
+        <select id="bitrateSelector">
+          <option value="">Bitrate</option>
+        </select>
+        <select id="subtitleSelector" class="hide"></select>
+        <input type="checkbox" id="favButton" />
+        <label for="favButton" class="ri-heart-line"></label>
       </div>
 
       <article id="subtitleContainer" class="hide"></article>
@@ -65,50 +70,6 @@
         <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
       </audio>
 
-      <details>
-        <summary>Related Streams</summary>
-        <div id="related-streams">
-          <h1>Streams related to your current playing stream show up here.</h1>
-        </div>
-      </details>
-
-      <details>
-        <summary>Settings</summary>
-        <div id="settings">
-          <span>
-            <label for="pipedInstances">Piped Instance</label>
-            <select id="pipedInstances"></select>
-          </span>
-          <span>
-            <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
-              <option value="auto">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
-          </span>
-          <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
-          <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
-          <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
-          <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
-          <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
-          <span>
-            <label for="autoplayConfig">Autoplay Lookup Depth</label>
-            <select id="autoplayConfig">
-              <option value="2">Shallow</option>
-              <option value="8" selected>Moderate</option>
-              <option value="20">Abysmal</option>
-            </select>
-          </span>
-
-          <a href="/" id="deleteButton">Clear All Stored Data</a>
-          <a href="https://github.com/n-ce/ytify/pull/124">Contribute on Github</a>
-          <a href="https://t.me/encetg">Contact on Telegram</a>
-          <form netlify name='feedback' method='POST'>
-            <input type="text" name="->" id="netlifyForm"
-              placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
-          </form>
-        </div>
-      </details>
     </section>
 
     <section id="upcoming">Upcoming
@@ -144,7 +105,10 @@
           Video</list-item>
       </div>
     </section>
+    <section id="related">
+      <h1>Streams related to your current playing stream show up here.</h1>
 
+    </section>
     <section id="library">
       <details>
         <summary>History</summary>
@@ -155,6 +119,41 @@
       <details>
         <summary>Playlists</summary>
       </details>
+    </section>
+    <section id="settings">
+      <span>
+        <label for="pipedInstances">Piped Instance</label>
+        <select id="pipedInstances"></select>
+      </span>
+      <span>
+        <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
+          <option value="auto">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </span>
+      <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
+      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+      <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
+      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
+      <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
+      <span>
+        <label for="autoplayConfig">Autoplay Lookup Depth</label>
+        <select id="autoplayConfig">
+          <option value="2">Shallow</option>
+          <option value="8" selected>Moderate</option>
+          <option value="20">Abysmal</option>
+        </select>
+      </span>
+
+      <a href="/" id="deleteButton">Clear All Stored Data</a>
+      <a href="https://github.com/n-ce/ytify/pull/124">Contribute on Github</a>
+      <a href="https://t.me/encetg">Contact on Telegram</a>
+      <form netlify name='feedback' method='POST'>
+        <input type="text" name="->" id="netlifyForm"
+          placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
+      </form>
+
     </section>
     <section id="modalContainer"></section>
     <footer>
