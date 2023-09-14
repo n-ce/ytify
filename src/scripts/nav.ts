@@ -1,11 +1,14 @@
-export default function nav(params: { has: (arg0: string) => boolean, size: number }) {
+import { params } from "./utils";
+
+export default function nav() {
+
   if (params.has('e')) return;
   const anchors = document.querySelectorAll('nav a');
   const sections = document.querySelectorAll('section');
 
   function showSection(id: string) {
     sections.forEach((section, index) => {
-      if (index > 5) return;
+      if (index > 6) return;
       if (id === '/') id += 'home';
       if (section.id === id.substring(1)) {
         section.classList.add('view');

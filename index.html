@@ -46,10 +46,11 @@
       <i class="ri-settings-line"></i>
       <p>Settings</p>
     </a>
+    <a id="/stealth" class="hide"></a>
   </nav>
   <main>
     <section id="home">
-      <img height="100%" width="100%" crossorigin="anonymous"
+      <img crossorigin="anonymous"
         src="https://raw.githubusercontent.com/n-ce/ytify/main/assets/ytify_thumbnail_min.webp"
         alt="Current Playing Media Thumbnail">
 
@@ -72,7 +73,8 @@
 
     </section>
 
-    <section id="upcoming">Upcoming
+    <section id="upcoming">
+      <h1>upcoming streams show here</h1>
     </section>
 
     <section id="search">
@@ -90,19 +92,14 @@
             <option value="music_videos">Videos</option>
             <option value="music_albums">Albums</option>
             <option value="music_playlists">Playlists</option>
+            <option value="music_artists">Artists</option>
           </optgroup>
         </select>
         <button aria-label="search" class="ri-search-2-line"></button>
       </span>
       <ul id="suggestions"></ul>
       <div id="searchlist">
-        <!--  <h1>search results show here</h1>-->
-        <list-item
-          data-thumbnail="https://pipedproxy.kavin.rocks/vi/we9jeU76Y9E/hq720.jpg?sqp=-oaymwEcCOgCEMoBSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCy-MWtz-eg5fbWWbBtCe8lYPijEg&host=i.ytimg.com"
-          data-author="author"
-          data-avatar="https://pipedproxy.kavin.rocks/-vP_YeMZ-G36SWGGcBJfOmPcUT642PmtuXgZOdabO8QxCL_svcS0PS5N8USk_P2HpG2sD5Pk5kM=s88-c-k-c0x00ffffff-no-rw?host=yt3.ggpht.com"
-          data-duration="220" data-uploaded="1600000000000" data-views="150000">New
-          Video</list-item>
+        <h1>search results show here</h1>
       </div>
     </section>
     <section id="related">
@@ -155,7 +152,9 @@
       </form>
 
     </section>
-    <section id="modalContainer"></section>
+    <section id="stealth">
+      <h1>playlist or channel items show here</h1>
+    </section>
     <footer>
       <span>
         <p id="currentDuration">00:05</p>

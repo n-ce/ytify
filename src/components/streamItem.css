@@ -2,42 +2,39 @@
   height: 20vmin;
   width: auto;
   user-select: none;
-  overflow: hidden;
   background-color: var(--onBg);
   padding: 1vmin;
   margin-bottom: 1vmin;
   border-radius: calc(var(--roundedness) + 0.75vmin);
-  display: grid;
-  grid-template-areas:
-    "A B B"
-    "A C D"
-    "A C E";
+  display: flex;
 }
 
 
 p {
   margin: 0;
   padding: 0;
+  font-size: smaller;
+  overflow: hidden;
 }
 
 span {
   position: relative;
   z-index: 0;
-  grid-area: A;
+  height: 20vmin;
+  margin-right: 1vmin;
 }
 
 #thumbnail {
-  height: 20vmin;
+  height: 100%;
   border-radius: var(--roundedness);
-  margin-right: 1vmin;
 }
 
 #duration {
   position: absolute;
   margin: 0;
   padding: 0.5vmin 1vmin;
-  bottom: 2vmin;
-  right: calc(100% - 34.8vmin);
+  bottom: 1.1vmin;
+  right: 1.2vmin;
   background-color: #0007;
   color: #fffc;
   font-weight: bold;
@@ -46,39 +43,48 @@ span {
 }
 
 slot {
-  display: block;
-  font-weight: bold;
-  grid-area: B;
   font-size: medium;
+  height: 50%;
+  width: 100%;
+  display: flex;
   overflow: hidden;
-  max-height: 9vmin;
 }
 
+div {
+  display: flex;
+  overflow: hidden;
+}
 
 #avatar {
-  border-radius: 50%;
   height: 8vmin;
-  grid-area: C;
+  border-radius: 50%;
+  margin: 1vmin;
+  margin-left: 0;
 }
 
-#author {
-  display: block;
-  font-size: small;
-  height: 4vmin;
-  overflow: hidden;
-  grid-area: D;
+#metadata {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 90%;
 }
 
-#viewsXuploaded {
-  display: inline;
-  font-size: small;
-  grid-area: E;
+#aau {
+  display: flex;
+  align-items: center;
+}
+
+#avu {
+  display: flex;
+  flex-direction: column;
 }
 
 @media(orientation:landscape) {
-  :host {
-    grid-template-areas:
-      "A B B B"
-      "A C D E"
+
+  #avu {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
 }

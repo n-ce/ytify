@@ -1,10 +1,6 @@
-export default function search(
-  pipedInstances: HTMLSelectElement,
-  streamsLoader: (streams: []) => DocumentFragment,
-  getSaved: (key: string) => string | null,
-  save: (key: string, value: string) => void,
-  params: { get: (arg0: string) => string | null }
-) {
+import { pipedInstances, getSaved, save, params } from "./utils";
+
+export default function search(itemsLoader: (items: []) => DocumentFragment) {
 
   const superInput = <HTMLInputElement>document.getElementById('superInput');
   const searchlist = document.getElementById('searchlist');
@@ -22,7 +18,7 @@ export default function search(
     fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
       .then(res => res.json())
       .then(searchResults => searchResults.items)
-      .then(items => streamsLoader(items))
+      .then(items => itemsLoader(items))
       .then(fragment => searchlist.appendChild(fragment))
       .catch(err => {
         if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -94,6 +90,7 @@ export default function search(
   const query = params.get('q');
   if (query) {
     superInput.value = query;
+    searchFilters.value = 'channels';
     searchLoader();
   }
 

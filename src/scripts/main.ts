@@ -1,74 +1,122 @@
 import '../stylesheets/style.css';
-import { convertSStoHHMMSS, getSaved, params, save, unixTsFMT, viewsFormatter } from './utils';
+import { img, params, pipedInstances } from './utils';
 import api from './api';
 import nav from './nav';
 import theme from './theme';
 import search from './search';
-import listItem from '../components/listItem';
-import listItemCSS from '../components/listItem.css?inline';
+import streamItem from '../components/streamItem';
+import channelItem from '../components/channelItem';
+import playlistItem from '../components/playlistItem';
 import toggleSwitch from '../components/toggleSwitch';
-import toggleSwitchCSS from '../components/toggleSwitch.css?inline';
 
 
-const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
-const img = document.querySelector('img');
+const stealthContainer = document.getElementById('stealth');
+const stealthAnchor = <HTMLAnchorElement>document.getElementById('/stealth');
 
-function init() {
+
+api(() => {
   if (params.has('e')) {
     location.replace(params.get('e') || '/');
     return;
   }
-  nav(params);
-  if (img)
-    theme(img, getSaved, save);
-  search(pipedInstances, streamsLoader, getSaved, save, params);
-  listItem(convertSStoHHMMSS, viewsFormatter, unixTsFMT, listItemCSS);
-  toggleSwitch(toggleSwitchCSS);
+  nav();
+  theme();
+  search(itemsLoader);
+  streamItem();
+  playlistItem();
+  channelItem();
+  toggleSwitch();
+});
+
+
+
+function loadGroup(group: string) {
+  fetch(pipedInstances.value + group)
+    .then(res => res.json())
+    .then(group => group.relatedStreams)
+    .then(streams => itemsLoader(streams))
+    .then(fragment => {
+      if (!stealthContainer) return;
+      stealthContainer.innerHTML = '';
+      stealthContainer.appendChild(fragment);
+      stealthAnchor.click();
+    })
+    .catch(err => {
+      /*
+        if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+          pipedInstances.selectedIndex++;
+          loadGroup(group);
+          return;
+        }
+        alert(err)*/
+      console.log(err)
+    })
 }
 
-api(pipedInstances, init, save, getSaved);
+
+type item = 'title' | 'name' | 'uploaderName' | 'description' | 'thumbnail' | 'type' | 'url' | 'views' | 'duration' | 'uploadedDate' | 'uploaderAvatar' | 'videos' | 'subscribers';
+
+function createStreamItem(stream: Record<item, string>) {
+  const streamItem = document.createElement('stream-item');
+  streamItem.textContent = stream.title;
+  streamItem.dataset.author = stream.uploaderName;
+  streamItem.dataset.thumbnail = stream.thumbnail;
+  streamItem.dataset.views = stream.views;
+  streamItem.dataset.duration = stream.duration;
+  streamItem.dataset.uploaded = stream.uploadedDate || '';
+  streamItem.dataset.avatar = stream.uploaderAvatar || '';
+  streamItem.addEventListener('click', () => {
+    img.src = stream.thumbnail;
+  })
+  return streamItem;
+}
 
 
+function createPlaylistItem(playlist: Record<item, string>) {
 
+  const playlistItem = document.createElement('playlist-item');
+  playlistItem.textContent = playlist.name;
+  playlistItem.dataset.length = playlist.videos;
+  playlistItem.dataset.author = playlist.uploaderName;
+  playlistItem.dataset.thumbnail = playlist.thumbnail;
+  playlistItem.addEventListener('click', () => {
+    loadGroup(playlist.url.replace('?list=', 's/'));
+  })
+  return playlistItem;
+}
 
+function createChannelItem(channel: Record<item, string>) {
+  const channelItem = document.createElement('channel-item');
+  channelItem.textContent = channel.name;
+  channelItem.dataset.thumbnail = channel.thumbnail;
+  channelItem.dataset.description = channel.description;
+  channelItem.dataset.subscribers = channel.subscribers;
+  channelItem.addEventListener('click', () => {
+    loadGroup(channel.url);
+  })
 
-// Loads streams into related streams / search / upcoming
-type stream = 'title' | 'name' | 'uploaderName' | 'description' | 'thumbnail' | 'type' | 'url' | 'views' | 'duration' | 'uploaded' | 'uploaderAvatar';
+  return channelItem;
+}
 
-function streamsLoader(streamsArray: Record<stream, string>[]): DocumentFragment {
+function itemsLoader(itemsArray: Record<item, string>[]): DocumentFragment {
 
   const fragment = document.createDocumentFragment();
 
-  for (const stream of streamsArray) {
-    const listItem = document.createElement('list-item');
-    listItem.textContent = stream.title || stream.name;
-    listItem.dataset.author = stream.uploaderName || stream.description;
-    listItem.dataset.thumbnail = stream.thumbnail;
-    listItem.dataset.views = stream.views;
-    listItem.dataset.duration = stream.duration;
-    listItem.dataset.uploaded = stream.uploaded;
-    listItem.dataset.avatar = stream.uploaderAvatar;
-    listItem.addEventListener('click', () => {
-      if (img)
-        img.src = stream.thumbnail;
-      /*
-      switch (stream.type) {
-        case 'stream':
-          validator(null, null, stream.url.slice(9));
-          break;
-        case 'playlist':
-          validator(null, stream.url.slice(15), null);
-          break;
-        case 'channel':
-          open('https://youtube.com' + stream.url);
-          //		fetch(api[0] + stream.url).then(res => res.json()).then(channel => streamsLoader(channel.relatedStreams));
-          break;
-      }*/
+  for (const item of itemsArray) {
 
-    });
-    fragment.appendChild(listItem);
+    const type = item.type === 'stream' ? createStreamItem(item) : item.type === 'playlist' ? createPlaylistItem(item) : createChannelItem(item);
+
+
+    fragment.appendChild(type);
   }
+
   return fragment;
 }
 
 
+const favButton = document.getElementById('favButton')?.nextElementSibling;
+const icons = ['ri-heart-line', 'ri-heart-fill'];
+favButton?.addEventListener('click', () => {
+  favButton.classList.replace(icons[0], icons[1]);
+  icons.reverse();
+})

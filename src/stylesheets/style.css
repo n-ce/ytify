@@ -6,18 +6,18 @@
 @import 'remixicon.css';
 
 :root {
-  --bg: transparent;
-  --onBg: transparent;
-  --text: transparent;
-  --borderColor: transparent;
+  --bg: ;
+  --onBg: ;
+  --text: ;
+  --borderColor: ;
   --border: 0.1vmin solid var(--borderColor);
-  --shadowColor: transparent;
+  --shadowColor: ;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundedness: 2vmin;
 }
 
 @font-face {
-  font-family: 'Noto Sans';
+  font-family: "Noto Sans";
   src: url("/NotoSans.woff2") format("woff2");
   font-display: swap;
 }
@@ -52,6 +52,14 @@ section {
   align-items: center;
   width: 100%;
   overflow-y: auto;
+  animation: appear 0.2s ease-out;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
 }
 
 section.view {
@@ -92,7 +100,22 @@ section.view {
 
 
 /* global styles for tags */
+
+button {
+  transition: transform 0.5s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.8)
+}
+
+input {
+  font-family: inherit;
+  outline: none;
+}
+
 select {
+  font-family: inherit;
   background: none;
   outline: none;
   color: var(--text);
@@ -117,4 +140,9 @@ details>summary {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+
+.hide {
+  display: none;
 }

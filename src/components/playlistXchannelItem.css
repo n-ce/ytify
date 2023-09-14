@@ -1,0 +1,52 @@
+:host {
+  background-color: var(--onBg);
+  height: 20vmin;
+  margin-bottom: 1vmin;
+  padding: 1vmin;
+  border-radius: calc(var(--roundedness) + 0.75vmin);
+  overflow: hidden;
+  display: flex;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+#thumbnail {
+  height: 20vmin;
+  border-radius: var(--roundedness);
+}
+
+div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin-left: 1vmin;
+}
+
+slot {
+  display: flex;
+  height: 10vmin;
+  font-size: medium;
+  overflow: hidden;
+}
+
+#author,
+#desc {
+  font-size: small;
+  height: 25%;
+  overflow: hidden;
+}
+
+
+#amount {
+  font-size: larger;
+  height: 25%;
+}
+
+#subs {
+  font-size: small;
+  height: 25%;
+}

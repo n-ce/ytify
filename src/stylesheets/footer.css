@@ -8,10 +8,9 @@ footer {
   border: var(--border);
   align-items: center;
   flex-direction: column;
-  overflow: hidden;
   box-shadow: var(--shadow);
+  overflow-x: hidden;
 }
-
 
 footer span {
   height: 4vmin;
@@ -47,7 +46,7 @@ input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 100%;
   width: 1vmin;
-  background-color: var(--onBg);
+  background-color: var(--text);
   border: var(--border);
   transform: scale(2);
 }
@@ -55,14 +54,19 @@ input[type='range']::-webkit-slider-thumb {
 
 
 #playerControls {
-  height: calc(100% - 1rem);
+  height: 99%;
   width: 100%;
   align-items: center;
 }
 
 #playerControls button {
-  font-size: 4vmax;
   color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font-size: x-large;
+  transition: all 0.5s;
 }
 
 @media(orientation:landscape) {
@@ -94,17 +98,13 @@ input[type='range']::-webkit-slider-thumb {
   .spinner {
     margin: auto;
   }
+
+  footer select {
+    font-size: 1.8dvh;
+    font-weight: bold;
+  }
 }
 
-
-footer button {
-  border: none;
-  background: none;
-  padding: 0;
-  margin: 0;
-  font-size: x-large;
-  transition: all 0.5s;
-}
 
 .on {
   background-color: var(--accent);

@@ -1,14 +1,41 @@
-export default function theme(
-  img: HTMLImageElement,
-  getSaved: (key: string) => string | null,
-  save: (key: string, value: string) => void
-) {
+import { getSaved, save, img } from "./utils";
 
+export default function theme() {
+
+  const style = document.documentElement.style;
+  const cssVar = style.setProperty.bind(style);
+  const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
+  const highContrastSwitch = document.getElementById('highContrastSwitch');
 
   const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
-  // for now type:any due to complex type structure requirement
-  const palette: any = {
+  function accentLightener(r: number, g: number, b: number) {
+    const max = Math.floor((255 - Math.max(r, g, b)) / 2);
+    return `rgb(${r + max}, ${g + max},${b + max})`;
+  }
+
+  function accentDarkener(
+    r: number, g: number, b: number
+  ) {
+    const min = Math.min(r, g, b);
+    return `rgb(${r - min}, ${g - min},${b - min})`;
+  }
+
+
+  type Scheme = {
+    [index: string]: {
+      bg: (r: number, g: number, b: number) => string,
+      borderColor: (r: number, g: number, b: number) => string,
+      shadowColor: string,
+      onBg: string,
+      text: string
+    }
+  }
+
+  const palette: Scheme = {
     light: {
       bg: accentLightener,
       onBg: '#fff3',
@@ -39,28 +66,14 @@ export default function theme(
     }
   };
 
-  const style = document.documentElement.style;
-  const cssVar = style.setProperty.bind(style);
-  const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
-  const highContrastSwitch = document.getElementById('highContrastSwitch');
 
-  function accentDarkener(
-    r: number, g: number, b: number
-  ) {
-    const min = Math.min(r, g, b);
-    return `rgb(${r - min}, ${g - min},${b - min})`;
-  }
+  palette['light'].onBg
 
-  function accentLightener(r: number, g: number, b: number) {
-    const max = Math.floor((255 - Math.max(r, g, b)) / 2);
-    return `rgb(${r + max}, ${g + max},${b + max})`;
-  }
+  if (!img || !highContrastSwitch) return;
+
 
   function themer() {
-    if (!context) return;
+    if (!context || !img) return;
     const canvasImg = new Image();
     canvasImg.onload = () => {
       canvas.height = canvasImg.height;
@@ -69,7 +82,8 @@ export default function theme(
 
       const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
       const len = data.length;
-      const nthPixel = 40;
+
+      const nthPixel = 40; // sweet spot for getting high performance and accuracy
 
       let r = 0, g = 0, b = 0;
 
@@ -104,7 +118,7 @@ export default function theme(
     canvasImg.src = img.src;
   }
 
-  highContrastSwitch?.addEventListener('click', () => {
+  highContrastSwitch.addEventListener('click', () => {
     getSaved('highContrast') ?
       localStorage.removeItem('highContrast') :
       save('highContrast', 'true');
@@ -121,10 +135,9 @@ export default function theme(
     save('theme', themeSelector.value);
   });
 
-  themeSelector.options[['auto', 'light', 'dark'].indexOf(getSaved('theme') || 'auto')].selected = true;
+  themeSelector.value = getSaved('theme') || 'auto';
 
   img.addEventListener('load', themer);
 
   themer();
-
 }

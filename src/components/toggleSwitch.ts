@@ -1,4 +1,6 @@
-export default function toggleSwitch(css: string) {
+import css from '../components/toggleSwitch.css?inline';
+
+export default function toggleSwitch() {
   customElements.define('toggle-switch', class extends HTMLElement {
     constructor() {
       super();

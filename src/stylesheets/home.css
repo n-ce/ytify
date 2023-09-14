@@ -12,9 +12,9 @@
 }
 
 img {
-  aspect-ratio: 16/9;
   border: var(--border);
   border-radius: var(--roundedness);
+  box-shadow: var(--shadow);
 }
 
 
@@ -33,13 +33,13 @@ img {
 }
 
 #metadata select {
+  font-family: inherit;
   font-size: small;
-  display: block
 }
 
 #bitrateSelector {
   grid-area: C;
-  max-width: 8ch;
+  max-width: 9ch;
 }
 
 #subtitleSelector {
@@ -47,11 +47,29 @@ img {
   grid-area: D;
 }
 
-#subtitleSelector.hide {
+
+#favButton {
   display: none;
 }
 
+#favButton+label {
+  text-align: right;
+  font-size: x-large;
+  font-weight: bold;
+  color: deeppink;
+  opacity: 0.8;
+  grid-area: E;
+}
 
+#favButton:checked+label {
+  animation: like 0.5s ease-in-out;
+}
+
+@keyframes like {
+  50% {
+    transform: scale(0.8)
+  }
+}
 
 @media(orientation:portrait) {
   img {
@@ -76,29 +94,4 @@ img {
     height: 45dvh;
   }
 
-}
-
-
-#favButton {
-  display: none;
-}
-
-#favButton+label {
-  text-align: right;
-  font-size: x-large;
-  font-weight: bold;
-  transition: color 0.5s;
-  transform: translateY(1vmin);
-  grid-area: E;
-}
-
-#favButton:checked+label {
-  color: deeppink;
-  animation: like 0.5s ease-in-out;
-}
-
-@keyframes like {
-  50% {
-    transform: scale(0.8)
-  }
 }

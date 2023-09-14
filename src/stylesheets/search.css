@@ -1,6 +1,6 @@
 #superInputContainer {
   height: auto;
-  width: auto;
+  width: calc(100% - 8.3vmin);
   padding: 2.4vmin 4vmin;
   margin-bottom: 2vmin;
   position: sticky;
@@ -18,12 +18,9 @@
   border: none;
   height: 100%;
   width: 100%;
-  color: inherit;
-  outline: none;
-  font-size: large;
-  font-family: 'Noto Sans';
-  font-weight: bold;
   background: none;
+  color: inherit;
+  font-size: medium;
 }
 
 #superInput::placeholder {
@@ -32,15 +29,11 @@
 }
 
 #searchFilters {
-  font-size: large;
-  width: 9.2ch;
+  font-size: medium;
+  width: 10ch;
   padding: 0;
   border: none;
   color: inherit;
-  outline: none;
-  font-family: 'Noto Sans';
-  font-weight: bold;
-  background: none;
 }
 
 #search button {
