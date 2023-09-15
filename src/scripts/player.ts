@@ -1,35 +1,98 @@
-export default function player() {
-  function setMetaData(thumbnail: string, id: string, streamName: string, authorName: string, authorUrl: string) {
+import { audio, bitrateSelector, pipedInstances, playButton } from "./dom";
+import { getSaved, itemsLoader, params, setMetaData } from "./utils";
 
-    if (getSaved('img')) {
-      save('img', thumbnail)
-      thumbnail = null;
-    } else img.src = thumbnail;
+export default async function player(id: string) {
 
-    title.href = `https://youtube.com/watch?v=${id}`;
-    title.textContent = streamName;
-    author.href = `https://youtube.com${authorUrl}`;
-    author.textContent = authorName;
+  if (!id) return;
 
-    document.title = streamName + ' - ytify';
+  const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
+  const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
 
-    if (thumbnail?.includes('maxres'))
-      thumbnail = thumbnail.replace('maxres', 'hq');
+  /*
+      if (id.length !== 11) {
+        playlistLoad(id);
+        return;
+      }*/
+  playButton.classList.replace(playButton.classList[0], 'ri-loader-3-line');
 
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.setPositionState(null);
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: streamName,
-        artist: authorName,
-        artwork: [
-          { src: thumbnail, sizes: '96x96' },
-          { src: thumbnail, sizes: '128x128' },
-          { src: thumbnail, sizes: '192x192' },
-          { src: thumbnail, sizes: '256x256' },
-          { src: thumbnail, sizes: '384x384' },
-          { src: thumbnail, sizes: '512x512' },
-        ]
-      });
+  const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
+    if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+      pipedInstances.selectedIndex++;
+      player(id);
+      return;
+    }
+    alert(err);
+  });
+
+  if (!data.audioStreams.length) {
+    alert('NO AUDIO STREAMS AVAILABLE.');
+    return;
+  } audio.dataset.seconds = '0';
+
+  // extracting opus streams and storing m4a streams
+  interface Opus {
+    urls: string[],
+    bitrates: number[]
+  }
+  interface M4A extends Opus {
+    options: HTMLOptionElement[]
+  }
+  const opus: Opus = { urls: [], bitrates: [] }
+  const m4a: M4A = { urls: [], bitrates: [], options: [] }
+  bitrateSelector.innerHTML = '';
+
+  for (const value of data.audioStreams) {
+    if (value.codec === "opus") {
+      if (isSafari) continue;
+      opus.urls.push(value.url);
+      opus.bitrates.push(parseInt(value.quality));
+      bitrateSelector.add(new Option(value.quality, value.url));
+    }
+    else {
+      m4a.urls.push(value.url);
+      m4a.bitrates.push(parseInt(value.quality));
+      isSafari ?
+        bitrateSelector.add(new Option(value.quality, value.url)) :
+        m4a.options.push(new Option(value.quality, value.url));
     }
   }
+
+  // finding lowest available stream when low opus bitrate unavailable
+  if (!getSaved('quality') && Math.min(...opus.bitrates) > 64 && !isSafari) {
+    opus.urls = opus.urls.concat(m4a.urls);
+    opus.bitrates = opus.bitrates.concat(m4a.bitrates);
+    for (const opts of m4a.options) bitrateSelector.add(opts);
+  } const codec = (isSafari ? m4a : opus);
+  bitrateSelector.selectedIndex = codec.bitrates.indexOf(getSaved('quality') ? Math.max(...codec.bitrates) : Math.min(...codec.bitrates));
+  audio.src = codec.urls[bitrateSelector.selectedIndex];
+
+
+  setMetaData(
+    id,
+    data.thumbnailUrl,
+    data.title,
+    data.uploader,
+    data.uploaderUrl
+  );
+
+
+  // load related streams
+  relatedStreamsContainer.innerHTML = '';
+  relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
+
+  params.set('s', id);
+  history.pushState({}, '', '?' + params);
+  /*
+
+  // autoplay init
+  if (autoplayState.contains('on')) {
+    autoplayButton.firstElementChild.classList.replace('ri-magic-line', 'spinner');
+    streamHistory.push(id);
+    autoplayFX(
+      await similarStreamsCollector(
+        data.title + (data.uploader.includes(' - Topic') ? ' ' + data.uploader.replace(' - Topic', '') : ''),
+        id
+      )
+    );
+  }*/
 }

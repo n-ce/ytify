@@ -1,14 +1,15 @@
-import { getSaved, save, img } from "./utils";
+import { img } from "./dom";
+import { getSaved, save } from "./utils";
 
 export default function theme() {
 
   const style = document.documentElement.style;
   const cssVar = style.setProperty.bind(style);
   const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
-  const canvas = document.createElement('canvas');
+  const canvas = <HTMLCanvasElement>document.createElement('canvas');
   const context = canvas.getContext('2d');
   const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
-  const highContrastSwitch = document.getElementById('highContrastSwitch');
+  const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContrastSwitch');
 
   const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
@@ -67,13 +68,8 @@ export default function theme() {
   };
 
 
-  palette['light'].onBg
-
-  if (!img || !highContrastSwitch) return;
-
-
   function themer() {
-    if (!context || !img) return;
+    if (!context) return;
     const canvasImg = new Image();
     canvasImg.onload = () => {
       canvas.height = canvasImg.height;
@@ -132,7 +128,9 @@ export default function theme() {
 
   themeSelector.addEventListener('change', () => {
     themer();
-    save('theme', themeSelector.value);
+    themeSelector.value === 'auto' ?
+      localStorage.removeItem('theme') :
+      save('theme', themeSelector.value);
   });
 
   themeSelector.value = getSaved('theme') || 'auto';

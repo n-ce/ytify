@@ -1,6 +1,6 @@
 :host {
   height: 20vmin;
-  width: auto;
+  width: calc(100% - 2vmin);
   user-select: none;
   background-color: var(--onBg);
   padding: 1vmin;

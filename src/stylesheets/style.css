@@ -146,3 +146,15 @@ a {
 .hide {
   display: none;
 }
+
+stream-item,
+channel-item,
+playlist-item {
+  transition: transform 0.5s;
+}
+
+stream-item:hover,
+channel-item:hover,
+playlist-item:hover {
+  transform: scale(0.95);
+}

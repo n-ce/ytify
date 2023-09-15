@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { convertSStoHHMMSS, numFormatter } from '../scripts/utils';
+import { blankImage, convertSStoHHMMSS, numFormatter } from '../scripts/utils';
 
 export default function streamItem() {
 
@@ -14,6 +14,8 @@ export default function streamItem() {
 			const span = document.createElement('span');
 
 			const thumbnail = document.createElement('img');
+			thumbnail.crossOrigin = 'anonymous';
+			thumbnail.src = blankImage;
 			thumbnail.id = 'thumbnail';
 			thumbnail.loading = 'lazy';
 

@@ -1,12 +1,10 @@
-import { pipedInstances, getSaved, save, params } from "./utils";
+import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "./dom";
+import { getSaved, save, params } from "./utils";
 
 export default function search(itemsLoader: (items: []) => DocumentFragment) {
 
-  const superInput = <HTMLInputElement>document.getElementById('superInput');
   const searchlist = document.getElementById('searchlist');
   const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
-  const suggestions = <HTMLUListElement>document.getElementById('suggestions');
-  const suggestionsSwitch = document.getElementById('suggestionsSwitch');
 
   // Get search results of input
 
@@ -64,6 +62,17 @@ export default function search(itemsLoader: (items: []) => DocumentFragment) {
       fragment.appendChild(li);
     }
     suggestions.appendChild(fragment);
+
+    superInput.onkeyup = e => {
+      if (e.key === 'ArrowDown') {
+        const topSuggestion = <HTMLLIElement>suggestions.firstElementChild;
+        topSuggestion.setAttribute('tabindex', '-1');
+        topSuggestion.onkeyup = f => {
+          if (f.key === 'ArrowUp') superInput.focus();
+        }
+        topSuggestion.focus();
+      }
+    }
   });
 
 

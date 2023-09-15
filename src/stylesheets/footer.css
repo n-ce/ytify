@@ -74,6 +74,7 @@ input[type='range']::-webkit-slider-thumb {
     display: flex;
     justify-content: space-evenly;
   }
+
 }
 
 @media(orientation:portrait) {
@@ -89,13 +90,9 @@ input[type='range']::-webkit-slider-thumb {
   }
 
   #playback,
-  #volume {
+  #volumeSelector {
     grid-column: auto / span 2;
     width: auto;
-    margin: auto;
-  }
-
-  .spinner {
     margin: auto;
   }
 
@@ -112,15 +109,8 @@ input[type='range']::-webkit-slider-thumb {
   border-radius: var(--roundedness);
 }
 
-.spinner {
-  content: '';
-  height: 7vmin;
-  padding: 1vmin;
-  aspect-ratio: 1;
-  border: 0.4vmax solid transparent;
-  border-top-color: black;
-  border-radius: 50%;
-  animation: spinner 1s ease-out infinite;
+.ri-loader-3-line {
+  animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
 }
 
 @keyframes spinner {

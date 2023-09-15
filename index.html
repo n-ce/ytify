@@ -60,16 +60,12 @@
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
         </select>
-        <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line"></label>
       </div>
 
-      <article id="subtitleContainer" class="hide"></article>
 
-      <audio data-seconds="0">
-        <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
-      </audio>
+      <audio data-seconds="0"></audio>
 
     </section>
 
@@ -157,17 +153,17 @@
     </section>
     <footer>
       <span>
-        <p id="currentDuration">00:05</p>
-        <input type="range" data-position="00:00" data-duration="02:59" />
-        <p id="FullDuration">01:39</p>
+        <p id="currentDuration">00:00</p>
+        <input type="range" data-position="00:00" data-duration="00:00" id="progress" />
+        <p id="fullDuration">00:00</p>
       </span>
       <div id="playerControls">
-        <button class="ri-skip-back-line"></button>
-        <button class="ri-replay-15-line"></button>
-        <button class="ri-play-line"></button>
-        <button class="ri-forward-15-line"></button>
-        <button class="ri-skip-forward-line"></button>
-        <select id="volume">
+        <button class="ri-skip-back-line" id="playPrevButton"></button>
+        <button class="ri-replay-15-line" id="seekBwdButton"></button>
+        <button class="ri-play-line" id="playButton"></button>
+        <button class="ri-forward-15-line" id="seekFwdButton"></button>
+        <button class="ri-skip-forward-line" id="playNextButton"></button>
+        <select id="volumeSelector">
           <option value="0">Mute</option>
           <option value="0.16">16%</option>
           <option value="0.33">33%</option>
@@ -175,7 +171,6 @@
           <option value="0.66">66%</option>
           <option value="0.83">83%</option>
           <option value="1" selected>VOL : 100%</option>
-          <option value="2">2x Boost</option>
         </select>
         <select id="playSpeed">
           <option value="0.25">0.25x</option>

@@ -2,7 +2,6 @@ import { params } from "./utils";
 
 export default function nav() {
 
-  if (params.has('e')) return;
   const anchors = document.querySelectorAll('nav a');
   const sections = document.querySelectorAll('section');
 

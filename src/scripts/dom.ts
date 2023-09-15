@@ -1,0 +1,16 @@
+
+export const img = <HTMLImageElement>document.querySelector('img');
+
+export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
+
+export const superInput = <HTMLInputElement>document.getElementById('superInput');
+
+export const playButton = <HTMLButtonElement>document.getElementById('playButton');
+
+export const audio = <HTMLAudioElement>document.querySelector('audio');
+
+export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
+
+export const suggestions = <HTMLUListElement>document.getElementById('suggestions');
+
+export const suggestionsSwitch = document.getElementById('suggestionsSwitch');

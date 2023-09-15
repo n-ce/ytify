@@ -19,6 +19,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 .ri-search-2-line:before {
   content: "\f0cd";
 }
@@ -77,4 +78,8 @@
 
 .ri-node-tree:before {
   content: "\ef90";
+}
+
+.ri-loader-3-line:before {
+  content: "\eec4";
 }

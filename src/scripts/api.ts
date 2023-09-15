@@ -1,4 +1,5 @@
-import { pipedInstances, getSaved, save } from "./utils";
+import { pipedInstances } from "./dom";
+import { getSaved, save } from "./utils";
 
 export default async function api(init: () => void) {
 
