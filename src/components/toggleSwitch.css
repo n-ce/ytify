@@ -33,7 +33,7 @@ span,
 span:before {
   position: absolute;
   transition: 0.3s;
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
   border: var(--border);
 }
 

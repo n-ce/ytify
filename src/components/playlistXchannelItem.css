@@ -3,7 +3,7 @@
   height: 20vmin;
   margin-bottom: 1vmin;
   padding: 1vmin;
-  border-radius: calc(var(--roundedness) + 0.75vmin);
+  border-radius: calc(var(--roundness) + 0.75vmin);
   overflow: hidden;
   display: flex;
 }
@@ -15,7 +15,7 @@ p {
 
 #thumbnail {
   height: 20vmin;
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
 }
 
 div {

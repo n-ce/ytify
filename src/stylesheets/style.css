@@ -1,9 +1,10 @@
+@import 'remixicon.css';
 @import 'nav.css';
 @import 'footer.css';
 @import 'home.css';
 @import 'search.css';
 @import 'settings.css';
-@import 'remixicon.css';
+@import 'superModal.css';
 
 :root {
   --bg: ;
@@ -13,7 +14,7 @@
   --border: 0.1vmin solid var(--borderColor);
   --shadowColor: ;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
-  --roundedness: 2vmin;
+  --roundness: 2vmin;
 }
 
 @font-face {
@@ -120,7 +121,7 @@ select {
   outline: none;
   color: var(--text);
   border: none;
-  border-radius: var(--roundedness)
+  border-radius: var(--roundness)
 }
 
 details {
@@ -130,7 +131,7 @@ details {
   padding: 2vmin;
   margin-bottom: 4vmin;
   border: var(--border);
-  border-radius: var(--roundedness)
+  border-radius: var(--roundness)
 }
 
 details>summary {
@@ -144,13 +145,13 @@ a {
 
 
 .hide {
-  display: none;
+  display: none !important;
 }
 
 stream-item,
 channel-item,
 playlist-item {
-  transition: transform 0.5s;
+  transition: transform 0.3s ease-in-out;
 }
 
 stream-item:hover,

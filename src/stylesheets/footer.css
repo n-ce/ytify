@@ -2,7 +2,7 @@ footer {
   display: flex;
   height: 20%;
   width: 100%;
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
   background-color: var(--onBg);
   color: var(--text);
   border: var(--border);
@@ -24,7 +24,7 @@ footer span {
 
 footer span p {
   margin: 0;
-  font-size: 100%;
+  font-size: large;
 }
 
 input[type='range'] {
@@ -69,6 +69,7 @@ input[type='range']::-webkit-slider-thumb {
   transition: all 0.5s;
 }
 
+
 @media(orientation:landscape) {
   #playerControls {
     display: flex;
@@ -89,15 +90,19 @@ input[type='range']::-webkit-slider-thumb {
     text-align: center;
   }
 
-  #playback,
+  #playSpeed,
   #volumeSelector {
     grid-column: auto / span 2;
     width: auto;
-    margin: auto;
+    margin: 0 auto;
+  }
+
+  #loopButton {
+    font-size: medium !important
   }
 
   footer select {
-    font-size: 1.8dvh;
+    font-size: 0.7rem;
     font-weight: bold;
   }
 }
@@ -106,7 +111,7 @@ input[type='range']::-webkit-slider-thumb {
 .on {
   background-color: var(--accent);
   border: var(--border);
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
 }
 
 .ri-loader-3-line {

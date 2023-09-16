@@ -1,0 +1,46 @@
+#superModal {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #0004;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: bgFade 0.3s ease-in-out;
+}
+
+#superModal ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.5vmin 2vmin;
+  width: auto;
+  background-color: var(--bg);
+  border-radius: calc(var(--roundness)*1.4);
+  box-shadow: var(--shadow);
+  animation: boing 0.3s ease-in-out;
+}
+
+#superModal li {
+  background-color: var(--onBg);
+  padding: 2vmin 8vmin;
+  margin: 2vmin 0;
+  border: var(--border);
+  border-radius: var(--roundness);
+  font-weight: bold;
+  font-size: medium;
+  user-select: none;
+}
+
+@keyframes bgFade {
+  from {
+    background-color: #0000;
+  }
+}
+
+@keyframes boing {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}

@@ -5,7 +5,7 @@
   background-color: var(--onBg);
   padding: 1vmin;
   margin-bottom: 1vmin;
-  border-radius: calc(var(--roundedness) + 0.75vmin);
+  border-radius: calc(var(--roundness) + 0.75vmin);
   display: flex;
 }
 
@@ -26,7 +26,7 @@ span {
 
 #thumbnail {
   height: 100%;
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
 }
 
 #duration {

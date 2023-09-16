@@ -13,7 +13,7 @@
 
 img {
   border: var(--border);
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
   box-shadow: var(--shadow);
 }
 

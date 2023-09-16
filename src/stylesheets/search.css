@@ -8,7 +8,7 @@
   top: 0;
   backdrop-filter: blur(2vmin);
   background-color: var(--onBg);
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
   border: var(--border);
   box-shadow: var(--shadow);
   display: flex;
@@ -32,8 +32,10 @@
   font-size: medium;
   width: 10ch;
   padding: 0;
+  margin-right: 1vmin;
   border: none;
   color: inherit;
+  text-align: right;
 }
 
 #search button {
@@ -56,7 +58,7 @@
   background-color: var(--bg);
   list-style-type: none;
   padding: 0;
-  border-radius: 0 0 var(--roundedness) var(--roundedness);
+  border-radius: 0 0 var(--roundness) var(--roundness);
   border: var(--border);
   box-shadow: var(--shadow);
   display: none;

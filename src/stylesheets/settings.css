@@ -2,7 +2,7 @@
   background-color: var(--onBg);
   width: 90%;
   padding: 0 5%;
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
 }
 
 #settings.view {
@@ -29,7 +29,7 @@
   background-color: var(--onBg);
   padding: 1vmin;
   border: var(--border);
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
   display: inline-block;
   margin-bottom: 4vmin;
 }
@@ -48,7 +48,7 @@
   font-size: medium;
   background-color: var(--onBg);
   border: var(--border);
-  border-radius: var(--roundedness);
+  border-radius: var(--roundness);
   color: var(--text);
   padding: 1vmin;
   width: calc(100% - 2.3vmin);
@@ -57,4 +57,5 @@
 
 #netlifyForm::placeholder {
   color: var(--text);
+  opacity: 75%;
 }

@@ -58,12 +58,26 @@ export default async function player(id: string) {
   }
 
   // finding lowest available stream when low opus bitrate unavailable
-  if (!getSaved('quality') && Math.min(...opus.bitrates) > 64 && !isSafari) {
+
+  if (
+    !getSaved('quality') &&
+    Math.min(...opus.bitrates) > 64 &&
+    !isSafari) {
+
     opus.urls = opus.urls.concat(m4a.urls);
+
     opus.bitrates = opus.bitrates.concat(m4a.bitrates);
+
     for (const opts of m4a.options) bitrateSelector.add(opts);
-  } const codec = (isSafari ? m4a : opus);
-  bitrateSelector.selectedIndex = codec.bitrates.indexOf(getSaved('quality') ? Math.max(...codec.bitrates) : Math.min(...codec.bitrates));
+  }
+
+  const codec = (isSafari ? m4a : opus);
+
+  bitrateSelector.selectedIndex =
+    codec.bitrates.indexOf(getSaved('quality') ?
+      Math.max(...codec.bitrates) :
+      Math.min(...codec.bitrates));
+
   audio.src = codec.urls[bitrateSelector.selectedIndex];
 
 
@@ -80,8 +94,10 @@ export default async function player(id: string) {
   relatedStreamsContainer.innerHTML = '';
   relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
 
+  (<HTMLAnchorElement>document.getElementById('/')).click(
+  );
   params.set('s', id);
-  history.pushState({}, '', '?' + params);
+  history.replaceState({}, '', '?' + params);
   /*
 
   // autoplay init

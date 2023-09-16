@@ -14,3 +14,10 @@ export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitra
 export const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 
 export const suggestionsSwitch = document.getElementById('suggestionsSwitch');
+
+export const superModal = <HTMLDivElement>document.getElementById('superModal');
+
+
+export const [playNow, queueNext, addToPlaylist, startRadio] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+
+export const queuelist = <HTMLElement>document.getElementById('upcoming');

@@ -1,5 +1,4 @@
-import { audio, img, pipedInstances}   from "./dom";
-import player from "./player";
+import { audio, img, pipedInstances, playNow, queueNext, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -28,6 +27,19 @@ export function convertSStoHHMMSS(seconds: number): string {
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 
+const author = <HTMLAnchorElement>document.getElementById('author');
+author.addEventListener('click', e => {
+  e.preventDefault();
+  fetch((<HTMLAnchorElement>e.target).href)
+    .then(res => res.json())
+    .then(data => itemsLoader(data.relatedStreams))
+    .then(fragment => {
+      stealthContainer.innerHTML = '';
+      stealthContainer.appendChild(fragment);
+      stealthAnchor.click();
+    })
+    .catch(_ => alert(_));
+})
 
 export function setMetaData(
   id: string,
@@ -46,8 +58,7 @@ export function setMetaData(
   title.href = `https://youtube.com/watch?v=${id}`;
   title.textContent = streamName;
 
-  const author = <HTMLAnchorElement>document.getElementById('author');
-  author.href = `https://youtube.com${authorUrl}`;
+  author.href = pipedInstances.value + authorUrl;
   author.textContent = authorName;
 
   document.title = streamName + ' - ytify';
@@ -116,8 +127,8 @@ if ('mediaSession' in navigator) {
 
 
 
-const stealthContainer = document.getElementById('stealth');
-const stealthAnchor = <HTMLAnchorElement>document.getElementById('/stealth');
+const stealthContainer = <HTMLElement>document.getElementById('>');
+const stealthAnchor = <HTMLAnchorElement>document.getElementById('/>');
 
 type item = 'title' | 'name' | 'uploaderName' | 'description' | 'thumbnail' | 'type' | 'url' | 'views' | 'duration' | 'uploadedDate' | 'uploaderAvatar' | 'videos' | 'subscribers';
 
@@ -127,7 +138,6 @@ function loadGroup(group: string) {
     .then(group => group.relatedStreams)
     .then(streams => itemsLoader(streams))
     .then(fragment => {
-      if (!stealthContainer) return;
       stealthContainer.innerHTML = '';
       stealthContainer.appendChild(fragment);
       stealthAnchor.click();
@@ -141,6 +151,10 @@ function loadGroup(group: string) {
       alert(err);
     })
 }
+
+
+
+
 function createStreamItem(stream: Record<item, string>) {
   const streamItem = document.createElement('stream-item');
   streamItem.textContent = stream.title;
@@ -151,7 +165,14 @@ function createStreamItem(stream: Record<item, string>) {
   streamItem.dataset.uploaded = stream.uploadedDate || '';
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
-    player(stream.url.substring(9))
+    superModal.classList.toggle('hide');
+    playNow.dataset.id = stream.url.substring(9);
+    const qds = queueNext.dataset
+    qds.title = stream.title;
+    qds.thumbnail = stream.thumbnail;
+    qds.author = stream.uploaderName;
+    qds.duration = stream.duration;
+    qds.id = stream.url.substring(9);
   })
   return streamItem;
 }
