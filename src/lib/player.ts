@@ -1,18 +1,17 @@
 import { audio, bitrateSelector, pipedInstances, playButton } from "./dom";
 import { getSaved, itemsLoader, params, setMetaData } from "./utils";
 
-export default async function player(id: string) {
+
+
+export default async function player(id: string | null = '') {
 
   if (!id) return;
 
   const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
+
   const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
 
-  /*
-      if (id.length !== 11) {
-        playlistLoad(id);
-        return;
-      }*/
+
   playButton.classList.replace(playButton.classList[0], 'ri-loader-3-line');
 
   const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
@@ -27,7 +26,11 @@ export default async function player(id: string) {
   if (!data.audioStreams.length) {
     alert('NO AUDIO STREAMS AVAILABLE.');
     return;
-  } audio.dataset.seconds = '0';
+  }
+
+  audio.dataset.seconds = '0';
+
+
 
   // extracting opus streams and storing m4a streams
   interface Opus {
@@ -94,21 +97,13 @@ export default async function player(id: string) {
   relatedStreamsContainer.innerHTML = '';
   relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
 
-  (<HTMLAnchorElement>document.getElementById('/')).click(
-  );
+  // (<HTMLAnchorElement>document.getElementById('/')).click();
   params.set('s', id);
-  history.replaceState({}, '', '?' + params);
-  /*
+  // history.pushState({}, '', '?' + params);
 
-  // autoplay init
-  if (autoplayState.contains('on')) {
-    autoplayButton.firstElementChild.classList.replace('ri-magic-line', 'spinner');
-    streamHistory.push(id);
-    autoplayFX(
-      await similarStreamsCollector(
-        data.title + (data.uploader.includes(' - Topic') ? ' ' + data.uploader.replace(' - Topic', '') : ''),
-        id
-      )
-    );
-  }*/
+  audio.dataset.id = id;
+  audio.dataset.thumbnail = data.thumbnailUrl;
+  audio.dataset.name = data.title;
+  audio.dataset.author = data.uploader;
+  audio.dataset.duration = data.duration;
 }

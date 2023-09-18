@@ -17,7 +17,7 @@ import player from '../lib/player';
 if (params.has('e'))
   location.replace(params.get('e') || '/');
 if (params.has('s'))
-  player(params.get('s') || '');
+  player(params.get('s'));
 
 
 

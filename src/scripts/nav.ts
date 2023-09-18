@@ -29,9 +29,8 @@ for (const anchor of anchors) {
     q => search
     e => error
     */
-
     const allowRoute = params.has('p') || params.has('s') ? '/' : params.has('q') ? '/search' : '';
-    const url = anchor.id + (params.size && anchor.id === allowRoute ? '?' + params : '');
+    const url = anchor.id + (anchor.id === allowRoute ? '?' + params : '');
 
     history.pushState({}, '', new URL(url, location.origin));
     showSection(anchor.id);

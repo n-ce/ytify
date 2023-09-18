@@ -64,7 +64,8 @@ export default defineConfig(({ command }) => {
   return {
     plugins: (eruda && command === 'serve') ? [erudaInjector] : [VitePWA({
       registerType: 'autoUpdate',
-      manifest: manifest
+      manifest: manifest,
+      includeAssets: ['*.woff2']
     })]
   }
 });

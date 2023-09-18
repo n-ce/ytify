@@ -9,7 +9,7 @@ footer {
   align-items: center;
   flex-direction: column;
   box-shadow: var(--shadow);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 footer span {
@@ -54,9 +54,8 @@ input[type='range']::-webkit-slider-thumb {
 
 
 #playerControls {
-  height: 99%;
+  height: 100%;
   width: 100%;
-  align-items: center;
 }
 
 #playerControls button {
@@ -76,42 +75,71 @@ input[type='range']::-webkit-slider-thumb {
     justify-content: space-evenly;
   }
 
+  #loopButton {
+    aspect-ratio: 1;
+  }
 }
 
 @media(orientation:portrait) {
 
   #playerControls {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: 5fr 3fr;
+    grid-template-areas:
+      "A B C D E"
+      "F F G H H";
+  }
+
+  #playPrevButton {
+    grid-area: A;
+  }
+
+  #seekBwdButton {
+    grid-area: B;
+  }
+
+  #playButton {
+    grid-area: C;
+  }
+
+  #seekFwdButton {
+    grid-area: D;
+  }
+
+  #playNextButton {
+    grid-area: E;
+  }
+
+  #volumeSelector {
+    grid-area: F;
+  }
+
+  #loopButton {
+    grid-area: G;
+    font-size: medium !important;
+    font-weight: bold;
+  }
+
+  #playSpeed {
+    grid-area: H;
   }
 
   #playerControls * {
     text-align: center;
   }
 
-  #playSpeed,
-  #volumeSelector {
-    grid-column: auto / span 2;
-    width: auto;
-    margin: 0 auto;
-  }
-
-  #loopButton {
-    font-size: medium !important
-  }
-
   footer select {
-    font-size: 0.7rem;
     font-weight: bold;
+    width: 13ch;
+    margin: auto;
   }
 }
 
 
 .on {
-  background-color: var(--accent);
-  border: var(--border);
+  background-color: var(--onBg) !important;
+  border: var(--border) !important;
   border-radius: var(--roundness);
+  transform: scale(0.9);
 }
 
 .ri-loader-3-line {

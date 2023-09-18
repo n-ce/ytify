@@ -24,7 +24,7 @@ qualitySwitch.addEventListener('click', async () => {
 
   if (params.has('s')) {
     const timeOfSwitch = parseInt(audio.dataset.seconds || '');
-    await player(params.get('s') || '');
+    await player(params.get('s'));
     audio.currentTime = timeOfSwitch;
     updatePositionState();
   }

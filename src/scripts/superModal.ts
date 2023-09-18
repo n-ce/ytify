@@ -1,34 +1,35 @@
-import { playNow, queueNext, queuelist, superModal } from "../lib/dom";
+import { playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
 import player from "../lib/player";
+import { orderByFrequency, relativesData, sanitizeAuthorName, similarStreamsCollector } from "../lib/utils";
 
+export const streamHistory: string[] = [];
 
+let oneOff = true;
 superModal.addEventListener('click', () => {
+  if (oneOff) {
+    (<HTMLHeadingElement>queuelist.firstElementChild).remove();
+    oneOff = !oneOff;
+  }
   superModal.classList.toggle('hide');
 });
 
 
 playNow.addEventListener('click', () => {
-  player(playNow.dataset.id || '');
-
+  player(superModal.dataset.id);
 });
 
-const queueArray: string[] = [];
+export const queueArray: string[] = [];
 
 
-let oneOff = true;
 
 queueNext.addEventListener('click', () => {
-  if (oneOff) {
-    (<HTMLHeadingElement>queuelist.firstElementChild).remove();
-    oneOff = !oneOff;
-  }
-  queueArray.push(queueNext.dataset.id || '');
-  appendToQueuelist();
+  appendToQueuelist(superModal.dataset);
 })
 
 
-const appendToQueuelist = () => {
-  const data = queueNext.dataset;
+export const appendToQueuelist = (data: DOMStringMap, prepend: boolean = false) => {
+  queueArray.push(data.id || '');
+
   const listItem = document.createElement('stream-item');
   listItem.textContent = data.title || '';
   listItem.dataset.author = data.author;
@@ -43,5 +44,30 @@ const appendToQueuelist = () => {
     queueArray.splice(index, 1);
     queuelist.children[index].remove();
   });
-  queuelist.appendChild(listItem);
+  prepend ?
+    queuelist.prepend(listItem) :
+    queuelist.appendChild(listItem);
 }
+
+function radio(relatives: string[]) {
+  const orderedItems = orderByFrequency(relatives);
+
+  if (!orderedItems) return;
+  orderedItems.filter(stream => !streamHistory.includes(stream) && !queueArray.includes(stream));
+  if (orderedItems.length) {
+    for (const id of orderedItems) {
+      queueArray.push(id);
+      appendToQueuelist(relativesData[id]);
+    }
+  }
+}
+
+startRadio.addEventListener('click', async () => {
+  radio(
+    await similarStreamsCollector(
+      superModal.dataset.title +
+      sanitizeAuthorName(superModal.dataset.author),
+      superModal.dataset.id || ''
+    )
+  );
+})

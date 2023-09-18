@@ -17,6 +17,9 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.src = blankImage;
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
+		thumbnail.onerror = () => {
+			thumbnail.src = blankImage;
+		}
 
 		const duration = document.createElement('p');
 		duration.id = 'duration';

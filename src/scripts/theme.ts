@@ -18,10 +18,18 @@ function accentLightener(r: number, g: number, b: number) {
   return `rgb(${r + max}, ${g + max},${b + max})`;
 }
 
+
 function accentDarkener(
   r: number, g: number, b: number
 ) {
-  const min = Math.min(r, g, b);
+  let min = Math.min(r, g, b);
+  if (r + g + b > 382.5 && min < 25.5) {
+    r = Math.floor(r / 3);
+    g = Math.floor(g / 3);
+    b = Math.floor(b / 3);
+    min = Math.floor(min / 3);
+  }
+
   return `rgb(${r - min}, ${g - min},${b - min})`;
 }
 

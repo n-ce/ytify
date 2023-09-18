@@ -1,6 +1,7 @@
-import { audio, playButton, queuelist, superInput } from "../lib/dom";
+import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
+import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
-
+import { appendToQueuelist, streamHistory } from "./superModal";
 
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
@@ -47,6 +48,8 @@ playButton.addEventListener('click', () => {
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.classList[0], 'ri-pause-line');
   playButton.dataset.state = '';
+  if (!streamHistory.includes(audio.dataset.id || ''))
+    streamHistory.push(audio.dataset.id || '');
 });
 
 audio.addEventListener('pause', () => {
@@ -54,13 +57,29 @@ audio.addEventListener('pause', () => {
   playButton.dataset.state = '1';
 });
 
+
+audio.addEventListener('loadstart', () => {
+  setTimeout(
+    () => {
+      if (playButton.classList.contains('ri-loader-3-line')) {
+        pipedInstances.selectedIndex++;
+        player(audio.dataset.id);
+      }
+    }, 10000);
+})
+
+
 audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-line');
 
-  playButton.classList.add('on');
-  if (superInput.value)
+  if (superInput.value || streamHistory.length)
     audio.play();
 });
+
+audio.addEventListener('waiting', () => {
+  playButton.classList.replace(playButton.classList[0], 'ri-loader-3-line');
+})
+
 
 playSpeed.addEventListener('change', () => {
   const speed = parseFloat(playSpeed.value);
@@ -118,23 +137,36 @@ audio.addEventListener('loadedmetadata', () => {
 });
 
 
-/*
+const loopButton = <HTMLButtonElement>document.getElementById('loopButton');
 loopButton.addEventListener('click', () => {
-  loopButton.firstElementChild.classList.toggle('on');
+  loopButton.classList.toggle('on');
   audio.loop = !audio.loop;
 });
-*/
+
 
 function onEnd() {
   if (queuelist.childElementCount)
     (<HTMLElement>queuelist.firstElementChild).click();
 }
 
-audio.addEventListener('ended', onEnd)
+audio.addEventListener('ended', onEnd);
 
-// play next 
+
+
 playPrevButton.addEventListener('click', () => {
-  console.log(true)
+  if (streamHistory.length > 1) {
+    appendToQueuelist({
+      title: audio.dataset.name,
+      author: audio.dataset.author,
+      id: audio.dataset.id,
+      thumbnail: audio.dataset.thumbnail,
+      duration: audio.dataset.duration
+    }, true);
+    streamHistory.pop();
+    player(streamHistory[streamHistory.length - 1]);
+  }
 })
+
+
 playNextButton.addEventListener('click', onEnd);
 
