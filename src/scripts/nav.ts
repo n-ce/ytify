@@ -27,12 +27,13 @@ for (const anchor of anchors) {
     p => playlist
     t => timestamp
     q => search
+    f => filter
     e => error
     */
-    const allowRoute = params.has('p') || params.has('s') ? '/' : params.has('q') ? '/search' : '';
-    const url = anchor.id + (anchor.id === allowRoute ? '?' + params : '');
 
-    history.pushState({}, '', new URL(url, location.origin));
+    const url = (params.get('s') && anchor.id === '/') ? '?' + params : '';
+
+    history.pushState({}, '', new URL(anchor.id + url, location.origin));
     showSection(anchor.id);
   })
 }

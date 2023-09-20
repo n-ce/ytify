@@ -13,7 +13,7 @@ export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitra
 
 export const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 
-export const suggestionsSwitch = document.getElementById('suggestionsSwitch');
+export const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
 
 export const superModal = <HTMLDivElement>document.getElementById('superModal');
 

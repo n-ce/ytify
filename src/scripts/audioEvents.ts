@@ -57,7 +57,6 @@ audio.addEventListener('pause', () => {
   playButton.dataset.state = '1';
 });
 
-
 audio.addEventListener('loadstart', () => {
   setTimeout(
     () => {

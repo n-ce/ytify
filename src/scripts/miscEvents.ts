@@ -63,6 +63,20 @@ thumbnailSwitch.addEventListener('click', () => {
 });
 
 
+const librarySwitch = <HTMLElement>document.getElementById('librarySwitch');
+
+
+librarySwitch.addEventListener('click', () => {
+  (<HTMLAnchorElement>document.getElementById('/library')).classList.toggle('hide');
+  getSaved('library') ?
+    localStorage.removeItem('library') :
+    save('library', 'on');
+})
+
+if (getSaved('library'))
+  librarySwitch.click();
+
+
 
 const volumeSelector = <HTMLSelectElement>document.getElementById('volumeSelector');
 

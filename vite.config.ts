@@ -28,7 +28,7 @@ const erudaInjector: PluginOption = {
 }
 
 const manifest = {
-  "short_name": "ytify",
+  "short_name": "Ytify",
   "name": "audio streaming with ytify",
   "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
   "icons": [
@@ -65,7 +65,7 @@ export default defineConfig(({ command }) => {
     plugins: (eruda && command === 'serve') ? [erudaInjector] : [VitePWA({
       registerType: 'autoUpdate',
       manifest: manifest,
-      includeAssets: ['*.woff2']
+      includeAssets: ['*.woff2,ytify_thumbnail_min.webp']
     })]
   }
 });

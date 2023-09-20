@@ -148,8 +148,6 @@ img.addEventListener('load', themer);
 
 systemDark.addEventListener('change', themer);
 
-themer();
-
 
 
 const roundnessChanger = <HTMLSelectElement>document.getElementById('roundnessChanger');

@@ -49,18 +49,16 @@ img {
   text-align: right;
   font-size: x-large;
   font-weight: bold;
-  color: deeppink;
-  opacity: 0.8;
   grid-area: E;
 }
 
 #favButton:checked+label {
-  animation: like 0.5s ease-in-out;
+  animation: like 0.4s ease-in-out;
 }
 
 @keyframes like {
   50% {
-    transform: scale(0.8)
+    transform: scale(0.9);
   }
 }
 

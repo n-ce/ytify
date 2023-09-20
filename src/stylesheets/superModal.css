@@ -44,3 +44,9 @@
     opacity: 0;
   }
 }
+
+#playlistSelector {
+  font-weight: inherit;
+  font-size: inherit;
+  appearance: none;
+}

@@ -38,7 +38,7 @@
       <i class="ri-node-tree"></i>
       <p>Related</p>
     </a>
-    <a href="/library" id="/library">
+    <a href="/library" id="/library" class="hide">
       <i class="ri-stack-line"></i>
       <p>Library</p>
     </a>
@@ -50,7 +50,7 @@
   </nav>
   <main>
     <section id="home">
-      <img crossorigin="anonymous" src="/ytify_thumbnail_min.webp" alt="Current Playing Media Thumbnail">
+      <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
         <a id="title" href="" target="_blank">ytify v6 alpha 7</a>
@@ -128,6 +128,7 @@
       <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
+      <toggle-switch id="librarySwitch" checked>Disable Library</toggle-switch>
 
       <span>
         <label for="roundnessChanger">UI Roundness</label>
@@ -139,17 +140,20 @@
         </select>
       </span>
       <span>
-        <label for="autoplayConfig">Autoplay Lookup Depth</label>
-        <select id="autoplayConfig">
-          <option value="2">Shallow</option>
+        <label for="radioRadius">Radio Search Radius</label>
+        <select id="radioRadius">
+          <option value="2">Narrow</option>
           <option value="8" selected>Moderate</option>
-          <option value="20">Abysmal</option>
+          <option value="20">Wide</option>
         </select>
       </span>
 
       <a href="/" id="deleteButton">Clear All Stored Data</a>
+
       <a href="https://github.com/n-ce/ytify/pull/124" target="_blank">Contribute on Github</a>
+
       <a href="https://t.me/encetg">Contact on Telegram</a>
+
       <form netlify name='feedback' method='POST'>
         <input type="text" name="->" id="netlifyForm"
           placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
@@ -197,11 +201,16 @@
       </div>
     </footer>
   </main>
+
   <div id="superModal" class="hide">
     <ul>
       <li>Play Now</li>
       <li>Queue Next</li>
-      <li>Add to Playlist</li>
+      <li>
+        <select id="playlistSelector">
+          <option>Add To Playlist</option>
+        </select>
+      </li>
       <li>Start Radio</li>
     </ul>
   </div>

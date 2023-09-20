@@ -1,4 +1,4 @@
-import { playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
+import { addToPlaylist, playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
 import player from "../lib/player";
 import { orderByFrequency, relativesData, sanitizeAuthorName, similarStreamsCollector } from "../lib/utils";
 
@@ -10,6 +10,7 @@ superModal.addEventListener('click', () => {
     (<HTMLHeadingElement>queuelist.firstElementChild).remove();
     oneOff = !oneOff;
   }
+  //if (!(e.target as HTMLLIElement).matches('select'))
   superModal.classList.toggle('hide');
 });
 
@@ -63,11 +64,17 @@ function radio(relatives: string[]) {
 }
 
 startRadio.addEventListener('click', async () => {
+  player(superModal.dataset.id);
   radio(
     await similarStreamsCollector(
-      superModal.dataset.title +
+      superModal.dataset.title + ' ' +
       sanitizeAuthorName(superModal.dataset.author),
-      superModal.dataset.id || ''
+      superModal.dataset.id
     )
   );
+})
+
+addToPlaylist.addEventListener('click', () => {
+  superModal.classList.toggle('hide');
+
 })

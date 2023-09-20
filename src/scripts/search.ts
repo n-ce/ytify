@@ -1,18 +1,21 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
-import { getSaved, save, params, itemsLoader } from "../lib/utils";
+import { getSaved, save, itemsLoader } from "../lib/utils";
 
 
-const searchlist = document.getElementById('searchlist');
+const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
+
 
 // Get search results of input
 
 const searchLoader = () => {
-  if (!superInput.value || !superInput || !searchlist || !searchFilters) return;
+  const text = superInput.value;
+
+  if (!text) return;
 
   searchlist.innerHTML = '';
 
-  fetch(pipedInstances.value + '/search?q=' + superInput.value + '&filter=' + searchFilters.value)
+  fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
     .then(searchResults => searchResults.items)
     .then(items => itemsLoader(items))
@@ -26,12 +29,19 @@ const searchLoader = () => {
       alert(err)
     });
   suggestions.style.display = 'none';
+  /*
+  params.set('q', text);
+  if (searchFilters.value !== 'all')
+    params.set('f', searchFilters.value);
+  history.replaceState({}, '', '?' + params);*/
 }
 
 
 // super input supports both searching and direct link, also loads suggestions
 
 superInput.addEventListener('input', async () => {
+
+  const text = superInput.value;
 
   suggestions.innerHTML = '';
   suggestions.style.display = 'none';
@@ -40,11 +50,13 @@ superInput.addEventListener('input', async () => {
         if (validator(superInput.value))
           return;*/
 
-  if (superInput.value.length < 3 || getSaved('search_suggestions')) return;
+
+
+  if (text.length < 3 || getSaved('search_suggestions')) return;
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(pipedInstances.value + '/suggestions/?query=' + superInput.value).then(res => res.json());
+  const data = await fetch(pipedInstances.value + '/suggestions/?query=' + text).then(res => res.json());
 
   if (!data.length) return;
 
@@ -61,29 +73,40 @@ superInput.addEventListener('input', async () => {
   }
   suggestions.appendChild(fragment);
 
-  superInput.onkeyup = e => {
-    if (e.key === 'ArrowDown') {
-      const topSuggestion = <HTMLLIElement>suggestions.firstElementChild;
-      topSuggestion.setAttribute('tabindex', '-1');
-      topSuggestion.onkeyup = f => {
-        if (f.key === 'ArrowUp') superInput.focus();
-      }
-      topSuggestion.focus();
-    }
+
+  index = 0;
+
+});
+
+let index = 0;
+
+superInput.addEventListener('keyup', _ => {
+  if (_.key === 'Enter')
+    return searchLoader();
+
+  if (!suggestions.hasChildNodes()) return;
+
+  if (_.key === 'ArrowUp') {
+    if (index === 0) index = suggestions.childElementCount;
+    index--;
   }
+
+  superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
+
+  if (_.key === 'ArrowDown') {
+    index++;
+    if (index === suggestions.childElementCount) index = 0;
+  }
+
 });
 
 
-superInput.addEventListener('keypress', e => {
-  if (e.key === 'Enter') searchLoader();
-});
 
-
-searchFilters.nextElementSibling?.addEventListener('click', searchLoader);
+(<HTMLButtonElement>searchFilters.nextElementSibling).addEventListener('click', searchLoader);
 
 searchFilters.addEventListener('change', searchLoader);
 
-suggestionsSwitch?.addEventListener('click', () => {
+suggestionsSwitch.addEventListener('click', () => {
   getSaved('search_suggestions') ?
     localStorage.removeItem('search_suggestions') :
     save('search_suggestions', 'off');
@@ -93,11 +116,13 @@ suggestionsSwitch?.addEventListener('click', () => {
 if (getSaved('search_suggestions') && suggestionsSwitch)
   suggestionsSwitch.removeAttribute('checked')
 
-
+/*
 const query = params.get('q');
+const filter = params.get('f');
 if (query) {
   superInput.value = query;
-  searchFilters.value = 'channels';
+  if (filter)
+    searchFilters.value = filter;
   searchLoader();
-}
+}*/
 

@@ -53,7 +53,7 @@ section {
   align-items: center;
   width: 100%;
   overflow-y: auto;
-  animation: appear 0.2s ease-out;
+  animation: appear 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 @keyframes appear {

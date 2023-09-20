@@ -248,7 +248,7 @@ export function orderByFrequency(array: string[]) {
 }
 
 
-const autoplayDepth = <HTMLSelectElement>document.getElementById('autoplayConfig');
+const radioRadius = <HTMLSelectElement>document.getElementById('radioRadius');
 
 export type Relative = {
   [index: string]: {
@@ -259,7 +259,7 @@ export type Relative = {
 export const relativesData: Relative = {};
 
 
-export async function similarStreamsCollector(streamTitle: string, currentStream: string) {
+export async function similarStreamsCollector(streamTitle: string, currentStream: string | undefined) {
   const relatives = [];
   const searchPlaylists = await fetch(
     pipedInstances.value + '/search?q=' + streamTitle + '&filter=playlists'
@@ -267,7 +267,7 @@ export async function similarStreamsCollector(streamTitle: string, currentStream
     .then(res => res.json())
     .then(data => data.items);
 
-  const depth = parseInt(autoplayDepth.value);
+  const depth = parseInt(radioRadius.value);
 
   for (let index = 0; index < depth; index++) {
 
