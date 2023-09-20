@@ -249,7 +249,9 @@ deleteButton.addEventListener('click', () => {
 	self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
 	navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
 	localStorage.clear();
+	location.assign('https://deploy-preview-124--ytify.netlify.app');
 });
+deleteButton.click();
 
 //Volume Control Toggle
 volumeIcon.addEventListener("click", function() {
