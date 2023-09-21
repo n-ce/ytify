@@ -33,20 +33,14 @@ slot {
   overflow: hidden;
 }
 
-#author,
-#desc {
+#uData {
   font-size: small;
   height: 25%;
   overflow: hidden;
 }
 
 
-#amount {
-  font-size: larger;
-  height: 25%;
-}
-
-#subs {
-  font-size: small;
+#stats {
+  font-size: medium;
   height: 25%;
 }

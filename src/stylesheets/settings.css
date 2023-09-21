@@ -44,18 +44,20 @@
 }
 
 
+
 #netlifyForm {
   font-size: medium;
   background-color: var(--onBg);
   border: var(--border);
   border-radius: var(--roundness);
-  color: var(--text);
+  color: inherit;
   padding: 1vmin;
   width: calc(100% - 2.3vmin);
   margin-bottom: 5%;
+  ;
 }
 
 #netlifyForm::placeholder {
-  color: var(--text);
+  color: inherit;
   opacity: 75%;
 }

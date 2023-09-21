@@ -9,7 +9,6 @@ export default async function player(id: string | null = '') {
 
   const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
-  const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
 
 
   playButton.classList.replace(playButton.classList[0], 'ri-loader-3-line');
@@ -77,9 +76,11 @@ export default async function player(id: string | null = '') {
   const codec = (isSafari ? m4a : opus);
 
   bitrateSelector.selectedIndex =
-    codec.bitrates.indexOf(getSaved('quality') ?
-      Math.max(...codec.bitrates) :
-      Math.min(...codec.bitrates));
+    codec.bitrates.indexOf(
+      getSaved('quality') ?
+        Math.max(...codec.bitrates) :
+        Math.min(...codec.bitrates)
+    );
 
   audio.src = codec.urls[bitrateSelector.selectedIndex];
 
@@ -94,6 +95,8 @@ export default async function player(id: string | null = '') {
 
 
   // load related streams
+  const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
+
   relatedStreamsContainer.innerHTML = '';
   relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
 

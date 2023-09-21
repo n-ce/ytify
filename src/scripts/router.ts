@@ -22,25 +22,16 @@ function showSection(id: string) {
 for (const anchor of anchors) {
   anchor.addEventListener('click', _ => {
     _.preventDefault();
-    /* query params to be shown :
-    s => stream
-    p => playlist
-    t => timestamp
-    q => search
-    f => filter
-    e => error
-    */
-
-    const url = (params.get('s') && anchor.id === '/') ? '?' + params : '';
-
-    history.pushState({}, '', new URL(anchor.id + url, location.origin));
+    history.pushState({}, '',
+      anchor.id + ((params.has('s') && anchor.id === '/') ? ('?' + params) : '')
+    );
     showSection(anchor.id);
   })
 }
 
 // load section if name found in address else load home
 
-document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => location.pathname === _) || '/')?.click();
+(<HTMLAnchorElement>document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => location.pathname === _) || '/')).click();
 
 // enables back button functionality
 addEventListener('popstate', () => {

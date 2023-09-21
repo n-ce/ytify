@@ -34,6 +34,7 @@ function updatePositionState() {
 
 
 playButton.addEventListener('click', () => {
+  if (!audio.dataset.id) return;
   if (playButton.dataset.state) {
     audio.play();
     playButton.dataset.state = '';

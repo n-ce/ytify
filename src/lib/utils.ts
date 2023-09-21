@@ -130,28 +130,10 @@ if ('mediaSession' in navigator) {
 const stealthContainer = <HTMLElement>document.getElementById('>');
 const stealthAnchor = <HTMLAnchorElement>document.getElementById('/>');
 
+
+
+
 type item = 'title' | 'name' | 'uploaderName' | 'description' | 'thumbnail' | 'type' | 'url' | 'views' | 'duration' | 'uploadedDate' | 'uploaderAvatar' | 'videos' | 'subscribers';
-
-function loadGroup(group: string) {
-  fetch(pipedInstances.value + group)
-    .then(res => res.json())
-    .then(group => group.relatedStreams)
-    .then(streams => itemsLoader(streams))
-    .then(fragment => {
-      stealthContainer.innerHTML = '';
-      stealthContainer.appendChild(fragment);
-      stealthAnchor.click();
-    })
-    .catch(err => {
-      if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
-        pipedInstances.selectedIndex++;
-        loadGroup(group);
-        return;
-      }
-      alert(err);
-    })
-}
-
 
 
 
@@ -166,42 +148,52 @@ function createStreamItem(stream: Record<item, string>) {
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
     superModal.classList.toggle('hide');
-    const smds = superModal.dataset;
-    smds.id = stream.url.substring(9);
-    smds.title = stream.title;
-    smds.thumbnail = stream.thumbnail;
-    smds.author = stream.uploaderName;
-    smds.duration = stream.duration;
+    const _ = superModal.dataset;
+    _.id = stream.url.substring(9);
+    _.title = stream.title;
+    _.thumbnail = stream.thumbnail;
+    _.author = stream.uploaderName;
+    _.duration = stream.duration;
   })
   return streamItem;
 }
 
 
-function createPlaylistItem(playlist: Record<item, string>) {
+function createListItem(list: Record<item, string>) {
+  const listItem = document.createElement('list-item');
+  listItem.textContent = list.name;
+  listItem.dataset.thumbnail = list.thumbnail;
 
-  const playlistItem = document.createElement('playlist-item');
-  playlistItem.textContent = playlist.name;
-  playlistItem.dataset.length = playlist.videos;
-  playlistItem.dataset.author = playlist.uploaderName;
-  playlistItem.dataset.thumbnail = playlist.thumbnail;
-  playlistItem.addEventListener('click', () => {
-    loadGroup(playlist.url.replace('?list=', 's/'));
+  listItem.dataset.uploaderData = list.description || list.uploaderName || '';
+
+  const subs = parseInt(list.subscribers);
+  listItem.dataset.stats = subs > 0 ? numFormatter(subs) + ' subscribers' : list.videos + ' streams';
+
+  listItem.addEventListener('click', () => {
+    fetch(pipedInstances.value + list.url.replace('?list=', 's/'))
+      .then(res => res.json())
+      .then(group => group.relatedStreams)
+      .then(streams => itemsLoader(streams))
+      .then(fragment => {
+        stealthContainer.innerHTML = '';
+        stealthContainer.appendChild(fragment);
+        stealthAnchor.click();
+      })
+      .catch(err => {
+        if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
+          pipedInstances.selectedIndex++;
+          listItem.click();
+          return;
+        }
+        alert(err);
+      })
   })
-  return playlistItem;
+
+  return listItem;
 }
 
-function createChannelItem(channel: Record<item, string>) {
-  const channelItem = document.createElement('channel-item');
-  channelItem.textContent = channel.name;
-  channelItem.dataset.thumbnail = channel.thumbnail;
-  channelItem.dataset.description = channel.description;
-  channelItem.dataset.subscribers = channel.subscribers;
-  channelItem.addEventListener('click', () => {
-    loadGroup(channel.url);
-  })
 
-  return channelItem;
-}
+
 
 export function itemsLoader(itemsArray: Record<item, string>[]): DocumentFragment {
   if (!itemsArray.length)
@@ -210,8 +202,7 @@ export function itemsLoader(itemsArray: Record<item, string>[]): DocumentFragmen
 
   for (const item of itemsArray) {
 
-    const type = item.type === 'stream' ? createStreamItem(item) : item.type === 'playlist' ? createPlaylistItem(item) : createChannelItem(item);
-
+    const type = item.type === 'stream' ? createStreamItem(item) : createListItem(item);
 
     fragment.appendChild(type);
   }

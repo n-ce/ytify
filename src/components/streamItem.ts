@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { blankImage, convertSStoHHMMSS, numFormatter } from '../lib/utils';
+import { blankImage, convertSStoHHMMSS, getSaved, numFormatter } from '../lib/utils';
 
 
 customElements.define('stream-item', class extends HTMLElement {
@@ -66,7 +66,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 
-		if (!localStorage.getItem('img')) {
+		if (!getSaved('img')) {
 			if (data.thumbnail)
 				thumbnail.src = data.thumbnail;
 

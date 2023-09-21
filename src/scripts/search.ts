@@ -29,11 +29,6 @@ const searchLoader = () => {
       alert(err)
     });
   suggestions.style.display = 'none';
-  /*
-  params.set('q', text);
-  if (searchFilters.value !== 'all')
-    params.set('f', searchFilters.value);
-  history.replaceState({}, '', '?' + params);*/
 }
 
 
@@ -45,12 +40,6 @@ superInput.addEventListener('input', async () => {
 
   suggestions.innerHTML = '';
   suggestions.style.display = 'none';
-  /*
-      if (!superInput.value.includes(previous_ID))
-        if (validator(superInput.value))
-          return;*/
-
-
 
   if (text.length < 3 || getSaved('search_suggestions')) return;
 
@@ -81,8 +70,9 @@ superInput.addEventListener('input', async () => {
 let index = 0;
 
 superInput.addEventListener('keyup', _ => {
-  if (_.key === 'Enter')
-    return searchLoader();
+  if (_.key === 'Backspace') return;
+
+  if (_.key === 'Enter') return searchLoader();
 
   if (!suggestions.hasChildNodes()) return;
 
@@ -116,13 +106,4 @@ suggestionsSwitch.addEventListener('click', () => {
 if (getSaved('search_suggestions') && suggestionsSwitch)
   suggestionsSwitch.removeAttribute('checked')
 
-/*
-const query = params.get('q');
-const filter = params.get('f');
-if (query) {
-  superInput.value = query;
-  if (filter)
-    searchFilters.value = filter;
-  searchLoader();
-}*/
 
