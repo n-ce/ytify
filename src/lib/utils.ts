@@ -1,4 +1,4 @@
-import { audio, img, pipedInstances, superModal } from "./dom";
+import { audio, author, img, listItemsAnchor, listItemsContainer, pipedInstances, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -27,19 +27,6 @@ export function convertSStoHHMMSS(seconds: number): string {
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 
-const author = <HTMLAnchorElement>document.getElementById('author');
-author.addEventListener('click', e => {
-  e.preventDefault();
-  fetch((<HTMLAnchorElement>e.target).href)
-    .then(res => res.json())
-    .then(data => itemsLoader(data.relatedStreams))
-    .then(fragment => {
-      stealthContainer.innerHTML = '';
-      stealthContainer.appendChild(fragment);
-      stealthAnchor.click();
-    })
-    .catch(_ => alert(_));
-})
 
 export function setMetaData(
   id: string,
@@ -59,7 +46,7 @@ export function setMetaData(
   title.textContent = streamName;
 
   author.href = pipedInstances.value + authorUrl;
-  author.textContent = sanitizeAuthorName(authorName);
+  author.textContent = authorName.replace(' - Topic', '');
 
   document.title = streamName + ' - ytify';
 
@@ -84,8 +71,6 @@ export function setMetaData(
 }
 
 
-
-
 export function updatePositionState() {
   if ('mediaSession' in navigator) {
     if ('setPositionState' in navigator.mediaSession) {
@@ -98,52 +83,32 @@ export function updatePositionState() {
   }
 }
 
-if ('mediaSession' in navigator) {
-  navigator.mediaSession.setActionHandler('play', () => {
-    audio.play();
-    updatePositionState();
-  });
-  navigator.mediaSession.setActionHandler('pause', () => {
-    audio.pause();
-    updatePositionState();
-  });
-  navigator.mediaSession.setActionHandler("seekforward", () => {
-    audio.currentTime += 10;
-    updatePositionState();
-  });
-  navigator.mediaSession.setActionHandler("seekbackward", () => {
-    audio.currentTime -= 10;
-    updatePositionState();
-  });
-  navigator.mediaSession.setActionHandler("seekto", e => {
-    audio.currentTime = e.seekTime || 0;
-    updatePositionState();
-  });
-  navigator.mediaSession.setActionHandler("nexttrack", () => {
-    // audio on end
-    updatePositionState();
-  });
+
+
+type item = {
+  title: string,
+  name: string,
+  uploaderName: string,
+  description: string,
+  thumbnail: string,
+  type: string,
+  url: string,
+  views: number,
+  duration: number,
+  uploadedDate: string,
+  uploaderAvatar: string,
+  videos: number,
+  subscribers: number
 }
 
 
-
-const stealthContainer = <HTMLElement>document.getElementById('>');
-const stealthAnchor = <HTMLAnchorElement>document.getElementById('/>');
-
-
-
-
-type item = 'title' | 'name' | 'uploaderName' | 'description' | 'thumbnail' | 'type' | 'url' | 'views' | 'duration' | 'uploadedDate' | 'uploaderAvatar' | 'videos' | 'subscribers';
-
-
-
-function createStreamItem(stream: Record<item, string>) {
+function createStreamItem(stream: item) {
   const streamItem = document.createElement('stream-item');
   streamItem.textContent = stream.title;
   streamItem.dataset.author = stream.uploaderName;
   streamItem.dataset.thumbnail = stream.thumbnail;
-  streamItem.dataset.views = stream.views;
-  streamItem.dataset.duration = stream.duration;
+  streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
+  streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
   streamItem.dataset.uploaded = stream.uploadedDate || '';
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
@@ -153,21 +118,21 @@ function createStreamItem(stream: Record<item, string>) {
     _.title = stream.title;
     _.thumbnail = stream.thumbnail;
     _.author = stream.uploaderName;
-    _.duration = stream.duration;
+    _.duration = streamItem.dataset.duration;
   })
   return streamItem;
 }
 
 
-function createListItem(list: Record<item, string>) {
+function createListItem(list: item) {
   const listItem = document.createElement('list-item');
   listItem.textContent = list.name;
   listItem.dataset.thumbnail = list.thumbnail;
 
   listItem.dataset.uploaderData = list.description || list.uploaderName || '';
 
-  const subs = parseInt(list.subscribers);
-  listItem.dataset.stats = subs > 0 ? numFormatter(subs) + ' subscribers' : list.videos + ' streams';
+
+  listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
 
   listItem.addEventListener('click', () => {
     fetch(pipedInstances.value + list.url.replace('?list=', 's/'))
@@ -175,9 +140,9 @@ function createListItem(list: Record<item, string>) {
       .then(group => group.relatedStreams)
       .then(streams => itemsLoader(streams))
       .then(fragment => {
-        stealthContainer.innerHTML = '';
-        stealthContainer.appendChild(fragment);
-        stealthAnchor.click();
+        listItemsContainer.innerHTML = '';
+        listItemsContainer.appendChild(fragment);
+        listItemsAnchor.click();
       })
       .catch(err => {
         if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -195,7 +160,7 @@ function createListItem(list: Record<item, string>) {
 
 
 
-export function itemsLoader(itemsArray: Record<item, string>[]): DocumentFragment {
+export function itemsLoader(itemsArray: item[]): DocumentFragment {
   if (!itemsArray.length)
     throw new Error('No Data Found');
   const fragment = document.createDocumentFragment();
@@ -221,20 +186,12 @@ export function orderByFrequency(array: string[]) {
   // make array from the frequency object to de-duplicate
 
   const maxFreq = Math.max(...Object.values(frequency));
-  if (maxFreq === 1) {
-    alert('No Radios Found');
+  if (maxFreq === 1)
     return;
-  }
-  /*
-  const uniques = [];
-  for (const value in frequency)
-    if (frequency[value] >= minFreqLimit)
-      uniques.push(value);
-  */
   // sort the uniques array in descending order by frequency
 
   return Object.keys(frequency)
-    .filter(key => frequency[key] === maxFreq)
+    .filter(key => frequency[key] >= maxFreq - 1)
     .sort((a, b) => frequency[b] - frequency[a]);
 }
 
@@ -250,12 +207,12 @@ export type Relative = {
 export const relativesData: Relative = {};
 
 
-export async function similarStreamsCollector(streamTitle: string, currentStream: string | undefined) {
+export async function similarStreamsCollector(streamTitle: string | undefined, streamAuthor: string | undefined) {
+  const streamInfo = streamTitle?.replace('#', '') + ' ' + streamAuthor?.replace(' - Topic', '');
   const relatives = [];
   const searchPlaylists = await fetch(
-    pipedInstances.value + '/search?q=' + streamTitle + '&filter=playlists'
-  )
-    .then(res => res.json())
+    pipedInstances.value + '/search?q=' + streamInfo + '&filter=playlists'
+  ).then(res => res.json())
     .then(data => data.items);
 
   const depth = parseInt(radioRadius.value);
@@ -270,20 +227,20 @@ export async function similarStreamsCollector(streamTitle: string, currentStream
       .then(data => data.relatedStreams);
 
     for (const stream of playlistItems)
-      if (stream.duration < 600 && stream.url !== `/watch?v=${currentStream}`) {
+      if (stream.duration < 600) {
         const id = stream.url.slice(9);
         relatives.push(id);
         relativesData[id] = {
           id: id,
           title: stream.title,
-          thumbnail: stream.thumbnail, author: stream.uploaderName,
-          duration: stream.duration
+          thumbnail: stream.thumbnail,
+          author: stream.uploaderName,
+          duration: convertSStoHHMMSS(stream.duration)
         }
       }
   }
 
-  return relatives;
+  return orderByFrequency(relatives);
 }
 
 
-export const sanitizeAuthorName = (name: string = '') => name.includes(' - Topic') ? name.replace(' - Topic', '') : name;

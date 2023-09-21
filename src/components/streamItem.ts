@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { blankImage, convertSStoHHMMSS, getSaved, numFormatter } from '../lib/utils';
+import { blankImage, getSaved } from '../lib/utils';
 
 
 customElements.define('stream-item', class extends HTMLElement {
@@ -76,15 +76,12 @@ customElements.define('stream-item', class extends HTMLElement {
 		}
 
 		if (data.duration)
-			duration.textContent = convertSStoHHMMSS(parseInt(data.duration));
+			duration.textContent = data.duration
 
 		if (data.author)
 			author.textContent = data.author;
 
-
-		const views = parseInt(data.views || '0');
-
-		if (views > 0)
-			viewsXuploaded.textContent = numFormatter(views) + ' views' + (data.uploaded ? ' • ' + data.uploaded : '');
+		if (data.views)
+			viewsXuploaded.textContent = data.views + (data.uploaded ? ' • ' + data.uploaded : '');
 	}
 })

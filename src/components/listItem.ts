@@ -42,9 +42,9 @@ customElements.define('list-item', class extends HTMLElement {
     if (data.uploaderData)
       uData.textContent = data.uploaderData;
 
-    if (data.stats && !data.stats.startsWith('-1')) {
+    if (data.stats)
       stats.textContent = data.stats;
-    }
+
   }
 
 })

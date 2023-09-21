@@ -144,13 +144,6 @@ loopButton.addEventListener('click', () => {
 });
 
 
-function onEnd() {
-  if (queuelist.childElementCount)
-    (<HTMLElement>queuelist.firstElementChild).click();
-}
-
-audio.addEventListener('ended', onEnd);
-
 
 
 playPrevButton.addEventListener('click', () => {
@@ -168,5 +161,44 @@ playPrevButton.addEventListener('click', () => {
 })
 
 
+
+function onEnd() {
+  if (queuelist.childElementCount)
+    (<HTMLElement>queuelist.firstElementChild).click();
+
+}
+
+audio.addEventListener('ended', () => {
+  onEnd();
+
+});
+
 playNextButton.addEventListener('click', onEnd);
 
+
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.setActionHandler('play', () => {
+    audio.play();
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler('pause', () => {
+    audio.pause();
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler("seekforward", () => {
+    audio.currentTime += 10;
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler("seekbackward", () => {
+    audio.currentTime -= 10;
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler("seekto", e => {
+    audio.currentTime = e.seekTime || 0;
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler("nexttrack", () => {
+    onEnd();
+    updatePositionState();
+  });
+}

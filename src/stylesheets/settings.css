@@ -54,7 +54,6 @@
   padding: 1vmin;
   width: calc(100% - 2.3vmin);
   margin-bottom: 5%;
-  ;
 }
 
 #netlifyForm::placeholder {

@@ -1,6 +1,6 @@
 import { addToPlaylist, playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
 import player from "../lib/player";
-import { orderByFrequency, relativesData, sanitizeAuthorName, similarStreamsCollector } from "../lib/utils";
+import { relativesData, similarStreamsCollector } from "../lib/utils";
 
 export const streamHistory: string[] = [];
 
@@ -10,7 +10,6 @@ superModal.addEventListener('click', () => {
     (<HTMLHeadingElement>queuelist.firstElementChild).remove();
     oneOff = !oneOff;
   }
-  //if (!(e.target as HTMLLIElement).matches('select'))
   superModal.classList.toggle('hide');
 });
 
@@ -50,15 +49,25 @@ export const appendToQueuelist = (data: DOMStringMap, prepend: boolean = false) 
     queuelist.appendChild(listItem);
 }
 
-function radio(relatives: string[]) {
-  const orderedItems = orderByFrequency(relatives);
 
-  if (!orderedItems) return;
-  orderedItems.filter(stream => !streamHistory.includes(stream) && !queueArray.includes(stream));
-  if (orderedItems.length) {
-    for (const id of orderedItems) {
+
+
+function radio(relatives: string[] | undefined) {
+  if (!relatives) return;
+
+
+  relatives = relatives.filter(stream => !streamHistory.includes(stream) && !queueArray.includes(stream));
+
+  if (relatives.length) {
+    for (const id of relatives) {
       queueArray.push(id);
-      appendToQueuelist(relativesData[id]);
+      appendToQueuelist(relativesData[id]);/* // for recursive generation
+      await radio(
+        await similarStreamsCollector(
+          relativesData[id].title,
+          relativesData[id].author
+        )
+      );*/
     }
   }
 }
@@ -67,9 +76,8 @@ startRadio.addEventListener('click', async () => {
   player(superModal.dataset.id);
   radio(
     await similarStreamsCollector(
-      superModal.dataset.title + ' ' +
-      sanitizeAuthorName(superModal.dataset.author),
-      superModal.dataset.id
+      superModal.dataset.title,
+      superModal.dataset.author
     )
   );
 })

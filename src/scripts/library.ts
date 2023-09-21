@@ -1,11 +1,28 @@
+/*
+import { getSaved } from "../lib/utils";
 
 const library = <HTMLElement>document.getElementById('library');
+
+
+
+export const library_history = [];
 
 
 const collections: string[] = [];
 
 
-function addToPlaylist(name: string, item: HTMLElement) {
+function historyUpdater(){
+  const data = JSON.parse(getSaved(
+    'history')||'');
+  const dom = document.getElementById('library:history');
+  for(const stream of data){
+    
+      }
+  
+}
+
+
+export function addToPlaylist(name: string, item: HTMLElement) {
 
   if (collections.includes(name)) {
     (<HTMLDetailsElement>document.getElementById('collection:' + name)).appendChild(item);
@@ -21,3 +38,4 @@ function addToPlaylist(name: string, item: HTMLElement) {
 }
 
 
+*/

@@ -6,11 +6,14 @@ const sections = document.querySelectorAll('section');
 
 function showSection(id: string) {
   sections.forEach((section, index) => {
-    if (index > 6) return;
     if (id === '/') id += 'home';
     if (section.id === id.substring(1)) {
-      section.classList.add('view');
-      anchors[index].classList.add('active');
+      try {
+        section.classList.add('view');
+        anchors[index].classList.add('active');
+      } catch (e) {
+        console.error(e)
+      }
     } else {
       section.classList.remove('view');
       anchors[index].classList.remove('active');
