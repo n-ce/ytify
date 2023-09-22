@@ -83,21 +83,20 @@ export function updatePositionState() {
 }
 
 
-
-export type Item = {
-  title: string,
-  name: string,
-  uploaderName: string,
-  description: string,
-  thumbnail: string,
-  type: string,
+type Item = {
   url: string,
+  type: string,
+  name: string,
   views: number,
-  duration: number,
-  uploadedDate: string,
-  uploaderAvatar: string,
+  title: string,
   videos: number,
-  subscribers: number
+  duration: number,
+  thumbnail: string,
+  subscribers: number,
+  description: string,
+  uploadedDate: string,
+  uploaderName: string,
+  uploaderAvatar: string
 }
 
 
@@ -133,6 +132,9 @@ function createListItem(list: Item) {
   listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
 
   listItem.addEventListener('click', () => {
+    if (list.type === 'channel')
+      return open('https://youtube.com' + list.url);
+
     fetch(pipedInstances.value + list.url.replace('?list=', 's/'))
       .then(res => res.json())
       .then(group => group.relatedStreams)
@@ -175,9 +177,6 @@ export function itemsLoader(itemsArray: Item[]): DocumentFragment {
 
 
 
-
-const radioRadius = <HTMLSelectElement>document.getElementById('radioRadius');
-
 type Relative = {
   [index: string]: {
     [index: string]: string
@@ -185,8 +184,7 @@ type Relative = {
 }
 
 
-
-export async function similarStreamsCollector(streamTitle: string | undefined = '', streamAuthor: string | undefined = ''): Promise<[string[], Relative] | undefined> {
+export async function similarStreamsCollector(streamTitle: string | undefined = '', streamAuthor: string | undefined = ''): Promise<[string[] | undefined, Relative] | undefined> {
   if (!streamTitle || !streamAuthor) throw new Error('incompatible stream info');
 
   const streamInfo = streamTitle.replace('#', '') + ' ' + streamAuthor.replace(' - Topic', '');
@@ -196,18 +194,16 @@ export async function similarStreamsCollector(streamTitle: string | undefined = 
   ).then(res => res.json())
     .then(data => data.items);
 
-  const depth = parseInt(radioRadius.value);
   const relativesData: Relative = {};
   const frequency: { [index: string]: number } = {};
 
-  for (let index = 0; index < depth; index++) {
-
-    const luckyID = searchPlaylists[index].url.slice(15);
+  for (const playlists of searchPlaylists) {
 
     const playlistItems = await fetch(
-      pipedInstances.value + '/playlists/' + luckyID)
+      pipedInstances.value + '/playlists/' + playlists.url.slice(15))
       .then(res => res.json())
       .then(data => data.relatedStreams);
+    if (!playlistItems) continue;
 
     for (const stream of playlistItems)
       if (stream.duration < 600) {
@@ -227,14 +223,18 @@ export async function similarStreamsCollector(streamTitle: string | undefined = 
       }
   }
 
-
-  const maxFreq = Math.max(...Object.values(frequency));
-
   // return the most frequent values and the data
 
-  if (maxFreq !== 1)
-    return [Object.keys(frequency)
-      .filter(key => frequency[key] === maxFreq), relativesData]
+  function getValues(limit: number): string[] | undefined {
+    const values = Object.keys(frequency).filter(key => frequency[key] > limit);
+    if (limit === 1) return;
+    return values.length < 5 ?
+      getValues(limit - 1) :
+      values;
+  }
+  const maxFreq = Math.max(...Object.values(frequency));
+
+  return [getValues(maxFreq), relativesData]
 }
 
 

@@ -7,11 +7,7 @@ export default async function player(id: string | null = '') {
 
   if (!id) return;
 
-  const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
-
-
-
-  playButton.classList.replace(playButton.classList[0], 'ri-loader-3-line');
+  playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
     if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -29,9 +25,8 @@ export default async function player(id: string | null = '') {
 
   audio.dataset.seconds = '0';
 
-
-
   // extracting opus streams and storing m4a streams
+
   interface Opus {
     urls: string[],
     bitrates: number[]
@@ -41,6 +36,9 @@ export default async function player(id: string | null = '') {
   }
   const opus: Opus = { urls: [], bitrates: [] }
   const m4a: M4A = { urls: [], bitrates: [], options: [] }
+
+  const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
+
   bitrateSelector.innerHTML = '';
 
   for (const value of data.audioStreams) {

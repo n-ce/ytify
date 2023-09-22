@@ -159,3 +159,48 @@ channel-item:hover,
 playlist-item:hover {
   transform: scale(0.95);
 }
+
+
+
+#queuetools {
+  height: 10vmin;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  top: calc(100% - 10vmin);
+  z-index: 3;
+  background-image: linear-gradient(transparent, var(--bg));
+}
+
+#queuetools button,
+#searchlist+button {
+  border: var(--border);
+  border-radius: var(--roundness);
+  background: var(--onBg);
+  color: inherit;
+  font-size: inherit;
+  font-weight: bold;
+  transform: none;
+  padding: 1vmin 2vmin;
+  margin: 1vmin 2vmin;
+}
+
+#queuetools button:active,
+#searchlist+button:active {
+  transform: scale(0.9);
+}
+
+#searchlist+button {
+  display: none;
+}
+
+#queuelist {
+  width: 100%;
+  height: 100%;
+  margin-top: -10vmin;
+}
+
+.delete {
+  background-color: #f007 !important;
+}

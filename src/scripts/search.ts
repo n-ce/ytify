@@ -4,6 +4,21 @@ import { getSaved, save, itemsLoader } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
+const loadMoreBtn = <HTMLButtonElement>document.getElementById('loadMore');
+
+let token = '';
+
+loadMoreBtn.addEventListener('click', () => {
+  if (token)
+    fetch(
+      `${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&q=${superInput.value}&filter=${searchFilters.value}`
+    )
+      .then(res => res.json())
+      .then(data => {
+        token = data.nextpage;
+        searchlist.appendChild(itemsLoader(data.items));
+      })
+});
 
 
 // Get search results of input
@@ -17,9 +32,15 @@ const searchLoader = () => {
 
   fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
-    .then(searchResults => searchResults.items)
-    .then(items => itemsLoader(items))
-    .then(fragment => searchlist.appendChild(fragment))
+    .then(searchResults => {
+      token = searchResults.nextpage;
+      loadMoreBtn.style.display = 'block';
+      searchlist.appendChild(
+        itemsLoader(
+          searchResults.items
+        )
+      )
+    })
     .catch(err => {
       if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
         pipedInstances.selectedIndex++;

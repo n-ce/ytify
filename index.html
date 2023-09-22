@@ -68,7 +68,14 @@
     </section>
 
     <section id="upcoming">
-      <h1>upcoming streams show here</h1>
+      <span id="queuetools">
+        <button>Clear</button>
+        <button>Shuffle</button>
+        <button>Remove</button>
+      </span>
+      <div id="queuelist">
+        <h1 align="center">upcoming streams show here</h1>
+      </div>
     </section>
 
     <section id="search">
@@ -95,6 +102,7 @@
       <div id="searchlist">
         <h1>search results show here</h1>
       </div>
+      <button id="loadMore">Load More</button>
     </section>
     <section id="related">
       <h1>Streams related to your current playing stream show up here.</h1>
@@ -137,14 +145,6 @@
           <option value="1vmin">Light</option>
           <option value="2vmin" selected>Medium</option>
           <option value="4vmin">Heavy</option>
-        </select>
-      </span>
-      <span>
-        <label for="radioRadius">Radio Search Radius</label>
-        <select id="radioRadius">
-          <option value="2">Narrow</option>
-          <option value="8" selected>Moderate</option>
-          <option value="20">Wide</option>
         </select>
       </span>
 

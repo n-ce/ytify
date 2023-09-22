@@ -72,7 +72,8 @@ customElements.define('stream-item', class extends HTMLElement {
 
 			data.avatar ?
 				avatar.src = data.avatar :
-				avatar.remove();
+				avatar.style.display = 'none';
+
 		}
 
 		if (data.duration)

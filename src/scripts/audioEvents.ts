@@ -47,7 +47,7 @@ playButton.addEventListener('click', () => {
 
 
 audio.addEventListener('playing', () => {
-  playButton.classList.replace(playButton.classList[0], 'ri-pause-line');
+  playButton.classList.replace(playButton.className, 'ri-pause-line');
   playButton.dataset.state = '';
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
@@ -77,7 +77,7 @@ audio.addEventListener('loadeddata', () => {
 });
 
 audio.addEventListener('waiting', () => {
-  playButton.classList.replace(playButton.classList[0], 'ri-loader-3-line');
+  playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 })
 
 
