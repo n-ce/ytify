@@ -18,10 +18,11 @@ fetch('https://piped-instances.kavin.rocks')
   })
   .catch(err => {
     if (err.message !== 'Failed to fetch') {
-      if (confirm(`Unknown Error Detected \n${err}\n send data to developer ?`)) {
-        (<HTMLInputElement>document.getElementById('netlifyForm')).value = err;
+      if (confirm(`Unknown Error Detected \n${err}\n,(might be solved if you reload or clear data in settings) report it ? `)) {
+        (<HTMLInputElement>document.getElementById('netlifyForm')).value = err + ' in' + location.href;
         document.forms[0].submit();
       }
+
     }
   })
 

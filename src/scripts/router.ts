@@ -8,12 +8,8 @@ function showSection(id: string) {
   sections.forEach((section, index) => {
     if (id === '/') id += 'home';
     if (section.id === id.substring(1)) {
-      try {
-        section.classList.add('view');
-        anchors[index].classList.add('active');
-      } catch (e) {
-        console.error(e)
-      }
+      section.classList.add('view');
+      anchors[index].classList.add('active');
     } else {
       section.classList.remove('view');
       anchors[index].classList.remove('active');

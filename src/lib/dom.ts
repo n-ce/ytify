@@ -17,12 +17,12 @@ export const suggestionsSwitch = <HTMLSelectElement>document.getElementById('sug
 
 export const superModal = <HTMLDivElement>document.getElementById('superModal');
 
-
 export const [playNow, queueNext, addToPlaylist, startRadio] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
 export const queuelist = <HTMLElement>document.getElementById('upcoming');
 
 export const author = <HTMLAnchorElement>document.getElementById('author');
-export const listItemsContainer = <HTMLElement>document.getElementById('>');
 
-export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/>');
+export const listItemsContainer = <HTMLElement>document.getElementById('list');
+
+export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/list');

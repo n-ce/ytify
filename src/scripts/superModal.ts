@@ -1,6 +1,6 @@
 import { addToPlaylist, playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
 import player from "../lib/player";
-import { relativesData, similarStreamsCollector } from "../lib/utils";
+import { similarStreamsCollector } from "../lib/utils";
 
 export const streamHistory: string[] = [];
 
@@ -25,6 +25,7 @@ export const queueArray: string[] = [];
 queueNext.addEventListener('click', () => {
   appendToQueuelist(superModal.dataset);
 })
+
 
 
 export const appendToQueuelist = (data: DOMStringMap, prepend: boolean = false) => {
@@ -52,37 +53,26 @@ export const appendToQueuelist = (data: DOMStringMap, prepend: boolean = false) 
 
 
 
-function radio(relatives: string[] | undefined) {
-  if (!relatives) return;
 
-
-  relatives = relatives.filter(stream => !streamHistory.includes(stream) && !queueArray.includes(stream));
-
-  if (relatives.length) {
-    for (const id of relatives) {
-      queueArray.push(id);
-      appendToQueuelist(relativesData[id]);/* // for recursive generation
-      await radio(
-        await similarStreamsCollector(
-          relativesData[id].title,
-          relativesData[id].author
-        )
-      );*/
-    }
-  }
-}
-
-startRadio.addEventListener('click', async () => {
+startRadio.addEventListener('click', () => {
   player(superModal.dataset.id);
-  radio(
-    await similarStreamsCollector(
-      superModal.dataset.title,
-      superModal.dataset.author
-    )
-  );
+
+  similarStreamsCollector(
+    superModal.dataset.title,
+    superModal.dataset.author
+  )
+    .then(data => {
+      if (!data) throw new Error('No data');
+      const [relatives, relativesData] = data;
+      if (!relatives) throw new Error('No Relatives Found');
+
+      for (const id of relatives)
+        if (id !== superModal.dataset.id && !streamHistory.includes(id) && !queueArray.includes(id))
+          appendToQueuelist(relativesData[id]);
+    })
+    .catch(_ => alert(_))
 })
 
 addToPlaylist.addEventListener('click', () => {
   superModal.classList.toggle('hide');
-
-})
+});

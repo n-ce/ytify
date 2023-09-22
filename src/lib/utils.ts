@@ -50,8 +50,7 @@ export function setMetaData(
 
   document.title = streamName + ' - ytify';
 
-  if (thumbnail?.includes('maxres'))
-    thumbnail = thumbnail.replace('maxres', 'hq');
+  thumbnail.replace('maxres', 'hq');
 
   if ('mediaSession' in navigator) {
     navigator.mediaSession.setPositionState();
@@ -85,7 +84,7 @@ export function updatePositionState() {
 
 
 
-type item = {
+export type Item = {
   title: string,
   name: string,
   uploaderName: string,
@@ -102,14 +101,14 @@ type item = {
 }
 
 
-function createStreamItem(stream: item) {
+function createStreamItem(stream: Item) {
   const streamItem = document.createElement('stream-item');
   streamItem.textContent = stream.title;
   streamItem.dataset.author = stream.uploaderName;
   streamItem.dataset.thumbnail = stream.thumbnail;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
-  streamItem.dataset.uploaded = stream.uploadedDate || '';
+  streamItem.dataset.uploaded = stream.uploadedDate;
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
     superModal.classList.toggle('hide');
@@ -124,13 +123,12 @@ function createStreamItem(stream: item) {
 }
 
 
-function createListItem(list: item) {
+function createListItem(list: Item) {
   const listItem = document.createElement('list-item');
   listItem.textContent = list.name;
   listItem.dataset.thumbnail = list.thumbnail;
 
   listItem.dataset.uploaderData = list.description || list.uploaderName || '';
-
 
   listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
 
@@ -160,7 +158,7 @@ function createListItem(list: item) {
 
 
 
-export function itemsLoader(itemsArray: item[]): DocumentFragment {
+export function itemsLoader(itemsArray: Item[]): DocumentFragment {
   if (!itemsArray.length)
     throw new Error('No Data Found');
   const fragment = document.createDocumentFragment();
@@ -176,46 +174,31 @@ export function itemsLoader(itemsArray: item[]): DocumentFragment {
 }
 
 
-export function orderByFrequency(array: string[]) {
-  const frequency: { [index: string]: number } = {};
-  // compute frequencies of each value
-  for (const value of array)
-    value in frequency ?
-      frequency[value]++ :
-      frequency[value] = 1;
-  // make array from the frequency object to de-duplicate
-
-  const maxFreq = Math.max(...Object.values(frequency));
-  if (maxFreq === 1)
-    return;
-  // sort the uniques array in descending order by frequency
-
-  return Object.keys(frequency)
-    .filter(key => frequency[key] >= maxFreq - 1)
-    .sort((a, b) => frequency[b] - frequency[a]);
-}
 
 
 const radioRadius = <HTMLSelectElement>document.getElementById('radioRadius');
 
-export type Relative = {
+type Relative = {
   [index: string]: {
     [index: string]: string
   }
 }
 
-export const relativesData: Relative = {};
 
 
-export async function similarStreamsCollector(streamTitle: string | undefined, streamAuthor: string | undefined) {
-  const streamInfo = streamTitle?.replace('#', '') + ' ' + streamAuthor?.replace(' - Topic', '');
-  const relatives = [];
+export async function similarStreamsCollector(streamTitle: string | undefined = '', streamAuthor: string | undefined = ''): Promise<[string[], Relative] | undefined> {
+  if (!streamTitle || !streamAuthor) throw new Error('incompatible stream info');
+
+  const streamInfo = streamTitle.replace('#', '') + ' ' + streamAuthor.replace(' - Topic', '');
+
   const searchPlaylists = await fetch(
     pipedInstances.value + '/search?q=' + streamInfo + '&filter=playlists'
   ).then(res => res.json())
     .then(data => data.items);
 
   const depth = parseInt(radioRadius.value);
+  const relativesData: Relative = {};
+  const frequency: { [index: string]: number } = {};
 
   for (let index = 0; index < depth; index++) {
 
@@ -229,7 +212,11 @@ export async function similarStreamsCollector(streamTitle: string | undefined, s
     for (const stream of playlistItems)
       if (stream.duration < 600) {
         const id = stream.url.slice(9);
-        relatives.push(id);
+        // compute frequencies of each value
+        id in frequency ?
+          frequency[id]++ :
+          frequency[id] = 1;
+
         relativesData[id] = {
           id: id,
           title: stream.title,
@@ -240,7 +227,14 @@ export async function similarStreamsCollector(streamTitle: string | undefined, s
       }
   }
 
-  return orderByFrequency(relatives);
+
+  const maxFreq = Math.max(...Object.values(frequency));
+
+  // return the most frequent values and the data
+
+  if (maxFreq !== 1)
+    return [Object.keys(frequency)
+      .filter(key => frequency[key] === maxFreq), relativesData]
 }
 
 
