@@ -1,8 +1,6 @@
-import { audio, author, img, listItemsAnchor, listItemsContainer, pipedInstances, superModal } from "./dom";
-
+import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, superModal } from "./dom";
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -26,8 +24,6 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
-
-
 export function setMetaData(
   id: string,
   thumbnail: string,
@@ -45,7 +41,8 @@ export function setMetaData(
   title.href = `https://youtube.com/watch?v=${id}`;
   title.textContent = streamName;
 
-  author.href = pipedInstances.value + authorUrl;
+  const author = <HTMLAnchorElement>document.getElementById('author');
+  author.href = 'https://youtube.com' + authorUrl;
   author.textContent = authorName.replace(' - Topic', '');
 
   document.title = streamName + ' - ytify';
@@ -69,7 +66,6 @@ export function setMetaData(
   }
 }
 
-
 export function updatePositionState() {
   if ('mediaSession' in navigator) {
     if ('setPositionState' in navigator.mediaSession) {
@@ -82,7 +78,6 @@ export function updatePositionState() {
   }
 }
 
-
 type Item = {
   url: string,
   type: string,
@@ -94,11 +89,11 @@ type Item = {
   thumbnail: string,
   subscribers: number,
   description: string,
+  playlistType: string,
   uploadedDate: string,
   uploaderName: string,
   uploaderAvatar: string
 }
-
 
 function createStreamItem(stream: Item) {
   const streamItem = document.createElement('stream-item');
@@ -107,7 +102,7 @@ function createStreamItem(stream: Item) {
   streamItem.dataset.thumbnail = stream.thumbnail;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
-  streamItem.dataset.uploaded = stream.uploadedDate;
+  streamItem.dataset.uploaded = stream.uploadedDate || '';
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
     superModal.classList.toggle('hide');
@@ -120,7 +115,6 @@ function createStreamItem(stream: Item) {
   })
   return streamItem;
 }
-
 
 function createListItem(list: Item) {
   const listItem = document.createElement('list-item');
@@ -135,7 +129,12 @@ function createListItem(list: Item) {
     if (list.type === 'channel')
       return open('https://youtube.com' + list.url);
 
-    fetch(pipedInstances.value + list.url.replace('?list=', 's/'))
+    const url = list.playlistType === 'NORMAL' ? list.url.replace('?list=', 's/') : 'https://youtube.com' + list.url;
+
+    if (list.playlistType === 'MIX_STREAM')
+      return open(url);
+
+    fetch(pipedInstances.value + url)
       .then(res => res.json())
       .then(group => group.relatedStreams)
       .then(streams => itemsLoader(streams))
@@ -153,10 +152,8 @@ function createListItem(list: Item) {
         alert(err);
       })
   })
-
   return listItem;
 }
-
 
 
 

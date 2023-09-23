@@ -1,24 +1,7 @@
-import { audio, author, bitrateSelector, img, listItemsAnchor, listItemsContainer } from "../lib/dom";
+import { audio, bitrateSelector, img } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, itemsLoader, params, save, updatePositionState } from "../lib/utils";
+import { blankImage, getSaved, params, save, updatePositionState } from "../lib/utils";
 
-author.addEventListener('click', _ => {
-  const link = author.href;
-
-  _.preventDefault();
-
-  if (!link || link === location.href) return;
-
-  fetch(link)
-    .then(res => res.json())
-    .then(data => itemsLoader(data.relatedStreams))
-    .then(fragment => {
-      listItemsContainer.innerHTML = '';
-      listItemsContainer.appendChild(fragment);
-      listItemsAnchor.click();
-    })
-    .catch(_ => alert(_))
-})
 
 bitrateSelector.addEventListener('change', () => {
   const timeOfSwitch = parseInt(audio.dataset.seconds || '0');

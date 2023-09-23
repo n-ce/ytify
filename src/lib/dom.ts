@@ -21,8 +21,6 @@ export const [playNow, queueNext, addToPlaylist, startRadio] = <HTMLCollectionOf
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
-export const author = <HTMLAnchorElement>document.getElementById('author');
-
 export const listItemsContainer = <HTMLDivElement>document.getElementById('list');
 
 export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/list');

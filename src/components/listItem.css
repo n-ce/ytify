@@ -1,10 +1,10 @@
 :host {
   background-color: var(--onBg);
   height: 20vmin;
+  width: calc(100% - 2vmin);
   margin-bottom: 1vmin;
   padding: 1vmin;
   border-radius: calc(var(--roundness) + 0.75vmin);
-  overflow: hidden;
   display: flex;
 }
 
@@ -14,7 +14,7 @@ p {
 }
 
 #thumbnail {
-  height: 20vmin;
+  height: 100%;
   border-radius: var(--roundness);
 }
 
