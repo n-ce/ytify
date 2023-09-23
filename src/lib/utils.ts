@@ -126,13 +126,11 @@ function createListItem(list: Item) {
   listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
 
   listItem.addEventListener('click', () => {
+
     if (list.type === 'channel')
       return open('https://youtube.com' + list.url);
 
-    const url = list.playlistType === 'NORMAL' ? list.url.replace('?list=', 's/') : 'https://youtube.com' + list.url;
-
-    if (list.playlistType === 'MIX_STREAM')
-      return open(url);
+    const url = list.playlistType === 'NORMAL' ? list.url.replace('?list=', 's/') : '/playlists/' + list.url.slice(-13);
 
     fetch(pipedInstances.value + url)
       .then(res => res.json())

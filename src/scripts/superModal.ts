@@ -1,6 +1,7 @@
-import { addToPlaylist, playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
+import { addToPlaylist, pipedInstances, playNow, queueNext, queuelist, startRadio, superModal } from "../lib/dom";
 import player from "../lib/player";
-import { similarStreamsCollector } from "../lib/utils";
+import { convertSStoHHMMSS } from "../lib/utils";
+//import { similarStreamsCollector } from "../lib/utils";
 
 export const streamHistory: string[] = [];
 export const queueArray: string[] = [];
@@ -50,29 +51,64 @@ queueNext.addEventListener('click', () => {
 });
 
 
+
+
 startRadio.addEventListener('click', () => {
 
   const upcoming = <HTMLElement>(<HTMLAnchorElement>document.getElementById('/upcoming')).firstElementChild;
 
   upcoming.classList.replace(upcoming.className, 'ri-loader-3-line');
 
-  player(superModal.dataset.id);
-
-  similarStreamsCollector(
-    superModal.dataset.title,
-    superModal.dataset.author
-  )
-    .then(data => {
-      if (!data) throw new Error('No Radio Data');
-      const [relatives, relativesData] = data;
-      if (!relatives) throw new Error('No Relatives Found');
-
-      for (const id of relatives)
-        if (id !== superModal.dataset.id && !streamHistory.includes(id) && !queueArray.includes(id))
-          appendToQueuelist(relativesData[id]);
+  fetch(pipedInstances.value + '/streams/' + superModal.dataset.id)
+    .then(res => res.json())
+    .then(data => data.relatedStreams)
+    .then(relatives => relatives.filter((r: any) => r.playlistType === 'MIX_STREAM' && r.type === 'playlist'))
+    .then(mixes => {
+      if (!mixes.length) throw new Error('Sorry no radios are available for this stream right now.');
+      return mixes.map((m: any) => m.url.slice(-13));
     })
-    .catch(_ => alert(_))
+    .then(ids => {
+      ids.forEach((id: string) =>
+        fetch(pipedInstances.value + '/playlists/' + id)
+          .then(res => res.json())
+          .then(data => data.relatedStreams)
+          .then(streams => {
+            for (const stream of streams) {
+              appendToQueuelist({
+                id: stream.url.slice(9),
+                title: stream.title,
+                thumbnail: stream.thumbnail,
+                author: stream.uploaderName,
+                duration: convertSStoHHMMSS(stream.duration)
+              })
+            }
+            (<HTMLElement>queuelist?.firstElementChild).click();
+          })
+          .catch(err => alert(err.message))
+      )
+    })
+    .catch(err => alert(err.message))
+
+    /*
+      player(superModal.dataset.id);
+    
+      similarStreamsCollector(
+        superModal.dataset.title,
+        superModal.dataset.author
+      )
+        .then(data => {
+          if (!data) throw new Error('No Radio Data');
+          const [relatives, relativesData] = data;
+          if (!relatives) throw new Error('No Relatives Found');
+    
+          for (const id of relatives)
+            if (id !== superModal.dataset.id && !streamHistory.includes(id) && !queueArray.includes(id))
+              appendToQueuelist(relativesData[id]);
+        })
+        .catch(_ => alert(_))
+    */
     .finally(() => upcoming.classList.replace(upcoming.className, 'ri-skip-forward-line'));
+
 });
 
 addToPlaylist.addEventListener('click', () => {
