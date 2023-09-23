@@ -78,7 +78,7 @@ export function updatePositionState() {
   }
 }
 
-type Item = {
+export type Item = {
   url: string,
   type: string,
   name: string,
@@ -148,6 +148,7 @@ function createListItem(list: Item) {
           return;
         }
         alert(err);
+        pipedInstances.selectedIndex = 0;
       })
   })
   return listItem;
@@ -168,68 +169,6 @@ export function itemsLoader(itemsArray: Item[]): DocumentFragment {
   }
 
   return fragment;
-}
-
-
-
-type Relative = {
-  [index: string]: {
-    [index: string]: string
-  }
-}
-
-
-export async function similarStreamsCollector(streamTitle: string | undefined = '', streamAuthor: string | undefined = ''): Promise<[string[] | undefined, Relative] | undefined> {
-  if (!streamTitle || !streamAuthor) throw new Error('incompatible stream info');
-
-  const streamInfo = streamTitle.replace('#', '') + ' ' + streamAuthor.replace(' - Topic', '');
-
-  const searchPlaylists = await fetch(
-    pipedInstances.value + '/search?q=' + streamInfo + '&filter=playlists'
-  ).then(res => res.json())
-    .then(data => data.items);
-
-  const relativesData: Relative = {};
-  const frequency: { [index: string]: number } = {};
-
-  for (const playlists of searchPlaylists) {
-
-    const playlistItems = await fetch(
-      pipedInstances.value + '/playlists/' + playlists.url.slice(15))
-      .then(res => res.json())
-      .then(data => data.relatedStreams);
-    if (!playlistItems) continue;
-
-    for (const stream of playlistItems)
-      if (stream.duration < 600) {
-        const id = stream.url.slice(9);
-        // compute frequencies of each value
-        id in frequency ?
-          frequency[id]++ :
-          frequency[id] = 1;
-
-        relativesData[id] = {
-          id: id,
-          title: stream.title,
-          thumbnail: stream.thumbnail,
-          author: stream.uploaderName,
-          duration: convertSStoHHMMSS(stream.duration)
-        }
-      }
-  }
-
-  // return the most frequent values and the data
-
-  function getValues(limit: number): string[] | undefined {
-    const values = Object.keys(frequency).filter(key => frequency[key] > limit);
-    if (limit === 1) return;
-    return values.length < 5 ?
-      getValues(limit - 1) :
-      values;
-  }
-  const maxFreq = Math.max(...Object.values(frequency));
-
-  return [getValues(maxFreq), relativesData]
 }
 
 

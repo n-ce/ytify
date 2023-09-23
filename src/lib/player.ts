@@ -16,6 +16,7 @@ export default async function player(id: string | null = '') {
       return;
     }
     alert(err);
+    pipedInstances.selectedIndex = 0;
   });
 
   if (!data.audioStreams.length) {

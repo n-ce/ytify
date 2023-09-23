@@ -47,7 +47,8 @@ const searchLoader = () => {
         searchLoader();
         return;
       }
-      alert(err)
+      alert(err);
+      pipedInstances.selectedIndex = 0;
     });
   suggestions.style.display = 'none';
 }
