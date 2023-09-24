@@ -1,5 +1,6 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
-import { getSaved, save, itemsLoader } from "../lib/utils";
+import player from "../lib/player";
+import { getSaved, save, itemsLoader, idFromURL } from "../lib/utils";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
@@ -56,9 +57,18 @@ const searchLoader = () => {
 
 // super input supports both searching and direct link, also loads suggestions
 
+let prevID: string | undefined;
+
 superInput.addEventListener('input', async () => {
 
   const text = superInput.value;
+
+  const id = idFromURL(text);
+  if (id !== prevID) {
+    player(id);
+    prevID = id;
+    return;
+  }
 
   suggestions.innerHTML = '';
   suggestions.style.display = 'none';

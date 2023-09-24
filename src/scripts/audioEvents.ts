@@ -46,11 +46,16 @@ playButton.addEventListener('click', () => {
 });
 
 
+
+
+let resolvePlayback: number;
+
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-line');
   playButton.dataset.state = '';
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
+  window.clearTimeout(resolvePlayback);
 });
 
 audio.addEventListener('pause', () => {
@@ -58,8 +63,9 @@ audio.addEventListener('pause', () => {
   playButton.dataset.state = '1';
 });
 
+
 audio.addEventListener('loadstart', () => {
-  setTimeout(
+  resolvePlayback = window.setTimeout(
     () => {
       if (playButton.classList.contains('ri-loader-3-line')) {
         pipedInstances.selectedIndex++;
