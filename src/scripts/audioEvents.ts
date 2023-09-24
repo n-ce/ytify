@@ -1,9 +1,10 @@
 import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
-import { appendToQueuelist, streamHistory } from "./superModal";
+import { appendToQueuelist } from "./queue";
 
 
+const streamHistory: string[] = [];
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
@@ -69,7 +70,9 @@ audio.addEventListener('loadstart', () => {
     () => {
       if (playButton.classList.contains('ri-loader-3-line')) {
         pipedInstances.selectedIndex++;
+        const timeOfSwitch = audio.currentTime;
         player(audio.dataset.id);
+        audio.currentTime = timeOfSwitch;
       }
     }, 10000);
 })

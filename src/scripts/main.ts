@@ -6,6 +6,7 @@ import './search';
 import './library';
 import './miscEvents';
 import './audioEvents';
+import './queue';
 import './superModal';
 import '../components/streamItem';
 import '../components/listItem';
