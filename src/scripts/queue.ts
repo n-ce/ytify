@@ -10,7 +10,9 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
   if (queueArray.includes(data.id)) return;
 
-  queueArray.push(data.id);
+  prepend ?
+    queueArray.unshift(data.id) :
+    queueArray.push(data.id);
 
   const listItem = document.createElement('stream-item');
   listItem.textContent = data.title || '';
@@ -35,22 +37,20 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 
 
-
 clearQBtn.addEventListener('click', () => {
   queueArray.length = 0;
   queuelist.innerHTML = '';
 });
 
 shuffleQBtn.addEventListener('click', () => {
-  const original = queueArray.slice(0);
-  for (let i = queueArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = queueArray[i];
-    queueArray[i] = queueArray[j];
-    queueArray[j] = temp;
-  }
-  for (const item of queueArray)
-    queuelist.appendChild(queuelist.children[original.indexOf(item)]);
+
+  for (let i = queuelist.children.length; i >= 0; i--)
+    queuelist.appendChild(queuelist.children[Math.random() * i | 0]);
+
+  queueArray.length = 0;
+
+  for (const item of queuelist.children)
+    queueArray.push((<HTMLElement>item).dataset.id || '');
 
 });
 

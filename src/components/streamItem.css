@@ -45,15 +45,17 @@ span {
 slot {
   font-size: medium;
   height: 50%;
-  width: 100%;
+  width: auto;
   display: flex;
   overflow: hidden;
+  word-break: break-all;
 }
 
 div {
   display: flex;
   overflow: hidden;
 }
+
 
 #avatar {
   height: 8vmin;
@@ -78,6 +80,8 @@ div {
   display: flex;
   flex-direction: column;
 }
+
+
 
 @media(orientation:landscape) {
 

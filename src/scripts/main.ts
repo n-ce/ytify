@@ -22,7 +22,6 @@ const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL
 streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/ytify_thumbnail_min.webp';
 
 
-
 const favButton = <HTMLElement>(<HTMLButtonElement>document.getElementById('favButton')).nextElementSibling;
 const icons = ['ri-heart-line', 'ri-heart-fill'];
 favButton.addEventListener('click', () => {

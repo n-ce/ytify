@@ -1,7 +1,7 @@
 import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
-import { appendToQueuelist } from "./queue";
+import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
 const streamHistory: string[] = [];
@@ -173,14 +173,11 @@ playPrevButton.addEventListener('click', () => {
 
 function onEnd() {
   if (queuelist.childElementCount)
-    (<HTMLElement>queuelist.firstElementChild).click();
+    firstItemInQueue().click();
 
 }
 
-audio.addEventListener('ended', () => {
-  onEnd();
-
-});
+audio.addEventListener('ended', onEnd);
 
 playNextButton.addEventListener('click', onEnd);
 
@@ -195,11 +192,11 @@ if ('mediaSession' in navigator) {
     updatePositionState();
   });
   navigator.mediaSession.setActionHandler("seekforward", () => {
-    audio.currentTime += 10;
+    audio.currentTime += 15;
     updatePositionState();
   });
   navigator.mediaSession.setActionHandler("seekbackward", () => {
-    audio.currentTime -= 10;
+    audio.currentTime -= 15;
     updatePositionState();
   });
   navigator.mediaSession.setActionHandler("seekto", e => {

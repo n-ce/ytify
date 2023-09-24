@@ -1,5 +1,5 @@
 import { audio, bitrateSelector, pipedInstances, playButton } from "./dom";
-import { getSaved, itemsLoader, params, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getSaved, itemsLoader, params, setMetaData } from "./utils";
 
 
 
@@ -107,5 +107,5 @@ export default async function player(id: string | null = '') {
   audio.dataset.thumbnail = data.thumbnailUrl;
   audio.dataset.name = data.title;
   audio.dataset.author = data.uploader;
-  audio.dataset.duration = data.duration;
+  audio.dataset.duration = convertSStoHHMMSS(data.duration);
 }

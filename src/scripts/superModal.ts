@@ -5,12 +5,6 @@ import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 const [playNow, queueNext, atpContainer, startRadio] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
-let oneOff = true;
-function removeH1() {
-  if (!oneOff) return;
-  firstItemInQueue().remove();
-  oneOff = !oneOff;
-}
 
 
 superModal.addEventListener('click', e => {
@@ -26,8 +20,13 @@ playNow.addEventListener('click', () => {
 
 
 
+let removeH1 = true;
+
 queueNext.addEventListener('click', () => {
-  removeH1();
+  if (removeH1) {
+    firstItemInQueue().remove();
+    removeH1 = !removeH1;
+  }
   appendToQueuelist(superModal.dataset);
 });
 
@@ -40,9 +39,12 @@ function upcomingIcon(loaded = false) {
 }
 
 async function fetchMix(id: string, apiIndexB = 0) {
+
   await fetch(pipedInstances.options[apiIndexB].value + '/playlists/' + id)
     .then(res => res.json())
     .then(data => {
+      if (!data.relatedStreams)
+        throw new Error('No streams for mix');
       for (const stream of data.relatedStreams) {
         appendToQueuelist({
           id: stream.url.slice(9),

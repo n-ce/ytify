@@ -19,9 +19,8 @@ export function convertSStoHHMMSS(seconds: number): string {
   let ssStr = String(ss);
   if (mm < 10) mmStr = '0' + mmStr;
   if (ss < 10) ssStr = '0' + ssStr;
-  return hh > 0 ?
-    `${hh}:${mmStr}:${ssStr}` :
-    `${mmStr}:${ssStr}`;
+  return (hh > 0 ?
+    hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
@@ -45,7 +44,7 @@ export function setMetaData(
 
   const author = <HTMLAnchorElement>document.getElementById('author');
   author.href = 'https://youtube.com' + authorUrl;
-  author.textContent = authorName.replace(' - Topic', '');
+  author.textContent = authorName;
 
   document.title = streamName + ' - ytify';
 

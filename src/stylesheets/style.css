@@ -170,14 +170,13 @@ playlist-item:hover {
   position: sticky;
   top: calc(100% - 10vmin);
   z-index: 3;
-  background-image: linear-gradient(transparent, var(--bg));
 }
 
 #queuetools button,
 #searchlist+button {
   border: var(--border);
   border-radius: var(--roundness);
-  background: var(--onBg);
+  background: var(--bg);
   color: inherit;
   font-size: inherit;
   font-weight: bold;
