@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
-import type { PluginOption } from 'vite'
-import { VitePWA } from "vite-plugin-pwa";
+import { PluginOption, defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
+import autoprefixer from 'autoprefixer';
 
 // Set to false to disable eruda during development
 const eruda = true; // false
@@ -66,6 +66,11 @@ export default defineConfig(({ command }) => {
       registerType: 'autoUpdate',
       manifest: manifest,
       includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
-    })]
+    })],
+    css: {
+      postcss: {
+        plugins: [autoprefixer]
+      }
+    }
   }
 });

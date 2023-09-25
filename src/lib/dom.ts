@@ -1,4 +1,3 @@
-
 export const img = <HTMLImageElement>document.querySelector('img');
 
 export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
@@ -17,11 +16,9 @@ export const suggestionsSwitch = <HTMLSelectElement>document.getElementById('sug
 
 export const superModal = <HTMLDivElement>document.getElementById('superModal');
 
-
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
 export const listItemsContainer = <HTMLDivElement>document.getElementById('list');
 
 export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/list');
 
-export const [clearQBtn, shuffleQBtn, removeQBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;

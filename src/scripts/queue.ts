@@ -1,7 +1,9 @@
-import { clearQBtn, queuelist, removeQBtn, shuffleQBtn } from "../lib/dom";
+import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 
 const queueArray: string[] = [];
+
+const [clearQBtn, shuffleQBtn, removeQBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
@@ -37,10 +39,12 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 
 
-clearQBtn.addEventListener('click', () => {
+export function clearQ() {
   queueArray.length = 0;
   queuelist.innerHTML = '';
-});
+}
+
+clearQBtn.addEventListener('click', clearQ);
 
 shuffleQBtn.addEventListener('click', () => {
 

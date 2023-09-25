@@ -84,6 +84,10 @@ export default async function player(id: string | null = '') {
   audio.src = codec.urls[bitrateSelector.selectedIndex];
 
 
+  // remove ' - topic' from name
+  if (data.category === 'Music')
+    data.uploader = data.uploader.slice(0, -8);
+
   setMetaData(
     id,
     data.thumbnailUrl,
