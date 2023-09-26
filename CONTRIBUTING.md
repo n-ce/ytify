@@ -4,19 +4,15 @@
 
 # Development List
 
-- PlayPrevious button (requires globally storing streamHistory)
-- Favorites button (saves favorites to localStorage as map)
-- stream title topic/subject/data extraction to get better autoplay recommendations (maybe using compromise/one nlp library)
-- Recommendations feed using indexedDB & related streams averages of favorites
-- Material You colors with material color utilities using C++ / WASM
-- rewrite cleaner / efficient CSS
-- Github Actions
-  - Vite : combine js and css files into one and minify it
-  - Autoprefixer : removes need for manually adding css prefix
+- Volume slider instead of selector
+- Library using IndexedDB
 
-*Deployments for older versions : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/)*
+*Deployments for older versions : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/) || [v5.final.a](https://deploy-preview-118--ytify.netlify.app/)* 
 
 ## Changelog
+
+**v6.0**:
+[Full Changelog](https://github.com/n-ce/ytify/discussions/125)
 
 **v5.16**:
 - Shuffle Queue
