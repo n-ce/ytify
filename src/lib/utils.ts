@@ -11,6 +11,7 @@ export const save = localStorage.setItem.bind(localStorage);
 export const getSaved = localStorage.getItem.bind(localStorage);
 
 export function convertSStoHHMMSS(seconds: number): string {
+  if (seconds < 0) return '';
   const hh = Math.floor(seconds / 3600);
   seconds %= 3600;
   const mm = Math.floor(seconds / 60);

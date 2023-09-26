@@ -7,8 +7,9 @@ const [initial_name, initial_url] = (getSaved('pipedInstance')?.split('|') || ['
 
 pipedInstances.add(new Option(initial_name, initial_url, undefined, true));
 
+const apiList = 'https://piped-instances.kavin.rocks';
 
-fetch('https://piped-instances.kavin.rocks')
+fetch(apiList)
   .then(res => res.json())
   .then(data => {
     for (const instance of data)
@@ -18,11 +19,11 @@ fetch('https://piped-instances.kavin.rocks')
   .catch(err => {
     if (err.message === 'Failed to fetch')
       return console.log('fetching instances list failed');
-    else if (err.message === 'NetworkError when attempting to fetch resource.')
-      return alert('Your network might be blocking our api access although you can continue to use ytify it might be more error prone.');
 
-    if (confirm(`Unknown Error Detected \n${err.message}\n(might be solved if you reload or clear data in settings)\nReport it ? `)) {
-      (<HTMLInputElement>document.getElementById('netlifyForm')).value = err + ' in ' + location.href;
+    if (confirm('API blockage detected, more likely an error on your side, you can continue to use services but they may not work optimally. Investigate issue ?')) {
+      const text = prompt('Visit ' + apiList + ' in another tab, you can write what you see here, clicking on ok will report it. Alternatively if you have github submit an issue at https://github.com/n-ce/ytify/issues');
+      if (!text) return;
+      (<HTMLInputElement>document.getElementById('netlifyForm')).value = text + ' ' + err;
       document.forms[0].submit();
     }
   })
