@@ -19,9 +19,7 @@ function accentLightener(r: number, g: number, b: number) {
 }
 
 
-function accentDarkener(
-  r: number, g: number, b: number
-) {
+function accentDarkener(r: number, g: number, b: number) {
   let min = Math.min(r, g, b);
   if (r + g + b > 382.5 && min < 25.5) {
     r = Math.floor(r / 3);
@@ -29,7 +27,6 @@ function accentDarkener(
     b = Math.floor(b / 3);
     min = Math.floor(min / 3);
   }
-
   return `rgb(${r - min}, ${g - min},${b - min})`;
 }
 

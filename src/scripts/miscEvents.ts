@@ -52,7 +52,7 @@ if (getSaved('img')) {
 thumbnailSwitch.addEventListener('click', () => {
 
   if (getSaved('img')) {
-    img.src = getSaved('img') || '';
+    img.src = sessionStorage.getItem('img') || blankImage;
     localStorage.removeItem('img');
   }
   else {

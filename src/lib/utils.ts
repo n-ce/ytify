@@ -35,7 +35,7 @@ export function setMetaData(
 ) {
 
   if (getSaved('img')) {
-    save('img', thumbnail)
+    sessionStorage.setItem('img', thumbnail);
     thumbnail = '';
   } else img.src = thumbnail;
 
@@ -88,6 +88,7 @@ export type Item = {
   title: string,
   videos: number,
   duration: number,
+  category: string,
   thumbnail: string,
   subscribers: number,
   description: string,

@@ -33,13 +33,13 @@ const manifest = {
   "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
   "icons": [
     {
-      "src": "logo_192px.png",
+      "src": "icon192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "logo_512px.png",
+      "src": "icon512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
@@ -48,7 +48,7 @@ const manifest = {
   "start_url": "/",
   "display": "standalone",
   "theme_color": "white",
-  "background_color": "#00bfff",
+  "background_color": "#00558B",
   "share_target": {
     "action": "/",
     "method": "GET",

@@ -84,9 +84,9 @@ export default async function player(id: string | null = '') {
   audio.src = codec.urls[bitrateSelector.selectedIndex];
 
 
-  // remove ' - topic' from name
-  if (data.category === 'Music')
-    data.uploader = data.uploader.slice(0, -8);
+
+  // remove ' - topic' from name if it exists
+  data.uploader = data.uploader.replace(' - topic', '');
 
   setMetaData(
     id,
@@ -103,9 +103,7 @@ export default async function player(id: string | null = '') {
   relatedStreamsContainer.innerHTML = '';
   relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
 
-  // (<HTMLAnchorElement>document.getElementById('/')).click();
   params.set('s', id);
-  // history.pushState({}, '', '?' + params);
 
   audio.dataset.id = id;
   audio.dataset.thumbnail = data.thumbnailUrl;
