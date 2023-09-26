@@ -52,7 +52,7 @@ if (getSaved('img')) {
 thumbnailSwitch.addEventListener('click', () => {
 
   if (getSaved('img')) {
-    img.src = sessionStorage.getItem('img') || blankImage;
+    img.src = img.dataset.saved || '/ytify_thumbnail_min.webp';
     localStorage.removeItem('img');
   }
   else {

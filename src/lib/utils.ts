@@ -34,10 +34,10 @@ export function setMetaData(
   authorUrl: string
 ) {
 
-  if (getSaved('img')) {
-    sessionStorage.setItem('img', thumbnail);
-    thumbnail = '';
-  } else img.src = thumbnail;
+  img.dataset.saved = thumbnail;
+  getSaved('img') ?
+    thumbnail = '' :
+    img.src = thumbnail;
 
   const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = `https://youtube.com/watch?v=${id}`;
