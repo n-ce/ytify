@@ -1,6 +1,5 @@
 import { PluginOption, defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import autoprefixer from 'autoprefixer';
 
 // Set to false to disable eruda during development
 const eruda = true; // false
