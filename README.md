@@ -17,11 +17,6 @@
 
 [![chrome_screenshot_1687843035105](https://github.com/n-ce/ytify/assets/69345507/7f54fa3a-83ff-44d1-ac29-504097996378)](https://ytify.netlify.app/?s=9p5Oi4wPVVo)
 
-## Instances
-- Official - https://ytify.netlify.app
-- TotoB12 - https://totob12-music.netlify.app
-- Ozip - https://ytify.ozip.my.id/
-
 ## WHY / The story of ytify
 - I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
 - I noticed it wasn't able to stream under low network conditions which would occur when my daily data quota would expire.

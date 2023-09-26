@@ -1,0 +1,73 @@
+nav {
+  display: flex;
+}
+
+nav a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  opacity: 50%;
+}
+
+
+nav a:hover {
+  opacity: 75%;
+}
+
+nav a.active {
+  opacity: 1;
+}
+
+@media(orientation:portrait) {
+
+  nav {
+    height: auto;
+    justify-content: space-around;
+    width: 90%;
+    padding: 5%;
+    padding-bottom: 0;
+  }
+
+
+  nav a {
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-evenly;
+  }
+
+  nav i {
+    font-size: larger;
+  }
+
+  nav p {
+    margin: 0;
+    padding: 0;
+    font-size: small;
+  }
+
+}
+
+@media(orientation:landscape) {
+
+  nav {
+    height: 100dvh;
+    flex-direction: column;
+    width: 20%;
+    font-size: large;
+    justify-content: center;
+    background-image: linear-gradient(to right, var(--onBg), transparent);
+  }
+
+
+  nav a {
+    width: auto;
+    height: 12%;
+    margin: 1dvh;
+  }
+
+  nav i {
+    margin: 0 1vw;
+  }
+
+}

@@ -1,0 +1,157 @@
+footer {
+  display: flex;
+  height: 20%;
+  width: 100%;
+  border-radius: var(--roundness);
+  background-color: var(--onBg);
+  color: var(--text);
+  border: var(--border);
+  align-items: center;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+footer span {
+  height: 4vmin;
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  background-color: var(--onBg);
+  border-bottom: var(--border);
+}
+
+footer span p {
+  margin: 0;
+  font-size: large;
+}
+
+input[type='range'] {
+  height: 50%;
+  width: 70%;
+  -webkit-appearance: none;
+  cursor: pointer;
+  margin: 0;
+  background: none;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 100%;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 100%;
+  width: 1vmin;
+  background-color: var(--text);
+  border: var(--border);
+  transform: scale(2);
+}
+
+
+
+#playerControls {
+  height: 100%;
+  width: 100%;
+}
+
+#playerControls button {
+  color: inherit;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font-size: x-large;
+  transition: all 0.5s;
+}
+
+
+@media(orientation:landscape) {
+  #playerControls {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  #loopButton {
+    aspect-ratio: 1;
+  }
+}
+
+@media(orientation:portrait) {
+
+  #playerControls {
+    display: grid;
+    grid-template-areas:
+      "A B C D E"
+      "F F G H H";
+  }
+
+  #playPrevButton {
+    grid-area: A;
+  }
+
+  #seekBwdButton {
+    grid-area: B;
+  }
+
+  #playButton {
+    grid-area: C;
+  }
+
+  #seekFwdButton {
+    grid-area: D;
+  }
+
+  #playNextButton {
+    grid-area: E;
+  }
+
+  #volumeSelector {
+    grid-area: F;
+  }
+
+  #loopButton {
+    grid-area: G;
+    font-size: medium !important;
+    font-weight: bold;
+  }
+
+  #playSpeed {
+    grid-area: H;
+  }
+
+  #playerControls * {
+    text-align: center;
+  }
+
+  footer select {
+    font-weight: bold;
+    width: 13ch;
+    margin: auto;
+  }
+}
+
+
+.on {
+  background-color: var(--onBg) !important;
+  border: var(--border) !important;
+  border-radius: var(--roundness);
+  transform: scale(0.9);
+}
+
+.ri-loader-3-line {
+  animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0turn)
+  }
+
+  to {
+    transform: rotate(1turn)
+  }
+}

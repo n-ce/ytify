@@ -1,0 +1,46 @@
+:host {
+  background-color: var(--onBg);
+  height: 20vmin;
+  width: calc(100% - 2vmin);
+  margin-bottom: 1vmin;
+  padding: 1vmin;
+  border-radius: calc(var(--roundness) + 0.75vmin);
+  display: flex;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+#thumbnail {
+  height: 100%;
+  border-radius: var(--roundness);
+}
+
+div {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin-left: 1vmin;
+}
+
+slot {
+  display: flex;
+  height: 10vmin;
+  font-size: medium;
+  overflow: hidden;
+}
+
+#uData {
+  font-size: small;
+  height: 25%;
+  overflow: hidden;
+}
+
+
+#stats {
+  font-size: medium;
+  height: 25%;
+}

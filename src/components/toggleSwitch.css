@@ -1,0 +1,52 @@
+:host {
+  display: flex;
+  align-items: center;
+  margin: 4vmin 0;
+  color: var(--text);
+}
+
+label {
+  margin-left: auto;
+  position: relative;
+  display: inline-block;
+  pointer-events: none;
+  width: 9vmin;
+  height: 6vmin;
+}
+
+span {
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+  border: var(--border);
+}
+
+span:before {
+  position: absolute;
+  content: "";
+  height: calc(100% - 2.1vmin);
+  width: 2vmin;
+  margin: 1vmin;
+  background-color: var(--text);
+  border-radius: calc(var(--roundness) - 0.5vmin);
+
+}
+
+span,
+span:before {
+  position: absolute;
+  transition: 0.3s;
+}
+
+input {
+  display: none;
+}
+
+input:checked+span {
+  background-color: var(--onBg);
+}
+
+input:checked+span:before {
+  transform: translateX(4.6vmin);
+}

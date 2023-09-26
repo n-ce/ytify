@@ -1,0 +1,205 @@
+@import 'remixicon.css';
+@import 'nav.css';
+@import 'footer.css';
+@import 'home.css';
+@import 'search.css';
+@import 'settings.css';
+@import 'superModal.css';
+
+:root {
+  --bg: ;
+  --onBg: ;
+  --text: ;
+  --borderColor: ;
+  --border: 0.1vmin solid var(--borderColor);
+  --shadowColor: ;
+  --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
+  --roundness: 2vmin;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: url("/NotoSans.woff2") format("woff2");
+  font-display: swap;
+}
+
+html {
+  background-color: var(--bg);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100dvh;
+}
+
+body {
+  background-image: linear-gradient(var(--onBg), transparent);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  font-family: 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+}
+
+section {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  overflow-y: auto;
+  animation: appear 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+section.view {
+  display: flex;
+}
+
+@media(orientation:portrait) {
+  body {
+    flex-direction: column;
+  }
+
+  main {
+    height: calc(100dvh - 10%);
+    width: 90%;
+    padding: 5%;
+  }
+
+  section {
+    height: calc(75dvh - 5dvw);
+    margin-bottom: 5dvw;
+
+  }
+}
+
+
+@media(orientation:landscape) {
+  main {
+    height: 96dvh;
+    width: calc(80% - 4dvh);
+    padding: 2dvh;
+  }
+
+  section {
+    height: calc(80% - 2dvh);
+    margin-bottom: 2dvh;
+  }
+}
+
+
+/* global styles for tags */
+
+button {
+  transition: transform 0.5s ease-in-out;
+}
+
+button:active {
+  transform: scale(0.8)
+}
+
+input {
+  font-family: inherit;
+  outline: none;
+}
+
+select {
+  font-family: inherit;
+  background: none;
+  outline: none;
+  color: var(--text);
+  border: none;
+  border-radius: var(--roundness)
+}
+
+details {
+  width: calc(100% - 4.3vmin);
+  background-color: var(--onBg);
+  color: var(--text);
+  padding: 2vmin;
+  margin-bottom: 4vmin;
+  border: var(--border);
+  border-radius: var(--roundness)
+}
+
+details>summary {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.hide {
+  display: none !important;
+}
+
+stream-item,
+channel-item,
+playlist-item {
+  transition: transform 0.3s ease-in-out;
+}
+
+stream-item:hover,
+channel-item:hover,
+playlist-item:hover {
+  transform: scale(0.95);
+}
+
+
+
+#queuetools {
+  height: 10vmin;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  top: calc(100% - 10vmin);
+  z-index: 3;
+}
+
+#queuetools button,
+#searchlist+button {
+  border: var(--border);
+  border-radius: var(--roundness);
+  background: var(--bg);
+  color: inherit;
+  font-size: inherit;
+  font-weight: bold;
+  transform: none;
+  padding: 1vmin 2vmin;
+  margin: 1vmin 2vmin;
+}
+
+#queuetools button:active,
+#searchlist+button:active {
+  transform: scale(0.9);
+}
+
+#searchlist+button {
+  display: none;
+}
+
+#queuelist {
+  width: 100%;
+  height: 100%;
+  margin-top: -10vmin;
+}
+
+.delete {
+  background-color: #f007 !important;
+}
