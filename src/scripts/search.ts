@@ -101,21 +101,24 @@ superInput.addEventListener('input', async () => {
 
 let index = 0;
 
-superInput.addEventListener('keyup', _ => {
+superInput.addEventListener('keydown', _ => {
   if (_.key === 'Backspace') return;
 
   if (_.key === 'Enter') return searchLoader();
 
   if (!suggestions.hasChildNodes()) return;
 
+
+
   if (_.key === 'ArrowUp') {
     if (index === 0) index = suggestions.childElementCount;
     index--;
+    superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
   }
 
-  superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
 
   if (_.key === 'ArrowDown') {
+    superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
     index++;
     if (index === suggestions.childElementCount) index = 0;
   }

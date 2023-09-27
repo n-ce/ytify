@@ -1,6 +1,6 @@
 import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS } from "../lib/utils";
+import { convertSStoHHMMSS, params } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
@@ -81,7 +81,7 @@ audio.addEventListener('loadstart', () => {
 audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-line');
 
-  if (superInput.value || streamHistory.length)
+  if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
     audio.play();
 });
 
