@@ -18,10 +18,10 @@ function accentLightener(r: number, g: number, b: number) {
   return `rgb(${r + max}, ${g + max},${b + max})`;
 }
 
-
 function accentDarkener(r: number, g: number, b: number) {
   let min = Math.min(r, g, b);
-  if (r + g + b > 382.5 && min < 25.5) {
+
+  if ((r + g + b) / min > 14) {
     r = Math.floor(r / 3);
     g = Math.floor(g / 3);
     b = Math.floor(b / 3);
@@ -75,6 +75,7 @@ const palette: Scheme = {
 
 function themer() {
   if (!context) return;
+
   const canvasImg = new Image();
   canvasImg.onload = () => {
     canvas.height = canvasImg.height;
@@ -97,6 +98,7 @@ function themer() {
     r = Math.floor(r / amount),
       g = Math.floor(g / amount),
       b = Math.floor(b / amount);
+
 
     const theme = themeSelector.selectedOptions[0].value;
     let light = 'light', dark = 'dark';

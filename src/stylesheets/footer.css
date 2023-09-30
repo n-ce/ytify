@@ -10,9 +10,10 @@ footer {
   flex-direction: column;
   box-shadow: var(--shadow);
   overflow: hidden;
+  margin: -1.5vmin 0;
 }
 
-footer span {
+footer>span {
   height: 4vmin;
   display: flex;
   width: 100%;
@@ -20,6 +21,7 @@ footer span {
   align-items: center;
   background-color: var(--onBg);
   border-bottom: var(--border);
+  margin-bottom: 2vmin;
 }
 
 footer span p {
@@ -27,7 +29,7 @@ footer span p {
   font-size: large;
 }
 
-input[type='range'] {
+[type="range"] {
   height: 50%;
   width: 70%;
   -webkit-appearance: none;
@@ -36,13 +38,13 @@ input[type='range'] {
   background: none;
 }
 
-input[type='range']::-webkit-slider-runnable-track {
+[type="range"]::-webkit-slider-runnable-track {
   -webkit-appearance: none;
   width: 100%;
   height: 100%;
 }
 
-input[type='range']::-webkit-slider-thumb {
+[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 100%;
   width: 1vmin;
@@ -51,6 +53,32 @@ input[type='range']::-webkit-slider-thumb {
   transform: scale(2);
 }
 
+
+#volumeContainer {
+  height: 40%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+  margin: auto 0;
+  overflow: hidden;
+}
+
+#volumeContainer label {
+  filter: invert();
+  margin: 1vmin;
+}
+
+#volumeContainer input {
+  width: 100%;
+}
+
+#volumeContainer input::-webkit-slider-thumb {
+  border: none;
+  transform: none;
+  box-shadow: -55vw 0 0 55vw var(--text);
+}
 
 
 #playerControls {
@@ -69,16 +97,15 @@ input[type='range']::-webkit-slider-thumb {
 }
 
 
+
+
 @media(orientation:landscape) {
   #playerControls {
     display: flex;
     justify-content: space-evenly;
   }
-
-  #loopButton {
-    aspect-ratio: 1;
-  }
 }
+
 
 @media(orientation:portrait) {
 
@@ -86,7 +113,7 @@ input[type='range']::-webkit-slider-thumb {
     display: grid;
     grid-template-areas:
       "A B C D E"
-      "F F G H H";
+      "F G G G H";
   }
 
   #playPrevButton {
@@ -109,41 +136,45 @@ input[type='range']::-webkit-slider-thumb {
     grid-area: E;
   }
 
-  #volumeSelector {
-    grid-area: F;
-  }
-
   #loopButton {
-    grid-area: G;
+    grid-area: F;
+    width: 15vw;
     font-size: medium !important;
     font-weight: bold;
   }
 
+  #volumeContainer {
+    grid-area: G;
+    width: 60vw;
+
+  }
+
   #playSpeed {
     grid-area: H;
+    font-weight: bold;
+    width: 15vmin;
+    margin: auto;
   }
 
   #playerControls * {
     text-align: center;
   }
-
-  footer select {
-    font-weight: bold;
-    width: 13ch;
-    margin: auto;
-  }
 }
 
+#playButton {
+  transform: scale(1.7) translateY(1%);
+}
+
+#playButton:active {
+  transform: scale(1.5) translateY(2%);
+}
 
 .on {
-  background-color: var(--onBg) !important;
-  border: var(--border) !important;
-  border-radius: var(--roundness);
-  transform: scale(0.9);
+  text-shadow: 0 0 1vmin var(--text);
 }
 
 .ri-loader-3-line {
-  animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
 }
 
 @keyframes spinner {

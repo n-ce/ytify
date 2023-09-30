@@ -85,8 +85,8 @@ export default async function player(id: string | null = '') {
 
 
 
-  // remove ' - topic' from name if it exists
-  data.uploader = data.uploader.replace(' - topic', '');
+  // remove ' - Topic' from name if it exists
+  data.uploader = data.uploader.replace(' - Topic', '');
 
   setMetaData(
     id,
@@ -103,7 +103,11 @@ export default async function player(id: string | null = '') {
   relatedStreamsContainer.innerHTML = '';
   relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
 
+
   params.set('s', id);
+
+  if (location.pathname === '/')
+    history.replaceState({}, '', location.origin + '?' + params);
 
   audio.dataset.id = id;
   audio.dataset.thumbnail = data.thumbnailUrl;

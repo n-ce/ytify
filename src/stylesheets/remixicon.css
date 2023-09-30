@@ -28,14 +28,6 @@
   content: "\ee2b";
 }
 
-.ri-play-line:before {
-  content: "\f00b";
-}
-
-.ri-stop-line:before {
-  content: "\f1a1";
-}
-
 .ri-skip-back-line:before {
   content: "\f140";
 }
@@ -64,14 +56,6 @@
   content: "\f354";
 }
 
-.ri-stack-line:before {
-  content: "\f181";
-}
-
-.ri-pause-line:before {
-  content: "\efd8";
-}
-
 .ri-settings-line:before {
   content: "\f0ee";
 }
@@ -82,4 +66,64 @@
 
 .ri-loader-3-line:before {
   content: "\eec4";
+}
+
+.ri-youtube-line:before {
+  content: "\f2d5";
+}
+
+.ri-volume-down-line:before {
+  content: "\f29c";
+}
+
+.ri-volume-mute-line:before {
+  content: "\f29e";
+}
+
+.ri-rfid-line:before {
+  content: "\f3bb";
+}
+
+.ri-download-2-line:before {
+  content: "\ec54";
+}
+
+.ri-play-list-add-line:before {
+  content: "\f00f";
+}
+
+.ri-pause-circle-fill:before {
+  content: "\efd5";
+}
+
+.ri-play-circle-fill:before {
+  content: "\f008";
+}
+
+.ri-stop-circle-fill:before {
+  content: "\f19e";
+}
+
+.ri-shuffle-line:before {
+  content: "\f124";
+}
+
+.ri-close-line:before {
+  content: "\eb99";
+}
+
+.ri-delete-bin-7-line:before {
+  content: "\ec28";
+}
+
+.ri-list-check-2:before {
+  content: "\eeb9";
+}
+
+.ri-play-line:before {
+  content: "\f00b";
+}
+
+.ri-subtract-line:before {
+  content: "\f1af";
 }

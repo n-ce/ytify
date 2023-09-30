@@ -63,7 +63,7 @@
       <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.0 beta 2</a>
+        <a id="title" href="" target="_blank">ytify 6.0 beta 3</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
@@ -79,9 +79,9 @@
 
     <section id="upcoming">
       <span id="queuetools">
-        <button>Clear</button>
-        <button>Shuffle</button>
-        <button>Remove</button>
+        <button class="ri-delete-bin-7-line">&nbsp;Clear</button>
+        <button class="ri-shuffle-line">&nbsp;Shuffle</button>
+        <button class="ri-subtract-line">&nbsp;Remove</button>
       </span>
       <div id="queuelist">
         <h1 align="center">upcoming streams show here</h1>
@@ -176,27 +176,22 @@
     <footer>
       <span>
         <p id="currentDuration">00:00</p>
-        <input type="range" id="progress" />
+        <input type="range" value="0" id="progress" />
         <p id="fullDuration">00:00</p>
       </span>
       <div id="playerControls">
         <button class="ri-skip-back-line" id="playPrevButton"></button>
         <button class="ri-replay-15-line" id="seekBwdButton"></button>
-        <button class="ri-play-line" id="playButton"></button>
+        <button class="ri-stop-circle-fill" id="playButton"></button>
         <button class="ri-forward-15-line" id="seekFwdButton"></button>
         <button class="ri-skip-forward-line" id="playNextButton"></button>
-        <select id="volumeSelector">
-          <option value="0">Mute</option>
-          <option value="0.16">16%</option>
-          <option value="0.33">33%</option>
-          <option value="0.5">50%</option>
-          <option value="0.66">66%</option>
-          <option value="0.83">83%</option>
-          <option value="1" selected>VOL : 100%</option>
-        </select>
-
         <button class="ri-repeat-line" id="loopButton">
         </button>
+
+        <span id="volumeContainer">
+          <label for="volumeChanger" class="ri-volume-down-line"></label>
+          <input type="range" min="0" max="100" value="100" id="volumeChanger">
+        </span>
         <select id="playSpeed">
           <option value="0.25">0.25x</option>
           <option value="0.50">0.50x</option>
@@ -214,15 +209,23 @@
 
   <div id="superModal" class="hide">
     <ul>
-      <li>Play Now</li>
-      <li>Queue Next</li>
+      <li><i class="ri-play-line"></i>Play Now</li>
+      <li><i class="ri-list-check-2"></i>Enqueue</li>
       <li id="psc">
+        <i class="ri-play-list-add-line"></i>
         <select id="playlistSelector">
           <option>Add To Playlist</option>
         </select>
       </li>
-      <li>Start Radio</li>
+      <li><i class="ri-rfid-line"></i>Start Radio</li>
+      <!-- hidden till racoon is ready -->
+      <li class="hide"><i class="ri-download-2-line"></i>Download</li>
+      <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
+  </div>
+  <div id="download" class="hide">
+    <button class="ri-close-line"></button>
+    <iframe></iframe>
   </div>
   <script src="/src/scripts/main.ts" type="module"></script>
 </body>

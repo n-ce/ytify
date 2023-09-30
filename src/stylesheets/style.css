@@ -203,3 +203,33 @@ playlist-item:hover {
 .delete {
   background-color: #f007 !important;
 }
+
+#download {
+  position: absolute;
+  z-index: 4;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #0005;
+}
+
+#download button {
+  position: fixed;
+  top: 5%;
+  right: 4%;
+  color: red;
+  font-size: xx-large;
+  font-weight: bolder;
+  border: none;
+  text-shadow: 0 0 1vmin black;
+  background: none;
+}
+
+iframe {
+  height: 90%;
+  width: 90%;
+  border: none;
+  border-radius: var(--roundness);
+}

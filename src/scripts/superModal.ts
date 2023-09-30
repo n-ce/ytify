@@ -3,7 +3,7 @@ import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
-const [playNow, queueNext, atpContainer, startRadio] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+const [playNow, enqueue, atpContainer, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
 
 
@@ -21,14 +21,13 @@ playNow.addEventListener('click', () => {
 
 let removeH1 = true;
 
-queueNext.addEventListener('click', () => {
+enqueue.addEventListener('click', () => {
   if (removeH1) {
     firstItemInQueue().remove();
     removeH1 = !removeH1;
   }
   appendToQueuelist(superModal.dataset);
 });
-
 
 
 
@@ -81,3 +80,22 @@ atpSelector.addEventListener('change', () => {
 });
 
 
+const download = <HTMLDivElement>document.getElementById('download');
+const iframe = <HTMLIFrameElement>download.lastElementChild;
+const exitDownloader = <HTMLButtonElement>download.firstElementChild;
+
+downloadBtn.addEventListener('click', () => {
+  const url = 'https://shailendramaurya.github.io/racoon/?link=https://youtu.be/' + superModal.dataset.id;
+  iframe.src = url;
+  download.classList.toggle('hide');
+
+})
+
+exitDownloader.addEventListener('click', () => {
+  iframe.src = '';
+  download.classList.toggle('hide');
+})
+
+openChannelBtn.addEventListener('click', () => {
+  open('https://youtube.com' + superModal.dataset.channelUrl);
+})

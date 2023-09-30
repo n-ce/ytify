@@ -1,6 +1,6 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { getSaved, save, itemsLoader, idFromURL } from "../lib/utils";
+import { getSaved, save, itemsLoader, idFromURL, params } from "../lib/utils";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
@@ -140,5 +140,15 @@ suggestionsSwitch.addEventListener('click', () => {
 });
 if (getSaved('search_suggestions') && suggestionsSwitch)
   suggestionsSwitch.removeAttribute('checked')
+
+
+// search param /?q=
+
+if (params.has('q')) {
+  superInput.value = params.get('q') || '';
+  if (params.has('f'))
+    searchFilters.value = params.get('f') || '';
+  searchLoader();
+}
 
 

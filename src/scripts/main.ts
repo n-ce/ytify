@@ -25,6 +25,7 @@ streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/y
 const favButton = <HTMLElement>(<HTMLButtonElement>document.getElementById('favButton')).nextElementSibling;
 const icons = ['ri-heart-line', 'ri-heart-fill'];
 favButton.addEventListener('click', () => {
+  alert('this feature is being tested')
   favButton.classList.replace(icons[0], icons[1]);
   icons.reverse();
 })

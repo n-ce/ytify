@@ -2,13 +2,15 @@ import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, superM
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
-
 export const params = (new URL(location.href)).searchParams;
 
 export const save = localStorage.setItem.bind(localStorage);
 
 export const getSaved = localStorage.getItem.bind(localStorage);
+
+export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
+export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
@@ -24,7 +26,6 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
-export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 export function setMetaData(
   id: string,
@@ -93,6 +94,7 @@ export type Item = {
   subscribers: number,
   description: string,
   playlistType: string,
+  uploaderUrl: string,
   uploadedDate: string,
   uploaderName: string,
   uploaderAvatar: string
@@ -114,6 +116,7 @@ function createStreamItem(stream: Item) {
     _.title = stream.title;
     _.thumbnail = stream.thumbnail;
     _.author = stream.uploaderName;
+    _.channelUrl = stream.uploaderUrl;
     _.duration = streamItem.dataset.duration;
   })
   return streamItem;

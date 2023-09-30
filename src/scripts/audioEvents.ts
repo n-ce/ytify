@@ -52,7 +52,7 @@ playButton.addEventListener('click', () => {
 let resolvePlayback: number;
 
 audio.addEventListener('playing', () => {
-  playButton.classList.replace(playButton.className, 'ri-pause-line');
+  playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   playButton.dataset.state = '';
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
@@ -60,7 +60,7 @@ audio.addEventListener('playing', () => {
 });
 
 audio.addEventListener('pause', () => {
-  playButton.classList.replace('ri-pause-line', 'ri-play-line');
+  playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
   playButton.dataset.state = '1';
 });
 
@@ -79,7 +79,7 @@ audio.addEventListener('loadstart', () => {
 
 
 audio.addEventListener('loadeddata', () => {
-  playButton.classList.replace('ri-loader-3-line', 'ri-play-line');
+  playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
 
   if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
     audio.play();
@@ -172,6 +172,7 @@ playPrevButton.addEventListener('click', () => {
 
 
 function onEnd() {
+  playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   if (queuelist.childElementCount)
     firstItemInQueue().click();
 
