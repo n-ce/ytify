@@ -78,25 +78,6 @@ if (getSaved('library'))
 
 
 
-const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger');
-const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
-
-volumeIcon.addEventListener('click', () => {
-  volumeChanger.value = audio.volume ? '0' : '100';
-  audio.volume = audio.volume ? 0 : 1;
-  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className === 'ri-volume-down-line' ? 'ri-volume-mute-line' : 'ri-volume-down-line');
-
-});
-
-volumeChanger.addEventListener('change', () => {
-  audio.volume = parseFloat(volumeChanger.value) / 100;
-
-  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? 'ri-volume-down-line' : 'ri-volume-mute-line');
-
-})
-
-
-
 const deleteButton = <HTMLAnchorElement>document.getElementById('deleteButton');
 
 deleteButton.addEventListener('click', () => {

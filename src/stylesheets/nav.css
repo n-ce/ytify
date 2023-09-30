@@ -56,7 +56,6 @@ nav a.active {
     width: 20%;
     font-size: large;
     justify-content: center;
-    background-image: linear-gradient(to right, var(--onBg), transparent);
   }
 
 

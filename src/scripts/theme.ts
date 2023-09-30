@@ -14,8 +14,9 @@ const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContr
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
 function accentLightener(r: number, g: number, b: number) {
-  const max = Math.floor((255 - Math.max(r, g, b)) / 2);
-  return `rgb(${r + max}, ${g + max},${b + max})`;
+  const $ = (_: number) => _ + (207 - Math.max(r, g, b));
+
+  return `rgb(${$(r)}, ${$(g)},${$(b)})`;
 }
 
 function accentDarkener(r: number, g: number, b: number) {

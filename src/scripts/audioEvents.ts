@@ -183,6 +183,26 @@ audio.addEventListener('ended', onEnd);
 playNextButton.addEventListener('click', onEnd);
 
 
+
+const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger');
+const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
+
+volumeIcon.addEventListener('click', () => {
+  volumeChanger.value = audio.volume ? '0' : '100';
+  audio.volume = audio.volume ? 0 : 1;
+  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className === 'ri-volume-down-line' ? 'ri-volume-mute-line' : 'ri-volume-down-line');
+
+});
+
+volumeChanger.addEventListener('input', () => {
+  audio.volume = parseFloat(volumeChanger.value) / 100;
+
+  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? 'ri-volume-down-line' : 'ri-volume-mute-line');
+
+});
+
+
+
 if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('play', () => {
     audio.play();

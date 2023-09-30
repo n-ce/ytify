@@ -1,7 +1,15 @@
 import { audio, bitrateSelector, pipedInstances, playButton } from "./dom";
 import { convertSStoHHMMSS, getSaved, itemsLoader, params, setMetaData } from "./utils";
 
+const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
+interface Opus {
+  urls: string[],
+  bitrates: number[]
+}
+interface M4A extends Opus {
+  options: HTMLOptionElement[]
+}
 
 export default async function player(id: string | null = '') {
 
@@ -28,17 +36,9 @@ export default async function player(id: string | null = '') {
 
   // extracting opus streams and storing m4a streams
 
-  interface Opus {
-    urls: string[],
-    bitrates: number[]
-  }
-  interface M4A extends Opus {
-    options: HTMLOptionElement[]
-  }
   const opus: Opus = { urls: [], bitrates: [] }
   const m4a: M4A = { urls: [], bitrates: [], options: [] }
 
-  const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
   bitrateSelector.innerHTML = '';
 

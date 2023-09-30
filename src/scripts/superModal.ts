@@ -19,13 +19,10 @@ playNow.addEventListener('click', () => {
 });
 
 
-let removeH1 = true;
 
 enqueue.addEventListener('click', () => {
-  if (removeH1) {
+  if (firstItemInQueue().matches('h1'))
     firstItemInQueue().remove();
-    removeH1 = !removeH1;
-  }
   appendToQueuelist(superModal.dataset);
 });
 

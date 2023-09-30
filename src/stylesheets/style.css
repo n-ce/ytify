@@ -23,9 +23,6 @@
   font-display: swap;
 }
 
-html {
-  background-color: var(--bg);
-}
 
 html,
 body {
@@ -35,7 +32,7 @@ body {
 }
 
 body {
-  background-image: linear-gradient(var(--onBg), transparent);
+  background-color: var(--bg);
   color: var(--text);
   display: flex;
   align-items: center;
@@ -173,7 +170,8 @@ playlist-item:hover {
 }
 
 #queuetools button,
-#searchlist+button {
+#searchlist+button,
+#listTools button {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--bg);
@@ -186,7 +184,8 @@ playlist-item:hover {
 }
 
 #queuetools button:active,
-#searchlist+button:active {
+#searchlist+button:active,
+#listTools button:active {
   transform: scale(0.9);
 }
 
@@ -201,7 +200,7 @@ playlist-item:hover {
 }
 
 .delete {
-  background-color: #f007 !important;
+  background-color: #800 !important;
 }
 
 #download {

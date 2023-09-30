@@ -47,7 +47,7 @@ const manifest = {
   "start_url": "/",
   "display": "standalone",
   "theme_color": "white",
-  "background_color": "#00558B",
+  "background_color": "white",
   "share_target": {
     "action": "/",
     "method": "GET",

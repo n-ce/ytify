@@ -51,6 +51,12 @@ const searchLoader = () => {
       alert(err);
       pipedInstances.selectedIndex = 0;
     });
+
+  const searchQuery = '?q=' + superInput.value;
+  const filterQuery = searchFilters.value === 'all' ? '' : '&f=' + searchFilters.value;
+  superInput.dataset.query = searchQuery + filterQuery;
+
+  history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query);
   suggestions.style.display = 'none';
 }
 

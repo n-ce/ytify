@@ -102,7 +102,8 @@ export type Item = {
 
 function createStreamItem(stream: Item) {
   const streamItem = document.createElement('stream-item');
-  streamItem.textContent = stream.title;
+  streamItem.dataset.id = stream.url.substring(9);
+  streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
   streamItem.dataset.thumbnail = stream.thumbnail;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';

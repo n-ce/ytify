@@ -18,7 +18,7 @@ export const superModal = <HTMLDivElement>document.getElementById('superModal');
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
-export const listItemsContainer = <HTMLDivElement>document.getElementById('list');
+export const listItemsContainer = <HTMLDivElement>document.getElementById('playlist');
 
 export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/list');
 

@@ -1,3 +1,4 @@
+import { superInput } from "../lib/dom";
 import { params } from "../lib/utils";
 
 
@@ -21,9 +22,11 @@ function showSection(id: string) {
 for (const anchor of anchors) {
   anchor.addEventListener('click', _ => {
     _.preventDefault();
+
     history.pushState({}, '',
-      anchor.id + ((params.has('s') && anchor.id === '/') ? ('?' + params) : '')
+      anchor.id + ((params.has('s') && anchor.id === '/') ? ('?' + params) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
     );
+    // ↑↑ this is really bad programming ↑↑
     showSection(anchor.id);
   })
 }

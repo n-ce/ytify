@@ -4,7 +4,6 @@
 
 # Development List
 
-- Volume slider instead of selector
 - Library using IndexedDB
 
 *Deployments for older versions : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/) || [v5.final.a](https://deploy-preview-118--ytify.netlify.app/)* 
