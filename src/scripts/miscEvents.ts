@@ -16,7 +16,7 @@ bitrateSelector.addEventListener('change', () => {
 
 subtitleSelector.addEventListener('change', () => {
   subtitleTrack.src = subtitleSelector.value;
-  subtitleTrack.src ?
+  subtitleSelector.value ?
     subtitleContainer.classList.remove('hide') :
     subtitleContainer.classList.add('hide');
   parseTTML();
