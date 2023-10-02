@@ -1,4 +1,5 @@
-import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, superModal } from "./dom";
+import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -178,4 +179,70 @@ export function itemsLoader(itemsArray: Item[]): DocumentFragment {
   return fragment;
 }
 
+
+// subtitles
+
+let loaded = false;
+function loadParser() {
+
+  // Dynamically Loading Library on Demand only
+  if (loaded)
+    return true;
+  const imscript = document.createElement('script');
+  imscript.src = 'https://unpkg.com/imsc/dist/imsc.all.min.js';
+  imscript.type = 'text/javascript';
+  document.head.appendChild(imscript);
+  return new Promise(res => {
+    imscript.addEventListener('load', () => {
+      loaded = true;
+      res(true);
+    })
+  })
+}
+
+
+
+export async function parseTTML() {
+  if (!loaded)
+    await loadParser();
+
+  const myTrack = audio.textTracks[0];
+  myTrack.mode = "hidden";
+  const d = img.getBoundingClientRect();
+
+  subtitleContainer.style.top = Math.floor(d.y) + 'px';
+  subtitleContainer.style.left = Math.floor(d.x) + 'px';
+
+
+  fetch(subtitleTrack.src)
+    .then(res => res.text())
+    .then(text => {
+      const imscDoc = imsc.fromXML(text);
+      const timeEvents = imscDoc.getMediaTimeEvents();
+      const telen = timeEvents.length;
+
+      for (let i = 0; i < telen; i++) {
+        const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
+
+        myCue.onenter = () => {
+          const subtitleActive = subtitleContainer.firstChild;
+          if (subtitleActive)
+            subtitleContainer.removeChild(subtitleActive)
+          imsc.renderHTML(
+            imsc.generateISD(imscDoc, myCue.startTime),
+            subtitleContainer,
+            img,
+            Math.floor(d.height),
+            Math.floor(d.width)
+          );
+        }
+        myCue.onexit = () => {
+          const subtitleActive = subtitleContainer.firstChild;
+          if (subtitleActive)
+            subtitleContainer.removeChild(subtitleActive)
+        }
+        myTrack.addCue(myCue);
+      }
+    });
+}
 

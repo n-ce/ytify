@@ -1,4 +1,4 @@
-import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
+import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS, params } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
@@ -49,33 +49,18 @@ playButton.addEventListener('click', () => {
 
 
 
-let resolvePlayback: number;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   playButton.dataset.state = '';
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
-  window.clearTimeout(resolvePlayback);
 });
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
   playButton.dataset.state = '1';
 });
-
-
-audio.addEventListener('loadstart', () => {
-  resolvePlayback = window.setTimeout(
-    () => {
-      if (playButton.classList.contains('ri-loader-3-line')) {
-        pipedInstances.selectedIndex++;
-        const timeOfSwitch = audio.currentTime;
-        player(audio.dataset.id);
-        audio.currentTime = timeOfSwitch;
-      }
-    }, 10000);
-})
 
 
 audio.addEventListener('loadeddata', () => {

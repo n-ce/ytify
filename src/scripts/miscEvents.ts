@@ -1,6 +1,7 @@
-import { audio, bitrateSelector, img } from "../lib/dom";
+import { audio, bitrateSelector, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, params, save, updatePositionState } from "../lib/utils";
+import { blankImage, getSaved, params, parseTTML, save, updatePositionState } from "../lib/utils";
+
 
 
 bitrateSelector.addEventListener('change', () => {
@@ -10,6 +11,18 @@ bitrateSelector.addEventListener('change', () => {
   audio.play();
   updatePositionState();
 });
+
+
+
+subtitleSelector.addEventListener('change', () => {
+  subtitleTrack.src = subtitleSelector.value;
+  subtitleTrack.src ?
+    subtitleContainer.classList.remove('hide') :
+    subtitleContainer.classList.add('hide');
+  parseTTML();
+});
+
+
 
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 

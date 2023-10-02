@@ -7,8 +7,8 @@
   padding: 0 2%;
   display: grid;
   grid-template-areas:
-    "A A A"
-    "B C E";
+    "A A A A"
+    "B C D E";
 }
 
 img {
@@ -39,6 +39,12 @@ img {
   grid-area: C;
 }
 
+#subtitleSelector {
+  font-family: inherit;
+  font-size: small;
+  max-width: 11ch;
+  grid-area: D;
+}
 
 
 #favButton {

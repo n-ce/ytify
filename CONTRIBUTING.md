@@ -1,17 +1,15 @@
 - To add to our repository, check out our issues or the [development list](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md#development-list)
-- To contribute, fork the repository, make a branch, commit your changes, and make a pull request. 
-- Considering to fix a bug or add a new feature? Make sure to increment the version number in the sw.js file if you do so.
 
 # Development List
 
-- Library using IndexedDB
+- Library using IndexedDB (Favorites, History, Saved Playlists)
 
-*Deployments for older versions : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/) || [v5.final.a](https://deploy-preview-118--ytify.netlify.app/)* 
+*Deployments for older versions : [v1](https://deploy-preview-8--ytify.netlify.app/) || [v2](https://deploy-preview-20--ytify.netlify.app/) || [v3](https://deploy-preview-32--ytify.netlify.app/) || [v4](https://deploy-preview-51--ytify.netlify.app/) || [v5](https://deploy-preview-60--ytify.netlify.app/) || [v5.final](https://deploy-preview-118--ytify.netlify.app/)* 
 
 ## Changelog
 
 **v6.0**:
-[Full Changelog](https://github.com/n-ce/ytify/discussions/125)
+- [Full Changelog](https://github.com/n-ce/ytify/discussions/125)
 
 **v5.16**:
 - Shuffle Queue

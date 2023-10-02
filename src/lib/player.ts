@@ -1,5 +1,5 @@
-import { audio, bitrateSelector, pipedInstances, playButton } from "./dom";
-import { convertSStoHHMMSS, getSaved, itemsLoader, params, setMetaData } from "./utils";
+import { audio, bitrateSelector, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
+import { convertSStoHHMMSS, getSaved, itemsLoader, params, parseTTML, setMetaData } from "./utils";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
@@ -97,6 +97,21 @@ export default async function player(id: string | null = '') {
   );
 
 
+  // Subtitle data Injection into dom
+
+  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
+  subtitleSelector.classList.remove('hide');
+  subtitleContainer.innerHTML = '';
+  if (data.subtitles.length)
+    for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
+  else {
+    subtitleTrack.src = '';
+    subtitleContainer.classList.add('hide');
+    subtitleSelector.classList.add('hide');
+    parseTTML();
+  }
+
+
   // load related streams
   const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
 
@@ -107,7 +122,7 @@ export default async function player(id: string | null = '') {
   params.set('s', id);
 
   if (location.pathname === '/')
-    history.replaceState({}, '', location.origin + '?' + params);
+    history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
 
   audio.dataset.id = id;
   audio.dataset.thumbnail = data.thumbnailUrl;

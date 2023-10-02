@@ -27,6 +27,7 @@
   <link rel="icon" type="image/png" href="/logo192.png" sizes="192x192" />
   <link rel="icon" type="image/png" href="/logo512.png" sizes="512x512" />
 
+
   <title>ytify</title>
 </head>
 
@@ -60,22 +61,29 @@
   </nav>
   <main>
     <section id="home">
+      <article class="hide" id="subtitleContainer"></article>
+
       <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.0 beta 4</a>
+        <a id="title" href="" target="_blank">ytify 6.0</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
         </select>
+        <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line"></label>
       </div>
 
 
-      <audio data-seconds="0"></audio>
+      <audio data-seconds="0">
+        <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
+      </audio>
 
     </section>
+
+
 
     <section id="upcoming">
       <span id="queuetools">
@@ -87,6 +95,8 @@
         <h1 align="center">upcoming streams show here</h1>
       </div>
     </section>
+
+
 
     <section id="search">
       <span id="superInputContainer">
@@ -114,10 +124,13 @@
       </div>
       <button id="loadMore">Load More</button>
     </section>
+
+
     <section id="related">
       <h1>Streams related to your current playing stream show up here.</h1>
-
     </section>
+
+
     <section id="library">
       <details>
         <summary id="library:history">History</summary>
@@ -129,6 +142,8 @@
         <summary>Playlists</summary>
       </details>
     </section>
+
+
     <section id="settings">
       <span>
         <label for="pipedInstances">Piped Instance</label>
@@ -170,6 +185,8 @@
       </form>
 
     </section>
+
+
     <section id="list">
       <span id="listTools">
         <button class="ri-play-line" id="playAllBtn">&nbsp;Play All</button>
@@ -181,16 +198,20 @@
         <h1>playlist or channel items show here</h1>
       </div>
     </section>
+
+
     <footer>
+
       <span>
         <p id="currentDuration">00:00</p>
         <input type="range" value="0" id="progress" />
         <p id="fullDuration">00:00</p>
       </span>
+
       <div id="playerControls">
         <button class="ri-skip-back-line" id="playPrevButton"></button>
         <button class="ri-replay-15-line" id="seekBwdButton"></button>
-        <button class="ri-stop-circle-fill" id="playButton"></button>
+        <button class="ri-stop-circle-fill" id="playButton" data-state="1"></button>
         <button class="ri-forward-15-line" id="seekFwdButton"></button>
         <button class="ri-skip-forward-line" id="playNextButton"></button>
         <button class="ri-repeat-line" id="loopButton">

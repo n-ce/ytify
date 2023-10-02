@@ -24,9 +24,9 @@ for (const anchor of anchors) {
     _.preventDefault();
 
     history.pushState({}, '',
-      anchor.id + ((params.has('s') && anchor.id === '/') ? ('?' + params) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
+      anchor.id + ((params.has('s') && anchor.id === '/') ? ('?s=' + params.get('s')) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
     );
-    // ↑↑ this is really bad programming ↑↑
+    // ↑↑ bad coding habit ↑↑
     showSection(anchor.id);
   })
 }

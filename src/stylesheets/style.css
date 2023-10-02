@@ -232,3 +232,20 @@ iframe {
   border: none;
   border-radius: var(--roundness);
 }
+
+
+
+#subtitleContainer {
+  pointer-events: none;
+  position: absolute;
+}
+
+#subtitleContainer span {
+  font-size: medium !important;
+  font-family: 'Noto Sans';
+}
+
+#subtitleContainer div div div div {
+  border-radius: var(--roundness);
+  overflow: hidden;
+}

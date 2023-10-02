@@ -22,3 +22,6 @@ export const listItemsContainer = <HTMLDivElement>document.getElementById('playl
 
 export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/list');
 
+export const subtitleContainer = <HTMLElement>document.getElementById('subtitleContainer');
+export const subtitleSelector = <HTMLSelectElement>document.getElementById('subtitleSelector');
+export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
