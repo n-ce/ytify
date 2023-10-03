@@ -19,7 +19,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 .ri-search-2-line:before {
   content: "\f0cd";
 }
@@ -126,4 +125,16 @@
 
 .ri-subtract-line:before {
   content: "\f1af";
+}
+
+.ri-stack-line:before {
+  content: "\f181";
+}
+
+.ri-history-line:before {
+  content: "\ee17";
+}
+
+.ri-play-list-2-line:before {
+  content: "\f00d";
 }

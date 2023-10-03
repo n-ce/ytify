@@ -134,6 +134,7 @@ details {
 
 details>summary {
   list-style: none;
+  font-size: larger;
 }
 
 a {
@@ -182,6 +183,7 @@ playlist-item:hover {
   transform: none;
   padding: 1vmin 2vmin;
   margin: 1vmin 2vmin;
+  font-family: inherit;
 }
 
 #queuetools button:active,
