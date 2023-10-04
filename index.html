@@ -252,21 +252,21 @@
     <ul>
       <li><i class="ri-play-line"></i>Play Now</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
-      <li id="psc">
+      <li>
         <i class="ri-play-list-add-line"></i>
         <select id="playlistSelector">
           <option>Add To Playlist</option>
         </select>
       </li>
       <li><i class="ri-rfid-line"></i>Start Radio</li>
-      <!-- hidden till racoon is ready -->
-      <li class="hide"><i class="ri-download-2-line"></i>Download</li>
+      <li>
+        <i class="ri-download-2-line"></i>
+        <select id="downloadSelector">
+          <option>Download</option>
+        </select>
+      </li>
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
-  </div>
-  <div id="download" class="hide">
-    <button class="ri-close-line"></button>
-    <iframe></iframe>
   </div>
   <script src="/src/scripts/main.ts" type="module"></script>
 </body>

@@ -7,15 +7,16 @@ const [playNow, enqueue, atpContainer, startRadio, downloadBtn, openChannelBtn] 
 
 
 
-superModal.addEventListener('click', e => {
-  const el = <HTMLLIElement | HTMLSelectElement>e.target;
-  if (el.matches('#psc') && !el.matches('select')) return;
-  superModal.classList.toggle('hide');
+superModal.addEventListener('click', _ => {
+  if ((<HTMLDivElement>_.target).matches('#superModal'))
+    superModal.classList.toggle('hide');
 });
 
 
 playNow.addEventListener('click', () => {
   player(superModal.dataset.id);
+
+  superModal.classList.toggle('hide');
 });
 
 
@@ -24,6 +25,7 @@ enqueue.addEventListener('click', () => {
   if (firstItemInQueue().matches('h1'))
     firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
+  superModal.classList.toggle('hide');
 });
 
 
@@ -67,32 +69,58 @@ startRadio.addEventListener('click', async () => {
 
   upcomingIcon.classList.replace('ri-loader-3-line', 'ri-skip-forward-line');
 
-});
-
-
-const atpSelector = <HTMLSelectElement>atpContainer.firstElementChild;
-
-atpSelector.addEventListener('change', () => {
   superModal.classList.toggle('hide');
 });
 
 
-const download = <HTMLDivElement>document.getElementById('download');
-const iframe = <HTMLIFrameElement>download.lastElementChild;
-const exitDownloader = <HTMLButtonElement>download.firstElementChild;
+const atpSelector = <HTMLSelectElement>atpContainer.lastElementChild;
+
+atpContainer.addEventListener('click', () => {
+
+})
+
+atpSelector.addEventListener('change', () => {
+
+});
+
+
+const dlSelector = <HTMLSelectElement>document.getElementById('downloadSelector');
+
 
 downloadBtn.addEventListener('click', () => {
-  const url = 'https://shailendramaurya.github.io/racoon/?link=https://youtu.be/' + superModal.dataset.id;
-  iframe.src = url;
-  download.classList.toggle('hide');
+  dlSelector.innerHTML = '<option>Fetching...</option>';
 
+  fetch(pipedInstances.value + '/streams/' + superModal.dataset.id)
+    .then(_ => _.json())
+    .then(_ => _.audioStreams)
+    .then(streams => {
+      dlSelector.innerHTML = '<option value>Download</option';
+      for (const stream of streams) {
+        dlSelector.add(
+          new Option(
+            stream.quality +
+            (stream.codec === 'opus' ? ' opus' : ' m4a'),
+            stream.itag));
+      }
+    })
+    .catch(() => dlSelector.innerHTML = '<option>Fetching Failed</option')
 })
 
-exitDownloader.addEventListener('click', () => {
-  iframe.src = '';
-  download.classList.toggle('hide');
+
+dlSelector.addEventListener('change', () => {
+  const provider = 'https://projectlounge.pw/ytdl';
+  const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
+  const itag = dlSelector.value;
+  const link = provider + '/download?url=' + streamUrl + '&format=' + itag;
+
+  if (itag)
+    open(link);
 })
+
+
+
 
 openChannelBtn.addEventListener('click', () => {
   open('https://youtube.com' + superModal.dataset.channelUrl);
+  superModal.classList.toggle('hide');
 })

@@ -176,14 +176,14 @@ playlist-item:hover {
 #listTools button {
   border: var(--border);
   border-radius: var(--roundness);
-  background: var(--bg);
-  color: inherit;
+  background: var(--text);
+  color: var(--bg);
+  font-family: inherit;
   font-size: inherit;
   font-weight: bold;
   transform: none;
   padding: 1vmin 2vmin;
   margin: 1vmin 2vmin;
-  font-family: inherit;
 }
 
 #queuetools button:active,
@@ -204,51 +204,4 @@ playlist-item:hover {
 
 .delete {
   background-color: #800 !important;
-}
-
-#download {
-  position: absolute;
-  z-index: 4;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #0005;
-}
-
-#download button {
-  position: fixed;
-  top: 5%;
-  right: 4%;
-  color: red;
-  font-size: xx-large;
-  font-weight: bolder;
-  border: none;
-  text-shadow: 0 0 1vmin black;
-  background: none;
-}
-
-iframe {
-  height: 90%;
-  width: 90%;
-  border: none;
-  border-radius: var(--roundness);
-}
-
-
-
-#subtitleContainer {
-  pointer-events: none;
-  position: absolute;
-}
-
-#subtitleContainer span {
-  font-size: medium !important;
-  font-family: 'Noto Sans';
-}
-
-#subtitleContainer div div div div {
-  border-radius: var(--roundness);
-  overflow: hidden;
 }

@@ -1,4 +1,5 @@
-import { pipedInstances } from "../lib/dom";
+import { audio, pipedInstances } from "../lib/dom";
+import player from "../lib/player";
 import { getSaved, save } from "../lib/utils";
 
 
@@ -30,7 +31,7 @@ fetch(apiList)
 
 // Instance Selector change event
 
-pipedInstances.addEventListener('change', () => {
+pipedInstances.addEventListener('change', async () => {
   const instance = pipedInstances.options[pipedInstances.selectedIndex];
   const name = instance.textContent;
   const url = instance.value;
@@ -38,4 +39,7 @@ pipedInstances.addEventListener('change', () => {
     save('pipedInstance', name + '|' + url);
   if (url === defURL)
     localStorage.removeItem('pipedInstance');
+  const timeOfSwitch = audio.currentTime;
+  await player(audio.dataset.id);
+  audio.currentTime = timeOfSwitch;
 });

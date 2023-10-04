@@ -32,7 +32,6 @@ export default async function player(id: string | null = '') {
     return;
   }
 
-  audio.dataset.seconds = '0';
 
   // extracting opus streams and storing m4a streams
 
@@ -46,12 +45,12 @@ export default async function player(id: string | null = '') {
     if (value.codec === "opus") {
       if (isSafari) continue;
       opus.urls.push(value.url);
-      opus.bitrates.push(parseInt(value.quality));
+      opus.bitrates.push(value.bitrate);
       bitrateSelector.add(new Option(value.quality, value.url));
     }
     else {
       m4a.urls.push(value.url);
-      m4a.bitrates.push(parseInt(value.quality));
+      m4a.bitrates.push(value.bitrate);
       isSafari ?
         bitrateSelector.add(new Option(value.quality, value.url)) :
         m4a.options.push(new Option(value.quality, value.url));
@@ -62,7 +61,7 @@ export default async function player(id: string | null = '') {
 
   if (
     !getSaved('quality') &&
-    Math.min(...opus.bitrates) > 64 &&
+    Math.min(...opus.bitrates) > 65536 &&
     !isSafari) {
 
     opus.urls = opus.urls.concat(m4a.urls);
