@@ -1,4 +1,4 @@
-import { audio, playButton, queuelist, superInput } from "../lib/dom";
+import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS, params } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
@@ -6,20 +6,17 @@ import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 const streamHistory: string[] = [];
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
-
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
-
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
-
 const progress = <HTMLInputElement>document.getElementById('progress');
-
 const currentDuration = <HTMLParagraphElement>document.getElementById('currentDuration');
-
 const fullDuration = <HTMLParagraphElement>document.getElementById('fullDuration');
-
 const playPrevButton = <HTMLButtonElement>document.getElementById('playPrevButton');
-
 const playNextButton = <HTMLButtonElement>document.getElementById('playNextButton');
+const loopButton = <HTMLButtonElement>document.getElementById('loopButton');
+const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger');
+const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
+
 
 function updatePositionState() {
   if ('mediaSession' in navigator) {
@@ -47,14 +44,15 @@ playButton.addEventListener('click', () => {
 });
 
 
-
-
+let loadingTimeout: number;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   playButton.dataset.state = '';
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
+
+  clearTimeout(loadingTimeout);
 });
 
 audio.addEventListener('pause', () => {
@@ -70,9 +68,15 @@ audio.addEventListener('loadeddata', () => {
     audio.play();
 });
 
+
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-})
+  loadingTimeout = window.setTimeout(() => {
+    pipedInstances.selectedIndex++;
+    player(audio.dataset.id);
+  }, 1e4);
+
+});
 
 
 playSpeed.addEventListener('change', () => {
@@ -128,12 +132,10 @@ audio.addEventListener('loadedmetadata', () => {
 });
 
 
-const loopButton = <HTMLButtonElement>document.getElementById('loopButton');
 loopButton.addEventListener('click', () => {
   loopButton.classList.toggle('on');
   audio.loop = !audio.loop;
 });
-
 
 
 
@@ -164,10 +166,6 @@ audio.addEventListener('ended', onEnd);
 
 playNextButton.addEventListener('click', onEnd);
 
-
-
-const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger');
-const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 volumeIcon.addEventListener('click', () => {
   volumeChanger.value = audio.volume ? '0' : '100';

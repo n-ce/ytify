@@ -1,4 +1,4 @@
-import { superInput } from "../lib/dom";
+import { audio, superInput } from "../lib/dom";
 import { params } from "../lib/utils";
 
 
@@ -23,9 +23,16 @@ for (const anchor of anchors) {
   anchor.addEventListener('click', _ => {
     _.preventDefault();
 
-    history.pushState({}, '',
-      anchor.id + ((params.has('s') && anchor.id === '/') ? ('?s=' + params.get('s')) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
-    );
+    if (anchor.id !== location.pathname) {
+
+      history.pushState({}, '',
+        anchor.id + ((params.has('s') && anchor.id === '/') ? ('?s=' + params.get('s')) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
+      );
+      document.title = (anchor.id === '/' ?
+        (audio.dataset.name ? audio.dataset.name : 'Home')
+        :
+        (<HTMLParagraphElement>anchor.lastElementChild).textContent || '') + ' - ytify';
+    }
     // ↑↑ bad coding habit ↑↑
     showSection(anchor.id);
   })

@@ -33,7 +33,7 @@
 
 <body>
   <nav>
-    <a href="/" id="/" class="active">
+    <a href="/" id="/">
       <i class="ri-home-line"></i>
       <p>Home</p>
     </a>
@@ -57,7 +57,9 @@
       <i class="ri-settings-line"></i>
       <p>Settings</p>
     </a>
-    <a id="/list" class="hide"></a>
+    <a id="/list" class="hide"><br>
+      <p>List</p>
+    </a>
   </nav>
   <main>
     <section id="home">
@@ -201,9 +203,15 @@
 
     <section id="list">
       <span id="listTools">
-        <button class="ri-play-line" id="playAllBtn">&nbsp;Play All</button>
-        <button class="ri-list-check-2" id="enqueueAllBtn">&nbsp;Enqueue All</button>
-        <button id="saveListBtn">+ Save</button>
+        <button id="playAllBtn">
+          <i class="ri-play-line"></i> Play
+        </button>
+        <button id="enqueueAllBtn">
+          <i class="ri-list-check-2"></i> Enqueue
+        </button>
+        <button id="saveListBtn">
+          <i class="ri-stack-line"></i> Save
+        </button>
       </span>
       <br>
       <div id="playlist">

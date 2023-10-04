@@ -62,6 +62,7 @@ async function fetchMix(id: string, api = 0) {
 const upcomingIcon = <HTMLElement>(<HTMLAnchorElement>document.getElementById('/upcoming')).firstElementChild;
 
 startRadio.addEventListener('click', async () => {
+  superModal.classList.toggle('hide');
 
   upcomingIcon.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
 
@@ -69,7 +70,6 @@ startRadio.addEventListener('click', async () => {
 
   upcomingIcon.classList.replace('ri-loader-3-line', 'ri-skip-forward-line');
 
-  superModal.classList.toggle('hide');
 });
 
 
@@ -103,8 +103,10 @@ downloadBtn.addEventListener('click', () => {
             stream.itag));
       }
     })
-    .catch(() => dlSelector.innerHTML = '<option>Fetching Failed</option')
-})
+    .catch(() => {
+      dlSelector.innerHTML = '<option>Fetching Failed</option';
+    });
+});
 
 
 dlSelector.addEventListener('change', () => {
@@ -115,7 +117,7 @@ dlSelector.addEventListener('change', () => {
 
   if (itag)
     open(link);
-})
+});
 
 
 
