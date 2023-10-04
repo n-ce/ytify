@@ -1,22 +1,21 @@
 import { audio, bitrateSelector, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, params, parseTTML, save, updatePositionState } from "../lib/utils";
+import { blankImage, getSaved, parseTTML, save } from "../lib/utils";
 
 
 
 bitrateSelector.addEventListener('change', () => {
-  const timeOfSwitch = parseInt(audio.dataset.seconds || '0');
+  const timeOfSwitch = audio.currentTime;
   audio.src = bitrateSelector.value;
   audio.currentTime = timeOfSwitch;
   audio.play();
-  updatePositionState();
 });
 
 
 
 subtitleSelector.addEventListener('change', () => {
   subtitleTrack.src = subtitleSelector.value;
-  subtitleTrack.src ?
+  subtitleSelector.value ?
     subtitleContainer.classList.remove('hide') :
     subtitleContainer.classList.add('hide');
   parseTTML();
@@ -35,13 +34,9 @@ qualitySwitch.addEventListener('click', async () => {
     localStorage.removeItem('quality') : // low
     save('quality', 'hq'); // high
 
-  if (params.has('s')) {
-    const timeOfSwitch = parseInt(audio.dataset.seconds || '');
-    await player(params.get('s'));
-    audio.currentTime = timeOfSwitch;
-    updatePositionState();
-  }
-
+  const timeOfSwitch = audio.currentTime;
+  await player(audio.dataset.id);
+  audio.currentTime = timeOfSwitch;
 })
 
 

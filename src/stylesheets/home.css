@@ -2,6 +2,21 @@
   align-items: center;
 }
 
+#subtitleContainer {
+  pointer-events: none;
+  position: absolute;
+}
+
+#subtitleContainer span {
+  font-size: medium !important;
+  font-family: 'Noto Sans';
+}
+
+#subtitleContainer div div div div {
+  border-radius: var(--roundness);
+  overflow: hidden;
+}
+
 #metadata {
   width: 96%;
   padding: 0 2%;
@@ -32,17 +47,19 @@ img {
   grid-area: B;
 }
 
-#bitrateSelector {
+#metadata select {
   font-family: inherit;
   font-size: small;
+  text-align: right;
+}
+
+#bitrateSelector {
   max-width: 11ch;
   grid-area: C;
 }
 
 #subtitleSelector {
-  font-family: inherit;
-  font-size: small;
-  max-width: 11ch;
+  max-width: 10ch;
   grid-area: D;
 }
 

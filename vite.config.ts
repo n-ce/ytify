@@ -61,10 +61,10 @@ const manifest = {
 
 export default defineConfig(({ command }) => {
   return {
-    plugins: (eruda && command === 'serve') ? [erudaInjector] : [VitePWA({
+    plugins: (eruda && command === 'serve') ? [erudaInjector] : (command === 'build') ? [VitePWA({
       registerType: 'autoUpdate',
       manifest: manifest,
       includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
-    })]
+    })] : []
   }
 });

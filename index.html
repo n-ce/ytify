@@ -66,7 +66,7 @@
       <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.0</a>
+        <a id="title" href="" target="_blank">ytify 6.1</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
@@ -77,7 +77,7 @@
       </div>
 
 
-      <audio data-seconds="0">
+      <audio>
         <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
       </audio>
 
@@ -87,9 +87,15 @@
 
     <section id="upcoming">
       <span id="queuetools">
-        <button class="ri-delete-bin-7-line">&nbsp;Clear</button>
-        <button class="ri-shuffle-line">&nbsp;Shuffle</button>
-        <button class="ri-subtract-line">&nbsp;Remove</button>
+        <button>
+          <i class="ri-delete-bin-7-line"></i> Clear
+        </button>
+        <button>
+          <i class="ri-shuffle-line"></i> Shuffle
+        </button>
+        <button>
+          <i class="ri-subtract-line"></i> Remove
+        </button>
       </span>
       <div id="queuelist">
         <h1 align="center">upcoming streams show here</h1>
@@ -133,13 +139,19 @@
 
     <section id="library">
       <details>
-        <summary id="library:history">History</summary>
+        <summary id="history">
+          <i class="ri-history-line"></i> History
+        </summary>
       </details>
       <details>
-        <summary>Favorites</summary>
+        <summary id="favorites">
+          <i class="ri-heart-fill"></i> Favorites
+        </summary>
       </details>
       <details>
-        <summary>Playlists</summary>
+        <summary>
+          <i class="ri-play-list-2-line"></i> Playlists
+        </summary>
       </details>
     </section>
 
@@ -161,7 +173,7 @@
       <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
-      <toggle-switch id="librarySwitch" checked>Disable Library</toggle-switch>
+      <toggle-switch checked id="librarySwitch">Disable Library</toggle-switch>
 
       <span>
         <label for="roundnessChanger">UI Roundness</label>
@@ -240,21 +252,21 @@
     <ul>
       <li><i class="ri-play-line"></i>Play Now</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
-      <li id="psc">
+      <li>
         <i class="ri-play-list-add-line"></i>
         <select id="playlistSelector">
           <option>Add To Playlist</option>
         </select>
       </li>
       <li><i class="ri-rfid-line"></i>Start Radio</li>
-      <!-- hidden till racoon is ready -->
-      <li class="hide"><i class="ri-download-2-line"></i>Download</li>
+      <li>
+        <i class="ri-download-2-line"></i>
+        <select id="downloadSelector">
+          <option>Download</option>
+        </select>
+      </li>
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
-  </div>
-  <div id="download" class="hide">
-    <button class="ri-close-line"></button>
-    <iframe></iframe>
   </div>
   <script src="/src/scripts/main.ts" type="module"></script>
 </body>

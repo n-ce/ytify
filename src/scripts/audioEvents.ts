@@ -113,13 +113,10 @@ audio.addEventListener('timeupdate', () => {
     return;
 
   const seconds = Math.floor(audio.currentTime);
-  const data = parseInt(audio.dataset.seconds || '0');
-  // only update every second
-  if (seconds > data) {
-    progress.value = seconds.toString();
-    currentDuration.textContent = convertSStoHHMMSS(seconds);
-  }
-  audio.dataset.seconds = seconds.toString();
+
+  progress.value = seconds.toString();
+  currentDuration.textContent = convertSStoHHMMSS(seconds);
+
 });
 
 
