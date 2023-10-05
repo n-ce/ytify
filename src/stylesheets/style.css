@@ -71,9 +71,9 @@ section.view {
   }
 
   main {
-    height: calc(100dvh - 10%);
-    width: 90%;
-    padding: 5%;
+    height: calc(100dvh - 6%);
+    width: 94%;
+    padding: 3%;
   }
 
   section {
@@ -194,6 +194,10 @@ playlist-item:hover {
 
 #searchlist+button {
   display: none;
+}
+
+#searchlist {
+  margin-top: -10vmin;
 }
 
 #queuelist {

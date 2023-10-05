@@ -1,6 +1,6 @@
 footer {
   display: flex;
-  height: 20%;
+  height: 19%;
   width: 100%;
   border-radius: var(--roundness);
   background-color: var(--onBg);
@@ -10,7 +10,6 @@ footer {
   flex-direction: column;
   box-shadow: var(--shadow);
   overflow: hidden;
-  margin: -1.5vmin 0;
 }
 
 footer>span {

@@ -117,6 +117,7 @@ dlSelector.addEventListener('change', () => {
 
   if (itag)
     open(link);
+  dlSelector.innerHTML = '<option>Download</option>';
 });
 
 

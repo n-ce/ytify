@@ -15,6 +15,7 @@ customElements.define('toggle-switch', class extends HTMLElement {
 
     this.addEventListener('click', () => {
       input.checked = !input.checked;
+      this.toggleAttribute('checked');
     });
 
     label.append(input, document.createElement('span'));
