@@ -5,21 +5,25 @@ import { getSaved, save, itemsLoader, idFromURL, params } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
+const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 const loadMoreBtn = <HTMLButtonElement>document.getElementById('loadMore');
 
 let token = '';
 
-loadMoreBtn.addEventListener('click', () => {
-  if (token)
-    fetch(
-      `${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&q=${superInput.value}&filter=${searchFilters.value}`
-    )
-      .then(res => res.json())
-      .then(data => {
-        token = data.nextpage;
-        searchlist.appendChild(itemsLoader(data.items));
-      })
+const loadMoreResults = async () =>
+  fetch(
+    `${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&q=${superInput.value}&filter=${searchFilters.value}`
+  ).then(res => res.json())
+
+
+loadMoreBtn.addEventListener('click', async () => {
+  if (!token) return;
+  const data = await loadMoreResults();
+  token = data.nextpage;
+  searchlist.appendChild(itemsLoader(data.items));
+
 });
+
 
 
 // Get search results of input
@@ -33,9 +37,21 @@ const searchLoader = () => {
 
   fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
-    .then(searchResults => {
+    .then(async searchResults => {
       token = searchResults.nextpage;
       loadMoreBtn.style.display = 'block';
+
+      if (sortSwitch.hasAttribute('checked')) {
+        for (let i = 0; i < 3; i++) {
+          const data = await loadMoreResults();
+          token = data.nextpage;
+          searchResults.items = searchResults.items.concat(data.items);
+        }
+        searchResults.items.sort((
+          a: { uploaded: number },
+          b: { uploaded: number }
+        ) => b.uploaded - a.uploaded);
+      }
       searchlist.appendChild(
         itemsLoader(
           searchResults.items
@@ -59,6 +75,9 @@ const searchLoader = () => {
   history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query);
   suggestions.style.display = 'none';
 }
+
+
+sortSwitch.addEventListener('click', searchLoader);
 
 
 // super input supports both searching and direct link, also loads suggestions

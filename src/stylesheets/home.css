@@ -87,7 +87,7 @@ img {
 
 @media(orientation:portrait) {
   img {
-    height: 50vw;
+    height: 52vw;
     width: auto;
   }
 

@@ -33,7 +33,7 @@
 
 <body>
   <nav>
-    <a href="/" id="/" class="active">
+    <a href="/" id="/">
       <i class="ri-home-line"></i>
       <p>Home</p>
     </a>
@@ -57,7 +57,9 @@
       <i class="ri-settings-line"></i>
       <p>Settings</p>
     </a>
-    <a id="/list" class="hide"></a>
+    <a id="/list" class="hide"><br>
+      <p>List</p>
+    </a>
   </nav>
   <main>
     <section id="home">
@@ -66,7 +68,7 @@
       <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.1</a>
+        <a id="title" href="" target="_blank">ytify 6.2</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
@@ -125,10 +127,15 @@
         <button aria-label="search" class="ri-search-2-line"></button>
       </span>
       <ul id="suggestions"></ul>
+      <div id="sort">
+        <toggle-switch id="sortByTime">Sort By Time&nbsp;&nbsp;</toggle-switch>
+      </div>
       <div id="searchlist">
         <h1>search results show here</h1>
       </div>
       <button id="loadMore">Load More</button>
+      <br>
+      <br>
     </section>
 
 
@@ -201,9 +208,15 @@
 
     <section id="list">
       <span id="listTools">
-        <button class="ri-play-line" id="playAllBtn">&nbsp;Play All</button>
-        <button class="ri-list-check-2" id="enqueueAllBtn">&nbsp;Enqueue All</button>
-        <button id="saveListBtn">+ Save</button>
+        <button id="playAllBtn">
+          <i class="ri-play-line"></i> Play
+        </button>
+        <button id="enqueueAllBtn">
+          <i class="ri-list-check-2"></i> Enqueue
+        </button>
+        <button id="saveListBtn">
+          <i class="ri-stack-line"></i> Save
+        </button>
       </span>
       <br>
       <div id="playlist">

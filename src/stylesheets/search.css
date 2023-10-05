@@ -77,3 +77,18 @@
   background-color: #39FC;
   color: #ADFD;
 }
+
+
+#sort {
+  height: 9vmin;
+  display: flex;
+  justify-content: space-around;
+  position: sticky;
+  top: calc(100% - 12vmin);
+  z-index: 3;
+  background-color: var(--bg);
+  padding: 0.5vmin 2vmin;
+  border: var(--border);
+  border-radius: calc(var(--roundness) + 0.5vmin);
+  box-shadow: var(--shadow);
+}

@@ -49,7 +49,8 @@ export function setMetaData(
   author.href = 'https://youtube.com' + authorUrl;
   author.textContent = authorName;
 
-  document.title = streamName + ' - ytify';
+  if (location.pathname === '/')
+    document.title = streamName + ' - ytify';
 
   thumbnail.replace('maxres', 'hq');
 
