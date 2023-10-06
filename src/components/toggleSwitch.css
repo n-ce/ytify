@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   margin: 4vmin 0;
-  color: var(--text);
+  color: inherit;
 }
 
 label {
@@ -44,7 +44,7 @@ input {
 }
 
 input:checked+span {
-  background-color: var(--onBg);
+  background-color: var(--bg);
 }
 
 input:checked+span:before {

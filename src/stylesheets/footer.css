@@ -145,7 +145,7 @@ footer span p {
   #volumeContainer {
     grid-area: G;
     width: 60vw;
-
+    margin: auto;
   }
 
   #playSpeed {

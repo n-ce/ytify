@@ -86,9 +86,16 @@
   position: sticky;
   top: calc(100% - 12vmin);
   z-index: 3;
-  background-color: var(--bg);
-  padding: 0.5vmin 2vmin;
+  background-color: var(--onBg);
+  padding: 0 1.5vmin;
   border: var(--border);
   border-radius: calc(var(--roundness) + 0.5vmin);
   box-shadow: var(--shadow);
+  backdrop-filter: blur(2vmin);
+}
+
+
+
+#loadMore {
+  margin-bottom: 14vmin !important
 }
