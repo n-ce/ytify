@@ -40,7 +40,9 @@ for (const anchor of anchors) {
 
 // load section if name found in address else load home
 
-(<HTMLAnchorElement>document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => location.pathname === _) || '/')).click();
+
+(<HTMLAnchorElement>document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => (params.has('e') ? params.get('e') : location.pathname) === _) || '/')).click();
+
 
 // enables back button functionality
 addEventListener('popstate', () => {

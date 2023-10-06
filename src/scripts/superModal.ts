@@ -115,8 +115,12 @@ dlSelector.addEventListener('change', () => {
   const itag = dlSelector.value;
   const link = provider + '/download?url=' + streamUrl + '&format=' + itag;
 
-  if (itag)
-    open(link);
+  if (itag) {
+    const _ = document.createElement('a');
+    _.href = link;
+    _.click();
+  }
+
   dlSelector.innerHTML = '<option>Download</option>';
 });
 
