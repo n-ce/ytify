@@ -45,6 +45,10 @@ playButton.addEventListener('click', () => {
 
 
 let loadingTimeout: number;
+function resolvePlayback() {
+  pipedInstances.selectedIndex++;
+  player(audio.dataset.id);
+}
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
@@ -68,14 +72,15 @@ audio.addEventListener('loadeddata', () => {
     audio.play();
 });
 
+audio.addEventListener('loadstart', () => {
+  loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
+});
+  
+audio.addEventListener('stalled', resolvePlayback);
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  loadingTimeout = window.setTimeout(() => {
-    pipedInstances.selectedIndex++;
-    player(audio.dataset.id);
-  }, 1e4);
-
+  loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
 });
 
 
