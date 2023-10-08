@@ -56,7 +56,8 @@ audio.addEventListener('playing', () => {
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
 
-  clearTimeout(loadingTimeout);
+  window.clearTimeout(loadingTimeout);
+  loadingTimeout = 0;
 });
 
 audio.addEventListener('pause', () => {
@@ -73,14 +74,16 @@ audio.addEventListener('loadeddata', () => {
 });
 
 audio.addEventListener('loadstart', () => {
-  loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
+  if (!loadingTimeout)
+    loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
 });
   
 audio.addEventListener('stalled', resolvePlayback);
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
+  if (!loadingTimeout)
+    loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
 });
 
 
