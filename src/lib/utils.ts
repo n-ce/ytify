@@ -182,11 +182,10 @@ export function itemsLoader(itemsArray: Item[]): DocumentFragment {
 // subtitles
 
 export function loadParser(): Promise<number> {
-  const fetch_sub_parser_start: number;
+  const fetch_sub_parser_start = new Date().getTime();
   const kiloBytes = 139.73;
   const _ = document.createElement('script');
   _.src = 'https://unpkg.com/imsc/dist/imsc.all.min.js';
-  fetch_sub_parser_start = new Date().getTime();
   _.type = 'text/javascript';
   document.head.appendChild(_);
   return new Promise((res) => {
