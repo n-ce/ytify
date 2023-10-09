@@ -1,7 +1,14 @@
 import { audio, bitrateSelector, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, parseTTML, save } from "../lib/utils";
+import { blankImage, getSaved, imgUrl, parseTTML, save } from "../lib/utils";
 
+img.addEventListener('load', () => {
+  if (img.src.includes('maxres'))
+    if (img.naturalWidth === 120)
+      if (audio.dataset.id)
+        img.src = imgUrl(audio.dataset.id, 'hq');
+
+});
 
 
 bitrateSelector.addEventListener('change', () => {
@@ -60,7 +67,8 @@ if (getSaved('img')) {
 thumbnailSwitch.addEventListener('click', () => {
 
   if (getSaved('img')) {
-    img.src = img.dataset.saved || '/ytify_thumbnail_min.webp';
+
+    img.src = audio.dataset.id ? imgUrl(audio.dataset.id, 'maxres') : '/ytify_thumbnail_min.webp';
     localStorage.removeItem('img');
   }
   else {

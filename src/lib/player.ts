@@ -89,7 +89,6 @@ export default async function player(id: string | null = '') {
 
   setMetaData(
     id,
-    data.thumbnailUrl,
     data.title,
     data.uploader,
     data.uploaderUrl

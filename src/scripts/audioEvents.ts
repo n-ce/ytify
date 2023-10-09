@@ -1,6 +1,6 @@
 import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, params } from "../lib/utils";
+import { convertSStoHHMMSS, loadParser, params } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
@@ -44,10 +44,35 @@ playButton.addEventListener('click', () => {
 });
 
 
-// let loadingTimeout: number;
-function resolvePlayback() {
+let loadingTimeoutID: number;
+const networkSpeed: number = await loadParser(); // in KBPS
+
+// adjust loading timeout as per network speed
+
+/* 
+ mapping network speed to timer
+ using the form ax+b = c
+ where a is time & c is networkSpeed 
+ solving for 5x+b = 1000 & 20x+b=100
+ x = -60 & b = 1300
+ finding for every c
+ a = (1300 - c) / 60
+*/
+
+const timer =
+  (networkSpeed < 100 ?
+    20 :
+    networkSpeed > 1000 ?
+      5 :
+      (1300 - networkSpeed) / 60) * 1000;
+
+
+async function resolvePlayback() {
+
   pipedInstances.selectedIndex++;
-  player(audio.dataset.id);
+  const timeOfSwitch = audio.currentTime;
+  await player(audio.dataset.id);
+  audio.currentTime = timeOfSwitch;
 }
 
 audio.addEventListener('playing', () => {
@@ -56,8 +81,8 @@ audio.addEventListener('playing', () => {
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
 
- // window.clearTimeout(loadingTimeout);
- // loadingTimeout = 0;
+  window.clearTimeout(loadingTimeoutID);
+  loadingTimeoutID = 0;
 });
 
 audio.addEventListener('pause', () => {
@@ -71,19 +96,22 @@ audio.addEventListener('loadeddata', () => {
 
   if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
     audio.play();
+
+  window.clearTimeout(loadingTimeoutID);
+  loadingTimeoutID = 0;
 });
 
 audio.addEventListener('loadstart', () => {
-//  if (!loadingTimeout)
-//    loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
+  if (!loadingTimeoutID)
+    loadingTimeoutID = window.setTimeout(resolvePlayback, timer);
 });
-  
+
 audio.addEventListener('stalled', resolvePlayback);
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  // if (!loadingTimeout)
-  //   loadingTimeout = window.setTimeout(resolvePlayback, 1e4);
+  if (!loadingTimeoutID)
+    loadingTimeoutID = window.setTimeout(resolvePlayback, timer);
 });
 
 

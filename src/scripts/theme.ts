@@ -13,13 +13,16 @@ const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContr
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
+
 function accentLightener(r: number, g: number, b: number) {
-  const $ = (_: number) => _ + (207 - Math.max(r, g, b));
+
+  const $ = (_: number) => _ + (204 - Math.max(r, g, b));
 
   return `rgb(${$(r)}, ${$(g)},${$(b)})`;
 }
 
 function accentDarkener(r: number, g: number, b: number) {
+
   let min = Math.min(r, g, b);
 
   if ((r + g + b) / min > 14) {
@@ -29,6 +32,8 @@ function accentDarkener(r: number, g: number, b: number) {
     min = Math.floor(min / 3);
   }
   return `rgb(${r - min}, ${g - min},${b - min})`;
+
+
 }
 
 
@@ -109,6 +114,7 @@ function themer() {
     const scheme = theme === 'auto' ?
       (systemDark.matches ? dark : light) :
       theme === 'light' ? light : dark;
+
 
     cssVar('--bg', palette[scheme].bg(r, g, b));
     cssVar('--onBg', palette[scheme].onBg);
