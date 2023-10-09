@@ -59,7 +59,7 @@ const networkSpeed: number = await loadParser(); // in KBPS
  a = (1300 - c) / 60
 */
 
-let timer =
+const timer =
   (networkSpeed < 100 ?
     20 :
     networkSpeed > 1000 ?

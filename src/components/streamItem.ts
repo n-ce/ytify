@@ -17,7 +17,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('error', () => {
-			thumbnail.src = imgUrl(this.dataset.id, 'hq');
+			thumbnail.src = imgUrl(this.dataset.id || '', 'hq');
 		});
 
 		const duration = document.createElement('p');
@@ -41,6 +41,9 @@ customElements.define('stream-item', class extends HTMLElement {
 
 		const author = document.createElement('p');
 		author.id = 'author';
+		avatar.addEventListener('error', () => {
+			avatar.src = blankImage;
+		});
 
 		const viewsXuploaded = document.createElement('p');
 		viewsXuploaded.id = 'viewsXuploaded';
