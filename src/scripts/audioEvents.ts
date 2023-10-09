@@ -1,6 +1,6 @@
-import { audio, pipedInstances, playButton, queuelist, superInput } from "../lib/dom";
+import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, loadParser, params } from "../lib/utils";
+import { convertSStoHHMMSS, params } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
@@ -44,36 +44,6 @@ playButton.addEventListener('click', () => {
 });
 
 
-let loadingTimeoutID: number;
-const networkSpeed: number = await loadParser(); // in KBPS
-
-// adjust loading timeout as per network speed
-
-/* 
- mapping network speed to timer
- using the form ax+b = c
- where a is time & c is networkSpeed 
- solving for 5x+b = 1000 & 20x+b=100
- x = -60 & b = 1300
- finding for every c
- a = (1300 - c) / 60
-*/
-
-const timer =
-  (networkSpeed < 100 ?
-    20 :
-    networkSpeed > 1000 ?
-      5 :
-      (1300 - networkSpeed) / 60) * 1000;
-
-
-async function resolvePlayback() {
-
-  pipedInstances.selectedIndex++;
-  const timeOfSwitch = audio.currentTime;
-  await player(audio.dataset.id);
-  audio.currentTime = timeOfSwitch;
-}
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
@@ -81,8 +51,6 @@ audio.addEventListener('playing', () => {
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
 
-  window.clearTimeout(loadingTimeoutID);
-  loadingTimeoutID = 0;
 });
 
 audio.addEventListener('pause', () => {
@@ -97,21 +65,11 @@ audio.addEventListener('loadeddata', () => {
   if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
     audio.play();
 
-  window.clearTimeout(loadingTimeoutID);
-  loadingTimeoutID = 0;
 });
 
-audio.addEventListener('loadstart', () => {
-  if (!loadingTimeoutID)
-    loadingTimeoutID = window.setTimeout(resolvePlayback, timer);
-});
-
-audio.addEventListener('stalled', resolvePlayback);
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  if (!loadingTimeoutID)
-    loadingTimeoutID = window.setTimeout(resolvePlayback, timer);
 });
 
 
