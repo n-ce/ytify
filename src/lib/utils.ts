@@ -181,29 +181,25 @@ export function itemsLoader(itemsArray: Item[]): DocumentFragment {
 
 // subtitles
 
-let loaded = false;
-function loadParser() {
-
-  // Dynamically Loading Library on Demand only
-  if (loaded)
-    return true;
-  const imscript = document.createElement('script');
-  imscript.src = 'https://unpkg.com/imsc/dist/imsc.all.min.js';
-  imscript.type = 'text/javascript';
-  document.head.appendChild(imscript);
-  return new Promise(res => {
-    imscript.addEventListener('load', () => {
-      loaded = true;
-      res(true);
+export function loadParser(): Promise<number> {
+  let fetch_sub_parser_start: number;
+  const kiloBytes = 139.73;
+  const _ = document.createElement('script');
+  _.src = 'https://unpkg.com/imsc/dist/imsc.all.min.js';
+  fetch_sub_parser_start = new Date().getTime();
+  _.type = 'text/javascript';
+  document.head.appendChild(_);
+  return new Promise((res) => {
+    _.addEventListener('load', () => {
+      res((kiloBytes /
+        ((new Date().getTime() - fetch_sub_parser_start) / 1000)
+      ) * 8);
     })
-  })
+  });
 }
 
 
-
 export async function parseTTML() {
-  if (!loaded)
-    await loadParser();
 
   const myTrack = audio.textTracks[0];
   myTrack.mode = "hidden";
