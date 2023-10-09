@@ -3,6 +3,8 @@ import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, subtit
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
+export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}default.webp`;
+
 export const params = (new URL(location.href)).searchParams;
 
 export const save = localStorage.setItem.bind(localStorage);
@@ -30,20 +32,18 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 export function setMetaData(
   id: string,
-  thumbnail: string,
   streamName: string,
   authorName: string,
   authorUrl: string
 ) {
 
-  img.dataset.saved = thumbnail;
-  getSaved('img') ?
-    thumbnail = '' :
-    img.src = thumbnail;
+  if (!getSaved('img'))
+    img.src = imgUrl(id, 'maxres');
 
   const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = `https://youtube.com/watch?v=${id}`;
   title.textContent = streamName;
+  img.alt = streamName;
 
   const author = <HTMLAnchorElement>document.getElementById('author');
   author.href = 'https://youtube.com' + authorUrl;
@@ -52,20 +52,18 @@ export function setMetaData(
   if (location.pathname === '/')
     document.title = streamName + ' - ytify';
 
-  thumbnail.replace('maxres', 'hq');
-
   if ('mediaSession' in navigator) {
     navigator.mediaSession.setPositionState();
     navigator.mediaSession.metadata = new MediaMetadata({
       title: streamName,
       artist: authorName,
       artwork: [
-        { src: thumbnail, sizes: '96x96' },
-        { src: thumbnail, sizes: '128x128' },
-        { src: thumbnail, sizes: '192x192' },
-        { src: thumbnail, sizes: '256x256' },
-        { src: thumbnail, sizes: '384x384' },
-        { src: thumbnail, sizes: '512x512' },
+        { src: imgUrl(id, ''), sizes: '96x96' },
+        { src: imgUrl(id, ''), sizes: '128x128' },
+        { src: imgUrl(id, 'mq'), sizes: '192x192' },
+        { src: imgUrl(id, 'mq'), sizes: '256x256' },
+        { src: imgUrl(id, 'hq'), sizes: '384x384' },
+        { src: imgUrl(id, 'hq'), sizes: '512x512' },
       ]
     });
   }

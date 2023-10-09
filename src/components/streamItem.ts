@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { blankImage, getSaved } from '../lib/utils';
+import { blankImage, getSaved, imgUrl } from '../lib/utils';
 
 
 customElements.define('stream-item', class extends HTMLElement {
@@ -14,12 +14,11 @@ customElements.define('stream-item', class extends HTMLElement {
 
 		const thumbnail = document.createElement('img');
 		thumbnail.crossOrigin = 'anonymous';
-		thumbnail.src = blankImage;
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
-		thumbnail.onerror = () => {
-			thumbnail.src = blankImage;
-		}
+		thumbnail.addEventListener('error', () => {
+			thumbnail.src = imgUrl(this.dataset.id, 'hq');
+		});
 
 		const duration = document.createElement('p');
 		duration.id = 'duration';

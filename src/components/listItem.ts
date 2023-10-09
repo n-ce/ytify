@@ -1,4 +1,3 @@
-
 import { blankImage, getSaved } from '../lib/utils';
 import css from './listItem.css?inline';
 customElements.define('list-item', class extends HTMLElement {
@@ -11,7 +10,9 @@ customElements.define('list-item', class extends HTMLElement {
 
     const img = document.createElement('img');
     img.id = 'thumbnail';
-    img.src = blankImage;
+    img.addEventListener('error', () => {
+      img.src = blankImage;
+    })
 
     const div = document.createElement('div');
 
