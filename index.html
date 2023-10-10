@@ -178,7 +178,7 @@
       <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
-      <toggle-switch checked id="librarySwitch">Disable Library</toggle-switch>
+      <toggle-switch id="librarySwitch" class="hide">Disable Library</toggle-switch>
 
       <span>
         <label for="roundnessChanger">UI Roundness</label>
@@ -274,6 +274,11 @@
         <i class="ri-download-2-line"></i>
         <select id="downloadSelector">
           <option>Download</option>
+          <option value="best">Best</option>
+          <option value="opus">Opus</option>
+          <option value="mp3">Mp3</option>
+          <option value="ogg">Ogg</option>
+          <option value="wav">Wav</option>
         </select>
       </li>
       <li><i class="ri-youtube-line"></i>View Channel</li>

@@ -1,33 +1,30 @@
 /*
-
 const openDb = indexedDB.open('library', 1);
-
-let db: IDBDatabase;
 
 //upgrade event
 
-openDb.onupgradeneeded = () => {
-  db = openDb.result;
-  console.log("upgrade needed", db);
+openDb.onupgradeneeded = (e) => {
+  const db = e.target as IDBOpenDBRequest;
+  console.log("upgrade needed", db.result);
 }
 
 //on success
 
-openDb.onsuccess = () => {
-
-  console.log("success is called", db);
+openDb.onsuccess = (e) => {
+  const db = e.target as IDBOpenDBRequest;
+  console.log("success is called", db.result);
 
   // Create the history object store
 
-  const historyStore = db.createObjectStore(
+  const historyStore = db.result.createObjectStore(
     'history', { keyPath: 'id' }
   );
-
-  console.log(db.objectStoreNames)
+  console.log(historyStore);
+  console.log(db.result.objectStoreNames)
 }
 
-openDb.onerror = () => {
-  console.log('error : ', openDb.result)
+openDb.onerror = (e) => {
+  console.log('error : ', e)
 }
 
 // deletion procedure 

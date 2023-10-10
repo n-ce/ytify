@@ -86,12 +86,13 @@ librarySwitch.addEventListener('click', () => {
   (<HTMLAnchorElement>document.getElementById('/library')).classList.toggle('hide');
   getSaved('library') ?
     localStorage.removeItem('library') :
-    save('library', 'on');
+    save('library', 'off');
 })
 
-if (getSaved('library'))
-  librarySwitch.click();
-
+if (getSaved('library') === 'off') {
+  librarySwitch.setAttribute('checked', '');
+  (<HTMLAnchorElement>document.getElementById('/library')).classList.toggle('hide');
+}
 
 
 const deleteButton = <HTMLAnchorElement>document.getElementById('deleteButton');

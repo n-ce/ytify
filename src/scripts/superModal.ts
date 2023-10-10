@@ -3,7 +3,7 @@ import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
-const [playNow, enqueue, atpContainer, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+const [playNow, enqueue, atpContainer, startRadio, _, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
 
 
@@ -87,41 +87,29 @@ atpSelector.addEventListener('change', () => {
 const dlSelector = <HTMLSelectElement>document.getElementById('downloadSelector');
 
 
-downloadBtn.addEventListener('click', () => {
-  dlSelector.innerHTML = '<option>Fetching...</option>';
-
-  fetch(pipedInstances.value + '/streams/' + superModal.dataset.id)
-    .then(_ => _.json())
-    .then(_ => _.audioStreams)
-    .then(streams => {
-      dlSelector.innerHTML = '<option value>Download</option';
-      for (const stream of streams) {
-        dlSelector.add(
-          new Option(
-            stream.quality +
-            (stream.codec === 'opus' ? ' opus' : ' m4a'),
-            stream.itag));
-      }
-    })
-    .catch(() => {
-      dlSelector.innerHTML = '<option>Fetching Failed</option';
-    });
-});
-
-
 dlSelector.addEventListener('change', () => {
-  const provider = 'https://projectlounge.pw/ytdl';
+  const provider = 'https://co.wuk.sh/api/json';
   const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
-  const itag = dlSelector.value;
-  const link = provider + '/download?url=' + streamUrl + '&format=' + itag;
-
-  if (itag) {
-    const _ = document.createElement('a');
-    _.href = link;
-    _.click();
-  }
-
-  dlSelector.innerHTML = '<option>Download</option>';
+  fetch(provider, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url: streamUrl,
+      isAudioOnly: true,
+      aFormat: dlSelector.value
+    })
+  })
+    .then(_ => _.json())
+    .then(_ => {
+      const anchor = document.createElement('a');
+      anchor.href = _.url;
+      anchor.click();
+    })
+    .catch(_ => alert(_))
+    .finally(() => superModal.classList.toggle('hide'));
 });
 
 
