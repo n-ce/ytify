@@ -65,9 +65,6 @@ export default defineConfig(({ command }) => {
       registerType: 'autoUpdate',
       manifest: manifest,
       includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
-    })] : [],
-    build: {
-      target: 'esnext'
-    }
+    })] : []
   }
 });

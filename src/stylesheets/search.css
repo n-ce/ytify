@@ -97,5 +97,6 @@
 
 
 #loadMore {
+  display: none;
   margin-bottom: 14vmin !important
 }

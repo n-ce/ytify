@@ -5,6 +5,8 @@ customElements.define('list-item', class extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
 
+    const root = <ShadowRoot>this.shadowRoot;
+
     const style = document.createElement('style');
     style.textContent = css;
 
@@ -12,6 +14,9 @@ customElements.define('list-item', class extends HTMLElement {
     img.id = 'thumbnail';
     img.addEventListener('error', () => {
       img.src = blankImage;
+    });
+    img.addEventListener('load', () => {
+      (<HTMLElement>root.host).style.opacity = '1';
     })
 
     const div = document.createElement('div');
@@ -25,13 +30,12 @@ customElements.define('list-item', class extends HTMLElement {
     stats.id = 'stats';
     div.append(name, uploaderData, stats);
 
-    this.shadowRoot?.append(style, img, div);
+    root.append(style, img, div);
 
   }
   connectedCallback() {
-    const root = this.shadowRoot;
-    const data = this.dataset;
-    if (!root || !data) return;
+    const root = <ShadowRoot>this.shadowRoot;
+    const data = <DOMStringMap>this.dataset;
 
     const thumbnail = <HTMLImageElement>root.getElementById('thumbnail');
     const uData = <HTMLParagraphElement>root.getElementById('uData');
@@ -39,6 +43,8 @@ customElements.define('list-item', class extends HTMLElement {
 
     if (data.thumbnail && !getSaved('img'))
       thumbnail.src = data.thumbnail;
+    else
+      thumbnail.src = blankImage;
 
     if (data.uploaderData)
       uData.textContent = data.uploaderData;

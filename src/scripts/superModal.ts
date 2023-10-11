@@ -3,7 +3,7 @@ import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
-const [playNow, enqueue, atpContainer, startRadio, _, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+const [playNow, enqueue, atpContainer, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
 
 
@@ -84,22 +84,15 @@ atpSelector.addEventListener('change', () => {
 });
 
 
-const dlSelector = <HTMLSelectElement>document.getElementById('downloadSelector');
-
-
-dlSelector.addEventListener('change', () => {
+downloadBtn.addEventListener('click', () => {
   const provider = 'https://co.wuk.sh/api/json';
   const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
   fetch(provider, {
     method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
       url: streamUrl,
-      isAudioOnly: true,
-      aFormat: dlSelector.value
+      isAudioOnly: true
     })
   })
     .then(_ => _.json())
@@ -111,7 +104,6 @@ dlSelector.addEventListener('change', () => {
     .catch(_ => alert(_))
     .finally(() => superModal.classList.toggle('hide'));
 });
-
 
 
 

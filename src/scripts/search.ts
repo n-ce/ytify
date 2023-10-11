@@ -18,10 +18,11 @@ const loadMoreResults = async () =>
 
 loadMoreBtn.addEventListener('click', async () => {
   if (!token) return;
+  loadMoreBtn.style.display = 'none';
   const data = await loadMoreResults();
   token = data.nextpage;
   searchlist.appendChild(itemsLoader(data.items));
-
+  loadMoreBtn.style.display = 'block';
 });
 
 
@@ -35,11 +36,12 @@ const searchLoader = () => {
 
   searchlist.innerHTML = '';
 
+  loadMoreBtn.style.display = 'none';
+
   fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
     .then(async searchResults => {
       token = searchResults.nextpage;
-      loadMoreBtn.style.display = 'block';
 
       if (sortSwitch.hasAttribute('checked')) {
         for (let i = 0; i < 3; i++) {
@@ -66,7 +68,8 @@ const searchLoader = () => {
       }
       alert(err);
       pipedInstances.selectedIndex = 0;
-    });
+    })
+    .finally(() => loadMoreBtn.style.display = 'block');
 
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = searchFilters.value === 'all' ? '' : '&f=' + searchFilters.value;

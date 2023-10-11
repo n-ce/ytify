@@ -148,14 +148,14 @@ a {
 }
 
 stream-item,
-channel-item,
-playlist-item {
-  transition: transform 0.3s ease-in-out;
+list-item {
+  opacity: 0;
+  transition: all 0.3s ease-out;
 }
 
+
 stream-item:hover,
-channel-item:hover,
-playlist-item:hover {
+list-item:hover {
   transform: scale(0.95);
 }
 

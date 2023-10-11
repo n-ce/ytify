@@ -7,6 +7,8 @@ customElements.define('stream-item', class extends HTMLElement {
 		super();
 		this.attachShadow({ mode: 'open' });
 
+		const root = <ShadowRoot>this.shadowRoot;
+
 		const style = document.createElement('style');
 		style.textContent = css;
 
@@ -18,6 +20,9 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('error', () => {
 			thumbnail.src = imgUrl(this.dataset.id || '', 'hq');
+		});
+		thumbnail.addEventListener('load', () => {
+			(<HTMLElement>root.host).style.opacity = '1';
 		});
 
 		const duration = document.createElement('p');
@@ -51,15 +56,13 @@ customElements.define('stream-item', class extends HTMLElement {
 		avu.append(author, viewsXuploaded);
 		aau.append(avatar, avu);
 		metadata.append(slot, aau);
-		this.shadowRoot?.append(style, span, metadata);
+		root.append(style, span, metadata);
 
 	}
 	connectedCallback() {
 
-		const root = this.shadowRoot;
-		const data = this.dataset;
-
-		if (!root || !data) return;
+		const root = <ShadowRoot>this.shadowRoot;
+		const data = <DOMStringMap>this.dataset;
 
 		const thumbnail = <HTMLImageElement>root.getElementById('thumbnail');
 		const avatar = <HTMLImageElement>root.getElementById('avatar');
@@ -67,15 +70,15 @@ customElements.define('stream-item', class extends HTMLElement {
 		const author = <HTMLParagraphElement>root.getElementById('author');
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
-
-		if (!getSaved('img')) {
-			if (data.thumbnail)
-				thumbnail.src = data.thumbnail;
+		if (!getSaved('img') && data.thumbnail) {
+			thumbnail.src = data.thumbnail;
 
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';
 
+		} else {
+			thumbnail.src = blankImage;
 		}
 
 		if (data.duration)
