@@ -3,11 +3,9 @@ import player from "../lib/player";
 import { blankImage, getSaved, imgUrl, parseTTML, save } from "../lib/utils";
 
 img.addEventListener('load', () => {
-  if (img.src.includes('maxres'))
-    if (img.naturalWidth === 120)
-      if (audio.dataset.id)
-        img.src = imgUrl(audio.dataset.id, 'hq');
-
+  if (img.naturalWidth === 120)
+    if (audio.dataset.id)
+      img.src = imgUrl(audio.dataset.id, 'hq');
 });
 
 

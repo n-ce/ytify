@@ -10,10 +10,16 @@ const loadMoreBtn = <HTMLButtonElement>document.getElementById('loadMore');
 
 let token = '';
 
-const loadMoreResults = async () =>
+const loadMoreResults = async (api = 0) =>
   fetch(
-    `${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&q=${superInput.value}&filter=${searchFilters.value}`
-  ).then(res => res.json())
+    `${pipedInstances.options[api].value}/nextpage/search?nextpage=${encodeURIComponent(token)}&q=${superInput.value}&filter=${searchFilters.value}`
+  )
+    .then(res => res.json())
+    .catch(_ => {
+      if (pipedInstances.length === api)
+        return alert(_);
+      loadMoreResults(api + 1);
+    });
 
 
 loadMoreBtn.addEventListener('click', async () => {
@@ -29,7 +35,7 @@ loadMoreBtn.addEventListener('click', async () => {
 
 // Get search results of input
 
-const searchLoader = () => {
+const searchLoader = (_: Event | undefined = undefined, api: number = 0) => {
   const text = superInput.value;
 
   if (!text) return;
@@ -38,7 +44,7 @@ const searchLoader = () => {
 
   loadMoreBtn.style.display = 'none';
 
-  fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
+  fetch(pipedInstances.options[api].value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
     .then(async searchResults => {
       token = searchResults.nextpage;
@@ -61,13 +67,10 @@ const searchLoader = () => {
       )
     })
     .catch(err => {
-      if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-        pipedInstances.selectedIndex++;
-        searchLoader();
-        return;
-      }
+      if (pipedInstances.length > api)
+        return searchLoader(_, api + 1);
+
       alert(err);
-      pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadMoreBtn.style.display = 'block');
 

@@ -91,7 +91,8 @@ export default async function player(id: string | null = '') {
     id,
     data.title,
     data.uploader,
-    data.uploaderUrl
+    data.uploaderUrl,
+    data.thumbnailUrl
   );
 
 

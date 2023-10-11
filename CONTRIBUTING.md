@@ -8,6 +8,12 @@
 
 ## Changelog
 
+**v6.2**:
+- Search sorting by Time Uploaded
+
+**v6.1**:
+- Download Functionality
+
 **v6.0**:
 - [Full Changelog](https://github.com/n-ce/ytify/discussions/125)
 

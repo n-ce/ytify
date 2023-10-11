@@ -34,11 +34,12 @@ export function setMetaData(
   id: string,
   streamName: string,
   authorName: string,
-  authorUrl: string
+  authorUrl: string,
+  thumbnailUrl: string
 ) {
 
   if (!getSaved('img'))
-    img.src = imgUrl(id, 'maxres');
+    img.src = thumbnailUrl;
 
   const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = `https://youtube.com/watch?v=${id}`;

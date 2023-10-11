@@ -22,7 +22,7 @@ customElements.define('stream-item', class extends HTMLElement {
 			thumbnail.src = imgUrl(this.dataset.id || '', 'hq');
 		});
 		thumbnail.addEventListener('load', () => {
-			(<HTMLElement>root.host).style.opacity = '1';
+			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
 		});
 
 		const duration = document.createElement('p');
