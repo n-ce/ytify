@@ -35,7 +35,7 @@ loadMoreBtn.addEventListener('click', async () => {
 
 // Get search results of input
 
-const searchLoader = (_: Event | undefined = undefined, api: number = 0) => {
+const searchLoader = () => {
   const text = superInput.value;
 
   if (!text) return;
@@ -44,7 +44,7 @@ const searchLoader = (_: Event | undefined = undefined, api: number = 0) => {
 
   loadMoreBtn.style.display = 'none';
 
-  fetch(pipedInstances.options[api].value + '/search?q=' + text + '&filter=' + searchFilters.value)
+  fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
     .then(async searchResults => {
       token = searchResults.nextpage;
@@ -67,10 +67,13 @@ const searchLoader = (_: Event | undefined = undefined, api: number = 0) => {
       )
     })
     .catch(err => {
-      if (pipedInstances.length > api)
-        return searchLoader(_, api + 1);
-
+      if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+        pipedInstances.selectedIndex++;
+        searchLoader();
+        return;
+      }
       alert(err);
+      pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadMoreBtn.style.display = 'block');
 
