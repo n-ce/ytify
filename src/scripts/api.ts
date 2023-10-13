@@ -8,26 +8,22 @@ const [initial_name, initial_url] = (getSaved('pipedInstance')?.split('|') || ['
 
 pipedInstances.add(new Option(initial_name, initial_url, undefined, true));
 
-const apiList = 'https://piped-instances.kavin.rocks';
 
-fetch(apiList)
-  .then(res => res.json())
-  .then(data => {
-    for (const instance of data)
+// fetches list and falls back to saved previous list if not available
+
+addEventListener('DOMContentLoaded', async () => {
+  (await fetch('https://piped-instances.kavin.rocks')
+    .then(res => res.json())
+    .then(data => {
+      save('apiList', JSON.stringify(data));
+      return data;
+    })
+    .catch(() => JSON.parse(getSaved('apiList') || '[]')))
+    .forEach((instance: Record<'api_url' | 'name' | 'locations', string>) => {
       if (initial_url !== instance.api_url)
-        pipedInstances.add(new Option(instance.name + ' ' + instance.locations, instance.api_url));
-  })
-  .catch(err => {
-    if (err.message === 'Failed to fetch')
-      return console.log('fetching instances list failed');
-
-    if (confirm('API blockage detected, more likely an error on your side, you can continue to use services but they may not work optimally. Investigate issue ?')) {
-      const text = prompt('Visit ' + apiList + ' in another tab, you can write what you see here, clicking on ok will report it. Alternatively if you have github submit an issue at https://github.com/n-ce/ytify/issues');
-      if (!text) return;
-      (<HTMLInputElement>document.getElementById('netlifyForm')).value = text + ' ' + err;
-      document.forms[0].submit();
-    }
-  })
+        pipedInstances.add(new Option(instance.name + ' ' + instance.locations, instance.api_url))
+    });
+});
 
 // Instance Selector change event
 
