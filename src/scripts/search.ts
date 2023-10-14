@@ -6,7 +6,6 @@ import { getSaved, save, itemsLoader, idFromURL, params } from "../lib/utils";
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
-const loadMoreBtn = <HTMLButtonElement>document.getElementById('loadMore');
 
 let token = '';
 
@@ -22,15 +21,21 @@ const loadMoreResults = async (api = 0) =>
     });
 
 
-loadMoreBtn.addEventListener('click', async () => {
-  if (!token) return;
-  loadMoreBtn.style.display = 'none';
-  const data = await loadMoreResults();
-  token = data.nextpage;
-  searchlist.appendChild(itemsLoader(data.items));
-  loadMoreBtn.style.display = 'block';
-});
+// autoload on scroll end
 
+const searchContainer = <HTMLDivElement>searchlist.parentElement; /* actually a section but div will do as well */
+
+let currentHeight = 0;
+searchContainer.addEventListener('scroll', async () => {
+  const height = searchContainer.scrollHeight;
+  if (searchContainer.scrollTop + searchContainer.clientHeight >= height - 10 && currentHeight !== height) {
+    currentHeight = searchContainer.scrollHeight;
+    if (!token) return;
+    const data = await loadMoreResults();
+    token = data.nextpage;
+    searchlist.appendChild(itemsLoader(data.items));
+  }
+});
 
 
 // Get search results of input
@@ -41,8 +46,6 @@ const searchLoader = () => {
   if (!text) return;
 
   searchlist.innerHTML = '';
-
-  loadMoreBtn.style.display = 'none';
 
   fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
     .then(res => res.json())
@@ -74,8 +77,7 @@ const searchLoader = () => {
       }
       alert(err);
       pipedInstances.selectedIndex = 0;
-    })
-    .finally(() => loadMoreBtn.style.display = 'block');
+    });
 
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = searchFilters.value === 'all' ? '' : '&f=' + searchFilters.value;
