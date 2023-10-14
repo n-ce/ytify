@@ -3,8 +3,6 @@ import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, subtit
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}default.webp`;
-
 export const params = (new URL(location.href)).searchParams;
 
 export const save = localStorage.setItem.bind(localStorage);
@@ -12,6 +10,8 @@ export const save = localStorage.setItem.bind(localStorage);
 export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
+export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}default.webp`;
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -102,11 +102,12 @@ export type Item = {
 }
 
 function createStreamItem(stream: Item) {
+  const id = stream.url.substring(9);
   const streamItem = document.createElement('stream-item');
-  streamItem.dataset.id = stream.url.substring(9);
+  streamItem.dataset.id = id;
   streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
-  streamItem.dataset.thumbnail = stream.thumbnail;
+  streamItem.dataset.thumbnail = imgUrl(id, 'mq');
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
   streamItem.dataset.uploaded = stream.uploadedDate || '';
@@ -114,9 +115,9 @@ function createStreamItem(stream: Item) {
   streamItem.addEventListener('click', () => {
     superModal.classList.toggle('hide');
     const _ = superModal.dataset;
-    _.id = stream.url.substring(9);
+    _.id = id;
     _.title = stream.title;
-    _.thumbnail = stream.thumbnail;
+    _.thumbnail = streamItem.dataset.thumbnail;
     _.author = stream.uploaderName;
     _.channelUrl = stream.uploaderUrl;
     _.duration = streamItem.dataset.duration;
