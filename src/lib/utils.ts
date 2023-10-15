@@ -11,7 +11,7 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}default.webp`;
+export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}.webp`;
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -59,12 +59,12 @@ export function setMetaData(
       title: streamName,
       artist: authorName,
       artwork: [
-        { src: imgUrl(id, ''), sizes: '96x96' },
-        { src: imgUrl(id, ''), sizes: '128x128' },
-        { src: imgUrl(id, 'mq'), sizes: '192x192' },
-        { src: imgUrl(id, 'mq'), sizes: '256x256' },
-        { src: imgUrl(id, 'hq'), sizes: '384x384' },
-        { src: imgUrl(id, 'hq'), sizes: '512x512' },
+        { src: imgUrl(id, 'default'), sizes: '96x96' },
+        { src: imgUrl(id, 'default'), sizes: '128x128' },
+        { src: imgUrl(id, 'mqdefault'), sizes: '192x192' },
+        { src: imgUrl(id, 'mqdefault'), sizes: '256x256' },
+        { src: imgUrl(id, 'hqdefault'), sizes: '384x384' },
+        { src: imgUrl(id, 'hqdefault'), sizes: '512x512' },
       ]
     });
   }
@@ -107,7 +107,7 @@ function createStreamItem(stream: Item) {
   streamItem.dataset.id = id;
   streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
-  streamItem.dataset.thumbnail = imgUrl(id, 'mq');
+  streamItem.dataset.thumbnail = stream.thumbnail;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
   streamItem.dataset.uploaded = stream.uploadedDate || '';

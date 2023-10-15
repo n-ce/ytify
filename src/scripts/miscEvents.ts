@@ -4,8 +4,13 @@ import { blankImage, getSaved, imgUrl, parseTTML, save } from "../lib/utils";
 
 img.addEventListener('load', () => {
   if (img.naturalWidth === 120)
-    if (audio.dataset.id)
-      img.src = imgUrl(audio.dataset.id, 'hq');
+    img.src = img.src.includes('corsproxy') ?
+      img.src.replace('vi_webp', 'vi').replace('.webp', '.jpg') :
+      imgUrl(audio.dataset.id || '', 'hqdefault');
+});
+
+img.addEventListener('error', () => {
+  img.src = imgUrl(audio.dataset.id || '', 'maxresdefault');
 });
 
 
@@ -66,7 +71,7 @@ thumbnailSwitch.addEventListener('click', () => {
 
   if (getSaved('img')) {
 
-    img.src = audio.dataset.id ? imgUrl(audio.dataset.id, 'maxres') : '/ytify_thumbnail_min.webp';
+    img.src = audio.dataset.id ? imgUrl(audio.dataset.id, 'maxresdefault') : '/ytify_thumbnail_min.webp';
     localStorage.removeItem('img');
   }
   else {

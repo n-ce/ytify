@@ -84,6 +84,7 @@ function themer() {
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
+    if (canvasImg.width === 120) return;
     canvas.height = canvasImg.height;
     canvas.width = canvasImg.width;
     context.drawImage(canvasImg, 0, 0);

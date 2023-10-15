@@ -35,6 +35,7 @@ pipedInstances.addEventListener('change', async () => {
     save('pipedInstance', name + '|' + url);
   if (url === defURL)
     localStorage.removeItem('pipedInstance');
+  audio.pause();
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;

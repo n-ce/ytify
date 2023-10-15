@@ -7,12 +7,12 @@
 @import 'superModal.css';
 
 :root {
-  --bg: ;
-  --onBg: ;
-  --text: ;
-  --borderColor: ;
+  --bg: transparent;
+  --onBg: transparent;
+  --text: transparent;
+  --borderColor: transparent;
   --border: 0.1vmin solid var(--borderColor);
-  --shadowColor: ;
+  --shadowColor: transparent;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundness: 2vmin;
 }
