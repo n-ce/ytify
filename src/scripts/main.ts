@@ -13,8 +13,9 @@ import '../components/listItem';
 import '../components/toggleSwitch';
 import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
-import { img } from '../lib/dom';
+import { audio, img } from '../lib/dom';
 import { appendToQueuelist, clearQ, firstItemInQueue } from './queue';
+import { addToCollection, removeFromCollection } from './library';
 
 
 const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL(params.get('text'));
@@ -23,11 +24,23 @@ const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL
 streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/ytify_thumbnail_min.webp';
 
 
-const favButton = <HTMLElement>(<HTMLButtonElement>document.getElementById('favButton')).nextElementSibling;
+const favButton = <HTMLInputElement>document.getElementById('favButton');
+
 const icons = ['ri-heart-line', 'ri-heart-fill'];
 favButton.addEventListener('click', () => {
-  alert('this feature is being tested')
-  favButton.classList.replace(icons[0], icons[1]);
+  if (!audio.dataset.id) return;
+  favButton.checked ?
+    addToCollection('favorites', {
+      title: audio.dataset.name,
+      author: audio.dataset.author,
+      id: audio.dataset.id,
+      thumbnail: audio.dataset.thumbnail,
+      duration: audio.dataset.duration,
+      channelUrl: audio.dataset.channelUrl
+    }) :
+    removeFromCollection('favorites', <string>audio.dataset.id);
+
+  favButton.nextElementSibling?.classList.replace(icons[0], icons[1]);
   icons.reverse();
 })
 

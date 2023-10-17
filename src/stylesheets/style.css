@@ -137,6 +137,10 @@ details>summary {
   font-size: larger;
 }
 
+details[open]>summary {
+  margin-bottom: 4vmin;
+}
+
 a {
   text-decoration: none;
   color: inherit;

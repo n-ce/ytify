@@ -128,4 +128,5 @@ export default async function player(id: string | null = '') {
   audio.dataset.name = data.title;
   audio.dataset.author = data.uploader;
   audio.dataset.duration = convertSStoHHMMSS(data.duration);
+  audio.dataset.channelUrl = data.uploaderUrl;
 }

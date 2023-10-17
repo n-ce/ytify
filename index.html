@@ -50,7 +50,7 @@
       <i class="ri-node-tree"></i>
       <p>Related</p>
     </a>
-    <a href="/library" id="/library" class="hide">
+    <a href="/library" id="/library">
       <i class="ri-stack-line"></i>
       <p>Library</p>
     </a>
@@ -143,19 +143,25 @@
 
 
     <section id="library">
-      <details>
-        <summary id="history">
+      <details id="history">
+        <summary>
           <i class="ri-history-line"></i> History
         </summary>
       </details>
-      <details>
-        <summary id="favorites">
+      <details id="favorites">
+        <summary>
           <i class="ri-heart-fill"></i> Favorites
         </summary>
       </details>
       <details>
         <summary>
           <i class="ri-play-list-2-line"></i> Playlists
+        </summary>
+      </details>
+      <details id="YTMusicLists">
+        <summary>
+          <i class="ri-play-circle-fill"></i>
+          YT Music
         </summary>
       </details>
     </section>
@@ -178,7 +184,7 @@
       <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
-      <toggle-switch id="librarySwitch" class="hide">Disable Library</toggle-switch>
+      <toggle-switch id="librarySwitch">Disable Library</toggle-switch>
 
       <span>
         <label for="roundnessChanger">UI Roundness</label>

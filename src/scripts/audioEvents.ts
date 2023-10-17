@@ -1,6 +1,7 @@
 import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS, params } from "../lib/utils";
+import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
@@ -50,7 +51,16 @@ audio.addEventListener('playing', () => {
   playButton.dataset.state = '';
   if (!streamHistory.includes(audio.dataset.id || ''))
     streamHistory.push(audio.dataset.id || '');
-
+  setTimeout(() => {
+    addToCollection('history', {
+      title: audio.dataset.name,
+      author: audio.dataset.author,
+      id: audio.dataset.id,
+      thumbnail: audio.dataset.thumbnail,
+      duration: audio.dataset.duration,
+      channelUrl: audio.dataset.channelUrl
+    });
+  }, 1000);
 });
 
 audio.addEventListener('pause', () => {

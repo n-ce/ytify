@@ -74,8 +74,8 @@
 
 #suggestions li:hover,
 #suggestions li:focus {
-  background-color: #39FC;
-  color: #ADFD;
+  background-color: var(--text);
+  color: var(--bg);
 }
 
 

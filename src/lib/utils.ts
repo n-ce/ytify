@@ -101,7 +101,7 @@ export type Item = {
   uploaderAvatar: string
 }
 
-function createStreamItem(stream: Item) {
+export function createStreamItem(stream: Item) {
   const id = stream.url.substring(9);
   const streamItem = document.createElement('stream-item');
   streamItem.dataset.id = id;
