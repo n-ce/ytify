@@ -37,15 +37,6 @@ function accentDarkener(r: number, g: number, b: number) {
 }
 
 
-type Scheme = {
-  [index: string]: {
-    bg: (r: number, g: number, b: number) => string,
-    borderColor: (r: number, g: number, b: number) => string,
-    shadowColor: string,
-    onBg: string,
-    text: string
-  }
-}
 
 const palette: Scheme = {
   light: {

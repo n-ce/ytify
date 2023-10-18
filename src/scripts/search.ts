@@ -28,7 +28,7 @@ const searchContainer = <HTMLDivElement>searchlist.parentElement; /* actually a 
 let currentHeight = 0;
 searchContainer.addEventListener('scroll', async () => {
   const height = searchContainer.scrollHeight;
-  if (searchContainer.scrollTop + searchContainer.clientHeight >= height - 10 && currentHeight !== height) {
+  if (searchContainer.scrollTop + searchContainer.clientHeight >= height - 20 && currentHeight !== height) {
     currentHeight = searchContainer.scrollHeight;
     if (!token) return;
     const data = await loadMoreResults();

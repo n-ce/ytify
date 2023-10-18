@@ -9,6 +9,12 @@ export const save = localStorage.setItem.bind(localStorage);
 
 export const getSaved = localStorage.getItem.bind(localStorage);
 
+export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{},"history":{},"favorites":{}}');
+
+export const saveDB = (data: Library) => save('library', JSON.stringify(data));
+
+export const getCollection = (name: string) => <HTMLDetailsElement>document.getElementById(name);
+
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}.webp`;
@@ -82,26 +88,8 @@ export function updatePositionState() {
   }
 }
 
-export type Item = {
-  url: string,
-  type: string,
-  name: string,
-  views: number,
-  title: string,
-  videos: number,
-  duration: number,
-  category: string,
-  thumbnail: string,
-  subscribers: number,
-  description: string,
-  playlistType: string,
-  uploaderUrl: string,
-  uploadedDate: string,
-  uploaderName: string,
-  uploaderAvatar: string
-}
 
-export function createStreamItem(stream: Item) {
+export function createStreamItem(stream: StreamItem) {
   const id = stream.url.substring(9);
   const streamItem = document.createElement('stream-item');
   streamItem.dataset.id = id;
@@ -125,7 +113,7 @@ export function createStreamItem(stream: Item) {
   return streamItem;
 }
 
-function createListItem(list: Item) {
+function createListItem(list: StreamItem) {
   const listItem = document.createElement('list-item');
   listItem.textContent = list.name;
   listItem.dataset.thumbnail = list.thumbnail;
@@ -165,7 +153,7 @@ function createListItem(list: Item) {
 
 
 
-export function itemsLoader(itemsArray: Item[]): DocumentFragment {
+export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
   if (!itemsArray.length)
     throw new Error('No Data Found');
   const fragment = document.createDocumentFragment();

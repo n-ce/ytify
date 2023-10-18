@@ -60,7 +60,7 @@ audio.addEventListener('playing', () => {
       duration: audio.dataset.duration,
       channelUrl: audio.dataset.channelUrl
     });
-  }, 1000);
+  }, 1e4);
 });
 
 audio.addEventListener('pause', () => {

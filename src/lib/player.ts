@@ -1,15 +1,9 @@
+import { addToCollection } from "../scripts/library";
 import { audio, bitrateSelector, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
-import { convertSStoHHMMSS, getSaved, itemsLoader, params, parseTTML, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getCollection, getDB, getSaved, params, parseTTML, saveDB, setMetaData } from "./utils";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
-interface Opus {
-  urls: string[],
-  bitrates: number[]
-}
-interface M4A extends Opus {
-  options: HTMLOptionElement[]
-}
 
 export default async function player(id: string | null = '') {
 
@@ -111,13 +105,6 @@ export default async function player(id: string | null = '') {
   }
 
 
-  // load related streams
-  const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
-
-  relatedStreamsContainer.innerHTML = '';
-  relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
-
-
   params.set('s', id);
 
   if (location.pathname === '/')
@@ -129,4 +116,48 @@ export default async function player(id: string | null = '') {
   audio.dataset.author = data.uploader;
   audio.dataset.duration = convertSStoHHMMSS(data.duration);
   audio.dataset.channelUrl = data.uploaderUrl;
+
+
+  // reset fav button state
+
+
+  // load related streams into discovery data
+
+  setTimeout(() => {
+    getCollection('discover').innerHTML =
+      `<summary>
+          <i class="ri-compass-3-line"></i> Discover
+        </summary>`;
+    const db = getDB();
+
+    data.relatedStreams
+      .filter((stream: StreamItem) => stream.type === 'stream')
+      .forEach((stream: StreamItem) => {
+        const id = stream.url.slice(9);
+        if (db.discover.hasOwnProperty(id))
+          (<number>db.discover[id].frequency)++;
+        else
+          db.discover[id] = {
+            id: id,
+            title: stream.title,
+            thumbnail: stream.thumbnailUrl,
+            author: stream.uploaderName,
+            duration: convertSStoHHMMSS(stream.duration),
+            channelUrl: stream.uploaderUrl,
+            frequency: 1
+          }
+      });
+
+    const sortedArray = Object.entries(db.discover).sort((a, b) => <number>a[1].frequency - <number>b[1].frequency)
+
+    db.discover = {};
+
+    sortedArray.forEach(i => {
+      db.discover[i[0]] = i[1];
+      addToCollection('discover', i[1])
+    });
+
+    saveDB(db);
+
+  }, 1e4);
 }

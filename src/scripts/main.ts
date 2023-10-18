@@ -30,14 +30,7 @@ const icons = ['ri-heart-line', 'ri-heart-fill'];
 favButton.addEventListener('click', () => {
   if (!audio.dataset.id) return;
   favButton.checked ?
-    addToCollection('favorites', {
-      title: audio.dataset.name,
-      author: audio.dataset.author,
-      id: audio.dataset.id,
-      thumbnail: audio.dataset.thumbnail,
-      duration: audio.dataset.duration,
-      channelUrl: audio.dataset.channelUrl
-    }) :
+    addToCollection('favorites', audio.dataset) :
     removeFromCollection('favorites', <string>audio.dataset.id);
 
   favButton.nextElementSibling?.classList.replace(icons[0], icons[1]);
