@@ -9,7 +9,7 @@ export const save = localStorage.setItem.bind(localStorage);
 
 export const getSaved = localStorage.getItem.bind(localStorage);
 
-export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{},"history":{},"favorites":{}}');
+export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
 
 export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 

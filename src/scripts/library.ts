@@ -1,4 +1,4 @@
-import { audio, favButton, superModal } from "../lib/dom";
+import { atpSelector, audio, favButton, superModal } from "../lib/dom";
 import { getCollection, getDB, saveDB } from "../lib/utils";
 
 
@@ -31,6 +31,9 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
   if (collection === 'discover' && <number>data.frequency < 2) return;
 
+  // create collection if it does not exist
+  if (!db.hasOwnProperty(collection)) db[collection] = {};
+
   // remove previous stream if exists
   if (db[collection].hasOwnProperty(id)) {
     if (collection === 'discover') {
@@ -55,14 +58,17 @@ export function removeFromCollection(collection: string, id: string) {
   saveDB(db);
 }
 
+// setup initial data
+
 const initialData = getDB();
+
+const initialKeys = Object.keys(initialData);
+for (let i = 3; i < initialKeys.length; i++)
+  createPlaylist(initialKeys[i]);
 
 for (const collection in initialData)
   for (const stream in initialData[collection])
     addToCollection(collection, initialData[collection][stream]);
-
-
-
 
 
 // favorites button & data
@@ -76,4 +82,22 @@ favButton.addEventListener('click', () => {
 
   (<HTMLLabelElement>favButton.nextElementSibling).classList.replace(icons[0], icons[1]);
   icons.reverse();
-})
+});
+
+
+// playlists
+
+export function createPlaylist(title: string) {
+  const details = document.createElement('details');
+  details.id = title;
+  const summary = document.createElement('summary');
+  const i = document.createElement('i');
+  i.className = 'ri-play-list-2-line';
+  summary.append(i, ' ' + title);
+  details.appendChild(summary);
+
+  (<HTMLDivElement>document.getElementById('library')).appendChild(details);
+  atpSelector.add(new Option(title, title));
+}
+
+
