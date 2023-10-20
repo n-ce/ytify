@@ -56,14 +56,7 @@ audio.addEventListener('playing', () => {
 
   historyTimeoutId = window.setTimeout(() => {
     if (historyID === audio.dataset.id)
-      addToCollection('history', {
-        title: audio.dataset.name,
-        author: audio.dataset.author,
-        id: audio.dataset.id,
-        thumbnail: audio.dataset.thumbnail,
-        duration: audio.dataset.duration,
-        channelUrl: audio.dataset.channelUrl
-      });
+      addToCollection('history', audio.dataset);
   }, 1e4);
 });
 
@@ -152,13 +145,7 @@ loopButton.addEventListener('click', () => {
 
 playPrevButton.addEventListener('click', () => {
   if (streamHistory.length > 1) {
-    appendToQueuelist({
-      title: audio.dataset.name,
-      author: audio.dataset.author,
-      id: audio.dataset.id,
-      thumbnail: audio.dataset.thumbnail,
-      duration: audio.dataset.duration
-    }, true);
+    appendToQueuelist(audio.dataset, true);
     streamHistory.pop();
     player(streamHistory[streamHistory.length - 1]);
   }

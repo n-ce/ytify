@@ -1,10 +1,9 @@
 import { audio } from "../lib/dom";
-import { convertSStoHHMMSS, getCollection, getDB, saveDB } from "../lib/utils";
+import { convertSStoHHMMSS, getCollection, saveDB } from "../lib/utils";
 import { createCollectionItem } from "./library";
 
-export default function discover(relatedStreams: StreamItem[], rootID: string) {
+export default function discover(relatedStreams: StreamItem[], rootID: string, db: Library) {
   if (audio.dataset.id !== rootID) return;
-  const db = getDB();
 
   // merge previous discover items with current related streams
 

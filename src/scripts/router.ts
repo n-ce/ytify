@@ -29,7 +29,7 @@ for (const anchor of anchors) {
         anchor.id + ((params.has('s') && anchor.id === '/') ? ('?s=' + params.get('s')) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
       );
       document.title = (anchor.id === '/' ?
-        (audio.dataset.name ? audio.dataset.name : 'Home')
+        (audio.dataset.title ? audio.dataset.title : 'Home')
         :
         (<HTMLParagraphElement>anchor.lastElementChild).textContent || '') + ' - ytify';
     }

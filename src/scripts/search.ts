@@ -29,14 +29,13 @@ const searchLoader = () => {
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
+      searchlist.dataset.token = searchResults.nextpage;
       loadMoreOnScroll(
         <HTMLDivElement>searchlist.parentElement,
         searchlist,
-        () => query + '&',
-        searchResults.nextpage
+        () => query + '&'
       );
       if (sortSwitch.hasAttribute('checked')) {
-        searchlist.dataset.token = searchResults.nextpage;
         for (let i = 0; i < 3; i++) {
           const data = await loadMoreResults(
             query + '&',

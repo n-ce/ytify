@@ -1,4 +1,4 @@
-import { superModal } from "../lib/dom";
+import { audio, favButton, superModal } from "../lib/dom";
 import { getCollection, getDB, saveDB } from "../lib/utils";
 
 
@@ -60,3 +60,20 @@ const initialData = getDB();
 for (const collection in initialData)
   for (const stream in initialData[collection])
     addToCollection(collection, initialData[collection][stream]);
+
+
+
+
+
+// favorites button & data
+
+const icons = ['ri-heart-line', 'ri-heart-fill'];
+favButton.addEventListener('click', () => {
+  if (!audio.dataset.id) return;
+  favButton.checked ?
+    addToCollection('favorites', audio.dataset) :
+    removeFromCollection('favorites', <string>audio.dataset.id);
+
+  (<HTMLLabelElement>favButton.nextElementSibling).classList.replace(icons[0], icons[1]);
+  icons.reverse();
+})

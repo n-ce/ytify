@@ -46,14 +46,16 @@ export const loadMoreResults = async (urlComponent: string, token: string) =>
         loadMoreResults(urlComponent, token);
     });
 
-export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string, token: string) {
+export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string) {
   let currentHeight = 0;
   container.onscroll = async () => {
     const height = container.scrollHeight;
-    if (container.scrollTop + container.clientHeight >= height - 100 && currentHeight !== height) {
+    if (container.scrollTop + container.clientHeight >= height - 200 && currentHeight !== height) {
       currentHeight = container.scrollHeight;
-      console.log(urlComponent(), token)
-      const data = await loadMoreResults(urlComponent(), token);
+      const data = await loadMoreResults(
+        urlComponent(),
+        <string>list.dataset.token
+      );
       list.appendChild(itemsLoader(data.items || data.relatedStreams));
       data.nextpage ?
         list.dataset.token = data.nextpage :
@@ -160,12 +162,12 @@ function createListItem(list: StreamItem) {
     fetch(pipedInstances.value + url)
       .then(res => res.json())
       .then(group => {
+        listItemsContainer.dataset.token = group.nextpage;
         if (group.nextpage)
           loadMoreOnScroll(
             <HTMLDivElement>listItemsContainer.parentElement,
             listItemsContainer,
-            () => `playlists/${id}?`,
-            group.nextpage
+            () => `playlists/${id}?`
           );
         return group.relatedStreams;
       })
