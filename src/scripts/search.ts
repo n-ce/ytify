@@ -8,14 +8,7 @@ const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters'
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
 
-const loadMoreSearchUrl = () =>
-  `search?nextpage=${encodeURIComponent(<string>searchlist.dataset.token)}&q=${superInput.value}&filter=${searchFilters.value}`;
 
-loadMoreOnScroll(
-  <HTMLDivElement>searchlist.parentElement,
-  searchlist,
-  loadMoreSearchUrl
-);
 
 // Get search results of input
 
@@ -26,14 +19,29 @@ const searchLoader = () => {
 
   searchlist.innerHTML = '';
 
-  fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
+  const searchQuery = '?q=' + superInput.value;
+  const filterQuery = '&filter=' + searchFilters.value;
+
+  superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
+
+  const query = 'search' + searchQuery + filterQuery;
+
+  fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
-      searchlist.dataset.token = searchResults.nextpage;
-
+      loadMoreOnScroll(
+        <HTMLDivElement>searchlist.parentElement,
+        searchlist,
+        () => query + '&',
+        searchResults.nextpage
+      );
       if (sortSwitch.hasAttribute('checked')) {
+        searchlist.dataset.token = searchResults.nextpage;
         for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults(loadMoreSearchUrl());
+          const data = await loadMoreResults(
+            query + '&',
+            <string>searchlist.dataset.token
+          );
           searchlist.dataset.token = data.nextpage;
           searchResults.items = searchResults.items.concat(data.items);
         }
@@ -58,11 +66,7 @@ const searchLoader = () => {
       pipedInstances.selectedIndex = 0;
     });
 
-  const searchQuery = '?q=' + superInput.value;
-  const filterQuery = searchFilters.value === 'all' ? '' : '&f=' + searchFilters.value;
-  superInput.dataset.query = searchQuery + filterQuery;
-
-  history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query);
+  history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query.replace('filter', 'f'));
   suggestions.style.display = 'none';
 }
 

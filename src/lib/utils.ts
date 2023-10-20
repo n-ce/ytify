@@ -36,28 +36,30 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 let api = 0;
-export const loadMoreResults = async (urlComponent: string) =>
-  fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent)
+export const loadMoreResults = async (urlComponent: string, token: string) =>
+  fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent + 'nextpage=' + encodeURIComponent(token))
     .then(res => res.json())
     .catch(_ => {
       api++;
       pipedInstances.length === api ?
         alert(_) :
-        loadMoreResults(urlComponent);
+        loadMoreResults(urlComponent, token);
     });
 
-export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string) {
+export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string, token: string) {
   let currentHeight = 0;
-  container.addEventListener('scroll', async () => {
+  container.onscroll = async () => {
     const height = container.scrollHeight;
     if (container.scrollTop + container.clientHeight >= height - 100 && currentHeight !== height) {
       currentHeight = container.scrollHeight;
-      if (!list.dataset.token) return;
-      const data = await loadMoreResults(urlComponent());
-      list.dataset.token = data.nextpage;
+      console.log(urlComponent(), token)
+      const data = await loadMoreResults(urlComponent(), token);
       list.appendChild(itemsLoader(data.items || data.relatedStreams));
+      data.nextpage ?
+        list.dataset.token = data.nextpage :
+        container.onscroll = null;
     }
-  });
+  }
 }
 
 export function setMetaData(
@@ -158,15 +160,13 @@ function createListItem(list: StreamItem) {
     fetch(pipedInstances.value + url)
       .then(res => res.json())
       .then(group => {
-        listItemsContainer.dataset.token = group.nextpage;
-
         if (group.nextpage)
           loadMoreOnScroll(
             <HTMLDivElement>listItemsContainer.parentElement,
             listItemsContainer,
-            () => `playlists/${id}?nextpage=${encodeURIComponent(group.nextpage)}`
+            () => `playlists/${id}?`,
+            group.nextpage
           );
-
         return group.relatedStreams;
       })
       .then(streams => itemsLoader(streams))
