@@ -1,6 +1,6 @@
 import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, params } from "../lib/utils";
+import { convertSStoHHMMSS, getCollection, params } from "../lib/utils";
 import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
@@ -53,11 +53,11 @@ audio.addEventListener('playing', () => {
   playButton.dataset.state = '';
   if (!streamHistory.includes(<string>audio.dataset.id))
     streamHistory.push(audio.dataset.id || '');
-
-  historyTimeoutId = window.setTimeout(() => {
-    if (historyID === audio.dataset.id)
-      addToCollection('history', audio.dataset);
-  }, 1e4);
+  if ((<HTMLElement>getCollection('history').firstElementChild)?.dataset.id !== audio.dataset.id)
+    historyTimeoutId = window.setTimeout(() => {
+      if (historyID === audio.dataset.id)
+        addToCollection('history', audio.dataset);
+    }, 1e4);
 });
 
 audio.addEventListener('pause', () => {

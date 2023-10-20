@@ -8,9 +8,9 @@
 
 > [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
-### What else are you getting ?
+## What else are you getting ?
 - **Queue** 🚦: Add multiple streams to keep your audio streams going. 
-- **Playlists** 🎧: Open YouTube playlists and queue them to the player. 
+- **Playlists** 🎶: Open YouTube playlists and queue them to the player. 
 - **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail. 
 - **PWA** 📱: Install ytify as an app on your device and open YouTube links with it from your OS share menu. 
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
@@ -58,21 +58,21 @@ npm run dev -- --open
 8. Want to save more data or speed up ux? Just turn off `Load Thumbnails` in Settings.
 
 ## Privacy Policy 👁️
-> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this.Everything else remains on your device only, which can also be cleared anytime using the clear data option in settings.
+> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this. Everything else remains on your device only, which can also be cleared anytime using the clear data option in settings.
 
 ## License 📝
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
 
 ## Contributing 📋
-> [Read More](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
+> Actively Looking For Contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
 
 ## Acknowledgements 🙏
-- [Piped](https://github.com/teampiped/piped)
-- [Cobalt](https://github.com/wukko/cobalt)
-- [Netlify](https://www.netlify.com)
+- [Piped](https://github.com/teampiped/piped) - Powerful YouTube API
+- [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
+- [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms.
 - [Vite](https://vitejs.dev)
 - [Autoprefixer](https://github.com/postcss/autoprefixer)
-- [Remix Icons](https://github.com/Remix-Design/RemixIcon)
-- [Google Fonts](https://fonts.google.com)
+- [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution
+- [Google Fonts](https://fonts.google.com) - NotoSans Font
 
 

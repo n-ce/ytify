@@ -13,7 +13,7 @@ export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discove
 
 export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 
-export const getCollection = (name: string) => <HTMLDetailsElement>document.getElementById(name);
+export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 

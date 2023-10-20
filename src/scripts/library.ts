@@ -58,13 +58,30 @@ export function removeFromCollection(collection: string, id: string) {
   saveDB(db);
 }
 
+
 // setup initial data
 
 const initialData = getDB();
 
 const initialKeys = Object.keys(initialData);
-for (let i = 3; i < initialKeys.length; i++)
-  createPlaylist(initialKeys[i]);
+for (let i = 0; i < initialKeys.length; i++) {
+  if (i < 3) {
+    const container = getCollection(initialKeys[i]);
+    const [clearBtn, removeBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
+
+    clearBtn.addEventListener('click', () => {
+      const db = getDB();
+      db[initialKeys[i]] = {};
+      saveDB(db);
+      container.innerHTML = '';
+    })
+    removeBtn.addEventListener('click', () => {
+
+    })
+
+  }
+  else createPlaylist(initialKeys[i]);
+}
 
 for (const collection in initialData)
   for (const stream in initialData[collection])
@@ -94,7 +111,21 @@ export function createPlaylist(title: string) {
   const i = document.createElement('i');
   i.className = 'ri-play-list-2-line';
   summary.append(i, ' ' + title);
-  details.appendChild(summary);
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.addEventListener('click', () => {
+    (<HTMLDetailsElement>document.getElementById(title)).remove();
+    const db = getDB();
+    delete db[title];
+    saveDB(db);
+  });
+
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.addEventListener('click', () => {
+
+  });
+  details.append(summary, deleteBtn, removeBtn, document.createElement('div'));
 
   (<HTMLDivElement>document.getElementById('library')).appendChild(details);
   atpSelector.add(new Option(title, title));
