@@ -6,23 +6,23 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is a simple WebApp that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
+> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 ### What else are you getting ?
-- **Queue** : Add multiple streams to keep your audio streams going. 🎵
-- **Playlists** : Open YouTube playlists and queue them to the player. 🎧
-- **Theming** : Modern Autonomous themed UI based on stream thumbnail. 🎨
-- **PWA** : Install ytify as an app on your device and open YouTube links with it from your OS share menu. 📱
-- **Radio** : Fetches similar streams and creates a playlist for your stream, great for music listeners. 📻
+- **Queue** 🚦: Add multiple streams to keep your audio streams going. 
+- **Playlists** 🎧: Open YouTube playlists and queue them to the player. 
+- **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail. 
+- **PWA** 📱: Install ytify as an app on your device and open YouTube links with it from your OS share menu. 
+- **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
+- **Library** 📚: Discover feed, history, favorites & custom playlists. 
 
 ![chrome_screenshot_ytify_v6_desktop](https://imageupload.io/ib/U74XZC8af5zwzqD_1695788573.jpg)
 
 ## WHY / The story of ytify with [n-ce](https://github.com/n-ce)
 - I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
-- I noticed it wasn't able to stream under low network conditions which would occur when my daily data quota would expire.
-- Newpipe allowed downloading audio of the stream in multiple bitrates (50kbps, 90kbps, 130kbps) but it provided only the best one while streaming. So i decided to create an [issue](https://github.com/TeamNewPipe/NewPipe/issues/5838).
-- At the time I used to download opus audio, av1 video streams from https://projectlounge.pw/ytdl. The streams could easily be downloadable in required format by just modifying the site link.
-- Things clicked in my mind, and I created this project on Jan 2022.
+- I noticed it wasn't able to stream under low network conditions.
+- So i decided to create an [issue](https://github.com/TeamNewPipe/NewPipe/issues/5838).
+- Upon finding no active resolution on the issue, I took it to myself and created this project on Jan 2022.
 
 ## Development Setup 🔧
 1. Prerequisites : Node.js , Beginner TypeScript Knowledge. 
@@ -34,15 +34,15 @@ or
 ```
  gh repo clone n-ce/ytify
 ```
-4. Move to Directory & Install Dependencies
+3. Move to Directory & Install Dependencies
 ```
 cd ytify ; npm install
 ```
-5. If you prefer using DevTools, you may disable eruda in `vite.config.ts` 
+4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts) 
   ```
 const eruda = false
 ```
-6. Start the development server and open localhost 
+5. Start the development server and open localhost 
 ```
 npm run dev -- --open
 ```
@@ -51,13 +51,14 @@ npm run dev -- --open
 1. Visit the [Production Deployment](https://ytify.netlify.app/), or if you've installed the project, wherever you're hosting it.
 2. Change the bitrate of the content you're streaming on the "Home" tab.
 3. Use the "Search" tab to search for streams with keywords or a direct URL.
-4. Click on a track to open a menu to either play, enqueue, or start a Radio of similar tracks and various other actions.
-5. Enjoy listening to music, podcast episodes, or other forms of audio even on low network conditions.
-6. Want the Highest Quality Output always? Just turn on `Highest Quality` in Settings.
-7. Want to save more data or speed up ux? Just turn off `Load Thumbnails` in Settings.
+4. Click on a stream to open a menu to either play, enqueue, or start a Radio of similar tracks and various other actions.
+5. Enjoy listening to music, podcast episodes, or other forms of audio even under low network conditions.
+6. Finding something new? Head over to `Discover` on the Library Tab.
+7. Want the Highest Quality Output always? Just turn on `Highest Quality` in Settings.
+8. Want to save more data or speed up ux? Just turn off `Load Thumbnails` in Settings.
 
 ## Privacy Policy 👁️
-> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this.
+> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this.Everything else remains on your device only, which can also be cleared anytime using the clear data option in settings.
 
 ## License 📝
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
@@ -67,6 +68,7 @@ npm run dev -- --open
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped)
+- [Cobalt](https://github.com/wukko/cobalt)
 - [Netlify](https://www.netlify.com)
 - [Vite](https://vitejs.dev)
 - [Autoprefixer](https://github.com/postcss/autoprefixer)

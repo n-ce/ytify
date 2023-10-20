@@ -129,16 +129,20 @@ details {
   padding: 2vmin;
   margin-bottom: 4vmin;
   border: var(--border);
-  border-radius: var(--roundness)
+  border-radius: var(--roundness);
 }
+
+
 
 details>summary {
   list-style: none;
   font-size: larger;
+  transition: all 0.3s ease-in-out;
 }
 
 details[open]>summary {
   margin-bottom: 4vmin;
+  font-size: xx-large;
 }
 
 a {

@@ -20,9 +20,8 @@ playNow.addEventListener('click', () => {
 });
 
 
-
 enqueue.addEventListener('click', () => {
-  if (firstItemInQueue().matches('h1'))
+  if (firstItemInQueue()?.matches('h1'))
     firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
   superModal.classList.toggle('hide');

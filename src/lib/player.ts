@@ -1,6 +1,6 @@
-import { addToCollection } from "../scripts/library";
 import { audio, bitrateSelector, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
-import { convertSStoHHMMSS, getCollection, getDB, getSaved, params, parseTTML, saveDB, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getSaved, params, parseTTML, setMetaData } from "./utils";
+import discover from "../scripts/discover";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
@@ -121,43 +121,8 @@ export default async function player(id: string | null = '') {
   // reset fav button state
 
 
-  // load related streams into discovery data
+  // load related streams into discovery data after 10 seconds of playback
 
-  setTimeout(() => {
-    getCollection('discover').innerHTML =
-      `<summary>
-          <i class="ri-compass-3-line"></i> Discover
-        </summary>`;
-    const db = getDB();
+  setTimeout(discover, 1e4, data.relatedStreams, id);
 
-    data.relatedStreams
-      .filter((stream: StreamItem) => stream.type === 'stream')
-      .forEach((stream: StreamItem) => {
-        const id = stream.url.slice(9);
-        if (db.discover.hasOwnProperty(id))
-          (<number>db.discover[id].frequency)++;
-        else
-          db.discover[id] = {
-            id: id,
-            title: stream.title,
-            thumbnail: stream.thumbnailUrl,
-            author: stream.uploaderName,
-            duration: convertSStoHHMMSS(stream.duration),
-            channelUrl: stream.uploaderUrl,
-            frequency: 1
-          }
-      });
-
-    const sortedArray = Object.entries(db.discover).sort((a, b) => <number>a[1].frequency - <number>b[1].frequency)
-
-    db.discover = {};
-
-    sortedArray.forEach(i => {
-      db.discover[i[0]] = i[1];
-      addToCollection('discover', i[1])
-    });
-
-    saveDB(db);
-
-  }, 1e4);
 }

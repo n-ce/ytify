@@ -2,7 +2,7 @@ import { superModal } from "../lib/dom";
 import { getCollection, getDB, saveDB } from "../lib/utils";
 
 
-function createCollectionItem(data: CollectionItem | DOMStringMap) {
+export function createCollectionItem(data: CollectionItem | DOMStringMap) {
 
   const item = document.createElement('stream-item');
   item.dataset.id = data.id;
@@ -29,6 +29,7 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
   const db = getDB();
   const id = <string>data.id;
 
+  if (collection === 'discover' && <number>data.frequency < 2) return;
 
   // remove previous stream if exists
   if (db[collection].hasOwnProperty(id)) {

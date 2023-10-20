@@ -35,6 +35,30 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
+let api = 0;
+export const loadMoreResults = async (urlComponent: string) =>
+  fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent)
+    .then(res => res.json())
+    .catch(_ => {
+      api++;
+      pipedInstances.length === api ?
+        alert(_) :
+        loadMoreResults(urlComponent);
+    });
+
+export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string) {
+  let currentHeight = 0;
+  container.addEventListener('scroll', async () => {
+    const height = container.scrollHeight;
+    if (container.scrollTop + container.clientHeight >= height - 100 && currentHeight !== height) {
+      currentHeight = container.scrollHeight;
+      if (!list.dataset.token) return;
+      const data = await loadMoreResults(urlComponent());
+      list.dataset.token = data.nextpage;
+      list.appendChild(itemsLoader(data.items || data.relatedStreams));
+    }
+  });
+}
 
 export function setMetaData(
   id: string,
@@ -126,17 +150,31 @@ function createListItem(list: StreamItem) {
 
     if (list.type === 'channel')
       return open('https://youtube.com' + list.url);
+    const id = list.url.slice(15);
 
     const url = list.playlistType === 'NORMAL' ? list.url.replace('?list=', 's/') : '/playlists/' + list.url.slice(-13);
 
+
     fetch(pipedInstances.value + url)
       .then(res => res.json())
-      .then(group => group.relatedStreams)
+      .then(group => {
+        listItemsContainer.dataset.token = group.nextpage;
+
+        if (group.nextpage)
+          loadMoreOnScroll(
+            <HTMLDivElement>listItemsContainer.parentElement,
+            listItemsContainer,
+            () => `playlists/${id}?nextpage=${encodeURIComponent(group.nextpage)}`
+          );
+
+        return group.relatedStreams;
+      })
       .then(streams => itemsLoader(streams))
       .then(fragment => {
         listItemsContainer.innerHTML = '';
         listItemsContainer.appendChild(fragment);
         listItemsAnchor.click();
+        listItemsContainer.scrollTo(0, 0);
       })
       .catch(err => {
         if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {

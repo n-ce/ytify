@@ -45,27 +45,32 @@ playButton.addEventListener('click', () => {
 });
 
 
+let historyID: string | undefined = '';
+let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   playButton.dataset.state = '';
-  if (!streamHistory.includes(audio.dataset.id || ''))
+  if (!streamHistory.includes(<string>audio.dataset.id))
     streamHistory.push(audio.dataset.id || '');
-  setTimeout(() => {
-    addToCollection('history', {
-      title: audio.dataset.name,
-      author: audio.dataset.author,
-      id: audio.dataset.id,
-      thumbnail: audio.dataset.thumbnail,
-      duration: audio.dataset.duration,
-      channelUrl: audio.dataset.channelUrl
-    });
+
+  historyTimeoutId = window.setTimeout(() => {
+    if (historyID === audio.dataset.id)
+      addToCollection('history', {
+        title: audio.dataset.name,
+        author: audio.dataset.author,
+        id: audio.dataset.id,
+        thumbnail: audio.dataset.thumbnail,
+        duration: audio.dataset.duration,
+        channelUrl: audio.dataset.channelUrl
+      });
   }, 1e4);
 });
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
   playButton.dataset.state = '1';
+  clearTimeout(historyTimeoutId);
 });
 
 
@@ -74,12 +79,14 @@ audio.addEventListener('loadeddata', () => {
 
   if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
     audio.play();
-
+  historyID = audio.dataset.id;
+  clearTimeout(historyTimeoutId);
 });
 
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+  clearTimeout(historyTimeoutId);
 });
 
 
