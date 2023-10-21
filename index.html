@@ -72,7 +72,7 @@
         </select>
         <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
-        <label for="favButton" class="ri-heart-line"></label>
+        <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
 
 
@@ -236,12 +236,12 @@
       </span>
 
       <div id="playerControls">
-        <button class="ri-skip-back-line" id="playPrevButton"></button>
-        <button class="ri-replay-15-line" id="seekBwdButton"></button>
-        <button class="ri-stop-circle-fill" id="playButton" data-state="1"></button>
-        <button class="ri-forward-15-line" id="seekFwdButton"></button>
-        <button class="ri-skip-forward-line" id="playNextButton"></button>
-        <button class="ri-repeat-line" id="loopButton">
+        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
+        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
+        <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-state="1"></button>
+        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
+        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
+        <button class="ri-repeat-line" id="loopButton" aria-label="loop">
         </button>
 
         <span id="volumeContainer">
