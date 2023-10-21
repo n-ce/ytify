@@ -141,6 +141,40 @@ export function createStreamItem(stream: StreamItem) {
   return streamItem;
 }
 
+function fetchList(url: string) {
+
+  fetch(pipedInstances.value + url)
+    .then(res => res.json())
+    .then(group => {
+      listContainer.dataset.token = group.nextpage;
+      if (group.nextpage)
+        loadMoreOnScroll(
+          listSection,
+          listContainer,
+          () => url.substring(1) + '?'
+        );
+      return group.relatedStreams;
+    })
+    .then(streams => itemsLoader(streams))
+    .then(fragment => {
+      listContainer.innerHTML = '';
+      listContainer.appendChild(fragment);
+      listAnchor.click();
+      listSection.scrollTo(0, 0);
+    })
+    .catch(err => {
+      if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
+        pipedInstances.selectedIndex++;
+        fetchList(url);
+        return;
+      }
+      alert(err);
+      pipedInstances.selectedIndex = 0;
+    })
+}
+
+
+
 function createListItem(list: StreamItem) {
   const listItem = document.createElement('list-item');
   listItem.textContent = list.name;
@@ -151,45 +185,15 @@ function createListItem(list: StreamItem) {
   listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
 
   listItem.addEventListener('click', () => {
-
-    if (list.type === 'channel')
-      return open('https://youtube.com' + list.url);
-    const id = list.url.slice(15);
-
-    const url = list.playlistType === 'NORMAL' ? list.url.replace('?list=', 's/') : '/playlists/' + list.url.slice(-13);
-
-
-    fetch(pipedInstances.value + url)
-      .then(res => res.json())
-      .then(group => {
-        listContainer.dataset.token = group.nextpage;
-        if (group.nextpage)
-          loadMoreOnScroll(
-            listSection,
-            listContainer,
-            () => `playlists/${id}?`
-          );
-        return group.relatedStreams;
-      })
-      .then(streams => itemsLoader(streams))
-      .then(fragment => {
-        listContainer.innerHTML = '';
-        listContainer.appendChild(fragment);
-        listAnchor.click();
-        listSection.scrollTo(0, 0);
-        // data binding for save list btn
-        listContainer.dataset.name = list.name;
-      })
-      .catch(err => {
-        if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
-          pipedInstances.selectedIndex++;
-          listItem.click();
-          return;
-        }
-        alert(err);
-        pipedInstances.selectedIndex = 0;
-      })
-  })
+    fetchList(
+      list.type === 'playlist' ?
+        list.url.replace('?list=', 's/') :
+        list.url
+    );
+    // data binding for save list & open in yt btn
+    listContainer.dataset.name = list.name;
+    listContainer.dataset.url = list.url;
+  });
   return listItem;
 }
 

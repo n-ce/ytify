@@ -48,10 +48,9 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
   db[collection][id] = data;
 
-  collection === ('discover' || 'history') ?
+  ['discover', 'history', 'favorites'].includes(collection) ?
     getCollection(collection).prepend(createCollectionItem(data)) :
     getCollection(collection).appendChild(createCollectionItem(data));
-
 
   saveDB(db);
 }
@@ -67,6 +66,11 @@ function removeFromCollection(collection: string, id: string) {
 // playlists
 
 export function createPlaylist(title: string) {
+  const library = <HTMLDivElement>document.getElementById('library');
+
+  if (library.contains(document.getElementById(title)))
+    return alert('This Playlist Already Exists!');
+
   const details = document.createElement('details');
   details.id = title;
   const summary = document.createElement('summary');
@@ -91,7 +95,7 @@ export function createPlaylist(title: string) {
   });
   details.append(summary, deleteBtn, removeBtn, div);
 
-  (<HTMLDivElement>document.getElementById('library')).appendChild(details);
+  library.appendChild(details);
 
   atpSelector.add(new Option(title, title));
 }

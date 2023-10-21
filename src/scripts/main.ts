@@ -33,22 +33,29 @@ function listToQ() {
   listContainer.childNodes.forEach(e => appendToQueuelist((<HTMLElement>e).dataset))
 }
 
+// list tools functions
 
-(<HTMLButtonElement>document.getElementById('playAllBtn')).addEventListener('click', () => {
+const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = (<HTMLSpanElement>document.getElementById('listTools')).children;
+
+playAllBtn.addEventListener('click', () => {
   clearQ();
   listToQ();
   firstItemInQueue().click();
 });
 
-(<HTMLButtonElement>document.getElementById('enqueueAllBtn')).addEventListener('click', () => {
+enqueueBtn.addEventListener('click', () => {
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
   listToQ();
 });
 
-(<HTMLButtonElement>document.getElementById('saveListBtn')).addEventListener('click', () => {
+saveListBtn.addEventListener('click', () => {
   const listTitle = <string>listContainer.dataset.name;
+
   createPlaylist(listTitle);
 
   listContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
-
 });
+
+openInYtBtn.addEventListener('click', () => {
+  open('https://youtube.com' + listContainer.dataset.url);
+})

@@ -1,7 +1,7 @@
 <div align="center">
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys) 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys) [![Tokei Lines Of Code](https://tokei.rs/b1/github/n-ce/ytify)](https://github.com/n-ce/ytify)
 
 </div>
 
