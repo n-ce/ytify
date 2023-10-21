@@ -1,19 +1,20 @@
+// import in order of site usage to minimize loading time
 import '../stylesheets/style.css';
 import './api';
 import './router';
 import './theme';
 import './search';
-import './library';
-import './miscEvents';
 import './audioEvents';
-import './queue';
+import './library';
 import './superModal';
+import './queue';
+import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
 import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
-import { img, listItemsContainer } from '../lib/dom';
+import { img, listContainer } from '../lib/dom';
 import { appendToQueuelist, clearQ, firstItemInQueue } from './queue';
 import { addToCollection, createPlaylist } from './library';
 
@@ -27,14 +28,9 @@ streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/y
 
 // temporary location for these functions below because i couldnt decide where to put them
 
-const playlistContainer = <HTMLDivElement>document.getElementById('playlist');
 
 function listToQ() {
-
-  const children = <HTMLCollectionOf<HTMLElement>>playlistContainer.children;
-
-  for (const child of children)
-    appendToQueuelist(child.dataset)
+  listContainer.childNodes.forEach(e => appendToQueuelist((<HTMLElement>e).dataset))
 }
 
 
@@ -45,14 +41,14 @@ function listToQ() {
 });
 
 (<HTMLButtonElement>document.getElementById('enqueueAllBtn')).addEventListener('click', () => {
-  if (firstItemInQueue().matches('h1')) firstItemInQueue().remove();
+  if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
   listToQ();
 });
 
 (<HTMLButtonElement>document.getElementById('saveListBtn')).addEventListener('click', () => {
-  const listTitle = <string>listItemsContainer.dataset.name
+  const listTitle = <string>listContainer.dataset.name;
   createPlaylist(listTitle);
 
-  playlistContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
+  listContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
 
 });

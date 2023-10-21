@@ -56,7 +56,7 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
   saveDB(db);
 }
 
-export function removeFromCollection(collection: string, id: string) {
+function removeFromCollection(collection: string, id: string) {
   const db = getDB();
   delete db[collection][id];
   getCollection(collection).querySelector(`[data-id="${id}"]`)?.remove();
@@ -97,8 +97,8 @@ export function createPlaylist(title: string) {
 }
 
 
-// setup initial data
-addEventListener('DOMContentLoaded', () => {
+// setup initial data after 1.5s to speedup initial load
+setTimeout(() => {
   const initialData = getDB();
 
   const initialKeys = Object.keys(initialData);
@@ -126,7 +126,7 @@ addEventListener('DOMContentLoaded', () => {
   for (const collection in initialData)
     for (const stream in initialData[collection])
       addToCollection(collection, initialData[collection][stream]);
-});
+}, 1500);
 
 // favorites button & data
 

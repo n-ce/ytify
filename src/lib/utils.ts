@@ -1,4 +1,4 @@
-import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -162,23 +162,23 @@ function createListItem(list: StreamItem) {
     fetch(pipedInstances.value + url)
       .then(res => res.json())
       .then(group => {
-        listItemsContainer.dataset.token = group.nextpage;
+        listContainer.dataset.token = group.nextpage;
         if (group.nextpage)
           loadMoreOnScroll(
-            <HTMLDivElement>listItemsContainer.parentElement,
-            listItemsContainer,
+            listSection,
+            listContainer,
             () => `playlists/${id}?`
           );
         return group.relatedStreams;
       })
       .then(streams => itemsLoader(streams))
       .then(fragment => {
-        listItemsContainer.innerHTML = '';
-        listItemsContainer.appendChild(fragment);
-        listItemsAnchor.click();
-        listItemsContainer.scrollTo(0, 0);
+        listContainer.innerHTML = '';
+        listContainer.appendChild(fragment);
+        listAnchor.click();
+        listSection.scrollTo(0, 0);
         // data binding for save list btn
-        listItemsContainer.dataset.name = list.name;
+        listContainer.dataset.name = list.name;
       })
       .catch(err => {
         if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
