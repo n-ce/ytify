@@ -48,7 +48,10 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
   db[collection][id] = data;
 
-  getCollection(collection).prepend(createCollectionItem(data));
+  collection === ('discover' || 'history') ?
+    getCollection(collection).prepend(createCollectionItem(data)) :
+    getCollection(collection).appendChild(createCollectionItem(data));
+
 
   saveDB(db);
 }

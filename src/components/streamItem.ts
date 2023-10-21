@@ -19,11 +19,16 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('error', () => {
-			thumbnail.src = imgUrl(this.dataset.id || '', 'hqdefault');
+			thumbnail.src = imgUrl(
+				<string>this.dataset.id,
+				(thumbnail.src.includes('hqdefault') ? 'hq720' : 'hqdefault')
+			);
 		});
 		thumbnail.addEventListener('load', () => {
-			if (thumbnail.naturalWidth !== 120)
-				['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+			if (thumbnail.naturalWidth === 120)
+				return thumbnail.src = <string>this.dataset.pipedImg;
+			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+
 		});
 
 
@@ -73,16 +78,8 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img') && data.thumbnail) {
-			const pipedImg = data.thumbnail;
-			thumbnail.src = data.thumbnail = imgUrl(data.id || '', 'mqdefault');
-			thumbnail.addEventListener('load', () => {
-				if (thumbnail.naturalWidth === 120)
-					thumbnail.src = data.thumbnail = pipedImg;
-			});
-
-			thumbnail.addEventListener('error', () => {
-				thumbnail.src = data.thumbnail = imgUrl(data.id || '', 'hq720');
-			});
+			data.pipedImg = data.thumbnail;
+			thumbnail.src = imgUrl(<string>data.id, 'mqdefault');
 
 			data.avatar ?
 				avatar.src = data.avatar :
