@@ -4,7 +4,7 @@ import { getSaved, save } from "../lib/utils";
 
 
 const defURL = 'https://pipedapi.kavin.rocks';
-const [initial_name, initial_url] = (getSaved('pipedInstance')?.split('|') || ['kavin.rocks (Official) 🌐', defURL]);
+const [initial_name, initial_url] = getSaved('pipedInstance')?.split('|') || ['kavin.rocks (Official) 🌐', defURL];
 
 pipedInstances.add(new Option(initial_name, initial_url, undefined, true));
 

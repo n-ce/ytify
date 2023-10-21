@@ -28,13 +28,9 @@ export default function discover(relatedStreams: StreamItem[], rootID: string, d
   // sorted the array form of merged objects because objects are not sortable
   const sortedArray = Object.entries(db.discover).sort((a, b) => <number>a[1].frequency - <number>b[1].frequency);
 
-
   // obliterate the previous discover
   db.discover = {};
-  getCollection('discover').innerHTML =
-    `<summary>
-       <i class="ri-compass-3-line"></i> Discover
-     </summary>`;
+  getCollection('discover').innerHTML = '';
 
   // generate new discover
   sortedArray.forEach(i => {
@@ -42,6 +38,5 @@ export default function discover(relatedStreams: StreamItem[], rootID: string, d
     if ((<number>i[1].frequency) > 1)
       getCollection('discover').prepend(createCollectionItem(i[1]));
   });
-
   saveDB(db);
 }

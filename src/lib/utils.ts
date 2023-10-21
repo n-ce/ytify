@@ -177,6 +177,8 @@ function createListItem(list: StreamItem) {
         listItemsContainer.appendChild(fragment);
         listItemsAnchor.click();
         listItemsContainer.scrollTo(0, 0);
+        // data binding for save list btn
+        listItemsContainer.dataset.name = list.name;
       })
       .catch(err => {
         if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {

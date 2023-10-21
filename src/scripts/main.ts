@@ -13,8 +13,9 @@ import '../components/listItem';
 import '../components/toggleSwitch';
 import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
-import { img } from '../lib/dom';
+import { img, listItemsContainer } from '../lib/dom';
 import { appendToQueuelist, clearQ, firstItemInQueue } from './queue';
+import { addToCollection, createPlaylist } from './library';
 
 
 const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL(params.get('text'));
@@ -24,11 +25,11 @@ streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/y
 
 
 
+// temporary location for these functions below because i couldnt decide where to put them
 
-
+const playlistContainer = <HTMLDivElement>document.getElementById('playlist');
 
 function listToQ() {
-  const playlistContainer = <HTMLDivElement>document.getElementById('playlist');
 
   const children = <HTMLCollectionOf<HTMLElement>>playlistContainer.children;
 
@@ -49,5 +50,9 @@ function listToQ() {
 });
 
 (<HTMLButtonElement>document.getElementById('saveListBtn')).addEventListener('click', () => {
-  alert('this feature has not been implemented yet');
+  const listTitle = <string>listItemsContainer.dataset.name
+  createPlaylist(listTitle);
+
+  playlistContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
+
 });

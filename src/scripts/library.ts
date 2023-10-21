@@ -27,7 +27,6 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
 }
 
 
-
 export function addToCollection(collection: string, data: CollectionItem | DOMStringMap) {
   const db = getDB();
   const id = <string>data.id;
@@ -59,6 +58,39 @@ export function removeFromCollection(collection: string, id: string) {
   delete db[collection][id];
   getCollection(collection).querySelector(`[data-id="${id}"]`)?.remove();
   saveDB(db);
+}
+
+
+// playlists
+
+export function createPlaylist(title: string) {
+  const details = document.createElement('details');
+  details.id = title;
+  const summary = document.createElement('summary');
+  const i = document.createElement('i');
+  i.className = 'ri-play-list-2-line';
+  summary.append(i, ' ' + title);
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete';
+  deleteBtn.addEventListener('click', () => {
+    details.remove();
+    const db = getDB();
+    delete db[title];
+    saveDB(db);
+    (<HTMLOptionElement>atpSelector.querySelector(`[value="${title}"]`)).remove();
+  });
+  const div = document.createElement('div');
+  const removeBtn = document.createElement('button');
+  removeBtn.textContent = 'Remove';
+  removeBtn.addEventListener('click', () => {
+    div.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
+    removeBtn.classList.toggle('delete');
+  });
+  details.append(summary, deleteBtn, removeBtn, div);
+
+  (<HTMLDivElement>document.getElementById('library')).appendChild(details);
+
+  atpSelector.add(new Option(title, title));
 }
 
 
@@ -105,37 +137,4 @@ favButton.addEventListener('click', () => {
   (<HTMLLabelElement>favButton.nextElementSibling).classList.replace(icons[0], icons[1]);
   icons.reverse();
 });
-
-
-// playlists
-
-export function createPlaylist(title: string) {
-  const details = document.createElement('details');
-  details.id = title;
-  const summary = document.createElement('summary');
-  const i = document.createElement('i');
-  i.className = 'ri-play-list-2-line';
-  summary.append(i, ' ' + title);
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'Delete';
-  deleteBtn.addEventListener('click', () => {
-    details.remove();
-    const db = getDB();
-    delete db[title];
-    saveDB(db);
-    (<HTMLOptionElement>atpSelector.querySelector(`[value="${title}"]`)).remove();
-  });
-  const div = document.createElement('div');
-  const removeBtn = document.createElement('button');
-  removeBtn.textContent = 'Remove';
-  removeBtn.addEventListener('click', () => {
-    div.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
-    removeBtn.classList.toggle('delete');
-  });
-  details.append(summary, deleteBtn, removeBtn, div);
-
-  (<HTMLDivElement>document.getElementById('library')).appendChild(details);
-  atpSelector.add(new Option(title, title));
-}
-
 

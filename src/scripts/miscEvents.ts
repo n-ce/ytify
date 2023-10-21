@@ -50,7 +50,6 @@ qualitySwitch.addEventListener('click', async () => {
 })
 
 
-
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 
 fullscreenSwitch.addEventListener('click', () => {
@@ -80,22 +79,6 @@ thumbnailSwitch.addEventListener('click', () => {
   }
   img.classList.toggle('hide');
 });
-
-
-const librarySwitch = <HTMLElement>document.getElementById('librarySwitch');
-
-
-librarySwitch.addEventListener('click', () => {
-  (<HTMLAnchorElement>document.getElementById('/library')).classList.toggle('hide');
-  getSaved('library') ?
-    localStorage.removeItem('library') :
-    save('library', 'off');
-})
-
-if (getSaved('library') === 'off') {
-  librarySwitch.setAttribute('checked', '');
-  (<HTMLAnchorElement>document.getElementById('/library')).classList.toggle('hide');
-}
 
 
 const deleteButton = <HTMLAnchorElement>document.getElementById('deleteButton');
