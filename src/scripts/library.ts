@@ -98,46 +98,45 @@ export function createPlaylist(title: string) {
 
 
 // setup initial data
+addEventListener('DOMContentLoaded', () => {
+  const initialData = getDB();
 
-const initialData = getDB();
+  const initialKeys = Object.keys(initialData);
 
-const initialKeys = Object.keys(initialData);
+  for (let i = 0; i < initialKeys.length; i++) {
+    if (i > 2) {
+      createPlaylist(initialKeys[i]);
+      continue;
+    }
+    const container = getCollection(initialKeys[i]);
+    const [clearBtn, removeBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
 
-for (let i = 0; i < initialKeys.length; i++) {
-  if (i > 2) {
-    createPlaylist(initialKeys[i]);
-    continue;
+    clearBtn.addEventListener('click', () => {
+      const db = getDB();
+      db[initialKeys[i]] = {};
+      saveDB(db);
+      container.innerHTML = '';
+    })
+    removeBtn.addEventListener('click', () => {
+      container.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
+      removeBtn.classList.toggle('delete');
+    })
   }
-  const container = getCollection(initialKeys[i]);
-  const [clearBtn, removeBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
 
-  clearBtn.addEventListener('click', () => {
-    const db = getDB();
-    db[initialKeys[i]] = {};
-    saveDB(db);
-    container.innerHTML = '';
-  })
-  removeBtn.addEventListener('click', () => {
-    container.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
-    removeBtn.classList.toggle('delete');
-  })
-}
-
-for (const collection in initialData)
-  for (const stream in initialData[collection])
-    addToCollection(collection, initialData[collection][stream]);
-
+  for (const collection in initialData)
+    for (const stream in initialData[collection])
+      addToCollection(collection, initialData[collection][stream]);
+});
 
 // favorites button & data
 
-const icons = ['ri-heart-line', 'ri-heart-fill'];
 favButton.addEventListener('click', () => {
-  if (!audio.dataset.id) return;
+  const id = audio.dataset.id;
+  if (!id) return;
   favButton.checked ?
     addToCollection('favorites', audio.dataset) :
-    removeFromCollection('favorites', <string>audio.dataset.id);
+    removeFromCollection('favorites', id);
 
-  (<HTMLLabelElement>favButton.nextElementSibling).classList.replace(icons[0], icons[1]);
-  icons.reverse();
+  (<HTMLLabelElement>favButton.nextElementSibling).classList.toggle('ri-heart-fill');
 });
 
