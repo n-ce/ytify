@@ -1,7 +1,7 @@
 <div align="center">
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys) [![Tokei Lines Of Code](https://tokei.rs/b1/github/n-ce/ytify)](https://github.com/n-ce/ytify)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys) [![Tokei Lines Of Code](https://tokei.rs/b1/github/n-ce/ytify?style=flat&color=black)](https://github.com/n-ce/ytify)
 
 </div>
 
@@ -49,8 +49,8 @@ npm run dev -- --open
  
 ## Usage 👆
 1. Visit the [Production Deployment](https://ytify.netlify.app/), or if you've installed the project, wherever you're hosting it.
-2. Change the bitrate of the content you're streaming on the "Home" tab.
-3. Use the "Search" tab to search for streams with keywords or a direct URL.
+2. Change the bitrate of the content you're streaming on the `Home` tab.
+3. Use the `Search` tab to search for streams with keywords or a direct URL.
 4. Click on a stream to open a menu to either play, enqueue, or start a Radio of similar tracks and various other actions.
 5. Enjoy listening to music, podcast episodes, or other forms of audio even under low network conditions.
 6. Finding something new? Head over to `Discover` on the Library Tab.
@@ -64,15 +64,15 @@ npm run dev -- --open
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
 
 ## Contributing 📋
-> Actively Looking For Contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
+> We are actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
 
 ## Acknowledgements 🙏
 - [Piped](https://github.com/teampiped/piped) - Powerful YouTube API
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms.
-- [Vite](https://vitejs.dev)
-- [Autoprefixer](https://github.com/postcss/autoprefixer)
-- [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution
-- [Google Fonts](https://fonts.google.com) - NotoSans Font
+- [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
+- [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
+- [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution.
+- [Google Fonts](https://fonts.google.com) - NotoSans Font.
 
 
