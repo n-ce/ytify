@@ -1,15 +1,9 @@
-import { audio, bitrateSelector, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
-import { convertSStoHHMMSS, getSaved, itemsLoader, params, parseTTML, setMetaData } from "./utils";
+import { audio, bitrateSelector, favButton, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
+import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
+import discover from "../scripts/discover";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
-interface Opus {
-  urls: string[],
-  bitrates: number[]
-}
-interface M4A extends Opus {
-  options: HTMLOptionElement[]
-}
 
 export default async function player(id: string | null = '') {
 
@@ -111,13 +105,6 @@ export default async function player(id: string | null = '') {
   }
 
 
-  // load related streams
-  const relatedStreamsContainer = <HTMLElement>document.getElementById('related');
-
-  relatedStreamsContainer.innerHTML = '';
-  relatedStreamsContainer.appendChild(itemsLoader(data.relatedStreams));
-
-
   params.set('s', id);
 
   if (location.pathname === '/')
@@ -125,7 +112,21 @@ export default async function player(id: string | null = '') {
 
   audio.dataset.id = id;
   audio.dataset.thumbnail = data.thumbnailUrl;
-  audio.dataset.name = data.title;
+  audio.dataset.title = data.title;
   audio.dataset.author = data.uploader;
   audio.dataset.duration = convertSStoHHMMSS(data.duration);
+  audio.dataset.channelUrl = data.uploaderUrl;
+
+
+  const db = getDB();
+
+  // reset & set favbutton state
+
+  if (favButton.checked) favButton.click();
+  if (db.favorites.hasOwnProperty(id)) favButton.click();
+
+  // load related streams into discovery data after 10 seconds of constant playback
+
+  setTimeout(discover, 1e4, data.relatedStreams, id, db);
+
 }

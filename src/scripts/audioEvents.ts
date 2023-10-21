@@ -1,6 +1,7 @@
 import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, params } from "../lib/utils";
+import { convertSStoHHMMSS, getCollection, params } from "../lib/utils";
+import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
@@ -44,18 +45,25 @@ playButton.addEventListener('click', () => {
 });
 
 
+let historyID: string | undefined = '';
+let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   playButton.dataset.state = '';
-  if (!streamHistory.includes(audio.dataset.id || ''))
+  if (!streamHistory.includes(<string>audio.dataset.id))
     streamHistory.push(audio.dataset.id || '');
-
+  if ((<HTMLElement>getCollection('history').firstElementChild)?.dataset.id !== audio.dataset.id)
+    historyTimeoutId = window.setTimeout(() => {
+      if (historyID === audio.dataset.id)
+        addToCollection('history', audio.dataset);
+    }, 1e4);
 });
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
   playButton.dataset.state = '1';
+  clearTimeout(historyTimeoutId);
 });
 
 
@@ -64,12 +72,14 @@ audio.addEventListener('loadeddata', () => {
 
   if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
     audio.play();
-
+  historyID = audio.dataset.id;
+  clearTimeout(historyTimeoutId);
 });
 
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+  clearTimeout(historyTimeoutId);
 });
 
 
@@ -135,13 +145,7 @@ loopButton.addEventListener('click', () => {
 
 playPrevButton.addEventListener('click', () => {
   if (streamHistory.length > 1) {
-    appendToQueuelist({
-      title: audio.dataset.name,
-      author: audio.dataset.author,
-      id: audio.dataset.id,
-      thumbnail: audio.dataset.thumbnail,
-      duration: audio.dataset.duration
-    }, true);
+    appendToQueuelist(audio.dataset, true);
     streamHistory.pop();
     player(streamHistory[streamHistory.length - 1]);
   }

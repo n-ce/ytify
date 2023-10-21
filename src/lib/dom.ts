@@ -18,10 +18,18 @@ export const superModal = <HTMLDivElement>document.getElementById('superModal');
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
-export const listItemsContainer = <HTMLDivElement>document.getElementById('playlist');
+export const listSection = <HTMLDivElement>document.getElementById('list');
 
-export const listItemsAnchor = <HTMLAnchorElement>document.getElementById('/list');
+export const listContainer = <HTMLDivElement>document.getElementById('playlist');
+
+export const listAnchor = <HTMLAnchorElement>document.getElementById('/list');
 
 export const subtitleContainer = <HTMLElement>document.getElementById('subtitleContainer');
+
 export const subtitleSelector = <HTMLSelectElement>document.getElementById('subtitleSelector');
+
 export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
+
+export const favButton = <HTMLInputElement>document.getElementById('favButton');
+// Add To Playlist Selector
+export const atpSelector = <HTMLSelectElement>document.getElementById('playlistSelector');

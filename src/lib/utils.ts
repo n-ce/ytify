@@ -1,4 +1,4 @@
-import { audio, img, listItemsAnchor, listItemsContainer, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -8,6 +8,12 @@ export const params = (new URL(location.href)).searchParams;
 export const save = localStorage.setItem.bind(localStorage);
 
 export const getSaved = localStorage.getItem.bind(localStorage);
+
+export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
+
+export const saveDB = (data: Library) => save('library', JSON.stringify(data));
+
+export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -29,6 +35,34 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
+let api = 0;
+export const loadMoreResults = async (urlComponent: string, token: string) =>
+  fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent + 'nextpage=' + encodeURIComponent(token))
+    .then(res => res.json())
+    .catch(_ => {
+      api++;
+      pipedInstances.length === api ?
+        alert(_) :
+        loadMoreResults(urlComponent, token);
+    });
+
+export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string) {
+  let currentHeight = 0;
+  container.onscroll = async () => {
+    const height = container.scrollHeight;
+    if (container.scrollTop + container.clientHeight >= height - 200 && currentHeight !== height) {
+      currentHeight = container.scrollHeight;
+      const data = await loadMoreResults(
+        urlComponent(),
+        <string>list.dataset.token
+      );
+      list.appendChild(itemsLoader(data.items || data.relatedStreams));
+      data.nextpage ?
+        list.dataset.token = data.nextpage :
+        container.onscroll = null;
+    }
+  }
+}
 
 export function setMetaData(
   id: string,
@@ -82,26 +116,8 @@ export function updatePositionState() {
   }
 }
 
-export type Item = {
-  url: string,
-  type: string,
-  name: string,
-  views: number,
-  title: string,
-  videos: number,
-  duration: number,
-  category: string,
-  thumbnail: string,
-  subscribers: number,
-  description: string,
-  playlistType: string,
-  uploaderUrl: string,
-  uploadedDate: string,
-  uploaderName: string,
-  uploaderAvatar: string
-}
 
-function createStreamItem(stream: Item) {
+export function createStreamItem(stream: StreamItem) {
   const id = stream.url.substring(9);
   const streamItem = document.createElement('stream-item');
   streamItem.dataset.id = id;
@@ -125,7 +141,7 @@ function createStreamItem(stream: Item) {
   return streamItem;
 }
 
-function createListItem(list: Item) {
+function createListItem(list: StreamItem) {
   const listItem = document.createElement('list-item');
   listItem.textContent = list.name;
   listItem.dataset.thumbnail = list.thumbnail;
@@ -138,17 +154,31 @@ function createListItem(list: Item) {
 
     if (list.type === 'channel')
       return open('https://youtube.com' + list.url);
+    const id = list.url.slice(15);
 
     const url = list.playlistType === 'NORMAL' ? list.url.replace('?list=', 's/') : '/playlists/' + list.url.slice(-13);
 
+
     fetch(pipedInstances.value + url)
       .then(res => res.json())
-      .then(group => group.relatedStreams)
+      .then(group => {
+        listContainer.dataset.token = group.nextpage;
+        if (group.nextpage)
+          loadMoreOnScroll(
+            listSection,
+            listContainer,
+            () => `playlists/${id}?`
+          );
+        return group.relatedStreams;
+      })
       .then(streams => itemsLoader(streams))
       .then(fragment => {
-        listItemsContainer.innerHTML = '';
-        listItemsContainer.appendChild(fragment);
-        listItemsAnchor.click();
+        listContainer.innerHTML = '';
+        listContainer.appendChild(fragment);
+        listAnchor.click();
+        listSection.scrollTo(0, 0);
+        // data binding for save list btn
+        listContainer.dataset.name = list.name;
       })
       .catch(err => {
         if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -165,7 +195,7 @@ function createListItem(list: Item) {
 
 
 
-export function itemsLoader(itemsArray: Item[]): DocumentFragment {
+export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
   if (!itemsArray.length)
     throw new Error('No Data Found');
   const fragment = document.createDocumentFragment();

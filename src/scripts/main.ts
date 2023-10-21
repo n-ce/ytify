@@ -1,20 +1,22 @@
+// import in order of site usage to minimize loading time
 import '../stylesheets/style.css';
 import './api';
 import './router';
 import './theme';
 import './search';
-import './library';
-import './miscEvents';
 import './audioEvents';
-import './queue';
+import './library';
 import './superModal';
+import './queue';
+import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
 import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
-import { img } from '../lib/dom';
+import { img, listContainer } from '../lib/dom';
 import { appendToQueuelist, clearQ, firstItemInQueue } from './queue';
+import { addToCollection, createPlaylist } from './library';
 
 
 const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL(params.get('text'));
@@ -23,24 +25,12 @@ const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL
 streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/ytify_thumbnail_min.webp';
 
 
-const favButton = <HTMLElement>(<HTMLButtonElement>document.getElementById('favButton')).nextElementSibling;
-const icons = ['ri-heart-line', 'ri-heart-fill'];
-favButton.addEventListener('click', () => {
-  alert('this feature is being tested')
-  favButton.classList.replace(icons[0], icons[1]);
-  icons.reverse();
-})
 
-
+// temporary location for these functions below because i couldnt decide where to put them
 
 
 function listToQ() {
-  const playlistContainer = <HTMLDivElement>document.getElementById('playlist');
-
-  const children = <HTMLCollectionOf<HTMLElement>>playlistContainer.children;
-
-  for (const child of children)
-    appendToQueuelist(child.dataset)
+  listContainer.childNodes.forEach(e => appendToQueuelist((<HTMLElement>e).dataset))
 }
 
 
@@ -51,10 +41,14 @@ function listToQ() {
 });
 
 (<HTMLButtonElement>document.getElementById('enqueueAllBtn')).addEventListener('click', () => {
-  if (firstItemInQueue().matches('h1')) firstItemInQueue().remove();
+  if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
   listToQ();
 });
 
 (<HTMLButtonElement>document.getElementById('saveListBtn')).addEventListener('click', () => {
-  alert('this feature has not been implemented yet');
+  const listTitle = <string>listContainer.dataset.name;
+  createPlaylist(listTitle);
+
+  listContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
+
 });

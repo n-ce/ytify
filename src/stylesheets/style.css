@@ -129,13 +129,25 @@ details {
   padding: 2vmin;
   margin-bottom: 4vmin;
   border: var(--border);
-  border-radius: var(--roundness)
+  border-radius: var(--roundness);
+}
+
+details>div {
+  margin-top: 3vmin;
 }
 
 details>summary {
   list-style: none;
   font-size: larger;
+  transition: all 0.3s ease-in-out;
 }
+
+details[open]>summary {
+  font-size: xx-large;
+  margin-bottom: 3vmin;
+}
+
+
 
 a {
   text-decoration: none;
@@ -172,7 +184,8 @@ list-item:hover {
 
 #queuetools button,
 #searchlist+button,
-#listTools button {
+#listTools button,
+details button {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);

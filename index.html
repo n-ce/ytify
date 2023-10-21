@@ -46,11 +46,7 @@
       <i class="ri-search-2-line"></i>
       <p>Search</p>
     </a>
-    <a href="/related" id="/related">
-      <i class="ri-node-tree"></i>
-      <p>Related</p>
-    </a>
-    <a href="/library" id="/library" class="hide">
+    <a href="/library" id="/library">
       <i class="ri-stack-line"></i>
       <p>Library</p>
     </a>
@@ -69,14 +65,14 @@
       <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.2</a>
+        <a id="title" href="" target="_blank">ytify 6.3</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
         </select>
         <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
-        <label for="favButton" class="ri-heart-line"></label>
+        <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
 
 
@@ -136,28 +132,37 @@
       </div>
     </section>
 
-
-    <section id="related">
-      <h1>Streams related to your current playing stream show up here.</h1>
-    </section>
-
-
     <section id="library">
-      <details>
-        <summary id="history">
+
+      <details id="discover">
+        <summary>
+          <i class="ri-compass-3-line"></i> Discover
+        </summary>
+        <button>Clear All</button>
+        <button>Remove</button>
+        <div>
+          <h2>Listen more to discover more.</h2>
+        </div>
+      </details>
+
+      <details id="history">
+        <summary>
           <i class="ri-history-line"></i> History
         </summary>
+        <button>Clear All</button>
+        <button>Remove</button>
+        <div></div>
       </details>
-      <details>
-        <summary id="favorites">
+
+      <details id="favorites">
+        <summary>
           <i class="ri-heart-fill"></i> Favorites
         </summary>
+        <button>Clear All</button>
+        <button>Remove</button>
+        <div></div>
       </details>
-      <details>
-        <summary>
-          <i class="ri-play-list-2-line"></i> Playlists
-        </summary>
-      </details>
+
     </section>
 
 
@@ -178,7 +183,6 @@
       <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
-      <toggle-switch id="librarySwitch" class="hide">Disable Library</toggle-switch>
 
       <span>
         <label for="roundnessChanger">UI Roundness</label>
@@ -192,7 +196,7 @@
 
       <a href="/" id="deleteButton">Clear All Stored Data</a>
 
-      <a href="https://github.com/n-ce/ytify/" target="_blank">Contribute on Github</a>
+      <a href="https://github.com/n-ce/ytify/" target="_blank">View on Github</a>
 
       <a href="https://t.me/encetg" target="_blank">Contact on Telegram</a>
 
@@ -232,12 +236,12 @@
       </span>
 
       <div id="playerControls">
-        <button class="ri-skip-back-line" id="playPrevButton"></button>
-        <button class="ri-replay-15-line" id="seekBwdButton"></button>
-        <button class="ri-stop-circle-fill" id="playButton" data-state="1"></button>
-        <button class="ri-forward-15-line" id="seekFwdButton"></button>
-        <button class="ri-skip-forward-line" id="playNextButton"></button>
-        <button class="ri-repeat-line" id="loopButton">
+        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
+        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
+        <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-state="1"></button>
+        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
+        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
+        <button class="ri-repeat-line" id="loopButton" aria-label="loop">
         </button>
 
         <span id="volumeContainer">
@@ -267,6 +271,7 @@
         <i class="ri-play-list-add-line"></i>
         <select id="playlistSelector">
           <option>Add To Playlist</option>
+          <option value="+pl">Create New Playlist</option>
         </select>
       </li>
       <li><i class="ri-rfid-line"></i>Start Radio</li>

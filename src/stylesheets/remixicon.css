@@ -59,10 +59,6 @@
   content: "\f0ee";
 }
 
-.ri-node-tree:before {
-  content: "\ef90";
-}
-
 .ri-loader-3-line:before {
   content: "\eec4";
 }
@@ -137,4 +133,8 @@
 
 .ri-play-list-2-line:before {
   content: "\f00d";
+}
+
+.ri-compass-3-line:before {
+  content: "\ebbe";
 }

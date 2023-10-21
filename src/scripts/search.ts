@@ -1,41 +1,13 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { getSaved, save, itemsLoader, idFromURL, params } from "../lib/utils";
+import { getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, loadMoreOnScroll } from "../lib/utils";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
-let token = '';
 
-const loadMoreResults = async (api = 0) =>
-  fetch(
-    `${pipedInstances.options[api].value}/nextpage/search?nextpage=${encodeURIComponent(token)}&q=${superInput.value}&filter=${searchFilters.value}`
-  )
-    .then(res => res.json())
-    .catch(_ => {
-      if (pipedInstances.length === api)
-        return alert(_);
-      loadMoreResults(api + 1);
-    });
-
-
-// autoload on scroll end
-
-const searchContainer = <HTMLDivElement>searchlist.parentElement; /* actually a section but div will do as well */
-
-let currentHeight = 0;
-searchContainer.addEventListener('scroll', async () => {
-  const height = searchContainer.scrollHeight;
-  if (searchContainer.scrollTop + searchContainer.clientHeight >= height - 10 && currentHeight !== height) {
-    currentHeight = searchContainer.scrollHeight;
-    if (!token) return;
-    const data = await loadMoreResults();
-    token = data.nextpage;
-    searchlist.appendChild(itemsLoader(data.items));
-  }
-});
 
 
 // Get search results of input
@@ -47,15 +19,29 @@ const searchLoader = () => {
 
   searchlist.innerHTML = '';
 
-  fetch(pipedInstances.value + '/search?q=' + text + '&filter=' + searchFilters.value)
+  const searchQuery = '?q=' + superInput.value;
+  const filterQuery = '&filter=' + searchFilters.value;
+
+  superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
+
+  const query = 'search' + searchQuery + filterQuery;
+
+  fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
-      token = searchResults.nextpage;
-
+      searchlist.dataset.token = searchResults.nextpage;
+      loadMoreOnScroll(
+        <HTMLDivElement>searchlist.parentElement,
+        searchlist,
+        () => query + '&'
+      );
       if (sortSwitch.hasAttribute('checked')) {
         for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults();
-          token = data.nextpage;
+          const data = await loadMoreResults(
+            query + '&',
+            <string>searchlist.dataset.token
+          );
+          searchlist.dataset.token = data.nextpage;
           searchResults.items = searchResults.items.concat(data.items);
         }
         searchResults.items.sort((
@@ -79,11 +65,7 @@ const searchLoader = () => {
       pipedInstances.selectedIndex = 0;
     });
 
-  const searchQuery = '?q=' + superInput.value;
-  const filterQuery = searchFilters.value === 'all' ? '' : '&f=' + searchFilters.value;
-  superInput.dataset.query = searchQuery + filterQuery;
-
-  history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query);
+  history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query.replace('filter', 'f'));
   suggestions.style.display = 'none';
 }
 

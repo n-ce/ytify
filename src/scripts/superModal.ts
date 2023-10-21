@@ -1,9 +1,10 @@
-import { pipedInstances, superModal } from "../lib/dom";
+import { atpSelector, pipedInstances, superModal } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS } from "../lib/utils";
+import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
-const [playNow, enqueue, atpContainer, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
 
 
@@ -20,9 +21,8 @@ playNow.addEventListener('click', () => {
 });
 
 
-
 enqueue.addEventListener('click', () => {
-  if (firstItemInQueue().matches('h1'))
+  if (firstItemInQueue()?.matches('h1'))
     firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
   superModal.classList.toggle('hide');
@@ -73,14 +73,21 @@ startRadio.addEventListener('click', async () => {
 });
 
 
-const atpSelector = <HTMLSelectElement>atpContainer.lastElementChild;
-
-atpContainer.addEventListener('click', () => {
-
-})
 
 atpSelector.addEventListener('change', () => {
+  let title;
+  if (!atpSelector.value) return;
+  if (atpSelector.value === '+pl') {
+    title = prompt('Playlist Title')
+    if (title)
+      createPlaylist(title);
+  }
+  else title = atpSelector.value;
 
+  if (title)
+    addToCollection(title, superModal.dataset);
+  superModal.classList.toggle('hide');
+  atpSelector.selectedIndex = 0;
 });
 
 
