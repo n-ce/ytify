@@ -1,5 +1,6 @@
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
+import { $ } from "../lib/utils";
 
 const queueArray: string[] = [];
 
@@ -16,7 +17,7 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queueArray.unshift(data.id) :
     queueArray.push(data.id);
 
-  const listItem = document.createElement('stream-item');
+  const listItem = $('stream-item');
   listItem.textContent = data.title || '';
   listItem.dataset.author = data.author;
   listItem.dataset.thumbnail = data.thumbnail;

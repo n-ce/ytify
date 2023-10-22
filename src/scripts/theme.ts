@@ -1,11 +1,11 @@
 import { img } from "../lib/dom";
-import { getSaved, save } from "../lib/utils";
+import { $, getSaved, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
-const canvas = <HTMLCanvasElement>document.createElement('canvas');
+const canvas = <HTMLCanvasElement>$('canvas');
 const context = canvas.getContext('2d');
 const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');

@@ -5,6 +5,8 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 
 export const params = (new URL(location.href)).searchParams;
 
+export const $ = document.createElement.bind(document);
+
 export const save = localStorage.setItem.bind(localStorage);
 
 export const getSaved = localStorage.getItem.bind(localStorage);
@@ -123,7 +125,7 @@ export function updatePositionState() {
 
 export function createStreamItem(stream: StreamItem) {
   const id = stream.url.substring(9);
-  const streamItem = document.createElement('stream-item');
+  const streamItem = $('stream-item');
   streamItem.dataset.id = id;
   streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
@@ -179,7 +181,7 @@ export function fetchList(url: string) {
 
 
 function createListItem(list: StreamItem) {
-  const listItem = document.createElement('list-item');
+  const listItem = $('list-item');
   listItem.textContent = list.name;
   listItem.dataset.thumbnail = list.thumbnail;
   listItem.dataset.uploaderData = list.description || list.uploaderName || '';
@@ -225,7 +227,7 @@ function loadParser() {
   // Dynamically Loading Library on Demand only
   if (loaded)
     return true;
-  const imscript = document.createElement('script');
+  const imscript = $('script');
   imscript.src = 'https://unpkg.com/imsc/dist/imsc.all.min.js';
   imscript.type = 'text/javascript';
   document.head.appendChild(imscript);

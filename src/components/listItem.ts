@@ -1,4 +1,4 @@
-import { blankImage, getSaved } from '../lib/utils';
+import { $, blankImage, getSaved } from '../lib/utils';
 import css from './listItem.css?inline';
 customElements.define('list-item', class extends HTMLElement {
   constructor() {
@@ -7,28 +7,28 @@ customElements.define('list-item', class extends HTMLElement {
 
     const root = <ShadowRoot>this.shadowRoot;
 
-    const style = document.createElement('style');
+    const style = $('style');
     style.textContent = css;
 
-    const img = document.createElement('img');
+    const img = $('img');
     img.id = 'thumbnail';
     img.loading = 'lazy';
     img.onerror = () => img.src = blankImage;
 
-    const div = document.createElement('div');
+    const div = $('div');
 
-    const name = document.createElement('slot');
+    const name = $('slot');
 
-    const uploaderData = document.createElement('p');
+    const uploaderData = $('p');
     uploaderData.id = 'uData';
 
-    const stats = document.createElement('p');
+    const stats = $('p');
     stats.id = 'stats';
     div.append(name, uploaderData, stats);
 
     root.append(style, img, div);
-
   }
+
   connectedCallback() {
     const root = <ShadowRoot>this.shadowRoot;
     const data = <DOMStringMap>this.dataset;

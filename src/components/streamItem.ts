@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { blankImage, getSaved, imgUrl } from '../lib/utils';
+import { $, blankImage, getSaved, imgUrl } from '../lib/utils';
 
 
 customElements.define('stream-item', class extends HTMLElement {
@@ -9,12 +9,12 @@ customElements.define('stream-item', class extends HTMLElement {
 
 		const root = <ShadowRoot>this.shadowRoot;
 
-		const style = document.createElement('style');
+		const style = $('style');
 		style.textContent = css;
 
-		const span = document.createElement('span');
+		const span = $('span');
 
-		const thumbnail = document.createElement('img');
+		const thumbnail = $('img');
 		thumbnail.crossOrigin = 'anonymous';
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
@@ -31,44 +31,42 @@ customElements.define('stream-item', class extends HTMLElement {
 				return;
 			}
 			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
-
 		});
 
-
-		const duration = document.createElement('p');
+		const duration = $('p');
 		duration.id = 'duration';
 
 		span.append(thumbnail, duration);
-		const metadata = document.createElement('div');
+		const metadata = $('div');
 		metadata.id = 'metadata';
 
-		const aau = document.createElement('div');
+		const aau = $('div');
 		aau.id = 'aau';
 
-		const slot = document.createElement('slot');
+		const slot = $('slot');
 
-		const avu = document.createElement('div');
+		const avu = $('div');
 		avu.id = 'avu';
 
-		const avatar = document.createElement('img');
+		const avatar = $('img');
 		avatar.id = 'avatar';
 		avatar.loading = 'lazy';
 
-		const author = document.createElement('p');
+		const author = $('p');
 		author.id = 'author';
 		avatar.addEventListener('error', () => {
 			avatar.src = blankImage;
 		});
 
-		const viewsXuploaded = document.createElement('p');
+		const viewsXuploaded = $('p');
 		viewsXuploaded.id = 'viewsXuploaded';
 
 		avu.append(author, viewsXuploaded);
 		aau.append(avatar, avu);
 		metadata.append(slot, aau);
 		root.append(style, span, metadata);
-
 	}
+
 	connectedCallback() {
 
 		const root = <ShadowRoot>this.shadowRoot;

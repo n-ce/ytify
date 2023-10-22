@@ -1,11 +1,11 @@
 import { atpSelector, audio, favButton, superModal } from "../lib/dom";
-import { getCollection, getDB, saveDB } from "../lib/utils";
+import { $, getCollection, getDB, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
 
-  const item = document.createElement('stream-item');
+  const item = $('stream-item');
   item.dataset.id = data.id;
   item.textContent = item.dataset.title = <string>data.title;
   item.dataset.author = data.author;
@@ -19,10 +19,10 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
     const _ = superModal.dataset;
     _.id = data.id;
     _.title = data.title;
-    _.thumbnail = data.thumbnail;
     _.author = data.author;
-    _.channelUrl = data.channelUrl;
     _.duration = data.duration;
+    _.thumbnail = data.thumbnail;
+    _.channelUrl = data.channelUrl;
   })
   return item;
 }
@@ -72,38 +72,56 @@ export function createPlaylist(title: string) {
   if (library.contains(document.getElementById(title)))
     return alert('This Playlist Already Exists!');
 
-  const details = document.createElement('details');
+  const details = $('details');
   details.id = title;
-  const summary = document.createElement('summary');
-  const i = document.createElement('i');
+
+  atpSelector.add(new Option(title, title));
+  const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${details.id}"]`);
+
+  const summary = $('summary');
+  const i = $('i');
   i.className = 'ri-play-list-2-line';
   summary.append(i, ' ' + title);
 
-  const deleteBtn = document.createElement('button');
+  const deleteBtn = $('button');
   deleteBtn.textContent = 'Delete';
   deleteBtn.addEventListener('click', () => {
+    atpOption.remove();
     details.remove();
     const db = getDB();
-    delete db[title];
+    delete db[details.id];
     saveDB(db);
-    (<HTMLOptionElement>atpSelector.querySelector(`[value="${title}"]`)).remove();
   });
-  const div = document.createElement('div');
-  const removeBtn = document.createElement('button');
+  const div = $('div');
+  const removeBtn = $('button');
   removeBtn.textContent = 'Remove';
   removeBtn.addEventListener('click', () => {
     div.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
     removeBtn.classList.toggle('delete');
   });
-  const enqueueBtn = document.createElement('button');
+  const enqueueBtn = $('button');
   enqueueBtn.textContent = 'Enqueue';
   enqueueBtn.onclick = () => listToQ(div);
+  const renameBtn = $('button');
+  renameBtn.textContent = 'Rename';
+  renameBtn.addEventListener('click', () => {
+    const newTitle = prompt('Enter the new title', title);
+    if (!newTitle) return;
+    atpOption.text = newTitle;
+    atpOption.value = newTitle;
+    details.id = newTitle;
+    summary.innerHTML = '';
+    summary.append(i, ' ' + newTitle);
+    const db = getDB();
+    db[newTitle] = db[title];
+    delete db[title];
+    saveDB(db);
+  });
 
-  details.append(summary, deleteBtn, removeBtn, enqueueBtn, div);
+  details.append(summary, deleteBtn, removeBtn, enqueueBtn, renameBtn, div);
 
   library.appendChild(details);
 
-  atpSelector.add(new Option(title, title));
 }
 
 

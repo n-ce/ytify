@@ -1,3 +1,4 @@
+import { $ } from '../lib/utils';
 import css from '../components/toggleSwitch.css?inline';
 
 customElements.define('toggle-switch', class extends HTMLElement {
@@ -5,12 +6,12 @@ customElements.define('toggle-switch', class extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
 
-    const style = document.createElement('style');
+    const style = $('style');
     style.textContent = css;
 
-    const label = document.createElement('label');
+    const label = $('label');
 
-    const input = document.createElement('input');
+    const input = $('input');
     input.type = 'checkbox';
 
     this.addEventListener('click', () => {
@@ -18,9 +19,9 @@ customElements.define('toggle-switch', class extends HTMLElement {
       this.toggleAttribute('checked');
     });
 
-    label.append(input, document.createElement('span'));
+    label.append(input, $('span'));
 
-    this.shadowRoot?.append(style, document.createElement('slot'), label);
+    this.shadowRoot?.append(style, $('slot'), label);
   }
 
   static get observedAttributes() {

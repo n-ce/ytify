@@ -1,6 +1,6 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, loadMoreOnScroll } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, loadMoreOnScroll } from "../lib/utils";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
@@ -102,7 +102,7 @@ superInput.addEventListener('input', async () => {
   const fragment = document.createDocumentFragment();
 
   for (const suggestion of data) {
-    const li = document.createElement('li');
+    const li = $('li');
     li.textContent = suggestion;
     li.onclick = () => {
       superInput.value = suggestion;

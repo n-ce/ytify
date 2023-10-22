@@ -1,6 +1,6 @@
-import { atpSelector, pipedInstances, superModal, upcomingBtn } from "../lib/dom";
+import { atpSelector, listContainer, pipedInstances, superModal, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, fetchList } from "../lib/utils";
+import { $, convertSStoHHMMSS, fetchList } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
@@ -103,7 +103,7 @@ downloadBtn.addEventListener('click', () => {
   })
     .then(_ => _.json())
     .then(_ => {
-      const anchor = document.createElement('a');
+      const anchor = $('a');
       anchor.href = _.url;
       anchor.click();
     })
@@ -114,6 +114,9 @@ downloadBtn.addEventListener('click', () => {
 
 
 openChannelBtn.addEventListener('click', () => {
+  // data binding for save list & open in yt btn
+  listContainer.dataset.name = superModal.dataset.author;
+  listContainer.dataset.url = superModal.dataset.channelUrl;
   fetchList(<string>superModal.dataset.channelUrl);
   superModal.classList.toggle('hide');
 })
