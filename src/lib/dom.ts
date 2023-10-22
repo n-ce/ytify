@@ -16,6 +16,8 @@ export const suggestionsSwitch = <HTMLSelectElement>document.getElementById('sug
 
 export const superModal = <HTMLDivElement>document.getElementById('superModal');
 
+export const upcomingBtn = <HTMLAnchorElement>document.getElementById('/upcoming');
+
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
 export const listSection = <HTMLDivElement>document.getElementById('list');

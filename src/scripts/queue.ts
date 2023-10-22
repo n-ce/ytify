@@ -1,4 +1,4 @@
-import { queuelist } from "../lib/dom";
+import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 
 const queueArray: string[] = [];
@@ -38,6 +38,14 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 }
 
 
+
+// clones any list items from the provided container to queue
+
+export function listToQ(container: HTMLDivElement) {
+  if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
+  container.childNodes.forEach(e => appendToQueuelist((<HTMLElement>e).dataset));
+  upcomingBtn.click();
+}
 
 export function clearQ() {
   queueArray.length = 0;

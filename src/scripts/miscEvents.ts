@@ -67,17 +67,10 @@ if (getSaved('img')) {
 }
 
 thumbnailSwitch.addEventListener('click', () => {
-
-  if (getSaved('img')) {
-
-    img.src = audio.dataset.id ? imgUrl(audio.dataset.id, 'maxresdefault') : '/ytify_thumbnail_min.webp';
-    localStorage.removeItem('img');
-  }
-  else {
-    save('img', img.src);
-    img.src = blankImage;
-  }
-  img.classList.toggle('hide');
+  getSaved('img') ?
+    localStorage.removeItem('img') :
+    localStorage.setItem('img', 'off');
+  location.reload();
 });
 
 

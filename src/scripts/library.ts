@@ -1,5 +1,6 @@
 import { atpSelector, audio, favButton, superModal } from "../lib/dom";
 import { getCollection, getDB, saveDB } from "../lib/utils";
+import { listToQ } from "./queue";
 
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
@@ -77,6 +78,7 @@ export function createPlaylist(title: string) {
   const i = document.createElement('i');
   i.className = 'ri-play-list-2-line';
   summary.append(i, ' ' + title);
+
   const deleteBtn = document.createElement('button');
   deleteBtn.textContent = 'Delete';
   deleteBtn.addEventListener('click', () => {
@@ -93,7 +95,11 @@ export function createPlaylist(title: string) {
     div.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
     removeBtn.classList.toggle('delete');
   });
-  details.append(summary, deleteBtn, removeBtn, div);
+  const enqueueBtn = document.createElement('button');
+  enqueueBtn.textContent = 'Enqueue';
+  enqueueBtn.onclick = () => listToQ(div);
+
+  details.append(summary, deleteBtn, removeBtn, enqueueBtn, div);
 
   library.appendChild(details);
 
@@ -113,7 +119,7 @@ setTimeout(() => {
       continue;
     }
     const container = getCollection(initialKeys[i]);
-    const [clearBtn, removeBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
+    const [clearBtn, removeBtn, enqueueBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
 
     clearBtn.addEventListener('click', () => {
       const db = getDB();
@@ -125,11 +131,16 @@ setTimeout(() => {
       container.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
       removeBtn.classList.toggle('delete');
     })
+
+    if (initialKeys[i] === 'favorites')
+      enqueueBtn.onclick = () => listToQ(container);
+
   }
 
   for (const collection in initialData)
     for (const stream in initialData[collection])
       addToCollection(collection, initialData[collection][stream]);
+
 }, 1500);
 
 // favorites button & data

@@ -1,6 +1,6 @@
-import { atpSelector, pipedInstances, superModal } from "../lib/dom";
+import { atpSelector, pipedInstances, superModal, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS } from "../lib/utils";
+import { convertSStoHHMMSS, fetchList } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
@@ -59,16 +59,15 @@ async function fetchMix(id: string, api = 0) {
 }
 
 
-const upcomingIcon = <HTMLElement>(<HTMLAnchorElement>document.getElementById('/upcoming')).firstElementChild;
 
 startRadio.addEventListener('click', async () => {
   superModal.classList.toggle('hide');
 
-  upcomingIcon.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
+  upcomingBtn.firstElementChild?.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
 
   await fetchMix('RD' + superModal.dataset.id)
 
-  upcomingIcon.classList.replace('ri-loader-3-line', 'ri-skip-forward-line');
+  upcomingBtn.firstElementChild?.classList.replace('ri-loader-3-line', 'ri-skip-forward-line');
 
 });
 
@@ -115,6 +114,6 @@ downloadBtn.addEventListener('click', () => {
 
 
 openChannelBtn.addEventListener('click', () => {
-  open('https://youtube.com' + superModal.dataset.channelUrl);
+  fetchList(<string>superModal.dataset.channelUrl);
   superModal.classList.toggle('hide');
 })

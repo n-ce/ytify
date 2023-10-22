@@ -82,6 +82,10 @@ export function setMetaData(
 
   const author = <HTMLAnchorElement>document.getElementById('author');
   author.href = 'https://youtube.com' + authorUrl;
+  author.onclick = _ => {
+    _.preventDefault();
+    fetchList(authorUrl);
+  }
   author.textContent = authorName;
 
   if (location.pathname === '/')
@@ -141,7 +145,7 @@ export function createStreamItem(stream: StreamItem) {
   return streamItem;
 }
 
-function fetchList(url: string) {
+export function fetchList(url: string) {
 
   fetch(pipedInstances.value + url)
     .then(res => res.json())
@@ -174,12 +178,10 @@ function fetchList(url: string) {
 }
 
 
-
 function createListItem(list: StreamItem) {
   const listItem = document.createElement('list-item');
   listItem.textContent = list.name;
   listItem.dataset.thumbnail = list.thumbnail;
-
   listItem.dataset.uploaderData = list.description || list.uploaderName || '';
 
   listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';

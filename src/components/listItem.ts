@@ -13,12 +13,7 @@ customElements.define('list-item', class extends HTMLElement {
     const img = document.createElement('img');
     img.id = 'thumbnail';
     img.loading = 'lazy';
-    img.addEventListener('error', () => {
-      img.src = blankImage;
-    });
-    img.addEventListener('load', () => {
-      ['img', 'div'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
-    })
+    img.onerror = () => img.src = blankImage;
 
     const div = document.createElement('div');
 

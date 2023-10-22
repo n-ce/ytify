@@ -15,7 +15,7 @@ import '../components/toggleSwitch';
 import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
 import { img, listContainer } from '../lib/dom';
-import { appendToQueuelist, clearQ, firstItemInQueue } from './queue';
+import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addToCollection, createPlaylist } from './library';
 
 
@@ -29,24 +29,17 @@ streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/y
 // temporary location for these functions below because i couldnt decide where to put them
 
 
-function listToQ() {
-  listContainer.childNodes.forEach(e => appendToQueuelist((<HTMLElement>e).dataset))
-}
-
 // list tools functions
 
-const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = (<HTMLSpanElement>document.getElementById('listTools')).children;
+const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
 
 playAllBtn.addEventListener('click', () => {
   clearQ();
-  listToQ();
+  listToQ(listContainer);
   firstItemInQueue().click();
 });
 
-enqueueBtn.addEventListener('click', () => {
-  if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
-  listToQ();
-});
+enqueueBtn.onclick = () => listToQ(listContainer);
 
 saveListBtn.addEventListener('click', () => {
   const listTitle = <string>listContainer.dataset.name;
@@ -56,6 +49,4 @@ saveListBtn.addEventListener('click', () => {
   listContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
 });
 
-openInYtBtn.addEventListener('click', () => {
-  open('https://youtube.com' + listContainer.dataset.url);
-})
+openInYtBtn.onclick = () => open('https://youtube.com' + listContainer.dataset.url);
