@@ -2,6 +2,7 @@ import { atpSelector, audio, favButton, superModal } from "../lib/dom";
 import { $, getCollection, getDB, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 
+const reservedCollections = ['discover', 'history', 'favorites'];
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
 
@@ -49,7 +50,7 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
   db[collection][id] = data;
 
-  ['discover', 'history', 'favorites'].includes(collection) ?
+  reservedCollections.includes(collection) ?
     getCollection(collection).prepend(createCollectionItem(data)) :
     getCollection(collection).appendChild(createCollectionItem(data));
 
@@ -131,17 +132,17 @@ setTimeout(() => {
 
   const initialKeys = Object.keys(initialData);
 
-  for (let i = 0; i < initialKeys.length; i++) {
-    if (i > 2) {
-      createPlaylist(initialKeys[i]);
+  for (const key of initialKeys) {
+    if (!reservedCollections.includes(key)) {
+      createPlaylist(key);
       continue;
     }
-    const container = getCollection(initialKeys[i]);
+    const container = getCollection(key);
     const [clearBtn, removeBtn, enqueueBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
 
     clearBtn.addEventListener('click', () => {
       const db = getDB();
-      db[initialKeys[i]] = {};
+      db[key] = {};
       saveDB(db);
       container.innerHTML = '';
     })
@@ -150,7 +151,7 @@ setTimeout(() => {
       removeBtn.classList.toggle('delete');
     })
 
-    if (initialKeys[i] === 'favorites')
+    if (key === 'favorites')
       enqueueBtn.onclick = () => listToQ(container);
 
   }
