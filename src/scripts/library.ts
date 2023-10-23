@@ -40,9 +40,6 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
   // remove previous stream if exists
   if (db[collection].hasOwnProperty(id)) {
-    if (collection === 'discover') {
-      (<number>db[collection][id].frequency)++;
-    }
     delete db[collection][id];
 
     getCollection(collection).querySelector(`[data-id="${id}"]`)?.remove();
@@ -142,7 +139,7 @@ setTimeout(() => {
 
     clearBtn.addEventListener('click', () => {
       const db = getDB();
-      db[key] = {};
+      delete db[key];
       saveDB(db);
       container.innerHTML = '';
     })
