@@ -16,7 +16,7 @@ import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
 import { img, listContainer } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { addToCollection, createPlaylist } from './library';
+import { addListToCollection, createPlaylist } from './library';
 
 
 const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL(params.get('text'));
@@ -46,7 +46,12 @@ saveListBtn.addEventListener('click', () => {
 
   createPlaylist(listTitle);
 
-  listContainer.childNodes.forEach(item => addToCollection(listTitle, (<HTMLElement>item).dataset));
+  const list: { [index: string]: DOMStringMap } = {};
+  listContainer.childNodes.forEach(_ => {
+    const data = (<HTMLElement>_).dataset;
+    list[<string>data.id] = data;
+  });
+  addListToCollection(listTitle, list);
 });
 
 openInYtBtn.onclick = () => open('https://youtube.com' + listContainer.dataset.url);

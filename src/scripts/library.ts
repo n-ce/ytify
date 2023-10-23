@@ -28,31 +28,45 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   return item;
 }
 
+function toCollection(collection: string, data: CollectionItem | DOMStringMap, db: Library) {
+  const id = <string>data.id;
+  if (db.hasOwnProperty(collection)) {
+    if (db[collection].hasOwnProperty(id)) { // delete old data if already exists
+      delete db[collection][id];
+      getCollection(collection).querySelector(`[data-id="${id}"]`)?.remove();
+    }
+  } // create if collection does not exists
+  else db[collection] = {};
+  db[collection][id] = data;
+}
 
 export function addToCollection(collection: string, data: CollectionItem | DOMStringMap) {
   const db = getDB();
-  const id = <string>data.id;
-
-  if (collection === 'discover' && <number>data.frequency < 2) return;
-
-  // create collection if it does not exist
-  if (!db.hasOwnProperty(collection)) db[collection] = {};
-
-  // remove previous stream if exists
-  if (db[collection].hasOwnProperty(id)) {
-    delete db[collection][id];
-
-    getCollection(collection).querySelector(`[data-id="${id}"]`)?.remove();
-  }
-
-  db[collection][id] = data;
-
+  toCollection(collection, data, db);
   reservedCollections.includes(collection) ?
     getCollection(collection).prepend(createCollectionItem(data)) :
     getCollection(collection).appendChild(createCollectionItem(data));
-
   saveDB(db);
 }
+
+export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
+  const fragment = document.createDocumentFragment();
+  if (collection === 'discover') {
+    db.discover = {};
+    getCollection('discover').innerHTML = '';
+  }
+  for (const key in list) {
+    const data = list[key];
+    toCollection(collection, data, db);
+    if (collection === 'discover' && <number>data.frequency < 2) continue;
+    reservedCollections.includes(collection) ?
+      fragment.prepend(createCollectionItem(data)) :
+      fragment.appendChild(createCollectionItem(data));
+  }
+  getCollection(collection).appendChild(fragment);
+  saveDB(db);
+}
+
 
 function removeFromCollection(collection: string, id: string) {
   const db = getDB();
@@ -119,12 +133,12 @@ export function createPlaylist(title: string) {
   details.append(summary, deleteBtn, removeBtn, enqueueBtn, renameBtn, div);
 
   library.appendChild(details);
-
 }
 
 
-// setup initial data after 1.5s to speedup initial load
-setTimeout(() => {
+// setup initial dom state
+
+addEventListener('DOMContentLoaded', () => {
   const initialData = getDB();
 
   const initialKeys = Object.keys(initialData);
@@ -150,14 +164,11 @@ setTimeout(() => {
 
     if (key === 'favorites')
       enqueueBtn.onclick = () => listToQ(container);
-
   }
 
   for (const collection in initialData)
-    for (const stream in initialData[collection])
-      addToCollection(collection, initialData[collection][stream]);
-
-}, 1500);
+    addListToCollection(collection, initialData[collection], initialData);
+});
 
 // favorites button & data
 

@@ -1,6 +1,6 @@
 import { audio, bitrateSelector, favButton, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
-import { convertSStoHHMMSS, getCollection, getDB, getSaved, params, parseTTML, saveDB, setMetaData } from "./utils";
-import { createCollectionItem } from "../scripts/library";
+import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
+import { addListToCollection } from "../scripts/library";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 
@@ -118,51 +118,40 @@ export default async function player(id: string | null = '') {
   audio.dataset.channelUrl = data.uploaderUrl;
 
 
-  const db = getDB();
 
-  // reset & set favbutton state
-
+  // favbutton state
+  // reset
   if (favButton.checked) favButton.click();
-  if (db.favorites?.hasOwnProperty(id)) favButton.click();
+  // set
+  if (getDB().favorites?.hasOwnProperty(id)) favButton.click();
 
-  // load related streams into discovery data after 10 seconds of constant playback
+  // related streams data injection as discovery data after 10 seconds
 
   setTimeout(() => {
     if (id !== audio.dataset.id) return;
 
+    const db = getDB();
+    if (!db.hasOwnProperty('discover')) db.discover = {};
+
     data.relatedStreams.forEach((stream: StreamItem) => {
       if (stream.type !== 'stream') return;
       const rsId = stream.url.slice(9);
-
       // merges previous discover items with current related streams
-
       db.discover.hasOwnProperty(rsId) ?
         (<number>db.discover[rsId].frequency)++ :
         db.discover[rsId] = {
           id: rsId,
           title: stream.title,
-          thumbnail: stream.thumbnailUrl,
+          thumbnail: stream.thumbnail,
           author: stream.uploaderName,
           duration: convertSStoHHMMSS(stream.duration),
           channelUrl: stream.uploaderUrl,
           frequency: 1
         }
     });
-
     // sorted the array form of merged objects
     const sortedArray = Object.entries(db.discover).sort((a, b) => <number>a[1].frequency - <number>b[1].frequency);
-
-    // obliterate the previous discover
-    db.discover = {};
-    getCollection('discover').innerHTML = '';
-
-    // inject the new merged+sorted discover
-    sortedArray.forEach(i => {
-      db.discover[i[0]] = i[1];
-      if ((<number>i[1].frequency) > 1)
-        getCollection('discover').prepend(createCollectionItem(i[1]));
-    });
-    saveDB(db);
+    // convert the new merged+sorted discover back to object and inject it
+    addListToCollection('discover', Object.fromEntries(sortedArray), db);
   }, 1e4);
-
 }
