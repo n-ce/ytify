@@ -67,19 +67,18 @@ section.view {
 
 @media(orientation:portrait) {
   body {
-    flex-direction: column;
+    flex-direction: column-reverse;
   }
 
   main {
     height: calc(100dvh - 6%);
-    width: 94%;
-    padding: 3%;
+    width: 100%;
   }
 
   section {
-    height: calc(75dvh - 5dvw);
-    margin-bottom: 5dvw;
-
+    height: calc(75dvh - 3dvw);
+    margin: 3dvw 1.5dvw;
+    width: calc(100% - 3dvw);
   }
 }
 

@@ -107,6 +107,12 @@ footer span p {
 
 
 @media(orientation:portrait) {
+  footer {
+    border-bottom: none;
+    width: calc(100% - 0.2vmin);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 
   #playerControls {
     display: grid;
