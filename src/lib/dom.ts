@@ -14,7 +14,7 @@ export const suggestions = <HTMLUListElement>document.getElementById('suggestion
 
 export const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
 
-export const superModal = <HTMLDivElement>document.getElementById('superModal');
+export const superModal = <HTMLDialogElement>document.getElementById('superModal');
 
 export const upcomingBtn = <HTMLAnchorElement>document.getElementById('/upcoming');
 

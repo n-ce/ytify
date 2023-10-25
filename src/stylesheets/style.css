@@ -67,18 +67,18 @@ section.view {
 
 @media(orientation:portrait) {
   body {
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
 
   main {
     height: calc(100dvh - 6%);
-    width: 100%;
+    width: 94%;
+    padding: 3%;
   }
 
   section {
-    height: calc(75dvh - 3dvw);
-    margin: 3dvw 1.5dvw;
-    width: calc(100% - 3dvw);
+    height: calc(75dvh - 5dvw);
+    margin-bottom: 5dvw;
   }
 }
 
@@ -123,12 +123,41 @@ select {
   border-radius: var(--roundness)
 }
 
+dialog[open] {
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+dialog::backdrop {
+  background-color: #0007;
+}
+
+#library>span {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+#library>span button {
+  background-color: var(--onBg);
+  color: var(--text);
+  border: var(--border);
+  border-radius: var(--roundness);
+  width: calc(50% - 2vmin);
+  padding: 2vmin;
+  font-size: larger;
+
+}
+
 details {
   width: calc(100% - 4.3vmin);
   background-color: var(--onBg);
   color: var(--text);
   padding: 2vmin;
-  margin-bottom: 4vmin;
+  margin-top: 4vmin;
   border: var(--border);
   border-radius: var(--roundness);
 }
@@ -183,6 +212,7 @@ list-item:hover {
   top: calc(100% - 10vmin);
   z-index: 3;
 }
+
 
 #queuetools button,
 #listTools button,

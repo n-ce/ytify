@@ -42,7 +42,9 @@ playAllBtn.addEventListener('click', () => {
 enqueueBtn.onclick = () => listToQ(listContainer);
 
 saveListBtn.addEventListener('click', () => {
-  const listTitle = <string>listContainer.dataset.name;
+  const listTitle = prompt('Set Title', <string>openInYtBtn.textContent);
+
+  if (!listTitle) return;
 
   createPlaylist(listTitle);
 

@@ -10,13 +10,15 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   item.dataset.id = data.id;
   item.textContent = item.dataset.title = <string>data.title;
   item.dataset.author = data.author;
+  item.dataset.channelUrl = data.channelUrl;
   item.dataset.thumbnail = data.thumbnail;
   item.dataset.duration = data.duration;
   item.addEventListener('click', () => {
     if (item.classList.contains('delete'))
       return removeFromCollection((<HTMLDetailsElement>(<HTMLDivElement>item.parentElement).parentElement).id, <string>data.id);
 
-    superModal.classList.toggle('hide');
+    superModal.showModal();
+    history.pushState({}, '', '∫');
     const _ = superModal.dataset;
     _.id = data.id;
     _.title = data.title;

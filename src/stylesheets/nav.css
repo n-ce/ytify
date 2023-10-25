@@ -24,11 +24,9 @@ nav a.active {
   nav {
     height: auto;
     justify-content: space-around;
-    width: calc(100% - 0.2vmin);
-    padding: 2% 0;
-    border: var(--border);
-    border-top: none;
-    background-color: var(--onBg);
+    width: 94%;
+    padding: 5% 3%;
+    padding-bottom: 0;
   }
 
 

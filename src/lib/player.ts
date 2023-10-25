@@ -149,9 +149,17 @@ export default async function player(id: string | null = '') {
           frequency: 1
         }
     });
-    // sorted the array form of merged objects
-    const sortedArray = Object.entries(db.discover).sort((a, b) => <number>a[1].frequency - <number>b[1].frequency);
-    // convert the new merged+sorted discover back to object and inject it
-    addListToCollection('discover', Object.fromEntries(sortedArray), db);
+
+    // convert to array
+    const array = Object.entries(db.discover);
+
+    // Randomize Array
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    // convert the new merged+randomized discover back to object and inject it
+    addListToCollection('discover', Object.fromEntries(array), db);
   }, 1e4);
 }

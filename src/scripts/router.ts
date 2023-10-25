@@ -1,4 +1,4 @@
-import { audio, superInput } from "../lib/dom";
+import { audio, superInput, superModal } from "../lib/dom";
 import { params } from "../lib/utils";
 
 
@@ -46,5 +46,6 @@ for (const anchor of anchors) {
 
 // enables back button functionality
 addEventListener('popstate', () => {
-  showSection(location.pathname)
+
+  showSection(location.pathname);
 });

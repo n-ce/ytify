@@ -7,25 +7,23 @@ import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
 
 
+superModal.onclose = () => history.back();
 
-superModal.addEventListener('click', _ => {
-  if ((<HTMLDivElement>_.target).matches('#superModal'))
-    superModal.classList.toggle('hide');
-});
+superModal.onclick = () =>
+  superModal.close();
 
+(<HTMLUListElement>superModal.firstElementChild).onclick = _ => _.stopPropagation();
 
 playNow.addEventListener('click', () => {
   player(superModal.dataset.id);
-
-  superModal.classList.toggle('hide');
+  superModal.close();
 });
-
 
 enqueue.addEventListener('click', () => {
   if (firstItemInQueue()?.matches('h1'))
     firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
-  superModal.classList.toggle('hide');
+  superModal.close();
 });
 
 
@@ -61,7 +59,7 @@ async function fetchMix(id: string, api = 0) {
 
 
 startRadio.addEventListener('click', async () => {
-  superModal.classList.toggle('hide');
+  superModal.close();
 
   upcomingBtn.firstElementChild?.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
 
@@ -85,7 +83,7 @@ atpSelector.addEventListener('change', () => {
 
   if (title)
     addToCollection(title, superModal.dataset);
-  superModal.classList.toggle('hide');
+  superModal.close();
   atpSelector.selectedIndex = 0;
 });
 
@@ -108,15 +106,15 @@ downloadBtn.addEventListener('click', () => {
       anchor.click();
     })
     .catch(_ => alert(_))
-    .finally(() => superModal.classList.toggle('hide'));
+    .finally(() => superModal.close());
 });
 
 
 
 openChannelBtn.addEventListener('click', () => {
   // data binding for save list & open in yt btn
-  listContainer.dataset.name = superModal.dataset.author;
+  (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + <string>superModal.dataset.author;
   listContainer.dataset.url = superModal.dataset.channelUrl;
   fetchList(<string>superModal.dataset.channelUrl);
-  superModal.classList.toggle('hide');
+  superModal.close();
 })

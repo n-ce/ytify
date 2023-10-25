@@ -1,7 +1,7 @@
 #settings {
+  width: auto;
   background-color: var(--onBg);
-  width: 90%;
-  padding: 0 5%;
+  padding: 0 4vmin;
   border-radius: var(--roundness);
 }
 

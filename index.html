@@ -54,9 +54,6 @@
       <i class="ri-settings-line"></i>
       <p>Settings</p>
     </a>
-    <a id="/list" class="hide"><br>
-      <p>List</p>
-    </a>
   </nav>
   <main>
     <section id="home">
@@ -133,7 +130,10 @@
     </section>
 
     <section id="library">
-
+      <span>
+        <button>Import</button>
+        <button>Export</button>
+      </span>
       <details id="discover">
         <summary>
           <i class="ri-compass-3-line"></i> Discover
@@ -208,29 +208,6 @@
 
     </section>
 
-
-    <section id="list">
-      <span id="listTools">
-        <button id="playAllBtn">
-          <i class="ri-play-line"></i> Play
-        </button>
-        <button id="enqueueAllBtn">
-          <i class="ri-list-check-2"></i> Enqueue
-        </button>
-        <button id="saveListBtn">
-          <i class="ri-stack-line"></i> Save
-        </button>
-        <button id="openInYT">
-          <i class="ri-youtube-line"></i> Open In YouTube
-        </button>
-      </span>
-      <br>
-      <div id="playlist">
-        <h1>playlist or channel items show here</h1>
-      </div>
-    </section>
-
-
     <footer>
 
       <span>
@@ -267,7 +244,7 @@
     </footer>
   </main>
 
-  <div id="superModal" class="hide">
+  <dialog id="superModal">
     <ul>
       <li><i class="ri-play-line"></i>Play Now</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
@@ -282,7 +259,28 @@
       <li><i class="ri-download-2-line"></i>Download</li>
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
-  </div>
+  </dialog>
+
+  <dialog id="list">
+    <span id="listTools">
+      <button id="playAllBtn">
+        <i class="ri-play-line"></i> Play
+      </button>
+      <button id="enqueueAllBtn">
+        <i class="ri-list-check-2"></i> Enqueue
+      </button>
+      <button id="saveListBtn">
+        <i class="ri-stack-line"></i> Save
+      </button>
+      <button id="openInYT">
+        <i class="ri-youtube-line"></i> Open In YouTube
+      </button>
+    </span>
+    <br>
+    <div id="playlist">
+      <h1>playlist or channel items show here</h1>
+    </div>
+  </dialog>
   <script src="/src/scripts/main.ts" type="module"></script>
 </body>
 

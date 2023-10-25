@@ -129,13 +129,15 @@ export function createStreamItem(stream: StreamItem) {
   streamItem.dataset.id = id;
   streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
+  streamItem.dataset.channelUrl = stream.uploaderUrl;
   streamItem.dataset.thumbnail = stream.thumbnail;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
   streamItem.dataset.uploaded = stream.uploadedDate || '';
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
-    superModal.classList.toggle('hide');
+    superModal.showModal();
+    history.pushState({}, '', '#');
     const _ = superModal.dataset;
     _.id = id;
     _.title = stream.title;
@@ -148,7 +150,6 @@ export function createStreamItem(stream: StreamItem) {
 }
 
 export function fetchList(url: string) {
-
   fetch(pipedInstances.value + url)
     .then(res => res.json())
     .then(group => {
@@ -159,6 +160,8 @@ export function fetchList(url: string) {
           listContainer,
           () => url.substring(1) + '?'
         );
+
+      (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
       return group.relatedStreams;
     })
     .then(streams => itemsLoader(streams))
@@ -194,8 +197,7 @@ function createListItem(list: StreamItem) {
         list.url.replace('?list=', 's/') :
         list.url
     );
-    // data binding for save list & open in yt btn
-    listContainer.dataset.name = list.name;
+    // data binding for open channel action
     listContainer.dataset.url = list.url;
   });
   return listItem;
