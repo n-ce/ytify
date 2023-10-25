@@ -4,26 +4,28 @@ import { $, convertSStoHHMMSS, fetchList } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
 
-const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+const superModalList = <HTMLUListElement>superModal.firstElementChild;
+
+const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
 
 
-superModal.onclose = () => history.back();
-
-superModal.onclick = () =>
+superModal.addEventListener('click', () => {
   superModal.close();
+  history.back();
+});
 
-(<HTMLUListElement>superModal.firstElementChild).onclick = _ => _.stopPropagation();
+superModalList.onclick = _ => _.stopPropagation();
 
 playNow.addEventListener('click', () => {
   player(superModal.dataset.id);
-  superModal.close();
+  superModal.click();
 });
 
 enqueue.addEventListener('click', () => {
   if (firstItemInQueue()?.matches('h1'))
     firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
-  superModal.close();
+  superModal.click();
 });
 
 
@@ -59,7 +61,7 @@ async function fetchMix(id: string, api = 0) {
 
 
 startRadio.addEventListener('click', async () => {
-  superModal.close();
+  superModal.click();
 
   upcomingBtn.firstElementChild?.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
 
@@ -83,7 +85,7 @@ atpSelector.addEventListener('change', () => {
 
   if (title)
     addToCollection(title, superModal.dataset);
-  superModal.close();
+  superModal.click();
   atpSelector.selectedIndex = 0;
 });
 
@@ -106,7 +108,9 @@ downloadBtn.addEventListener('click', () => {
       anchor.click();
     })
     .catch(_ => alert(_))
-    .finally(() => superModal.close());
+    .finally(() => {
+      superModal.click();
+    });
 });
 
 
@@ -116,5 +120,5 @@ openChannelBtn.addEventListener('click', () => {
   (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + <string>superModal.dataset.author;
   listContainer.dataset.url = superModal.dataset.channelUrl;
   fetchList(<string>superModal.dataset.channelUrl);
-  superModal.close();
+  superModal.click();
 })
