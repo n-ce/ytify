@@ -1,4 +1,4 @@
-import { audio, img, listContainer, listModal, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listModal, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -171,9 +171,9 @@ export function fetchList(url: string, mix = false) {
     .then(fragment => {
       listContainer.innerHTML = '';
       listContainer.appendChild(fragment);
-      listModal.showModal();
+      listAnchor.click();
       listModal.scrollTo(0, 0);
-      history.pushState({}, '', '#');
+      if (mix) (<HTMLButtonElement>document.getElementById('playAllBtn')).click();
     })
     .catch(err => {
       if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {

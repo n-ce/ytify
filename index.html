@@ -54,6 +54,9 @@
       <i class="ri-settings-line"></i>
       <p>Settings</p>
     </a>
+    <a href="/list" id="/list" class="hide">
+      <p>list</p>
+    </a>
   </nav>
   <main>
     <section id="home">
@@ -130,13 +133,6 @@
     </section>
 
     <section id="library">
-      <div>
-        <label id="importBtn" for="upload">
-          <i class="ri-login-circle-line"></i> Import</label>
-        <input type="file" id="upload" class="hide">
-        <label id="exportBtn">
-          <i class="ri-logout-circle-line"></i> Export</label>
-      </div>
       <details id="discover">
         <summary>
           <i class="ri-compass-3-line"></i> Discover
@@ -180,7 +176,15 @@
         </button>
         <div></div>
       </details>
-
+      <br>
+      <div>
+        <label id="importBtn" for="upload">
+          <i class="ri-login-circle-line"></i> Import</label>
+        <input type="file" id="upload" class="hide">
+        <label id="exportBtn">
+          <i class="ri-logout-circle-line"></i> Export</label>
+      </div>
+      <br>
     </section>
 
 
@@ -223,6 +227,27 @@
           placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
       </form>
 
+    </section>
+
+    <section id="list">
+      <span id="listTools">
+        <button id="playAllBtn">
+          <i class="ri-play-line"></i> Play
+        </button>
+        <button id="enqueueAllBtn">
+          <i class="ri-list-check-2"></i> Enqueue
+        </button>
+        <button id="saveListBtn">
+          <i class="ri-stack-line"></i> Save
+        </button>
+        <button id="openInYT">
+          <i class="ri-youtube-line"></i> Open In YouTube
+        </button>
+      </span>
+      <br>
+      <div id="playlist">
+        <h1>playlist or channel items show here</h1>
+      </div>
     </section>
 
     <footer>
@@ -270,6 +295,7 @@
         <select id="playlistSelector">
           <option>Add To Playlist</option>
           <option value="+pl">Create New Playlist</option>
+          <option value="favorites">Favorites</option>
         </select>
       </li>
       <li><i class="ri-rfid-line"></i>Start Radio</li>
@@ -278,26 +304,6 @@
     </ul>
   </dialog>
 
-  <dialog id="list">
-    <span id="listTools">
-      <button id="playAllBtn">
-        <i class="ri-play-line"></i> Play
-      </button>
-      <button id="enqueueAllBtn">
-        <i class="ri-list-check-2"></i> Enqueue
-      </button>
-      <button id="saveListBtn">
-        <i class="ri-stack-line"></i> Save
-      </button>
-      <button id="openInYT">
-        <i class="ri-youtube-line"></i> Open In YouTube
-      </button>
-    </span>
-    <br>
-    <div id="playlist">
-      <h1>playlist or channel items show here</h1>
-    </div>
-  </dialog>
   <script src="/src/scripts/main.ts" type="module"></script>
 </body>
 

@@ -139,8 +139,7 @@ dialog::backdrop {
 
 #library>div {
   display: flex;
-  justify-content: right;
-  width: 100%;
+  margin-top: 1vmin;
 }
 
 #library>div>label {
@@ -149,12 +148,10 @@ dialog::backdrop {
   border: var(--border);
   border-radius: var(--roundness);
   padding: 1vmin;
+  margin: 0 3vmin;
   font-size: large;
 }
 
-#importBtn {
-  margin-right: 4vmin;
-}
 
 details {
   width: calc(100% - 4.3vmin);

@@ -34,7 +34,7 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
       return removeFromCollection((<HTMLDetailsElement>(<HTMLDivElement>item.parentElement).parentElement).id, <string>data.id);
 
     superModal.showModal();
-    history.pushState({}, '', '∫');
+    history.pushState({}, '', '#');
     const _ = superModal.dataset;
     _.id = data.id;
     _.title = data.title;
@@ -147,7 +147,7 @@ export function createPlaylist(title: string) {
 
   details.append(summary, deleteBtn, removeBtn, enqueueBtn, renameBtn, div);
 
-  library.appendChild(details);
+  library.insertBefore(details, <HTMLBRElement>document.querySelector('br'));
 }
 
 
