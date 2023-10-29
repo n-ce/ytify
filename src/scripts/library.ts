@@ -1,4 +1,4 @@
-import { atpSelector, audio, favButton, superModal } from "../lib/dom";
+import { atpSelector, audio, favButton, favIcon, superModal } from "../lib/dom";
 import { $, getCollection, getDB, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 
@@ -194,6 +194,6 @@ favButton.addEventListener('click', () => {
     addToCollection('favorites', audio.dataset) :
     removeFromCollection('favorites', id);
 
-  (<HTMLLabelElement>favButton.nextElementSibling).classList.toggle('ri-heart-fill');
+  favIcon.classList.toggle('ri-heart-fill');
 });
 

@@ -1,4 +1,4 @@
-import { audio, bitrateSelector, favButton, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
+import { audio, bitrateSelector, favButton, favIcon, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
@@ -53,10 +53,9 @@ export default async function player(id: string | null = '') {
 
   // finding lowest available stream when low opus bitrate unavailable
 
-  if (
-    !getSaved('quality') &&
-    Math.min(...opus.bitrates) > 65536 &&
-    !isSafari) {
+  if (!getSaved('quality') &&
+    Math.min(...opus.bitrates) > 65536
+    && !isSafari) {
 
     opus.urls = opus.urls.concat(m4a.urls);
 
@@ -121,9 +120,17 @@ export default async function player(id: string | null = '') {
 
   // favbutton state
   // reset
-  if (favButton.checked) favButton.click();
+  if (favButton.checked) {
+    favButton.checked = false;
+    favIcon.classList.remove('ri-heart-fill');
+  }
+
   // set
-  if (getDB().favorites?.hasOwnProperty(id)) favButton.click();
+  if (getDB().favorites?.hasOwnProperty(id)) {
+    favButton.checked = true;
+    favIcon.classList.add('ri-heart-fill');
+  }
+
 
   // related streams data injection as discovery data after 10 seconds
 

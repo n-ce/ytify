@@ -33,6 +33,7 @@
   border-radius: var(--roundness);
   display: inline-block;
   margin-bottom: 4vmin;
+  margin-right: 2vmin;
 }
 
 

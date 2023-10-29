@@ -33,5 +33,7 @@ export const subtitleSelector = <HTMLSelectElement>document.getElementById('subt
 export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
 
 export const favButton = <HTMLInputElement>document.getElementById('favButton');
+
+export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 // Add To Playlist Selector
 export const atpSelector = <HTMLSelectElement>document.getElementById('playlistSelector');
