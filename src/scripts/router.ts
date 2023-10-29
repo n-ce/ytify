@@ -46,8 +46,7 @@ for (const anchor of anchors) {
 
 // enables back button functionality
 
-addEventListener('popstate', () => {
+onpopstate = () =>
   superModal.open ?
     superModal.close() :
     showSection(location.pathname);
-});

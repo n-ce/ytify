@@ -23,6 +23,7 @@
   font-size: inherit;
   border: var(--border);
   padding: 1vmin;
+  max-width: calc(100% - 15ch);
 }
 
 #settings a {
@@ -34,16 +35,11 @@
   margin-bottom: 4vmin;
 }
 
-#pipedInstances {
-  width: calc(100% - 6ch);
-}
 
 #deleteButton:hover {
   background-color: orangered;
   color: black;
 }
-
-
 
 #netlifyForm {
   font-size: medium;

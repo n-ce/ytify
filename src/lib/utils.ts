@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listContainer, listModal, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -149,32 +149,36 @@ export function createStreamItem(stream: StreamItem) {
   return streamItem;
 }
 
-export function fetchList(url: string) {
+export function fetchList(url: string, mix = false) {
+
   fetch(pipedInstances.value + url)
     .then(res => res.json())
     .then(group => {
-      listContainer.dataset.token = group.nextpage;
-      if (group.nextpage)
-        loadMoreOnScroll(
-          listSection,
-          listContainer,
-          () => url.substring(1) + '?'
-        );
+      if (!mix) {
+        listContainer.dataset.token = group.nextpage;
+        if (group.nextpage)
+          loadMoreOnScroll(
+            listModal,
+            listContainer,
+            () => url.substring(1) + '?'
+          );
 
-      (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+        (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+      }
       return group.relatedStreams;
     })
     .then(streams => itemsLoader(streams))
     .then(fragment => {
       listContainer.innerHTML = '';
       listContainer.appendChild(fragment);
-      listAnchor.click();
-      listSection.scrollTo(0, 0);
+      listModal.showModal();
+      listModal.scrollTo(0, 0);
+      history.pushState({}, '', '#');
     })
     .catch(err => {
       if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
         pipedInstances.selectedIndex++;
-        fetchList(url);
+        fetchList(url, mix);
         return;
       }
       alert(err);

@@ -99,6 +99,7 @@ section.view {
 
 /* global styles for tags */
 
+
 button {
   transition: all 0.3s ease;
   user-select: none;
@@ -135,21 +136,24 @@ dialog::backdrop {
   background-color: #0007;
 }
 
-#library>span {
+
+#library>div {
   display: flex;
+  justify-content: right;
   width: 100%;
-  justify-content: space-between;
 }
 
-#library>span button {
+#library>div>label {
   background-color: var(--onBg);
   color: var(--text);
   border: var(--border);
   border-radius: var(--roundness);
-  width: calc(50% - 2vmin);
-  padding: 2vmin;
-  font-size: larger;
+  padding: 1vmin;
+  font-size: large;
+}
 
+#importBtn {
+  margin-right: 4vmin;
 }
 
 details {

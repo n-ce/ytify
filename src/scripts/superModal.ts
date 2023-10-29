@@ -65,7 +65,7 @@ startRadio.addEventListener('click', async () => {
 
   upcomingBtn.firstElementChild?.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
 
-  await fetchMix('RD' + superModal.dataset.id)
+  fetchList('/playlists/RD' + superModal.dataset.id, true);
 
   upcomingBtn.firstElementChild?.classList.replace('ri-loader-3-line', 'ri-skip-forward-line');
 
@@ -108,9 +108,7 @@ downloadBtn.addEventListener('click', () => {
       anchor.click();
     })
     .catch(_ => alert(_))
-    .finally(() => {
-      superModal.click();
-    });
+    .finally(() => superModal.click());
 });
 
 
