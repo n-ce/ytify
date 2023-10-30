@@ -79,7 +79,8 @@ downloadBtn.addEventListener('click', () => {
 openChannelBtn.addEventListener('click', () => {
   // data binding for save list & open in yt btn
   (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + <string>superModal.dataset.author;
-  listContainer.dataset.url = superModal.dataset.channelUrl;
-  fetchList(<string>superModal.dataset.channelUrl);
+  const channelUrl = <string>superModal.dataset.channelUrl;
+  listContainer.dataset.url = channelUrl;
+  fetchList(channelUrl);
   superModal.click();
 })
