@@ -20,9 +20,9 @@ export const upcomingBtn = <HTMLAnchorElement>document.getElementById('/upcoming
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
-export const listAnchor = <HTMLAnchorElement>document.getElementById('/list');
+export const listSection = <HTMLDivElement>document.getElementById('list');
 
-export const listModal = <HTMLDivElement>document.getElementById('list');
+export const listAnchor = <HTMLAnchorElement>document.getElementById('/list');
 
 export const listContainer = <HTMLDivElement>document.getElementById('playlist');
 

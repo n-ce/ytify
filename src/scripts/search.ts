@@ -1,6 +1,6 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, loadMoreOnScroll } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } from "../lib/utils";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
@@ -31,14 +31,25 @@ const searchLoader = () => {
     .then(res => res.json())
     .then(async searchResults => {
       searchlist.dataset.token = searchResults.nextpage;
-      let items = searchResults.items;
-      searchSection.scrollTo(0, 0);
 
-      loadMoreOnScroll(
-        searchSection,
-        searchlist,
-        () => query + '&'
-      );
+      let items = searchResults.items;
+      let currentHeight = 0;
+
+      searchSection.onscroll = async () => {
+        const height = searchSection.scrollHeight;
+        if (searchSection.scrollTop + searchSection.clientHeight >= height - 200 && currentHeight !== height) {
+          currentHeight = searchSection.scrollHeight;
+          const data = await loadMoreResults(
+            query + '&',
+            <string>searchlist.dataset.token
+          );
+          // filter livestreams && shorts
+          searchlist.appendChild(itemsLoader(
+            data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
+          ));
+          searchlist.dataset.token = data.nextpage;
+        }
+      }
       if (sortSwitch.hasAttribute('checked')) {
         for (let i = 0; i < 3; i++) {
           const data = await loadMoreResults(
@@ -55,13 +66,11 @@ const searchLoader = () => {
         ) => b.uploaded - a.uploaded);
       }
 
-      // filter livestreams & shorts
-      items = items
-        .filter((item: StreamItem) => !item.isShort && item.duration > 0)
+      // filter livestreams & shorts & append rest
 
       searchlist.appendChild(
         itemsLoader(
-          items
+          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         )
       )
     })

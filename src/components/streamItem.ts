@@ -24,11 +24,9 @@ customElements.define('stream-item', class extends HTMLElement {
 				imgUrl(<string>this.dataset.id, 'mqdefault');
 		});
 		thumbnail.addEventListener('load', () => {
-			if (thumbnail.naturalWidth === 120) {
-				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi');
-				return;
-			}
-			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+			thumbnail.naturalWidth === 120 && thumbnail.src.includes('cors') ?
+				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
+				['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
 		});
 
 		const duration = $('p');
@@ -76,7 +74,6 @@ customElements.define('stream-item', class extends HTMLElement {
 
 		if (!getSaved('img') && data.thumbnail) {
 			thumbnail.src = data.thumbnail;
-
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';

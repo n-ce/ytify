@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listModal, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -48,26 +48,6 @@ export const loadMoreResults = async (urlComponent: string, token: string) =>
         loadMoreResults(urlComponent, token);
     });
 
-export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLDivElement, urlComponent: () => string) {
-  let currentHeight = 0;
-  container.onscroll = async () => {
-    const height = container.scrollHeight;
-    if (container.scrollTop + container.clientHeight >= height - 200 && currentHeight !== height) {
-      currentHeight = container.scrollHeight;
-      const data = await loadMoreResults(
-        urlComponent(),
-        <string>list.dataset.token
-      );
-      // filter livestreams && shorts
-      const items = (data.items || data.relatedStreams)
-        .filter((item: StreamItem) => !item.isShort && item.duration > 0)
-      list.appendChild(itemsLoader(items));
-      data.nextpage ?
-        list.dataset.token = data.nextpage :
-        container.onscroll = null;
-    }
-  }
-}
 
 export function setMetaData(
   id: string,
@@ -159,12 +139,23 @@ export function fetchList(url: string, mix = false) {
     .then(group => {
       if (!mix) {
         listContainer.dataset.token = group.nextpage;
-        if (group.nextpage)
-          loadMoreOnScroll(
-            listModal,
-            listContainer,
-            () => url.substring(1) + '?'
-          );
+        if (group.nextpage) {
+          let currentHeight = 0;
+          listSection.onscroll = async () => {
+            const height = listSection.scrollHeight;
+            if (listSection.scrollTop + listSection.clientHeight >= height - 200 && currentHeight !== height) {
+              currentHeight = listSection.scrollHeight;
+              const data = await loadMoreResults(
+                url.substring(1) + '?',
+                <string>listContainer.dataset.token
+              );
+              listContainer.appendChild(itemsLoader(data.relatedStreams));
+              data.nextpage ?
+                listContainer.dataset.token = data.nextpage :
+                listSection.onscroll = null;
+            }
+          }
+        }
 
         (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
       }
@@ -175,7 +166,7 @@ export function fetchList(url: string, mix = false) {
       listContainer.innerHTML = '';
       listContainer.appendChild(fragment);
       listAnchor.click();
-      listModal.scrollTo(0, 0);
+      listSection.scrollTo(0, 0);
       if (mix) (<HTMLButtonElement>document.getElementById('playAllBtn')).click();
     })
     .catch(err => {
