@@ -9,6 +9,10 @@
 
 ## Changelog
 
+**v6.4**:
+- Import, Export Library
+- Various Fixes & Optimizations
+
 **v6.3**:
 - Library (Discover, History, Favorites, Playlists)
 - Channel Support
