@@ -24,6 +24,10 @@ customElements.define('stream-item', class extends HTMLElement {
 				imgUrl(<string>this.dataset.id, 'mqdefault');
 		});
 		thumbnail.addEventListener('load', () => {
+			if (thumbnail.naturalWidth === 120) {
+				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi');
+				return;
+			}
 			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
 		});
 
@@ -48,9 +52,7 @@ customElements.define('stream-item', class extends HTMLElement {
 
 		const author = $('p');
 		author.id = 'author';
-		avatar.addEventListener('error', () => {
-			avatar.src = blankImage;
-		});
+		avatar.onerror = () => avatar.src = blankImage;
 
 		const viewsXuploaded = $('p');
 		viewsXuploaded.id = 'viewsXuploaded';
