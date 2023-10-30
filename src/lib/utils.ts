@@ -19,7 +19,7 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}.webp`;
+export const imgUrl = (id: string, res: string) => 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${id}/${res}.webp`);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 

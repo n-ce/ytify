@@ -19,10 +19,9 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('error', () => {
-			const quality = thumbnail.src.includes('hq720') ? 'hqdefault' : 'hq720';
-			thumbnail.src = imgUrl(
-				<string>this.dataset.id,
-				quality);
+			thumbnail.src = thumbnail.src.includes('webp') ?
+				imgUrl(<string>this.dataset.id, 'hqdefault') :
+				('https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${this.dataset.id}/hqdefault.jpg`));
 		});
 		thumbnail.addEventListener('load', () => {
 			const backupImg = this.dataset.pipedImg;

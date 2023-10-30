@@ -141,7 +141,8 @@ export default async function player(id: string | null = '') {
     if (!db.hasOwnProperty('discover')) db.discover = {};
 
     data.relatedStreams.forEach((stream: StreamItem) => {
-      if (stream.type !== 'stream') return;
+      if (stream.type !== 'stream' || stream.duration > 3000) return;
+
       const rsId = stream.url.slice(9);
       // merges previous discover items with current related streams
       db.discover.hasOwnProperty(rsId) ?

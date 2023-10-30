@@ -50,8 +50,11 @@ saveListBtn.addEventListener('click', () => {
 
   const list: { [index: string]: DOMStringMap } = {};
   listContainer.childNodes.forEach(_ => {
-    const data = (<HTMLElement>_).dataset;
-    list[<string>data.id] = data;
+    const sender = (<HTMLElement>_).dataset;
+    let id = <string>sender.id;
+    list[id] = {};
+    ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
+      .forEach($ => list[id][$] = sender[$]);
   });
   addListToCollection(listTitle, list);
 });
