@@ -11,6 +11,7 @@ declare global {
     category: string,
     duration: number,
     thumbnail: string,
+    isShort?: boolean,
     subscribers: number,
     description: string,
     uploaderUrl: string,

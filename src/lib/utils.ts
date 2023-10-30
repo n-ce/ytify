@@ -48,7 +48,7 @@ export const loadMoreResults = async (urlComponent: string, token: string) =>
         loadMoreResults(urlComponent, token);
     });
 
-export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string) {
+export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLDivElement, urlComponent: () => string) {
   let currentHeight = 0;
   container.onscroll = async () => {
     const height = container.scrollHeight;
@@ -58,7 +58,10 @@ export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, u
         urlComponent(),
         <string>list.dataset.token
       );
-      list.appendChild(itemsLoader(data.items || data.relatedStreams));
+      // filter livestreams && shorts
+      const items = (data.items || data.relatedStreams)
+        .filter((item: StreamItem) => !item.isShort && item.duration > 0)
+      list.appendChild(itemsLoader(items));
       data.nextpage ?
         list.dataset.token = data.nextpage :
         container.onscroll = null;
@@ -181,7 +184,7 @@ export function fetchList(url: string, mix = false) {
         fetchList(url, mix);
         return;
       }
-      alert(err);
+      alert(mix ? 'No Mixes Found' : err);
       pipedInstances.selectedIndex = 0;
     })
 }

@@ -19,16 +19,11 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('error', () => {
-			thumbnail.src = thumbnail.src.includes('webp') ?
-				imgUrl(<string>this.dataset.id, 'hqdefault') :
-				('https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${this.dataset.id}/hqdefault.jpg`));
+			thumbnail.src = thumbnail.src.includes('cors') ?
+				('https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${this.dataset.id}/hqdefault.jpg`)) :
+				imgUrl(<string>this.dataset.id, 'mqdefault');
 		});
 		thumbnail.addEventListener('load', () => {
-			const backupImg = this.dataset.pipedImg;
-			if (thumbnail.naturalWidth === 120 && backupImg) {
-				thumbnail.src = backupImg;
-				return;
-			}
 			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
 		});
 
@@ -78,8 +73,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img') && data.thumbnail) {
-			data.pipedImg = data.thumbnail;
-			thumbnail.src = imgUrl(<string>data.id, 'mqdefault');
+			thumbnail.src = data.thumbnail;
 
 			data.avatar ?
 				avatar.src = data.avatar :

@@ -18,11 +18,13 @@ export default async function player(id: string | null = '') {
       return;
     }
     alert(err);
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     pipedInstances.selectedIndex = 0;
   });
 
   if (!data.audioStreams.length) {
     alert('NO AUDIO STREAMS AVAILABLE.');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
 

@@ -4,6 +4,7 @@ import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, loa
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
+const searchSection = <HTMLDivElement>searchlist.parentElement;
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
@@ -30,8 +31,11 @@ const searchLoader = () => {
     .then(res => res.json())
     .then(async searchResults => {
       searchlist.dataset.token = searchResults.nextpage;
+      let items = searchResults.items;
+      searchSection.scrollTo(0, 0);
+
       loadMoreOnScroll(
-        <HTMLDivElement>searchlist.parentElement,
+        searchSection,
         searchlist,
         () => query + '&'
       );
@@ -42,16 +46,22 @@ const searchLoader = () => {
             <string>searchlist.dataset.token
           );
           searchlist.dataset.token = data.nextpage;
-          searchResults.items = searchResults.items.concat(data.items);
+          items = items.concat(data.items);
         }
-        searchResults.items.sort((
+
+        items.sort((
           a: { uploaded: number },
           b: { uploaded: number }
         ) => b.uploaded - a.uploaded);
       }
+
+      // filter livestreams & shorts
+      items = items
+        .filter((item: StreamItem) => !item.isShort && item.duration > 0)
+
       searchlist.appendChild(
         itemsLoader(
-          searchResults.items
+          items
         )
       )
     })
