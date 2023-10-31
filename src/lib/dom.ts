@@ -37,3 +37,5 @@ export const favButton = <HTMLInputElement>document.getElementById('favButton');
 export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 // Add To Playlist Selector
 export const atpSelector = <HTMLSelectElement>document.getElementById('playlistSelector');
+
+export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;

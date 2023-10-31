@@ -14,7 +14,7 @@ import '../components/listItem';
 import '../components/toggleSwitch';
 import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
-import { img, listContainer } from '../lib/dom';
+import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 
@@ -31,7 +31,6 @@ streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/y
 
 // list tools functions
 
-const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
 
 playAllBtn.addEventListener('click', () => {
   clearQ();
@@ -42,21 +41,29 @@ playAllBtn.addEventListener('click', () => {
 enqueueBtn.onclick = () => listToQ(listContainer);
 
 saveListBtn.addEventListener('click', () => {
-  const listTitle = prompt('Set Title', <string>openInYtBtn.textContent);
+  if (saveListBtn.textContent === ' Subscribe') {
+    alert('this is being tested');
+    saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Subscribed';
+  }
+  else {
 
-  if (!listTitle) return;
+    const listTitle = prompt('Set Title', <string>openInYtBtn.textContent?.substring(1));
 
-  createPlaylist(listTitle);
+    if (!listTitle) return;
 
-  const list: { [index: string]: DOMStringMap } = {};
-  listContainer.childNodes.forEach(_ => {
-    const sender = (<HTMLElement>_).dataset;
-    const id = <string>sender.id;
-    list[id] = {};
-    ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
-      .forEach($ => list[id][$] = sender[$]);
-  });
-  addListToCollection(listTitle, list);
+    createPlaylist(listTitle);
+
+    const list: { [index: string]: DOMStringMap } = {};
+    listContainer.childNodes.forEach(_ => {
+      const sender = (<HTMLElement>_).dataset;
+      const id = <string>sender.id;
+      list[id] = {};
+      ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
+        .forEach($ => list[id][$] = sender[$]);
+    });
+    addListToCollection(listTitle, list);
+    saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Saved';
+  }
 });
 
 openInYtBtn.onclick = () => open('https://youtube.com' + listContainer.dataset.url);

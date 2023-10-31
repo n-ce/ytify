@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -113,7 +113,6 @@ export function createStreamItem(stream: StreamItem) {
   streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
   streamItem.dataset.channelUrl = stream.uploaderUrl;
-  streamItem.dataset.thumbnail = stream.thumbnail;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
   streamItem.dataset.uploaded = stream.uploadedDate || '';
@@ -124,7 +123,6 @@ export function createStreamItem(stream: StreamItem) {
     const _ = superModal.dataset;
     _.id = id;
     _.title = stream.title;
-    _.thumbnail = streamItem.dataset.thumbnail;
     _.author = stream.uploaderName;
     _.channelUrl = stream.uploaderUrl;
     _.duration = streamItem.dataset.duration;
@@ -161,9 +159,10 @@ export function fetchList(url: string, mix = false) {
           return data.nextpage;
         });
 
-      (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+      openInYtBtn.innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+      saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${url.includes('channel') ? 'Subscribe' : 'Save'}`;
 
-      if (mix) (<HTMLButtonElement>document.getElementById('playAllBtn')).click();
+      if (mix) playAllBtn.click();
     })
     .catch(err => {
       if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {

@@ -18,16 +18,12 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.crossOrigin = 'anonymous';
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
-		thumbnail.addEventListener('error', () => {
-			thumbnail.src = thumbnail.src.includes('cors') ?
-				('https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${this.dataset.id}/hqdefault.jpg`)) :
-				imgUrl(<string>this.dataset.id, 'mqdefault');
-		});
-		thumbnail.addEventListener('load', () => {
-			thumbnail.naturalWidth === 120 && thumbnail.src.includes('cors') ?
+		thumbnail.onerror = () =>
+			thumbnail.src = 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${this.dataset.id}/mqdefault.jpg`);
+		thumbnail.onload = () =>
+			thumbnail.naturalWidth === 120 ?
 				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
 				['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
-		});
 
 		const duration = $('p');
 		duration.id = 'duration';
@@ -72,12 +68,11 @@ customElements.define('stream-item', class extends HTMLElement {
 		const author = <HTMLParagraphElement>root.getElementById('author');
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
-		if (!getSaved('img') && data.thumbnail) {
-			thumbnail.src = data.thumbnail;
+		if (!getSaved('img')) {
+			thumbnail.src = imgUrl(<string>data.id, 'mqdefault');
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';
-
 		}
 		else thumbnail.src = blankImage;
 
@@ -89,6 +84,6 @@ customElements.define('stream-item', class extends HTMLElement {
 			author.textContent = data.author;
 
 		if (data.views)
-			viewsXuploaded.textContent = data.views + (data.uploaded ? ' • ' + data.uploaded : '');
+			viewsXuploaded.textContent = data.views + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '');
 	}
 })

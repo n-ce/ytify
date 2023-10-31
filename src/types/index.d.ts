@@ -10,8 +10,8 @@ declare global {
     videos: number,
     duration: number,
     category: string,
-    thumbnail: string,
     isShort?: boolean,
+    thumbnail?: string,
     subscribers: number,
     description: string,
     uploaderUrl: string,
@@ -27,7 +27,6 @@ declare global {
     title: string,
     author: string,
     duration: string
-    thumbnail: string,
     channelUrl: string,
     frequency?: number
 

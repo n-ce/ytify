@@ -17,16 +17,15 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queueArray.unshift(data.id) :
     queueArray.push(data.id);
 
-  const listItem = $('stream-item');
-  listItem.textContent = data.title || '';
-  listItem.dataset.author = data.author;
-  listItem.dataset.thumbnail = data.thumbnail;
-  listItem.dataset.duration = data.duration;
-  listItem.dataset.id = data.id;
+  const queueItem = $('stream-item');
+  queueItem.textContent = <string>data.title;
+  queueItem.dataset.author = data.author;
+  queueItem.dataset.duration = data.duration;
+  queueItem.dataset.id = data.id;
 
-  listItem.addEventListener('click', () => {
-    const id = listItem.dataset.id || '';
-    if (!listItem.classList.contains('delete'))
+  queueItem.addEventListener('click', () => {
+    const id = queueItem.dataset.id || '';
+    if (!queueItem.classList.contains('delete'))
       player(id);
     const index = queueArray.indexOf(id);
     queueArray.splice(index, 1);
@@ -34,8 +33,8 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
   });
 
   prepend ?
-    queuelist.prepend(listItem) :
-    queuelist.appendChild(listItem);
+    queuelist.prepend(queueItem) :
+    queuelist.appendChild(queueItem);
 }
 
 

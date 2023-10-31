@@ -112,7 +112,6 @@ export default async function player(id: string | null = '') {
     history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
 
   audio.dataset.id = id;
-  audio.dataset.thumbnail = data.thumbnailUrl;
   audio.dataset.title = data.title;
   audio.dataset.author = data.uploader;
   audio.dataset.duration = convertSStoHHMMSS(data.duration);
@@ -152,7 +151,6 @@ export default async function player(id: string | null = '') {
         db.discover[rsId] = {
           id: rsId,
           title: stream.title,
-          thumbnail: stream.thumbnail,
           author: stream.uploaderName,
           duration: convertSStoHHMMSS(stream.duration),
           channelUrl: stream.uploaderUrl,
