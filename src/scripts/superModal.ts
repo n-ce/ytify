@@ -54,6 +54,7 @@ atpSelector.addEventListener('change', () => {
 
 
 downloadBtn.addEventListener('click', () => {
+  superModal.click();
   const provider = 'https://co.wuk.sh/api/json';
   const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
   fetch(provider, {
@@ -71,7 +72,6 @@ downloadBtn.addEventListener('click', () => {
       anchor.click();
     })
     .catch(_ => alert(_))
-    .finally(() => superModal.click());
 });
 
 
