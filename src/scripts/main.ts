@@ -42,28 +42,27 @@ enqueueBtn.onclick = () => listToQ(listContainer);
 
 saveListBtn.addEventListener('click', () => {
   if (saveListBtn.textContent === ' Subscribe') {
-    alert('this is being tested');
+    alert('This has not been implemented yet.');
     saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Subscribed';
+    return;
   }
-  else {
 
-    const listTitle = prompt('Set Title', <string>openInYtBtn.textContent?.substring(1));
+  const listTitle = prompt('Set Title', <string>openInYtBtn.textContent?.substring(1));
 
-    if (!listTitle) return;
+  if (!listTitle) return;
 
-    createPlaylist(listTitle);
+  createPlaylist(listTitle);
 
-    const list: { [index: string]: DOMStringMap } = {};
-    listContainer.childNodes.forEach(_ => {
-      const sender = (<HTMLElement>_).dataset;
-      const id = <string>sender.id;
-      list[id] = {};
-      ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
-        .forEach($ => list[id][$] = sender[$]);
-    });
-    addListToCollection(listTitle, list);
-    saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Saved';
-  }
+  const list: { [index: string]: DOMStringMap } = {};
+  listContainer.childNodes.forEach(_ => {
+    const sender = (<HTMLElement>_).dataset;
+    const id = <string>sender.id;
+    list[id] = {};
+    ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
+      .forEach($ => list[id][$] = sender[$]);
+  });
+  addListToCollection(listTitle, list);
+  saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Saved';
 });
 
 openInYtBtn.onclick = () => open('https://youtube.com' + listContainer.dataset.url);
