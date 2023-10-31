@@ -143,25 +143,23 @@ export function fetchList(url: string, mix = false) {
       listSection.scrollTo(0, 0);
 
       let token = group.nextpage;
-      if (!mix && token) {
-        function setObserver(callback: () => Promise<string>) {
-          new IntersectionObserver((entries, observer) =>
-            entries.forEach(async e => {
-              if (e.isIntersecting) {
-                token = await callback();
-                observer.disconnect();
-                if (token)
-                  setObserver(callback);
-              }
-            })).observe(listContainer.children[listContainer.childElementCount - 3]);
-        }
-
+      function setObserver(callback: () => Promise<string>) {
+        new IntersectionObserver((entries, observer) =>
+          entries.forEach(async e => {
+            if (e.isIntersecting) {
+              token = await callback();
+              observer.disconnect();
+              if (token)
+                setObserver(callback);
+            }
+          })).observe(listContainer.children[listContainer.childElementCount - 3]);
+      }
+      if (!mix && token)
         setObserver(async () => {
           const data = await loadMoreResults(url.substring(1) + '?', token);
           listContainer.appendChild(itemsLoader(data.relatedStreams));
           return data.nextpage;
         });
-      }
 
       (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
 
