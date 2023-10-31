@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url("/remixicon.woff2") format("woff2");
+  src: url("/remixicon.woff2")format("woff2");
   font-display: swap;
 }
 
@@ -137,4 +137,16 @@
 
 .ri-compass-3-line:before {
   content: "\ebbe";
+}
+
+.ri-edit-line:before {
+  content: "\ec86";
+}
+
+.ri-login-circle-line:before {
+  content: "\eed6";
+}
+
+.ri-logout-circle-line:before {
+  content: "\eedc";
 }

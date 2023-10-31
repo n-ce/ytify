@@ -79,7 +79,6 @@ section.view {
   section {
     height: calc(75dvh - 5dvw);
     margin-bottom: 5dvw;
-
   }
 }
 
@@ -99,6 +98,7 @@ section.view {
 
 
 /* global styles for tags */
+
 
 button {
   transition: all 0.3s ease;
@@ -123,6 +123,35 @@ select {
   border: none;
   border-radius: var(--roundness)
 }
+
+dialog[open] {
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+dialog::backdrop {
+  background-color: #0007;
+}
+
+
+#library>div {
+  display: flex;
+  margin-top: 1vmin;
+}
+
+#library>div>label {
+  background-color: var(--onBg);
+  color: var(--text);
+  border: var(--border);
+  border-radius: var(--roundness);
+  padding: 1vmin;
+  margin: 0 3vmin;
+  font-size: large;
+}
+
 
 details {
   width: calc(100% - 4.3vmin);
@@ -185,6 +214,7 @@ list-item:hover {
   z-index: 3;
 }
 
+
 #queuetools button,
 #listTools button,
 details button {
@@ -194,7 +224,6 @@ details button {
   color: var(--bg);
   font-family: inherit;
   font-size: inherit;
-  font-weight: bold;
   padding: 1vmin 2vmin;
   margin: 1vmin 2vmin;
 }

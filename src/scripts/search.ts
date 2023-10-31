@@ -1,13 +1,24 @@
 import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, loadMoreOnScroll } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } from "../lib/utils";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
+let nextPageToken = '';
 
+function setObserver(callback: () => Promise<string>) {
+  new IntersectionObserver((entries, observer) =>
+    entries.forEach(async e => {
+      if (e.isIntersecting) {
+        nextPageToken = await callback();
+        observer.disconnect();
+        setObserver(callback);
+      }
+    })).observe(searchlist.children[searchlist.childElementCount - 3]);
+}
 
 
 // Get search results of input
@@ -29,31 +40,37 @@ const searchLoader = () => {
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
-      searchlist.dataset.token = searchResults.nextpage;
-      loadMoreOnScroll(
-        <HTMLDivElement>searchlist.parentElement,
-        searchlist,
-        () => query + '&'
-      );
+      let items = searchResults.items;
+      nextPageToken = searchResults.nextpage;
+
       if (sortSwitch.hasAttribute('checked')) {
         for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults(
-            query + '&',
-            <string>searchlist.dataset.token
-          );
-          searchlist.dataset.token = data.nextpage;
-          searchResults.items = searchResults.items.concat(data.items);
+          const data = await loadMoreResults(query + '&', nextPageToken);
+          nextPageToken = data.nextpage;
+          items = items.concat(data.items);
         }
-        searchResults.items.sort((
+
+        items.sort((
           a: { uploaded: number },
           b: { uploaded: number }
         ) => b.uploaded - a.uploaded);
       }
+
+      // filter livestreams & shorts & append rest
+
       searchlist.appendChild(
         itemsLoader(
-          searchResults.items
+          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         )
-      )
+      );
+      // load more results when 3rd last element is visible
+      setObserver(async () => {
+        const data = await loadMoreResults(query + '&', nextPageToken);
+        searchlist.appendChild(itemsLoader(
+          data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
+        ));
+        return data.nextpage;
+      });
     })
     .catch(err => {
       if (pipedInstances.selectedIndex < pipedInstances.length - 1) {

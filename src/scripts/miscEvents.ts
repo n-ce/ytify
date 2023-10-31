@@ -4,13 +4,19 @@ import { blankImage, getSaved, imgUrl, parseTTML, save } from "../lib/utils";
 
 img.addEventListener('load', () => {
   if (img.naturalWidth === 120)
-    img.src = img.src.includes('corsproxy') ?
-      img.src.replace('vi_webp', 'vi').replace('.webp', '.jpg') :
-      imgUrl(audio.dataset.id || '', 'hqdefault');
+    img.src = img.src.includes('webp') ?
+      ('https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${audio.dataset.id}/hqdefault.jpg`)) :
+      imgUrl(
+        <string>audio.dataset.id,
+        (img.src.includes('maxresdefault') ? 'hq720' : 'hqdefault')
+      );
 });
 
 img.addEventListener('error', () => {
-  img.src = imgUrl(audio.dataset.id || '', 'maxresdefault');
+  img.src = imgUrl(
+    <string>audio.dataset.id,
+    (img.src.includes('maxresdefault') ? 'hqdefault' : 'maxresdefault')
+  );
 });
 
 

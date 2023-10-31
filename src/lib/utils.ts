@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, pipedInstances, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -19,7 +19,7 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const imgUrl = (id: string, res: string) => `https://corsproxy.io?https://i.ytimg.com/vi_webp/${id}/${res}.webp`;
+export const imgUrl = (id: string, res: string) => 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${id}/${res}.webp`);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -48,23 +48,6 @@ export const loadMoreResults = async (urlComponent: string, token: string) =>
         loadMoreResults(urlComponent, token);
     });
 
-export function loadMoreOnScroll(container: HTMLDivElement, list: HTMLElement, urlComponent: () => string) {
-  let currentHeight = 0;
-  container.onscroll = async () => {
-    const height = container.scrollHeight;
-    if (container.scrollTop + container.clientHeight >= height - 200 && currentHeight !== height) {
-      currentHeight = container.scrollHeight;
-      const data = await loadMoreResults(
-        urlComponent(),
-        <string>list.dataset.token
-      );
-      list.appendChild(itemsLoader(data.items || data.relatedStreams));
-      data.nextpage ?
-        list.dataset.token = data.nextpage :
-        container.onscroll = null;
-    }
-  }
-}
 
 export function setMetaData(
   id: string,
@@ -129,17 +112,17 @@ export function createStreamItem(stream: StreamItem) {
   streamItem.dataset.id = id;
   streamItem.textContent = streamItem.dataset.title = stream.title;
   streamItem.dataset.author = stream.uploaderName;
-  streamItem.dataset.thumbnail = stream.thumbnail;
+  streamItem.dataset.channelUrl = stream.uploaderUrl;
   streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
   streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
   streamItem.dataset.uploaded = stream.uploadedDate || '';
   streamItem.dataset.avatar = stream.uploaderAvatar || '';
   streamItem.addEventListener('click', () => {
-    superModal.classList.toggle('hide');
+    superModal.showModal();
+    history.pushState({}, '', '#');
     const _ = superModal.dataset;
     _.id = id;
     _.title = stream.title;
-    _.thumbnail = streamItem.dataset.thumbnail;
     _.author = stream.uploaderName;
     _.channelUrl = stream.uploaderUrl;
     _.duration = streamItem.dataset.duration;
@@ -147,34 +130,47 @@ export function createStreamItem(stream: StreamItem) {
   return streamItem;
 }
 
-export function fetchList(url: string) {
+export function fetchList(url: string, mix = false) {
 
   fetch(pipedInstances.value + url)
     .then(res => res.json())
     .then(group => {
-      listContainer.dataset.token = group.nextpage;
-      if (group.nextpage)
-        loadMoreOnScroll(
-          listSection,
-          listContainer,
-          () => url.substring(1) + '?'
-        );
-      return group.relatedStreams;
-    })
-    .then(streams => itemsLoader(streams))
-    .then(fragment => {
       listContainer.innerHTML = '';
-      listContainer.appendChild(fragment);
+      listContainer.appendChild(itemsLoader(group.relatedStreams));
       listAnchor.click();
       listSection.scrollTo(0, 0);
+
+      let token = group.nextpage;
+      function setObserver(callback: () => Promise<string>) {
+        new IntersectionObserver((entries, observer) =>
+          entries.forEach(async e => {
+            if (e.isIntersecting) {
+              token = await callback();
+              observer.disconnect();
+              if (token)
+                setObserver(callback);
+            }
+          })).observe(listContainer.children[listContainer.childElementCount - 3]);
+      }
+      if (!mix && token)
+        setObserver(async () => {
+          const data = await loadMoreResults(url.substring(1) + '?', token);
+          listContainer.appendChild(itemsLoader(data.relatedStreams));
+          return data.nextpage;
+        });
+
+      openInYtBtn.innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+      saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${url.includes('channel') ? 'Subscribe' : 'Save'}`;
+
+      if (mix) playAllBtn.click();
     })
     .catch(err => {
       if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
         pipedInstances.selectedIndex++;
-        fetchList(url);
+        fetchList(url, mix);
         return;
       }
-      alert(err);
+      alert(mix ? 'No Mixes Found' : err);
       pipedInstances.selectedIndex = 0;
     })
 }
@@ -194,8 +190,7 @@ function createListItem(list: StreamItem) {
         list.url.replace('?list=', 's/') :
         list.url
     );
-    // data binding for save list & open in yt btn
-    listContainer.dataset.name = list.name;
+    // data binding for open channel action
     listContainer.dataset.url = list.url;
   });
   return listItem;

@@ -49,11 +49,12 @@ span {
 
 slot {
   font-size: medium;
-  height: 50%;
+  height: 55%;
   width: auto;
   display: flex;
   overflow: hidden;
   word-break: break-all;
+  text-overflow: clip;
 }
 
 div {
@@ -86,6 +87,10 @@ div {
   flex-direction: column;
 }
 
+#author {
+  height: auto;
+  text-overflow: clip;
+}
 
 
 @media(orientation:landscape) {
@@ -95,5 +100,9 @@ div {
     display: inline-flex;
     flex-direction: row;
     justify-content: space-between;
+  }
+
+  #author {
+    height: initial;
   }
 }

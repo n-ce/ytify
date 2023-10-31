@@ -1,7 +1,7 @@
 #settings {
+  width: auto;
   background-color: var(--onBg);
-  width: 90%;
-  padding: 0 5%;
+  padding: 0 4vmin;
   border-radius: var(--roundness);
 }
 
@@ -23,6 +23,7 @@
   font-size: inherit;
   border: var(--border);
   padding: 1vmin;
+  max-width: calc(100% - 15ch);
 }
 
 #settings a {
@@ -32,18 +33,14 @@
   border-radius: var(--roundness);
   display: inline-block;
   margin-bottom: 4vmin;
+  margin-right: 2vmin;
 }
 
-#pipedInstances {
-  width: calc(100% - 6ch);
-}
 
 #deleteButton:hover {
   background-color: orangered;
   color: black;
 }
-
-
 
 #netlifyForm {
   font-size: medium;

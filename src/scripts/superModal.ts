@@ -1,74 +1,37 @@
-import { atpSelector, listContainer, pipedInstances, superModal, upcomingBtn } from "../lib/dom";
+import { atpSelector, listContainer, superModal } from "../lib/dom";
 import player from "../lib/player";
-import { $, convertSStoHHMMSS, fetchList } from "../lib/utils";
+import { $, fetchList } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
-import { appendToQueuelist, clearQ, firstItemInQueue } from "./queue";
+import { appendToQueuelist, firstItemInQueue } from "./queue";
 
-const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>(<HTMLUListElement>superModal.firstElementChild).children;
+const superModalList = <HTMLUListElement>superModal.firstElementChild;
+
+const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
 
 
-
-superModal.addEventListener('click', _ => {
-  if ((<HTMLDivElement>_.target).matches('#superModal'))
-    superModal.classList.toggle('hide');
+superModal.addEventListener('click', () => {
+  superModal.close();
+  history.back();
 });
 
+superModalList.onclick = _ => _.stopPropagation();
 
 playNow.addEventListener('click', () => {
   player(superModal.dataset.id);
-
-  superModal.classList.toggle('hide');
+  superModal.click();
 });
-
 
 enqueue.addEventListener('click', () => {
   if (firstItemInQueue()?.matches('h1'))
     firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
-  superModal.classList.toggle('hide');
+  superModal.click();
 });
 
 
-
-async function fetchMix(id: string, api = 0) {
-  const knownError = 'No Radios could be found.';
-  await fetch(pipedInstances.options[api].value + '/playlists/' + id)
-    .then(res => res.json())
-    .then(data => {
-      if (!data.relatedStreams)
-        throw new Error(knownError);
-
-      clearQ();
-
-      for (const stream of data.relatedStreams)
-        appendToQueuelist({
-          id: stream.url.slice(9),
-          title: stream.title,
-          thumbnail: stream.thumbnail,
-          author: stream.uploaderName,
-          duration: convertSStoHHMMSS(stream.duration)
-        });
-
-      firstItemInQueue().click();
-    })
-    .catch(e => {
-      if (api < pipedInstances.length - 1)
-        return fetchMix(id, api + 1);
-      e.message === knownError ? alert(e) : console.error(e);
-    });
-}
-
-
-
 startRadio.addEventListener('click', async () => {
-  superModal.classList.toggle('hide');
-
-  upcomingBtn.firstElementChild?.classList.replace('ri-skip-forward-line', 'ri-loader-3-line');
-
-  await fetchMix('RD' + superModal.dataset.id)
-
-  upcomingBtn.firstElementChild?.classList.replace('ri-loader-3-line', 'ri-skip-forward-line');
-
+  superModal.click();
+  fetchList('/playlists/RD' + superModal.dataset.id, true);
 });
 
 
@@ -85,7 +48,7 @@ atpSelector.addEventListener('change', () => {
 
   if (title)
     addToCollection(title, superModal.dataset);
-  superModal.classList.toggle('hide');
+  superModal.click();
   atpSelector.selectedIndex = 0;
 });
 
@@ -108,15 +71,16 @@ downloadBtn.addEventListener('click', () => {
       anchor.click();
     })
     .catch(_ => alert(_))
-    .finally(() => superModal.classList.toggle('hide'));
+    .finally(() => superModal.click());
 });
 
 
 
 openChannelBtn.addEventListener('click', () => {
   // data binding for save list & open in yt btn
-  listContainer.dataset.name = superModal.dataset.author;
-  listContainer.dataset.url = superModal.dataset.channelUrl;
-  fetchList(<string>superModal.dataset.channelUrl);
-  superModal.classList.toggle('hide');
+  (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + <string>superModal.dataset.author;
+  const channelUrl = <string>superModal.dataset.channelUrl;
+  listContainer.dataset.url = channelUrl;
+  fetchList(channelUrl);
+  superModal.click();
 })

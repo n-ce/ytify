@@ -1,8 +1,24 @@
-import { atpSelector, audio, favButton, superModal } from "../lib/dom";
+import { atpSelector, audio, favButton, favIcon, superModal } from "../lib/dom";
 import { $, getCollection, getDB, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 
 const reservedCollections = ['discover', 'history', 'favorites'];
+
+const importBtn = <HTMLInputElement>document.getElementById('upload');
+importBtn.addEventListener('change', async () => {
+  if (!confirm('This will overwrite your current library')) return;
+  saveDB(JSON.parse(await (<FileList>importBtn.files)[0].text()));
+  location.reload();
+});
+
+
+(<HTMLButtonElement>document.getElementById('exportBtn')).addEventListener('click', () => {
+  const link = $('a');
+  link.download = 'ytify_library.json';
+  link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
+  link.click();
+});
+
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
 
@@ -10,19 +26,19 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   item.dataset.id = data.id;
   item.textContent = item.dataset.title = <string>data.title;
   item.dataset.author = data.author;
-  item.dataset.thumbnail = data.thumbnail;
+  item.dataset.channelUrl = data.channelUrl;
   item.dataset.duration = data.duration;
   item.addEventListener('click', () => {
     if (item.classList.contains('delete'))
       return removeFromCollection((<HTMLDetailsElement>(<HTMLDivElement>item.parentElement).parentElement).id, <string>data.id);
 
-    superModal.classList.toggle('hide');
+    superModal.showModal();
+    history.pushState({}, '', '#');
     const _ = superModal.dataset;
     _.id = data.id;
     _.title = data.title;
     _.author = data.author;
     _.duration = data.duration;
-    _.thumbnail = data.thumbnail;
     _.channelUrl = data.channelUrl;
   })
   return item;
@@ -91,12 +107,10 @@ export function createPlaylist(title: string) {
   const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${details.id}"]`);
 
   const summary = $('summary');
-  const i = $('i');
-  i.className = 'ri-play-list-2-line';
-  summary.append(i, ' ' + title);
+  summary.innerHTML = '<i class="ri-play-list-2-line"></i> ' + title;
 
   const deleteBtn = $('button');
-  deleteBtn.textContent = 'Delete';
+  deleteBtn.innerHTML = '<i class="ri-delete-bin-7-line"></i> Delete';
   deleteBtn.addEventListener('click', () => {
     atpOption.remove();
     details.remove();
@@ -106,24 +120,23 @@ export function createPlaylist(title: string) {
   });
   const div = $('div');
   const removeBtn = $('button');
-  removeBtn.textContent = 'Remove';
+  removeBtn.innerHTML = '<i class="ri-subtract-line"></i> Remove';
   removeBtn.addEventListener('click', () => {
     div.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
     removeBtn.classList.toggle('delete');
   });
   const enqueueBtn = $('button');
-  enqueueBtn.textContent = 'Enqueue';
+  enqueueBtn.innerHTML = '<i class="ri-list-check-2"></i> Enqueue';
   enqueueBtn.onclick = () => listToQ(div);
   const renameBtn = $('button');
-  renameBtn.textContent = 'Rename';
+  renameBtn.innerHTML = '<i class="ri-edit-line"></i> Rename';
   renameBtn.addEventListener('click', () => {
     const newTitle = prompt('Enter the new title', title);
     if (!newTitle) return;
     atpOption.text = newTitle;
     atpOption.value = newTitle;
     details.id = newTitle;
-    summary.innerHTML = '';
-    summary.append(i, ' ' + newTitle);
+    summary.innerHTML = '<i class="ri-play-list-2-line"></i> ' + newTitle;
     const db = getDB();
     db[newTitle] = db[title];
     delete db[title];
@@ -132,7 +145,7 @@ export function createPlaylist(title: string) {
 
   details.append(summary, deleteBtn, removeBtn, enqueueBtn, renameBtn, div);
 
-  library.appendChild(details);
+  library.insertBefore(details, <HTMLBRElement>document.querySelector('br'));
 }
 
 
@@ -179,6 +192,6 @@ favButton.addEventListener('click', () => {
     addToCollection('favorites', audio.dataset) :
     removeFromCollection('favorites', id);
 
-  (<HTMLLabelElement>favButton.nextElementSibling).classList.toggle('ri-heart-fill');
+  favIcon.classList.toggle('ri-heart-fill');
 });
 

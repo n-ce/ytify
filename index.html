@@ -54,8 +54,8 @@
       <i class="ri-settings-line"></i>
       <p>Settings</p>
     </a>
-    <a id="/list" class="hide"><br>
-      <p>List</p>
+    <a href="/list" id="/list" class="hide">
+      <p>list</p>
     </a>
   </nav>
   <main>
@@ -65,7 +65,7 @@
       <img height="100%" width="100%" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.3</a>
+        <a id="title" href="" target="_blank">ytify 6.4</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option value="">Bitrate</option>
@@ -87,7 +87,7 @@
     <section id="upcoming">
       <span id="queuetools">
         <button>
-          <i class="ri-delete-bin-7-line"></i> Clear
+          <i class="ri-close-line"></i> Clear
         </button>
         <button>
           <i class="ri-shuffle-line"></i> Shuffle
@@ -133,13 +133,16 @@
     </section>
 
     <section id="library">
-
       <details id="discover">
         <summary>
           <i class="ri-compass-3-line"></i> Discover
         </summary>
-        <button>Clear All</button>
-        <button>Remove</button>
+        <button>
+          <i class="ri-close-line"></i> Clear All
+        </button>
+        <button>
+          <i class="ri-subtract-line"></i> Remove
+        </button>
         <div>
           <h2>Listen more to discover more.</h2>
         </div>
@@ -149,8 +152,12 @@
         <summary>
           <i class="ri-history-line"></i> History
         </summary>
-        <button>Clear All</button>
-        <button>Remove</button>
+        <button>
+          <i class="ri-close-line"></i> Clear All
+        </button>
+        <button>
+          <i class="ri-subtract-line"></i> Remove
+        </button>
         <div></div>
       </details>
 
@@ -158,12 +165,26 @@
         <summary>
           <i class="ri-heart-fill"></i> Favorites
         </summary>
-        <button>Clear All</button>
-        <button>Remove</button>
-        <button>Enqueue</button>
+        <button>
+          <i class="ri-close-line"></i> Clear All
+        </button>
+        <button>
+          <i class="ri-subtract-line"></i> Remove
+        </button>
+        <button>
+          <i class="ri-list-check-2"></i> Enqueue
+        </button>
         <div></div>
       </details>
-
+      <br>
+      <div>
+        <label id="importBtn" for="upload">
+          <i class="ri-login-circle-line"></i> Import</label>
+        <input type="file" id="upload" class="hide">
+        <label id="exportBtn">
+          <i class="ri-logout-circle-line"></i> Export</label>
+      </div>
+      <br>
     </section>
 
 
@@ -171,6 +192,15 @@
       <span>
         <label for="pipedInstances">Piped Instance</label>
         <select id="pipedInstances"></select>
+      </span>
+      <span>
+        <label for="roundnessChanger">UI Roundness</label>
+        <select id="roundnessChanger">
+          <option value="none">None</option>
+          <option value="1vmin">Light</option>
+          <option value="2vmin" selected>Medium</option>
+          <option value="4vmin">Heavy</option>
+        </select>
       </span>
       <span>
         <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
@@ -185,17 +215,8 @@
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
 
-      <span>
-        <label for="roundnessChanger">UI Roundness</label>
-        <select id="roundnessChanger">
-          <option value="none">None</option>
-          <option value="1vmin">Light</option>
-          <option value="2vmin" selected>Medium</option>
-          <option value="4vmin">Heavy</option>
-        </select>
-      </span>
 
-      <a href="/" id="deleteButton">Clear All Stored Data</a>
+      <a href="/" id="deleteButton">Clear all data</a>
 
       <a href="https://github.com/n-ce/ytify/" target="_blank">View on Github</a>
 
@@ -207,7 +228,6 @@
       </form>
 
     </section>
-
 
     <section id="list">
       <span id="listTools">
@@ -229,7 +249,6 @@
         <h1>playlist or channel items show here</h1>
       </div>
     </section>
-
 
     <footer>
 
@@ -267,7 +286,7 @@
     </footer>
   </main>
 
-  <div id="superModal" class="hide">
+  <dialog id="superModal">
     <ul>
       <li><i class="ri-play-line"></i>Play Now</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
@@ -276,13 +295,15 @@
         <select id="playlistSelector">
           <option>Add To Playlist</option>
           <option value="+pl">Create New Playlist</option>
+          <option value="favorites">Favorites</option>
         </select>
       </li>
       <li><i class="ri-rfid-line"></i>Start Radio</li>
       <li><i class="ri-download-2-line"></i>Download</li>
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
-  </div>
+  </dialog>
+
   <script src="/src/scripts/main.ts" type="module"></script>
 </body>
 
