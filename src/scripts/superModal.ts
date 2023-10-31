@@ -62,7 +62,8 @@ downloadBtn.addEventListener('click', () => {
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
       url: streamUrl,
-      isAudioOnly: true
+      isAudioOnly: true,
+      filenamePattern: 'basic'
     })
   })
     .then(_ => _.json())
