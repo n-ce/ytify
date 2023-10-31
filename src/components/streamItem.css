@@ -49,7 +49,7 @@ span {
 
 slot {
   font-size: medium;
-  height: 50%;
+  height: 60%;
   width: auto;
   display: flex;
   overflow: hidden;
@@ -65,13 +65,13 @@ div {
 #avatar {
   height: 8vmin;
   border-radius: 50%;
-  margin: 1vmin;
-  margin-left: 0;
+  margin-right: 1vmin;
 }
 
 #metadata {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   height: 100%;
   width: 90%;
 }

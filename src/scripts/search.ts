@@ -4,11 +4,21 @@ import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } fr
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
-const searchSection = <HTMLDivElement>searchlist.parentElement;
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
+let nextPageToken = '';
 
+function setObserver(callback: () => Promise<string>) {
+  new IntersectionObserver((entries, observer) =>
+    entries.forEach(async e => {
+      if (e.isIntersecting) {
+        nextPageToken = await callback();
+        observer.disconnect();
+        setObserver(callback);
+      }
+    })).observe(searchlist.children[searchlist.childElementCount - 3]);
+}
 
 
 // Get search results of input
@@ -30,33 +40,13 @@ const searchLoader = () => {
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
-      searchlist.dataset.token = searchResults.nextpage;
-
       let items = searchResults.items;
-      let currentHeight = 0;
+      nextPageToken = searchResults.nextpage;
 
-      searchSection.onscroll = async () => {
-        const height = searchSection.scrollHeight;
-        if (searchSection.scrollTop + searchSection.clientHeight >= height - 200 && currentHeight !== height) {
-          currentHeight = searchSection.scrollHeight;
-          const data = await loadMoreResults(
-            query + '&',
-            <string>searchlist.dataset.token
-          );
-          // filter livestreams && shorts
-          searchlist.appendChild(itemsLoader(
-            data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-          ));
-          searchlist.dataset.token = data.nextpage;
-        }
-      }
       if (sortSwitch.hasAttribute('checked')) {
         for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults(
-            query + '&',
-            <string>searchlist.dataset.token
-          );
-          searchlist.dataset.token = data.nextpage;
+          const data = await loadMoreResults(query + '&', nextPageToken);
+          nextPageToken = data.nextpage;
           items = items.concat(data.items);
         }
 
@@ -72,7 +62,15 @@ const searchLoader = () => {
         itemsLoader(
           items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         )
-      )
+      );
+      // load more results when 3rd last element is visible
+      setObserver(async () => {
+        const data = await loadMoreResults(query + '&', nextPageToken);
+        searchlist.appendChild(itemsLoader(
+          data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
+        ));
+        return data.nextpage;
+      });
     })
     .catch(err => {
       if (pipedInstances.selectedIndex < pipedInstances.length - 1) {

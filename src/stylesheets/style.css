@@ -224,7 +224,6 @@ details button {
   color: var(--bg);
   font-family: inherit;
   font-size: inherit;
-  font-weight: bold;
   padding: 1vmin 2vmin;
   margin: 1vmin 2vmin;
 }

@@ -137,36 +137,34 @@ export function fetchList(url: string, mix = false) {
   fetch(pipedInstances.value + url)
     .then(res => res.json())
     .then(group => {
-      if (!mix) {
-        listContainer.dataset.token = group.nextpage;
-        if (group.nextpage) {
-          let currentHeight = 0;
-          listSection.onscroll = async () => {
-            const height = listSection.scrollHeight;
-            if (listSection.scrollTop + listSection.clientHeight >= height - 200 && currentHeight !== height) {
-              currentHeight = listSection.scrollHeight;
-              const data = await loadMoreResults(
-                url.substring(1) + '?',
-                <string>listContainer.dataset.token
-              );
-              listContainer.appendChild(itemsLoader(data.relatedStreams));
-              data.nextpage ?
-                listContainer.dataset.token = data.nextpage :
-                listSection.onscroll = null;
-            }
-          }
-        }
-
-        (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
-      }
-      return group.relatedStreams;
-    })
-    .then(streams => itemsLoader(streams))
-    .then(fragment => {
       listContainer.innerHTML = '';
-      listContainer.appendChild(fragment);
+      listContainer.appendChild(itemsLoader(group.relatedStreams));
       listAnchor.click();
       listSection.scrollTo(0, 0);
+
+      let token = group.nextpage;
+      if (!mix && token) {
+        function setObserver(callback: () => Promise<string>) {
+          new IntersectionObserver((entries, observer) =>
+            entries.forEach(async e => {
+              if (e.isIntersecting) {
+                token = await callback();
+                observer.disconnect();
+                if (token)
+                  setObserver(callback);
+              }
+            })).observe(listContainer.children[listContainer.childElementCount - 3]);
+        }
+
+        setObserver(async () => {
+          const data = await loadMoreResults(url.substring(1) + '?', token);
+          listContainer.appendChild(itemsLoader(data.relatedStreams));
+          return data.nextpage;
+        });
+      }
+
+      (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+
       if (mix) (<HTMLButtonElement>document.getElementById('playAllBtn')).click();
     })
     .catch(err => {
