@@ -12,9 +12,7 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
-import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
-import player from '../lib/player';
-import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
+import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
@@ -33,13 +31,7 @@ const update = registerSW({
   }
 });
 
-
-const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
-
-streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/ytify_thumbnail_min.webp';
-
 // temporary location for these functions below because i couldnt decide where to put them
-
 
 // list tools functions
 
