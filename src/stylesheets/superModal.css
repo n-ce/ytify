@@ -8,7 +8,6 @@
   border: var(--border);
   border-radius: calc(var(--roundness)*1.4);
   box-shadow: var(--shadow);
-  /*animation: boing 0.3s ease-in-out;*/
 }
 
 #superModal li {
@@ -35,13 +34,6 @@
 @keyframes bgFade {
   from {
     background-color: #0000;
-  }
-}
-
-@keyframes boing {
-  from {
-    transform: scale(0);
-    opacity: 0;
   }
 }
 

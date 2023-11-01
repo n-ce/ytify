@@ -12,7 +12,7 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
-import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
+import { $, blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
 import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
@@ -27,7 +27,27 @@ const update = registerSW({
           update();
       });
   }
-})
+});
+
+fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
+  .then(res => res.text())
+  .then(data => {
+    const displayer = <HTMLDialogElement>document.getElementById('changelog');
+    const [_, list, span] = displayer.children;
+    const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>span.children;
+
+    const lines = data.split('\n');
+    lines.forEach(text => {
+      const line = $('li');
+      line.textContent = text;
+      list.appendChild(line);
+    });
+
+    updateBtn.onclick = () => location.reload();
+    laterBtn.onclick = () => displayer.close();
+    displayer.showModal();
+    displayer.onclick = () => displayer.close();
+  });
 
 
 
