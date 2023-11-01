@@ -21,8 +21,11 @@ import { registerSW } from 'virtual:pwa-register';
 
 const update = registerSW({
   onNeedRefresh() {
-    if (confirm('An Update is Available, Update?'))
-      update();
+    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md').then(res => res.text())
+      .then(data => {
+        if (confirm('An Update is Available, Update?' + data))
+          update();
+      });
   }
 })
 
