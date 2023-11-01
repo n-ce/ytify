@@ -18,6 +18,7 @@ import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } 
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
+
 const update = registerSW({
   async onNeedRefresh() {
     const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json());

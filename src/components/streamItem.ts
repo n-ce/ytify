@@ -18,12 +18,18 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.crossOrigin = 'anonymous';
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
-		thumbnail.onerror = () =>
-			thumbnail.src = 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${this.dataset.id}/mqdefault.jpg`);
-		thumbnail.onload = () =>
-			thumbnail.naturalWidth === 120 ?
-				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
-				['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+		thumbnail.addEventListener('load', () => {
+			if (thumbnail.naturalWidth !== 120)
+				return ['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+			if (thumbnail.src.includes('webp'))
+				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi')
+			else {
+				// total annihilation
+				this.classList.add('delete');
+				this.click();
+			}
+
+		});
 
 		const duration = $('p');
 		duration.id = 'duration';
