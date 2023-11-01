@@ -17,14 +17,18 @@ import player from '../lib/player';
 import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
+import { registerSW } from 'virtual:pwa-register';
 
+const update = registerSW({
+  onNeedRefresh() {
+    if (confirm('An Update is Available, Update?'))
+      update();
+  }
+})
 
-const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL(params.get('text'));
-
+const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
 
 streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/ytify_thumbnail_min.webp';
-
-
 
 // temporary location for these functions below because i couldnt decide where to put them
 
