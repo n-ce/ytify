@@ -23,12 +23,10 @@ customElements.define('stream-item', class extends HTMLElement {
 				return ['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
 			if (thumbnail.src.includes('webp'))
 				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi')
-			else {
-				// total annihilation
+			else { // total annihilation
 				this.classList.add('delete');
 				this.click();
 			}
-
 		});
 
 		const duration = $('p');
