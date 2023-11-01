@@ -12,43 +12,25 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
-import { $, blankImage, getSaved, idFromURL, params } from '../lib/utils';
+import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
 import player from '../lib/player';
 import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
 const update = registerSW({
-  onNeedRefresh() {
-    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
-      .then(res => res.text())
-      .then(data => {
-        if (confirm('An Update is Available, Update?' + data))
-          update();
-      });
+  async onNeedRefresh() {
+    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json());
+    const displayer = <HTMLDialogElement>document.getElementById('changelog');
+    const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
+    displayer.children[1].innerHTML = data.commit.message;
+    displayer.showModal();
+    displayer.onclick = _ => _.stopPropagation();
+    updateBtn.onclick = () => update();
+    updateBtn.focus();
+    laterBtn.onclick = () => displayer.close();
   }
 });
-
-fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
-  .then(res => res.text())
-  .then(data => {
-    const displayer = <HTMLDialogElement>document.getElementById('changelog');
-    const [_, list, span] = displayer.children;
-    const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>span.children;
-
-    const lines = data.split('\n');
-    lines.forEach(text => {
-      const line = $('li');
-      line.textContent = text;
-      list.appendChild(line);
-    });
-
-    updateBtn.onclick = () => location.reload();
-    laterBtn.onclick = () => displayer.close();
-    displayer.showModal();
-    displayer.onclick = () => displayer.close();
-  });
-
 
 
 const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
