@@ -17,20 +17,17 @@ import player from '../lib/player';
 import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
-if (import.meta.env.DEV) {
-  import('virtual:pwa-register').then(_ => {
-    const update = _.registerSW({
-      onNeedRefresh() {
-        fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
-          .then(res => res.text())
-          .then(data => {
-            if (confirm('An Update is Available, Update?' + data))
-              update();
-          });
-      }
-    })
-  })
-}
+import { registerSW } from 'virtual:pwa-register';
+const update = registerSW({
+  onNeedRefresh() {
+    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
+      .then(res => res.text())
+      .then(data => {
+        if (confirm('An Update is Available, Update?' + data))
+          update();
+      });
+  }
+})
 
 
 

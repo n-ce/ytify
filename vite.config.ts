@@ -61,9 +61,13 @@ const manifest = {
 
 export default defineConfig(({ command }) => {
   return {
-    plugins: (eruda && command === 'serve') ? [erudaInjector] : (command === 'build') ? [VitePWA({
-      manifest: manifest,
-      includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
-    })] : []
+    plugins: [
+      ((eruda && command === 'serve') ? erudaInjector : null),
+      VitePWA({
+        manifest: manifest,
+        disable: (command !== 'build'),
+        includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
+      })
+    ]
   }
 });
