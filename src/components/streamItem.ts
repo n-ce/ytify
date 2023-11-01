@@ -19,16 +19,14 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('load', () => {
-			if (thumbnail.naturalWidth === 120) {
-				if (thumbnail.src.includes('webp'))
-					thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi')
-				else {
-					// total annihilation
-					this.classList.add('delete');
-					this.click();
-				}
-			} else
-				['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+			if (thumbnail.naturalWidth !== 120)
+				return ['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+			if (thumbnail.src.includes('webp'))
+				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi')
+			else { // total annihilation
+				this.classList.add('delete');
+				this.click();
+			}
 		});
 
 		const duration = $('p');

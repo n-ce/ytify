@@ -12,22 +12,26 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
-import { blankImage, getSaved, idFromURL, params } from '../lib/utils';
-import player from '../lib/player';
-import { enqueueBtn, img, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
+import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
+import { registerSW } from 'virtual:pwa-register';
 
-
-const streamQuery = params.get('s') || idFromURL(params.get('url')) || idFromURL(params.get('text'));
-
-
-streamQuery ? player(streamQuery) : img.src = getSaved('img') ? blankImage : '/ytify_thumbnail_min.webp';
-
-
+const update = registerSW({
+  async onNeedRefresh() {
+    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json());
+    const displayer = <HTMLDialogElement>document.getElementById('changelog');
+    const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
+    displayer.children[1].innerHTML = data.commit.message;
+    displayer.showModal();
+    displayer.onclick = _ => _.stopPropagation();
+    updateBtn.onclick = () => update();
+    updateBtn.focus();
+    laterBtn.onclick = () => displayer.close();
+  }
+});
 
 // temporary location for these functions below because i couldnt decide where to put them
-
 
 // list tools functions
 
