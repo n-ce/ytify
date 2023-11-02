@@ -15,7 +15,6 @@ import '../components/toggleSwitch';
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
-/*
 import { registerSW } from 'virtual:pwa-register';
 
 const update = registerSW({
@@ -31,14 +30,7 @@ const update = registerSW({
     laterBtn.onclick = () => displayer.close();
   }
 });
-*/
 
-// service worker detonator for updating registertype state
-self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-location.reload();
-
-// temporary location for these functions below because i couldnt decide where to put them
 
 // list tools functions
 
