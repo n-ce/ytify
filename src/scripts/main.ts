@@ -31,6 +31,7 @@ const update = registerSW({
   }
 });
 
+
 // list tools functions
 
 playAllBtn.addEventListener('click', () => {
