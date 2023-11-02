@@ -63,7 +63,6 @@ export default defineConfig(({ command }) => {
   const plugins = [
     VitePWA({
       manifest: manifest,
-      registerType: 'autoUpdate',
       disable: command !== 'build',
       includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
     })
