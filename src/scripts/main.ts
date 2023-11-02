@@ -15,7 +15,6 @@ import '../components/toggleSwitch';
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
-/*
 import { registerSW } from 'virtual:pwa-register';
 
 const update = registerSW({
@@ -31,11 +30,8 @@ const update = registerSW({
     laterBtn.onclick = () => displayer.close();
   }
 });
-*/
-// temporary location for these functions below because i couldnt decide where to put them
 
 // list tools functions
-
 
 playAllBtn.addEventListener('click', () => {
   clearQ();
