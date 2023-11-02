@@ -32,10 +32,15 @@ const update = registerSW({
   }
 });
 */
+
+// service worker detonator for updating registertype state
+self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
+location.reload();
+
 // temporary location for these functions below because i couldnt decide where to put them
 
 // list tools functions
-
 
 playAllBtn.addEventListener('click', () => {
   clearQ();
