@@ -32,6 +32,15 @@ const update = registerSW({
   }
 });
 */
+// sw detonator
+addEventListener('DOMContentLoaded', async () => {
+  if (!(await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json())).commit.message.includes('detonate')) return;
+  self.caches.keys().then(s => s.forEach(k => self.caches.delete(k)));
+  navigator.serviceWorker.getRegistrations().then(s => s.forEach(r => r.unregister()));
+  location.reload();
+});
+
+
 // temporary location for these functions below because i couldnt decide where to put them
 
 // list tools functions
