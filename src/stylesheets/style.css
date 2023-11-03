@@ -136,7 +136,6 @@ dialog::backdrop {
   background-color: #0007;
 }
 
-/*
 #changelog {
   flex-direction: column;
   color: var(--text);
@@ -149,7 +148,6 @@ dialog::backdrop {
   margin: 2vmin 0;
   text-decoration: underline;
 }
-*/
 
 #library>div {
   display: flex;

@@ -15,7 +15,6 @@ import '../components/toggleSwitch';
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
-/*
 import { registerSW } from 'virtual:pwa-register';
 
 const update = registerSW({
@@ -23,7 +22,7 @@ const update = registerSW({
     const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json());
     const displayer = <HTMLDialogElement>document.getElementById('changelog');
     const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
-    displayer.children[1].innerHTML = data.commit.message;
+    displayer.children[1].textContent = data.commit.message;
     displayer.showModal();
     displayer.onclick = _ => _.stopPropagation();
     updateBtn.onclick = () => update();
@@ -31,20 +30,9 @@ const update = registerSW({
     laterBtn.onclick = () => displayer.close();
   }
 });
-*/
-// sw detonator
-addEventListener('DOMContentLoaded', async () => {
-  if (!(await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json())).commit.message.includes('detonate')) return;
-  self.caches.keys().then(s => s.forEach(k => self.caches.delete(k)));
-  navigator.serviceWorker.getRegistrations().then(s => s.forEach(r => r.unregister()));
-  location.reload();
-});
 
-
-// temporary location for these functions below because i couldnt decide where to put them
 
 // list tools functions
-
 
 playAllBtn.addEventListener('click', () => {
   clearQ();
