@@ -19,7 +19,7 @@ import { registerSW } from 'virtual:pwa-register';
 
 const update = registerSW({
   async onNeedRefresh() {
-    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/dev').then(_ => _.json());
+    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/6.5').then(_ => _.json());
     const displayer = <HTMLDialogElement>document.getElementById('changelog');
     const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
     displayer.children[1].textContent = data.commit.message;
