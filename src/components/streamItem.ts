@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { $, blankImage, getSaved, imgUrl } from '../lib/utils';
+import { $, blankImage, getSaved } from '../lib/utils';
 
 
 customElements.define('stream-item', class extends HTMLElement {
@@ -18,6 +18,10 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.crossOrigin = 'anonymous';
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
+		thumbnail.addEventListener('error', () => {
+			thumbnail.src = blankImage;
+			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+		});
 		thumbnail.addEventListener('load', () => {
 			if (thumbnail.naturalWidth !== 120)
 				return ['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
@@ -73,7 +77,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img')) {
-			thumbnail.src = imgUrl(<string>data.id, 'mqdefault');
+			thumbnail.src = 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${data.id}/mqdefault.webp`);
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';

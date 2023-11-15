@@ -1,23 +1,9 @@
 import { audio, bitrateSelector, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, imgUrl, parseTTML, save } from "../lib/utils";
+import { blankImage, getSaved, parseTTML, save } from "../lib/utils";
 
-img.addEventListener('load', () => {
-  if (img.naturalWidth === 120)
-    img.src = img.src.includes('webp') ?
-      ('https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi/${audio.dataset.id}/hqdefault.jpg`)) :
-      imgUrl(
-        <string>audio.dataset.id,
-        (img.src.includes('maxresdefault') ? 'hq720' : 'hqdefault')
-      );
-});
-
-img.addEventListener('error', () => {
-  img.src = imgUrl(
-    <string>audio.dataset.id,
-    (img.src.includes('maxresdefault') ? 'hqdefault' : 'maxresdefault')
-  );
-});
+img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
+img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
 
 
 bitrateSelector.addEventListener('change', () => {

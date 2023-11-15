@@ -19,7 +19,6 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const imgUrl = (id: string, res: string) => 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${id}/${res}.webp`);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -53,17 +52,29 @@ export function setMetaData(
   id: string,
   streamName: string,
   authorName: string,
-  authorUrl: string,
-  thumbnailUrl: string
+  authorUrl: string
 ) {
 
   if (!getSaved('img'))
-    img.src = thumbnailUrl;
+    img.src = 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`);
+
+  img.alt = streamName;
 
   const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = `https://youtube.com/watch?v=${id}`;
   title.textContent = streamName;
-  img.alt = streamName;
+  title.onclick = _ => {
+    _.preventDefault();
+    superModal.showModal();
+    history.pushState({}, '', '#');
+    const s = superModal.dataset;
+    const a = audio.dataset;
+    s.id = a.id;
+    s.title = a.title;
+    s.author = a.author;
+    s.duration = a.duration;
+    s.channelUrl = a.channelUrl;
+  }
 
   const author = <HTMLAnchorElement>document.getElementById('author');
   author.href = 'https://youtube.com' + authorUrl;
@@ -76,18 +87,19 @@ export function setMetaData(
   if (location.pathname === '/')
     document.title = streamName + ' - ytify';
 
+  const notifImg = getSaved('img') ? blankImage : img.src.replace('maxres', '');
   if ('mediaSession' in navigator) {
     navigator.mediaSession.setPositionState();
     navigator.mediaSession.metadata = new MediaMetadata({
       title: streamName,
       artist: authorName,
       artwork: [
-        { src: imgUrl(id, 'default'), sizes: '96x96' },
-        { src: imgUrl(id, 'default'), sizes: '128x128' },
-        { src: imgUrl(id, 'mqdefault'), sizes: '192x192' },
-        { src: imgUrl(id, 'mqdefault'), sizes: '256x256' },
-        { src: imgUrl(id, 'hqdefault'), sizes: '384x384' },
-        { src: imgUrl(id, 'hqdefault'), sizes: '512x512' },
+        { src: notifImg, sizes: '96x96' },
+        { src: notifImg, sizes: '128x128' },
+        { src: notifImg, sizes: '192x192' },
+        { src: notifImg, sizes: '256x256' },
+        { src: notifImg, sizes: '384x384' },
+        { src: notifImg, sizes: '512x512' },
       ]
     });
   }

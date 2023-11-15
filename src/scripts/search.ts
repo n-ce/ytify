@@ -137,26 +137,32 @@ superInput.addEventListener('input', async () => {
 let index = 0;
 
 superInput.addEventListener('keydown', _ => {
-  if (_.key === 'Backspace') return;
-
   if (_.key === 'Enter') return searchLoader();
+  if (_.key === 'Backspace' ||
+    !suggestions.hasChildNodes() ||
+    getSaved('search_suggestions')) return;
 
-  if (!suggestions.hasChildNodes()) return;
-
-
+  suggestions.childNodes.forEach(node => {
+    if ((<HTMLLIElement>node).classList.contains('hover'))
+      (<HTMLLIElement>node).classList.remove('hover');
+  });
 
   if (_.key === 'ArrowUp') {
     if (index === 0) index = suggestions.childElementCount;
     index--;
-    superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
+    const li = <HTMLLIElement>suggestions.children[index];
+    superInput.value = <string>li.textContent;
+    li.classList.add('hover');
   }
 
-
   if (_.key === 'ArrowDown') {
-    superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
+    const li = <HTMLLIElement>suggestions.children[index];
+    superInput.value = <string>li.textContent;
+    li.classList.add('hover');
     index++;
     if (index === suggestions.childElementCount) index = 0;
   }
+
 
 });
 
