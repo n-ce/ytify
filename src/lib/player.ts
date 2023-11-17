@@ -1,4 +1,4 @@
-import { audio, bitrateSelector, favButton, favIcon, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
+import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
@@ -132,6 +132,9 @@ export default async function player(id: string | null = '') {
   }
 
 
+  const dsLimit = parseInt(discoveryStorageLimit.value);
+  if (!dsLimit) return;
+
   // related streams data injection as discovery data after 10 seconds
 
   setTimeout(() => {
@@ -158,12 +161,24 @@ export default async function player(id: string | null = '') {
     });
 
     // convert to array
-    const array = Object.entries(db.discover);
+    let array = Object.entries(db.discover);
 
     // Randomize Array
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    // remove if exists in history
+
+    array = array.filter(e => !db.history.hasOwnProperty(e[0]));
+
+    // randomly remove items from array when limit crossed
+    let len = array.length;
+    while (len > dsLimit) {
+      const i = Math.floor(Math.random() * len)
+      array.splice(i, 1);
+      len--;
     }
 
     // convert the new merged+randomized discover back to object and inject it

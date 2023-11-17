@@ -39,3 +39,5 @@ export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 export const atpSelector = <HTMLSelectElement>document.getElementById('playlistSelector');
 
 export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
+
+export const discoveryStorageLimit = <HTMLSelectElement>document.getElementById('discoverLimit');

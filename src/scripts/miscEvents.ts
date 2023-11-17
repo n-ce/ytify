@@ -1,6 +1,6 @@
-import { audio, bitrateSelector, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
+import { audio, bitrateSelector, discoveryStorageLimit, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, parseTTML, save } from "../lib/utils";
+import { blankImage, getDB, getSaved, parseTTML, save, saveDB } from "../lib/utils";
 
 img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
 img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
@@ -72,4 +72,23 @@ deleteButton.addEventListener('click', () => {
   self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
   navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
   localStorage.clear();
+});
+
+
+
+discoveryStorageLimit.value = getSaved('discoveryLimit') || '512';
+
+discoveryStorageLimit.addEventListener('change', () => {
+  const val = discoveryStorageLimit.value;
+  val === '512' ?
+    localStorage.removeItem('discoveryLimit') :
+    save('discoveryLimit', val);
+
+  if (val === '0') {
+    const db = getDB();
+    delete db.discover;
+    saveDB(db);
+    document.getElementById('discover')?.classList.add('hide');
+  }
+  else document.getElementById('discover')?.classList.remove('hide');
 });
