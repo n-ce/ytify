@@ -56,7 +56,7 @@ export function setMetaData(
 ) {
 
   if (!getSaved('img'))
-    img.src = 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`);
+    img.src = 'https://pipedproxy.kavin.rocks/vi_webp/' + id + '/maxresdefault.webp?host=i.ytimg.com';
 
   img.alt = streamName;
 
