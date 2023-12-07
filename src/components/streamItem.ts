@@ -77,7 +77,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img')) {
-			thumbnail.src = 'https://pipedproxy.kavin.rocks/vi_webp/' + data.id + '/mqdefault.webp?host=i.ytimg.com';
+			thumbnail.src = 'https://pipedproxy.syncpundit.io/vi_webp/' + data.id + '/mqdefault.webp?host=i.ytimg.com';
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';
