@@ -56,7 +56,7 @@ export function setMetaData(
 ) {
 
   if (!getSaved('img'))
-    img.src = 'https://pipedproxy.kavin.rocks/vi_webp/' + id + '/maxresdefault.webp?host=i.ytimg.com';
+    img.src = 'https://pipedproxy.syncpundit.io/vi_webp/' + id + '/maxresdefault.webp?host=i.ytimg.com';
 
   img.alt = streamName;
 
