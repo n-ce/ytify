@@ -66,12 +66,13 @@ audio.addEventListener('pause', () => {
   clearTimeout(historyTimeoutId);
 });
 
+let isPlayable = (superInput.value || streamHistory.length || params.has('url') || params.has('text') || location.pathname === '/library') ? true : false;
+
 
 audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
-
-  if (superInput.value || streamHistory.length || params.has('url') || params.has('text'))
-    audio.play();
+  console.log(isPlayable)
+  if (isPlayable) audio.play();
   historyID = audio.dataset.id;
   clearTimeout(historyTimeoutId);
 });
