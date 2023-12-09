@@ -23,13 +23,14 @@ const update = registerSW({
     const displayer = <HTMLDialogElement>document.getElementById('changelog');
     const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
     displayer.children[1].textContent = data.commit.message;
+    /*
     const commits = await fetch('https://api.github.com/repos/n-ce/ytify/commits')
       .then(_ => _.json());
 
     commits.map((e: { commit: string }) => e.commit).map((e: { committer: { date: string }, message: string }) => e.committer.date + ' : ' + e.message).forEach((e: string) => {
       displayer.children[1].textContent += e;
     })
-
+*/
     displayer.showModal();
     displayer.onclick = _ => _.stopPropagation();
     updateBtn.onclick = () => update();

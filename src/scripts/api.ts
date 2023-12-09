@@ -8,7 +8,7 @@ const [initial_name, initial_url] = getSaved('pipedInstance')?.split('|') || ['k
 
 if (initial_name.includes('Custom')) {
   pipedInstances.options[0].value = initial_url;
-  pipedInstances.options[0].textContent += ' : ' + new URL(initial_url).hostname.split('.');
+  pipedInstances.options[0].textContent += ' : ' + new URL(initial_url).hostname;
 } else pipedInstances.add(new Option(initial_name, initial_url, undefined, true));
 
 
