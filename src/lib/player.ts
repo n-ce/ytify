@@ -1,5 +1,5 @@
-import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
+import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton/*, subtitleContainer, subtitleSelector, subtitleTrack */ } from "./dom";
+import { convertSStoHHMMSS, getDB, getSaved, params, /*parseTTML,*/ setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
@@ -11,7 +11,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(playbackInstance.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,captions,author,authorUrl,recommendedVideos').then(res => res.json()).catch(err => {
+  const data = await fetch(playbackInstance.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).catch(err => {
     if (playbackInstance.selectedIndex < playbackInstance.length - 1) {
       playbackInstance.selectedIndex++;
       player(id);
@@ -39,14 +39,14 @@ export default async function player(id: string | null = '') {
   bitrateSelector.innerHTML = '';
 
   audioStreams.forEach(((_: {
-    encoding: string,
+    type: string,
     url: string,
     quality: string,
     bitrate: string
   }) => {
     const bitrate = parseInt(_.bitrate);
-    const quality = Math.floor(bitrate / 1024) + 'kbps';
-    if (_.encoding === 'opus') {
+    const quality = Math.floor(bitrate / 1024) + 'kbps ';
+    if (_.type.startsWith('audio/webm')) {
       if (isSafari) return;
       opus.urls.push(_.url);
       opus.bitrates.push(bitrate);
@@ -60,25 +60,19 @@ export default async function player(id: string | null = '') {
         aac.options.push(new Option(quality, _.url));
     }
   }));
-  console.log(audioStreams, opus, aac)
 
 
-
-  // finding lowest available stream when low opus bitrate unavailable
+  // using lowest aac stream when low opus bitrate unavailable
 
   if (!getSaved('quality') &&
     opus.bitrates[0] > 65536
     && !isSafari) {
-
     opus.urls = opus.urls.concat(aac.urls);
-
     opus.bitrates = opus.bitrates.concat(aac.bitrates);
-
     for (const opts of aac.options) bitrateSelector.add(opts);
   }
 
   const codec = (isSafari ? aac : opus);
-
   const index = getSaved('quality') ? (codec.length || 0) - 1 : 0;
 
   bitrateSelector.selectedIndex = index;
@@ -97,21 +91,21 @@ export default async function player(id: string | null = '') {
     data.authorUrl
   );
 
-
-  // Subtitle data Injection into dom
-
-  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
-  subtitleSelector.classList.remove('hide');
-  subtitleContainer.innerHTML = '';
-  if (data.captions.length)
-    for (const subtitles of data.captions) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
-  else {
-    subtitleTrack.src = '';
-    subtitleContainer.classList.add('hide');
-    subtitleSelector.classList.add('hide');
-    parseTTML();
-  }
-
+  /*
+    // Subtitle data Injection into dom
+  
+    subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
+    subtitleSelector.classList.remove('hide');
+    subtitleContainer.innerHTML = '';
+    if (data.captions.length)
+      for (const subtitles of data.captions) subtitleSelector.add(new Option(subtitles.label, playbackInstance.value + subtitles.url));
+    else {
+      subtitleTrack.src = '';
+      subtitleContainer.classList.add('hide');
+      subtitleSelector.classList.add('hide');
+      parseTTML();
+    }
+  */
 
   params.set('s', id);
 
