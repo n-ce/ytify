@@ -40,10 +40,11 @@ declare global {
 
   interface Opus {
     urls: string[],
-    bitrates: number[]
+    bitrates: number[],
+    length?: number
   }
 
-  interface M4A extends Opus {
+  interface AAC extends Opus {
     options: HTMLOptionElement[]
   }
 

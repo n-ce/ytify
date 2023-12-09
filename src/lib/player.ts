@@ -1,9 +1,9 @@
-import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
+import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
-
+const playbackInstance = <HTMLSelectElement>document.getElementById('playbackInstance');
 
 export default async function player(id: string | null = '') {
 
@@ -11,82 +11,90 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
-    if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-      pipedInstances.selectedIndex++;
+  const data = await fetch(playbackInstance.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,captions,author,authorUrl,recommendedVideos').then(res => res.json()).catch(err => {
+    if (playbackInstance.selectedIndex < playbackInstance.length - 1) {
+      playbackInstance.selectedIndex++;
       player(id);
       return;
     }
     alert(err);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    pipedInstances.selectedIndex = 0;
+    playbackInstance.selectedIndex = 0;
   });
 
-  if (!data.audioStreams.length) {
+
+  const audioStreams = data.adaptiveFormats
+    .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
+    .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
+
+  if (!audioStreams.length) {
     alert('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
 
-
-  // extracting opus streams and storing m4a streams
-
-  const opus: Opus = { urls: [], bitrates: [] }
-  const m4a: M4A = { urls: [], bitrates: [], options: [] }
-
+  const opus: Opus = { urls: [], bitrates: [] };
+  const aac: AAC = { urls: [], bitrates: [], options: [] };
 
   bitrateSelector.innerHTML = '';
 
-  for (const value of data.audioStreams) {
-    if (value.codec === "opus") {
-      if (isSafari) continue;
-      opus.urls.push(value.url);
-      opus.bitrates.push(value.bitrate);
-      bitrateSelector.add(new Option(value.quality, value.url));
+  audioStreams.forEach(((_: {
+    encoding: string,
+    url: string,
+    quality: string,
+    bitrate: string
+  }) => {
+    const bitrate = parseInt(_.bitrate);
+    const quality = Math.floor(bitrate / 1024) + 'kbps';
+    if (_.encoding === 'opus') {
+      if (isSafari) return;
+      opus.urls.push(_.url);
+      opus.bitrates.push(bitrate);
+      bitrateSelector.add(new Option(quality, _.url));
     }
     else {
-      m4a.urls.push(value.url);
-      m4a.bitrates.push(value.bitrate);
+      aac.urls.push(_.url);
+      aac.bitrates.push(bitrate);
       isSafari ?
-        bitrateSelector.add(new Option(value.quality, value.url)) :
-        m4a.options.push(new Option(value.quality, value.url));
+        bitrateSelector.add(new Option(quality, _.url)) :
+        aac.options.push(new Option(quality, _.url));
     }
-  }
+  }));
+  console.log(audioStreams, opus, aac)
+
+
 
   // finding lowest available stream when low opus bitrate unavailable
 
   if (!getSaved('quality') &&
-    Math.min(...opus.bitrates) > 65536
+    opus.bitrates[0] > 65536
     && !isSafari) {
 
-    opus.urls = opus.urls.concat(m4a.urls);
+    opus.urls = opus.urls.concat(aac.urls);
 
-    opus.bitrates = opus.bitrates.concat(m4a.bitrates);
+    opus.bitrates = opus.bitrates.concat(aac.bitrates);
 
-    for (const opts of m4a.options) bitrateSelector.add(opts);
+    for (const opts of aac.options) bitrateSelector.add(opts);
   }
 
-  const codec = (isSafari ? m4a : opus);
+  const codec = (isSafari ? aac : opus);
 
-  bitrateSelector.selectedIndex =
-    codec.bitrates.indexOf(
-      getSaved('quality') ?
-        Math.max(...codec.bitrates) :
-        Math.min(...codec.bitrates)
-    );
+  const index = getSaved('quality') ? (codec.length || 0) - 1 : 0;
 
-  audio.src = codec.urls[bitrateSelector.selectedIndex];
+  bitrateSelector.selectedIndex = index;
+
+  audio.src = codec.urls[index];
 
 
 
   // remove ' - Topic' from name if it exists
-  data.uploader = data.uploader.replace(' - Topic', '');
+  data.author = data.author.replace(' - Topic', '');
 
   setMetaData(
     id,
     data.title,
-    data.uploader,
-    data.uploaderUrl
+    data.author,
+    data.authorUrl
   );
 
 
@@ -95,8 +103,8 @@ export default async function player(id: string | null = '') {
   subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
   subtitleSelector.classList.remove('hide');
   subtitleContainer.innerHTML = '';
-  if (data.subtitles.length)
-    for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
+  if (data.captions.length)
+    for (const subtitles of data.captions) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
   else {
     subtitleTrack.src = '';
     subtitleContainer.classList.add('hide');
@@ -112,9 +120,9 @@ export default async function player(id: string | null = '') {
 
   audio.dataset.id = id;
   audio.dataset.title = data.title;
-  audio.dataset.author = data.uploader;
-  audio.dataset.duration = convertSStoHHMMSS(data.duration);
-  audio.dataset.channelUrl = data.uploaderUrl;
+  audio.dataset.author = data.author;
+  audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
+  audio.dataset.channelUrl = data.authorUrl;
 
 
 
@@ -143,19 +151,25 @@ export default async function player(id: string | null = '') {
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
 
-    data.relatedStreams.forEach((stream: StreamItem) => {
-      if (stream.type !== 'stream' || stream.duration < 100 || stream.duration > 3000) return;
+    data.recommendedVideos.forEach((stream: {
+      lengthSeconds: number,
+      videoId: string,
+      title: string,
+      author: string,
+      authorUrl: string
+    }) => {
+      if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
-      const rsId = stream.url.slice(9);
+      const rsId = stream.videoId;
       // merges previous discover items with current related streams
       db.discover.hasOwnProperty(rsId) ?
         (<number>db.discover[rsId].frequency)++ :
         db.discover[rsId] = {
           id: rsId,
           title: stream.title,
-          author: stream.uploaderName,
-          duration: convertSStoHHMMSS(stream.duration),
-          channelUrl: stream.uploaderUrl,
+          author: stream.author,
+          duration: convertSStoHHMMSS(stream.lengthSeconds),
+          channelUrl: stream.authorUrl,
           frequency: 1
         }
     });
