@@ -1,6 +1,69 @@
 import { audio, pipedInstances } from "../lib/dom";
 import player from "../lib/player";
-import { getSaved, save } from "../lib/utils";
+import { $, getSaved, imgUrl, save } from "../lib/utils";
+
+const apiTree: { [index: string]: { [index: string]: string } } = {
+  playback: {},
+  search: {},
+  thumbnail: {},
+  radio: {},
+}
+
+const apiRefreshBtn = <HTMLButtonElement>document.getElementById('apiRefreshBtn');
+
+function injectAPItreeIntoDOM() {
+
+}
+
+async function fetchAPIdata() {
+  alert('Generating API Base, This may take some time.');
+
+  const pipedUrl = 'https://piped-instances.kavin.rocks';
+  const invidiousUrl = 'https://api.invidious.io/instances.json';
+
+  const pipData = await fetch(pipedUrl).then(res => res.json());
+
+  for await (const instance of pipData) {
+    const name = instance.name + ' ' + instance.locations;
+    const url = instance.api_url;
+    const imgPrxy = instance.image_proxy_url;
+
+    // search
+    await fetch(url + '/search?q=Q86fth&filter=all')
+      .then(res => res.json())
+      .then(() => apiTree.search[name] = url)
+
+    // thumbnail
+    const testImg = new Image();
+    testImg.onload = () => apiTree.thumbnail[name] = imgPrxy;
+    testImg.src = imgUrl(imgPrxy, '1SLr62VBBjw', 'default');
+
+    // mix radio
+    await fetch(url + '/playlists/RDRgKAFK5djSk')
+      .then(res => res.ok ? (apiTree.radio[name] = url) : '')
+  }
+  const invData = await fetch(invidiousUrl).then(res => res.json());
+
+  for await (const _ of invData) {
+    const url = _[1].uri;
+    if (!_[1].cors || !_[1].api || _[1].type !== 'https') return;
+    const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json())
+    const audioElement = $('audio');
+    const audioURL = (audioData.adaptiveFormats
+      .filter((_: { audioSampleRate: number }) => _.audioSampleRate === 48000)
+      .sort((a: { bitrate: number }, b: { bitrate: number }) => a.bitrate - b.bitrate))[0].url;
+
+    audioElement.onloadedmetadata = () => apiTree.playback[_[0] + ' ' + _[1].flag] = url;
+    audioElement.src = audioURL;
+
+    (<HTMLSelectElement>document.getElementById('playbackInstance')).add(new Option(_[0] + ' ' + _[1].flag, url));
+  }
+  console.log(apiTree);
+}
+
+
+
+apiRefreshBtn.addEventListener('click', fetchAPIdata);
 
 
 const defURL = 'https://pipedapi.kavin.rocks';
@@ -22,9 +85,10 @@ addEventListener('DOMContentLoaded', async () => {
       return data;
     })
     .catch(() => JSON.parse(getSaved('apiList') || '[]')))
-    .forEach((instance: Record<'api_url' | 'name' | 'locations', string>) => {
+    .forEach((instance: Record<'api_url' | 'name' | 'locations' | 'image_proxy_url', string>) => {
+      const name = instance.name + ' ' + instance.locations;
       if (initial_url !== instance.api_url)
-        pipedInstances.add(new Option(instance.name + ' ' + instance.locations, instance.api_url))
+        pipedInstances.add(new Option(name, instance.api_url));
     });
 });
 

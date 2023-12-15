@@ -190,7 +190,8 @@
 
 
     <section id="settings">
-      <h2>API <button>Refresh</button></h2>
+      <h3>API<button id="apiRefreshBtn"><i class="ri-refresh-line"></i> Refresh</button>
+      </h3>
       <span>
         <label for="pipedInstances">Main</label>
         <select id="pipedInstances">
@@ -201,6 +202,7 @@
         <label for="searchInstance">Search</label>
         <select id="searchInstance">
           <option>Custom</option>
+          <option value="https://pipedapi.wireway.ch" selected>wireway.ch</option>
         </select>
       </span>
       <span>
@@ -212,18 +214,21 @@
         </select>
       </span>
       <span>
-        <label for="thumbnailInstance">Thumbnail</label>
-        <select id="thumbnailInstance">
+        <label for="thumbnailProxies">Thumbnail</label>
+        <select id="thumbnailProxies">
           <option>Custom</option>
+          <option value="https://pipedimg.adminforge.de" selected>adminforge.de</option>
         </select>
       </span>
       <span>
-        <label for="MixInstance">Mixes</label>
-        <select id="MixInstance">
+        <label for="mixInstance">Radio</label>
+        <select id="mixInstance">
           <option>Custom</option>
+          <option value="https://pipedapi.kavin.rocks" selected>kavin.rocks</option>
         </select>
       </span>
-      <h2>Library</h2>
+
+      <h3>Library</h3>
       <span>
         <label for="discoverLimit">Discover Storage Limit</label><select id="discoverLimit">
           <option value="0">Don't store</option>
@@ -233,7 +238,8 @@
           <option value="16384">MAX</option>
         </select>
       </span>
-      <h2>Interface</h2>
+
+      <h3>Interface</h3>
       <span>
         <label for="roundnessChanger">UI Roundness</label>
         <select id="roundnessChanger">
@@ -251,7 +257,8 @@
         </select>
       </span>
       <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
-      <h2>Miscellanous</h2>
+
+      <h3>Miscellanous</h3>
       <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
       <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
@@ -354,6 +361,10 @@
       <button>Update</button>
       <button>Later</button>
     </span>
+  </dialog>
+
+  <dialog id="loadingScreen">
+    <i class="ri-loader-3-line"></i>
   </dialog>
 
   <script src="/src/scripts/main.ts" type="module"></script>

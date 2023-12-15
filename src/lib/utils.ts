@@ -1,7 +1,9 @@
-import { audio, img, listAnchor, listContainer, listSection, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+export const imgUrl = (proxy: string, id: string, res: string) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -142,9 +144,12 @@ export function createStreamItem(stream: StreamItem) {
   return streamItem;
 }
 
-export function fetchList(url: string, mix = false) {
+export function fetchList(url: string, mix = true) {
 
-  fetch(pipedInstances.value + url)
+  loadingScreen.showModal();
+  const api = mix ? <HTMLSelectElement>document.getElementById('mixInstance') : pipedInstances;
+
+  fetch(api.value + url)
     .then(res => res.json())
     .then(group => {
       listContainer.innerHTML = '';
@@ -177,14 +182,15 @@ export function fetchList(url: string, mix = false) {
       if (mix) playAllBtn.click();
     })
     .catch(err => {
-      if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
-        pipedInstances.selectedIndex++;
+      if (err.message !== 'No Data Found' && api.selectedIndex < api.length - 1) {
+        api.selectedIndex++;
         fetchList(url, mix);
         return;
       }
       alert(mix ? 'No Mixes Found' : err);
-      pipedInstances.selectedIndex = 0;
+      api.selectedIndex = 0;
     })
+    .finally(() => loadingScreen.close());
 }
 
 

@@ -230,7 +230,8 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#changelog button {
+#changelog button,
+#apiRefreshBtn {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);
@@ -243,7 +244,8 @@ details button,
 
 #queuetools button:hover,
 #listTools button:hover,
-details button:hover {
+details button:hover,
+#apiRefreshBtn:hover {
   background-color: var(--bg);
   color: var(--text);
 }
@@ -256,4 +258,39 @@ details button:hover {
   width: 100%;
   height: 100%;
   margin-top: -10vmin;
+}
+
+#loadingScreen {
+  background-color: var(--bg);
+  color: var(--text);
+  border-radius: var(--roundness);
+}
+
+#loadingScreen i {
+  font-size: xx-large;
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0turn)
+  }
+
+  to {
+    transform: rotate(1turn)
+  }
+}
+
+.ri-loader-3-line {
+  animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+}
+
+#settings h3 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4%;
+  border-bottom: dotted;
+}
+
+#apiRefreshBtn {
+  font-size: small;
 }

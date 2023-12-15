@@ -5,6 +5,10 @@ import { addListToCollection } from "../scripts/library";
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 const playbackInstance = <HTMLSelectElement>document.getElementById('playbackInstance');
 
+audio.addEventListener('error', () => {
+  bitrateSelector.selectedIndex++
+})
+
 export default async function player(id: string | null = '') {
 
   if (!id) return;
@@ -42,22 +46,25 @@ export default async function player(id: string | null = '') {
     type: string,
     url: string,
     quality: string,
-    bitrate: string
+    bitrate: string,
+    encoding: string
   }) => {
     const bitrate = parseInt(_.bitrate);
-    const quality = Math.floor(bitrate / 1024) + 'kbps ';
-    if (_.type.startsWith('audio/webm')) {
+    const encoding = _.type.includes('opus') ? 'opus' : 'aac';
+    const quality = Math.floor(bitrate / 1024) + 'kbps ' + encoding;
+    const url = (_.url).replace(new URL(_.url).origin, playbackInstance.value);
+    if (encoding === 'opus') {
       if (isSafari) return;
-      opus.urls.push(_.url);
+      opus.urls.push(url);
       opus.bitrates.push(bitrate);
-      bitrateSelector.add(new Option(quality, _.url));
+      bitrateSelector.add(new Option(quality, url));
     }
     else {
-      aac.urls.push(_.url);
+      aac.urls.push(url);
       aac.bitrates.push(bitrate);
       isSafari ?
-        bitrateSelector.add(new Option(quality, _.url)) :
-        aac.options.push(new Option(quality, _.url));
+        bitrateSelector.add(new Option(quality, url)) :
+        aac.options.push(new Option(quality, url));
     }
   }));
 

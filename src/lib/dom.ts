@@ -41,3 +41,7 @@ export const atpSelector = <HTMLSelectElement>document.getElementById('playlistS
 export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
 
 export const discoveryStorageLimit = <HTMLSelectElement>document.getElementById('discoverLimit');
+
+export const thumbnailProxies = <HTMLSelectElement>document.getElementById('thumbnailProxies');
+
+export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');

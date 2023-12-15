@@ -66,7 +66,14 @@ audio.addEventListener('pause', () => {
   clearTimeout(historyTimeoutId);
 });
 
-const isPlayable = (superInput.value || streamHistory.length || params.has('url') || params.has('text') || location.pathname === '/library') ? true : false;
+
+let isPlayable = false;
+const playableCheckerID = setInterval(() => {
+  if (superInput.value || streamHistory.length || params.has('url') || params.has('text') || location.pathname === '/library') {
+    isPlayable = true;
+    clearInterval(playableCheckerID);
+  }
+}, 500);
 
 
 audio.addEventListener('loadeddata', () => {

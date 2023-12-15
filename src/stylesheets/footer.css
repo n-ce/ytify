@@ -31,7 +31,7 @@ footer span p {
 [type="range"] {
   height: 50%;
   width: 70%;
-  -webkit-appearance: none;
+  appearance: none;
   cursor: pointer;
   margin: 0;
   background: none;
@@ -170,18 +170,4 @@ footer span p {
 
 .on {
   text-shadow: 0 0 1vmin var(--text);
-}
-
-.ri-loader-3-line {
-  animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
-}
-
-@keyframes spinner {
-  from {
-    transform: rotate(0turn)
-  }
-
-  to {
-    transform: rotate(1turn)
-  }
 }

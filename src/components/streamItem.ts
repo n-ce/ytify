@@ -1,5 +1,6 @@
 import css from './streamItem.css?inline';
-import { $, blankImage, getSaved } from '../lib/utils';
+import { $, blankImage, getSaved, imgUrl } from '../lib/utils';
+import { thumbnailProxies } from '../lib/dom';
 
 
 customElements.define('stream-item', class extends HTMLElement {
@@ -19,7 +20,6 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
 		thumbnail.addEventListener('error', () => {
-			thumbnail.src = blankImage;
 			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
 		});
 		thumbnail.addEventListener('load', () => {
@@ -77,7 +77,8 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img')) {
-			thumbnail.src = 'https://pipedproxy.syncpundit.io/vi_webp/' + data.id + '/mqdefault.webp?host=i.ytimg.com';
+			console.log(thumbnailProxies.length);
+			thumbnail.src = imgUrl(thumbnailProxies.value, <string>data.id, 'mqdefault');
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';

@@ -1,8 +1,8 @@
-import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
+import { loadingScreen, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } from "../lib/utils";
 
-
+const searchInstance = <HTMLSelectElement>document.getElementById('searchInstance');
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
@@ -22,8 +22,9 @@ function setObserver(callback: () => Promise<string>) {
 
 
 // Get search results of input
-
 const searchLoader = () => {
+  loadingScreen.showModal();
+
   const text = superInput.value;
 
   if (!text) return;
@@ -37,7 +38,7 @@ const searchLoader = () => {
 
   const query = 'search' + searchQuery + filterQuery;
 
-  fetch(pipedInstances.value + '/' + query)
+  fetch(searchInstance.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
       let items = searchResults.items;
@@ -73,17 +74,19 @@ const searchLoader = () => {
       });
     })
     .catch(err => {
-      if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-        pipedInstances.selectedIndex++;
+      if (searchInstance.selectedIndex < searchInstance.length - 1) {
+        searchInstance.selectedIndex++;
         searchLoader();
         return;
       }
       alert(err);
-      pipedInstances.selectedIndex = 0;
-    });
+      searchInstance.selectedIndex = 0;
+    })
+    .finally(() => loadingScreen.close());
 
   history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query.replace('filter', 'f'));
   suggestions.style.display = 'none';
+
 }
 
 
@@ -112,7 +115,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(pipedInstances.value + '/suggestions/?query=' + text).then(res => res.json());
+  const data = await fetch(searchInstance.value + '/suggestions/?query=' + text).then(res => res.json());
 
   if (!data.length) return;
 
