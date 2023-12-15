@@ -11,9 +11,6 @@ const apiTree: { [index: string]: { [index: string]: string } } = {
 
 const apiRefreshBtn = <HTMLButtonElement>document.getElementById('apiRefreshBtn');
 
-function injectAPItreeIntoDOM() {
-
-}
 
 async function fetchAPIdata() {
   alert('Generating API Base, This may take some time.');
