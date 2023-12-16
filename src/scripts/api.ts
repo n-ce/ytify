@@ -3,17 +3,25 @@ import player from "../lib/player";
 import { $, getSaved, imgUrl, save } from "../lib/utils";
 
 const apiTree: { [index: string]: { [index: string]: string } } = {
-  playback: {},
-  search: {},
-  thumbnail: {},
-  radio: {},
+  playback: {
+    'Default': 'https://invidious.fdn.fr'
+  },
+  search: {
+    'Default': 'https://pipedapi.kavin.rocks'
+  },
+  thumbnail: {
+    'Default': 'https://pipedproxy.kavin.rocks'
+  },
+  radio: {
+    'Default': 'https://pipedapi.kavin.rocks'
+  },
 }
 
 const apiRefreshBtn = <HTMLButtonElement>document.getElementById('apiRefreshBtn');
 
 
 async function fetchAPIdata() {
-  alert('Generating API Base, This may take some time.');
+  alert('Standby...Generating API Base, This may take some time.');
 
   const pipedUrl = 'https://piped-instances.kavin.rocks';
   const invidiousUrl = 'https://api.invidious.io/instances.json';
@@ -33,18 +41,18 @@ async function fetchAPIdata() {
     // thumbnail
     const testImg = new Image();
     testImg.onload = () => apiTree.thumbnail[name] = imgPrxy;
-    testImg.src = imgUrl(imgPrxy, '1SLr62VBBjw', 'default');
+    testImg.src = imgUrl('1SLr62VBBjw', 'default');
 
     // mix radio
     await fetch(url + '/playlists/RDRgKAFK5djSk')
-      .then(res => res.ok ? (apiTree.radio[name] = url) : '')
+      .then(res => res.ok ? (apiTree.radio[name] = url) : fetch(url + '/playlists/RDRgKAFK5djSk').then(res => res.ok ? (apiTree.radio[name] = url) : ''))
   }
   const invData = await fetch(invidiousUrl).then(res => res.json());
 
   for await (const _ of invData) {
     const url = _[1].uri;
     if (!_[1].cors || !_[1].api || _[1].type !== 'https') return;
-    const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json())
+    const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json());
     const audioElement = $('audio');
     const audioURL = (audioData.adaptiveFormats
       .filter((_: { audioSampleRate: number }) => _.audioSampleRate === 48000)
@@ -55,7 +63,6 @@ async function fetchAPIdata() {
 
     (<HTMLSelectElement>document.getElementById('playbackInstance')).add(new Option(_[0] + ' ' + _[1].flag, url));
   }
-  console.log(apiTree);
 }
 
 

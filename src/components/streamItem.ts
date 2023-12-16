@@ -1,7 +1,5 @@
 import css from './streamItem.css?inline';
 import { $, blankImage, getSaved, imgUrl } from '../lib/utils';
-import { thumbnailProxies } from '../lib/dom';
-
 
 customElements.define('stream-item', class extends HTMLElement {
 	constructor() {
@@ -77,8 +75,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img')) {
-			console.log(thumbnailProxies.length);
-			thumbnail.src = imgUrl(thumbnailProxies.value, <string>data.id, 'mqdefault');
+			thumbnail.src = imgUrl(<string>data.id, 'mqdefault');
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';

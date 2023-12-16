@@ -5,9 +5,6 @@ import { addListToCollection } from "../scripts/library";
 const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
 const playbackInstance = <HTMLSelectElement>document.getElementById('playbackInstance');
 
-audio.addEventListener('error', () => {
-  bitrateSelector.selectedIndex++
-})
 
 export default async function player(id: string | null = '') {
 
@@ -51,7 +48,7 @@ export default async function player(id: string | null = '') {
   }) => {
     const bitrate = parseInt(_.bitrate);
     const encoding = _.type.includes('opus') ? 'opus' : 'aac';
-    const quality = Math.floor(bitrate / 1024) + 'kbps ' + encoding;
+    const quality = Math.floor(bitrate / 1024) + ' kbps ' + encoding;
     const url = (_.url).replace(new URL(_.url).origin, playbackInstance.value);
     if (encoding === 'opus') {
       if (isSafari) return;

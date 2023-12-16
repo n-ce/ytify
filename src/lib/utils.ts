@@ -1,9 +1,9 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-export const imgUrl = (proxy: string, id: string, res: string) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
+export const imgUrl = (id: string, res: string) => `${thumbnailProxies.value}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -58,7 +58,7 @@ export function setMetaData(
 ) {
 
   if (!getSaved('img'))
-    img.src = 'https://pipedproxy.syncpundit.io/vi_webp/' + id + '/maxresdefault.webp?host=i.ytimg.com';
+    img.src = imgUrl(id, 'maxresdefault');
 
   img.alt = streamName;
 
@@ -144,7 +144,7 @@ export function createStreamItem(stream: StreamItem) {
   return streamItem;
 }
 
-export function fetchList(url: string, mix = true) {
+export function fetchList(url: string, mix = false) {
 
   loadingScreen.showModal();
   const api = mix ? <HTMLSelectElement>document.getElementById('mixInstance') : pipedInstances;
