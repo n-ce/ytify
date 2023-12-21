@@ -1,8 +1,7 @@
-import { loadingScreen, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
+import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } from "../lib/utils";
 
-const searchInstance = <HTMLSelectElement>document.getElementById('searchInstance');
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
@@ -38,7 +37,7 @@ const searchLoader = () => {
 
   const query = 'search' + searchQuery + filterQuery;
 
-  fetch(searchInstance.value + '/' + query)
+  fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async searchResults => {
       let items = searchResults.items;
@@ -74,13 +73,13 @@ const searchLoader = () => {
       });
     })
     .catch(err => {
-      if (searchInstance.selectedIndex < searchInstance.length - 1) {
-        searchInstance.selectedIndex++;
+      if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
+        pipedInstances.selectedIndex++;
         searchLoader();
         return;
       }
       alert(err);
-      searchInstance.selectedIndex = 0;
+      pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
 
@@ -115,7 +114,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(searchInstance.value + '/suggestions/?query=' + text).then(res => res.json());
+  const data = await fetch(pipedInstances.value + '/suggestions/?query=' + text).then(res => res.json());
 
   if (!data.length) return;
 

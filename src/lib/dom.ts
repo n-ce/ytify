@@ -2,6 +2,8 @@ export const img = <HTMLImageElement>document.querySelector('img');
 
 export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 
+export const invidiousInstances = <HTMLSelectElement>document.getElementById('invidiousInstances');
+
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 
 export const playButton = <HTMLButtonElement>document.getElementById('playButton');
@@ -45,3 +47,6 @@ export const discoveryStorageLimit = <HTMLSelectElement>document.getElementById(
 export const thumbnailProxies = <HTMLSelectElement>document.getElementById('thumbnailProxies');
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
+loadingScreen.onclick = () => loadingScreen.close();
+
+

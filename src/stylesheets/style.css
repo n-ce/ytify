@@ -230,8 +230,7 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#changelog button,
-#apiRefreshBtn {
+#changelog button {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);
@@ -244,8 +243,7 @@ details button,
 
 #queuetools button:hover,
 #listTools button:hover,
-details button:hover,
-#apiRefreshBtn:hover {
+details button:hover {
   background-color: var(--bg);
   color: var(--text);
 }
@@ -289,8 +287,4 @@ details button:hover,
   justify-content: space-between;
   margin-top: 4%;
   border-bottom: dotted;
-}
-
-#apiRefreshBtn {
-  font-size: small;
 }

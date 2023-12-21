@@ -38,15 +38,12 @@ declare global {
     }
   }
 
-  interface Opus {
+  interface Codec {
     urls: string[],
     bitrates: number[],
     length?: number
   }
 
-  interface AAC extends Opus {
-    options: HTMLOptionElement[]
-  }
 
   type Scheme = {
     [index: string]: {

@@ -1,10 +1,17 @@
-import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton/*, subtitleContainer, subtitleSelector, subtitleTrack */ } from "./dom";
+import {
+  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,/*, subtitleContainer, subtitleSelector, subtitleTrack */
+  invidiousInstances
+} from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, params, /*parseTTML,*/ setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
-const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
-const playbackInstance = <HTMLSelectElement>document.getElementById('playbackInstance');
 
+const preferOpusSwitch = <HTMLElement>document.getElementById('preferOpusSwitch');
+
+if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
+  preferOpusSwitch.removeAttribute('checked');
+
+const [opusGroup, aacGroup] = <HTMLCollectionOf<HTMLOptGroupElement>>bitrateSelector.children;
 
 export default async function player(id: string | null = '') {
 
@@ -12,17 +19,20 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(playbackInstance.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).catch(err => {
-    if (playbackInstance.selectedIndex < playbackInstance.length - 1) {
-      playbackInstance.selectedIndex++;
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
+    if (invidiousInstances.selectedIndex < invidiousInstances.length - 1) {
+      alert('switcing playback instance from' +
+        invidiousInstances.options[invidiousInstances.selectedIndex].textContent
+        + 'to ' +
+        invidiousInstances.options[invidiousInstances.selectedIndex + 1].textContent);
+      invidiousInstances.selectedIndex++;
       player(id);
       return;
     }
     alert(err);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    playbackInstance.selectedIndex = 0;
+    invidiousInstances.selectedIndex = 0;
   });
-
 
   const audioStreams = data.adaptiveFormats
     .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
@@ -34,10 +44,12 @@ export default async function player(id: string | null = '') {
     return;
   }
 
-  const opus: Opus = { urls: [], bitrates: [] };
-  const aac: AAC = { urls: [], bitrates: [], options: [] };
+  const opus: Codec = { urls: [], bitrates: [] };
+  const aac: Codec = { urls: [], bitrates: [] };
+  const wantOpus = preferOpusSwitch.hasAttribute('checked');
 
-  bitrateSelector.innerHTML = '';
+  opusGroup.innerHTML = '';
+  aacGroup.innerHTML = '';
 
   audioStreams.forEach(((_: {
     type: string,
@@ -47,21 +59,18 @@ export default async function player(id: string | null = '') {
     encoding: string
   }) => {
     const bitrate = parseInt(_.bitrate);
-    const encoding = _.type.includes('opus') ? 'opus' : 'aac';
-    const quality = Math.floor(bitrate / 1024) + ' kbps ' + encoding;
-    const url = (_.url).replace(new URL(_.url).origin, playbackInstance.value);
-    if (encoding === 'opus') {
-      if (isSafari) return;
+    const quality = Math.floor(bitrate / 1024) + ' kbps';
+    const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
+    if (_.type.includes('opus')) {
+      if (!wantOpus) return;
       opus.urls.push(url);
       opus.bitrates.push(bitrate);
-      bitrateSelector.add(new Option(quality, url));
+      opusGroup.appendChild(new Option(quality, url));
     }
     else {
       aac.urls.push(url);
       aac.bitrates.push(bitrate);
-      isSafari ?
-        bitrateSelector.add(new Option(quality, url)) :
-        aac.options.push(new Option(quality, url));
+      aacGroup.appendChild(new Option(quality, url));
     }
   }));
 
@@ -70,13 +79,10 @@ export default async function player(id: string | null = '') {
 
   if (!getSaved('quality') &&
     opus.bitrates[0] > 65536
-    && !isSafari) {
-    opus.urls = opus.urls.concat(aac.urls);
-    opus.bitrates = opus.bitrates.concat(aac.bitrates);
-    for (const opts of aac.options) bitrateSelector.add(opts);
-  }
+    && wantOpus)
+    (<HTMLOptionElement>aacGroup.firstElementChild).selected = true;
 
-  const codec = (isSafari ? aac : opus);
+  const codec = (wantOpus ? opus : aac);
   const index = getSaved('quality') ? (codec.length || 0) - 1 : 0;
 
   bitrateSelector.selectedIndex = index;

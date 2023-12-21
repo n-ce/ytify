@@ -3,7 +3,7 @@ import { audio, img, listAnchor, listContainer, listSection, loadingScreen, open
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-export const imgUrl = (id: string, res: string) => `${thumbnailProxies.value}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
+export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -147,9 +147,8 @@ export function createStreamItem(stream: StreamItem) {
 export function fetchList(url: string, mix = false) {
 
   loadingScreen.showModal();
-  const api = mix ? <HTMLSelectElement>document.getElementById('mixInstance') : pipedInstances;
 
-  fetch(api.value + url)
+  fetch(pipedInstances.value + url)
     .then(res => res.json())
     .then(group => {
       listContainer.innerHTML = '';
@@ -182,13 +181,13 @@ export function fetchList(url: string, mix = false) {
       if (mix) playAllBtn.click();
     })
     .catch(err => {
-      if (err.message !== 'No Data Found' && api.selectedIndex < api.length - 1) {
-        api.selectedIndex++;
+      if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
+        pipedInstances.selectedIndex++;
         fetchList(url, mix);
         return;
       }
       alert(mix ? 'No Mixes Found' : err);
-      api.selectedIndex = 0;
+      pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
 }

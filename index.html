@@ -69,7 +69,12 @@
         <a id="title" href="" target="_blank">ytify 6.5</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
-          <option value="">Bitrate</option>
+          <optgroup label="Opus">
+            <option value="">Bitrate</option>
+          </optgroup>
+          <optgroup label="AAC">
+          </optgroup>
+
         </select>
         <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
@@ -190,58 +195,36 @@
 
 
     <section id="settings">
-      <h3>API<button id="apiRefreshBtn"><i class="ri-refresh-line"></i> Refresh</button>
-      </h3>
       <span>
-        <label for="pipedInstances">Main</label>
+        <label for="pipedInstances">
+          <h3>Piped Instance</h3>
+        </label>
         <select id="pipedInstances">
-          <option>Custom</option>
+          <option value="https://pipedapi.kavin.rocks">Custom : kavin.rocks</option>
         </select>
       </span>
+      <h3>Playback</h3>
       <span>
-        <label for="searchInstance">Search</label>
-        <select id="searchInstance">
-          <option>Custom</option>
-          <option value="https://pipedapi.wireway.ch" selected>wireway.ch</option>
+        <label for="invidiousInstances">Invidious Instance</label>
+        <select id="invidiousInstances">
+          <option value="https://invidious.fdn.fr">Custom : fdn.fr</option>
         </select>
       </span>
-      <span>
-        <label for="playbackInstance">Playback</label>
-        <select id="playbackInstance">
-          <option>Custom</option>
-          <option value="https://invidious.fdn.fr" selected>invidious.fdn.fr</option>
-          <option value="https://vid.puffyan.us">vid.puffyan.us</option>
-        </select>
-      </span>
-      <span>
-        <label for="thumbnailProxies">Thumbnail</label>
-        <select id="thumbnailProxies">
-          <option>Custom</option>
-          <option value="https://pipedimg.adminforge.de" selected>adminforge.de</option>
-        </select>
-      </span>
-      <span>
-        <label for="mixInstance">Radio</label>
-        <select id="mixInstance">
-          <option>Custom</option>
-          <option value="https://pipedapi.kavin.rocks" selected>kavin.rocks</option>
-        </select>
-      </span>
+      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
+      <toggle-switch id="preferOpusSwitch" checked>Prefer Opus (Unsupported on Safari)</toggle-switch>
 
-      <h3>Library</h3>
+      <h3>Thumbnail</h3>
       <span>
-        <label for="discoverLimit">Discover Storage Limit</label><select id="discoverLimit">
-          <option value="0">Don't store</option>
-          <option value="128">32KB</option>
-          <option value="512">128KB</option>
-          <option value="4096">1MB</option>
-          <option value="16384">MAX</option>
+        <label for="thumbnailProxies">Proxy</label>
+        <select id="thumbnailProxies">
+          <option value="https://pipedproxy.r4fo.com">Custom : r4fo.com</option>
         </select>
       </span>
+      <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
 
       <h3>Interface</h3>
       <span>
-        <label for="roundnessChanger">UI Roundness</label>
+        <label for="roundnessChanger">Roundness</label>
         <select id="roundnessChanger">
           <option value="none">None</option>
           <option value="1vmin">Light</option>
@@ -259,17 +242,29 @@
       <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
 
       <h3>Miscellanous</h3>
+      <span>
+        <label for="discoverLimit">Discover Storage Limit</label><select id="discoverLimit">
+          <option value="0">Don't store</option>
+          <option value="128">32KB</option>
+          <option value="512">128KB</option>
+          <option value="4096">1MB</option>
+          <option value="16384">MAX</option>
+        </select>
+      </span>
       <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
-      <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
-      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
 
+      <h3>Actions</h3>
+
+      <a href="" id="apiRefreshBtn">Regenerate Piped + Invidious Instances Data</a>
 
       <a href="/" id="deleteButton">Clear all data</a>
 
       <a href="https://github.com/n-ce/ytify/" target="_blank">View on Github</a>
 
-      <a href="https://t.me/encetg" target="_blank">Contact on Telegram</a>
+      <a href="https://t.me/encetg" target="_blank">Chat on Telegram</a>
+
+      <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Chat via Matrix</a>
 
       <form netlify name='feedback' method='POST'>
         <input type="text" name="->" id="netlifyForm"
