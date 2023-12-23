@@ -19,32 +19,48 @@ const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn
 
 function injectApi(tree: tree) {
 
-  if (tree.selected.inviduous) {
-
-  }
-
   while (invidiousInstances.length > 1)
     invidiousInstances.lastElementChild?.remove();
-
+  const selectedinvidious = tree.selected.invidious.split('|');
   for (const name in tree.invidious) {
-
     const url = tree.invidious[name];
-    invidiousInstances.add(new Option(name, url));
+    invidiousInstances.add(new Option(name, url, undefined, url === selectedinvidious[1]));
+  }
+  if (!Object.values(tree.invidious).includes(selectedinvidious[1])) {
+    const custom = invidiousInstances.options[0];
+    custom.value = selectedinvidious[1];
+    custom.textContent = (custom.textContent?.includes('Custom') ? '' : 'Custom : ') + selectedinvidious[0];
   }
 
   while (pipedInstances.length > 1)
     pipedInstances.lastElementChild?.remove();
+
+  const selectedpiped = tree.selected.piped.split('|');
   for (const name in tree.piped) {
     const url = tree.piped[name];
-    if (url === 'https://pipedapi.kavin.rocks') continue;
-    pipedInstances.add(new Option(name, url));
+    pipedInstances.add(new Option(name, url, undefined, url === selectedpiped[1]));
+  }
+  if (!Object.values(tree.piped).includes(selectedpiped[1])) {
+    const custom = pipedInstances.options[0];
+    custom.value = selectedpiped[1];
+    custom.textContent = (custom.textContent?.includes('Custom') ? '' : 'Custom : ') + selectedpiped[0];
   }
 
   while (thumbnailProxies.length > 1)
     thumbnailProxies.lastElementChild?.remove();
-  for (const _ in tree.image) {
-    thumbnailProxies.add(new Option(_, tree.image[_]));
+
+  const selectedimage = tree.selected.image.split('|');
+  for (const name in tree.image) {
+    const url = tree.image[name];
+    thumbnailProxies.add(new Option(name, url, undefined, url === selectedimage[1]));
   }
+
+  if (!Object.values(tree.image).includes(selectedimage[1])) {
+    const custom = thumbnailProxies.options[0];
+    custom.value = selectedimage[1];
+    custom.textContent = (custom.textContent?.includes('Custom') ? '' : 'Custom : ') + selectedimage[0];
+  }
+
 }
 
 const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <string>(<string>apiRefreshBtn.textContent).replace(init, now);
@@ -150,8 +166,7 @@ apiRefreshBtn.addEventListener('click', fetchAPIdata);
     const type = i === 0 ? 'invidious' : i === 1 ? 'piped' : 'image';
 
     const instance = instances.options[instances.selectedIndex];
-    const name = <string>instance.textContent;
-
+    let name = <string>instance.textContent;
     let url = instance.value;
 
     if (name.startsWith('Custom')) {
@@ -159,17 +174,17 @@ apiRefreshBtn.addEventListener('click', fetchAPIdata);
       if (!url) return;
       instance.value = url;
       const [_, dom, ain] = new URL(url).hostname.split('.');
-      instance.textContent = 'Custom : ' + [dom, ain].join('.');
+      name = instance.textContent = 'Custom : ' + [dom, ain].join('.');
     }
 
     if (!name || !url) return;
 
     const savedData: tree = JSON.parse(<string>getSaved('apiTree'));
 
-    savedData.selected[type] = name + ' | ' + url;
+    savedData.selected[type] = name + '|' + url;
     save('apiTree', JSON.stringify(savedData));
 
-    if (i) return;
+    if (i !== 0) return;
     audio.pause();
     const timeOfSwitch = audio.currentTime;
     await player(audio.dataset.id);

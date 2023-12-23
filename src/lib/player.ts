@@ -20,16 +20,19 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
-    if (invidiousInstances.selectedIndex < invidiousInstances.length - 1) {
-      alert('switcing playback instance from' +
-        invidiousInstances.options[invidiousInstances.selectedIndex].textContent
-        + 'to ' +
-        invidiousInstances.options[invidiousInstances.selectedIndex + 1].textContent);
-      invidiousInstances.selectedIndex++;
+    const i = invidiousInstances.selectedIndex;
+    if (i < invidiousInstances.length - 1) {
+      alert('switched playback instance from ' +
+        invidiousInstances.options[i].value
+        + ' to ' +
+        invidiousInstances.options[i + 1].value
+        + ' due to error ' + err.message
+      );
+      invidiousInstances.selectedIndex = i + 1;
       player(id);
       return;
     }
-    alert(err);
+    alert(err.message);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     invidiousInstances.selectedIndex = 0;
   });

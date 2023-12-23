@@ -73,12 +73,19 @@ const searchLoader = () => {
       });
     })
     .catch(err => {
-      if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-        pipedInstances.selectedIndex++;
+      const i = pipedInstances.selectedIndex;
+      if (i < pipedInstances.length - 1) {
+        alert('switched piped instance from ' +
+          pipedInstances.options[i].value
+          + ' to ' +
+          pipedInstances.options[i + 1].value
+          + ' due to error ' + err.message
+        );
+        pipedInstances.selectedIndex = i + 1;
         searchLoader();
         return;
       }
-      alert(err);
+      alert(err.message);
       pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());

@@ -93,15 +93,20 @@ export function setMetaData(
   canvasImg.onload = () => {
     if (!context) return;
 
+    // // Square Image Generator 
     const width = canvasImg.width;
     const height = canvasImg.height;
     const side = Math.min(width, height);
     canvas.width = side;
     canvas.height = side;
+    // centre the selection
     const offsetX = (width - side) / 2;
     const offsetY = (height - side) / 2;
     context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
+    // // // // // // // // //
+
     const notifImg = getSaved('img') ? blankImage : canvas.toDataURL();
+
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setPositionState();
       navigator.mediaSession.metadata = new MediaMetadata({
@@ -117,6 +122,7 @@ export function setMetaData(
         ]
       });
     }
+
   }
   canvasImg.crossOrigin = '';
   canvasImg.src = img.src;
