@@ -1,5 +1,9 @@
 export const img = <HTMLImageElement>document.querySelector('img');
 
+export const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+
+export const context = canvas.getContext('2d');
+
 export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 
 export const invidiousInstances = <HTMLSelectElement>document.getElementById('invidiousInstances');

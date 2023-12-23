@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
+import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -89,23 +89,39 @@ export function setMetaData(
   if (location.pathname === '/')
     document.title = streamName + ' - ytify';
 
-  const notifImg = getSaved('img') ? blankImage : img.src.replace('maxres', '');
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.setPositionState();
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: streamName,
-      artist: authorName,
-      artwork: [
-        { src: notifImg, sizes: '96x96' },
-        { src: notifImg, sizes: '128x128' },
-        { src: notifImg, sizes: '192x192' },
-        { src: notifImg, sizes: '256x256' },
-        { src: notifImg, sizes: '384x384' },
-        { src: notifImg, sizes: '512x512' },
-      ]
-    });
+  const canvasImg = new Image();
+  canvasImg.onload = () => {
+    if (!context) return;
+
+    const width = canvasImg.width;
+    const height = canvasImg.height;
+    const side = Math.min(width, height);
+    canvas.width = side;
+    canvas.height = side;
+    const offsetX = (width - side) / 2;
+    const offsetY = (height - side) / 2;
+    context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
+    const notifImg = getSaved('img') ? blankImage : canvas.toDataURL();
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setPositionState();
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: streamName,
+        artist: authorName,
+        artwork: [
+          { src: notifImg, sizes: '96x96' },
+          { src: notifImg, sizes: '128x128' },
+          { src: notifImg, sizes: '192x192' },
+          { src: notifImg, sizes: '256x256' },
+          { src: notifImg, sizes: '384x384' },
+          { src: notifImg, sizes: '512x512' },
+        ]
+      });
+    }
   }
+  canvasImg.crossOrigin = '';
+  canvasImg.src = img.src;
 }
+
 
 export function updatePositionState() {
   if ('mediaSession' in navigator) {

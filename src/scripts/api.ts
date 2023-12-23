@@ -52,6 +52,12 @@ const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <s
 async function fetchAPIdata(event: Event) {
   event?.preventDefault();
 
+  if (apiRefreshBtn.textContent?.includes('Generating')) {
+    apiRefreshBtn.textContent = 'API Generation stopped';
+    throw new Error('Generation was abruptly stopped');
+  }
+  else apiRefreshBtn.textContent = 'Regenerate Piped + Invidious Instances Data';
+
   txtReplace('Regenerate', ' 1% Generating');
 
   const pipData = await fetch('https://piped-instances.kavin.rocks')
@@ -70,8 +76,8 @@ async function fetchAPIdata(event: Event) {
   let c = 10;
 
   for await (const instance of pipData) {
-    c += 2;
-    txtReplace(`${c - 2}`, `${c}`)
+    txtReplace(`${c}`, `${c += 2}`);
+
     const name = instance.name + ' ' + instance.locations;
     const url = instance.api_url;
     const imgPrxy = instance.image_proxy_url;
@@ -83,37 +89,44 @@ async function fetchAPIdata(event: Event) {
       const testImg = new Image();
 
       testImg.onload = _ => testImg.width === 120 ?
-        res(_) : rej(_);
-      testImg.onerror = _ => rej(_);
+        res(_) : rej('load failure');
+
+      testImg.onerror = _ => rej('server failure');
       testImg.src = imgUrl('1SLr62VBBjw', 'default', imgPrxy);
     })).then(() => apiTree.image[name] = imgPrxy)
       .catch(e => console.log('loading thumbnail failed on ' + url + ' with error ' + JSON.stringify(e)));
   }
 
 
-  for await (const _ of invData) {
-    c += 2;
-    txtReplace(`${c - 2}`, `${c}`);
+  for await (const instance of invData) {
+    txtReplace(`${c}`, `${c += 2}`);
 
-    const url = _[1].uri;
-    if (!_[1].cors || !_[1].api || _[1].type !== 'https') continue;
+    const url = instance[1].uri;
+    if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
     const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json());
 
     if (!audioData.hasOwnProperty('adaptiveFormats')) continue;
 
     const audioURL = audioData.adaptiveFormats
-      .filter((_: { audioSampleRate: number }) => _.audioSampleRate === 48000)
+      .filter((stream: { audioSampleRate: number }) => stream.audioSampleRate === 48000)
       .sort((a: { bitrate: number }, b: { bitrate: number }) => a.bitrate - b.bitrate)[0].url;
+
+
+    const [_, dom, ain] = instance[0].split('.');
+
+    const instanceName = [dom, ain].join('.') + ' ' + instance[1].flag;
 
     await (new Promise((res, rej) => {
       const audioElement = $('audio');
       audioElement.onloadedmetadata = _ => res(_);
-      audioElement.onerror = _ => rej(_);
+      audioElement.onerror = _ => rej('response failure');
+
       audioElement.src =
         (audioURL).replace(new URL(audioURL).origin, url);
-    })).then(() => apiTree.invidious[_[0] + ' ' + _[1].flag] = url)
+    })).then(() => apiTree.invidious[instanceName] = url)
       .catch(e => console.log('playing audio from ' + url + ' failed with error ' + JSON.stringify(e)));
   }
+
   save('apiTree', JSON.stringify(apiTree));
   injectApi(apiTree);
 
