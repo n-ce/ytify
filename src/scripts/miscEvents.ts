@@ -1,4 +1,4 @@
-import { audio, bitrateSelector, discoveryStorageLimit, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
+import { audio, bitrateSelector, discoveryStorageLimit, img } from "../lib/dom";
 import player from "../lib/player";
 import { blankImage, getDB, getSaved, save, saveDB } from "../lib/utils";
 
@@ -13,18 +13,6 @@ bitrateSelector.addEventListener('change', () => {
   audio.play();
 });
 
-
-
-subtitleSelector.addEventListener('change', () => {
-  subtitleTrack.src = subtitleSelector.value;
-  subtitleTrack.label = <string>subtitleSelector.options[subtitleSelector.selectedIndex].textContent;
-  subtitleTrack.srclang = <string>subtitleSelector.options[subtitleSelector.selectedIndex].getAttribute('srclang');
-
-  subtitleSelector.value ?
-    subtitleContainer.classList.remove('hide') :
-    subtitleContainer.classList.add('hide');
-
-});
 
 
 

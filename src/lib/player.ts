@@ -1,8 +1,8 @@
 import {
-  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, subtitleContainer, subtitleSelector, subtitleTrack,
+  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,
   invidiousInstances
 } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, params, /*parseTTML,*/ setMetaData } from "./utils";
+import { convertSStoHHMMSS, getDB, getSaved, params, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 
@@ -24,7 +24,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos,captions').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
     const i = invidiousInstances.selectedIndex;
     if (i < invidiousInstances.length - 1) {
       alert('switched playback instance from ' +
@@ -99,23 +99,6 @@ export default async function player(id: string | null = '') {
     data.authorUrl
   );
 
-
-  // Subtitle data Injection into dom
-
-  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
-  subtitleSelector.classList.remove('hide');
-  subtitleContainer.innerHTML = '';
-  if (data.captions.length) {
-    for (const subtitles of data.captions) {
-      subtitleSelector.add(new Option(subtitles.label, invidiousInstances.value + subtitles.url));
-      subtitleSelector.lastElementChild?.setAttribute('srclang', subtitles.language_code);
-    }
-  }
-  else {
-    subtitleTrack.src = '';
-    subtitleContainer.classList.add('hide');
-    subtitleSelector.classList.add('hide');
-  }
 
 
   params.set('s', id);

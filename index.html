@@ -34,9 +34,7 @@
 
 <body>
   <canvas class="hide" id="canvas"></canvas>
-  <audio>
-    <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
-  </audio>
+  <audio> </audio>
 
   <nav>
     <a href="/" id="/">
@@ -65,8 +63,6 @@
   </nav>
   <main>
     <section id="home">
-      <article class="hide" id="subtitleContainer"></article>
-
       <img src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
         alt="Current Playing Media Thumbnail">
 
@@ -76,7 +72,6 @@
         <select id="bitrateSelector">
           <option>Bitrate</option>
         </select>
-        <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
