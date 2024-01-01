@@ -17,13 +17,6 @@ import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
 
-const url = 'https://ytify.netlify.app';
-if (location.href !== url) {
-  if (confirm('Transferring to the latest stable version, export your data from here?'))
-    document.getElementById('exportBtn')?.click();
-  setTimeout(() => location.replace(url), 1000);
-}
-
 
 const update = registerSW({
   async onNeedRefresh() {
