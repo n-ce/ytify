@@ -2,65 +2,35 @@ import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../
 import player from "../lib/player";
 import { $, getSaved, imgUrl, save } from "../lib/utils";
 
-type tree = Record<'invidious' | 'piped' | 'image' | 'selected', { [index: string]: string }>
-
-const apiTree: tree = {
-  invidious: {},
-  piped: {},
-  image: {},
-  selected: {
-    invidious: '',
-    image: '',
-    piped: ''
+type saved = {
+  [index: string]: {
+    name: string,
+    url: string,
+    custom: boolean
   }
 }
 
 const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn'));
 
-function injectApi(tree: tree) {
 
-  while (invidiousInstances.length > 1)
-    invidiousInstances.lastElementChild?.remove();
-  const selectedinvidious = tree.selected.invidious.split('|');
-  for (const name in tree.invidious) {
-    const url = tree.invidious[name];
-    invidiousInstances.add(new Option(name, url, undefined, url === selectedinvidious[1]));
-  }
-  if (!Object.values(tree.invidious).includes(selectedinvidious[1])) {
-    const custom = invidiousInstances.options[0];
-    custom.value = selectedinvidious[1];
-    custom.textContent = (custom.textContent?.includes('Custom') ? '' : 'Custom : ') + selectedinvidious[0];
-  }
+const serialisedList = getSaved('apiList') || '{}';
+if (serialisedList !== '{}') {
+  const apiList = JSON.parse(serialisedList);
+  const keys = Object.keys(apiList);
 
-  while (pipedInstances.length > 1)
-    pipedInstances.lastElementChild?.remove();
-
-  const selectedpiped = tree.selected.piped.split('|');
-  for (const name in tree.piped) {
-    const url = tree.piped[name];
-    pipedInstances.add(new Option(name, url, undefined, url === selectedpiped[1]));
-  }
-  if (!Object.values(tree.piped).includes(selectedpiped[1])) {
-    const custom = pipedInstances.options[0];
-    custom.value = selectedpiped[1];
-    custom.textContent = (custom.textContent?.includes('Custom') ? '' : 'Custom : ') + selectedpiped[0];
-  }
-
-  while (thumbnailProxies.length > 1)
-    thumbnailProxies.lastElementChild?.remove();
-
-  const selectedimage = tree.selected.image.split('|');
-  for (const name in tree.image) {
-    const url = tree.image[name];
-    thumbnailProxies.add(new Option(name, url, undefined, url === selectedimage[1]));
-  }
-
-  if (!Object.values(tree.image).includes(selectedimage[1])) {
-    const custom = thumbnailProxies.options[0];
-    custom.value = selectedimage[1];
-    custom.textContent = (custom.textContent?.includes('Custom') ? '' : 'Custom : ') + selectedimage[0];
-  }
-
+  [invidiousInstances, pipedInstances, thumbnailProxies].forEach((instance, i) => {
+    const key = keys[i];
+    const data = apiList[key];
+    const name = data.name;
+    const url = data.url;
+    const custom = data.custom;
+    if (custom) {
+      const dom = instance.options[0];
+      dom.value = url;
+      dom.textContent = 'Custom : ' + name;
+    }
+    else instance.add(new Option(name, url, undefined, true));
+  });
 }
 
 const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <string>(<string>apiRefreshBtn.textContent).replace(init, now);
@@ -98,7 +68,7 @@ async function fetchAPIdata(event: Event) {
     const url = instance.api_url;
     const imgPrxy = instance.image_proxy_url;
 
-    apiTree.piped[name] = url;
+    pipedInstances.add(new Option(name, url));
 
     // image proxy
     await (new Promise(async (res, rej) => {
@@ -107,9 +77,9 @@ async function fetchAPIdata(event: Event) {
       testImg.onload = _ => testImg.width === 120 ?
         res(_) : rej('load failure');
 
-      testImg.onerror = _ => rej('server failure');
+      testImg.onerror = e => rej(e + ' server failure');
       testImg.src = imgUrl('1SLr62VBBjw', 'default', imgPrxy);
-    })).then(() => apiTree.image[name] = imgPrxy)
+    })).then(() => thumbnailProxies.add(new Option(name, imgPrxy)))
       .catch(e => console.log('loading thumbnail failed on ' + url + ' with error ' + JSON.stringify(e)));
   }
 
@@ -128,33 +98,38 @@ async function fetchAPIdata(event: Event) {
       .sort((a: { bitrate: number }, b: { bitrate: number }) => a.bitrate - b.bitrate)[0].url;
 
 
-    const [_, dom, ain] = instance[0].split('.');
+    const [, dom, ain] = instance[0].split('.');
 
     const instanceName = [dom, ain].join('.') + ' ' + instance[1].flag;
 
     await (new Promise((res, rej) => {
       const audioElement = $('audio');
       audioElement.onloadedmetadata = _ => res(_);
-      audioElement.onerror = _ => rej('response failure');
+      audioElement.onerror = e => rej(e + ' response failure');
 
       audioElement.src =
         (audioURL).replace(new URL(audioURL).origin, url);
-    })).then(() => apiTree.invidious[instanceName] = url)
+    }))
+      .then(() => invidiousInstances.add(new Option(instanceName, url)))
       .catch(e => console.log('playing audio from ' + url + ' failed with error ' + JSON.stringify(e)));
   }
-
-  save('apiTree', JSON.stringify(apiTree));
-  injectApi(apiTree);
 
   txtReplace(c + '% Generating', 'Regenerate');
 
   alert('Instances successfully updated');
 }
 
-const savedTree = JSON.parse(<string>getSaved('apiTree'));
 
+const apiAutoFetchSwitch = (<HTMLElement>document.getElementById('apiAutoFetchSwitch'));
+apiAutoFetchSwitch.addEventListener('click', () => {
+  getSaved('apiAutoFetch') ?
+    localStorage.removeItem('apiAutoFetch') :
+    save('apiAutoFetch', 'false');
+})
 
-addEventListener('DOMContentLoaded', (e) => savedTree ? injectApi(savedTree) : fetchAPIdata(e));
+getSaved('apiAutoFetch') ?
+  apiAutoFetchSwitch.toggleAttribute('checked') :
+  addEventListener('DOMContentLoaded', fetchAPIdata);
 
 apiRefreshBtn.addEventListener('click', fetchAPIdata);
 
@@ -168,26 +143,30 @@ apiRefreshBtn.addEventListener('click', fetchAPIdata);
     const instance = instances.options[instances.selectedIndex];
     let name = <string>instance.textContent;
     let url = instance.value;
+    const custom = name.startsWith('Custom');
 
-    if (name.startsWith('Custom')) {
+    if (custom) {
       url = <string>prompt('Enter the URL');
       if (!url) return;
       instance.value = url;
-      const [_, dom, ain] = new URL(url).hostname.split('.');
-      name = instance.textContent = 'Custom : ' + [dom, ain].join('.');
+      const [, dom, ain] = new URL(url).hostname.split('.');
+      name = [dom, ain].join('.');
+      instance.textContent = 'Custom : ' + name;
     }
 
     if (!name || !url) return;
 
-    const savedData: tree = JSON.parse(<string>getSaved('apiTree'));
+    const savedData: saved = JSON.parse(<string>getSaved('apiList')) || { piped: {}, invidious: {}, image: {} };
+    savedData[type].name = name;
+    savedData[type].url = url;
+    savedData[type].custom = custom;
+    save('apiList', JSON.stringify(savedData));
 
-    savedData.selected[type] = name + '|' + url;
-    save('apiTree', JSON.stringify(savedData));
-
-    if (i !== 0) return;
-    audio.pause();
-    const timeOfSwitch = audio.currentTime;
-    await player(audio.dataset.id);
-    audio.currentTime = timeOfSwitch;
+    if (type === 'invidious') {
+      audio.pause();
+      const timeOfSwitch = audio.currentTime;
+      await player(audio.dataset.id);
+      audio.currentTime = timeOfSwitch;
+    }
   });
 });

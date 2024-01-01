@@ -1,17 +1,22 @@
 import {
-  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,/*, subtitleContainer, subtitleSelector, subtitleTrack */
+  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, subtitleContainer, subtitleSelector, subtitleTrack,
   invidiousInstances
 } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, params, /*parseTTML,*/ setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 
-const preferOpusSwitch = <HTMLElement>document.getElementById('preferOpusSwitch');
+const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+codecSelector.addEventListener('change', async () => {
+  audio.pause();
+  const timeOfSwitch = audio.currentTime;
+  await player(audio.dataset.id);
+  audio.currentTime = timeOfSwitch;
+})
 
 if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
-  preferOpusSwitch.removeAttribute('checked');
+  codecSelector.selectedIndex = 1;
 
-const [opusGroup, aacGroup] = <HTMLCollectionOf<HTMLOptGroupElement>>bitrateSelector.children;
 
 export default async function player(id: string | null = '') {
 
@@ -19,14 +24,14 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos,captions').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
     const i = invidiousInstances.selectedIndex;
     if (i < invidiousInstances.length - 1) {
       alert('switched playback instance from ' +
         invidiousInstances.options[i].value
         + ' to ' +
         invidiousInstances.options[i + 1].value
-        + ' due to error ' + err.message
+        + ' due to error: ' + err.message
       );
       invidiousInstances.selectedIndex = i + 1;
       player(id);
@@ -47,12 +52,10 @@ export default async function player(id: string | null = '') {
     return;
   }
 
-  const opus: Codec = { urls: [], bitrates: [] };
-  const aac: Codec = { urls: [], bitrates: [] };
-  const wantOpus = preferOpusSwitch.hasAttribute('checked');
+  const bitrates: number[] = [];
+  const preferedCodec = codecSelector.value;
 
-  opusGroup.innerHTML = '';
-  aacGroup.innerHTML = '';
+  bitrateSelector.innerHTML = '';
 
   audioStreams.forEach(((_: {
     type: string,
@@ -62,35 +65,27 @@ export default async function player(id: string | null = '') {
     encoding: string
   }) => {
     const bitrate = parseInt(_.bitrate);
-    const quality = Math.floor(bitrate / 1024) + ' kbps';
+    bitrates.push(bitrate);
+    const quality = Math.floor(bitrate / 1024) + ' kbps ' + (_.type.includes('opus') ? 'opus' : 'aac');
+    // proxy the url
     const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
-    if (_.type.includes('opus')) {
-      if (!wantOpus) return;
-      opus.urls.push(url);
-      opus.bitrates.push(bitrate);
-      opusGroup.appendChild(new Option(quality, url));
-    }
-    else {
-      aac.urls.push(url);
-      aac.bitrates.push(bitrate);
-      aacGroup.appendChild(new Option(quality, url));
-    }
+    bitrateSelector.add(new Option(quality, url));
   }));
 
+  let index = -1;
+
+  bitrateSelector.childNodes.forEach((e, i) => {
+    if (e.textContent?.endsWith(preferedCodec) && index < (getSaved('quality') ? 10 : 0)) index = i;
+  });
 
   // using lowest aac stream when low opus bitrate unavailable
-
-  if (!getSaved('quality') &&
-    opus.bitrates[0] > 65536
-    && wantOpus)
-    (<HTMLOptionElement>aacGroup.firstElementChild).selected = true;
-
-  const codec = (wantOpus ? opus : aac);
-  const index = getSaved('quality') ? (codec.length || 0) - 1 : 0;
+  if (!getSaved('quality') && preferedCodec === 'opus' &&
+    bitrates[index] > 65536)
+    index = 0
 
   bitrateSelector.selectedIndex = index;
 
-  audio.src = codec.urls[index];
+  audio.src = bitrateSelector.value;
 
 
 
@@ -104,21 +99,24 @@ export default async function player(id: string | null = '') {
     data.authorUrl
   );
 
-  /*
-    // Subtitle data Injection into dom
-  
-    subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
-    subtitleSelector.classList.remove('hide');
-    subtitleContainer.innerHTML = '';
-    if (data.captions.length)
-      for (const subtitles of data.captions) subtitleSelector.add(new Option(subtitles.label, playbackInstance.value + subtitles.url));
-    else {
-      subtitleTrack.src = '';
-      subtitleContainer.classList.add('hide');
-      subtitleSelector.classList.add('hide');
-      parseTTML();
+
+  // Subtitle data Injection into dom
+
+  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
+  subtitleSelector.classList.remove('hide');
+  subtitleContainer.innerHTML = '';
+  if (data.captions.length) {
+    for (const subtitles of data.captions) {
+      subtitleSelector.add(new Option(subtitles.label, invidiousInstances.value + subtitles.url));
+      subtitleSelector.lastElementChild?.setAttribute('srclang', subtitles.language_code);
     }
-  */
+  }
+  else {
+    subtitleTrack.src = '';
+    subtitleContainer.classList.add('hide');
+    subtitleSelector.classList.add('hide');
+  }
+
 
   params.set('s', id);
 

@@ -3,8 +3,6 @@ import { audio, canvas, context, img, listAnchor, listContainer, listSection, lo
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
-
 export const params = (new URL(location.href)).searchParams;
 
 export const $ = document.createElement.bind(document);
@@ -21,6 +19,7 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
+export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 

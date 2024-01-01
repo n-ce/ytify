@@ -1,6 +1,6 @@
 import { audio, bitrateSelector, discoveryStorageLimit, img, subtitleContainer, subtitleSelector, subtitleTrack } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getDB, getSaved, parseTTML, save, saveDB } from "../lib/utils";
+import { blankImage, getDB, getSaved, save, saveDB } from "../lib/utils";
 
 img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
 img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
@@ -17,10 +17,13 @@ bitrateSelector.addEventListener('change', () => {
 
 subtitleSelector.addEventListener('change', () => {
   subtitleTrack.src = subtitleSelector.value;
+  subtitleTrack.label = <string>subtitleSelector.options[subtitleSelector.selectedIndex].textContent;
+  subtitleTrack.srclang = <string>subtitleSelector.options[subtitleSelector.selectedIndex].getAttribute('srclang');
+
   subtitleSelector.value ?
     subtitleContainer.classList.remove('hide') :
     subtitleContainer.classList.add('hide');
-  parseTTML();
+
 });
 
 
