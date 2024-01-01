@@ -1,7 +1,6 @@
-import { pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
+import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } from "../lib/utils";
-
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
@@ -22,8 +21,9 @@ function setObserver(callback: () => Promise<string>) {
 
 
 // Get search results of input
-
 const searchLoader = () => {
+  loadingScreen.showModal();
+
   const text = superInput.value;
 
   if (!text) return;
@@ -73,17 +73,26 @@ const searchLoader = () => {
       });
     })
     .catch(err => {
-      if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-        pipedInstances.selectedIndex++;
+      const i = pipedInstances.selectedIndex;
+      if (i < pipedInstances.length - 1) {
+        alert('switched piped instance from ' +
+          pipedInstances.options[i].value
+          + ' to ' +
+          pipedInstances.options[i + 1].value
+          + ' due to error ' + err.message
+        );
+        pipedInstances.selectedIndex = i + 1;
         searchLoader();
         return;
       }
-      alert(err);
+      alert(err.message);
       pipedInstances.selectedIndex = 0;
-    });
+    })
+    .finally(() => loadingScreen.close());
 
   history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query.replace('filter', 'f'));
   suggestions.style.display = 'none';
+
 }
 
 
@@ -137,26 +146,32 @@ superInput.addEventListener('input', async () => {
 let index = 0;
 
 superInput.addEventListener('keydown', _ => {
-  if (_.key === 'Backspace') return;
-
   if (_.key === 'Enter') return searchLoader();
+  if (_.key === 'Backspace' ||
+    !suggestions.hasChildNodes() ||
+    getSaved('search_suggestions')) return;
 
-  if (!suggestions.hasChildNodes()) return;
-
-
+  suggestions.childNodes.forEach(node => {
+    if ((<HTMLLIElement>node).classList.contains('hover'))
+      (<HTMLLIElement>node).classList.remove('hover');
+  });
 
   if (_.key === 'ArrowUp') {
     if (index === 0) index = suggestions.childElementCount;
     index--;
-    superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
+    const li = <HTMLLIElement>suggestions.children[index];
+    superInput.value = <string>li.textContent;
+    li.classList.add('hover');
   }
 
-
   if (_.key === 'ArrowDown') {
-    superInput.value = (<HTMLLIElement>suggestions.children[index]).textContent || '';
+    const li = <HTMLLIElement>suggestions.children[index];
+    superInput.value = <string>li.textContent;
+    li.classList.add('hover');
     index++;
     if (index === suggestions.childElementCount) index = 0;
   }
+
 
 });
 
