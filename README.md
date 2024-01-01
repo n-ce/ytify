@@ -16,7 +16,7 @@
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
 - **Library** 📚: Discover feed, history, favorites & custom playlists. 
 
-![chrome_screenshot_ytify_v6_desktop](https://imageupload.io/ib/U74XZC8af5zwzqD_1695788573.jpg)
+
 
 ## WHY / The story of ytify with [n-ce](https://github.com/n-ce)
 - I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
