@@ -13,7 +13,7 @@ type saved = {
 const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn'));
 
 
-const serialisedList = getSaved('apiList') || '{}';
+const serialisedList = getSaved('apiList_2') || '{}';
 if (serialisedList !== '{}') {
   const apiList = JSON.parse(serialisedList);
   const keys = Object.keys(apiList);
@@ -156,11 +156,11 @@ apiRefreshBtn.addEventListener('click', fetchAPIdata);
 
     if (!name || !url) return;
 
-    const savedData: saved = JSON.parse(<string>getSaved('apiList')) || { piped: {}, invidious: {}, image: {} };
+    const savedData: saved = JSON.parse(<string>getSaved('apiList_2')) || { piped: {}, invidious: {}, image: {} };
     savedData[type].name = name;
     savedData[type].url = url;
     savedData[type].custom = custom;
-    save('apiList', JSON.stringify(savedData));
+    save('apiList_2', JSON.stringify(savedData));
 
     if (type === 'invidious') {
       audio.pause();
