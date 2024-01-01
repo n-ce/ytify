@@ -33,6 +33,9 @@
 </head>
 
 <body>
+  <canvas class="hide" id="canvas"></canvas>
+  <audio> </audio>
+
   <nav>
     <a href="/" id="/">
       <i class="ri-home-line"></i>
@@ -60,26 +63,20 @@
   </nav>
   <main>
     <section id="home">
-      <article class="hide" id="subtitleContainer"></article>
-
       <img src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.4</a>
+        <a id="title" href="" target="_blank">ytify 6.5</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
-          <option value="">Bitrate</option>
+          <option>Bitrate</option>
         </select>
-        <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
 
 
-      <audio>
-        <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
-      </audio>
 
     </section>
 
@@ -191,11 +188,43 @@
 
     <section id="settings">
       <span>
-        <label for="pipedInstances">Piped Instance</label>
-        <select id="pipedInstances"></select>
+        <label for="pipedInstances">
+          <h3>Piped Instance</h3>
+        </label>
+        <select id="pipedInstances">
+          <option value="https://pipedapi.kavin.rocks">Custom</option>
+        </select>
       </span>
+      <h3>Playback</h3>
       <span>
-        <label for="roundnessChanger">UI Roundness</label>
+        <label for="invidiousInstances">Invidious Instance</label>
+        <select id="invidiousInstances">
+          <option value="https://invidious.fdn.fr">Custom</option>
+        </select>
+      </span>
+      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
+
+      <span>
+        <label for="CodecPreference">Codec Preference</label>
+        <select id="CodecPreference">
+          <option value="opus">Opus</option>
+          <option value="aac">AAC</option>
+          <option value="">None</option>
+        </select>
+      </span>
+
+      <h3>Thumbnail</h3>
+      <span>
+        <label for="thumbnailProxies">Proxy</label>
+        <select id="thumbnailProxies">
+          <option value="https://pipedproxy.r4fo.com">Custom</option>
+        </select>
+      </span>
+      <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
+
+      <h3>Interface</h3>
+      <span>
+        <label for="roundnessChanger">Roundness</label>
         <select id="roundnessChanger">
           <option value="none">None</option>
           <option value="1vmin">Light</option>
@@ -211,17 +240,32 @@
         </select>
       </span>
       <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
+
+      <h3>Miscellanous</h3>
+      <toggle-switch id="apiAutoFetchSwitch" checked>Automatically Fetch Instances</toggle-switch>
+      <span>
+        <label for="discoverLimit">Discover Storage Limit</label><select id="discoverLimit">
+          <option value="0">Don't store</option>
+          <option value="128">32KB</option>
+          <option value="512">128KB</option>
+          <option value="4096">1MB</option>
+          <option value="16384">MAX</option>
+        </select>
+      </span>
       <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
-      <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
-      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
 
+      <h3>Actions</h3>
+
+      <a href="" id="apiRefreshBtn">Regenerate Piped + Invidious Instances Data</a>
 
       <a href="/" id="deleteButton">Clear all data</a>
 
       <a href="https://github.com/n-ce/ytify/" target="_blank">View on Github</a>
 
-      <a href="https://t.me/encetg" target="_blank">Contact on Telegram</a>
+      <a href="https://t.me/ytifytg" target="_blank">Chat on Telegram</a>
+
+      <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Chat via Matrix</a>
 
       <form netlify name='feedback' method='POST'>
         <input type="text" name="->" id="netlifyForm"
@@ -313,6 +357,10 @@
       <button>Update</button>
       <button>Later</button>
     </span>
+  </dialog>
+
+  <dialog id="loadingScreen">
+    <i class="ri-loader-3-line"></i>
   </dialog>
 
   <script src="/src/scripts/main.ts" type="module"></script>

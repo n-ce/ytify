@@ -1,7 +1,6 @@
 import css from './streamItem.css?inline';
 import { $, blankImage, getSaved, imgUrl } from '../lib/utils';
 
-
 customElements.define('stream-item', class extends HTMLElement {
 	constructor() {
 		super();
@@ -18,6 +17,9 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.crossOrigin = 'anonymous';
 		thumbnail.id = 'thumbnail';
 		thumbnail.loading = 'lazy';
+		thumbnail.addEventListener('error', () => {
+			['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+		});
 		thumbnail.addEventListener('load', () => {
 			if (thumbnail.naturalWidth !== 120)
 				return ['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');

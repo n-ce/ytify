@@ -73,7 +73,8 @@
 }
 
 #suggestions li:hover,
-#suggestions li:focus {
+#suggestions li:focus,
+#suggestions li.hover {
   background-color: var(--text);
   color: var(--bg);
 }
