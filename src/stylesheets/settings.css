@@ -2,6 +2,7 @@
   width: auto;
   background-color: var(--onBg);
   padding: 0 4vmin;
+  border: var(--border);
   border-radius: var(--roundness);
 }
 

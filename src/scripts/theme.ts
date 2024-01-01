@@ -1,13 +1,11 @@
-import { img } from "../lib/dom";
+import { img, canvas, context } from "../lib/dom";
 import player from "../lib/player";
-import { $, blankImage, getSaved, idFromURL, params, save } from "../lib/utils";
+import { blankImage, getSaved, idFromURL, params, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
-const canvas = <HTMLCanvasElement>$('canvas');
-const context = canvas.getContext('2d');
 const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
 const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContrastSwitch');
@@ -76,7 +74,7 @@ function themer() {
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    if (canvasImg.width === 120) return;
+    if (!context || canvasImg.width === 120) return;
     canvas.height = canvasImg.height;
     canvas.width = canvasImg.width;
     context.drawImage(canvasImg, 0, 0);

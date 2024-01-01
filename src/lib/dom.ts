@@ -1,6 +1,12 @@
 export const img = <HTMLImageElement>document.querySelector('img');
 
+export const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+
+export const context = canvas.getContext('2d');
+
 export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
+
+export const invidiousInstances = <HTMLSelectElement>document.getElementById('invidiousInstances');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 
@@ -26,12 +32,6 @@ export const listContainer = <HTMLDivElement>document.getElementById('playlist')
 
 export const listAnchor = <HTMLAnchorElement>document.getElementById('/list');
 
-export const subtitleContainer = <HTMLElement>document.getElementById('subtitleContainer');
-
-export const subtitleSelector = <HTMLSelectElement>document.getElementById('subtitleSelector');
-
-export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
-
 export const favButton = <HTMLInputElement>document.getElementById('favButton');
 
 export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
@@ -39,3 +39,12 @@ export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 export const atpSelector = <HTMLSelectElement>document.getElementById('playlistSelector');
 
 export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
+
+export const discoveryStorageLimit = <HTMLSelectElement>document.getElementById('discoverLimit');
+
+export const thumbnailProxies = <HTMLSelectElement>document.getElementById('thumbnailProxies');
+
+export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
+loadingScreen.onclick = () => loadingScreen.close();
+
+

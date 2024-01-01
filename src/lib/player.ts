@@ -1,8 +1,21 @@
-import { audio, bitrateSelector, favButton, favIcon, pipedInstances, playButton, subtitleContainer, subtitleSelector, subtitleTrack } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, params, parseTTML, setMetaData } from "./utils";
+import {
+  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,
+  invidiousInstances
+} from "./dom";
+import { convertSStoHHMMSS, getDB, getSaved, params, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
-const isSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1;
+
+const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+codecSelector.addEventListener('change', async () => {
+  audio.pause();
+  const timeOfSwitch = audio.currentTime;
+  await player(audio.dataset.id);
+  audio.currentTime = timeOfSwitch;
+})
+
+if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
+  codecSelector.selectedIndex = 1;
 
 
 export default async function player(id: string | null = '') {
@@ -11,99 +24,81 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(pipedInstances.value + '/streams/' + id).then(res => res.json()).catch(err => {
-    if (pipedInstances.selectedIndex < pipedInstances.length - 1) {
-      pipedInstances.selectedIndex++;
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
+    const i = invidiousInstances.selectedIndex;
+    if (i < invidiousInstances.length - 1) {
+      alert('switched playback instance from ' +
+        invidiousInstances.options[i].value
+        + ' to ' +
+        invidiousInstances.options[i + 1].value
+        + ' due to error: ' + err.message
+      );
+      invidiousInstances.selectedIndex = i + 1;
       player(id);
       return;
     }
-    alert(err);
+    alert(err.message);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    pipedInstances.selectedIndex = 0;
+    invidiousInstances.selectedIndex = 0;
   });
 
-  if (!data.audioStreams.length) {
+  const audioStreams = data.adaptiveFormats
+    .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
+    .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
+
+  if (!audioStreams.length) {
     alert('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
 
-
-  // extracting opus streams and storing m4a streams
-
-  const opus: Opus = { urls: [], bitrates: [] }
-  const m4a: M4A = { urls: [], bitrates: [], options: [] }
-
+  const bitrates: number[] = [];
+  const preferedCodec = codecSelector.value;
 
   bitrateSelector.innerHTML = '';
 
-  for (const value of data.audioStreams) {
-    if (value.codec === "opus") {
-      if (isSafari) continue;
-      opus.urls.push(value.url);
-      opus.bitrates.push(value.bitrate);
-      bitrateSelector.add(new Option(value.quality, value.url));
-    }
-    else {
-      m4a.urls.push(value.url);
-      m4a.bitrates.push(value.bitrate);
-      isSafari ?
-        bitrateSelector.add(new Option(value.quality, value.url)) :
-        m4a.options.push(new Option(value.quality, value.url));
-    }
-  }
+  audioStreams.forEach(((_: {
+    type: string,
+    url: string,
+    quality: string,
+    bitrate: string,
+    encoding: string
+  }) => {
+    const bitrate = parseInt(_.bitrate);
+    bitrates.push(bitrate);
+    const quality = Math.floor(bitrate / 1024) + ' kbps ' + (_.type.includes('opus') ? 'opus' : 'aac');
+    // proxy the url
+    const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
+    bitrateSelector.add(new Option(quality, url));
+  }));
 
-  // finding lowest available stream when low opus bitrate unavailable
+  let index = -1;
 
-  if (!getSaved('quality') &&
-    Math.min(...opus.bitrates) > 65536
-    && !isSafari) {
+  bitrateSelector.childNodes.forEach((e, i) => {
+    if (e.textContent?.endsWith(preferedCodec) && index < (getSaved('quality') ? 10 : 0)) index = i;
+  });
 
-    opus.urls = opus.urls.concat(m4a.urls);
+  // using lowest aac stream when low opus bitrate unavailable
+  if (!getSaved('quality') && preferedCodec === 'opus' &&
+    bitrates[index] > 65536)
+    index = 0
 
-    opus.bitrates = opus.bitrates.concat(m4a.bitrates);
+  bitrateSelector.selectedIndex = index;
 
-    for (const opts of m4a.options) bitrateSelector.add(opts);
-  }
-
-  const codec = (isSafari ? m4a : opus);
-
-  bitrateSelector.selectedIndex =
-    codec.bitrates.indexOf(
-      getSaved('quality') ?
-        Math.max(...codec.bitrates) :
-        Math.min(...codec.bitrates)
-    );
-
-  audio.src = codec.urls[bitrateSelector.selectedIndex];
+  audio.src = bitrateSelector.value;
 
 
 
   // remove ' - Topic' from name if it exists
-  data.uploader = data.uploader.replace(' - Topic', '');
+  data.author = data.author.replace(' - Topic', '');
 
   setMetaData(
     id,
     data.title,
-    data.uploader,
-    data.uploaderUrl,
-    data.thumbnailUrl
+    data.author,
+    data.authorUrl
   );
 
-
-  // Subtitle data Injection into dom
-
-  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
-  subtitleSelector.classList.remove('hide');
-  subtitleContainer.innerHTML = '';
-  if (data.subtitles.length)
-    for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
-  else {
-    subtitleTrack.src = '';
-    subtitleContainer.classList.add('hide');
-    subtitleSelector.classList.add('hide');
-    parseTTML();
-  }
 
 
   params.set('s', id);
@@ -113,9 +108,9 @@ export default async function player(id: string | null = '') {
 
   audio.dataset.id = id;
   audio.dataset.title = data.title;
-  audio.dataset.author = data.uploader;
-  audio.dataset.duration = convertSStoHHMMSS(data.duration);
-  audio.dataset.channelUrl = data.uploaderUrl;
+  audio.dataset.author = data.author;
+  audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
+  audio.dataset.channelUrl = data.authorUrl;
 
 
 
@@ -133,6 +128,9 @@ export default async function player(id: string | null = '') {
   }
 
 
+  const dsLimit = parseInt(discoveryStorageLimit.value);
+  if (!dsLimit) return;
+
   // related streams data injection as discovery data after 10 seconds
 
   setTimeout(() => {
@@ -141,30 +139,48 @@ export default async function player(id: string | null = '') {
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
 
-    data.relatedStreams.forEach((stream: StreamItem) => {
-      if (stream.type !== 'stream' || stream.duration < 100 || stream.duration > 3000) return;
+    data.recommendedVideos.forEach((stream: {
+      lengthSeconds: number,
+      videoId: string,
+      title: string,
+      author: string,
+      authorUrl: string
+    }) => {
+      if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
-      const rsId = stream.url.slice(9);
+      const rsId = stream.videoId;
       // merges previous discover items with current related streams
       db.discover.hasOwnProperty(rsId) ?
         (<number>db.discover[rsId].frequency)++ :
         db.discover[rsId] = {
           id: rsId,
           title: stream.title,
-          author: stream.uploaderName,
-          duration: convertSStoHHMMSS(stream.duration),
-          channelUrl: stream.uploaderUrl,
+          author: stream.author,
+          duration: convertSStoHHMMSS(stream.lengthSeconds),
+          channelUrl: stream.authorUrl,
           frequency: 1
         }
     });
 
     // convert to array
-    const array = Object.entries(db.discover);
+    let array = Object.entries(db.discover);
 
     // Randomize Array
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    // remove if exists in history
+
+    array = array.filter(e => !db.history.hasOwnProperty(e[0]));
+
+    // randomly remove items from array when limit crossed
+    let len = array.length;
+    while (len > dsLimit) {
+      const i = Math.floor(Math.random() * len)
+      array.splice(i, 1);
+      len--;
     }
 
     // convert the new merged+randomized discover back to object and inject it

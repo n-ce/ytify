@@ -38,14 +38,12 @@ declare global {
     }
   }
 
-  interface Opus {
+  interface Codec {
     urls: string[],
-    bitrates: number[]
+    bitrates: number[],
+    length?: number
   }
 
-  interface M4A extends Opus {
-    options: HTMLOptionElement[]
-  }
 
   type Scheme = {
     [index: string]: {

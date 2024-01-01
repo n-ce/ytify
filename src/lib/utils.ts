@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -19,7 +19,7 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const imgUrl = (id: string, res: string) => 'https://corsproxy.io?' + encodeURIComponent(`https://i.ytimg.com/vi_webp/${id}/${res}.webp`);
+export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -53,17 +53,29 @@ export function setMetaData(
   id: string,
   streamName: string,
   authorName: string,
-  authorUrl: string,
-  thumbnailUrl: string
+  authorUrl: string
 ) {
 
   if (!getSaved('img'))
-    img.src = thumbnailUrl;
+    img.src = imgUrl(id, 'maxresdefault');
+
+  img.alt = streamName;
 
   const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = `https://youtube.com/watch?v=${id}`;
   title.textContent = streamName;
-  img.alt = streamName;
+  title.onclick = _ => {
+    _.preventDefault();
+    superModal.showModal();
+    history.pushState({}, '', '#');
+    const s = superModal.dataset;
+    const a = audio.dataset;
+    s.id = a.id;
+    s.title = a.title;
+    s.author = a.author;
+    s.duration = a.duration;
+    s.channelUrl = a.channelUrl;
+  }
 
   const author = <HTMLAnchorElement>document.getElementById('author');
   author.href = 'https://youtube.com' + authorUrl;
@@ -76,22 +88,45 @@ export function setMetaData(
   if (location.pathname === '/')
     document.title = streamName + ' - ytify';
 
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.setPositionState();
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: streamName,
-      artist: authorName,
-      artwork: [
-        { src: imgUrl(id, 'default'), sizes: '96x96' },
-        { src: imgUrl(id, 'default'), sizes: '128x128' },
-        { src: imgUrl(id, 'mqdefault'), sizes: '192x192' },
-        { src: imgUrl(id, 'mqdefault'), sizes: '256x256' },
-        { src: imgUrl(id, 'hqdefault'), sizes: '384x384' },
-        { src: imgUrl(id, 'hqdefault'), sizes: '512x512' },
-      ]
-    });
+  const canvasImg = new Image();
+  canvasImg.onload = () => {
+    if (!context) return;
+
+    // // Square Image Generator 
+    const width = canvasImg.width;
+    const height = canvasImg.height;
+    const side = Math.min(width, height);
+    canvas.width = side;
+    canvas.height = side;
+    // centre the selection
+    const offsetX = (width - side) / 2;
+    const offsetY = (height - side) / 2;
+    context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
+    // // // // // // // // //
+
+    const notifImg = getSaved('img') ? blankImage : canvas.toDataURL();
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setPositionState();
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: streamName,
+        artist: authorName,
+        artwork: [
+          { src: notifImg, sizes: '96x96' },
+          { src: notifImg, sizes: '128x128' },
+          { src: notifImg, sizes: '192x192' },
+          { src: notifImg, sizes: '256x256' },
+          { src: notifImg, sizes: '384x384' },
+          { src: notifImg, sizes: '512x512' },
+        ]
+      });
+    }
+
   }
+  canvasImg.crossOrigin = '';
+  canvasImg.src = img.src;
 }
+
 
 export function updatePositionState() {
   if ('mediaSession' in navigator) {
@@ -131,6 +166,8 @@ export function createStreamItem(stream: StreamItem) {
 }
 
 export function fetchList(url: string, mix = false) {
+
+  loadingScreen.showModal();
 
   fetch(pipedInstances.value + url)
     .then(res => res.json())
@@ -173,6 +210,7 @@ export function fetchList(url: string, mix = false) {
       alert(mix ? 'No Mixes Found' : err);
       pipedInstances.selectedIndex = 0;
     })
+    .finally(() => loadingScreen.close());
 }
 
 
@@ -212,71 +250,3 @@ export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
 
   return fragment;
 }
-
-
-// subtitles
-
-let loaded = false;
-function loadParser() {
-
-  // Dynamically Loading Library on Demand only
-  if (loaded)
-    return true;
-  const imscript = $('script');
-  imscript.src = 'https://unpkg.com/imsc/dist/imsc.all.min.js';
-  imscript.type = 'text/javascript';
-  document.head.appendChild(imscript);
-  return new Promise(res => {
-    imscript.addEventListener('load', () => {
-      loaded = true;
-      res(true);
-    })
-  })
-}
-
-
-
-export async function parseTTML() {
-  if (!loaded)
-    await loadParser();
-
-  const myTrack = audio.textTracks[0];
-  myTrack.mode = "hidden";
-  const d = img.getBoundingClientRect();
-
-  subtitleContainer.style.top = Math.floor(d.y) + 'px';
-  subtitleContainer.style.left = Math.floor(d.x) + 'px';
-
-
-  fetch(subtitleTrack.src)
-    .then(res => res.text())
-    .then(text => {
-      const imscDoc = imsc.fromXML(text);
-      const timeEvents = imscDoc.getMediaTimeEvents();
-      const telen = timeEvents.length;
-
-      for (let i = 0; i < telen; i++) {
-        const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
-
-        myCue.onenter = () => {
-          const subtitleActive = subtitleContainer.firstChild;
-          if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive)
-          imsc.renderHTML(
-            imsc.generateISD(imscDoc, myCue.startTime),
-            subtitleContainer,
-            img,
-            Math.floor(d.height),
-            Math.floor(d.width)
-          );
-        }
-        myCue.onexit = () => {
-          const subtitleActive = subtitleContainer.firstChild;
-          if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive)
-        }
-        myTrack.addCue(myCue);
-      }
-    });
-}
-

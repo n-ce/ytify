@@ -1,7 +1,7 @@
 {
   "name": "ytify",
   "private": true,
-  "version": "6.4.X",
+  "version": "6.5.X",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,12 +12,12 @@
     "autoprefixer": "^10.4.16",
     "eruda": "^3.0.1",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "vite": "^5.0.0"
   },
   "browserslist": [
     "defaults"
   ],
   "dependencies": {
-    "vite-plugin-pwa": "^0.16.5"
+    "vite-plugin-pwa": "^0.16.7"
   }
 }
