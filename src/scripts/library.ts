@@ -1,6 +1,8 @@
-import { atpSelector, audio, favButton, favIcon, superModal } from "../lib/dom";
+import { audio, favButton, favIcon, superModal } from "../lib/dom";
 import { $, getCollection, getDB, notify, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
+import { atpSelector } from "./superModal";
+
 
 const reservedCollections = ['discover', 'history', 'favorites'];
 

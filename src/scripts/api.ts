@@ -32,7 +32,7 @@ const iMap = { 'piped': pipedInstances, 'invidious': invidiousInstances, 'image'
 const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn'));
 
 
-const serialisedList = getSaved('apiList_2') || clone;
+const serialisedList = getSaved('apiList_2') || '{}';
 if (serialisedList !== '{}') {
   const apiList = JSON.parse(serialisedList);
 
