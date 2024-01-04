@@ -23,6 +23,12 @@ export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
+export function notify(text: string) {
+  const el = $('snack-bar');
+  el.textContent = text;
+  document.body.appendChild(el);
+}
+
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
   const hh = Math.floor(seconds / 3600);
@@ -44,7 +50,7 @@ export const loadMoreResults = async (urlComponent: string, token: string) =>
     .catch(_ => {
       api++;
       pipedInstances.length === api ?
-        alert(_) :
+        notify(_.message) :
         loadMoreResults(urlComponent, token);
     });
 
@@ -207,7 +213,7 @@ export function fetchList(url: string, mix = false) {
         fetchList(url, mix);
         return;
       }
-      alert(mix ? 'No Mixes Found' : err);
+      notify(mix ? 'No Mixes Found' : err.message);
       pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());

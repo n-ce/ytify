@@ -1,12 +1,14 @@
-import { atpSelector, listContainer, superModal } from "../lib/dom";
+import { listContainer, superModal } from "../lib/dom";
 import player from "../lib/player";
-import { $, fetchList } from "../lib/utils";
+import { $, fetchList, notify } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;
 
-const [playNow, enqueue, _, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
+const [playNow, enqueue, li_atps, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
+
+export const atpSelector = <HTMLSelectElement>li_atps.lastElementChild;
 
 
 superModal.addEventListener('click', () => {
@@ -72,7 +74,7 @@ downloadBtn.addEventListener('click', () => {
       anchor.href = _.url;
       anchor.click();
     })
-    .catch(_ => alert(_))
+    .catch(_ => notify(_))
 });
 
 
