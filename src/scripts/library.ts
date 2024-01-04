@@ -1,5 +1,5 @@
 import { atpSelector, audio, favButton, favIcon, superModal } from "../lib/dom";
-import { $, getCollection, getDB, saveDB } from "../lib/utils";
+import { $, getCollection, getDB, notify, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 
 const reservedCollections = ['discover', 'history', 'favorites'];
@@ -98,7 +98,7 @@ export function createPlaylist(title: string) {
   const library = <HTMLDivElement>document.getElementById('library');
 
   if (library.contains(document.getElementById(title)))
-    return alert('This Playlist Already Exists!');
+    return notify('This Playlist Already Exists!');
 
   const details = $('details');
   details.id = title;

@@ -1,6 +1,6 @@
 import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, notify } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
@@ -75,7 +75,7 @@ const searchLoader = () => {
     .catch(err => {
       const i = pipedInstances.selectedIndex;
       if (i < pipedInstances.length - 1) {
-        alert('switched piped instance from ' +
+        notify('switched piped instance from ' +
           pipedInstances.options[i].value
           + ' to ' +
           pipedInstances.options[i + 1].value
@@ -85,7 +85,7 @@ const searchLoader = () => {
         searchLoader();
         return;
       }
-      alert(err.message);
+      notify(err.message);
       pipedInstances.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());

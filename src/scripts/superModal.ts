@@ -1,6 +1,6 @@
 import { atpSelector, listContainer, superModal } from "../lib/dom";
 import player from "../lib/player";
-import { $, fetchList } from "../lib/utils";
+import { $, fetchList, notify } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
@@ -72,7 +72,7 @@ downloadBtn.addEventListener('click', () => {
       anchor.href = _.url;
       anchor.click();
     })
-    .catch(_ => alert(_))
+    .catch(_ => notify(_))
 });
 
 

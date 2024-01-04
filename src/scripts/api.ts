@@ -1,6 +1,6 @@
 import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, imgUrl, save } from "../lib/utils";
+import { $, getSaved, imgUrl, notify, save } from "../lib/utils";
 
 type saved = {
   [index: string]: {
@@ -9,21 +9,41 @@ type saved = {
     custom: boolean
   }
 }
+const defData: saved = {
+  'piped': {
+    name: 'kavin.rocks',
+    url: 'https://pipedapi.kavin.rocks',
+    custom: false
+  },
+  'invidious': {
+    name: 'fdn.fr',
+    url: 'https://invidious.fdn.fr',
+    custom: false
+  },
+  'image': {
+    name: 'r4fo.com',
+    url: 'https://pipedproxy.r4fo.com',
+    custom: false
+  }
+};
+const clone = JSON.stringify(defData);
+const iMap = { 'piped': pipedInstances, 'invidious': invidiousInstances, 'image': thumbnailProxies };
 
 const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn'));
 
 
-const serialisedList = getSaved('apiList_2') || '{}';
+const serialisedList = getSaved('apiList_2') || clone;
 if (serialisedList !== '{}') {
   const apiList = JSON.parse(serialisedList);
-  const keys = Object.keys(apiList);
 
-  [invidiousInstances, pipedInstances, thumbnailProxies].forEach((instance, i) => {
-    const key = keys[i];
+  Object.entries(iMap).forEach(array => {
+    const [key, instance] = array;
+    instance.lastChild?.remove();
     const data = apiList[key];
     const name = data.name;
     const url = data.url;
     const custom = data.custom;
+    if (name === 'kavin.rocks' || name === 'r4fo.com' || name === 'fdn.fr') return;
     if (custom) {
       const dom = instance.options[0];
       dom.value = url;
@@ -48,14 +68,14 @@ async function fetchAPIdata(event: Event) {
 
   const pipData = await fetch('https://piped-instances.kavin.rocks')
     .then(res => res.json())
-    .catch(e => alert('fetching piped instances failed with error : ' + e));
+    .catch(e => notify('fetching piped instances failed with error : ' + e));
 
 
   txtReplace('1', '5');
 
   const invData = await fetch('https://api.invidious.io/instances.json')
     .then(res => res.json())
-    .catch(e => alert('fetching invidious instances failed with error : ' + JSON.stringify(e)));
+    .catch(e => notify('fetching invidious instances failed with error : ' + JSON.stringify(e)));
 
   txtReplace('5', '10');
 
@@ -68,7 +88,8 @@ async function fetchAPIdata(event: Event) {
     const url = instance.api_url;
     const imgPrxy = instance.image_proxy_url;
 
-    pipedInstances.add(new Option(name, url));
+    if (![...pipedInstances.options].map(_ => _.value).includes(url))
+      pipedInstances.add(new Option(name, url));
 
     // image proxy
     await (new Promise(async (res, rej) => {
@@ -79,7 +100,10 @@ async function fetchAPIdata(event: Event) {
 
       testImg.onerror = e => rej(e + ' server failure');
       testImg.src = imgUrl('1SLr62VBBjw', 'default', imgPrxy);
-    })).then(() => thumbnailProxies.add(new Option(name, imgPrxy)))
+    })).then(() => {
+      if (![...thumbnailProxies.options].map(_ => _.value).includes(imgPrxy))
+        thumbnailProxies.add(new Option(name, imgPrxy))
+    })
       .catch(e => console.log('loading thumbnail failed on ' + url + ' with error ' + JSON.stringify(e)));
   }
 
@@ -110,13 +134,16 @@ async function fetchAPIdata(event: Event) {
       audioElement.src =
         (audioURL).replace(new URL(audioURL).origin, url);
     }))
-      .then(() => invidiousInstances.add(new Option(instanceName, url)))
+      .then(() => {
+        if (![...invidiousInstances.options].map(_ => _.value).includes(url))
+          invidiousInstances.add(new Option(instanceName, url))
+      })
       .catch(e => console.log('playing audio from ' + url + ' failed with error ' + JSON.stringify(e)));
   }
 
   txtReplace(c + '% Generating', 'Regenerate');
 
-  alert('Instances successfully updated');
+  notify('Instances successfully added');
 }
 
 
@@ -135,32 +162,40 @@ apiRefreshBtn.addEventListener('click', fetchAPIdata);
 
 
 // Instance Selector change event
-[invidiousInstances, pipedInstances, thumbnailProxies].forEach((instances, i) => {
-  instances.addEventListener('change', async () => {
+Object.entries(iMap).forEach(array => {
+  const [type, instance] = array;
+  instance.addEventListener('change', async () => {
 
-    const type = i === 0 ? 'invidious' : i === 1 ? 'piped' : 'image';
-
-    const instance = instances.options[instances.selectedIndex];
-    let name = <string>instance.textContent;
-    let url = instance.value;
+    const selectedOption = instance.options[instance.selectedIndex];
+    let name = <string>selectedOption.textContent;
+    let url = selectedOption.value;
     const custom = name.startsWith('Custom');
 
     if (custom) {
       url = <string>prompt('Enter the URL');
       if (!url) return;
-      instance.value = url;
+      selectedOption.value = url;
       const [, dom, ain] = new URL(url).hostname.split('.');
       name = [dom, ain].join('.');
-      instance.textContent = 'Custom : ' + name;
+      selectedOption.textContent = 'Custom : ' + name;
     }
 
     if (!name || !url) return;
 
-    const savedData: saved = JSON.parse(<string>getSaved('apiList_2')) || { piped: {}, invidious: {}, image: {} };
+    const savedData: saved = JSON.parse(<string>getSaved('apiList_2')) || defData;
     savedData[type].name = name;
     savedData[type].url = url;
     savedData[type].custom = custom;
-    save('apiList_2', JSON.stringify(savedData));
+    let listIsSame = true;
+    const parsedClone = JSON.parse(clone);
+    for (const type in parsedClone)
+      if (savedData[type].url !== parsedClone[type].url)
+        listIsSame = false;
+
+    listIsSame ?
+      localStorage.removeItem('apiList_2') :
+      save('apiList_2', JSON.stringify(savedData));
+
 
     if (type === 'invidious') {
       audio.pause();
