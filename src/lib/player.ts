@@ -2,7 +2,7 @@ import {
   audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,
   invidiousInstances
 } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, params, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getDB, getSaved, notify, params, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 
@@ -27,7 +27,7 @@ export default async function player(id: string | null = '') {
   const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
     const i = invidiousInstances.selectedIndex;
     if (i < invidiousInstances.length - 1) {
-      alert('switched playback instance from ' +
+      notify('switched playback instance from ' +
         invidiousInstances.options[i].value
         + ' to ' +
         invidiousInstances.options[i + 1].value
@@ -37,7 +37,7 @@ export default async function player(id: string | null = '') {
       player(id);
       return;
     }
-    alert(err.message);
+    notify(err.message);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     invidiousInstances.selectedIndex = 0;
   });
@@ -47,7 +47,7 @@ export default async function player(id: string | null = '') {
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   if (!audioStreams.length) {
-    alert('NO AUDIO STREAMS AVAILABLE.');
+    notify('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }

@@ -16,7 +16,9 @@
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
 - **Library** 📚: Discover feed, history, favorites & custom playlists. 
 
-![chrome_screenshot_ytify_v6_desktop](https://imageupload.io/ib/U74XZC8af5zwzqD_1695788573.jpg)
+
+![ytify_6.6_landscape](https://github.com/n-ce/ytify/assets/69345507/aac99225-50ec-4a4f-a218-dfff0ddec560)
+
 
 ## WHY / The story of ytify with [n-ce](https://github.com/n-ce)
 - I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
@@ -64,10 +66,11 @@ npm run dev -- --open
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
 
 ## Contributing 📋
-> We are actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
+> This project is actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
 
 ## Acknowledgements 🙏
-- [Piped](https://github.com/teampiped/piped) - Powerful YouTube API
+- [Piped](https://github.com/teampiped/piped) - YouTube Data API & Proxy
+- [Invidious](https://invidious.io) - YouTube Playback API
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms.
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.

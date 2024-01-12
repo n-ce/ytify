@@ -34,8 +34,7 @@
 
 <body>
   <canvas class="hide" id="canvas"></canvas>
-  <audio> </audio>
-
+  <audio></audio>
   <nav>
     <a href="/" id="/">
       <i class="ri-home-line"></i>
@@ -67,7 +66,7 @@
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.5</a>
+        <a id="title" href="" target="_blank">ytify 6.6</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
@@ -192,14 +191,16 @@
           <h3>Piped Instance</h3>
         </label>
         <select id="pipedInstances">
-          <option value="https://pipedapi.kavin.rocks">Custom</option>
+          <option value="">Custom</option>
+          <option value="https://pipedapi.kavin.rocks" selected>kavin.rocks</option>
         </select>
       </span>
       <h3>Playback</h3>
       <span>
         <label for="invidiousInstances">Invidious Instance</label>
         <select id="invidiousInstances">
-          <option value="https://invidious.fdn.fr">Custom</option>
+          <option value="">Custom</option>
+          <option value="https://invidious.fdn.fr" selected>fdn.fr</option>
         </select>
       </span>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
@@ -209,7 +210,7 @@
         <select id="CodecPreference">
           <option value="opus">Opus</option>
           <option value="aac">AAC</option>
-          <option value="">None</option>
+          <option value="">Both</option>
         </select>
       </span>
 
@@ -217,7 +218,8 @@
       <span>
         <label for="thumbnailProxies">Proxy</label>
         <select id="thumbnailProxies">
-          <option value="https://pipedproxy.r4fo.com">Custom</option>
+          <option value="">Custom</option>
+          <option value="https://pipedproxy.r4fo.com" selected>r4fo.com</option>
         </select>
       </span>
       <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
