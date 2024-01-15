@@ -1,11 +1,12 @@
 import { $ } from '../lib/utils';
 import css from '../components/toggleSwitch.css?inline';
 
+let root: ShadowRoot;
+
 customElements.define('toggle-switch', class extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-
+    root = this.attachShadow({ mode: 'open' });
     const style = $('style');
     style.textContent = css;
 
@@ -21,7 +22,7 @@ customElements.define('toggle-switch', class extends HTMLElement {
 
     label.append(input, $('span'));
 
-    this.shadowRoot?.append(style, $('slot'), label);
+    root.append(style, $('slot'), label);
   }
 
   static get observedAttributes() {
@@ -29,7 +30,6 @@ customElements.define('toggle-switch', class extends HTMLElement {
   }
 
   attributeChangedCallback() {
-    this.shadowRoot?.querySelector('input')?.toggleAttribute('checked');
+    (<HTMLInputElement>root.querySelector('input')).toggleAttribute('checked');
   }
-
-})
+});

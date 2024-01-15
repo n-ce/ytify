@@ -5,6 +5,7 @@
 @import 'search.css';
 @import 'settings.css';
 @import 'superModal.css';
+@import 'snackbar.css';
 
 :root {
   --bg: transparent;

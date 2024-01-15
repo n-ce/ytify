@@ -1,15 +1,14 @@
-:host {
+p.snackbar {
   position: absolute;
   z-index: 9;
   top: 75%;
   width: calc(90dvmin - 1rem);
   padding: 0.5rem 1rem;
-  user-select: none;
   background-color: var(--bg);
   color: var(--text);
   border: 1px solid var(--text);
   border-radius: var(--roundness);
-  animation: fadeIn 1s, fadeOut 1s 7.5s;
+  animation: fadeIn 1s, fadeOut 1s 6.5s;
 }
 
 @keyframes fadeIn {

@@ -24,8 +24,12 @@ export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 export function notify(text: string) {
-  const el = $('snack-bar');
+  const el = $('p');
+  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
+  el.className = 'snackbar';
   el.textContent = text;
+  el.onclick = clear;
+  setTimeout(clear, 8e3);
   document.body.appendChild(el);
 }
 
@@ -96,8 +100,6 @@ export function setMetaData(
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    if (!context) return;
-
     // // Square Image Generator 
     const width = canvasImg.width;
     const height = canvasImg.height;

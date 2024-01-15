@@ -70,11 +70,10 @@ const palette: Scheme = {
 
 
 function themer() {
-  if (!context) return;
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    if (!context || canvasImg.width === 120) return;
+    if (canvasImg.width === 120) return;
     canvas.height = canvasImg.height;
     canvas.width = canvasImg.width;
     context.drawImage(canvasImg, 0, 0);

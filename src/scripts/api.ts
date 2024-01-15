@@ -2,14 +2,7 @@ import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../
 import player from "../lib/player";
 import { $, getSaved, imgUrl, notify, save } from "../lib/utils";
 
-type saved = {
-  [index: string]: {
-    name: string,
-    url: string,
-    custom: boolean
-  }
-}
-const defData: saved = {
+const defData: apiList = {
   'piped': {
     name: 'kavin.rocks',
     url: 'https://pipedapi.kavin.rocks',
@@ -182,7 +175,7 @@ Object.entries(iMap).forEach(array => {
 
     if (!name || !url) return;
 
-    const savedData: saved = JSON.parse(<string>getSaved('apiList_2')) || defData;
+    const savedData: apiList = JSON.parse(<string>getSaved('apiList_2')) || defData;
     savedData[type].name = name;
     savedData[type].url = url;
     savedData[type].custom = custom;
