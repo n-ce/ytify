@@ -231,7 +231,10 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#changelog button {
+#changelog button,
+#clearDataDialog button,
+#deleteButton,
+#apiRefreshBtn {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);
@@ -288,4 +291,32 @@ details button:hover {
   justify-content: space-between;
   margin-top: 4%;
   border-bottom: dotted;
+}
+
+#clearDataDialog {
+  flex-direction: column;
+  background-color: var(--bg);
+  border-radius: var(--roundness);
+  border: var(--border);
+}
+
+#clearDataDialog div {
+  background-color: var(--onBg);
+  color: var(--text);
+  max-height: 40dvh;
+  width: 99%;
+  overflow: scroll;
+  border-radius: var(--roundness);
+  margin-bottom: 3%;
+  border: var(--border);
+}
+
+#clearDataDialog toggle-switch {
+  width: 80%;
+  margin-left: 10%;
+}
+
+#clearDataDialog span {
+  display: flex;
+  justify-content: flex-end;
 }

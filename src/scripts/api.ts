@@ -21,7 +21,7 @@ const defData: apiList = {
 };
 const clone = JSON.stringify(defData);
 const iMap = { 'piped': pipedInstances, 'invidious': invidiousInstances, 'image': thumbnailProxies };
-const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn'));
+const apiRefreshBtn = <HTMLButtonElement>document.getElementById('apiRefreshBtn');
 const serialisedList = getSaved('apiList_2') || '{}';
 
 if (serialisedList !== '{}') {
@@ -47,8 +47,7 @@ if (serialisedList !== '{}') {
 
 const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <string>(<string>apiRefreshBtn.textContent).replace(init, now);
 
-async function fetchAPIdata(event: Event) {
-  event?.preventDefault();
+async function fetchAPIdata() {
 
   if (apiRefreshBtn.textContent?.includes('Generating')) {
     apiRefreshBtn.textContent = 'API Generation stopped';
@@ -62,14 +61,17 @@ async function fetchAPIdata(event: Event) {
     .then(res => res.json())
     .catch(e => notify('fetching piped instances failed with error : ' + JSON.stringify(e.message)));
 
+  let dataUsage = (new Blob([JSON.stringify(pipData)])).size / 1024;
+
   const invData = await fetch('https://api.invidious.io/instances.json')
     .then(res => res.json())
     .catch(e => notify('fetching invidious instances failed with error : ' + JSON.stringify(e.message)));
 
+  dataUsage += (new Blob([JSON.stringify(invData)])).size / 1024;
+
   const rate = 100 / (pipData.length + invData.length);
   let num = 0;
   let temp;
-  let dataUsage = 0;
 
   for await (const instance of pipData) {
     temp = num.toFixed();
@@ -87,7 +89,7 @@ async function fetchAPIdata(event: Event) {
     await (new Promise(async (res, rej) => {
       const testImg = new Image();
 
-      testImg.onload = _ => testImg.width === 120 ?
+      testImg.onload = () => testImg.width === 120 ?
         res(dataUsage += 0.08) : rej('load failure');
 
       testImg.onerror = e => rej(e + ' server failure');
@@ -120,7 +122,7 @@ async function fetchAPIdata(event: Event) {
 
     await (new Promise((res, rej) => {
       const audioElement = new Audio();
-      audioElement.onloadedmetadata = _ => res(dataUsage += 0.45);
+      audioElement.onloadedmetadata = () => res(dataUsage += 0.45);
       audioElement.onerror = e => rej(e + ' response failure');
 
       audioElement.src =
@@ -139,7 +141,7 @@ async function fetchAPIdata(event: Event) {
 }
 
 
-const apiAutoFetchSwitch = (<HTMLElement>document.getElementById('apiAutoFetchSwitch'));
+const apiAutoFetchSwitch = <HTMLElement>document.getElementById('apiAutoFetchSwitch');
 apiAutoFetchSwitch.addEventListener('click', () => {
   getSaved('apiAutoFetch') ?
     localStorage.removeItem('apiAutoFetch') :

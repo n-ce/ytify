@@ -57,12 +57,38 @@ thumbnailSwitch.addEventListener('click', () => {
 });
 
 
-const deleteButton = <HTMLAnchorElement>document.getElementById('deleteButton');
+const deleteButton = <HTMLButtonElement>document.getElementById('deleteButton');
+
+const cdd = <HTMLDialogElement>document.getElementById('clearDataDialog');
+const cddDiv = <HTMLDivElement>cdd.firstElementChild;
+const [cddCancel, cddSubmit] = <HTMLCollectionOf<HTMLButtonElement>>((<HTMLSpanElement>cdd.lastElementChild).children);
+
+cddCancel.onclick = () => cdd.close();
 
 deleteButton.addEventListener('click', () => {
-  self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-  navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-  localStorage.clear();
+  cdd.showModal();
+  cddDiv.innerHTML = '<toggle-switch>Service Worker</toggle-switch>';
+  for (let i = 0; i < localStorage.length; i++) {
+    const ts = document.createElement('toggle-switch');
+    const key = localStorage.key(i);
+    ts.textContent = key;
+    cddDiv.appendChild(ts);
+  }
+});
+
+cddSubmit.addEventListener('click', () => {
+
+  const swBtn = <HTMLElement>cddDiv.firstElementChild;
+  if (swBtn.hasAttribute('checked')) {
+    self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+    navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
+  }
+  swBtn.remove();
+
+  cddDiv.querySelectorAll('[checked]').forEach(ts => localStorage.removeItem(<string>ts.textContent));
+
+  cdd.close();
+  location.reload();
 });
 
 

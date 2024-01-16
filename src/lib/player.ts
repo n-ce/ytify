@@ -1,7 +1,4 @@
-import {
-  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,
-  invidiousInstances
-} from "./dom";
+import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 

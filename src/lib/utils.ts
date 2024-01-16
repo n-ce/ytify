@@ -249,12 +249,12 @@ export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
     throw new Error('No Data Found');
   const fragment = document.createDocumentFragment();
 
-  for (const item of itemsArray) {
-
-    const type = item.type === 'stream' ? createStreamItem(item) : createListItem(item);
-
-    fragment.appendChild(type);
-  }
+  for (const item of itemsArray)
+    fragment.appendChild(
+      item.type !== 'stream' ?
+        createListItem(item) :
+        createStreamItem(item)
+    );
 
   return fragment;
 }

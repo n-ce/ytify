@@ -258,9 +258,9 @@
 
       <h3>Actions</h3>
 
-      <a href="" id="apiRefreshBtn">Regenerate Instances</a>
+      <button id="apiRefreshBtn">Regenerate Instances</button>
 
-      <a href="/" id="deleteButton">Clear all data</a>
+      <button id="deleteButton">Clear Data</button>
 
       <a href="https://github.com/n-ce/ytify/" target="_blank">View Source Code</a>
 
@@ -366,6 +366,14 @@
 
   <dialog id="loadingScreen">
     <i class="ri-loader-3-line"></i>
+  </dialog>
+
+  <dialog id="clearDataDialog">
+    <div></div>
+    <span>
+      <button>Cancel</button>
+      <button>Submit & Reload</button>
+    </span>
   </dialog>
 
   <script src="/src/scripts/main.ts" type="module"></script>
