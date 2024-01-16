@@ -41,6 +41,7 @@ if (serialisedList !== '{}') {
       const dom = instance.options[0];
       dom.value = url;
       dom.textContent = 'Custom : ' + name;
+      dom.selected = true;
     }
     else instance.add(new Option(name, url, undefined, true));
   });
@@ -97,7 +98,7 @@ async function fetchAPIdata(event: Event) {
       if (![...thumbnailProxies.options].map(_ => _.value).includes(imgPrxy))
         thumbnailProxies.add(new Option(name, imgPrxy))
     })
-      .catch(e => console.log('loading thumbnail failed on ' + imgPrxy + ' with error ' + JSON.stringify(e.message)));
+      .catch(e => console.log('loading thumbnail failed on ' + imgPrxy + ' with error ' + e));
   }
 
 
@@ -110,7 +111,7 @@ async function fetchAPIdata(event: Event) {
     if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
     const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on' + url + 'with error: ' + JSON.stringify(e.message)));
 
-    if (!audioData.hasOwnProperty('adaptiveFormats')) continue;
+    if (!audioData) continue;
 
     const audioURL = audioData.adaptiveFormats
       .filter((stream: { audioSampleRate: number }) => stream.audioSampleRate === 48000)
@@ -133,7 +134,7 @@ async function fetchAPIdata(event: Event) {
         if (![...invidiousInstances.options].map(_ => _.value).includes(url))
           invidiousInstances.add(new Option(instanceName, url))
       })
-      .catch(e => console.log('playing audio from ' + url + ' failed with error ' + JSON.stringify(e.messsage)));
+      .catch(e => console.log('playing audio from ' + url + ' failed with error ' + e));
   }
 
   txtReplace('100% Generating', 'Regenerate');
