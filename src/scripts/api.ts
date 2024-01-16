@@ -1,6 +1,6 @@
 import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, imgUrl, notify, save } from "../lib/utils";
+import { getSaved, imgUrl, notify, save } from "../lib/utils";
 
 const defData: apiList = {
   'piped': {
@@ -55,27 +55,27 @@ async function fetchAPIdata(event: Event) {
     apiRefreshBtn.textContent = 'API Generation stopped';
     throw new Error('Generation was abruptly stopped');
   }
-  else apiRefreshBtn.textContent = 'Regenerate Piped + Invidious Instances Data';
+  else apiRefreshBtn.textContent = 'Regenerate Instances';
 
-  txtReplace('Regenerate', ' 1% Generating');
+  txtReplace('Regenerate', ' 0% Generating');
 
   const pipData = await fetch('https://piped-instances.kavin.rocks')
     .then(res => res.json())
-    .catch(e => notify('fetching piped instances failed with error : ' + e));
-
-
-  txtReplace('1', '5');
+    .catch(e => notify('fetching piped instances failed with error : ' + JSON.stringify(e.message)));
 
   const invData = await fetch('https://api.invidious.io/instances.json')
     .then(res => res.json())
-    .catch(e => notify('fetching invidious instances failed with error : ' + JSON.stringify(e)));
+    .catch(e => notify('fetching invidious instances failed with error : ' + JSON.stringify(e.message)));
 
-  txtReplace('5', '10');
 
-  let c = 10;
+  const rate = 100 / (pipData.length + invData.length);
+  let num = 0;
+  let temp;
 
   for await (const instance of pipData) {
-    txtReplace(`${c}`, `${c += 2}`);
+    temp = num.toFixed();
+    num += rate;
+    txtReplace(temp, num.toFixed());
 
     const name = instance.name + ' ' + instance.locations;
     const url = instance.api_url;
@@ -97,16 +97,18 @@ async function fetchAPIdata(event: Event) {
       if (![...thumbnailProxies.options].map(_ => _.value).includes(imgPrxy))
         thumbnailProxies.add(new Option(name, imgPrxy))
     })
-      .catch(e => console.log('loading thumbnail failed on ' + url + ' with error ' + JSON.stringify(e)));
+      .catch(e => console.log('loading thumbnail failed on ' + imgPrxy + ' with error ' + JSON.stringify(e.message)));
   }
 
 
   for await (const instance of invData) {
-    txtReplace(`${c}`, `${c += 2}`);
+    temp = num.toFixed();
+    num += rate;
+    txtReplace(temp, num.toFixed())
 
     const url = instance[1].uri;
     if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
-    const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json());
+    const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on' + url + 'with error: ' + JSON.stringify(e.message)));
 
     if (!audioData.hasOwnProperty('adaptiveFormats')) continue;
 
@@ -120,7 +122,7 @@ async function fetchAPIdata(event: Event) {
     const instanceName = [dom, ain].join('.') + ' ' + instance[1].flag;
 
     await (new Promise((res, rej) => {
-      const audioElement = $('audio');
+      const audioElement = new Audio();
       audioElement.onloadedmetadata = _ => res(_);
       audioElement.onerror = e => rej(e + ' response failure');
 
@@ -131,10 +133,10 @@ async function fetchAPIdata(event: Event) {
         if (![...invidiousInstances.options].map(_ => _.value).includes(url))
           invidiousInstances.add(new Option(instanceName, url))
       })
-      .catch(e => console.log('playing audio from ' + url + ' failed with error ' + JSON.stringify(e)));
+      .catch(e => console.log('playing audio from ' + url + ' failed with error ' + JSON.stringify(e.messsage)));
   }
 
-  txtReplace(c + '% Generating', 'Regenerate');
+  txtReplace('100% Generating', 'Regenerate');
 
   notify('Instances successfully added');
 }
