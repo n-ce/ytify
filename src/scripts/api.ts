@@ -69,6 +69,7 @@ async function fetchAPIdata(event: Event) {
   const rate = 100 / (pipData.length + invData.length);
   let num = 0;
   let temp;
+  let dataUsage = 0;
 
   for await (const instance of pipData) {
     temp = num.toFixed();
@@ -87,7 +88,7 @@ async function fetchAPIdata(event: Event) {
       const testImg = new Image();
 
       testImg.onload = _ => testImg.width === 120 ?
-        res(_) : rej('load failure');
+        res(dataUsage += 0.08) : rej('load failure');
 
       testImg.onerror = e => rej(e + ' server failure');
       testImg.src = imgUrl('1SLr62VBBjw', 'default', imgPrxy);
@@ -98,7 +99,6 @@ async function fetchAPIdata(event: Event) {
       .catch(e => console.log('loading thumbnail failed on ' + imgPrxy + ' with error ' + e));
   }
 
-
   for await (const instance of invData) {
     temp = num.toFixed();
     num += rate;
@@ -106,14 +106,13 @@ async function fetchAPIdata(event: Event) {
 
     const url = instance[1].uri;
     if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
-    const audioData = await fetch(url + '/api/v1/videos/tbnLqRW9Ef0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on' + url + 'with error: ' + JSON.stringify(e.message)));
+    const audioData = await fetch(url + '/api/v1/videos/NwmIu9iPkR0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on' + url + 'with error: ' + JSON.stringify(e.message)));
 
-    if (!audioData) continue;
+    if (!audioData || !audioData.adaptiveFormats) continue;
 
     const audioURL = audioData.adaptiveFormats
       .filter((stream: { audioSampleRate: number }) => stream.audioSampleRate === 48000)
       .sort((a: { bitrate: number }, b: { bitrate: number }) => a.bitrate - b.bitrate)[0].url;
-
 
     const [, dom, ain] = instance[0].split('.');
 
@@ -121,7 +120,7 @@ async function fetchAPIdata(event: Event) {
 
     await (new Promise((res, rej) => {
       const audioElement = new Audio();
-      audioElement.onloadedmetadata = _ => res(_);
+      audioElement.onloadedmetadata = _ => res(dataUsage += 0.45);
       audioElement.onerror = e => rej(e + ' response failure');
 
       audioElement.src =
@@ -136,7 +135,7 @@ async function fetchAPIdata(event: Event) {
 
   txtReplace('100% Generating', 'Regenerate');
 
-  notify('Instances successfully added');
+  notify(`Instances successfully added. ${Math.ceil(dataUsage)}KB data was used.`);
 }
 
 
@@ -176,11 +175,11 @@ Object.entries(iMap).forEach(array => {
     if (!name || !url) return;
 
     const savedData: apiList = JSON.parse(<string>getSaved('apiList_2')) || defData;
-   
+
     savedData[type].name = name;
     savedData[type].url = url;
     savedData[type].custom = custom;
-    
+
     let listIsSame = true;
     const parsedClone = JSON.parse(clone);
     for (const type in parsedClone)
