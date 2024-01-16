@@ -21,11 +21,9 @@ const defData: apiList = {
 };
 const clone = JSON.stringify(defData);
 const iMap = { 'piped': pipedInstances, 'invidious': invidiousInstances, 'image': thumbnailProxies };
-
 const apiRefreshBtn = (<HTMLAnchorElement>document.getElementById('apiRefreshBtn'));
-
-
 const serialisedList = getSaved('apiList_2') || '{}';
+
 if (serialisedList !== '{}') {
   const apiList = JSON.parse(serialisedList);
 
@@ -67,7 +65,6 @@ async function fetchAPIdata(event: Event) {
   const invData = await fetch('https://api.invidious.io/instances.json')
     .then(res => res.json())
     .catch(e => notify('fetching invidious instances failed with error : ' + JSON.stringify(e.message)));
-
 
   const rate = 100 / (pipData.length + invData.length);
   let num = 0;
@@ -179,9 +176,11 @@ Object.entries(iMap).forEach(array => {
     if (!name || !url) return;
 
     const savedData: apiList = JSON.parse(<string>getSaved('apiList_2')) || defData;
+   
     savedData[type].name = name;
     savedData[type].url = url;
     savedData[type].custom = custom;
+    
     let listIsSame = true;
     const parsedClone = JSON.parse(clone);
     for (const type in parsedClone)
