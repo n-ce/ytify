@@ -61,34 +61,28 @@ const deleteButton = <HTMLButtonElement>document.getElementById('deleteButton');
 
 const cdd = <HTMLDialogElement>document.getElementById('clearDataDialog');
 const cddDiv = <HTMLDivElement>cdd.firstElementChild;
-const [cddCancel, cddSubmit] = <HTMLCollectionOf<HTMLButtonElement>>((<HTMLSpanElement>cdd.lastElementChild).children);
+const [clear_sw, clear_library, clear_settings] = <HTMLCollectionOf<HTMLElement>>cddDiv.children;
 
-cddCancel.onclick = () => cdd.close();
+deleteButton.onclick = () => cdd.showModal();
 
-deleteButton.addEventListener('click', () => {
-  cdd.showModal();
-  cddDiv.innerHTML = '<toggle-switch>Service Worker</toggle-switch>';
-  for (let i = 0; i < localStorage.length; i++) {
-    const ts = document.createElement('toggle-switch');
-    const key = localStorage.key(i);
-    ts.textContent = key;
-    cddDiv.appendChild(ts);
-  }
-});
+(<HTMLButtonElement>cdd.lastElementChild).addEventListener('click', () => {
+  cdd.close();
 
-cddSubmit.addEventListener('click', () => {
-
-  const swBtn = <HTMLElement>cddDiv.firstElementChild;
-  if (swBtn.hasAttribute('checked')) {
+  if (clear_sw.hasAttribute('checked')) {
     self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
     navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
   }
-  swBtn.remove();
 
-  cddDiv.querySelectorAll('[checked]').forEach(ts => localStorage.removeItem(<string>ts.textContent));
+  if (clear_library.hasAttribute('checked'))
+    localStorage.removeItem('library');
 
-  cdd.close();
-  location.reload();
+  if (clear_settings.hasAttribute('checked'))
+    for (let i = 0; i < localStorage.length; i++)
+      if (localStorage.key(i) !== 'library')
+        localStorage.removeItem(<string>localStorage.key(i));
+
+  if (cddDiv.querySelectorAll('[checked]').length)
+    location.reload();
 });
 
 

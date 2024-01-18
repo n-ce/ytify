@@ -369,11 +369,12 @@
   </dialog>
 
   <dialog id="clearDataDialog">
-    <div></div>
-    <span>
-      <button>Cancel</button>
-      <button>Submit & Reload</button>
-    </span>
+    <div>
+      <toggle-switch>Cache</toggle-switch>
+      <toggle-switch>Library</toggle-switch>
+      <toggle-switch>Settings</toggle-switch>
+    </div>
+    <button>Clear & Reload</button>
   </dialog>
 
   <script src="/src/scripts/main.ts" type="module"></script>
