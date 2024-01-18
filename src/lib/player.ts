@@ -52,54 +52,58 @@ export default async function player(id: string | null = '') {
     .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
-  if (!audioStreams.length) {
+  const noOfBitrates = audioStreams.length;
+
+  if (!noOfBitrates) {
     notify('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
 
   const preferedCodec = codecSelector.value;
+  let index = -1;
 
   bitrateSelector.innerHTML = '';
 
-  audioStreams.forEach(((_: {
+  audioStreams.forEach((_: {
     type: string,
     url: string,
     quality: string,
     bitrate: string,
     encoding: string
-  }) => {
+  }, i: number) => {
     const bitrate = parseInt(_.bitrate);
-    const quality = Math.floor(bitrate / 1024) + ' kbps ' + (_.type.includes('opus') ? 'opus' : 'aac');
+    const codec = _.type.includes('opus') ? 'opus' : 'aac';
+    const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
+
     // proxy the url
     const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
+    // add to DOM
     bitrateSelector.add(new Option(quality, url));
-  }));
-  // Manages both quality & codec preferences
-  let index = -1;
-  const noOfBitrates = bitrateSelector.length;
-  for (let i = 0; i < noOfBitrates; i++)
-    if (
-      bitrateSelector.options[i].textContent?.endsWith(preferedCodec) &&
-      index < (
-        getSaved('hq') ? noOfBitrates : 0
-      )
-    )
-      index = i;
-  //  //  //  //  //  //  //  //  //  //  //
+
+    // find preferred bitrate
+    const codecPref = preferedCodec ? codec === preferedCodec : true;
+    const hqPref = getSaved('hq') ? noOfBitrates : 0;
+    if (codecPref && index < hqPref) index = i;
+  });
+
 
   bitrateSelector.selectedIndex = index;
   audio.src = bitrateSelector.value;
 
 
   // remove ' - Topic' from name if it exists
-  data.author = data.author.replace(' - Topic', '');
+  if (data.author.includes(' - Topic')) {
+    var music = true;
+    data.author = data.author.replace(' - Topic', '');
+  }
 
   setMetaData(
     id,
     data.title,
     data.author,
-    data.authorUrl
+    data.authorUrl,
+    music
   );
 
 
