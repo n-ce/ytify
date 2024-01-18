@@ -9,7 +9,7 @@ if (codecSaved)
   codecSelector.selectedIndex = parseInt(codecSaved);
 
 codecSelector.addEventListener('change', async () => {
-  const i = codecSelector.selectedIndex;;
+  const i = codecSelector.selectedIndex;
   i ?
     save('codec', String(i)) :
     removeSaved('codec');
