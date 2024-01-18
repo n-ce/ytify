@@ -1,6 +1,6 @@
 import { img, canvas, context } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getSaved, idFromURL, params, save } from "../lib/utils";
+import { blankImage, getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
@@ -120,7 +120,7 @@ function themer() {
 
 highContrastSwitch.addEventListener('click', () => {
   getSaved('highContrast') ?
-    localStorage.removeItem('highContrast') :
+    removeSaved('highContrast') :
     save('highContrast', 'true');
   themer();
 })
@@ -133,7 +133,7 @@ if (getSaved('highContrast'))
 themeSelector.addEventListener('change', () => {
   themer();
   themeSelector.value === 'auto' ?
-    localStorage.removeItem('theme') :
+    removeSaved('theme') :
     save('theme', themeSelector.value);
 });
 
@@ -155,7 +155,7 @@ if (getSaved('roundness')) {
 roundnessChanger.addEventListener('change', () => {
   cssVar('--roundness', roundnessChanger.value);
   roundnessChanger.value === '2vmin' ?
-    localStorage.removeItem('roundness') :
+    removeSaved('roundness') :
     save('roundness', roundnessChanger.value)
 })
 

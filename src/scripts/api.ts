@@ -1,6 +1,6 @@
 import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../lib/dom";
 import player from "../lib/player";
-import { getSaved, imgUrl, notify, save } from "../lib/utils";
+import { getSaved, imgUrl, notify, removeSaved, save } from "../lib/utils";
 
 const defData: apiList = {
   'piped': {
@@ -50,7 +50,7 @@ const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <s
 async function fetchAPIdata() {
 
   if (apiRefreshBtn.textContent?.includes('Generating')) {
-    apiRefreshBtn.textContent = 'API Generation stopped';
+    apiRefreshBtn.textContent = 'Instances Generation Stopped';
     throw new Error('Generation was abruptly stopped');
   }
   else apiRefreshBtn.textContent = 'Regenerate Instances';
@@ -144,7 +144,7 @@ async function fetchAPIdata() {
 const apiAutoFetchSwitch = <HTMLElement>document.getElementById('apiAutoFetchSwitch');
 apiAutoFetchSwitch.addEventListener('click', () => {
   getSaved('apiAutoFetch') ?
-    localStorage.removeItem('apiAutoFetch') :
+    removeSaved('apiAutoFetch') :
     save('apiAutoFetch', 'false');
 })
 
@@ -189,7 +189,7 @@ Object.entries(iMap).forEach(array => {
         listIsSame = false;
 
     listIsSame ?
-      localStorage.removeItem('apiList_2') :
+      removeSaved('apiList_2') :
       save('apiList_2', JSON.stringify(savedData));
 
 

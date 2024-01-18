@@ -1,6 +1,6 @@
 import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, notify } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, notify, removeSaved } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
@@ -183,7 +183,7 @@ searchFilters.addEventListener('change', searchLoader);
 
 suggestionsSwitch.addEventListener('click', () => {
   getSaved('search_suggestions') ?
-    localStorage.removeItem('search_suggestions') :
+    removeSaved('search_suggestions') :
     save('search_suggestions', 'off');
   suggestions.style.display = 'none';
 

@@ -1,6 +1,6 @@
 import { audio, bitrateSelector, discoveryStorageLimit, img } from "../lib/dom";
 import player from "../lib/player";
-import { blankImage, getDB, getSaved, save, saveDB } from "../lib/utils";
+import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
 
 img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
 img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
@@ -18,14 +18,14 @@ bitrateSelector.addEventListener('change', () => {
 
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 
-if (getSaved('quality') == 'hq')
+if (getSaved('hq') == 'true')
   qualitySwitch.toggleAttribute('checked');
 
 qualitySwitch.addEventListener('click', async () => {
 
-  getSaved('quality') ?
-    localStorage.removeItem('quality') : // low
-    save('quality', 'hq'); // high
+  getSaved('hq') ?
+    removeSaved('hq') : // low
+    save('hq', 'true'); // high
 
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
@@ -51,7 +51,7 @@ if (getSaved('img')) {
 
 thumbnailSwitch.addEventListener('click', () => {
   getSaved('img') ?
-    localStorage.removeItem('img') :
+    removeSaved('img') :
     localStorage.setItem('img', 'off');
   location.reload();
 });
@@ -65,6 +65,7 @@ const [clear_sw, clear_library, clear_settings] = <HTMLCollectionOf<HTMLElement>
 
 deleteButton.onclick = () => cdd.showModal();
 
+
 (<HTMLButtonElement>cdd.lastElementChild).addEventListener('click', () => {
   cdd.close();
 
@@ -74,12 +75,12 @@ deleteButton.onclick = () => cdd.showModal();
   }
 
   if (clear_library.hasAttribute('checked'))
-    localStorage.removeItem('library');
+    removeSaved('library');
 
   if (clear_settings.hasAttribute('checked'))
     for (let i = 0; i < localStorage.length; i++)
       if (localStorage.key(i) !== 'library')
-        localStorage.removeItem(<string>localStorage.key(i));
+        removeSaved(<string>localStorage.key(i));
 
   if (cddDiv.querySelectorAll('[checked]').length)
     location.reload();
@@ -92,7 +93,7 @@ discoveryStorageLimit.value = getSaved('discoveryLimit') || '512';
 discoveryStorageLimit.addEventListener('change', () => {
   const val = discoveryStorageLimit.value;
   val === '512' ?
-    localStorage.removeItem('discoveryLimit') :
+    removeSaved('discoveryLimit') :
     save('discoveryLimit', val);
 
   if (val === '0') {

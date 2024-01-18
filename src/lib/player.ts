@@ -1,15 +1,24 @@
 import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, invidiousInstances } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, notify, params, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+const codecSaved = getSaved('codec');
+if (codecSaved)
+  codecSelector.selectedIndex = parseInt(codecSaved);
+
 codecSelector.addEventListener('change', async () => {
+  const i = codecSelector.selectedIndex;;
+  i ?
+    save('codec', String(i)) :
+    removeSaved('codec');
+
   audio.pause();
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
-})
+});
 
 if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
   codecSelector.selectedIndex = 1;
@@ -49,7 +58,6 @@ export default async function player(id: string | null = '') {
     return;
   }
 
-  const bitrates: number[] = [];
   const preferedCodec = codecSelector.value;
 
   bitrateSelector.innerHTML = '';
@@ -62,28 +70,26 @@ export default async function player(id: string | null = '') {
     encoding: string
   }) => {
     const bitrate = parseInt(_.bitrate);
-    bitrates.push(bitrate);
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + (_.type.includes('opus') ? 'opus' : 'aac');
     // proxy the url
     const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
     bitrateSelector.add(new Option(quality, url));
   }));
-
+  // Manages both quality & codec preferences
   let index = -1;
-
-  bitrateSelector.childNodes.forEach((e, i) => {
-    if (e.textContent?.endsWith(preferedCodec) && index < (getSaved('quality') ? 10 : 0)) index = i;
-  });
-
-  // using lowest aac stream when low opus bitrate unavailable
-  if (!getSaved('quality') && preferedCodec === 'opus' &&
-    bitrates[index] > 65536)
-    index = 0
+  const noOfBitrates = bitrateSelector.length;
+  for (let i = 0; i < noOfBitrates; i++)
+    if (
+      bitrateSelector.options[i].textContent?.endsWith(preferedCodec) &&
+      index < (
+        getSaved('hq') ? noOfBitrates : 0
+      )
+    )
+      index = i;
+  //  //  //  //  //  //  //  //  //  //  //
 
   bitrateSelector.selectedIndex = index;
-
   audio.src = bitrateSelector.value;
-
 
 
   // remove ' - Topic' from name if it exists
