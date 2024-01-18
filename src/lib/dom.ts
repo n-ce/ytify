@@ -1,12 +1,14 @@
 export const img = <HTMLImageElement>document.querySelector('img');
 
-export const canvas = <HTMLCanvasElement>document.getElementById('canvas');
+export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 
-export const context = canvas.getContext('2d');
+export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
 
 export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
 
 export const invidiousInstances = <HTMLSelectElement>document.getElementById('invidiousInstances');
+
+export const thumbnailProxies = <HTMLSelectElement>document.getElementById('thumbnailProxies');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 
@@ -40,9 +42,7 @@ export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectio
 
 export const discoveryStorageLimit = <HTMLSelectElement>document.getElementById('discoverLimit');
 
-export const thumbnailProxies = <HTMLSelectElement>document.getElementById('thumbnailProxies');
-
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
-loadingScreen.onclick = () => loadingScreen.close();
+loadingScreen.addEventListener('click', () => loadingScreen.close());
 
 

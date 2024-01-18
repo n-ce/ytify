@@ -1,11 +1,12 @@
 import { $, blankImage, getSaved } from '../lib/utils';
 import css from './listItem.css?inline';
+
+let root: ShadowRoot;
+
 customElements.define('list-item', class extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-
-    const root = <ShadowRoot>this.shadowRoot;
+    root = this.attachShadow({ mode: 'open' });
 
     const style = $('style');
     style.textContent = css;
@@ -30,9 +31,7 @@ customElements.define('list-item', class extends HTMLElement {
   }
 
   connectedCallback() {
-    const root = <ShadowRoot>this.shadowRoot;
     const data = <DOMStringMap>this.dataset;
-
     const thumbnail = <HTMLImageElement>root.getElementById('thumbnail');
     const uData = <HTMLParagraphElement>root.getElementById('uData');
     const stats = <HTMLParagraphElement>root.getElementById('stats');

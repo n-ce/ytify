@@ -1,18 +1,24 @@
-import {
-  audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton,
-  invidiousInstances
-} from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, notify, params, setMetaData } from "./utils";
+import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, invidiousInstances } from "./dom";
+import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+const codecSaved = getSaved('codec');
+if (codecSaved)
+  codecSelector.selectedIndex = parseInt(codecSaved);
+
 codecSelector.addEventListener('change', async () => {
+  const i = codecSelector.selectedIndex;
+  i ?
+    save('codec', String(i)) :
+    removeSaved('codec');
+
   audio.pause();
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
-})
+});
 
 if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
   codecSelector.selectedIndex = 1;
@@ -46,57 +52,59 @@ export default async function player(id: string | null = '') {
     .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
-  if (!audioStreams.length) {
+  const noOfBitrates = audioStreams.length;
+
+  if (!noOfBitrates) {
     notify('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
 
-  const bitrates: number[] = [];
   const preferedCodec = codecSelector.value;
+  let index = -1;
 
   bitrateSelector.innerHTML = '';
 
-  audioStreams.forEach(((_: {
+  audioStreams.forEach((_: {
     type: string,
     url: string,
     quality: string,
     bitrate: string,
     encoding: string
-  }) => {
+  }, i: number) => {
     const bitrate = parseInt(_.bitrate);
-    bitrates.push(bitrate);
-    const quality = Math.floor(bitrate / 1024) + ' kbps ' + (_.type.includes('opus') ? 'opus' : 'aac');
+    const codec = _.type.includes('opus') ? 'opus' : 'aac';
+    const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
+
     // proxy the url
     const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
+    // add to DOM
     bitrateSelector.add(new Option(quality, url));
-  }));
 
-  let index = -1;
-
-  bitrateSelector.childNodes.forEach((e, i) => {
-    if (e.textContent?.endsWith(preferedCodec) && index < (getSaved('quality') ? 10 : 0)) index = i;
+    // find preferred bitrate
+    const codecPref = preferedCodec ? codec === preferedCodec : true;
+    const hqPref = getSaved('hq') ? noOfBitrates : 0;
+    if (codecPref && index < hqPref) index = i;
   });
 
-  // using lowest aac stream when low opus bitrate unavailable
-  if (!getSaved('quality') && preferedCodec === 'opus' &&
-    bitrates[index] > 65536)
-    index = 0
 
   bitrateSelector.selectedIndex = index;
-
   audio.src = bitrateSelector.value;
 
 
-
   // remove ' - Topic' from name if it exists
-  data.author = data.author.replace(' - Topic', '');
+  let music = false;
+  if (data.author.includes(' - Topic')) {
+    music = true;
+    data.author = data.author.replace(' - Topic', '');
+  }
 
   setMetaData(
     id,
     data.title,
     data.author,
-    data.authorUrl
+    data.authorUrl,
+    music
   );
 
 

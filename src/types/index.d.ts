@@ -1,5 +1,12 @@
 declare global {
-  const imsc: any;
+
+  type apiList = {
+    [index: string]: {
+      name: string,
+      url: string,
+      custom: boolean
+    }
+  }
 
   type StreamItem = {
     url: string,
@@ -29,7 +36,6 @@ declare global {
     duration: string
     channelUrl: string,
     frequency?: number
-
   }
 
   type Library = {
@@ -38,12 +44,11 @@ declare global {
     }
   }
 
-  interface Codec {
+  type Codec = {
     urls: string[],
     bitrates: number[],
     length?: number
   }
-
 
   type Scheme = {
     [index: string]: {

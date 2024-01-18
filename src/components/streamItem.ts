@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { $, blankImage, getSaved, imgUrl } from '../lib/utils';
+import { $, blankImage, getSaved, imgUrl, sqrThumb } from '../lib/utils';
 
 customElements.define('stream-item', class extends HTMLElement {
 	constructor() {
@@ -23,6 +23,7 @@ customElements.define('stream-item', class extends HTMLElement {
 		thumbnail.addEventListener('load', () => {
 			if (thumbnail.naturalWidth !== 120)
 				return ['span', '#metadata'].forEach(_ => (<HTMLElement>root.querySelector(_)).style.opacity = '1');
+
 			if (thumbnail.src.includes('webp'))
 				thumbnail.src = thumbnail.src.replace('.webp', '.jpg').replace('vi_webp', 'vi')
 			else { // total annihilation
@@ -75,7 +76,15 @@ customElements.define('stream-item', class extends HTMLElement {
 		const viewsXuploaded = <HTMLParagraphElement>root.getElementById('viewsXuploaded');
 
 		if (!getSaved('img')) {
-			thumbnail.src = imgUrl(<string>data.id, 'mqdefault');
+			const img = imgUrl(<string>data.id, 'mqdefault');
+			if (location.search.endsWith('songs')) {
+				const x = new Image();
+				x.onload = () => thumbnail.src = sqrThumb(x);
+				x.src = img;
+				x.crossOrigin = '';
+			}
+			else thumbnail.src = img;
+
 			data.avatar ?
 				avatar.src = data.avatar :
 				avatar.style.display = 'none';

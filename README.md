@@ -1,7 +1,10 @@
 <div align="center">
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys) [![Tokei Lines Of Code](https://tokei.rs/b1/github/n-ce/ytify?style=flat&color=black)](https://github.com/n-ce/ytify)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
+[![Tokei Lines Of Code](https://tokei.rs/b1/github/n-ce/ytify?style=flat&color=black)](https://github.com/n-ce/ytify)
+[![Telegram Members](https://img.shields.io/endpoint?style=flat&url=https://mogyo.ro/quart-apis/tgmembercount?chat_id=ytifytg)](https://t.me/encetg)
+[![Matrix](https://img.shields.io/matrix/ytify:matrix.org?label=Matrix)](https://matrix.to/#/!ytify:matrix.org)
 
 </div>
 
@@ -10,9 +13,9 @@
 
 ## What else are you getting ?
 - **Queue** 🚦: Add multiple streams to keep your audio streams going. 
-- **Playlists** 🎶: Open YouTube playlists and queue them to the player. 
+- **Playlists** 🎶: View YouTube playlists and queue them to the player. 
 - **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail. 
-- **PWA** 📱: Install ytify as an app on your device and open YouTube links with it from your OS share menu. 
+- **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
 - **Library** 📚: Discover feed, history, favorites & custom playlists. 
 
@@ -77,5 +80,4 @@ npm run dev -- --open
 - [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
 - [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution.
 - [Google Fonts](https://fonts.google.com) - NotoSans Font.
-
 

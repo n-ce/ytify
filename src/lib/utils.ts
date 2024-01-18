@@ -11,6 +11,8 @@ export const save = localStorage.setItem.bind(localStorage);
 
 export const getSaved = localStorage.getItem.bind(localStorage);
 
+export const removeSaved = localStorage.removeItem.bind(localStorage);
+
 export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
 
 export const saveDB = (data: Library) => save('library', JSON.stringify(data));
@@ -24,8 +26,12 @@ export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 export function notify(text: string) {
-  const el = $('snack-bar');
+  const el = $('p');
+  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
+  el.className = 'snackbar';
   el.textContent = text;
+  el.onclick = clear;
+  setTimeout(clear, 8e3);
   document.body.appendChild(el);
 }
 
@@ -43,6 +49,21 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
+// Square Image Generator 
+export function sqrThumb(canvasImg: HTMLImageElement) {
+  const width = canvasImg.width;
+  const height = canvasImg.height;
+  const side = Math.min(width, height);
+  canvas.width = side;
+  canvas.height = side;
+  // centre the selection
+  const offsetX = (width - side) / 2;
+  const offsetY = (height - side) / 2;
+  context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
+  return canvas.toDataURL();
+}
+
+
 let api = 0;
 export const loadMoreResults = async (urlComponent: string, token: string) =>
   fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent + 'nextpage=' + encodeURIComponent(token))
@@ -59,11 +80,12 @@ export function setMetaData(
   id: string,
   streamName: string,
   authorName: string,
-  authorUrl: string
+  authorUrl: string,
+  music: boolean = false
 ) {
-
-  if (!getSaved('img'))
-    img.src = imgUrl(id, 'maxresdefault');
+  const imgX = imgUrl(id, 'maxresdefault');
+  if (!getSaved('img') && !music)
+    img.src = imgX;
 
   img.alt = streamName;
 
@@ -96,21 +118,9 @@ export function setMetaData(
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    if (!context) return;
-
-    // // Square Image Generator 
-    const width = canvasImg.width;
-    const height = canvasImg.height;
-    const side = Math.min(width, height);
-    canvas.width = side;
-    canvas.height = side;
-    // centre the selection
-    const offsetX = (width - side) / 2;
-    const offsetY = (height - side) / 2;
-    context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
-    // // // // // // // // //
-
-    const notifImg = getSaved('img') ? blankImage : canvas.toDataURL();
+    const sqrImg = getSaved('img') ? blankImage : sqrThumb(canvasImg);
+    if (music)
+      img.src = sqrImg;
 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setPositionState();
@@ -118,19 +128,19 @@ export function setMetaData(
         title: streamName,
         artist: authorName,
         artwork: [
-          { src: notifImg, sizes: '96x96' },
-          { src: notifImg, sizes: '128x128' },
-          { src: notifImg, sizes: '192x192' },
-          { src: notifImg, sizes: '256x256' },
-          { src: notifImg, sizes: '384x384' },
-          { src: notifImg, sizes: '512x512' },
+          { src: sqrImg, sizes: '96x96' },
+          { src: sqrImg, sizes: '128x128' },
+          { src: sqrImg, sizes: '192x192' },
+          { src: sqrImg, sizes: '256x256' },
+          { src: sqrImg, sizes: '384x384' },
+          { src: sqrImg, sizes: '512x512' },
         ]
       });
     }
 
   }
   canvasImg.crossOrigin = '';
-  canvasImg.src = img.src;
+  canvasImg.src = imgX;
 }
 
 
@@ -247,12 +257,12 @@ export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
     throw new Error('No Data Found');
   const fragment = document.createDocumentFragment();
 
-  for (const item of itemsArray) {
-
-    const type = item.type === 'stream' ? createStreamItem(item) : createListItem(item);
-
-    fragment.appendChild(type);
-  }
+  for (const item of itemsArray)
+    fragment.appendChild(
+      item.type !== 'stream' ?
+        createListItem(item) :
+        createStreamItem(item)
+    );
 
   return fragment;
 }

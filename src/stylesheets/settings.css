@@ -37,10 +37,10 @@
   margin-right: 2vmin;
 }
 
-
-#deleteButton:hover {
-  background-color: orangered;
-  color: black;
+#settings>button {
+  margin: 0 2vmin 4vmin 0;
+  background-color: var(--onBg);
+  color: var(--text);
 }
 
 #netlifyForm {

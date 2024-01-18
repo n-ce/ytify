@@ -5,6 +5,7 @@
 @import 'search.css';
 @import 'settings.css';
 @import 'superModal.css';
+@import 'snackbar.css';
 
 :root {
   --bg: transparent;
@@ -230,7 +231,10 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#changelog button {
+#changelog button,
+#deleteButton,
+#apiRefreshBtn,
+#clearDataDialog button {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);
@@ -287,4 +291,17 @@ details button:hover {
   justify-content: space-between;
   margin-top: 4%;
   border-bottom: dotted;
+}
+
+#clearDataDialog {
+  flex-direction: column;
+  background-color: var(--onBg);
+  backdrop-filter: blur(1vmin);
+  border-radius: var(--roundness);
+  border: var(--border);
+}
+
+#clearDataDialog div {
+  width: calc(100% - 1vmin);
+  color: var(--text);
 }
