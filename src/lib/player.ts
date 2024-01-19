@@ -4,6 +4,10 @@ import { addListToCollection } from "../scripts/library";
 
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+// set AAC as default for safari
+if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
+  codecSelector.selectedIndex = 1;
+
 const codecSaved = getSaved('codec');
 if (codecSaved)
   codecSelector.selectedIndex = parseInt(codecSaved);
@@ -20,8 +24,6 @@ codecSelector.addEventListener('change', async () => {
   audio.currentTime = timeOfSwitch;
 });
 
-if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
-  codecSelector.selectedIndex = 1;
 
 
 export default async function player(id: string | null = '') {
