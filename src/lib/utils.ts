@@ -232,10 +232,8 @@ export function fetchList(url: string, mix = false) {
     })
     .finally(() => loadingScreen.close());
 }
-if (location.pathname.startsWith('/list')) {
-  const url = location.pathname.substring(5);
-  fetchList(url)
-}
+if (location.pathname.startsWith('/list/'))
+  fetchList(location.pathname.substring(5));
 
 
 
