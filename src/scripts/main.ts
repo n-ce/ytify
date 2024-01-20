@@ -16,7 +16,7 @@ import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from 
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
-import { notify } from '../lib/utils';
+import { getSaved, notify, removeSaved, save } from '../lib/utils';
 
 
 const update = registerSW({
@@ -32,6 +32,22 @@ const update = registerSW({
     laterBtn.onclick = () => displayer.close();
   }
 });
+
+
+const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
+startupTabSelector.addEventListener('change', () => {
+  const tab = startupTabSelector.value;
+  tab ?
+    save('startupTab', tab) :
+    removeSaved('startupTab');
+});
+
+const savedStartupTab = getSaved('startupTab');
+if (savedStartupTab) {
+  startupTabSelector.value = savedStartupTab;
+  if (location.pathname === '/')
+    (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
+}
 
 
 // list tools functions

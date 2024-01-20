@@ -6,6 +6,9 @@ const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
+
+
+
 let nextPageToken = '';
 
 function setObserver(callback: () => Promise<string>) {
@@ -181,14 +184,16 @@ superInput.addEventListener('keydown', _ => {
 
 searchFilters.addEventListener('change', searchLoader);
 
+
+
 suggestionsSwitch.addEventListener('click', () => {
-  getSaved('search_suggestions') ?
-    removeSaved('search_suggestions') :
-    save('search_suggestions', 'off');
+  getSaved('searchSuggestions') ?
+    removeSaved('searchSuggestions') :
+    save('searchSuggestions', 'off');
   suggestions.style.display = 'none';
 
 });
-if (getSaved('search_suggestions') && suggestionsSwitch)
+if (getSaved('searchSuggestions'))
   suggestionsSwitch.removeAttribute('checked')
 
 
@@ -202,3 +207,14 @@ if (params.has('q')) {
 }
 
 
+const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
+
+defaultFilterSongs.addEventListener('click', () => {
+  getSaved('defaultFilter') ?
+    removeSaved('defaultFilter') :
+    save('defaultFilter', 'songs');
+});
+if (getSaved('defaultFilter')) {
+  defaultFilterSongs.setAttribute('checked', '');
+  searchFilters.value = 'music_songs';
+}

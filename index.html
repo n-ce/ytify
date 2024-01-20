@@ -186,13 +186,29 @@
     <section id="settings">
       <span>
         <label for="pipedInstances">
-          <h3>Piped Instance</h3>
+          Piped Instance
         </label>
         <select id="pipedInstances">
           <option value="">Custom</option>
           <option value="https://pipedapi.kavin.rocks" selected>kavin.rocks 🌐</option>
         </select>
       </span>
+
+      <span>
+        <label for="startupTab">
+          Default Tab on Startup
+        </label>
+        <select id="startupTab">
+          <option value="">Home</option>
+          <option value="/search">Search</option>
+          <option value="/ibrary">Library</option>
+        </select>
+      </span>
+
+      <h3>Search</h3>
+      <toggle-switch id="defaultFilterSongs">Filter Songs by Default</toggle-switch>
+      <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
+
       <h3>Playback</h3>
       <span>
         <label for="invidiousInstances">Invidious Instance</label>
@@ -253,7 +269,6 @@
         </select>
       </span>
       <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
-      <toggle-switch id="suggestionsSwitch" checked>Display Search Suggestions</toggle-switch>
 
       <h3>Actions</h3>
 
