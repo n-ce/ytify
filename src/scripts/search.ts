@@ -25,11 +25,11 @@ function setObserver(callback: () => Promise<string>) {
 
 // Get search results of input
 const searchLoader = () => {
-  loadingScreen.showModal();
-
   const text = superInput.value;
 
   if (!text) return;
+
+  loadingScreen.showModal();
 
   searchlist.innerHTML = '';
 

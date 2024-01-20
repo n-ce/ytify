@@ -216,6 +216,10 @@ export function fetchList(url: string, mix = false) {
       saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${url.includes('channel') ? 'Subscribe' : 'Save'}`;
 
       if (mix) playAllBtn.click();
+      else {
+        history.replaceState({}, '', location.origin + location.pathname + url);
+        document.title = group.name + ' - ytify';
+      }
     })
     .catch(err => {
       if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -228,6 +232,11 @@ export function fetchList(url: string, mix = false) {
     })
     .finally(() => loadingScreen.close());
 }
+if (location.pathname.startsWith('/list')) {
+  const url = location.pathname.substring(5);
+  fetchList(url)
+}
+
 
 
 function createListItem(list: StreamItem) {

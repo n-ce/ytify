@@ -3,21 +3,25 @@ import { params } from "../lib/utils";
 
 
 const anchors = document.querySelectorAll('nav a');
-const sections = document.querySelectorAll('section');
+const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
+
 
 function showSection(id: string) {
-  sections.forEach((section, index) => {
+  routes.forEach((route, index) => {
     if (id === '/') id += 'home';
-    if (section.id === id.substring(1)) {
+    if (route === '/') route += 'home';
+    const section = <HTMLDivElement>document.getElementById(route.substring(1));
+
+    if (route === id) {
       section.classList.add('view');
       anchors[index].classList.add('active');
     } else {
       section.classList.remove('view');
       anchors[index].classList.remove('active');
     }
-
   })
 }
+
 
 for (const anchor of anchors) {
   anchor.addEventListener('click', _ => {
@@ -31,7 +35,7 @@ for (const anchor of anchors) {
       document.title = (anchor.id === '/' ?
         (audio.dataset.title ? audio.dataset.title : 'Home')
         :
-        (<HTMLParagraphElement>anchor.lastElementChild).textContent || '') + ' - ytify';
+        <string>(<HTMLParagraphElement>anchor.lastElementChild).textContent) + ' - ytify';
     }
     // ↑↑ bad coding habit ↑↑
     showSection(anchor.id);
@@ -39,9 +43,10 @@ for (const anchor of anchors) {
 }
 
 // load section if name found in address else load home
-
-
-(<HTMLAnchorElement>document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => (params.has('e') ? params.get('e') : location.pathname) === _) || '/')).click();
+(<HTMLAnchorElement>document.getElementById(
+  routes.find(route =>
+    (params.has('e') ? params.get('e') : location.pathname) === route) || '/'
+)).click();
 
 
 // enables back button functionality
