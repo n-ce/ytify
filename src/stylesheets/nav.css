@@ -10,7 +10,6 @@ nav a {
   opacity: 50%;
 }
 
-
 nav a:hover {
   opacity: 75%;
 }
@@ -19,16 +18,18 @@ nav a.active {
   opacity: 1;
 }
 
-@media(orientation:portrait) {
-
+@media (orientation: portrait) {
   nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
     height: auto;
     justify-content: space-around;
     width: 94%;
     padding: 5% 3%;
     padding-bottom: 0;
   }
-
 
   nav a {
     height: 100%;
@@ -45,28 +46,24 @@ nav a.active {
     padding: 0;
     font-size: small;
   }
-
 }
 
-@media(orientation:landscape) {
-
+@media (orientation: landscape) {
   nav {
-    height: 100dvh;
+    height: 100vh;
     flex-direction: column;
     width: 20%;
     font-size: large;
     justify-content: center;
   }
 
-
   nav a {
     width: auto;
     height: 12%;
-    margin: 1dvh;
+    margin: 1vh;
   }
 
   nav i {
     margin: 0 1vw;
   }
-
 }
