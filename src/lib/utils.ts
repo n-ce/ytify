@@ -64,17 +64,6 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
 }
 
 
-let api = 0;
-export const loadMoreResults = async (urlComponent: string, token: string) =>
-  fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent + 'nextpage=' + encodeURIComponent(token))
-    .then(res => res.json())
-    .catch(_ => {
-      api++;
-      pipedInstances.length === api ?
-        notify(_.message) :
-        loadMoreResults(urlComponent, token);
-    });
-
 
 export function setMetaData(
   id: string,
@@ -207,7 +196,13 @@ export function fetchList(url: string, mix = false) {
       }
       if (!mix && token)
         setObserver(async () => {
-          const data = await loadMoreResults(url.substring(1) + '?', token);
+          const data = await fetch(
+            pipedInstances.value + '/nextpage/' +
+            url.substring(1) + '?nextpage=' + encodeURIComponent(token)
+          )
+            .then(res => res.json())
+            .catch(_ => console.log(_));
+          if (!data) return;
           listContainer.appendChild(itemsLoader(data.relatedStreams));
           return data.nextpage;
         });

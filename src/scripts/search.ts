@@ -1,6 +1,6 @@
 import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, notify, removeSaved } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
@@ -10,6 +10,12 @@ const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
 
 let nextPageToken = '';
+
+const loadMoreResults = (token: string, query: string) =>
+  fetch(`${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
+    .then(res => res.json())
+    .catch(x => console.log('e:' + x))
+
 
 function setObserver(callback: () => Promise<string>) {
   new IntersectionObserver((entries, observer) =>
@@ -42,21 +48,29 @@ const searchLoader = () => {
 
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
-    .then(async searchResults => {
+    .then(async (searchResults) => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
 
-      if (sortSwitch.hasAttribute('checked')) {
+      if (sortSwitch.hasAttribute('checked') && nextPageToken) {
         for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults(query + '&', nextPageToken);
+          const data = await loadMoreResults(nextPageToken, query.substring(7));
+          if (!data)
+            throw new Error('nextpage error');
+
           nextPageToken = data.nextpage;
           items = items.concat(data.items);
         }
 
-        items.sort((
-          a: { uploaded: number },
-          b: { uploaded: number }
-        ) => b.uploaded - a.uploaded);
+        type u = StreamItem & {
+          uploaded: number
+        }
+        const temp: u[] = [];
+
+        for (const item of items)
+          if (item.type === 'stream' && !temp.includes(item))
+            temp.push(item);
+        items = temp.sort((a, b) => b.uploaded - a.uploaded);
       }
 
       // filter livestreams & shorts & append rest
@@ -68,7 +82,7 @@ const searchLoader = () => {
       );
       // load more results when 3rd last element is visible
       setObserver(async () => {
-        const data = await loadMoreResults(query + '&', nextPageToken);
+        const data = await loadMoreResults(nextPageToken, query.substring(7));
         searchlist.appendChild(itemsLoader(
           data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         ));
@@ -76,9 +90,10 @@ const searchLoader = () => {
       });
     })
     .catch(err => {
+      if (err.message === 'nextpage error') return;
       const i = pipedInstances.selectedIndex;
       if (i < pipedInstances.length - 1) {
-        notify('switched piped instance from ' +
+        notify('search error :  switching instance from ' +
           pipedInstances.options[i].value
           + ' to ' +
           pipedInstances.options[i + 1].value
