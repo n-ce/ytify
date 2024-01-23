@@ -53,20 +53,24 @@ for (const anchor of anchors) {
 
 // load section if name found in address else load home
 let route;
-if (params.has('e')) {
-  const url = new URL(location.origin + params.get('e'));
-  route = url.pathname.substring(1);
-  if (url.search) {
-    if (route === 'list')
-      fetchList(url.search.substring(1));
-    if (route === 'search') {
-      superInput.value = <string>url.searchParams.get('q');
-      searchFilters.value = url.searchParams.get('f') || 'all';
+const errorParam = params.get('e');
+if (errorParam) {
+  if (!errorParam.includes('?'))
+    route = errorParam;
+  else {
+    let query;
+    [route, query] = errorParam.split('?');
+    if (route === '/list')
+      fetchList(query);
+    if (route === '/search') {
+      const x = new URLSearchParams(query);
+      superInput.value = x.get('q') || '';
+      searchFilters.value = x.get('f') || 'all';
     }
   }
-} else
-  route = routes.find(route => location.pathname === route) || '/';
-const anchor = <HTMLAnchorElement>document.getElementById(route);
+}
+else route = routes.find(route => location.pathname === route);
+const anchor = <HTMLAnchorElement>document.getElementById(route || '/');
 anchor.click();
 
 // enables back button functionality
