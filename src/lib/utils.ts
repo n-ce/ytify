@@ -217,7 +217,13 @@ export function fetchList(url: string, mix = false) {
 
       if (mix) playAllBtn.click();
       else {
-        history.replaceState({}, '', location.origin + location.pathname + url);
+        history.replaceState({}, '',
+          location.origin + location.pathname +
+          '?' + url
+            .split('/')
+            .join('=')
+            .substring(1)
+        );
         document.title = group.name + ' - ytify';
       }
     })
@@ -232,9 +238,14 @@ export function fetchList(url: string, mix = false) {
     })
     .finally(() => loadingScreen.close());
 }
-if (location.pathname.startsWith('/list/'))
-  fetchList(location.pathname.substring(5));
 
+if (params.has('channel') || params.has('playlists'))
+  fetchList('/' +
+    location.search
+      .substring(1)
+      .split('=')
+      .join('/')
+  );
 
 
 function createListItem(list: StreamItem) {
