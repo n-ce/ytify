@@ -55,13 +55,15 @@ for (const anchor of anchors) {
 let route;
 const errorParam = params.get('e');
 if (errorParam) {
+
   if (!errorParam.includes('?'))
     route = errorParam;
   else {
-    let query;
-    [route, query] = errorParam.split('?');
+    const _ = errorParam.split('?');
+    route = _[0];
+    let query = encodeURI(_[1]);
     if (route === '/list')
-      fetchList(query);
+      fetchList('/' + query.split('=').join('/'));
     if (route === '/search') {
       const x = new URLSearchParams(query);
       superInput.value = x.get('q') || '';
