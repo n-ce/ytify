@@ -1,5 +1,6 @@
 import { audio, superInput, superModal } from "../lib/dom";
-import { params } from "../lib/utils";
+import { fetchList, params } from "../lib/utils";
+import { searchFilters } from "./search";
 
 
 const anchors = document.querySelectorAll('nav a');
@@ -27,27 +28,46 @@ for (const anchor of anchors) {
   anchor.addEventListener('click', _ => {
     _.preventDefault();
 
+    const inHome = anchor.id === '/';
+
     if (anchor.id !== location.pathname) {
+      const sParamInHome = params.has('s') && inHome;
+      const sParam = '?s=' + params.get('s');
+      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : ''
 
       history.pushState({}, '',
-        anchor.id + ((params.has('s') && anchor.id === '/') ? ('?s=' + params.get('s')) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
+        anchor.id + (
+          sParamInHome ? sParam : otherQuery
+        )
       );
-      document.title = (anchor.id === '/' ?
-        (audio.dataset.title ? audio.dataset.title : 'Home')
-        :
-        <string>(<HTMLParagraphElement>anchor.lastElementChild).textContent) + ' - ytify';
+
+      const routeName = anchor.lastElementChild?.textContent;
+      const homeTitle = audio.dataset.title || 'Home';
+      document.title = (
+        inHome ? homeTitle : routeName
+      ) + ' - ytify';
     }
-    // ↑↑ bad coding habit ↑↑
     showSection(anchor.id);
   })
 }
 
 // load section if name found in address else load home
-(<HTMLAnchorElement>document.getElementById(
-  routes.find(route =>
-    (params.has('e') ? params.get('e') : location.pathname) === route) || '/'
-)).click();
-
+let route;
+if (params.has('e')) {
+  const url = new URL(location.origin + params.get('e'));
+  route = url.pathname.substring(1);
+  if (url.search) {
+    if (route === 'list')
+      fetchList(url.search.substring(1));
+    if (route === 'search') {
+      superInput.value = <string>url.searchParams.get('q');
+      searchFilters.value = url.searchParams.get('f') || 'all';
+    }
+  }
+} else
+  route = routes.find(route => location.pathname === route) || '/';
+const anchor = <HTMLAnchorElement>document.getElementById(route);
+anchor.click();
 
 // enables back button functionality
 

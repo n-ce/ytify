@@ -3,7 +3,7 @@ import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
-const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
+export const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
 
