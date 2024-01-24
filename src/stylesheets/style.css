@@ -145,9 +145,15 @@ dialog::backdrop {
   height: 100%;
 }
 
-#changelog a {
-  margin: 2vmin 0;
-  text-decoration: underline;
+#changelog ul {
+  overflow: scroll;
+}
+
+#changelog ul li:first-child {
+  list-style-type: none;
+  font-size: 1.5rem;
+  font-weight: bolder;
+  margin: 0 0 5% -1.5rem;
 }
 
 #library>div {

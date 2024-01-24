@@ -16,7 +16,7 @@ import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from 
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
-import { getSaved, notify, removeSaved, save } from '../lib/utils';
+import { $, getSaved, notify, removeSaved, save } from '../lib/utils';
 
 
 const update = registerSW({
@@ -24,7 +24,12 @@ const update = registerSW({
     const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json());
     const displayer = <HTMLDialogElement>document.getElementById('changelog');
     const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
-    displayer.children[1].textContent = data.commit.message;
+    const ul = <HTMLUListElement>displayer.firstElementChild;
+    data.commit.message.split('-').forEach((c: string) => {
+      const li = $('li');
+      li.textContent = c;
+      ul.appendChild(li);
+    });
     displayer.showModal();
     displayer.onclick = _ => _.stopPropagation();
     updateBtn.onclick = () => update();

@@ -55,13 +55,10 @@ for (const anchor of anchors) {
 let route;
 const errorParam = params.get('e');
 if (errorParam) {
-
-  if (!errorParam.includes('?'))
-    route = errorParam;
-  else {
+  if (errorParam.includes('?')) {
     const _ = errorParam.split('?');
     route = _[0];
-    let query = encodeURI(_[1]);
+    const query = encodeURI(_[1]);
     if (route === '/list')
       fetchList('/' + query.split('=').join('/'));
     if (route === '/search') {
@@ -70,6 +67,7 @@ if (errorParam) {
       searchFilters.value = x.get('f') || 'all';
     }
   }
+  else route = errorParam;
 }
 else route = routes.find(route => location.pathname === route);
 const anchor = <HTMLAnchorElement>document.getElementById(route || '/');
