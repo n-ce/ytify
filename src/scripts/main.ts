@@ -19,15 +19,15 @@ import { registerSW } from 'virtual:pwa-register';
 import { getSaved, notify, removeSaved, save } from '../lib/utils';
 import { html, render } from 'lit';
 
-
+alert('lit_test_2')
 window.updateSW = registerSW({
-  async onNeedRefresh() {
-    import('../components/updatePrompt');
-    render(html`
+  onNeedRefresh() {
+    import('../components/updatePrompt').then(_ =>
+      render(html`
       <dialog id='changelog' onclick='(e)=>e.stopPropagation()' open>
         <update-prompt></update-prompt>
       </dialog>
-    `, document.body);
+    `, document.body));
   }
 });
 
