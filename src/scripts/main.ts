@@ -19,7 +19,6 @@ import { registerSW } from 'virtual:pwa-register';
 import { getSaved, notify, removeSaved, save } from '../lib/utils';
 import { html, render } from 'lit';
 
-alert('lit_test_2')
 window.updateSW = registerSW({
   onNeedRefresh() {
     import('../components/updatePrompt').then(_ =>
