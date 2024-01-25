@@ -1,5 +1,9 @@
 declare global {
 
+  interface Window {
+    updateSW: any
+  }
+
   type apiList = {
     [index: string]: {
       name: string,
