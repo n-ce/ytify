@@ -302,13 +302,12 @@ details button:hover {
   width: calc(100% - 10dvmin);
   height: calc(100% - 10dvmin);
   background-color: black;
-  animation: zoomout 0.5s ease-in forwards;
+  animation: zoomout 0.5s ease-in-out forwards;
 }
 
 @keyframes zoomout {
   from {
     transform: scale(2);
     opacity: 0;
-    backdrop-filter: blur(0);
   }
 }
