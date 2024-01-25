@@ -21,7 +21,7 @@ import { html, render } from 'lit';
 
 window.updateSW = registerSW({
   onNeedRefresh() {
-    import('../components/updatePrompt').then(_ =>
+    import('../components/updatePrompt').then(() =>
       render(html`
       <dialog id='changelog' onclick='(e)=>e.stopPropagation()' open>
         <update-prompt></update-prompt>

@@ -126,7 +126,6 @@ select {
 }
 
 dialog[open] {
-  z-index: 9;
   background: none;
   border: none;
   display: flex;
@@ -296,6 +295,10 @@ details button:hover {
 }
 
 #changelog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
   flex-direction: column;
   color: var(--text);
   background-color: var(--bg);
