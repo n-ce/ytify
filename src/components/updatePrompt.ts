@@ -7,27 +7,40 @@ import { until } from 'lit/directives/until.js';
 export class UpdatePrompt extends LitElement {
 
   static styles = css`
-  :host {}
+  :host {
+    background-color: var(--onBg);
+    border-radius: calc(var(--roundness) + 0.75vmin);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   ul {
-  overflow: scroll;
+    overflow: scroll;
+    margin-left:-1.5rem
   }
   ul li:first-child {
-  list-style-type: none;
-  font-size: 1.5rem;
-  font-weight: bolder;
-  margin: 0 0 5% -1.5rem;
+    list-style-type: none;
+    font-size: 1.5rem;
+    font-weight: bolder;
+    margin-bottom:5%;
+  }
+  span{
+    display: flex;
   }
   button{
-  border: var(--border);
-  border-radius: var(--roundness);
-  background: var(--text);
-  color: var(--bg);
-  font-family: inherit;
-  font-size: inherit;
-  padding: 1vmin 2vmin;
-  margin: 1vmin 2vmin;
+    width: 50%;
+    border: var(--border);
+    border-radius: var(--roundness);
+    background: var(--text);
+    color: var(--bg);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1vmin 2vmin;
+    margin: 2.4vmin 2vmin;
   }
   `;
+
 
   render() {
     return html`
@@ -39,10 +52,9 @@ export class UpdatePrompt extends LitElement {
         .then(d => d.map((c: string) => html`<li>${c}</li>`)
         )
       , html`<h1>Loading Update...</h1>`)}
-      </ul>
-    <br>
+    </ul>
     <span>
-      <button @click=${() => window.updateSW()}>Update</button>
+      <button @click=${() => window.updateSW()} autofocus>Update</button>
       <button @click=${() => (<HTMLDialogElement>this.parentElement).close()}>Later</button>
     </span>
       `;

@@ -19,6 +19,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { getSaved, notify, removeSaved, save } from '../lib/utils';
 import { html, render } from 'lit';
 
+
 window.updateSW = registerSW({
   onNeedRefresh() {
     import('../components/updatePrompt').then(() =>
@@ -30,6 +31,12 @@ window.updateSW = registerSW({
   }
 });
 
+import('../components/updatePrompt').then(() =>
+  render(html`
+      <dialog id='changelog' onclick='(e)=>e.stopPropagation()' open>
+        <update-prompt></update-prompt>
+      </dialog>
+    `, document.body));
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
 startupTabSelector.addEventListener('change', () => {
