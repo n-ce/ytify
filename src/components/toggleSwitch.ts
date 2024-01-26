@@ -1,35 +1,82 @@
-import { $ } from '../lib/utils';
-import css from '../components/toggleSwitch.css?inline';
+import { LitElement, css, html } from "lit";
+import { customElement, property } from "lit/decorators.js";
 
-let root: ShadowRoot;
 
-customElements.define('toggle-switch', class extends HTMLElement {
+@customElement('toggle-switch')
+export class ToggleSwitch extends LitElement {
+
+  static styles = css` 
+  :host {
+    display: flex;
+    align-items: center;
+    margin: 4vmin 0;
+    color: inherit;
+  }
+
+  label {
+    margin-left: auto;
+    position: relative;
+    display: inline-block;
+    pointer-events: none;
+    width: 9vmin;
+    height: 6vmin;
+  }
+
+  span {
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--onBg);
+    border-radius: var(--roundness);
+    border: var(--border);
+  }
+
+  span:before {
+    position: absolute;
+    content: "";
+    height: calc(100% - 2.1vmin);
+    width: 2vmin;
+    margin: 1vmin;
+    background-color: var(--text);
+    border-radius: calc(var(--roundness) - 0.5vmin);
+  }
+
+  span,
+  span:before {
+    position: absolute;
+    transition: 0.3s;
+  }
+
+  input {
+    display: none;
+  }
+
+  input:checked+span {
+    background-color: var(--bg);
+  }
+
+  input:checked+span:before {
+    transform: translateX(4.6vmin);
+  } 
+   `;
+
+  @property({ type: Boolean }) checked = false;
+
   constructor() {
     super();
-    root = this.attachShadow({ mode: 'open' });
-    const style = $('style');
-    style.textContent = css;
-
-    const label = $('label');
-
-    const input = $('input');
-    input.type = 'checkbox';
-
     this.addEventListener('click', () => {
-      input.checked = !input.checked;
+      this.checked = !this.checked;
       this.toggleAttribute('checked');
     });
-
-    label.append(input, $('span'));
-
-    root.append(style, $('slot'), label);
   }
 
-  static get observedAttributes() {
-    return ['checked']
+  render() {
+    return html`
+      <slot></slot>
+      <label>
+        <input type='checkbox' .checked=${this.checked}></input>
+        <span></span>
+      </label>
+      `;
   }
+}
 
-  attributeChangedCallback() {
-    (<HTMLInputElement>root.querySelector('input')).toggleAttribute('checked');
-  }
-});

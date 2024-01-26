@@ -19,7 +19,7 @@ import { registerSW } from 'virtual:pwa-register';
 import { $, getSaved, notify, removeSaved, save } from '../lib/utils';
 
 
-const up = <HTMLElement & { handleUpdate: () => {} }>$('update-prompt');
+const up = <HTMLElement & { handleUpdate: () => void }>$('update-prompt');
 up.handleUpdate = registerSW({
   async onNeedRefresh() {
     const { html, render } = await import('lit');
