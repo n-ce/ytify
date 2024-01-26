@@ -295,13 +295,11 @@ details button:hover {
 }
 
 #changelog {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
   z-index: 4;
   width: calc(100% - 10dvmin);
   height: calc(100% - 10dvmin);
-  background-color: black;
+  background-color: var(--bg);
   animation: zoomout 0.5s ease-in-out forwards;
 }
 
