@@ -53,7 +53,7 @@ customElements.define('stream-item', class extends HTMLElement {
 
 		const author = $('p');
 		author.id = 'author';
-		avatar.onerror = () => avatar.src = blankImage;
+		avatar.onerror = () => avatar.src = '/logo192.png';
 
 		const viewsXuploaded = $('p');
 		viewsXuploaded.id = 'viewsXuploaded';
@@ -85,9 +85,8 @@ customElements.define('stream-item', class extends HTMLElement {
 			}
 			else thumbnail.src = img;
 
-			data.avatar ?
-				avatar.src = data.avatar :
-				avatar.style.display = 'none';
+			avatar.src = data.avatar || '/logo192.png';
+
 		}
 		else thumbnail.src = blankImage;
 

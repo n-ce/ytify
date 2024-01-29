@@ -8,7 +8,6 @@ const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
 
 
-
 let nextPageToken = '';
 
 const loadMoreResults = (token: string, query: string) =>
@@ -74,13 +73,12 @@ const searchLoader = () => {
       }
 
       // filter livestreams & shorts & append rest
-
       searchlist.appendChild(
         itemsLoader(
-          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-        )
-      );
+          items.filter((item: StreamItem) => !item.isShort)
+        ));
       // load more results when 3rd last element is visible
+
       setObserver(async () => {
         const data = await loadMoreResults(nextPageToken, query.substring(7));
         searchlist.appendChild(itemsLoader(

@@ -1,3 +1,4 @@
+import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
 
 
@@ -133,42 +134,6 @@ export function setMetaData(
 }
 
 
-export function updatePositionState() {
-  if ('mediaSession' in navigator) {
-    if ('setPositionState' in navigator.mediaSession) {
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: audio.currentTime,
-      });
-    }
-  }
-}
-
-
-export function createStreamItem(stream: StreamItem) {
-  const id = stream.url.substring(9);
-  const streamItem = $('stream-item');
-  streamItem.dataset.id = id;
-  streamItem.textContent = streamItem.dataset.title = stream.title;
-  streamItem.dataset.author = stream.uploaderName;
-  streamItem.dataset.channelUrl = stream.uploaderUrl;
-  streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
-  streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
-  streamItem.dataset.uploaded = stream.uploadedDate || '';
-  streamItem.dataset.avatar = stream.uploaderAvatar || '';
-  streamItem.addEventListener('click', () => {
-    superModal.showModal();
-    history.pushState({}, '', '#');
-    const _ = superModal.dataset;
-    _.id = id;
-    _.title = stream.title;
-    _.author = stream.uploaderName;
-    _.channelUrl = stream.uploaderUrl;
-    _.duration = streamItem.dataset.duration;
-  })
-  return streamItem;
-}
 
 export function fetchList(url: string, mix = false) {
 
@@ -178,7 +143,11 @@ export function fetchList(url: string, mix = false) {
     .then(res => res.json())
     .then(group => {
       listContainer.innerHTML = '';
-      listContainer.appendChild(itemsLoader(group.relatedStreams));
+      listContainer.appendChild(
+        itemsLoader(
+          group.relatedStreams
+        )
+      );
       listAnchor.click();
       listSection.scrollTo(0, 0);
 
@@ -201,7 +170,7 @@ export function fetchList(url: string, mix = false) {
             url.substring(1) + '?nextpage=' + encodeURIComponent(token)
           )
             .then(res => res.json())
-            .catch(_ => console.log(_));
+            .catch(e => console.log(e));
           if (!data) return;
           listContainer.appendChild(itemsLoader(data.relatedStreams));
           return data.nextpage;
@@ -243,39 +212,54 @@ if (params.has('channel') || params.has('playlists'))
   );
 
 
-function createListItem(list: StreamItem) {
-  const listItem = $('list-item');
-  listItem.textContent = list.name;
-  listItem.dataset.thumbnail = list.thumbnail;
-  listItem.dataset.uploaderData = list.description || list.uploaderName || '';
-
-  listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
-
-  listItem.addEventListener('click', () => {
-    fetchList(
-      list.type === 'playlist' ?
-        list.url.replace('?list=', 's/') :
-        list.url
-    );
-    // data binding for open channel action
-    listContainer.dataset.url = list.url;
-  });
-  return listItem;
-}
 
 
 
-export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
+export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
+
+  const streamItem = (stream: StreamItem) => html`<stream-item 
+      data-id=${stream.url.substring(9)} 
+      data-title=${stream.title}
+      data-author=${stream.uploaderName}
+      data-channel=${stream.uploaderUrl}
+      data-views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
+      data-duration=${convertSStoHHMMSS(stream.duration)}
+      data-uploaded=${stream.uploadedDate}
+      data-avatar=${stream.uploaderAvatar}
+      @click=${() => {
+      superModal.showModal();
+      history.pushState({}, '', '#');
+      const _ = superModal.dataset;
+      _.id = stream.url.substring(9);
+      _.title = stream.title;
+      _.author = stream.uploaderName;
+      _.channelUrl = stream.uploaderUrl;
+      _.duration = stream.duration.toString();
+    }}
+      >${stream.title}</stream-item>`;
+
+  const listItem = (item: StreamItem) => html`<list-item
+      thumbnail=${item.thumbnail}
+      uploader_data=${item.description || item.uploaderName}
+      stats=${item.subscribers > 0 ?
+      (numFormatter(item.subscribers) + ' subscribers') :
+      (item.videos > 0 ? item.videos + ' streams' : '')}
+      @click=${() => {
+      fetchList(
+        item.type === 'playlist' ?
+          item.url.replace('?list=', 's/') :
+          item.url
+      );
+      // data binding for open channel action
+      listContainer.dataset.url = item.url;
+    }}
+      >${item.name}</list-item>`;
+
   const fragment = document.createDocumentFragment();
-
-  for (const item of itemsArray)
-    fragment.appendChild(
-      item.type !== 'stream' ?
-        createListItem(item) :
-        createStreamItem(item)
-    );
-
+  render(html`${itemsArray.map(item => item.type !== 'stream' ?
+    listItem(item) : streamItem(item))
+    }`, fragment);
   return fragment;
 }

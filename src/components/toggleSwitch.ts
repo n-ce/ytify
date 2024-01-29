@@ -56,8 +56,8 @@ export class ToggleSwitch extends LitElement {
 
   input:checked+span:before {
     transform: translateX(4.6vmin);
-  } 
-   `;
+  }
+  `;
 
   @property({ type: Boolean }) checked = false;
 

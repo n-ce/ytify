@@ -96,7 +96,7 @@ export default async function player(id: string | null = '') {
 
   // remove ' - Topic' from name if it exists
   let music = false;
-  if (data.author.includes(' - Topic')) {
+  if (data.author.endsWith(' - Topic')) {
     music = true;
     data.author = data.author.replace(' - Topic', '');
   }

@@ -19,29 +19,27 @@ const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger')
 const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 
+
+
+const msn = 'mediaSession' in navigator;
+const ms = msn ? navigator.mediaSession : playButton.dataset;
 function updatePositionState() {
-  if ('mediaSession' in navigator) {
-    if ('setPositionState' in navigator.mediaSession) {
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: audio.currentTime,
-      });
-    }
-  }
+  if (!msn) return;
+  if (!('setPositionState' in navigator.mediaSession)) return;
+  navigator.mediaSession.setPositionState({
+    duration: audio.duration,
+    playbackRate: audio.playbackRate,
+    position: audio.currentTime,
+  });
 }
+
 
 
 playButton.addEventListener('click', () => {
   if (!audio.dataset.id) return;
-  if (playButton.dataset.state) {
+  ms.playbackState === 'playing' ?
+    audio.pause() :
     audio.play();
-    playButton.dataset.state = '';
-  } else {
-    audio.pause();
-    playButton.dataset.state = '1';
-  }
-  updatePositionState();
 });
 
 
@@ -50,7 +48,7 @@ let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
-  playButton.dataset.state = '';
+  ms.playbackState = 'playing';
   if (!streamHistory.includes(<string>audio.dataset.id))
     streamHistory.push(<string>audio.dataset.id);
   if ((<HTMLElement>getCollection('history').firstElementChild)?.dataset.id !== audio.dataset.id)
@@ -62,7 +60,7 @@ audio.addEventListener('playing', () => {
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
-  playButton.dataset.state = '1';
+  ms.playbackState = 'paused';
   clearTimeout(historyTimeoutId);
 });
 
