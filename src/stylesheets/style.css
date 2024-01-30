@@ -131,10 +131,25 @@ dialog[open] {
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: boing 0.3s ease-in-out forwards;
+}
+
+@keyframes boing {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
 }
 
 dialog::backdrop {
   background-color: #0007;
+  animation: x 0.3s ease-in-out forwards;
+}
+
+@keyframes x {
+  from {
+    background-color: transparent;
+  }
 }
 
 
@@ -238,10 +253,6 @@ details button,
 details button:hover {
   background-color: var(--bg);
   color: var(--text);
-}
-
-#searchlist {
-  margin-top: -10vmin;
 }
 
 #queuelist {

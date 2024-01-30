@@ -38,14 +38,3 @@
   margin-left: -3px;
   width: 16ch;
 }
-
-#superModal[open] {
-  animation: zoomin 0.3s ease-out forwards;
-}
-
-@keyframes zoomin {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-}

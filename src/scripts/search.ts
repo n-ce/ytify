@@ -4,7 +4,6 @@ import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 export const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
-const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
 
 
 
@@ -39,6 +38,9 @@ const searchLoader = () => {
   searchlist.innerHTML = '';
 
   const searchQuery = '?q=' + superInput.value;
+
+  const sortByTime = searchFilters.selectedOptions[0].textContent === 'All By Time';
+
   const filterQuery = '&filter=' + searchFilters.value;
 
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
@@ -51,7 +53,7 @@ const searchLoader = () => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
 
-      if (sortSwitch.hasAttribute('checked') && nextPageToken) {
+      if (sortByTime && nextPageToken) {
         for (let i = 0; i < 3; i++) {
           const data = await loadMoreResults(nextPageToken, query.substring(7));
           if (!data)
@@ -111,8 +113,6 @@ const searchLoader = () => {
 
 }
 
-
-sortSwitch.addEventListener('click', searchLoader);
 
 
 // super input supports both searching and direct link, also loads suggestions

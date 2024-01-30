@@ -24,13 +24,13 @@ const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 const msn = 'mediaSession' in navigator;
 const ms = msn ? navigator.mediaSession : playButton.dataset;
 function updatePositionState() {
-  if (!msn) return;
-  if (!('setPositionState' in navigator.mediaSession)) return;
-  navigator.mediaSession.setPositionState({
-    duration: audio.duration,
-    playbackRate: audio.playbackRate,
-    position: audio.currentTime,
-  });
+  if (msn)
+    if ('setPositionState' in navigator.mediaSession)
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime,
+      });
 }
 
 
@@ -159,10 +159,10 @@ playPrevButton.addEventListener('click', () => {
 
 
 function onEnd() {
+  audio.currentTime = audio.duration;
   playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   if (queuelist.childElementCount)
     firstItemInQueue().click();
-
 }
 
 audio.addEventListener('ended', onEnd);
@@ -186,14 +186,14 @@ volumeChanger.addEventListener('input', () => {
 
 
 
-if ('mediaSession' in navigator) {
+if (msn) {
   navigator.mediaSession.setActionHandler('play', () => {
     audio.play();
-    updatePositionState();
+    ms.playbackState = 'playing';
   });
   navigator.mediaSession.setActionHandler('pause', () => {
     audio.pause();
-    updatePositionState();
+    ms.playbackState = 'paused'
   });
   navigator.mediaSession.setActionHandler("seekforward", () => {
     audio.currentTime += 15;
