@@ -12,6 +12,7 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
+import '../components/iconButton';
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
@@ -19,17 +20,18 @@ import { registerSW } from 'virtual:pwa-register';
 import { $, getSaved, notify, removeSaved, save } from '../lib/utils';
 
 
-const up = <HTMLElement & { handleUpdate: () => void }>$('update-prompt');
-up.handleUpdate = registerSW({
+const updatePrompt = <HTMLElement & { handleUpdate: () => void }>$('update-prompt');
+updatePrompt.handleUpdate = registerSW({
   async onNeedRefresh() {
     const { html, render } = await import('lit');
     import('../components/updatePrompt').then(() => render(
-      html`<dialog id='changelog' open>${up}</dialog>`,
+      html`<dialog id='changelog' open>${updatePrompt}</dialog>`,
       document.body
-    )
-    );
+    ));
   }
 });
+
+
 
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');

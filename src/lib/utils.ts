@@ -218,7 +218,7 @@ if (params.has('channel') || params.has('playlists'))
 export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
-
+  // a vanilla webcomponent
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
       data-title=${stream.title}
@@ -239,8 +239,9 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       _.duration = stream.duration.toString();
     }}
       >${stream.title}</stream-item>`;
-
+  // a lit component
   const listItem = (item: StreamItem) => html`<list-item
+      title=${item.name}
       thumbnail=${item.thumbnail}
       uploader_data=${item.description || item.uploaderName}
       stats=${item.subscribers > 0 ?
@@ -254,8 +255,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       );
       // data binding for open channel action
       listContainer.dataset.url = item.url;
-    }}
-      >${item.name}</list-item>`;
+    }}/>`;
 
   const fragment = document.createDocumentFragment();
   render(html`${itemsArray.map(item => item.type !== 'stream' ?

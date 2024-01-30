@@ -1,4 +1,3 @@
-/*
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 import { blankImage, getSaved } from "../lib/utils";
@@ -37,7 +36,7 @@ export class ListItem extends LitElement {
       margin-left: 1vmin;
     }
 
-    slot {
+    #title {
       display: flex;
       height: 10vmin;
       font-size: medium;
@@ -57,75 +56,36 @@ export class ListItem extends LitElement {
   `;
 
   @query('img') img!: HTMLImageElement;
-  @property()
-  thumbnail!: string;
-  uploader_data!: string;
-  stats!: string;
+  @property() title!: string;
+  @property() stats!: string;
+  @property() thumbnail!: string;
+  @property() uploader_data!: string;
 
   render() {
+
+    let img = blankImage;
+
+    if (!getSaved('img')) {
+      const origin = new URL(this.thumbnail).origin;
+      if (origin.includes('kavin'))
+        // remove kavin's modifications
+        img = this.thumbnail.replace('/ytc', '').replace(/&qhash=.{8}$/, '');
+      // proxy through the selected instance
+      img = this.thumbnail.replace(origin,
+        thumbnailProxies.value);
+    }
     return html`
         <img
         loading='lazy'
-        src=${(getSaved('img') ? blankImage :
-        this.thumbnail.replace(new URL(this.thumbnail).origin, thumbnailProxies.value))}
+        src=${img}
         @error=${() => this.img.src = '/logo192.png'}
         />
         <div>
-          <slot></slot>
+          <p id='title'>${this.title}</p>
           <p id='uData'>${this.uploader_data}</p>
           <p id='stats'>${this.stats}</p>
         </div>
       `;
   }
-
 }
-
-*/
-
-
-import { thumbnailProxies } from '../lib/dom';
-import { $, blankImage, getSaved } from '../lib/utils';
-import css from './listItem.css?inline';
-
-customElements.define('list-item', class extends HTMLElement {
-  constructor() {
-    super();
-    const root = this.attachShadow({ mode: 'open' });
-
-    const style = $('style');
-    style.textContent = css;
-
-    const img = $('img');
-    img.id = 'thumbnail';
-    img.loading = 'lazy';
-    img.onerror = () => img.src = '/logo192.png';
-
-    const div = $('div');
-
-    const name = $('slot');
-
-    const uploaderData = $('p');
-    uploaderData.id = 'uData';
-
-    const stats = $('p');
-    stats.id = 'stats';
-    div.append(name, uploaderData, stats);
-
-    root.append(style, img, div);
-  }
-
-  connectedCallback() {
-    const data = this.getAttribute.bind(this);
-    const x = (<ShadowRoot>this.shadowRoot).getElementById.bind(this.shadowRoot);
-
-    (<HTMLParagraphElement>x('uData')).textContent = data('uploader_data') || '';
-    (<HTMLParagraphElement>x('stats')).textContent = data('stats') || '';
-    (<HTMLImageElement>x('thumbnail')).src =
-      (data('thumbnail') && !getSaved('img')) ?
-        (<string>data('thumbnail')).replace(new URL(<string>data('thumbnail')).origin, thumbnailProxies.value)
-        :
-        blankImage;
-  }
-
-})
 

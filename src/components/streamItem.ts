@@ -88,16 +88,16 @@ customElements.define('stream-item', class extends HTMLElement {
 			avatar.src = data.avatar || '/logo192.png';
 
 		}
-		else thumbnail.src = blankImage;
+		else {
+			thumbnail.src = blankImage;
+			avatar.style.display = 'none';
+		}
 
 
-		if (data.duration)
-			duration.textContent = data.duration
+		duration.textContent = data.duration || '';
 
-		if (data.author)
-			author.textContent = data.author;
+		author.textContent = data.author || '';
 
-		if (data.views)
-			viewsXuploaded.textContent = data.views + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '');
+		viewsXuploaded.textContent = (data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '');
 	}
 })

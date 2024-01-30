@@ -4,17 +4,17 @@ import { getSaved, imgUrl, notify, removeSaved, save } from "../lib/utils";
 
 const defData: apiList = {
   'piped': {
-    name: 'kavin.rocks',
+    name: 'kavin.rocks 🌐',
     url: 'https://pipedapi.kavin.rocks',
     custom: false
   },
   'invidious': {
-    name: 'fdn.fr',
+    name: 'fdn.fr 🇫🇷',
     url: 'https://invidious.fdn.fr',
     custom: false
   },
   'image': {
-    name: 'r4fo.com',
+    name: 'r4fo.com 🇩🇪',
     url: 'https://pipedproxy.r4fo.com',
     custom: false
   }
