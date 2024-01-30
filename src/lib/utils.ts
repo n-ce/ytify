@@ -1,4 +1,4 @@
-import { html, render } from "lit";
+import { TemplateResult, html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
 
 
@@ -218,6 +218,15 @@ if (params.has('channel') || params.has('playlists'))
 export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
+
+  const wrapper = (
+    link: string,
+    child: TemplateResult
+  ) => html`<a 
+  href=https://youtube.com${link}
+  @click=${(e: Event) => e.preventDefault()}
+  >${child}</a>`;
+
   // a vanilla webcomponent
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
@@ -258,8 +267,12 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     }}/>`;
 
   const fragment = document.createDocumentFragment();
-  render(html`${itemsArray.map(item => item.type !== 'stream' ?
-    listItem(item) : streamItem(item))
+  render(html`${itemsArray.map(item =>
+    wrapper(item.url,
+      item.type !== 'stream' ?
+        listItem(item) : streamItem(item)
+    )
+  )
     }`, fragment);
   return fragment;
 }
