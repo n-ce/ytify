@@ -159,7 +159,6 @@ playPrevButton.addEventListener('click', () => {
 
 
 function onEnd() {
-  audio.currentTime = audio.duration;
   playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   if (queuelist.childElementCount)
     firstItemInQueue().click();

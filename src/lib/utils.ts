@@ -1,4 +1,4 @@
-import { TemplateResult, html, render } from "lit";
+import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
 
 
@@ -23,6 +23,20 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
+
+export function avatarImg(url: string | undefined) {
+  if (!url) return '/logo192.png';
+  const origin = new URL(url).origin;
+  // proxy through the selected instance
+  url = url.replace(
+    origin,
+    thumbnailProxies.value
+  );
+  if (origin.includes('kavin'))
+    // remove kavin's modifications
+    url = url.replace('/ytc', '').replace(/&qhash=.{8}$/, '');
+  return url;
+}
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -219,13 +233,6 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
-  const wrapper = (
-    link: string,
-    child: TemplateResult
-  ) => html`<a 
-  href=https://youtube.com${link}
-  @click=${(e: Event) => e.preventDefault()}
-  >${child}</a>`;
 
   // a vanilla webcomponent
   const streamItem = (stream: StreamItem) => html`<stream-item 
@@ -267,12 +274,18 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     }}/>`;
 
   const fragment = document.createDocumentFragment();
+
   render(html`${itemsArray.map(item =>
-    wrapper(item.url,
-      item.type !== 'stream' ?
-        listItem(item) : streamItem(item)
-    )
-  )
-    }`, fragment);
+    html`<a 
+    href=https://youtube.com${item.url}
+    @click=${(e: Event) => {
+        e.preventDefault();
+      }}
+    >${item.type !== 'stream' ?
+        listItem(item) :
+        streamItem(item)}
+    </a>`
+  )}`, fragment);
+
   return fragment;
 }

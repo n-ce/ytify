@@ -108,7 +108,7 @@ async function fetchAPIdata() {
 
     const url = instance[1].uri;
     if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
-    const audioData = await fetch(url + '/api/v1/videos/NwmIu9iPkR0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on' + url + 'with error: ' + JSON.stringify(e.message)));
+    const audioData = await fetch(url + '/api/v1/videos/NwmIu9iPkR0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on ' + url + ' with error: ' + JSON.stringify(e.message)));
 
     if (!audioData || !audioData.adaptiveFormats) continue;
 

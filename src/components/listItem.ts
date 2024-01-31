@@ -1,8 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
-import { blankImage, getSaved } from "../lib/utils";
-import { thumbnailProxies } from "../lib/dom";
-
+import { avatarImg, blankImage, getSaved } from "../lib/utils";
 
 @customElement('list-item')
 export class ListItem extends LitElement {
@@ -63,17 +61,10 @@ export class ListItem extends LitElement {
 
   render() {
 
-    let img = blankImage;
+    const img = getSaved('img') ?
+      blankImage :
+      avatarImg(this.thumbnail);
 
-    if (!getSaved('img')) {
-      const origin = new URL(this.thumbnail).origin;
-      if (origin.includes('kavin'))
-        // remove kavin's modifications
-        img = this.thumbnail.replace('/ytc', '').replace(/&qhash=.{8}$/, '');
-      // proxy through the selected instance
-      img = this.thumbnail.replace(origin,
-        thumbnailProxies.value);
-    }
     return html`
         <img
         loading='lazy'

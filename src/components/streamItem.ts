@@ -1,5 +1,5 @@
 import css from './streamItem.css?inline';
-import { $, blankImage, getSaved, imgUrl, sqrThumb } from '../lib/utils';
+import { $, avatarImg, blankImage, getSaved, imgUrl, sqrThumb } from '../lib/utils';
 
 customElements.define('stream-item', class extends HTMLElement {
 	constructor() {
@@ -84,8 +84,7 @@ customElements.define('stream-item', class extends HTMLElement {
 				x.crossOrigin = '';
 			}
 			else thumbnail.src = img;
-
-			avatar.src = data.avatar || '/logo192.png';
+			avatar.src = avatarImg(data.avatar);
 
 		}
 		else {

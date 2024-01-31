@@ -22,11 +22,11 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
   queueItem.dataset.author = data.author;
   queueItem.dataset.duration = data.duration;
   queueItem.dataset.id = data.id;
-
   queueItem.addEventListener('click', () => {
     const id = queueItem.dataset.id || '';
     if (!queueItem.classList.contains('delete'))
       player(id);
+
     const index = queueArray.indexOf(id);
     queueArray.splice(index, 1);
     queuelist.children[index].remove();
@@ -43,7 +43,11 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 export function listToQ(container: HTMLDivElement) {
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
-  container.childNodes.forEach(e => appendToQueuelist((<HTMLElement>e).dataset));
+  for (const child of container.children) {
+    const anchor = <HTMLAnchorElement>child;
+    const streamItem = <HTMLElement>anchor.firstElementChild;
+    appendToQueuelist(streamItem.dataset);
+  }
   upcomingBtn.click();
 }
 

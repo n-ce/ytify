@@ -1,4 +1,4 @@
-import { audio, bitrateSelector, discoveryStorageLimit, img } from "../lib/dom";
+import { audio, bitrateSelector, discoverSwitch, img } from "../lib/dom";
 import player from "../lib/player";
 import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
 
@@ -12,8 +12,6 @@ bitrateSelector.addEventListener('change', () => {
   audio.currentTime = timeOfSwitch;
   audio.play();
 });
-
-
 
 
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
@@ -88,19 +86,24 @@ deleteButton.onclick = () => cdd.showModal();
 
 
 
-discoveryStorageLimit.value = getSaved('discoveryLimit') || '512';
+const discover = <HTMLElement>document.getElementById('discover');
+if (getSaved('discover')) {
+  discoverSwitch.toggleAttribute('checked');
+  discover.classList.add('hide');
+}
+discoverSwitch.addEventListener('click', () => {
 
-discoveryStorageLimit.addEventListener('change', () => {
-  const val = discoveryStorageLimit.value;
-  val === '512' ?
-    removeSaved('discoveryLimit') :
-    save('discoveryLimit', val);
-
-  if (val === '0') {
+  if (discoverSwitch.hasAttribute('checked')) {
     const db = getDB();
+    if (!confirm(`This will clear your existing ${db.discover?.length || 0} discoveries, continue?`)) return;
     delete db.discover;
     saveDB(db);
-    document.getElementById('discover')?.classList.add('hide');
+    discover.classList.add('hide');
+    save('discover', 'off');
+
+  } else {
+    discover.classList.remove('hide');
+    removeSaved('discover');
   }
-  else document.getElementById('discover')?.classList.remove('hide');
 });
+

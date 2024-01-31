@@ -40,9 +40,8 @@ export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 
 export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
 
-export const discoveryStorageLimit = <HTMLSelectElement>document.getElementById('discoverLimit');
+export const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());
-
 

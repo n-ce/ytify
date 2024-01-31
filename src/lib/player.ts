@@ -1,4 +1,4 @@
-import { audio, bitrateSelector, discoveryStorageLimit, favButton, favIcon, playButton, invidiousInstances } from "./dom";
+import { audio, bitrateSelector, discoverSwitch, favButton, favIcon, playButton, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
@@ -123,7 +123,6 @@ export default async function player(id: string | null = '') {
   audio.dataset.channelUrl = data.authorUrl;
 
 
-
   // favbutton state
   // reset
   if (favButton.checked) {
@@ -138,8 +137,7 @@ export default async function player(id: string | null = '') {
   }
 
 
-  const dsLimit = parseInt(discoveryStorageLimit.value);
-  if (!dsLimit) return;
+  if (!discoverSwitch.hasAttribute('checked')) return;
 
   // related streams data injection as discovery data after 10 seconds
 
@@ -187,7 +185,7 @@ export default async function player(id: string | null = '') {
 
     // randomly remove items from array when limit crossed
     let len = array.length;
-    while (len > dsLimit) {
+    while (len > 256) {
       const i = Math.floor(Math.random() * len)
       array.splice(i, 1);
       len--;
