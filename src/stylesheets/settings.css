@@ -37,6 +37,10 @@
   margin-right: 2vmin;
 }
 
+#settings a.social {
+  background-color: transparent;
+}
+
 #settings>button {
   margin: 0 2vmin 4vmin 0;
   background-color: var(--onBg);

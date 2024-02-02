@@ -1,11 +1,15 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { until } from 'lit/directives/until.js';
 
 const fetchList = () => fetch('https://api.github.com/repos/n-ce/ytify/commits/main')
   .then(res => res.json())
   .then(data => data.commit.message.split('-'))
   .then(array => array.map((c: string) => html`<li>${c}</li>`));
+
+const fetchChangelog = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
+  .then(res => res.text())
+
 
 
 @customElement('update-prompt')
@@ -54,6 +58,7 @@ export class UpdatePrompt extends LitElement {
   `;
 
   @property() handleUpdate = () => { };
+  @state() changelog!: string;
 
   handleLater() {
     const dialog = <HTMLDialogElement>this.parentElement;
@@ -65,11 +70,18 @@ export class UpdatePrompt extends LitElement {
     return html`
     <ul>
       ${until(fetchList(), html`<li>Loading Update...</li>`)}
-    </ul>
-    <span>
-      <button @click=${this.handleUpdate} autofocus>Update</button>
-      <button @click=${this.handleLater}>Later</button>
-    </span>
-      `;
+      <li @click=${async () => {
+        if (!this.changelog)
+          this.changelog = await fetchChangelog();
+        alert(this.changelog);
+      }}>Read changes from previous versions</li>
+      </details>
+      </li>
+      </ul>
+      <span>
+        <button @click=${this.handleUpdate} autofocus> Update</button>
+        <button @click=${this.handleLater}>Later</button>
+      </span>
+            `;
   }
 }

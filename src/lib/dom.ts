@@ -1,4 +1,4 @@
-export const img = <HTMLImageElement>document.querySelector('img');
+export const img = <HTMLImageElement>document.getElementById('img');
 
 export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 

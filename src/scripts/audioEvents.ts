@@ -1,6 +1,6 @@
 import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getCollection, params } from "../lib/utils";
+import { convertSStoHHMMSS, getCollection, getSaved, params } from "../lib/utils";
 import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
@@ -46,12 +46,15 @@ playButton.addEventListener('click', () => {
 let historyID: string | undefined = '';
 let historyTimeoutId = 0;
 
+
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   ms.playbackState = 'playing';
   if (!streamHistory.includes(<string>audio.dataset.id))
     streamHistory.push(<string>audio.dataset.id);
-  if ((<HTMLElement>getCollection('history').firstElementChild)?.dataset.id !== audio.dataset.id)
+  const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
+  if (!getSaved('history') ||
+    firstElementInHistory.dataset.id !== audio.dataset.id)
     historyTimeoutId = window.setTimeout(() => {
       if (historyID === audio.dataset.id)
         addToCollection('history', audio.dataset);
@@ -171,15 +174,16 @@ playNextButton.addEventListener('click', onEnd);
 
 volumeIcon.addEventListener('click', () => {
   volumeChanger.value = audio.volume ? '0' : '100';
+
   audio.volume = audio.volume ? 0 : 1;
-  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className === 'ri-volume-down-line' ? 'ri-volume-mute-line' : 'ri-volume-down-line');
+  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className.includes('mute') ? 'ri-volume-up-line' : 'ri-volume-mute-line');
 
 });
 
 volumeChanger.addEventListener('input', () => {
   audio.volume = parseFloat(volumeChanger.value) / 100;
 
-  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? 'ri-volume-down-line' : 'ri-volume-mute-line');
+  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-line` : 'ri-volume-mute-line');
 
 });
 

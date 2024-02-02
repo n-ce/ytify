@@ -12,7 +12,6 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
-import '../components/iconButton';
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
@@ -30,8 +29,6 @@ updatePrompt.handleUpdate = registerSW({
     ));
   }
 });
-
-
 
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');

@@ -6,7 +6,7 @@ import { render, html } from "lit";
 
 
 
-const reservedCollections = ['discover', 'history', 'favorites'];
+const reservedCollections = ['discover', 'history', 'favorites', 'listenLater'];
 
 const importBtn = <HTMLInputElement>document.getElementById('upload');
 importBtn.addEventListener('change', async () => {
@@ -27,6 +27,7 @@ importBtn.addEventListener('change', async () => {
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
   anchor.href = 'https://youtu.be/' + data.id;
+  anchor.onclick = e => e.preventDefault();
   render(html`
     <stream-item
       data-id=${data.id} 
@@ -74,10 +75,12 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
   const fragment = document.createDocumentFragment();
+  const dom = getCollection(collection);
   if (collection === 'discover') {
     db.discover = {};
-    getCollection('discover').innerHTML = '';
+    dom.innerHTML = '';
   }
+
   for (const key in list) {
     const data = list[key];
     toCollection(collection, data, db);
@@ -86,7 +89,7 @@ export function addListToCollection(collection: string, list: { [index: string]:
       fragment.prepend(createCollectionItem(data)) :
       fragment.appendChild(createCollectionItem(data));
   }
-  getCollection(collection).appendChild(fragment);
+  dom.appendChild(fragment);
   saveDB(db);
 }
 

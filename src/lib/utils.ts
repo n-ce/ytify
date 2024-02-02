@@ -237,7 +237,6 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       data-id=${stream.url.substring(9)} 
       title=${stream.title}
       author=${stream.uploaderName}
-      channel=${stream.uploaderUrl}
       views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
       duration=${convertSStoHHMMSS(stream.duration)}
       uploaded=${stream.uploadedDate}

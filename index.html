@@ -62,11 +62,11 @@
   </nav>
   <main>
     <section id="home">
-      <img src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
+      <img id="img" src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.7 beta</a>
+        <a id="title" href="" target="_blank">ytify 6.7</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
@@ -166,6 +166,19 @@
         </button>
         <div></div>
       </details>
+
+      <details id="listenLater">
+        <summary>
+          <i class="ri-calendar-schedule-line"></i> Listen Later
+        </summary>
+        <button>
+          <i class="ri-close-line"></i> Clear All
+        </button>
+        <button>
+          <i class="ri-subtract-line"></i> Remove
+        </button>
+        <div></div>
+      </details>
       <br>
       <div>
         <label id="importBtn" for="upload">
@@ -196,6 +209,8 @@
           <option value="/library">Library</option>
         </select>
       </span>
+      <toggle-switch id="apiAutoFetchSwitch" checked>Automatically Fetch Instances</toggle-switch>
+      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
 
       <h3>Search</h3>
       <toggle-switch id="defaultFilterSongs">Filter Songs by Default</toggle-switch>
@@ -229,6 +244,10 @@
       </span>
       <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
 
+      <h3>Library</h3>
+      <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
+      <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
+
       <h3>Interface</h3>
       <span>
         <label for="roundnessChanger">Roundness</label>
@@ -248,26 +267,28 @@
       </span>
       <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
 
-      <h3>Miscellanous</h3>
-      <toggle-switch id="apiAutoFetchSwitch" checked>Automatically Fetch Instances</toggle-switch>
-      <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
-      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
-
       <h3>Actions</h3>
 
       <button id="apiRefreshBtn">Regenerate Instances</button>
 
       <button id="deleteButton">Clear Data</button>
 
-      <a href="https://github.com/n-ce/ytify/" target="_blank">View Source Code</a>
-
       <a href="https://github.com/n-ce/ytify/wiki/troubleshooting" target="_blank">Troubleshooting</a>
 
       <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">View Changelog</a>
 
-      <a href="https://t.me/ytifytg" target="_blank">Chat on Telegram</a>
+      <a class="social" href="https://github.com/n-ce/ytify/" target="_blank">
+        <img src="https://img.shields.io/github/stars/n-ce/ytify.svg?logo=Github&label=Github" />
+      </a>
 
-      <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Chat via Matrix</a>
+
+      <a class="social" href="https://t.me/ytifytg" target="_blank">
+        <img src='https://img.shields.io/endpoint?url=https://mogyo.ro/quart-apis/tgmembercount?chat_id=ytifytg' />
+      </a>
+
+      <a class="social" href="https://matrix.to/#/#ytify:matrix.org" target="_blank">
+        <img src="https://img.shields.io/matrix/ytify:matrix.org?label=Matrix&logo=matrix" />
+      </a>
 
       <form netlify name='feedback' method='POST'>
         <input type="text" name="->" id="netlifyForm"
@@ -315,7 +336,7 @@
         </button>
 
         <span id="volumeContainer">
-          <label for="volumeChanger" class="ri-volume-down-line"></label>
+          <label for="volumeChanger" class="ri-volume-up-line"></label>
           <input type="range" min="0" max="100" value="100" id="volumeChanger">
         </span>
         <select id="playSpeed">
@@ -340,9 +361,10 @@
       <li>
         <i class="ri-play-list-add-line"></i>
         <select id="playlistSelector">
-          <option>Add To Playlist</option>
+          <option>Add To</option>
           <option value="+pl">Create New Playlist</option>
           <option value="favorites">Favorites</option>
+          <option value="listenLater">Listen Later</option>
         </select>
       </li>
       <li><i class="ri-rfid-line"></i>Start Radio</li>

@@ -88,14 +88,15 @@ deleteButton.onclick = () => cdd.showModal();
 
 const discover = <HTMLElement>document.getElementById('discover');
 if (getSaved('discover')) {
-  discoverSwitch.toggleAttribute('checked');
+  discoverSwitch.removeAttribute('checked');
   discover.classList.add('hide');
 }
 discoverSwitch.addEventListener('click', () => {
 
   if (discoverSwitch.hasAttribute('checked')) {
     const db = getDB();
-    if (!confirm(`This will clear your existing ${db.discover?.length || 0} discoveries, continue?`)) return;
+    if (!confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`))
+      return discoverSwitch.toggleAttribute('checked');
     delete db.discover;
     saveDB(db);
     discover.classList.add('hide');
@@ -107,3 +108,25 @@ discoverSwitch.addEventListener('click', () => {
   }
 });
 
+const historySwitch = <HTMLElement>document.getElementById('historySwitch');
+const history = <HTMLElement>document.getElementById('history');
+
+if (getSaved('history')) {
+  historySwitch.removeAttribute('checked');
+  history.classList.add('hide')
+}
+
+historySwitch.addEventListener('click', () => {
+  if (historySwitch.hasAttribute('checked')) {
+    const db = getDB();
+    if (!confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) return historySwitch.toggleAttribute('checked');
+    delete db.history;
+    saveDB(db);
+    history.classList.add('hide');
+    save('history', 'off')
+  }
+  else {
+    discover.classList.remove('hide');
+    removeSaved('history');
+  }
+});
