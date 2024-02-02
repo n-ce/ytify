@@ -1,4 +1,4 @@
-import { audio, bitrateSelector, discoveryStorageLimit, img } from "../lib/dom";
+import { audio, bitrateSelector, discoverSwitch, img } from "../lib/dom";
 import player from "../lib/player";
 import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
 
@@ -12,8 +12,6 @@ bitrateSelector.addEventListener('change', () => {
   audio.currentTime = timeOfSwitch;
   audio.play();
 });
-
-
 
 
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
@@ -88,19 +86,47 @@ deleteButton.onclick = () => cdd.showModal();
 
 
 
-discoveryStorageLimit.value = getSaved('discoveryLimit') || '512';
+const discover = <HTMLElement>document.getElementById('discover');
+if (getSaved('discover')) {
+  discoverSwitch.removeAttribute('checked');
+  discover.classList.add('hide');
+}
+discoverSwitch.addEventListener('click', () => {
 
-discoveryStorageLimit.addEventListener('change', () => {
-  const val = discoveryStorageLimit.value;
-  val === '512' ?
-    removeSaved('discoveryLimit') :
-    save('discoveryLimit', val);
-
-  if (val === '0') {
+  if (discoverSwitch.hasAttribute('checked')) {
     const db = getDB();
+    if (!confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`))
+      return discoverSwitch.toggleAttribute('checked');
     delete db.discover;
     saveDB(db);
-    document.getElementById('discover')?.classList.add('hide');
+    discover.classList.add('hide');
+    save('discover', 'off');
+
+  } else {
+    discover.classList.remove('hide');
+    removeSaved('discover');
   }
-  else document.getElementById('discover')?.classList.remove('hide');
+});
+
+const historySwitch = <HTMLElement>document.getElementById('historySwitch');
+const history = <HTMLElement>document.getElementById('history');
+
+if (getSaved('history')) {
+  historySwitch.removeAttribute('checked');
+  history.classList.add('hide')
+}
+
+historySwitch.addEventListener('click', () => {
+  if (historySwitch.hasAttribute('checked')) {
+    const db = getDB();
+    if (!confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) return historySwitch.toggleAttribute('checked');
+    delete db.history;
+    saveDB(db);
+    history.classList.add('hide');
+    save('history', 'off')
+  }
+  else {
+    discover.classList.remove('hide');
+    removeSaved('history');
+  }
 });

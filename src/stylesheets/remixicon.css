@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url("/remixicon.woff2")format("woff2");
+  src: url("/remixicon.woff2") format("woff2");
   font-display: swap;
 }
 
@@ -47,12 +47,12 @@
   content: "\ee0e";
 }
 
-.ri-forward-15-line:before {
-  content: "\f32d";
-}
-
 .ri-replay-15-line:before {
   content: "\f354";
+}
+
+.ri-forward-15-line:before {
+  content: "\f32d";
 }
 
 .ri-settings-line:before {
@@ -73,6 +73,10 @@
 
 .ri-volume-mute-line:before {
   content: "\f29e";
+}
+
+.ri-volume-up-line:before {
+  content: "\f2a2";
 }
 
 .ri-rfid-line:before {
@@ -149,4 +153,12 @@
 
 .ri-logout-circle-line:before {
   content: "\eedc";
+}
+
+.ri-tv-line:before {
+  content: "\f237";
+}
+
+.ri-calendar-schedule-line:before {
+  content: "\f3f3";
 }

@@ -16,22 +16,35 @@ import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from 
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
-import { notify } from '../lib/utils';
+import { $, getSaved, notify, removeSaved, save } from '../lib/utils';
 
 
-const update = registerSW({
+const updatePrompt = <HTMLElement & { handleUpdate: () => void }>$('update-prompt');
+updatePrompt.handleUpdate = registerSW({
   async onNeedRefresh() {
-    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(_ => _.json());
-    const displayer = <HTMLDialogElement>document.getElementById('changelog');
-    const [updateBtn, laterBtn] = <HTMLCollectionOf<HTMLButtonElement>>displayer.lastElementChild?.children;
-    displayer.children[1].textContent = data.commit.message;
-    displayer.showModal();
-    displayer.onclick = _ => _.stopPropagation();
-    updateBtn.onclick = () => update();
-    updateBtn.focus();
-    laterBtn.onclick = () => displayer.close();
+    const { html, render } = await import('lit');
+    import('../components/updatePrompt').then(() => render(
+      html`<dialog id='changelog' open>${updatePrompt}</dialog>`,
+      document.body
+    ));
   }
 });
+
+
+const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
+startupTabSelector.addEventListener('change', () => {
+  const tab = startupTabSelector.value;
+  tab ?
+    save('startupTab', tab) :
+    removeSaved('startupTab');
+});
+
+const savedStartupTab = getSaved('startupTab');
+if (savedStartupTab) {
+  startupTabSelector.value = savedStartupTab;
+  if (location.pathname === '/')
+    (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
+}
 
 
 // list tools functions

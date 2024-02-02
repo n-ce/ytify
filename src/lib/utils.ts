@@ -1,3 +1,4 @@
+import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
 
 
@@ -22,6 +23,20 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
+
+export function avatarImg(url: string | undefined) {
+  if (!url) return '/logo192.png';
+  const origin = new URL(url).origin;
+  // proxy through the selected instance
+  url = url.replace(
+    origin,
+    thumbnailProxies.value
+  );
+  if (origin.includes('kavin'))
+    // remove kavin's modifications
+    url = url.replace('/ytc', '').replace(/&qhash=.{8}$/, '');
+  return url;
+}
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -63,17 +78,6 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
   return canvas.toDataURL();
 }
 
-
-let api = 0;
-export const loadMoreResults = async (urlComponent: string, token: string) =>
-  fetch(pipedInstances.options[api].value + '/nextpage/' + urlComponent + 'nextpage=' + encodeURIComponent(token))
-    .then(res => res.json())
-    .catch(_ => {
-      api++;
-      pipedInstances.length === api ?
-        notify(_.message) :
-        loadMoreResults(urlComponent, token);
-    });
 
 
 export function setMetaData(
@@ -144,42 +148,6 @@ export function setMetaData(
 }
 
 
-export function updatePositionState() {
-  if ('mediaSession' in navigator) {
-    if ('setPositionState' in navigator.mediaSession) {
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: audio.currentTime,
-      });
-    }
-  }
-}
-
-
-export function createStreamItem(stream: StreamItem) {
-  const id = stream.url.substring(9);
-  const streamItem = $('stream-item');
-  streamItem.dataset.id = id;
-  streamItem.textContent = streamItem.dataset.title = stream.title;
-  streamItem.dataset.author = stream.uploaderName;
-  streamItem.dataset.channelUrl = stream.uploaderUrl;
-  streamItem.dataset.views = stream.views > 0 ? numFormatter(stream.views) + ' views' : '';
-  streamItem.dataset.duration = convertSStoHHMMSS(stream.duration);
-  streamItem.dataset.uploaded = stream.uploadedDate || '';
-  streamItem.dataset.avatar = stream.uploaderAvatar || '';
-  streamItem.addEventListener('click', () => {
-    superModal.showModal();
-    history.pushState({}, '', '#');
-    const _ = superModal.dataset;
-    _.id = id;
-    _.title = stream.title;
-    _.author = stream.uploaderName;
-    _.channelUrl = stream.uploaderUrl;
-    _.duration = streamItem.dataset.duration;
-  })
-  return streamItem;
-}
 
 export function fetchList(url: string, mix = false) {
 
@@ -189,7 +157,11 @@ export function fetchList(url: string, mix = false) {
     .then(res => res.json())
     .then(group => {
       listContainer.innerHTML = '';
-      listContainer.appendChild(itemsLoader(group.relatedStreams));
+      listContainer.appendChild(
+        itemsLoader(
+          group.relatedStreams
+        )
+      );
       listAnchor.click();
       listSection.scrollTo(0, 0);
 
@@ -207,7 +179,13 @@ export function fetchList(url: string, mix = false) {
       }
       if (!mix && token)
         setObserver(async () => {
-          const data = await loadMoreResults(url.substring(1) + '?', token);
+          const data = await fetch(
+            pipedInstances.value + '/nextpage/' +
+            url.substring(1) + '?nextpage=' + encodeURIComponent(token)
+          )
+            .then(res => res.json())
+            .catch(e => console.log(e));
+          if (!data) return;
           listContainer.appendChild(itemsLoader(data.relatedStreams));
           return data.nextpage;
         });
@@ -216,6 +194,16 @@ export function fetchList(url: string, mix = false) {
       saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${url.includes('channel') ? 'Subscribe' : 'Save'}`;
 
       if (mix) playAllBtn.click();
+      else {
+        history.replaceState({}, '',
+          location.origin + location.pathname +
+          '?' + url
+            .split('/')
+            .join('=')
+            .substring(1)
+        );
+        document.title = group.name + ' - ytify';
+      }
     })
     .catch(err => {
       if (err.message !== 'No Data Found' && pipedInstances.selectedIndex < pipedInstances.length - 1) {
@@ -229,40 +217,71 @@ export function fetchList(url: string, mix = false) {
     .finally(() => loadingScreen.close());
 }
 
-
-function createListItem(list: StreamItem) {
-  const listItem = $('list-item');
-  listItem.textContent = list.name;
-  listItem.dataset.thumbnail = list.thumbnail;
-  listItem.dataset.uploaderData = list.description || list.uploaderName || '';
-
-  listItem.dataset.stats = list.subscribers > 0 ? numFormatter(list.subscribers) + ' subscribers' : list.videos > 0 ? list.videos + ' streams' : '';
-
-  listItem.addEventListener('click', () => {
-    fetchList(
-      list.type === 'playlist' ?
-        list.url.replace('?list=', 's/') :
-        list.url
-    );
-    // data binding for open channel action
-    listContainer.dataset.url = list.url;
-  });
-  return listItem;
-}
+if (params.has('channel') || params.has('playlists'))
+  fetchList('/' +
+    location.search
+      .substring(1)
+      .split('=')
+      .join('/')
+  );
 
 
 
-export function itemsLoader(itemsArray: StreamItem[]): DocumentFragment {
+
+
+export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
+
+  const streamItem = (stream: StreamItem) => html`<stream-item 
+      data-id=${stream.url.substring(9)} 
+      title=${stream.title}
+      author=${stream.uploaderName}
+      views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
+      duration=${convertSStoHHMMSS(stream.duration)}
+      uploaded=${stream.uploadedDate}
+      avatar=${stream.uploaderAvatar}
+      @click=${() => {
+      superModal.showModal();
+      history.pushState({}, '', '#');
+      const _ = superModal.dataset;
+      _.id = stream.url.substring(9);
+      _.title = stream.title;
+      _.author = stream.uploaderName;
+      _.channelUrl = stream.uploaderUrl;
+      _.duration = stream.duration.toString();
+    }}/>`;
+
+  const listItem = (item: StreamItem) => html`<list-item
+      title=${item.name}
+      thumbnail=${item.thumbnail}
+      uploader_data=${item.description || item.uploaderName}
+      stats=${item.subscribers > 0 ?
+      (numFormatter(item.subscribers) + ' subscribers') :
+      (item.videos > 0 ? item.videos + ' streams' : '')}
+      @click=${() => {
+      fetchList(
+        item.type === 'playlist' ?
+          item.url.replace('?list=', 's/') :
+          item.url
+      );
+      // data binding for open channel action
+      listContainer.dataset.url = item.url;
+    }}/>`;
+
   const fragment = document.createDocumentFragment();
 
-  for (const item of itemsArray)
-    fragment.appendChild(
-      item.type !== 'stream' ?
-        createListItem(item) :
-        createStreamItem(item)
-    );
+  render(html`${itemsArray.map(item =>
+    html`<a 
+    href=https://youtube.com${item.url}
+    @click=${(e: Event) => {
+        e.preventDefault();
+      }}
+    >${item.type !== 'stream' ?
+        listItem(item) :
+        streamItem(item)}
+    </a>`
+  )}`, fragment);
 
   return fragment;
 }

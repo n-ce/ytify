@@ -1,12 +1,19 @@
 import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, loadMoreResults, notify, removeSaved } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
-const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
-const sortSwitch = <HTMLElement>document.getElementById('sortByTime');
+export const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
+
+
 
 let nextPageToken = '';
+
+const loadMoreResults = (token: string, query: string) =>
+  fetch(`${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
+    .then(res => res.json())
+    .catch(x => console.log('e:' + x))
+
 
 function setObserver(callback: () => Promise<string>) {
   new IntersectionObserver((entries, observer) =>
@@ -22,15 +29,18 @@ function setObserver(callback: () => Promise<string>) {
 
 // Get search results of input
 const searchLoader = () => {
-  loadingScreen.showModal();
-
   const text = superInput.value;
 
   if (!text) return;
 
+  loadingScreen.showModal();
+
   searchlist.innerHTML = '';
 
   const searchQuery = '?q=' + superInput.value;
+
+  const sortByTime = searchFilters.selectedOptions[0].textContent === 'All By Time';
+
   const filterQuery = '&filter=' + searchFilters.value;
 
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
@@ -39,33 +49,40 @@ const searchLoader = () => {
 
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
-    .then(async searchResults => {
+    .then(async (searchResults) => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
 
-      if (sortSwitch.hasAttribute('checked')) {
+      if (sortByTime && nextPageToken) {
         for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults(query + '&', nextPageToken);
+          const data = await loadMoreResults(nextPageToken, query.substring(7));
+          if (!data)
+            throw new Error('nextpage error');
+
           nextPageToken = data.nextpage;
           items = items.concat(data.items);
         }
 
-        items.sort((
-          a: { uploaded: number },
-          b: { uploaded: number }
-        ) => b.uploaded - a.uploaded);
+        type u = StreamItem & {
+          uploaded: number
+        }
+        const temp: u[] = [];
+
+        for (const item of items)
+          if (item.type === 'stream' && !temp.includes(item))
+            temp.push(item);
+        items = temp.sort((a, b) => b.uploaded - a.uploaded);
       }
 
       // filter livestreams & shorts & append rest
-
       searchlist.appendChild(
         itemsLoader(
-          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-        )
-      );
+          items.filter((item: StreamItem) => !item.isShort)
+        ));
       // load more results when 3rd last element is visible
+
       setObserver(async () => {
-        const data = await loadMoreResults(query + '&', nextPageToken);
+        const data = await loadMoreResults(nextPageToken, query.substring(7));
         searchlist.appendChild(itemsLoader(
           data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         ));
@@ -73,9 +90,10 @@ const searchLoader = () => {
       });
     })
     .catch(err => {
+      if (err.message === 'nextpage error') return;
       const i = pipedInstances.selectedIndex;
       if (i < pipedInstances.length - 1) {
-        notify('switched piped instance from ' +
+        notify('search error :  switching instance from ' +
           pipedInstances.options[i].value
           + ' to ' +
           pipedInstances.options[i + 1].value
@@ -95,8 +113,6 @@ const searchLoader = () => {
 
 }
 
-
-sortSwitch.addEventListener('click', searchLoader);
 
 
 // super input supports both searching and direct link, also loads suggestions
@@ -181,14 +197,16 @@ superInput.addEventListener('keydown', _ => {
 
 searchFilters.addEventListener('change', searchLoader);
 
+
+
 suggestionsSwitch.addEventListener('click', () => {
-  getSaved('search_suggestions') ?
-    removeSaved('search_suggestions') :
-    save('search_suggestions', 'off');
+  getSaved('searchSuggestions') ?
+    removeSaved('searchSuggestions') :
+    save('searchSuggestions', 'off');
   suggestions.style.display = 'none';
 
 });
-if (getSaved('search_suggestions') && suggestionsSwitch)
+if (getSaved('searchSuggestions'))
   suggestionsSwitch.removeAttribute('checked')
 
 
@@ -202,3 +220,14 @@ if (params.has('q')) {
 }
 
 
+const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
+
+defaultFilterSongs.addEventListener('click', () => {
+  getSaved('defaultFilter') ?
+    removeSaved('defaultFilter') :
+    save('defaultFilter', 'songs');
+});
+if (getSaved('defaultFilter')) {
+  defaultFilterSongs.setAttribute('checked', '');
+  searchFilters.value = 'music_songs';
+}

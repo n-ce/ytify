@@ -1,6 +1,6 @@
 import { audio, playButton, queuelist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getCollection, params } from "../lib/utils";
+import { convertSStoHHMMSS, getCollection, getSaved, params } from "../lib/utils";
 import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
@@ -19,41 +19,42 @@ const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger')
 const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 
+
+
+const msn = 'mediaSession' in navigator;
+const ms = msn ? navigator.mediaSession : playButton.dataset;
 function updatePositionState() {
-  if ('mediaSession' in navigator) {
-    if ('setPositionState' in navigator.mediaSession) {
+  if (msn)
+    if ('setPositionState' in navigator.mediaSession)
       navigator.mediaSession.setPositionState({
         duration: audio.duration,
         playbackRate: audio.playbackRate,
         position: audio.currentTime,
       });
-    }
-  }
 }
+
 
 
 playButton.addEventListener('click', () => {
   if (!audio.dataset.id) return;
-  if (playButton.dataset.state) {
+  ms.playbackState === 'playing' ?
+    audio.pause() :
     audio.play();
-    playButton.dataset.state = '';
-  } else {
-    audio.pause();
-    playButton.dataset.state = '1';
-  }
-  updatePositionState();
 });
 
 
 let historyID: string | undefined = '';
 let historyTimeoutId = 0;
 
+
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
-  playButton.dataset.state = '';
+  ms.playbackState = 'playing';
   if (!streamHistory.includes(<string>audio.dataset.id))
     streamHistory.push(<string>audio.dataset.id);
-  if ((<HTMLElement>getCollection('history').firstElementChild)?.dataset.id !== audio.dataset.id)
+  const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
+  if (!getSaved('history') ||
+    firstElementInHistory.dataset.id !== audio.dataset.id)
     historyTimeoutId = window.setTimeout(() => {
       if (historyID === audio.dataset.id)
         addToCollection('history', audio.dataset);
@@ -62,7 +63,7 @@ audio.addEventListener('playing', () => {
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
-  playButton.dataset.state = '1';
+  ms.playbackState = 'paused';
   clearTimeout(historyTimeoutId);
 });
 
@@ -164,7 +165,6 @@ function onEnd() {
   playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   if (queuelist.childElementCount)
     firstItemInQueue().click();
-
 }
 
 audio.addEventListener('ended', onEnd);
@@ -174,28 +174,29 @@ playNextButton.addEventListener('click', onEnd);
 
 volumeIcon.addEventListener('click', () => {
   volumeChanger.value = audio.volume ? '0' : '100';
+
   audio.volume = audio.volume ? 0 : 1;
-  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className === 'ri-volume-down-line' ? 'ri-volume-mute-line' : 'ri-volume-down-line');
+  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className.includes('mute') ? 'ri-volume-up-line' : 'ri-volume-mute-line');
 
 });
 
 volumeChanger.addEventListener('input', () => {
   audio.volume = parseFloat(volumeChanger.value) / 100;
 
-  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? 'ri-volume-down-line' : 'ri-volume-mute-line');
+  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-line` : 'ri-volume-mute-line');
 
 });
 
 
 
-if ('mediaSession' in navigator) {
+if (msn) {
   navigator.mediaSession.setActionHandler('play', () => {
     audio.play();
-    updatePositionState();
+    ms.playbackState = 'playing';
   });
   navigator.mediaSession.setActionHandler('pause', () => {
     audio.pause();
-    updatePositionState();
+    ms.playbackState = 'paused'
   });
   navigator.mediaSession.setActionHandler("seekforward", () => {
     audio.currentTime += 15;

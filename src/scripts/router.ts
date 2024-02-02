@@ -1,48 +1,77 @@
 import { audio, superInput, superModal } from "../lib/dom";
-import { params } from "../lib/utils";
+import { fetchList, params } from "../lib/utils";
+import { searchFilters } from "./search";
 
 
 const anchors = document.querySelectorAll('nav a');
-const sections = document.querySelectorAll('section');
+const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
+
 
 function showSection(id: string) {
-  sections.forEach((section, index) => {
+  routes.forEach((route, index) => {
     if (id === '/') id += 'home';
-    if (section.id === id.substring(1)) {
+    if (route === '/') route += 'home';
+    const section = <HTMLDivElement>document.getElementById(route.substring(1));
+
+    if (route === id) {
       section.classList.add('view');
       anchors[index].classList.add('active');
     } else {
       section.classList.remove('view');
       anchors[index].classList.remove('active');
     }
-
   })
 }
+
 
 for (const anchor of anchors) {
   anchor.addEventListener('click', _ => {
     _.preventDefault();
 
+    const inHome = anchor.id === '/';
+
     if (anchor.id !== location.pathname) {
+      const sParamInHome = params.has('s') && inHome;
+      const sParam = '?s=' + params.get('s');
+      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : ''
 
       history.pushState({}, '',
-        anchor.id + ((params.has('s') && anchor.id === '/') ? ('?s=' + params.get('s')) : anchor.id === '/search' ? superInput.dataset.query || '' : '')
+        anchor.id + (
+          sParamInHome ? sParam : otherQuery
+        )
       );
-      document.title = (anchor.id === '/' ?
-        (audio.dataset.title ? audio.dataset.title : 'Home')
-        :
-        (<HTMLParagraphElement>anchor.lastElementChild).textContent || '') + ' - ytify';
+
+      const routeName = anchor.lastElementChild?.textContent;
+      const homeTitle = audio.dataset.title || 'Home';
+      document.title = (
+        inHome ? homeTitle : routeName
+      ) + ' - ytify';
     }
-    // ↑↑ bad coding habit ↑↑
     showSection(anchor.id);
   })
 }
 
 // load section if name found in address else load home
-
-
-(<HTMLAnchorElement>document.getElementById(['/upcoming', '/search', '/related', '/library', '/settings'].find(_ => (params.has('e') ? params.get('e') : location.pathname) === _) || '/')).click();
-
+let route;
+const errorParam = params.get('e');
+if (errorParam) {
+  if (errorParam.includes('?')) {
+    const _ = errorParam.split('?');
+    route = _[0];
+    const query = encodeURI(_[1]);
+    if (route === '/list')
+      fetchList('/' + query.split('=').join('/'));
+    if (route === '/search') {
+      const x = new URLSearchParams(query);
+      superInput.value = x.get('q') || '';
+      searchFilters.value = x.get('f') || 'all';
+    }
+  }
+  else route = errorParam;
+}
+else route = routes.find(route => location.pathname === route);
+const anchor = <HTMLAnchorElement>document.getElementById(route || '/');
+anchor.click();
 
 // enables back button functionality
 

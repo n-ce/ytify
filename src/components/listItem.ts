@@ -1,52 +1,82 @@
-import { $, blankImage, getSaved } from '../lib/utils';
-import css from './listItem.css?inline';
+import { LitElement, css, html } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
+import { avatarImg, blankImage, getSaved } from "../lib/utils";
 
-let root: ShadowRoot;
+@customElement('list-item')
+export class ListItem extends LitElement {
 
-customElements.define('list-item', class extends HTMLElement {
-  constructor() {
-    super();
-    root = this.attachShadow({ mode: 'open' });
+  static styles = css`
+    :host {
+      background-color: var(--onBg);
+      height: 20vmin;
+      width: calc(100% - 2vmin);
+      margin-bottom: 1vmin;
+      padding: 1vmin;
+      border-radius: calc(var(--roundness) + 0.75vmin);
+      display: flex;
+    }
 
-    const style = $('style');
-    style.textContent = css;
+    p {
+      margin: 0;
+      padding: 0;
+    }
 
-    const img = $('img');
-    img.id = 'thumbnail';
-    img.loading = 'lazy';
-    img.onerror = () => img.src = blankImage;
+    img {
+      height: 100%;
+      border-radius: var(--roundness);
+    }
+  
+    div {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      margin-left: 1vmin;
+    }
 
-    const div = $('div');
+    #title {
+      display: flex;
+      height: 10vmin;
+      font-size: medium;
+      overflow: hidden;
+    }
+  
+    #uData {
+      font-size: small;
+      height: 25%;
+      overflow: hidden;
+    }
 
-    const name = $('slot');
+    #stats {
+      font-size: medium;
+       height: 25%;
+    }
+  `;
 
-    const uploaderData = $('p');
-    uploaderData.id = 'uData';
+  @query('img') img!: HTMLImageElement;
+  @property() title!: string;
+  @property() stats!: string;
+  @property() thumbnail!: string;
+  @property() uploader_data!: string;
 
-    const stats = $('p');
-    stats.id = 'stats';
-    div.append(name, uploaderData, stats);
+  render() {
 
-    root.append(style, img, div);
+    const img = getSaved('img') ?
+      blankImage :
+      avatarImg(this.thumbnail);
+
+    return html`
+        <img
+        loading='lazy'
+        src=${img}
+        @error=${() => this.img.src = '/logo192.png'}
+        />
+        <div>
+          <p id='title'>${this.title}</p>
+          <p id='uData'>${this.uploader_data}</p>
+          <p id='stats'>${this.stats}</p>
+        </div>
+      `;
   }
+}
 
-  connectedCallback() {
-    const data = <DOMStringMap>this.dataset;
-    const thumbnail = <HTMLImageElement>root.getElementById('thumbnail');
-    const uData = <HTMLParagraphElement>root.getElementById('uData');
-    const stats = <HTMLParagraphElement>root.getElementById('stats');
-
-    if (data.thumbnail && !getSaved('img'))
-      thumbnail.src = data.thumbnail;
-    else
-      thumbnail.src = blankImage;
-
-    if (data.uploaderData)
-      uData.textContent = data.uploaderData;
-
-    if (data.stats)
-      stats.textContent = data.stats;
-
-  }
-
-})
