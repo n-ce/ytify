@@ -11,7 +11,7 @@
     "B C D E";
 }
 
-img {
+#img {
   border: var(--border);
   border-radius: var(--roundness);
   box-shadow: var(--shadow);
@@ -66,7 +66,7 @@ img {
 }
 
 @media(orientation:portrait) {
-  img {
+  #img {
     height: 52vw;
     width: auto;
   }

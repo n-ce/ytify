@@ -4,17 +4,17 @@ import { getSaved, imgUrl, notify, removeSaved, save } from "../lib/utils";
 
 const defData: apiList = {
   'piped': {
-    name: 'kavin.rocks',
+    name: 'kavin.rocks 🌐',
     url: 'https://pipedapi.kavin.rocks',
     custom: false
   },
   'invidious': {
-    name: 'fdn.fr',
+    name: 'fdn.fr 🇫🇷',
     url: 'https://invidious.fdn.fr',
     custom: false
   },
   'image': {
-    name: 'r4fo.com',
+    name: 'r4fo.com 🇩🇪',
     url: 'https://pipedproxy.r4fo.com',
     custom: false
   }
@@ -34,7 +34,7 @@ if (serialisedList !== '{}') {
     const name = data.name;
     const url = data.url;
     const custom = data.custom;
-    if (name === 'kavin.rocks' || name === 'r4fo.com' || name === 'fdn.fr') return;
+    if (name === 'kavin.rocks 🌐' || name === 'r4fo.com 🇩🇪' || name === 'fdn.fr 🇫🇷') return;
     if (custom) {
       const dom = instance.options[0];
       dom.value = url;
@@ -108,7 +108,7 @@ async function fetchAPIdata() {
 
     const url = instance[1].uri;
     if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
-    const audioData = await fetch(url + '/api/v1/videos/NwmIu9iPkR0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on' + url + 'with error: ' + JSON.stringify(e.message)));
+    const audioData = await fetch(url + '/api/v1/videos/NwmIu9iPkR0?fields=adaptiveFormats').then(res => res.json()).catch(e => console.log('failed to fetch audio data on ' + url + ' with error: ' + JSON.stringify(e.message)));
 
     if (!audioData || !audioData.adaptiveFormats) continue;
 

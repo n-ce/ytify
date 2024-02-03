@@ -31,11 +31,6 @@
   font-size: larger;
 }
 
-@keyframes bgFade {
-  from {
-    background-color: #0000;
-  }
-}
 
 #playlistSelector {
   font-weight: inherit;

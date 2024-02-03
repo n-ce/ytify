@@ -78,19 +78,3 @@
   background-color: var(--text);
   color: var(--bg);
 }
-
-
-#sort {
-  height: 9vmin;
-  display: flex;
-  justify-content: space-around;
-  position: sticky;
-  top: calc(100% - 12vmin);
-  z-index: 3;
-  background-color: var(--onBg);
-  padding: 0 1.5vmin;
-  border: var(--border);
-  border-radius: calc(var(--roundness) + 0.5vmin);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(2vmin);
-}

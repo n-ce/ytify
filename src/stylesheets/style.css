@@ -131,24 +131,27 @@ dialog[open] {
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: boing 0.3s ease-in-out forwards;
+}
+
+@keyframes boing {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
 }
 
 dialog::backdrop {
   background-color: #0007;
+  animation: x 0.3s ease-in-out forwards;
 }
 
-#changelog {
-  flex-direction: column;
-  color: var(--text);
-  background-color: var(--bg);
-  width: 100%;
-  height: 100%;
+@keyframes x {
+  from {
+    background-color: transparent;
+  }
 }
 
-#changelog a {
-  margin: 2vmin 0;
-  text-decoration: underline;
-}
 
 #library>div {
   display: flex;
@@ -191,6 +194,7 @@ details[open]>summary {
   margin-bottom: 3vmin;
 }
 
+
 a {
   text-decoration: none;
   color: inherit;
@@ -231,7 +235,6 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#changelog button,
 #deleteButton,
 #apiRefreshBtn,
 #clearDataDialog button {
@@ -250,10 +253,6 @@ details button,
 details button:hover {
   background-color: var(--bg);
   color: var(--text);
-}
-
-#searchlist {
-  margin-top: -10vmin;
 }
 
 #queuelist {
@@ -304,4 +303,20 @@ details button:hover {
 #clearDataDialog div {
   width: calc(100% - 1vmin);
   color: var(--text);
+}
+
+#changelog {
+  position: fixed;
+  z-index: 4;
+  width: calc(100% - 10dvmin);
+  height: calc(100% - 10dvmin);
+  background-color: var(--bg);
+  animation: zoomout 0.5s ease-in-out forwards;
+}
+
+@keyframes zoomout {
+  from {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
