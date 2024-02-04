@@ -10,19 +10,19 @@ export class StreamItem extends LitElement {
 	@query('#thumbnail') thumbnail!: HTMLImageElement
 	@query('#avatar') avatar!: HTMLImageElement
 
-	@property() duration!: string
-	@property() author!: string
-	@property() avatarUrl!: string
+	@property() 'data-duration'!: string
+	@property() 'data-author'!: string
+	@property() 'data-avatar'!: string
 	@property() views!: string
 	@property() uploaded!: string
-	@property() title!: string
+	@property() 'data-title'!: string
 
 	@state() tsrc = blankImage;
-	@state() unravel = false;
+	@state() unravel = '0';
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
-			this.unravel = true;
+			this.unravel = '1';
 			return;
 		}
 		if (this.tsrc.includes('webp'))
@@ -49,29 +49,29 @@ export class StreamItem extends LitElement {
 
 
 		return html`
-				<span style=${'opacity:' + (this.unravel ? '1' : '0')}>
+				<span style=${'opacity:' + this.unravel}>
 					<img 
 						id='thumbnail'
 						loading='lazy'
 						crossorigin='anonymous'
-						@error=${() => this.unravel = true}
+						@error=${() => this.unravel = '1'}
 						@load=${this.handleThumbnailLoad}
 						src=${this.tsrc}
 					/>
-					<p id='duration'>${this.duration}</p>
+					<p id='duration'>${this["data-duration"]}</p>
 				</span>
-				<div id='metadata' style=${'opacity:' + (this.unravel ? '1' : '0')}>
-					<p id='title'>${this.title}</p>
+				<div id='metadata' style=${'opacity:' + this.unravel}>
+					<p id='title'>${this["data-title"]}</p>
 					<div id='aau'>
 						<img 
 							id='avatar'
 							loading='lazy'
-							@error =${() => this.avatar.src = '/logo192.png'}
-							src=${imgOff ? blankImage : avatarImg(this.avatarUrl)}
+							@error =${() => { this.avatar.src = '/logo192.png' }}
+							src=${imgOff ? blankImage : avatarImg(this["data-avatar"])}
 							style=${'display:' + (imgOff ? 'none' : 'initial')}
 						/>
 						<div id='avu'>
-							<p id='author'>${this.author}</p>
+							<p id='author'>${this["data-author"]}</p>
 							<p id='viewsXuploaded'>${(this.views || '') + (this.uploaded ? ' • ' + this.uploaded.replace('Streamed ', '') : '')}</p>
 						</div>
 					</div>

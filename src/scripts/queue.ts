@@ -18,7 +18,7 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queueArray.push(data.id);
 
   const queueItem = $('stream-item');
-  queueItem.textContent = <string>data.title;
+  queueItem.dataset.title = <string>data.title;
   queueItem.dataset.author = data.author;
   queueItem.dataset.duration = data.duration;
   queueItem.dataset.id = data.id;

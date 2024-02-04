@@ -31,9 +31,9 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   render(html`
     <stream-item
       data-id=${data.id} 
-      title=${data.title}
-      author=${data.author}
-      duration=${data.duration}
+      data-title=${data.title}
+      data-author=${data.author}
+      data-duration=${data.duration}
       @click=${(e: Event) => {
       const item = e.target as HTMLElement;
       if (item.classList.contains('delete'))

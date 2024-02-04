@@ -27,14 +27,14 @@ export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies
 export function avatarImg(url: string | undefined) {
   if (!url) return '/logo192.png';
   const origin = new URL(url).origin;
+
+  if (origin.includes('qhash'))
+    url = url.replace(/&qhash=.{8}$/, '');
   // proxy through the selected instance
   url = url.replace(
     origin,
     thumbnailProxies.value
   );
-  if (origin.includes('kavin'))
-    // remove kavin's modifications
-    url = url.replace('/ytc', '').replace(/&qhash=.{8}$/, '');
   return url;
 }
 
@@ -235,12 +235,12 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
-      title=${stream.title}
-      author=${stream.uploaderName}
+      data-title=${stream.title}
+      data-author=${stream.uploaderName}
       views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
-      duration=${convertSStoHHMMSS(stream.duration)}
+      data-duration=${convertSStoHHMMSS(stream.duration)}
       uploaded=${stream.uploadedDate}
-      avatar=${stream.uploaderAvatar}
+      data-avatar=${stream.uploaderAvatar}
       @click=${() => {
       superModal.showModal();
       history.pushState({}, '', '#');
@@ -249,7 +249,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       _.title = stream.title;
       _.author = stream.uploaderName;
       _.channelUrl = stream.uploaderUrl;
-      _.duration = stream.duration.toString();
+      _.duration = convertSStoHHMMSS(stream.duration);
     }}/>`;
 
   const listItem = (item: StreamItem) => html`<list-item
