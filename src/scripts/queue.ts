@@ -20,6 +20,7 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
   const queueItem = $('stream-item');
   queueItem.dataset.title = <string>data.title;
   queueItem.dataset.author = data.author;
+  queueItem.dataset.avatar = data.avatar;
   queueItem.dataset.duration = data.duration;
   queueItem.dataset.id = data.id;
   queueItem.addEventListener('click', () => {

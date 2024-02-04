@@ -24,19 +24,7 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
-export function avatarImg(url: string | undefined) {
-  if (!url) return '/logo192.png';
-  const origin = new URL(url).origin;
-
-  if (origin.includes('qhash'))
-    url = url.replace(/&qhash=.{8}$/, '');
-  // proxy through the selected instance
-  url = url.replace(
-    origin,
-    thumbnailProxies.value
-  );
-  return url;
-}
+export const avatarImg = (url: string | undefined) => url ? url.replace(new URL(url).origin, thumbnailProxies.value) : '/logo192.png';
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -248,6 +236,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       _.id = stream.url.substring(9);
       _.title = stream.title;
       _.author = stream.uploaderName;
+      _.avatar = stream.uploaderAvatar;
       _.channelUrl = stream.uploaderUrl;
       _.duration = convertSStoHHMMSS(stream.duration);
     }}/>`;

@@ -33,11 +33,17 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
       data-id=${data.id} 
       data-title=${data.title}
       data-author=${data.author}
+      data-avatar=${data.avatar}
       data-duration=${data.duration}
       @click=${(e: Event) => {
       const item = e.target as HTMLElement;
-      if (item.classList.contains('delete'))
-        return removeFromCollection((<HTMLDetailsElement>(<HTMLDivElement>item.parentElement).parentElement).id, <string>data.id);
+      if (item.classList.contains('delete')) {
+        const div = <HTMLDivElement>anchor.parentElement;
+        const details = <HTMLDetailsElement>div.parentElement;
+        if (data.id)
+          removeFromCollection(details.id, data.id);
+        return;
+      }
 
       superModal.showModal();
       history.pushState({}, '', '#');
@@ -45,6 +51,7 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
       _.id = data.id;
       _.title = data.title;
       _.author = data.author;
+      _.avatar = data.avatar;
       _.duration = data.duration;
       _.channelUrl = data.channelUrl;
     }}/>`,

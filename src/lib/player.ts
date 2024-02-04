@@ -32,7 +32,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
     const i = invidiousInstances.selectedIndex;
     if (i < invidiousInstances.length - 1) {
       notify('switched playback instance from ' +
@@ -119,6 +119,7 @@ export default async function player(id: string | null = '') {
   audio.dataset.id = id;
   audio.dataset.title = data.title;
   audio.dataset.author = data.author;
+  audio.dataset.avatar = data.authorThumbnails[0].url;
   audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
   audio.dataset.channelUrl = data.authorUrl;
 
@@ -152,7 +153,8 @@ export default async function player(id: string | null = '') {
       videoId: string,
       title: string,
       author: string,
-      authorUrl: string
+      authorUrl: string,
+      avatar: string
     }) => {
       if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
@@ -164,6 +166,7 @@ export default async function player(id: string | null = '') {
           id: rsId,
           title: stream.title,
           author: stream.author,
+          avatar: stream.avatar,
           duration: convertSStoHHMMSS(stream.lengthSeconds),
           channelUrl: stream.authorUrl,
           frequency: 1
