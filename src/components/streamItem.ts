@@ -18,16 +18,11 @@ export class StreamItem extends LitElement {
 	@property() title!: string
 
 	@state() tsrc = blankImage;
-
-	handleThumbnailError() {
-		this.span.style.opacity = '1';
-		this.metadata.style.opacity = '1';
-	}
+	@state() unravel = false;
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
-			this.span.style.opacity = '1';
-			this.metadata.style.opacity = '1';
+			this.unravel = true;
 			return;
 		}
 		if (this.tsrc.includes('webp'))
@@ -54,26 +49,26 @@ export class StreamItem extends LitElement {
 
 
 		return html`
-				<span>
+				<span style=${'opacity:' + (this.unravel ? '1' : '0')}>
 					<img 
 						id='thumbnail'
 						loading='lazy'
 						crossorigin='anonymous'
-						@error=${this.handleThumbnailError}
+						@error=${() => this.unravel = true}
 						@load=${this.handleThumbnailLoad}
 						src=${this.tsrc}
 					/>
 					<p id='duration'>${this.duration}</p>
 				</span>
-				<div id='metadata'>
+				<div id='metadata' style=${'opacity:' + (this.unravel ? '1' : '0')}>
 					<p id='title'>${this.title}</p>
 					<div id='aau'>
 						<img 
 							id='avatar'
 							loading='lazy'
 							@error =${() => this.avatar.src = '/logo192.png'}
-							style=${imgOff ? 'display:none' : ''}
 							src=${imgOff ? blankImage : avatarImg(this.avatarUrl)}
+							style=${'display:' + (imgOff ? 'none' : 'initial')}
 						/>
 						<div id='avu'>
 							<p id='author'>${this.author}</p>
@@ -98,7 +93,7 @@ export class StreamItem extends LitElement {
   	border-radius: calc(var(--roundness) + 0.75vmin);
   	display: flex;
 	}
-	span, #metadata {
+	span,#metadata {
   	opacity: 0;
   	transition: all 0.3s;
 	}
