@@ -152,9 +152,9 @@ export default async function player(id: string | null = '') {
       lengthSeconds: number,
       videoId: string,
       title: string,
-      author: string,
+      authorThumbnails: { url: string }[],
       authorUrl: string,
-      avatar: string
+      author: string
     }) => {
       if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
@@ -166,7 +166,7 @@ export default async function player(id: string | null = '') {
           id: rsId,
           title: stream.title,
           author: stream.author,
-          avatar: stream.avatar,
+          avatar: stream.authorThumbnails[0].url,
           duration: convertSStoHHMMSS(stream.lengthSeconds),
           channelUrl: stream.authorUrl,
           frequency: 1
