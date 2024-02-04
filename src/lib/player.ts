@@ -166,7 +166,7 @@ export default async function player(id: string | null = '') {
           id: rsId,
           title: stream.title,
           author: stream.author,
-          avatar: stream.authorThumbnails[0].url,
+          avatar: '',
           duration: convertSStoHHMMSS(stream.lengthSeconds),
           channelUrl: stream.authorUrl,
           frequency: 1
