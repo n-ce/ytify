@@ -28,6 +28,7 @@ export class StreamItem extends LitElement {
 		if (this.thumbnail.naturalWidth !== 120) {
 			this.span.style.opacity = '1';
 			this.metadata.style.opacity = '1';
+			return;
 		}
 		if (this.tsrc.includes('webp'))
 			this.thumbnail.src = this.tsrc.replace('.webp', '.jpg').replace('vi_webp', 'vi');
@@ -50,7 +51,7 @@ export class StreamItem extends LitElement {
 			}
 			else this.tsrc = img;
 		}
-		else this.avatar.style.display = 'none';
+
 
 		return html`
 				<span>
@@ -71,7 +72,8 @@ export class StreamItem extends LitElement {
 							id='avatar'
 							loading='lazy'
 							@error =${() => this.avatar.src = '/logo192.png'}
-							src=${avatarImg(this.avatarUrl)}
+							style=${imgOff ? 'display:none' : ''}
+							src=${imgOff ? blankImage : avatarImg(this.avatarUrl)}
 						/>
 						<div id='avu'>
 							<p id='author'>${this.author}</p>
@@ -176,6 +178,7 @@ export class StreamItem extends LitElement {
 		#author {
     	height: initial;
 		}
-	}`;
+	}
+	`;
 }
 
