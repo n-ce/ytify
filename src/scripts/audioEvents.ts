@@ -50,11 +50,12 @@ let historyTimeoutId = 0;
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
   ms.playbackState = 'playing';
-  if (!streamHistory.includes(<string>audio.dataset.id))
-    streamHistory.push(<string>audio.dataset.id);
+  const id = <string>audio.dataset.id;
+  if (!streamHistory.includes(id))
+    streamHistory.push(id);
   const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
   if (!getSaved('history') ||
-    firstElementInHistory.dataset.id !== audio.dataset.id)
+    firstElementInHistory.dataset.id !== id)
     historyTimeoutId = window.setTimeout(() => {
       if (historyID === audio.dataset.id)
         addToCollection('history', audio.dataset);

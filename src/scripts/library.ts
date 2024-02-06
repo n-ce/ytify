@@ -1,5 +1,5 @@
 import { audio, favButton, favIcon, superModal } from "../lib/dom";
-import { $, getCollection, getDB, notify, saveDB } from "../lib/utils";
+import { $, domainResolver, getCollection, getDB, notify, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 import { atpSelector } from "./superModal";
 import { render, html } from "lit";
@@ -26,8 +26,15 @@ importBtn.addEventListener('change', async () => {
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
-  anchor.href = 'https://youtu.be/' + data.id;
+  anchor.href = domainResolver('/watch?v=' + data.id);
   anchor.onclick = e => e.preventDefault();
+
+  // for backwards compatibility, can be removed after mass adoption
+  if (data.avatar?.startsWith('https')) {
+    const l = new URL(data.avatar);
+    data.avatar = l.pathname.replace('no-rj', 'no-rw') + '?host=' + l.origin.substring(8);
+  }
+
   render(html`
     <stream-item
       data-id=${data.id} 

@@ -12,11 +12,11 @@ import './miscEvents';
 import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
-import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
+import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn, searchlist } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { addListToCollection, createPlaylist } from './library';
 import { registerSW } from 'virtual:pwa-register';
-import { $, getSaved, notify, removeSaved, save } from '../lib/utils';
+import { $, getSaved, itemsLoader, notify, removeSaved, save } from '../lib/utils';
 
 
 const updatePrompt = <HTMLElement & { handleUpdate: () => void }>$('update-prompt');
@@ -29,6 +29,12 @@ updatePrompt.handleUpdate = registerSW({
     ));
   }
 });
+
+const curatedUrl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md';
+fetch(curatedUrl)
+  .then(res => res.text())
+  .then(res => JSON.parse(res.substring(3)))
+  .then(data => searchlist.appendChild(itemsLoader(data)));
 
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');

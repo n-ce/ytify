@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { avatarImg, blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { thumbnailProxies } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -13,12 +14,13 @@ export class StreamItem extends LitElement {
 	@property() 'data-duration'!: string
 	@property() 'data-author'!: string
 	@property() 'data-avatar'!: string
+	@property() 'data-title'!: string
 	@property() views!: string
 	@property() uploaded!: string
-	@property() 'data-title'!: string
 
 	@state() tsrc = blankImage;
 	@state() unravel = '0';
+	@state() display = 'initial';
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
@@ -35,6 +37,7 @@ export class StreamItem extends LitElement {
 
 	render() {
 		const imgOff = getSaved('img') ? true : false;
+		let avImg = '';
 
 		if (!imgOff) {
 			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
@@ -45,7 +48,13 @@ export class StreamItem extends LitElement {
 				x.crossOrigin = '';
 			}
 			else this.tsrc = img;
+
+			if (this["data-avatar"] && !avImg.startsWith('http'))
+				avImg = thumbnailProxies.value + this["data-avatar"];
 		}
+
+		if (!avImg)
+			this.display = 'none';
 
 
 		return html`
@@ -66,9 +75,8 @@ export class StreamItem extends LitElement {
 						<img 
 							id='avatar'
 							loading='lazy'
-							@error =${() => { this.avatar.src = '/logo192.png' }}
-							src=${imgOff ? blankImage : avatarImg(this["data-avatar"])}
-							style=${'display:' + (imgOff ? 'none' : 'initial')}
+							src=${avImg}
+							style=${'display:' + this.display}
 						/>
 						<div id='avu'>
 							<p id='author'>${this["data-author"]}</p>

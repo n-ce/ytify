@@ -119,7 +119,8 @@ export default async function player(id: string | null = '') {
   audio.dataset.id = id;
   audio.dataset.title = data.title;
   audio.dataset.author = data.author;
-  audio.dataset.avatar = data.authorThumbnails[0].url;
+  const av = new URL(data.authorThumbnails[1].url);
+  audio.dataset.avatar = av.pathname.replace('no-rj', 'no-rw') + '?host=' + av.origin.substring(8);
   audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
   audio.dataset.channelUrl = data.authorUrl;
 

@@ -24,7 +24,21 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
-export const avatarImg = (url: string | undefined) => url ? url.replace(new URL(url).origin, thumbnailProxies.value) : '/logo192.png';
+const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
+const savedLinkDomain = getSaved('linkDomain');
+if (savedLinkDomain) linkDomain.value = savedLinkDomain;
+
+linkDomain.addEventListener('change', () => {
+  linkDomain.selectedIndex === 0 ?
+    removeSaved('linkDomain') :
+    save('linkDomain', linkDomain.value);
+});
+
+export const domainResolver = (url: string) =>
+  linkDomain.value + (linkDomain.value.includes('ytify') ? url.
+    startsWith('/watch') ?
+    ('?s' + url.slice(8)) :
+    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -221,14 +235,21 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
+  function rmDomain(url: string) {
+    if (!url) return;
+    if (!url.startsWith('https')) return url;
+    const l = new URL(url.replace(/&qhash=.{8}$/, ''));
+    return l.pathname + l.search;
+  }
+
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
       data-title=${stream.title}
       data-author=${stream.uploaderName}
+      data-avatar=${rmDomain(stream.uploaderAvatar)}
       views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
       data-duration=${convertSStoHHMMSS(stream.duration)}
       uploaded=${stream.uploadedDate}
-      data-avatar=${stream.uploaderAvatar}
       @click=${() => {
       superModal.showModal();
       history.pushState({}, '', '#');
@@ -236,14 +257,15 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       _.id = stream.url.substring(9);
       _.title = stream.title;
       _.author = stream.uploaderName;
-      _.avatar = stream.uploaderAvatar;
+      _.avatar = rmDomain(stream.uploaderAvatar);
       _.channelUrl = stream.uploaderUrl;
       _.duration = convertSStoHHMMSS(stream.duration);
     }}/>`;
 
+
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
-      thumbnail=${item.thumbnail}
+      thumbnail=${rmDomain(item.thumbnail)}
       uploader_data=${item.description || item.uploaderName}
       stats=${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
@@ -262,7 +284,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   render(html`${itemsArray.map(item =>
     html`<a 
-    href=https://youtube.com${item.url}
+    href=${domainResolver(item.url)}
     @click=${(e: Event) => {
         e.preventDefault();
       }}

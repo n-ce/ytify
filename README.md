@@ -19,8 +19,8 @@
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
 - **Library** 📚: Discover feed, history, favorites & custom playlists. 
 
+![ytify_6.7_landscape](https://github.com/n-ce/ytify/assets/69345507/e8854300-8caf-49a4-befa-6bfc659e86b6)
 
-![ytify_6.6_landscape](https://github.com/n-ce/ytify/assets/69345507/aac99225-50ec-4a4f-a218-dfff0ddec560)
 
 
 ## WHY / The story of ytify with [n-ce](https://github.com/n-ce)
@@ -75,7 +75,7 @@ npm run dev -- --open
 - [Piped](https://github.com/teampiped/piped) - YouTube Data API & Proxy
 - [Invidious](https://invidious.io) - YouTube Playback API
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
-- [Lit](https://lit.dev) - Exceptional Web Component Framework
+- [Lit](https://lit.dev) - Exceptional Web Component Library
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms.
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
 - [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
