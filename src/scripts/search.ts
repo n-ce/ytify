@@ -1,8 +1,7 @@
-import { loadingScreen, pipedInstances, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
+import { loadingScreen, pipedInstances, searchlist, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
 
-const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 export const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 
 

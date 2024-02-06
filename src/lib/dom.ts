@@ -18,6 +18,8 @@ export const audio = <HTMLAudioElement>document.querySelector('audio');
 
 export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
+export const searchlist = <HTMLDivElement>document.getElementById('searchlist');
+
 export const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 
 export const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');

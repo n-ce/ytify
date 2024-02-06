@@ -237,6 +237,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   function rmDomain(url: string) {
     if (!url) return;
+    if (!url.startsWith('https')) return url;
     const l = new URL(url.replace(/&qhash=.{8}$/, ''));
     return l.pathname + l.search;
   }
