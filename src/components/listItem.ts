@@ -1,5 +1,5 @@
 import { LitElement, css, html } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import { customElement, property, query, state } from "lit/decorators.js";
 import { avatarImg, blankImage, getSaved } from "../lib/utils";
 
 @customElement('list-item')
@@ -14,6 +14,11 @@ export class ListItem extends LitElement {
       padding: 1vmin;
       border-radius: calc(var(--roundness) + 0.75vmin);
       display: flex;
+    }
+  
+    img, div{
+     	opacity: 0;
+      transition: all 0.3s;
     }
 
     p {
@@ -54,6 +59,7 @@ export class ListItem extends LitElement {
   `;
 
   @query('img') img!: HTMLImageElement;
+  @state() unravel = '0';
   @property() title!: string;
   @property() stats!: string;
   @property() thumbnail!: string;
@@ -63,15 +69,17 @@ export class ListItem extends LitElement {
 
     const img = getSaved('img') ?
       blankImage :
-      avatarImg(this.thumbnail);
+      avatarImg(this.thumbnail, 176);
 
     return html`
         <img
+        style=${'opacity:' + this.unravel}
         loading='lazy'
         src=${img}
         @error=${() => this.img.src = '/logo192.png'}
+        @load=${() => this.unravel = '1'}
         />
-        <div>
+        <div style=${'opacity:' + this.unravel}>
           <p id='title'>${this.title}</p>
           <p id='uData'>${this.uploader_data}</p>
           <p id='stats'>${this.stats}</p>

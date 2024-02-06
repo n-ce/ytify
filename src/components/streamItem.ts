@@ -13,9 +13,9 @@ export class StreamItem extends LitElement {
 	@property() 'data-duration'!: string
 	@property() 'data-author'!: string
 	@property() 'data-avatar'!: string
+	@property() 'data-title'!: string
 	@property() views!: string
 	@property() uploaded!: string
-	@property() 'data-title'!: string
 
 	@state() tsrc = blankImage;
 	@state() unravel = '0';
@@ -66,7 +66,12 @@ export class StreamItem extends LitElement {
 						<img 
 							id='avatar'
 							loading='lazy'
-							@error =${() => { this.avatar.src = '/logo192.png' }}
+							@error =${() => {
+				{
+					console.log(true);
+					this.avatar.src = '/logo192.png';
+				}
+			}}
 							src=${imgOff ? blankImage : avatarImg(this["data-avatar"])}
 							style=${'display:' + (imgOff ? 'none' : 'initial')}
 						/>

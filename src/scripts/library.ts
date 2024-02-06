@@ -1,5 +1,5 @@
 import { audio, favButton, favIcon, superModal } from "../lib/dom";
-import { $, getCollection, getDB, notify, saveDB } from "../lib/utils";
+import { $, domainResolver, getCollection, getDB, notify, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 import { atpSelector } from "./superModal";
 import { render, html } from "lit";
@@ -26,7 +26,7 @@ importBtn.addEventListener('change', async () => {
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
-  anchor.href = 'https://youtu.be/' + data.id;
+  anchor.href = domainResolver('/watch?v=' + data.id);
   anchor.onclick = e => e.preventDefault();
   render(html`
     <stream-item

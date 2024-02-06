@@ -24,7 +24,23 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
-export const avatarImg = (url: string | undefined) => url ? url.replace(new URL(url).origin, thumbnailProxies.value) : '/logo192.png';
+export const avatarImg = (id: string | undefined, px = 68) => (id && !id.startsWith('http')) ? thumbnailProxies.value + id + '=s' + px + '-c-k-c0x00ffffff-no-rw-mo?host=yt3.ggpht.com' : '/logo192.png';
+
+const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
+const savedLinkDomain = getSaved('linkDomain');
+if (savedLinkDomain) linkDomain.value = savedLinkDomain;
+
+linkDomain.addEventListener('change', () => {
+  linkDomain.selectedIndex === 0 ?
+    removeSaved('linkDomain') :
+    save('linkDomain', linkDomain.value);
+});
+
+export const domainResolver = (url: string) =>
+  linkDomain.value + (linkDomain.value.includes('ytify') ? url.
+    startsWith('/watch') ?
+    ('?s' + url.slice(8)) :
+    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -225,10 +241,10 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       data-id=${stream.url.substring(9)} 
       data-title=${stream.title}
       data-author=${stream.uploaderName}
+      data-avatar=${stream.uploaderAvatar ? new URL(stream.uploaderAvatar).pathname.split('=')[0] : ''}
       views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
       data-duration=${convertSStoHHMMSS(stream.duration)}
       uploaded=${stream.uploadedDate}
-      data-avatar=${stream.uploaderAvatar}
       @click=${() => {
       superModal.showModal();
       history.pushState({}, '', '#');
@@ -243,7 +259,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
-      thumbnail=${item.thumbnail}
+      thumbnail=${new URL(item.thumbnail).pathname.split('=')[0]}
       uploader_data=${item.description || item.uploaderName}
       stats=${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
@@ -262,7 +278,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   render(html`${itemsArray.map(item =>
     html`<a 
-    href=https://youtube.com${item.url}
+    href=${domainResolver(item.url)}
     @click=${(e: Event) => {
         e.preventDefault();
       }}
