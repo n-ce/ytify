@@ -1,6 +1,7 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { avatarImg, blankImage, getSaved } from "../lib/utils";
+import { blankImage, getSaved } from "../lib/utils";
+import { thumbnailProxies } from "../lib/dom";
 
 @customElement('list-item')
 export class ListItem extends LitElement {
@@ -68,7 +69,7 @@ export class ListItem extends LitElement {
   render() {
     const img = getSaved('img') ?
       blankImage :
-      avatarImg(this.thumbnail);
+      thumbnailProxies.value + this.thumbnail;
 
     return html`
         <img

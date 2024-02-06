@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { avatarImg, blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { thumbnailProxies } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -49,7 +50,7 @@ export class StreamItem extends LitElement {
 			else this.tsrc = img;
 
 			if (this["data-avatar"] && !avImg.startsWith('http'))
-				avImg = avatarImg(this["data-avatar"]);
+				avImg = thumbnailProxies.value + this["data-avatar"];
 		}
 
 		if (!avImg)

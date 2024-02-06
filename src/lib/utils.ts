@@ -24,8 +24,6 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
-export const avatarImg = (id: string | undefined) => (id && !id.startsWith('http')) ? (thumbnailProxies.value + id) : '';
-
 const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
 const savedLinkDomain = getSaved('linkDomain');
 if (savedLinkDomain) linkDomain.value = savedLinkDomain;
