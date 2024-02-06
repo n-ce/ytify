@@ -32,7 +32,7 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   // for backwards compatibility, can be removed after mass adoption
   if (data.avatar?.startsWith('https')) {
     const l = new URL(data.avatar);
-    data.avatar = l.pathname.replace('no-rj', 'no-rw') + '?host=' + l.origin;
+    data.avatar = l.pathname.replace('no-rj', 'no-rw') + '?host=' + l.origin.substring(8);
   }
 
   render(html`
