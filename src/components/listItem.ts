@@ -66,10 +66,9 @@ export class ListItem extends LitElement {
   @property() uploader_data!: string;
 
   render() {
-
     const img = getSaved('img') ?
       blankImage :
-      avatarImg(this.thumbnail, 176);
+      avatarImg(this.thumbnail);
 
     return html`
         <img

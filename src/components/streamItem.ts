@@ -19,6 +19,7 @@ export class StreamItem extends LitElement {
 
 	@state() tsrc = blankImage;
 	@state() unravel = '0';
+	@state() display = 'initial';
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
@@ -35,6 +36,7 @@ export class StreamItem extends LitElement {
 
 	render() {
 		const imgOff = getSaved('img') ? true : false;
+		let avImg = '';
 
 		if (!imgOff) {
 			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
@@ -45,7 +47,13 @@ export class StreamItem extends LitElement {
 				x.crossOrigin = '';
 			}
 			else this.tsrc = img;
+
+			if (this["data-avatar"] && !avImg.startsWith('http'))
+				avImg = avatarImg(this["data-avatar"]);
 		}
+
+		if (!avImg)
+			this.display = 'none';
 
 
 		return html`
@@ -66,14 +74,8 @@ export class StreamItem extends LitElement {
 						<img 
 							id='avatar'
 							loading='lazy'
-							@error =${() => {
-				{
-					console.log(true);
-					this.avatar.src = '/logo192.png';
-				}
-			}}
-							src=${imgOff ? blankImage : avatarImg(this["data-avatar"])}
-							style=${'display:' + (imgOff ? 'none' : 'initial')}
+							src=${avImg}
+							style=${'display:' + this.display}
 						/>
 						<div id='avu'>
 							<p id='author'>${this["data-author"]}</p>

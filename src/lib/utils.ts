@@ -24,7 +24,7 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
-export const avatarImg = (id: string | undefined, px = 68) => (id && !id.startsWith('http')) ? thumbnailProxies.value + id + '=s' + px + '-c-k-c0x00ffffff-no-rw-mo?host=yt3.ggpht.com' : '/logo192.png';
+export const avatarImg = (id: string | undefined) => (id && !id.startsWith('http')) ? (thumbnailProxies.value + id) : '';
 
 const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
 const savedLinkDomain = getSaved('linkDomain');
@@ -237,11 +237,17 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
+  function rmDomain(url: string) {
+    if (!url) return;
+    const l = new URL(url.replace(/&qhash=.{8}$/, ''));
+    return l.pathname + l.search;
+  }
+
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
       data-title=${stream.title}
       data-author=${stream.uploaderName}
-      data-avatar=${stream.uploaderAvatar ? new URL(stream.uploaderAvatar).pathname.split('=')[0] : ''}
+      data-avatar=${rmDomain(stream.uploaderAvatar)}
       views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
       data-duration=${convertSStoHHMMSS(stream.duration)}
       uploaded=${stream.uploadedDate}
@@ -252,14 +258,15 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       _.id = stream.url.substring(9);
       _.title = stream.title;
       _.author = stream.uploaderName;
-      _.avatar = stream.uploaderAvatar;
+      _.avatar = rmDomain(stream.uploaderAvatar);
       _.channelUrl = stream.uploaderUrl;
       _.duration = convertSStoHHMMSS(stream.duration);
     }}/>`;
 
+
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
-      thumbnail=${new URL(item.thumbnail).pathname.split('=')[0]}
+      thumbnail=${rmDomain(item.thumbnail)}
       uploader_data=${item.description || item.uploaderName}
       stats=${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
