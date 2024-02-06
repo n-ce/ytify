@@ -28,6 +28,13 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
   anchor.href = domainResolver('/watch?v=' + data.id);
   anchor.onclick = e => e.preventDefault();
+
+  // for backwards compatibility, can be removed after mass adoption
+  if (data.avatar?.startsWith('https')) {
+    const l = new URL(data.avatar);
+    data.avatar = l.pathname + '?host=' + l.origin;
+  }
+
   render(html`
     <stream-item
       data-id=${data.id} 
