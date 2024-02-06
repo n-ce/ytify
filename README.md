@@ -75,7 +75,7 @@ npm run dev -- --open
 - [Piped](https://github.com/teampiped/piped) - YouTube Data API & Proxy
 - [Invidious](https://invidious.io) - YouTube Playback API
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
-- [Lit](https://lit.dev) - Exceptional Web Component Framework
+- [Lit](https://lit.dev) - Exceptional Web Component Library
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms.
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
 - [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
