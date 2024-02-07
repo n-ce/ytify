@@ -14,14 +14,15 @@ import '../components/streamItem';
 import '../components/listItem';
 import '../components/toggleSwitch';
 import { registerSW } from 'virtual:pwa-register';
-import { $ } from '../lib/utils';
 
-const updatePrompt = <HTMLElement & { handleUpdate: () => void }>$('update-prompt');
-updatePrompt.handleUpdate = registerSW({
+const updater = <HTMLElement & { handleUpdate(): {} }>document.createElement('update-prompt');
+
+updater.handleUpdate = registerSW({
   async onNeedRefresh() {
     const { html, render } = await import('lit');
     import('../components/updatePrompt').then(() => render(
-      html`<dialog id='changelog' open>${updatePrompt}</dialog>`,
+      html`<dialog id='changelog' open>
+      ${updater}</dialog>`,
       document.body
     ));
   }
