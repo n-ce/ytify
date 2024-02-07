@@ -38,10 +38,10 @@
 }
 
 
-#settings>button {
-  margin: 0 2vmin 4vmin 0;
-  background-color: var(--onBg);
-  color: var(--text);
+#settings button {
+  margin: 0 2vmin 4vmin 0 !important;
+  background-color: var(--onBg) !important;
+  color: var(--text) !important;
 }
 
 #netlifyForm {

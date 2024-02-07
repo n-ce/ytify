@@ -235,9 +235,7 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#deleteButton,
-#apiRefreshBtn,
-#clearDataDialog button {
+#settings button {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);
@@ -292,18 +290,6 @@ details button:hover {
   border-bottom: dotted;
 }
 
-#clearDataDialog {
-  flex-direction: column;
-  background-color: var(--onBg);
-  backdrop-filter: blur(1vmin);
-  border-radius: var(--roundness);
-  border: var(--border);
-}
-
-#clearDataDialog div {
-  width: calc(100% - 1vmin);
-  color: var(--text);
-}
 
 #changelog {
   position: fixed;

@@ -77,13 +77,16 @@ saveListBtn.addEventListener('click', () => {
   createPlaylist(listTitle);
 
   const list: { [index: string]: DOMStringMap } = {};
-  listContainer.childNodes.forEach(_ => {
-    const sender = (<HTMLElement>_).dataset;
-    const id = <string>sender.id;
-    list[id] = {};
-    ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
-      .forEach($ => list[id][$] = sender[$]);
-  });
+  listContainer
+    .querySelectorAll('stream-item')
+    .forEach(_ => {
+      const sender = (<HTMLElement>_).dataset;
+      const id = <string>sender.id;
+      list[id] = {};
+      ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
+        .forEach($ => list[id][$] = sender[$]);
+    });
+
   addListToCollection(listTitle, list);
   saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Saved';
 });

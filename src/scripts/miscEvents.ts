@@ -55,35 +55,18 @@ thumbnailSwitch.addEventListener('click', () => {
 });
 
 
-const deleteButton = <HTMLButtonElement>document.getElementById('deleteButton');
-
-const cdd = <HTMLDialogElement>document.getElementById('clearDataDialog');
-const cddDiv = <HTMLDivElement>cdd.firstElementChild;
-const [clear_sw, clear_library, clear_settings] = <HTMLCollectionOf<HTMLElement>>cddDiv.children;
-
-deleteButton.onclick = () => cdd.showModal();
-
-
-(<HTMLButtonElement>cdd.lastElementChild).addEventListener('click', () => {
-  cdd.close();
-
-  if (clear_sw.hasAttribute('checked')) {
-    self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-    navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-  }
-
-  if (clear_library.hasAttribute('checked'))
-    removeSaved('library');
-
-  if (clear_settings.hasAttribute('checked'))
-    for (let i = 0; i < localStorage.length; i++)
-      if (localStorage.key(i) !== 'library')
-        removeSaved(<string>localStorage.key(i));
-
-  if (cddDiv.querySelectorAll('[checked]').length)
-    location.reload();
+document.getElementById('clearCacheBtn')?.addEventListener('click', () => {
+  self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+  navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
+  location.reload();
 });
 
+document.getElementById('restoreSettingsBtn')?.addEventListener('click', () => {
+  for (let i = 0; i < localStorage.length; i++)
+    if (localStorage.key(i) !== 'library')
+      removeSaved(<string>localStorage.key(i));
+  location.reload();
+});
 
 
 const discover = <HTMLElement>document.getElementById('discover');

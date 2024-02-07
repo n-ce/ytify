@@ -1,28 +1,37 @@
 import { audio, favButton, favIcon, superModal } from "../lib/dom";
-import { $, domainResolver, getCollection, getDB, notify, saveDB } from "../lib/utils";
+import { $, domainResolver, getCollection, getDB, notify, removeSaved, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 import { atpSelector } from "./superModal";
 import { render, html } from "lit";
 
 
-
+const library = <HTMLDivElement>document.getElementById('library');
+const importBtn = <HTMLInputElement>document.getElementById('upload');
 const reservedCollections = ['discover', 'history', 'favorites', 'listenLater'];
 
-const importBtn = <HTMLInputElement>document.getElementById('upload');
 importBtn.addEventListener('change', async () => {
-  if (!confirm('This will overwrite your current library')) return;
-  saveDB(JSON.parse(await (<FileList>importBtn.files)[0].text()));
+  const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
+  const oldDB = getDB();
+  if (!confirm('This will merge your current library with the imported library, continue?')) return;
+  for (const collection in newDB) for (const item in newDB[collection])
+    toCollection(collection, newDB[collection][item], oldDB)
+  saveDB(oldDB);
   location.reload();
 });
 
 
-(<HTMLButtonElement>document.getElementById('exportBtn')).addEventListener('click', () => {
+document.getElementById('exportBtn')?.addEventListener('click', () => {
   const link = $('a');
   link.download = 'ytify_library.json';
   link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
   link.click();
 });
 
+document.getElementById('cleanLibraryBtn')?.addEventListener('click', () => {
+  if (!confirm('Are you sure you want to clear ' + library.getElementsByTagName('stream-item').length + ' items from the library?')) return;
+  removeSaved('library');
+  location.reload();
+});
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
@@ -119,7 +128,6 @@ function removeFromCollection(collection: string, id: string) {
 // playlists
 
 export function createPlaylist(title: string) {
-  const library = <HTMLDivElement>document.getElementById('library');
 
   if (library.contains(document.getElementById(title)))
     return notify('This Playlist Already Exists!');

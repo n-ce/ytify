@@ -38,7 +38,7 @@ const searchLoader = () => {
 
   const searchQuery = '?q=' + superInput.value;
 
-  const sortByTime = searchFilters.selectedOptions[0].textContent === 'All By Time';
+  const sortByTime = searchFilters.selectedIndex === 1;
 
   const filterQuery = '&filter=' + searchFilters.value;
 
@@ -51,6 +51,7 @@ const searchLoader = () => {
     .then(async (searchResults) => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
+      if (!items) throw new Error('Search couldn\'t be resolved on ' + pipedInstances.value);
 
       if (sortByTime && nextPageToken) {
         for (let i = 0; i < 3; i++) {
@@ -76,7 +77,7 @@ const searchLoader = () => {
       // filter livestreams & shorts & append rest
       searchlist.appendChild(
         itemsLoader(
-          items.filter((item: StreamItem) => !item.isShort)
+          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         ));
       // load more results when 3rd last element is visible
 
