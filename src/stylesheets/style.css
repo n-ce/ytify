@@ -219,8 +219,6 @@ list-item:hover {
 }
 
 
-/* idk where else to put the styles below */
-
 #queuetools {
   height: 10vmin;
   width: 100%;
@@ -281,13 +279,6 @@ details button:hover {
 
 .ri-loader-3-line {
   animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
-}
-
-#settings h3 {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4%;
-  border-bottom: dotted;
 }
 
 

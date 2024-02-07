@@ -10,6 +10,13 @@
   display: block;
 }
 
+#settings h3 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4%;
+  border-bottom: dotted;
+}
+
 #settings span {
   width: 100%;
   display: flex;
@@ -36,7 +43,6 @@
   margin-bottom: 4vmin;
   margin-right: 2vmin;
 }
-
 
 #settings button {
   margin: 0 2vmin 4vmin 0 !important;
