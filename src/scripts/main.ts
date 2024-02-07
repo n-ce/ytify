@@ -15,7 +15,7 @@ import '../components/listItem';
 import '../components/toggleSwitch';
 import { registerSW } from 'virtual:pwa-register';
 
-const updater = <HTMLElement & { handleUpdate(): {} }>document.createElement('update-prompt');
+const updater = <HTMLElement & { handleUpdate(): void }>document.createElement('update-prompt');
 
 updater.handleUpdate = registerSW({
   async onNeedRefresh() {
