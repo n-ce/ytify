@@ -8,9 +8,7 @@ const fetchList = () => fetch('https://api.github.com/repos/n-ce/ytify/commits/m
   .then(array => array.map((c: string) => html`<li>${c}</li>`));
 
 const fetchChangelog = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
-  .then(res => res.text())
-
-
+  .then(res => res.text());
 
 @customElement('update-prompt')
 export class UpdatePrompt extends LitElement {
@@ -58,7 +56,7 @@ export class UpdatePrompt extends LitElement {
   `;
 
   @property() handleUpdate = () => { };
-  @state() changelog!: string;
+  @state() changelog = '';
 
   handleLater() {
     const dialog = <HTMLDialogElement>this.parentElement;

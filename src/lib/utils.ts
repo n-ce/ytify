@@ -81,6 +81,9 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
 }
 
 
+img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
+img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
+
 
 export function setMetaData(
   id: string,

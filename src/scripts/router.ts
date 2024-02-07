@@ -1,6 +1,5 @@
-import { audio, superInput, superModal } from "../lib/dom";
+import { audio, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchList, params } from "../lib/utils";
-import { searchFilters } from "./search";
 
 
 const anchors = document.querySelectorAll('nav a');

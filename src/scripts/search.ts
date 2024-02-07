@@ -1,9 +1,11 @@
-import { loadingScreen, pipedInstances, searchlist, suggestions, suggestionsSwitch, superInput } from "../lib/dom";
+import { loadingScreen, pipedInstances, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
 
-export const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
-
+const searchlist = <HTMLDivElement>document.getElementById('searchlist');
+const searchIcon = <HTMLButtonElement>searchFilters.nextElementSibling;
+const suggestions = <HTMLUListElement>document.getElementById('suggestions');
+const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
 
 
 let nextPageToken = '';
@@ -22,7 +24,7 @@ function setObserver(callback: () => Promise<string>) {
         observer.disconnect();
         setObserver(callback);
       }
-    })).observe(searchlist.children[searchlist.childElementCount - 3]);
+    })).observe(searchlist.children[searchlist.childElementCount - 5]);
 }
 
 
@@ -37,20 +39,19 @@ const searchLoader = () => {
   searchlist.innerHTML = '';
 
   const searchQuery = '?q=' + superInput.value;
-
-  const sortByTime = searchFilters.selectedOptions[0].textContent === 'All By Time';
-
   const filterQuery = '&filter=' + searchFilters.value;
+  const query = 'search' + searchQuery + filterQuery;
+  const sortByTime = searchFilters.selectedIndex === 1;
 
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
 
-  const query = 'search' + searchQuery + filterQuery;
 
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
+      if (!items) throw new Error('Search couldn\'t be resolved on ' + pipedInstances.value);
 
       if (sortByTime && nextPageToken) {
         for (let i = 0; i < 3; i++) {
@@ -76,7 +77,7 @@ const searchLoader = () => {
       // filter livestreams & shorts & append rest
       searchlist.appendChild(
         itemsLoader(
-          items.filter((item: StreamItem) => !item.isShort)
+          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
         ));
       // load more results when 3rd last element is visible
 
@@ -111,7 +112,6 @@ const searchLoader = () => {
   suggestions.style.display = 'none';
 
 }
-
 
 
 // super input supports both searching and direct link, also loads suggestions
@@ -187,16 +187,14 @@ superInput.addEventListener('keydown', _ => {
     if (index === suggestions.childElementCount) index = 0;
   }
 
-
 });
 
 
 
-(<HTMLButtonElement>searchFilters.nextElementSibling).addEventListener('click', searchLoader);
 
 searchFilters.addEventListener('change', searchLoader);
 
-
+searchIcon.addEventListener('click', searchLoader);
 
 suggestionsSwitch.addEventListener('click', () => {
   getSaved('searchSuggestions') ?
@@ -205,6 +203,7 @@ suggestionsSwitch.addEventListener('click', () => {
   suggestions.style.display = 'none';
 
 });
+
 if (getSaved('searchSuggestions'))
   suggestionsSwitch.removeAttribute('checked')
 
@@ -218,15 +217,10 @@ if (params.has('q')) {
   searchLoader();
 }
 
+// Community Highlights
 
-const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
+fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md')
+  .then(res => res.text())
+  .then(res => JSON.parse(res.substring(3)))
+  .then(data => searchlist.appendChild(itemsLoader(data)));
 
-defaultFilterSongs.addEventListener('click', () => {
-  getSaved('defaultFilter') ?
-    removeSaved('defaultFilter') :
-    save('defaultFilter', 'songs');
-});
-if (getSaved('defaultFilter')) {
-  defaultFilterSongs.setAttribute('checked', '');
-  searchFilters.value = 'music_songs';
-}

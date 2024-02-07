@@ -10,6 +10,13 @@
   display: block;
 }
 
+#settings h3 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4%;
+  border-bottom: dotted;
+}
+
 #settings span {
   width: 100%;
   display: flex;
@@ -37,11 +44,10 @@
   margin-right: 2vmin;
 }
 
-
-#settings>button {
-  margin: 0 2vmin 4vmin 0;
-  background-color: var(--onBg);
-  color: var(--text);
+#settings button {
+  margin: 0 2vmin 4vmin 0 !important;
+  background-color: var(--onBg) !important;
+  color: var(--text) !important;
 }
 
 #netlifyForm {

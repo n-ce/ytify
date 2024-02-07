@@ -44,11 +44,9 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 export function listToQ(container: HTMLDivElement) {
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
-  for (const child of container.children) {
-    const anchor = <HTMLAnchorElement>child;
-    const streamItem = <HTMLElement>anchor.firstElementChild;
-    appendToQueuelist(streamItem.dataset);
-  }
+  container.querySelectorAll('stream-item').forEach(item => {
+    appendToQueuelist((<HTMLElement>item).dataset);
+  });
   upcomingBtn.click();
 }
 
