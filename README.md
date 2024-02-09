@@ -9,7 +9,7 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
+> [**ytify**](https://vibesounds.netlify.app/) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 ## What else are you getting ?
 - **Queue** 🚦: Add multiple streams to keep your audio streams going. 
@@ -23,11 +23,6 @@
 
 
 
-## WHY / The story of ytify with [n-ce](https://github.com/n-ce)
-- I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
-- I noticed it wasn't able to stream under low network conditions.
-- So i decided to create an [issue](https://github.com/TeamNewPipe/NewPipe/issues/5838).
-- Upon finding no active resolution on the issue, I took it to myself and created this project on Jan 2022.
 
 ## Development Setup 🔧
 1. Prerequisites : Node.js , Beginner TypeScript Knowledge. 
@@ -53,7 +48,7 @@ npm run dev -- --open
 ```
  
 ## Usage 👆
-1. Visit the [Production Deployment](https://ytify.netlify.app/), or if you've installed the project, wherever you're hosting it.
+1. Visit the [Production Deployment](https://vibesounds.netlify.app/), or if you've installed the project, wherever you're hosting it.
 2. Change the bitrate of the content you're streaming on the `Home` tab.
 3. Use the `Search` tab to search for streams with keywords or a direct URL.
 4. Click on a stream to open a menu to either play, enqueue, or start a Radio of similar tracks and various other actions.
