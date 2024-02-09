@@ -9,7 +9,7 @@
 </div>
 
 
-> [**ytify**](https://vibesounds.netlify.app/) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
+> [**VibeSound**](https://vibesounds.netlify.app/) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 ## What else are you getting ?
 - **Queue** 🚦: Add multiple streams to keep your audio streams going. 
