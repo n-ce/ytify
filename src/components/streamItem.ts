@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { avatarImg, blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { thumbnailProxies } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -10,24 +11,21 @@ export class StreamItem extends LitElement {
 	@query('#thumbnail') thumbnail!: HTMLImageElement
 	@query('#avatar') avatar!: HTMLImageElement
 
-	@property() duration!: string
-	@property() author!: string
-	@property() avatarUrl!: string
+	@property() 'data-duration'!: string
+	@property() 'data-author'!: string
+	@property() 'data-avatar'!: string
+	@property() 'data-title'!: string
 	@property() views!: string
 	@property() uploaded!: string
-	@property() title!: string
 
 	@state() tsrc = blankImage;
-
-	handleThumbnailError() {
-		this.span.style.opacity = '1';
-		this.metadata.style.opacity = '1';
-	}
+	@state() unravel = '0';
+	@state() display = 'initial';
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
-			this.span.style.opacity = '1';
-			this.metadata.style.opacity = '1';
+			this.unravel = '1';
+			return;
 		}
 		if (this.tsrc.includes('webp'))
 			this.thumbnail.src = this.tsrc.replace('.webp', '.jpg').replace('vi_webp', 'vi');
@@ -39,6 +37,7 @@ export class StreamItem extends LitElement {
 
 	render() {
 		const imgOff = getSaved('img') ? true : false;
+		let avImg = '';
 
 		if (!imgOff) {
 			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
@@ -49,32 +48,38 @@ export class StreamItem extends LitElement {
 				x.crossOrigin = '';
 			}
 			else this.tsrc = img;
+
+			if (this["data-avatar"] && !avImg.startsWith('http'))
+				avImg = thumbnailProxies.value + this["data-avatar"];
 		}
-		else this.avatar.style.display = 'none';
+
+		if (!avImg)
+			this.display = 'none';
+
 
 		return html`
-				<span>
+				<span style=${'opacity:' + this.unravel}>
 					<img 
 						id='thumbnail'
 						loading='lazy'
 						crossorigin='anonymous'
-						@error=${this.handleThumbnailError}
+						@error=${() => this.unravel = '1'}
 						@load=${this.handleThumbnailLoad}
 						src=${this.tsrc}
 					/>
-					<p id='duration'>${this.duration}</p>
+					<p id='duration'>${this["data-duration"]}</p>
 				</span>
-				<div id='metadata'>
-					<p id='title'>${this.title}</p>
+				<div id='metadata' style=${'opacity:' + this.unravel}>
+					<p id='title'>${this["data-title"]}</p>
 					<div id='aau'>
 						<img 
 							id='avatar'
 							loading='lazy'
-							@error =${() => this.avatar.src = '/logo192.png'}
-							src=${avatarImg(this.avatarUrl)}
+							src=${avImg}
+							style=${'display:' + this.display}
 						/>
 						<div id='avu'>
-							<p id='author'>${this.author}</p>
+							<p id='author'>${this["data-author"]}</p>
 							<p id='viewsXuploaded'>${(this.views || '') + (this.uploaded ? ' • ' + this.uploaded.replace('Streamed ', '') : '')}</p>
 						</div>
 					</div>
@@ -96,7 +101,7 @@ export class StreamItem extends LitElement {
   	border-radius: calc(var(--roundness) + 0.75vmin);
   	display: flex;
 	}
-	span, #metadata {
+	span,#metadata {
   	opacity: 0;
   	transition: all 0.3s;
 	}
@@ -176,6 +181,7 @@ export class StreamItem extends LitElement {
 		#author {
     	height: initial;
 		}
-	}`;
+	}
+	`;
 }
 

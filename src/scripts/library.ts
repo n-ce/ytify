@@ -1,43 +1,65 @@
 import { audio, favButton, favIcon, superModal } from "../lib/dom";
-import { $, getCollection, getDB, notify, saveDB } from "../lib/utils";
+import { $, domainResolver, getCollection, getDB, notify, removeSaved, saveDB } from "../lib/utils";
 import { listToQ } from "./queue";
 import { atpSelector } from "./superModal";
 import { render, html } from "lit";
 
 
-
+const library = <HTMLDivElement>document.getElementById('library');
+const importBtn = <HTMLInputElement>document.getElementById('upload');
 const reservedCollections = ['discover', 'history', 'favorites', 'listenLater'];
 
-const importBtn = <HTMLInputElement>document.getElementById('upload');
 importBtn.addEventListener('change', async () => {
-  if (!confirm('This will overwrite your current library')) return;
-  saveDB(JSON.parse(await (<FileList>importBtn.files)[0].text()));
+  const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
+  const oldDB = getDB();
+  if (!confirm('This will merge your current library with the imported library, continue?')) return;
+  for (const collection in newDB) for (const item in newDB[collection])
+    toCollection(collection, newDB[collection][item], oldDB)
+  saveDB(oldDB);
   location.reload();
 });
 
 
-(<HTMLButtonElement>document.getElementById('exportBtn')).addEventListener('click', () => {
+document.getElementById('exportBtn')?.addEventListener('click', () => {
   const link = $('a');
   link.download = 'ytify_library.json';
   link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
   link.click();
 });
 
+document.getElementById('cleanLibraryBtn')?.addEventListener('click', () => {
+  if (!confirm('Are you sure you want to clear ' + library.getElementsByTagName('stream-item').length + ' items from the library?')) return;
+  removeSaved('library');
+  location.reload();
+});
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
-  anchor.href = 'https://youtu.be/' + data.id;
+  anchor.href = domainResolver('/watch?v=' + data.id);
   anchor.onclick = e => e.preventDefault();
+
+  // for backwards compatibility, can be removed after mass adoption
+  if (data.avatar?.startsWith('https')) {
+    const l = new URL(data.avatar);
+    data.avatar = l.pathname.replace('no-rj', 'no-rw') + '?host=' + l.origin.substring(8);
+  }
+
   render(html`
     <stream-item
       data-id=${data.id} 
-      title=${data.title}
-      author=${data.author}
-      duration=${data.duration}
+      data-title=${data.title}
+      data-author=${data.author}
+      data-avatar=${data.avatar}
+      data-duration=${data.duration}
       @click=${(e: Event) => {
       const item = e.target as HTMLElement;
-      if (item.classList.contains('delete'))
-        return removeFromCollection((<HTMLDetailsElement>(<HTMLDivElement>item.parentElement).parentElement).id, <string>data.id);
+      if (item.classList.contains('delete')) {
+        const div = <HTMLDivElement>anchor.parentElement;
+        const details = <HTMLDetailsElement>div.parentElement;
+        if (data.id)
+          removeFromCollection(details.id, data.id);
+        return;
+      }
 
       superModal.showModal();
       history.pushState({}, '', '#');
@@ -45,6 +67,7 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
       _.id = data.id;
       _.title = data.title;
       _.author = data.author;
+      _.avatar = data.avatar;
       _.duration = data.duration;
       _.channelUrl = data.channelUrl;
     }}/>`,
@@ -105,7 +128,6 @@ function removeFromCollection(collection: string, id: string) {
 // playlists
 
 export function createPlaylist(title: string) {
-  const library = <HTMLDivElement>document.getElementById('library');
 
   if (library.contains(document.getElementById(title)))
     return notify('This Playlist Already Exists!');

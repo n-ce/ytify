@@ -1,16 +1,11 @@
-import { audio, bitrateSelector, discoverSwitch, favButton, favIcon, playButton, invidiousInstances } from "./dom";
+import { audio, discoverSwitch, favButton, favIcon, playButton, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 
-
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
-// set AAC as default for safari
-if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
-  codecSelector.selectedIndex = 1;
+const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
-const codecSaved = getSaved('codec');
-if (codecSaved)
-  codecSelector.selectedIndex = parseInt(codecSaved);
+/////////////////////////////////////////////////////////////
 
 codecSelector.addEventListener('change', async () => {
   const i = codecSelector.selectedIndex;
@@ -24,7 +19,23 @@ codecSelector.addEventListener('change', async () => {
   audio.currentTime = timeOfSwitch;
 });
 
+const codecSaved = getSaved('codec');
+if (codecSaved)
+  codecSelector.selectedIndex = parseInt(codecSaved);
+// set AAC as default for safari
+else if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
+  codecSelector.selectedIndex = 1;
 
+/////////////////////////////////////////////////////////////
+
+bitrateSelector.addEventListener('change', () => {
+  const timeOfSwitch = audio.currentTime;
+  audio.src = bitrateSelector.value;
+  audio.currentTime = timeOfSwitch;
+  audio.play();
+});
+
+/////////////////////////////////////////////////////////////
 
 export default async function player(id: string | null = '') {
 
@@ -32,7 +43,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
     const i = invidiousInstances.selectedIndex;
     if (i < invidiousInstances.length - 1) {
       notify('switched playback instance from ' +
@@ -93,8 +104,8 @@ export default async function player(id: string | null = '') {
   bitrateSelector.selectedIndex = index;
   audio.src = bitrateSelector.value;
 
-
   // remove ' - Topic' from name if it exists
+
   let music = false;
   if (data.author.endsWith(' - Topic')) {
     music = true;
@@ -110,15 +121,16 @@ export default async function player(id: string | null = '') {
   );
 
 
-
   params.set('s', id);
 
   if (location.pathname === '/')
     history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
 
+  const av = new URL(data.authorThumbnails[1].url);
   audio.dataset.id = id;
   audio.dataset.title = data.title;
   audio.dataset.author = data.author;
+  audio.dataset.avatar = av.pathname.replace('no-rj', 'no-rw') + '?host=' + av.origin.substring(8);
   audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
   audio.dataset.channelUrl = data.authorUrl;
 
@@ -151,8 +163,9 @@ export default async function player(id: string | null = '') {
       lengthSeconds: number,
       videoId: string,
       title: string,
-      author: string,
-      authorUrl: string
+      authorThumbnails: { url: string }[],
+      authorUrl: string,
+      author: string
     }) => {
       if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
@@ -164,6 +177,7 @@ export default async function player(id: string | null = '') {
           id: rsId,
           title: stream.title,
           author: stream.author,
+          avatar: '',
           duration: convertSStoHHMMSS(stream.lengthSeconds),
           channelUrl: stream.authorUrl,
           frequency: 1
@@ -185,7 +199,7 @@ export default async function player(id: string | null = '') {
 
     // randomly remove items from array when limit crossed
     let len = array.length;
-    while (len > 256) {
+    while (len > 128) {
       const i = Math.floor(Math.random() * len)
       array.splice(i, 1);
       len--;

@@ -18,8 +18,9 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queueArray.push(data.id);
 
   const queueItem = $('stream-item');
-  queueItem.textContent = <string>data.title;
+  queueItem.dataset.title = <string>data.title;
   queueItem.dataset.author = data.author;
+  queueItem.dataset.avatar = data.avatar;
   queueItem.dataset.duration = data.duration;
   queueItem.dataset.id = data.id;
   queueItem.addEventListener('click', () => {
@@ -43,11 +44,9 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 export function listToQ(container: HTMLDivElement) {
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
-  for (const child of container.children) {
-    const anchor = <HTMLAnchorElement>child;
-    const streamItem = <HTMLElement>anchor.firstElementChild;
-    appendToQueuelist(streamItem.dataset);
-  }
+  container.querySelectorAll('stream-item').forEach(item => {
+    appendToQueuelist((<HTMLElement>item).dataset);
+  });
   upcomingBtn.click();
 }
 

@@ -24,19 +24,21 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
-export function avatarImg(url: string | undefined) {
-  if (!url) return '/logo192.png';
-  const origin = new URL(url).origin;
-  // proxy through the selected instance
-  url = url.replace(
-    origin,
-    thumbnailProxies.value
-  );
-  if (origin.includes('kavin'))
-    // remove kavin's modifications
-    url = url.replace('/ytc', '').replace(/&qhash=.{8}$/, '');
-  return url;
-}
+const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
+const savedLinkDomain = getSaved('linkDomain');
+if (savedLinkDomain) linkDomain.value = savedLinkDomain;
+
+linkDomain.addEventListener('change', () => {
+  linkDomain.selectedIndex === 0 ?
+    removeSaved('linkDomain') :
+    save('linkDomain', linkDomain.value);
+});
+
+export const domainResolver = (url: string) =>
+  linkDomain.value + (linkDomain.value.includes('ytify') ? url.
+    startsWith('/watch') ?
+    ('?s' + url.slice(8)) :
+    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -78,6 +80,9 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
   return canvas.toDataURL();
 }
 
+
+img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
+img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
 
 
 export function setMetaData(
@@ -233,14 +238,21 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
+  function rmDomain(url: string) {
+    if (!url) return;
+    if (!url.startsWith('https')) return url;
+    const l = new URL(url.replace(/&qhash=.{8}$/, ''));
+    return l.pathname + l.search;
+  }
+
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
-      title=${stream.title}
-      author=${stream.uploaderName}
+      data-title=${stream.title}
+      data-author=${stream.uploaderName}
+      data-avatar=${rmDomain(stream.uploaderAvatar)}
       views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
-      duration=${convertSStoHHMMSS(stream.duration)}
+      data-duration=${convertSStoHHMMSS(stream.duration)}
       uploaded=${stream.uploadedDate}
-      avatar=${stream.uploaderAvatar}
       @click=${() => {
       superModal.showModal();
       history.pushState({}, '', '#');
@@ -248,13 +260,15 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       _.id = stream.url.substring(9);
       _.title = stream.title;
       _.author = stream.uploaderName;
+      _.avatar = rmDomain(stream.uploaderAvatar);
       _.channelUrl = stream.uploaderUrl;
-      _.duration = stream.duration.toString();
+      _.duration = convertSStoHHMMSS(stream.duration);
     }}/>`;
+
 
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
-      thumbnail=${item.thumbnail}
+      thumbnail=${rmDomain(item.thumbnail)}
       uploader_data=${item.description || item.uploaderName}
       stats=${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
@@ -273,7 +287,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   render(html`${itemsArray.map(item =>
     html`<a 
-    href=https://youtube.com${item.url}
+    href=${domainResolver(item.url)}
     @click=${(e: Event) => {
         e.preventDefault();
       }}

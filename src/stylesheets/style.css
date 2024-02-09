@@ -219,8 +219,6 @@ list-item:hover {
 }
 
 
-/* idk where else to put the styles below */
-
 #queuetools {
   height: 10vmin;
   width: 100%;
@@ -235,9 +233,7 @@ list-item:hover {
 #queuetools button,
 #listTools button,
 details button,
-#deleteButton,
-#apiRefreshBtn,
-#clearDataDialog button {
+#settings button {
   border: var(--border);
   border-radius: var(--roundness);
   background: var(--text);
@@ -285,25 +281,6 @@ details button:hover {
   animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
 }
 
-#settings h3 {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4%;
-  border-bottom: dotted;
-}
-
-#clearDataDialog {
-  flex-direction: column;
-  background-color: var(--onBg);
-  backdrop-filter: blur(1vmin);
-  border-radius: var(--roundness);
-  border: var(--border);
-}
-
-#clearDataDialog div {
-  width: calc(100% - 1vmin);
-  color: var(--text);
-}
 
 #changelog {
   position: fixed;

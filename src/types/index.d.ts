@@ -32,6 +32,7 @@ declare global {
   type CollectionItem = {
     id: string,
     title: string,
+    avatar: string,
     author: string,
     duration: string
     channelUrl: string,
