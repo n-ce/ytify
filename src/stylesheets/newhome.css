@@ -1,1 +1,80 @@
-.
+#superInputContainer {
+  height: auto;
+  width: calc(100% - 8.3vmin);
+  padding: 2.4vmin 4vmin;
+  margin-bottom: 2vmin;
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  backdrop-filter: blur(2vmin);
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+}
+
+#superInput {
+  border: none;
+  height: 100%;
+  width: 100%;
+  background: none;
+  color: inherit;
+  font-size: medium;
+}
+
+#superInput::placeholder {
+  color: inherit;
+  opacity: 75%;
+}
+
+#searchFilters {
+  font-size: medium;
+  max-width: 10ch;
+  padding: 0;
+  margin-right: 1vmin;
+  border: none;
+  color: inherit;
+  text-align: right;
+}
+
+#search button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: x-large;
+}
+
+
+#suggestions {
+  max-height: 25vmax;
+  overflow-y: scroll;
+  position: absolute;
+  z-index: 1;
+  margin-top: 11.2vmin;
+  width: 80vmin;
+  background-color: var(--bg);
+  list-style-type: none;
+  padding: 0;
+  border-radius: 0 0 var(--roundness) var(--roundness);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  display: none;
+  user-select: none;
+}
+
+#suggestions li {
+  background-color: var(--onBg);
+  font-weight: bold;
+  padding: 1vmin 3vmin;
+  margin-top: 0.4vmin;
+}
+
+#suggestions li:hover,
+#suggestions li:focus,
+#suggestions li.hover {
+  background-color: var(--text);
+  color: var(--bg);
+}
