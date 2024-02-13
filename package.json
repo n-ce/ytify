@@ -13,7 +13,7 @@
     "eruda": "^3.0.1",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
-    "vite-plugin-pwa": "^0.17.4"
+    "vite-plugin-pwa": "^0.18.1"
   },
   "browserslist": [
     "defaults"
