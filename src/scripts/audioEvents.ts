@@ -5,7 +5,7 @@ import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
-const streamHistory: string[] = [];
+export const streamHistory: string[] = [];
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');

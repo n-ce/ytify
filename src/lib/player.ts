@@ -1,6 +1,8 @@
-import { audio, discoverSwitch, favButton, favIcon, playButton, invidiousInstances } from "./dom";
+import { audio, favButton, favIcon, playButton, invidiousInstances, queuelist } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
+import { appendToQueuelist } from "../scripts/queue";
+import { streamHistory } from "../scripts/audioEvents";
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -126,11 +128,9 @@ export default async function player(id: string | null = '') {
   if (location.pathname === '/')
     history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
 
-  const av = new URL(data.authorThumbnails[1].url);
   audio.dataset.id = id;
   audio.dataset.title = data.title;
   audio.dataset.author = data.author;
-  audio.dataset.avatar = av.pathname.replace('no-rj', 'no-rw') + '?host=' + av.origin.substring(8);
   audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
   audio.dataset.channelUrl = data.authorUrl;
 
@@ -149,7 +149,28 @@ export default async function player(id: string | null = '') {
   }
 
 
-  if (!discoverSwitch.hasAttribute('checked')) return;
+  if (!getSaved('autoQueue')) {
+    const queueIds = [...streamHistory];
+    const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
+    for (const item of items)
+      queueIds.push(<string>item.dataset.id);
+
+    data.recommendedVideos.forEach(
+      (stream: Recommendation) => {
+        if (!queueIds.includes(stream.videoId))
+          appendToQueuelist({
+            id: stream.videoId,
+            title: stream.title,
+            author: stream.author,
+            duration: convertSStoHHMMSS(stream.lengthSeconds),
+          })
+      });
+  }
+
+
+
+
+  if (getSaved('discover') === 'off') return;
 
   // related streams data injection as discovery data after 10 seconds
 
@@ -158,15 +179,8 @@ export default async function player(id: string | null = '') {
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
-
-    data.recommendedVideos.forEach((stream: {
-      lengthSeconds: number,
-      videoId: string,
-      title: string,
-      authorThumbnails: { url: string }[],
-      authorUrl: string,
-      author: string
-    }) => {
+    data.recommendedVideos.forEach((stream
+      : Recommendation) => {
       if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
       const rsId = stream.videoId;
@@ -177,7 +191,6 @@ export default async function player(id: string | null = '') {
           id: rsId,
           title: stream.title,
           author: stream.author,
-          avatar: '',
           duration: convertSStoHHMMSS(stream.lengthSeconds),
           channelUrl: stream.authorUrl,
           frequency: 1

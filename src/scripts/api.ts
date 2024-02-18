@@ -9,7 +9,7 @@ const defData: apiList = {
     custom: false
   },
   'invidious': {
-    name: 'fdn.fr 🇫🇷',
+    name: 'flokinet.to 🇷🇴',
     url: 'https://invidious.fdn.fr',
     custom: false
   },
@@ -34,7 +34,7 @@ if (serialisedList !== '{}') {
     const name = data.name;
     const url = data.url;
     const custom = data.custom;
-    if (name === 'kavin.rocks 🌐' || name === 'r4fo.com 🇩🇪' || name === 'fdn.fr 🇫🇷') return;
+    if (name === 'kavin.rocks 🌐' || name === 'r4fo.com 🇩🇪' || name === 'flokinet.to 🇷🇴') return;
     if (custom) {
       const dom = instance.options[0];
       dom.value = url;

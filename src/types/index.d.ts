@@ -32,12 +32,19 @@ declare global {
   type CollectionItem = {
     id: string,
     title: string,
-    avatar: string,
     author: string,
     duration: string
     channelUrl: string,
     frequency?: number
   }
+
+  type Recommendation = {
+    lengthSeconds: number,
+    videoId: string,
+    title: string,
+    authorUrl: string,
+    author: string
+  };
 
   type Library = {
     [index: string]: {

@@ -1,7 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
-import { thumbnailProxies } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -9,18 +8,15 @@ export class StreamItem extends LitElement {
 	@query('span') span!: HTMLSpanElement
 	@query('#metadata') metadata!: HTMLDivElement
 	@query('#thumbnail') thumbnail!: HTMLImageElement
-	@query('#avatar') avatar!: HTMLImageElement
 
 	@property() 'data-duration'!: string
 	@property() 'data-author'!: string
-	@property() 'data-avatar'!: string
 	@property() 'data-title'!: string
 	@property() views!: string
 	@property() uploaded!: string
 
 	@state() tsrc = blankImage;
 	@state() unravel = '0';
-	@state() display = 'initial';
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
@@ -37,7 +33,6 @@ export class StreamItem extends LitElement {
 
 	render() {
 		const imgOff = getSaved('img') ? true : false;
-		let avImg = '';
 
 		if (!imgOff) {
 			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
@@ -49,13 +44,7 @@ export class StreamItem extends LitElement {
 			}
 			else this.tsrc = img;
 
-			if (this["data-avatar"] && !avImg.startsWith('http'))
-				avImg = thumbnailProxies.value + this["data-avatar"];
 		}
-
-		if (!avImg)
-			this.display = 'none';
-
 
 		return html`
 				<span style=${'opacity:' + this.unravel}>
@@ -71,17 +60,9 @@ export class StreamItem extends LitElement {
 				</span>
 				<div id='metadata' style=${'opacity:' + this.unravel}>
 					<p id='title'>${this["data-title"]}</p>
-					<div id='aau'>
-						<img 
-							id='avatar'
-							loading='lazy'
-							src=${avImg}
-							style=${'display:' + this.display}
-						/>
-						<div id='avu'>
-							<p id='author'>${this["data-author"]}</p>
-							<p id='viewsXuploaded'>${(this.views || '') + (this.uploaded ? ' • ' + this.uploaded.replace('Streamed ', '') : '')}</p>
-						</div>
+					<div id='avu'>
+						<p id='author'>${this["data-author"]}</p>
+						<p id='viewsXuploaded'>${(this.views || '') + (this.uploaded ? ' • ' + this.uploaded.replace('Streamed ', '') : '')}</p>
 					</div>
 				</div>
 			`;
@@ -146,21 +127,11 @@ export class StreamItem extends LitElement {
   	display: flex;
   	overflow: hidden;
 	}
-	#avatar {
-  	height: 8vmin;
-  	border-radius: 50%;
-  	margin: 1vmin;
-  	margin-left: 0;
-	}
 	#metadata {
   	display: flex;
   	flex-direction: column;
   	height: 100%;
   	width: 90%;
-	}
-	#aau {
-  	display: flex;
-  	align-items: center;
 	}
 	#avu {
   	display: flex;

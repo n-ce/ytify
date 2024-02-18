@@ -1,12 +1,14 @@
-import { audio, discoverSwitch, img, searchFilters } from "../lib/dom";
+import { audio, img, searchFilters } from "../lib/dom";
 import player from "../lib/player";
 import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
+const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueueSwitch');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
+const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 const discover = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
 const history = <HTMLDetailsElement>document.getElementById('history');
@@ -48,6 +50,17 @@ if (getSaved('defaultFilter')) {
   defaultFilterSongs.setAttribute('checked', '');
   searchFilters.value = 'music_songs';
 }
+
+/////////////////////////////////////////////////////////////
+
+autoQueueSwitch.addEventListener('click', () => {
+  getSaved('autoQueue') ?
+    removeSaved('autoQueue') :
+    save('autoQueue', 'off');
+});
+
+if (getSaved('autoQueue') === 'off')
+  autoQueueSwitch.removeAttribute('checked');
 
 /////////////////////////////////////////////////////////////
 

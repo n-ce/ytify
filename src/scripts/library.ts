@@ -1,13 +1,16 @@
-import { audio, favButton, favIcon, superModal } from "../lib/dom";
-import { $, domainResolver, getCollection, getDB, notify, removeSaved, saveDB } from "../lib/utils";
+import { audio, favButton, favIcon } from "../lib/dom";
+import { $, domainResolver, getCollection, getDB, notify, removeSaved, saveDB, superClick } from "../lib/utils";
 import { listToQ } from "./queue";
 import { atpSelector } from "./superModal";
 import { render, html } from "lit";
 
 
-const library = <HTMLDivElement>document.getElementById('library');
-const importBtn = <HTMLInputElement>document.getElementById('upload');
+const library = document.getElementById('library') as HTMLDivElement;
+const importBtn = document.getElementById('upload') as HTMLInputElement;
+const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
+const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
 const reservedCollections = ['discover', 'history', 'favorites', 'listenLater'];
+
 
 importBtn.addEventListener('change', async () => {
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
@@ -20,14 +23,14 @@ importBtn.addEventListener('change', async () => {
 });
 
 
-document.getElementById('exportBtn')?.addEventListener('click', () => {
+exportBtn.addEventListener('click', () => {
   const link = $('a');
   link.download = 'ytify_library.json';
   link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
   link.click();
 });
 
-document.getElementById('cleanLibraryBtn')?.addEventListener('click', () => {
+cleanBtn.addEventListener('click', () => {
   if (!confirm('Are you sure you want to clear ' + library.getElementsByTagName('stream-item').length + ' items from the library?')) return;
   removeSaved('library');
   location.reload();
@@ -38,39 +41,13 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   anchor.href = domainResolver('/watch?v=' + data.id);
   anchor.onclick = e => e.preventDefault();
 
-  // for backwards compatibility, can be removed after mass adoption
-  if (data.avatar?.startsWith('https')) {
-    const l = new URL(data.avatar);
-    data.avatar = l.pathname.replace('no-rj', 'no-rw') + '?host=' + l.origin.substring(8);
-  }
-
   render(html`
     <stream-item
       data-id=${data.id} 
       data-title=${data.title}
       data-author=${data.author}
-      data-avatar=${data.avatar}
       data-duration=${data.duration}
-      @click=${(e: Event) => {
-      const item = e.target as HTMLElement;
-      if (item.classList.contains('delete')) {
-        const div = <HTMLDivElement>anchor.parentElement;
-        const details = <HTMLDetailsElement>div.parentElement;
-        if (data.id)
-          removeFromCollection(details.id, data.id);
-        return;
-      }
-
-      superModal.showModal();
-      history.pushState({}, '', '#');
-      const _ = superModal.dataset;
-      _.id = data.id;
-      _.title = data.title;
-      _.author = data.author;
-      _.avatar = data.avatar;
-      _.duration = data.duration;
-      _.channelUrl = data.channelUrl;
-    }}/>`,
+    />`,
     anchor);
   return anchor;
 }
@@ -117,7 +94,7 @@ export function addListToCollection(collection: string, list: { [index: string]:
 }
 
 
-function removeFromCollection(collection: string, id: string) {
+export function removeFromCollection(collection: string, id: string) {
   const db = getDB();
   delete db[collection][id];
   getCollection(collection).querySelector(`[data-id="${id}"]`)?.remove();
@@ -138,44 +115,44 @@ export function createPlaylist(title: string) {
   atpSelector.add(new Option(title, title));
   const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${details.id}"]`);
 
-  const summary = $('summary');
-  summary.innerHTML = '<i class="ri-play-list-2-line"></i> ' + title;
-
-  const deleteBtn = $('button');
-  deleteBtn.innerHTML = '<i class="ri-delete-bin-7-line"></i> Delete';
-  deleteBtn.addEventListener('click', () => {
-    atpOption.remove();
-    details.remove();
-    const db = getDB();
-    delete db[details.id];
-    saveDB(db);
-  });
-  const div = $('div');
-  const removeBtn = $('button');
-  removeBtn.innerHTML = '<i class="ri-subtract-line"></i> Remove';
-  removeBtn.addEventListener('click', () => {
-    div.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
-    removeBtn.classList.toggle('delete');
-  });
-  const enqueueBtn = $('button');
-  enqueueBtn.innerHTML = '<i class="ri-list-check-2"></i> Enqueue';
-  enqueueBtn.onclick = () => listToQ(div);
-  const renameBtn = $('button');
-  renameBtn.innerHTML = '<i class="ri-edit-line"></i> Rename';
-  renameBtn.addEventListener('click', () => {
-    const newTitle = prompt('Enter the new title', title);
-    if (!newTitle) return;
-    atpOption.text = newTitle;
-    atpOption.value = newTitle;
-    details.id = newTitle;
-    summary.innerHTML = '<i class="ri-play-list-2-line"></i> ' + newTitle;
-    const db = getDB();
-    db[newTitle] = db[title];
-    delete db[title];
-    saveDB(db);
-  });
-
-  details.append(summary, deleteBtn, removeBtn, enqueueBtn, renameBtn, div);
+  render(html`
+    <summary>
+      <i class="ri-play-list-2-line"></i> ${title}
+    </summary>
+    <button @click=${() => {
+      atpOption.remove();
+      details.remove();
+      const db = getDB();
+      delete db[details.id];
+      saveDB(db);
+    }}>
+      <i class="ri-delete-bin-7-line"></i> Delete
+    </button>
+    <button @click=${() => {
+      details.querySelectorAll('stream-item').forEach(el => el.classList.toggle('delete'));
+      details.classList.toggle('delete');
+    }}>
+      <i class="ri-subtract-line"></i> Remove
+    </button>
+    <button @click=${() => listToQ(details.lastElementChild as HTMLDivElement)}>
+      <i class="ri-list-check-2"></i> Enqueue
+    </button>
+    <button @click=${() => {
+      const newTitle = prompt('Enter the new title', title);
+      if (!newTitle) return;
+      atpOption.text = newTitle;
+      atpOption.value = newTitle;
+      details.id = newTitle;
+      (details.firstElementChild as HTMLElement).innerHTML = '<i class="ri-play-list-2-line"></i> ' + newTitle;
+      const db = getDB();
+      db[newTitle] = db[title];
+      delete db[title];
+      saveDB(db);
+    }}>
+      <i class="ri-edit-line"></i> Rename
+    </button>
+    <div @click=${superClick}></div>
+  `, details);
 
   library.insertBefore(details, <HTMLBRElement>document.querySelector('br'));
 }
@@ -195,6 +172,8 @@ addEventListener('DOMContentLoaded', () => {
     }
     const container = getCollection(key);
     const [clearBtn, removeBtn, enqueueBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
+
+    container.addEventListener('click', superClick);
 
     clearBtn.addEventListener('click', () => {
       const db = getDB();

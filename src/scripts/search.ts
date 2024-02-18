@@ -1,11 +1,12 @@
 import { loadingScreen, pipedInstances, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchIcon = <HTMLButtonElement>searchFilters.nextElementSibling;
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
+
 
 
 let nextPageToken = '';
@@ -191,6 +192,7 @@ superInput.addEventListener('keydown', _ => {
 
 
 
+searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
 

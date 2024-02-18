@@ -2,7 +2,7 @@ import { listContainer, superModal } from "../lib/dom";
 import player from "../lib/player";
 import { $, fetchList, notify } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
-import { appendToQueuelist, firstItemInQueue } from "./queue";
+import { appendToQueuelist } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;
 
@@ -24,8 +24,6 @@ playNow.addEventListener('click', () => {
 });
 
 enqueue.addEventListener('click', () => {
-  if (firstItemInQueue()?.matches('h1'))
-    firstItemInQueue().remove();
   appendToQueuelist(superModal.dataset);
   superModal.click();
 });
