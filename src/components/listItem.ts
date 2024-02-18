@@ -74,7 +74,7 @@ export class ListItem extends LitElement {
     return html`
         <img
         style=${'opacity:' + this.unravel}
-        loading='lazy'
+        loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
         src=${img}
         @error=${() => this.img.src = '/logo192.png'}
         @load=${() => this.unravel = '1'}

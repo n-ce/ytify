@@ -32,9 +32,8 @@ export class StreamItem extends LitElement {
 	}
 
 	render() {
-		const imgOff = getSaved('img') ? true : false;
 
-		if (!imgOff) {
+		if (getSaved('img') !== 'off') {
 			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
 			if (location.search.endsWith('songs')) {
 				const x = new Image();
@@ -50,7 +49,7 @@ export class StreamItem extends LitElement {
 				<span style=${'opacity:' + this.unravel}>
 					<img 
 						id='thumbnail'
-						loading='lazy'
+						loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
 						crossorigin='anonymous'
 						@error=${() => this.unravel = '1'}
 						@load=${this.handleThumbnailLoad}

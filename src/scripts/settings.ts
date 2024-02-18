@@ -8,6 +8,7 @@ const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSo
 const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueueSwitch');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
+const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 const discover = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
@@ -91,6 +92,17 @@ if (getSaved('img')) {
   img.src = blankImage;
   img.classList.toggle('hide');
 }
+
+/////////////////////////////////////////////////////////////
+
+lazyLoadSwitch.addEventListener('click', () => {
+  getSaved('lazyImg') ?
+    removeSaved('lazyImg') :
+    localStorage.setItem('lazyImg', 'true');
+});
+
+if (getSaved('lazyImg'))
+  lazyLoadSwitch.toggleAttribute('checked');
 
 /////////////////////////////////////////////////////////////
 
