@@ -212,7 +212,7 @@ export default async function player(id: string | null = '') {
 
     // randomly remove items from array when limit crossed
     let len = array.length;
-    while (len > 128) {
+    while (len > 256) {
       const i = Math.floor(Math.random() * len)
       array.splice(i, 1);
       len--;

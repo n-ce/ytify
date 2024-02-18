@@ -33,7 +33,11 @@ function setObserver(callback: () => Promise<string>) {
 const searchLoader = () => {
   const text = superInput.value;
 
-  if (!text) return;
+  if (!text) {
+    searchlist.innerHTML = '';
+    cH();
+    return;
+  }
 
   loadingScreen.showModal();
 
@@ -220,9 +224,10 @@ if (params.has('q')) {
 }
 
 // Community Highlights
-
-fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md')
+const cH = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md')
   .then(res => res.text())
   .then(res => JSON.parse(res.substring(3)))
   .then(data => searchlist.appendChild(itemsLoader(data)));
 
+if (!location.search)
+  cH();
