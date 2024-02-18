@@ -1,5 +1,8 @@
 import { PluginOption, defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import solid from 'vite-plugin-solid';
+import autoprefixer from 'autoprefixer';
+import postcssNesting from 'postcss-nesting';
 
 // Set to false to disable eruda during development
 const eruda = true; // false
@@ -65,8 +68,18 @@ export default defineConfig(({ command }) => {
       manifest: manifest,
       disable: command !== 'build',
       includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
-    })
+    }),
+    solid()
   ];
   if (eruda && command === 'serve') plugins.push([erudaInjector]);
-  return { plugins: plugins }
+  return {
+    plugins: plugins,
+    css: {
+      postcss: {
+        plugins: [
+          autoprefixer(), postcssNesting()
+        ],
+      },
+    }
+  }
 });
