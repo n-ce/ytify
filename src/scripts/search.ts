@@ -30,7 +30,7 @@ function setObserver(callback: () => Promise<string>) {
 
 
 // Get search results of input
-const searchLoader = () => {
+function searchLoader() {
   const text = superInput.value;
 
   if (!text) {

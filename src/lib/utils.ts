@@ -25,6 +25,18 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
+export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
+
+export function notify(text: string) {
+  const el = $('p');
+  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
+  el.className = 'snackbar';
+  el.textContent = text;
+  el.onclick = clear;
+  setTimeout(clear, 8e3);
+  document.body.appendChild(el);
+}
+
 const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
 const savedLinkDomain = getSaved('linkDomain');
 if (savedLinkDomain) linkDomain.value = savedLinkDomain;
@@ -41,17 +53,6 @@ export const domainResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + url.slice(1).split('/').join('=')) : url);
 
-export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
-
-export function notify(text: string) {
-  const el = $('p');
-  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
-  el.className = 'snackbar';
-  el.textContent = text;
-  el.onclick = clear;
-  setTimeout(clear, 8e3);
-  document.body.appendChild(el);
-}
 
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';

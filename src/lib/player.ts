@@ -45,23 +45,28 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
-    const i = invidiousInstances.selectedIndex;
-    if (i < invidiousInstances.length - 1) {
-      notify('switched playback instance from ' +
-        invidiousInstances.options[i].value
-        + ' to ' +
-        invidiousInstances.options[i + 1].value
-        + ' due to error: ' + err.message
-      );
-      invidiousInstances.selectedIndex = i + 1;
-      player(id);
-      return;
-    }
-    notify(err.message);
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    invidiousInstances.selectedIndex = 0;
-  });
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos')
+    .then(res => res.json())
+    .catch(err => {
+      const i = invidiousInstances.selectedIndex;
+      if (i < invidiousInstances.length - 1) {
+        notify('switched playback instance from ' +
+          invidiousInstances.options[i].value
+          + ' to ' +
+          invidiousInstances.options[i + 1].value
+          + ' due to error: ' + err.message
+        );
+        invidiousInstances.selectedIndex = i + 1;
+        player(id);
+        return;
+      }
+      notify(err.message);
+      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      invidiousInstances.selectedIndex = 0;
+    });
+
+  if (!data?.adaptiveFormats?.length)
+    return;
 
   const audioStreams = data.adaptiveFormats
     .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
