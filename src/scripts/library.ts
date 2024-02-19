@@ -47,6 +47,7 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
       data-title=${data.title}
       data-author=${data.author}
       data-duration=${data.duration}
+      data-channel_url=${data.channelUrl}
     />`,
     anchor);
   return anchor;
