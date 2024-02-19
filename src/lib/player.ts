@@ -1,6 +1,7 @@
-import { audio, discoverSwitch, favButton, favIcon, playButton, invidiousInstances } from "./dom";
+import { audio, favButton, favIcon, playButton, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
+import { autoQueue } from "../scripts/audioEvents";
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -43,23 +44,28 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos').then(res => res.json()).then(_ => _.hasOwnProperty('adaptiveFormats') ? _ : { throw: new Error('No Data') }).catch(err => {
-    const i = invidiousInstances.selectedIndex;
-    if (i < invidiousInstances.length - 1) {
-      notify('switched playback instance from ' +
-        invidiousInstances.options[i].value
-        + ' to ' +
-        invidiousInstances.options[i + 1].value
-        + ' due to error: ' + err.message
-      );
-      invidiousInstances.selectedIndex = i + 1;
-      player(id);
-      return;
-    }
-    notify(err.message);
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    invidiousInstances.selectedIndex = 0;
-  });
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos')
+    .then(res => res.json())
+    .catch(err => {
+      const i = invidiousInstances.selectedIndex;
+      if (i < invidiousInstances.length - 1) {
+        notify('switched playback instance from ' +
+          invidiousInstances.options[i].value
+          + ' to ' +
+          invidiousInstances.options[i + 1].value
+          + ' due to error: ' + err.message
+        );
+        invidiousInstances.selectedIndex = i + 1;
+        player(id);
+        return;
+      }
+      notify(err.message);
+      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      invidiousInstances.selectedIndex = 0;
+    });
+
+  if (!data?.adaptiveFormats?.length)
+    return;
 
   const audioStreams = data.adaptiveFormats
     .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
@@ -126,11 +132,9 @@ export default async function player(id: string | null = '') {
   if (location.pathname === '/')
     history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
 
-  const av = new URL(data.authorThumbnails[1].url);
   audio.dataset.id = id;
   audio.dataset.title = data.title;
   audio.dataset.author = data.author;
-  audio.dataset.avatar = av.pathname.replace('no-rj', 'no-rw') + '?host=' + av.origin.substring(8);
   audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
   audio.dataset.channelUrl = data.authorUrl;
 
@@ -149,7 +153,10 @@ export default async function player(id: string | null = '') {
   }
 
 
-  if (!discoverSwitch.hasAttribute('checked')) return;
+  if (!getSaved('autoQueue'))
+    autoQueue(data.recommendedVideos);
+
+  if (getSaved('discover') === 'off') return;
 
   // related streams data injection as discovery data after 10 seconds
 
@@ -158,31 +165,23 @@ export default async function player(id: string | null = '') {
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
+    data.recommendedVideos.forEach(
+      (stream: Recommendation) => {
+        if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
-    data.recommendedVideos.forEach((stream: {
-      lengthSeconds: number,
-      videoId: string,
-      title: string,
-      authorThumbnails: { url: string }[],
-      authorUrl: string,
-      author: string
-    }) => {
-      if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
-
-      const rsId = stream.videoId;
-      // merges previous discover items with current related streams
-      db.discover.hasOwnProperty(rsId) ?
-        (<number>db.discover[rsId].frequency)++ :
-        db.discover[rsId] = {
-          id: rsId,
-          title: stream.title,
-          author: stream.author,
-          avatar: '',
-          duration: convertSStoHHMMSS(stream.lengthSeconds),
-          channelUrl: stream.authorUrl,
-          frequency: 1
-        }
-    });
+        const rsId = stream.videoId;
+        // merges previous discover items with current related streams
+        db.discover.hasOwnProperty(rsId) ?
+          (<number>db.discover[rsId].frequency)++ :
+          db.discover[rsId] = {
+            id: rsId,
+            title: stream.title,
+            author: stream.author,
+            duration: convertSStoHHMMSS(stream.lengthSeconds),
+            channelUrl: stream.authorUrl,
+            frequency: 1
+          }
+      });
 
     // convert to array
     let array = Object.entries(db.discover);
@@ -199,7 +198,7 @@ export default async function player(id: string | null = '') {
 
     // randomly remove items from array when limit crossed
     let len = array.length;
-    while (len > 128) {
+    while (len > 256) {
       const i = Math.floor(Math.random() * len)
       array.splice(i, 1);
       len--;

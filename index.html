@@ -66,7 +66,7 @@
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.7 Final</a>
+        <a id="title" href="" target="_blank">ytify 6.8</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
@@ -117,7 +117,9 @@
       </span>
       <ul id="suggestions"></ul>
       <div id="searchlist">
-        <h1>Community Highlights</h1>
+        <h1 style="background:var(--onBg);padding:4% 2%;border-radius:var(--roundness);text-align:center">
+          Community Highlights
+        </h1>
       </div>
     </section>
 
@@ -235,6 +237,7 @@
           <option value="https://invidious.fdn.fr" selected>fdn.fr 🇫🇷</option>
         </select>
       </span>
+      <toggle-switch id="autoQueueSwitch" checked>Auto-Queue</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <span>
         <label for="CodecPreference">Codec Preference</label>
@@ -254,6 +257,7 @@
         </select>
       </span>
       <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
+      <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
 
       <h3>Library</h3>
       <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
@@ -378,7 +382,6 @@
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
   </dialog>
-
 
   <dialog id="loadingScreen">
     <i class="ri-loader-3-line"></i>

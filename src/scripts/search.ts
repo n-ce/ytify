@@ -1,11 +1,12 @@
 import { loadingScreen, pipedInstances, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved } from "../lib/utils";
+import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchIcon = <HTMLButtonElement>searchFilters.nextElementSibling;
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
+
 
 
 let nextPageToken = '';
@@ -29,10 +30,14 @@ function setObserver(callback: () => Promise<string>) {
 
 
 // Get search results of input
-const searchLoader = () => {
+function searchLoader() {
   const text = superInput.value;
 
-  if (!text) return;
+  if (!text) {
+    searchlist.innerHTML = '';
+    cH();
+    return;
+  }
 
   loadingScreen.showModal();
 
@@ -191,6 +196,7 @@ superInput.addEventListener('keydown', _ => {
 
 
 
+searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
 
@@ -218,9 +224,10 @@ if (params.has('q')) {
 }
 
 // Community Highlights
-
-fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md')
+const cH = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md')
   .then(res => res.text())
   .then(res => JSON.parse(res.substring(3)))
   .then(data => searchlist.appendChild(itemsLoader(data)));
 
+if (!location.search)
+  cH();

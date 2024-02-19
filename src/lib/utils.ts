@@ -1,5 +1,6 @@
 import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
+import { removeFromCollection } from "../scripts/library";
 
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -24,6 +25,18 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
 
+export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
+
+export function notify(text: string) {
+  const el = $('p');
+  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
+  el.className = 'snackbar';
+  el.textContent = text;
+  el.onclick = clear;
+  setTimeout(clear, 8e3);
+  document.body.appendChild(el);
+}
+
 const linkDomain = (<HTMLSelectElement>document.getElementById('linkOrigin'));
 const savedLinkDomain = getSaved('linkDomain');
 if (savedLinkDomain) linkDomain.value = savedLinkDomain;
@@ -40,17 +53,6 @@ export const domainResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + url.slice(1).split('/').join('=')) : url);
 
-export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
-
-export function notify(text: string) {
-  const el = $('p');
-  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
-  el.className = 'snackbar';
-  el.textContent = text;
-  el.onclick = clear;
-  setTimeout(clear, 8e3);
-  document.body.appendChild(el);
-}
 
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
@@ -238,33 +240,24 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
+
+  const streamItem = (stream: StreamItem) => html`<stream-item 
+      data-id=${stream.url.substring(9)} 
+      data-title=${stream.title}
+      data-author=${stream.uploaderName}
+      views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
+      data-duration=${convertSStoHHMMSS(stream.duration)}
+      uploaded=${stream.uploadedDate}
+      data-channel_url=${stream.uploaderUrl}
+  />`;
+
+
   function rmDomain(url: string) {
     if (!url) return;
     if (!url.startsWith('https')) return url;
     const l = new URL(url.replace(/&qhash=.{8}$/, ''));
     return l.pathname + l.search;
   }
-
-  const streamItem = (stream: StreamItem) => html`<stream-item 
-      data-id=${stream.url.substring(9)} 
-      data-title=${stream.title}
-      data-author=${stream.uploaderName}
-      data-avatar=${rmDomain(stream.uploaderAvatar)}
-      views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
-      data-duration=${convertSStoHHMMSS(stream.duration)}
-      uploaded=${stream.uploadedDate}
-      @click=${() => {
-      superModal.showModal();
-      history.pushState({}, '', '#');
-      const _ = superModal.dataset;
-      _.id = stream.url.substring(9);
-      _.title = stream.title;
-      _.author = stream.uploaderName;
-      _.avatar = rmDomain(stream.uploaderAvatar);
-      _.channelUrl = stream.uploaderUrl;
-      _.duration = convertSStoHHMMSS(stream.duration);
-    }}/>`;
-
 
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
@@ -273,29 +266,54 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       stats=${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
       (item.videos > 0 ? item.videos + ' streams' : '')}
-      @click=${() => {
-      fetchList(
-        item.type === 'playlist' ?
-          item.url.replace('?list=', 's/') :
-          item.url
-      );
-      // data binding for open channel action
-      listContainer.dataset.url = item.url;
-    }}/>`;
+      type=${item.type}
+      url=${item.url}
+  />`;
 
   const fragment = document.createDocumentFragment();
 
   render(html`${itemsArray.map(item =>
-    html`<a 
-    href=${domainResolver(item.url)}
-    @click=${(e: Event) => {
-        e.preventDefault();
-      }}
-    >${item.type !== 'stream' ?
+    html`<a href=${domainResolver(item.url)}>
+    ${item.type !== 'stream' ?
         listItem(item) :
         streamItem(item)}
     </a>`
   )}`, fragment);
 
   return fragment;
+}
+
+export function superClick(e: Event) {
+  e.preventDefault();
+  const elem = e.target as HTMLElement;
+
+  if (elem.matches('stream-item')) {
+    const eld = elem.dataset;
+    if (elem.classList.contains('delete')) {
+      const anchor = elem.parentElement as HTMLAnchorElement;
+      const div = anchor.parentElement as HTMLDivElement;
+      const details = div.parentElement as HTMLDetailsElement;
+      removeFromCollection(details.id, eld.id as string);
+      return;
+    }
+    superModal.showModal();
+    history.pushState({}, '', '#');
+    const smd = superModal.dataset;
+    smd.id = eld.id
+    smd.title = eld.title;
+    smd.author = eld.author;
+    smd.channelUrl = eld.channel_url;
+    smd.duration = eld.duration;
+  }
+
+  if (elem.matches('list-item')) {
+    const url = elem.getAttribute('url') as string;
+    fetchList(
+      elem.getAttribute('type') === 'playlist' ?
+        url.replace('?list=', 's/') :
+        url
+    );
+    // data binding for open channel action
+    listContainer.dataset.url = url;
+  }
 }

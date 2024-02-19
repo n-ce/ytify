@@ -1,7 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
-import { thumbnailProxies } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -9,18 +8,15 @@ export class StreamItem extends LitElement {
 	@query('span') span!: HTMLSpanElement
 	@query('#metadata') metadata!: HTMLDivElement
 	@query('#thumbnail') thumbnail!: HTMLImageElement
-	@query('#avatar') avatar!: HTMLImageElement
 
 	@property() 'data-duration'!: string
 	@property() 'data-author'!: string
-	@property() 'data-avatar'!: string
 	@property() 'data-title'!: string
 	@property() views!: string
 	@property() uploaded!: string
 
 	@state() tsrc = blankImage;
 	@state() unravel = '0';
-	@state() display = 'initial';
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
@@ -36,10 +32,8 @@ export class StreamItem extends LitElement {
 	}
 
 	render() {
-		const imgOff = getSaved('img') ? true : false;
-		let avImg = '';
 
-		if (!imgOff) {
+		if (getSaved('img') !== 'off') {
 			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
 			if (location.search.endsWith('songs')) {
 				const x = new Image();
@@ -49,19 +43,13 @@ export class StreamItem extends LitElement {
 			}
 			else this.tsrc = img;
 
-			if (this["data-avatar"] && !avImg.startsWith('http'))
-				avImg = thumbnailProxies.value + this["data-avatar"];
 		}
-
-		if (!avImg)
-			this.display = 'none';
-
 
 		return html`
 				<span style=${'opacity:' + this.unravel}>
 					<img 
 						id='thumbnail'
-						loading='lazy'
+						loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
 						crossorigin='anonymous'
 						@error=${() => this.unravel = '1'}
 						@load=${this.handleThumbnailLoad}
@@ -71,23 +59,14 @@ export class StreamItem extends LitElement {
 				</span>
 				<div id='metadata' style=${'opacity:' + this.unravel}>
 					<p id='title'>${this["data-title"]}</p>
-					<div id='aau'>
-						<img 
-							id='avatar'
-							loading='lazy'
-							src=${avImg}
-							style=${'display:' + this.display}
-						/>
-						<div id='avu'>
-							<p id='author'>${this["data-author"]}</p>
-							<p id='viewsXuploaded'>${(this.views || '') + (this.uploaded ? ' • ' + this.uploaded.replace('Streamed ', '') : '')}</p>
-						</div>
+					<div id='avu'>
+						<p id='author'>${this["data-author"]}</p>
+						<p id='viewsXuploaded'>${(this.views || '') + (this.uploaded ? ' • ' + this.uploaded.replace('Streamed ', '') : '')}</p>
 					</div>
 				</div>
 			`;
 
 	}
-
 
 
 	static styles = css`
@@ -134,23 +113,15 @@ export class StreamItem extends LitElement {
   	border-radius: 1vmin;
 	}
 	#title {
-  	font-size: medium;
-  	height: 55%;
-  	width: auto;
-  	display: flex;
+  	font-size: 1rem;
+		line-height: 1.3rem;
+  	height: 2.6rem;
+		word-break: break-all;
   	overflow: hidden;
-  	word-break: break-all;
-  	text-overflow: clip;
 	}
 	div {
   	display: flex;
   	overflow: hidden;
-	}
-	#avatar {
-  	height: 8vmin;
-  	border-radius: 50%;
-  	margin: 1vmin;
-  	margin-left: 0;
 	}
 	#metadata {
   	display: flex;
@@ -158,17 +129,16 @@ export class StreamItem extends LitElement {
   	height: 100%;
   	width: 90%;
 	}
-	#aau {
-  	display: flex;
-  	align-items: center;
-	}
 	#avu {
   	display: flex;
   	flex-direction: column;
+		font-size:1rem;
+		opacity:0.8;
 	}
 	#author {
-  	height: auto;
-  	text-overflow: clip;
+		line-height:1rem;
+		max-height:1rem;
+		overflow:hidden;
 	}
 	
 	@media(orientation:landscape) {
@@ -177,6 +147,9 @@ export class StreamItem extends LitElement {
     	display: inline-flex;
     	flex-direction: row;
     	justify-content: space-between;
+		}
+		#title{
+			height:50%;
 		}
 		#author {
     	height: initial;
