@@ -1,8 +1,7 @@
-import { audio, favButton, favIcon, playButton, invidiousInstances, queuelist } from "./dom";
+import { audio, favButton, favIcon, playButton, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
-import { appendToQueuelist } from "../scripts/queue";
-import { streamHistory } from "../scripts/audioEvents";
+import { autoQueue } from "../scripts/audioEvents";
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -154,26 +153,8 @@ export default async function player(id: string | null = '') {
   }
 
 
-  if (!getSaved('autoQueue')) {
-    const queueIds = [...streamHistory];
-    const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
-    for (const item of items)
-      queueIds.push(<string>item.dataset.id);
-
-    data.recommendedVideos.forEach(
-      (stream: Recommendation) => {
-        if (!queueIds.includes(stream.videoId))
-          appendToQueuelist({
-            id: stream.videoId,
-            title: stream.title,
-            author: stream.author,
-            duration: convertSStoHHMMSS(stream.lengthSeconds),
-          })
-      });
-  }
-
-
-
+  if (!getSaved('autoQueue'))
+    autoQueue(data.recommendedVideos);
 
   if (getSaved('discover') === 'off') return;
 
@@ -184,23 +165,23 @@ export default async function player(id: string | null = '') {
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
-    data.recommendedVideos.forEach((stream
-      : Recommendation) => {
-      if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
+    data.recommendedVideos.forEach(
+      (stream: Recommendation) => {
+        if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
-      const rsId = stream.videoId;
-      // merges previous discover items with current related streams
-      db.discover.hasOwnProperty(rsId) ?
-        (<number>db.discover[rsId].frequency)++ :
-        db.discover[rsId] = {
-          id: rsId,
-          title: stream.title,
-          author: stream.author,
-          duration: convertSStoHHMMSS(stream.lengthSeconds),
-          channelUrl: stream.authorUrl,
-          frequency: 1
-        }
-    });
+        const rsId = stream.videoId;
+        // merges previous discover items with current related streams
+        db.discover.hasOwnProperty(rsId) ?
+          (<number>db.discover[rsId].frequency)++ :
+          db.discover[rsId] = {
+            id: rsId,
+            title: stream.title,
+            author: stream.author,
+            duration: convertSStoHHMMSS(stream.lengthSeconds),
+            channelUrl: stream.authorUrl,
+            frequency: 1
+          }
+      });
 
     // convert to array
     let array = Object.entries(db.discover);

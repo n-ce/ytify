@@ -5,7 +5,7 @@ import { addToCollection } from "./library";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
-export const streamHistory: string[] = [];
+const streamHistory: string[] = [];
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
@@ -17,8 +17,6 @@ const playNextButton = <HTMLButtonElement>document.getElementById('playNextButto
 const loopButton = <HTMLButtonElement>document.getElementById('loopButton');
 const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger');
 const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
-
-
 
 
 const msn = 'mediaSession' in navigator;
@@ -95,9 +93,9 @@ audio.addEventListener('waiting', () => {
 playSpeed.addEventListener('change', () => {
   const speed = parseFloat(playSpeed.value);
 
-  if (speed < 0 || speed > 4) {
+  if (speed < 0 || speed > 4)
     return;
-  }
+
   audio.playbackRate = speed;
   updatePositionState();
   playSpeed.blur();
@@ -118,6 +116,7 @@ seekBwdButton.addEventListener('click', () => {
 
 progress.addEventListener('change', () => {
   const value = parseInt(progress.value);
+
   if (value < 0 || value > audio.duration)
     return;
 
@@ -175,17 +174,22 @@ playNextButton.addEventListener('click', onEnd);
 
 volumeIcon.addEventListener('click', () => {
   volumeChanger.value = audio.volume ? '0' : '100';
-
   audio.volume = audio.volume ? 0 : 1;
-  volumeIcon.classList.replace(volumeIcon.className, volumeIcon.className.includes('mute') ? 'ri-volume-up-line' : 'ri-volume-mute-line');
-
+  volumeIcon.classList.replace(
+    volumeIcon.className,
+    volumeIcon.className.includes('mute') ?
+      'ri-volume-up-line' :
+      'ri-volume-mute-line'
+  );
 });
 
 volumeChanger.addEventListener('input', () => {
   audio.volume = parseFloat(volumeChanger.value) / 100;
-
-  volumeIcon.classList.replace(volumeIcon.className, audio.volume ? `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-line` : 'ri-volume-mute-line');
-
+  volumeIcon.classList.replace(
+    volumeIcon.className,
+    audio.volume ?
+      `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-line` :
+      'ri-volume-mute-line');
 });
 
 
@@ -214,5 +218,23 @@ if (msn) {
   navigator.mediaSession.setActionHandler("nexttrack", () => {
     onEnd();
     updatePositionState();
+  });
+}
+
+
+export function autoQueue(data: Recommendation[]) {
+  const queueIds = [...streamHistory];
+  const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
+  for (const item of items)
+    queueIds.push(<string>item.dataset.id);
+
+  data.forEach(stream => {
+    if (!queueIds.includes(stream.videoId))
+      appendToQueuelist({
+        id: stream.videoId,
+        title: stream.title,
+        author: stream.author,
+        duration: convertSStoHHMMSS(stream.lengthSeconds),
+      })
   });
 }
