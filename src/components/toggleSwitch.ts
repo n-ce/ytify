@@ -28,16 +28,18 @@ export class ToggleSwitch extends LitElement {
     background-color: var(--onBg);
     border-radius: var(--roundness);
     border: var(--border);
+    transform: scale(1.1);
   }
 
   span:before {
     position: absolute;
     content: "";
     height: calc(100% - 2.1vmin);
-    width: 2vmin;
+    aspect-ratio:1;
     margin: 1vmin;
     background-color: var(--text);
     border-radius: calc(var(--roundness) - 0.5vmin);
+    box-shadow:var(--shadow);
   }
 
   span,
@@ -55,6 +57,7 @@ export class ToggleSwitch extends LitElement {
   }
 
   input:checked+span:before {
+    margin-left:-0.4vmin;
     transform: translateX(4.6vmin);
   }
   `;

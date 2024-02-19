@@ -69,7 +69,6 @@ export class StreamItem extends LitElement {
 	}
 
 
-
 	static styles = css`
 	:host {
 		height: 20vmin;
@@ -114,13 +113,11 @@ export class StreamItem extends LitElement {
   	border-radius: 1vmin;
 	}
 	#title {
-  	font-size: medium;
-  	height: 55%;
-  	width: auto;
-  	display: flex;
+  	font-size: 1rem;
+		line-height: 1.3rem;
+  	height: 2.6rem;
+		word-break: break-all;
   	overflow: hidden;
-  	word-break: break-all;
-  	text-overflow: clip;
 	}
 	div {
   	display: flex;
@@ -135,10 +132,13 @@ export class StreamItem extends LitElement {
 	#avu {
   	display: flex;
   	flex-direction: column;
+		font-size:1rem;
+		opacity:0.8;
 	}
 	#author {
-  	height: auto;
-  	text-overflow: clip;
+		line-height:1rem;
+		max-height:1rem;
+		overflow:hidden;
 	}
 	
 	@media(orientation:landscape) {
@@ -147,6 +147,9 @@ export class StreamItem extends LitElement {
     	display: inline-flex;
     	flex-direction: row;
     	justify-content: space-between;
+		}
+		#title{
+			height:50%;
 		}
 		#author {
     	height: initial;
