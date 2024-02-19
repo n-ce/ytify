@@ -224,6 +224,8 @@ export function fetchList(url: string, mix = false) {
     .finally(() => loadingScreen.close());
 }
 
+listContainer.addEventListener('click', superClick);
+
 if (params.has('channel') || params.has('playlists'))
   fetchList('/' +
     location.search
@@ -232,14 +234,9 @@ if (params.has('channel') || params.has('playlists'))
       .join('/')
   );
 
-
-
-
-
 export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
-
 
   const streamItem = (stream: StreamItem) => html`<stream-item 
       data-id=${stream.url.substring(9)} 
@@ -250,7 +247,6 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       uploaded=${stream.uploadedDate}
       data-channel_url=${stream.uploaderUrl}
   />`;
-
 
   function rmDomain(url: string) {
     if (!url) return;
