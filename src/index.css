@@ -9,10 +9,10 @@
 }
 
 :root {
-  --bg: black;
+  --bg: #121212;
   --onBg: #fff7;
   --text: white;
-  --accent: #f007;
+  --accent: #1f1f1f;
 }
 
 

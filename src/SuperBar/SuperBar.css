@@ -71,7 +71,7 @@
   width: 100%;
   overflow-y: scroll;
   background-color: var(--bg);
-  display: none;
+  display: block;
   user-select: none;
 
 
@@ -93,10 +93,11 @@
 #MiniPlayer {
   padding: 0 2%;
   display: flex;
+  align-items: center;
   justify-content: space-between;
 
   p {
-    font-size: x-large;
+    font-size: large;
   }
 
   button {

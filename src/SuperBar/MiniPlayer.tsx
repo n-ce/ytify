@@ -9,7 +9,7 @@ export default function MiniPlayer() {
 
   return (
     <div id="MiniPlayer">
-      <p>title</p>
+      <p>Now Playing</p>
       <button
         class={isPlaying() ? "ri-pause-circle-fill" : "ri-play-circle-fill"}
         onClick={() => setIsPlaying(!isPlaying())}></button>
