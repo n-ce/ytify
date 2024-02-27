@@ -11,8 +11,10 @@ export default function MiniPlayer() {
     <div id="MiniPlayer">
       <p>Now Playing</p>
       <button
-        class={isPlaying() ? "ri-pause-circle-fill" : "ri-play-circle-fill"}
-        onClick={() => setIsPlaying(!isPlaying())}></button>
+        onClick={() => setIsPlaying(!isPlaying())}
+        class={`ri-${isPlaying() ? 'pause' : 'play'}-circle-fill`}
+      >
+      </button>
     </div>
   );
 }

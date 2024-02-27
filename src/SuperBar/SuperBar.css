@@ -4,7 +4,7 @@
   background-color: var(--accent);
   width: 90%;
   margin: 5%;
-  border-radius: 0.5rem;
+  border-radius: var(--roundness);
   overflow: hidden;
 
   @media(orientation:landscape) {
@@ -22,6 +22,44 @@
   background-color: var(--onBg);
   display: flex;
   align-items: center;
+  border-radius: var(--roundness);
+
+  @media(orientation:landscape) {
+    width: 50%;
+  }
+
+  #suggestions {
+    display: block;
+    user-select: none;
+    list-style-type: none;
+    padding: 0;
+    position: fixed;
+    bottom: calc(1rem + 13%);
+    height: 10rem;
+    width: 86.5%;
+    overflow-y: scroll;
+    background-color: var(--bg);
+    border-radius: var(--roundness) var(--roundness) 0 0;
+
+    @media(orientation:landscape) {
+      bottom: calc(1rem + 18%);
+      width: 41%;
+    }
+
+    li {
+      background-color: var(--onBg);
+      font-weight: bold;
+      padding: 1vmin 3vmin;
+      margin-bottom: 0.4vmin;
+
+      &:hover,
+      &:focus,
+      &.hover {
+        background-color: var(--text);
+        color: var(--bg);
+      }
+    }
+  }
 
   input {
     background: none;
@@ -62,32 +100,6 @@
     }
   }
 
-}
-
-#suggestions {
-  list-style-type: none;
-  padding: 0;
-  max-height: 25vmax;
-  width: 100%;
-  overflow-y: scroll;
-  background-color: var(--bg);
-  display: block;
-  user-select: none;
-
-
-  li {
-    background-color: var(--onBg);
-    font-weight: bold;
-    padding: 1vmin 3vmin;
-    margin-bottom: 0.4vmin;
-
-    &:hover,
-    &:focus,
-    &.hover {
-      background-color: var(--text);
-      color: var(--bg);
-    }
-  }
 }
 
 #MiniPlayer {
