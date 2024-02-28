@@ -99,3 +99,23 @@ dialog::backdrop {
     }
   }
 }
+
+#libraryItem {
+  display: flex;
+  align-items: center;
+  width: 45vmin;
+  background-color: var(--onBg);
+  margin: 2.5vmin;
+  border-radius: var(--roundness);
+  overflow: hidden;
+
+  svg {
+    width: 4rem;
+    background-color: var(--onBg);
+    border-radius: var(--roundness);
+  }
+
+  p {
+    margin-left: 1rem;
+  }
+}
