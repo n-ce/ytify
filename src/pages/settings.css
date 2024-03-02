@@ -1,0 +1,21 @@
+#community {
+  display: flex;
+  padding: 1vmin;
+  width: 50vmin;
+  margin: 5% auto;
+  justify-content: space-between;
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+
+  a {
+    color: var(--text);
+    padding: 5%;
+    border-radius: calc(var(--roundness) - 0.8vmin);
+    transition: all 0.4s;
+
+    &:hover {
+      transform: scale(0.9);
+      background-color: var(--accent);
+    }
+  }
+}

@@ -1,35 +1,42 @@
 /* @refresh reload */
 import './index.css';
-import { render } from 'solid-js/web'
-import SearchBar from './SuperBar/SearchBar';
-import MiniPlayer from './SuperBar/MiniPlayer';
-import Community from './Community';
+import { render } from 'solid-js/web';
 import { Route, Router } from '@solidjs/router';
-import LibraryItem from './LibraryItem';
+import Settings from './pages/Settings';
+import Library from './pages/Library';
+import Search from './pages/Search';
+import SearchBar from './components/SearchBar';
+import MiniPlayer from './components/MiniPlayer';
+import NavBar from './components/NavBar';
+import { createSignal } from 'solid-js';
 
+const [searchResults, setSearchResults] = createSignal([]);
 
 render(
   () => (
     <Router root={(props) =>
       <>
+        <NavBar />
         {props.children}
         <div id="superBar">
-          <SearchBar />
+          <SearchBar setSearchResults={setSearchResults} />
           <MiniPlayer />
         </div>
       </>
     }>
-      <Route path="/settings" component={Community} />
-
-      <Route path="/"
+      <Route
+        path={["/", "*404"]}
+        component={Library}
+      />
+      <Route
+        path="/settings"
+        component={Settings}
+      />
+      {/*<Route path="/list" component={List} />*/}
+      <Route path="/search"
         component={() =>
-          <>
-            <dialog id="loadingScreen">
-              <i class="ri-loader-3-line"></i>
-            </dialog>
-            <LibraryItem label="Top 100 Music Global" />
-            <LibraryItem label="Top 100 Music Global" />
-          </>}
+          <Search searchResults={searchResults} />
+        }
       />
     </Router>
   ), document.body.firstElementChild as HTMLDivElement);

@@ -1,6 +1,11 @@
 @import './reset.css';
-@import './SuperBar/SuperBar.css';
 @import './remixicon.css';
+@import './pages/settings.css';
+@import './pages/library.css';
+@import './components/navBar.css';
+@import './components/searchBar.css';
+@import './components/miniPlayer.css';
+
 
 @font-face {
   font-family: "Noto Sans";
@@ -77,45 +82,17 @@ dialog::backdrop {
   animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
 }
 
-
-#community {
-  display: flex;
-  padding: 1vmin;
-  width: 50vmin;
-  margin: 5% auto;
-  justify-content: space-between;
-  background-color: var(--onBg);
-  border-radius: var(--roundness);
-
-  a {
-    color: var(--text);
-    padding: 5%;
-    border-radius: calc(var(--roundness) - 0.8vmin);
-    transition: all 0.4s;
-
-    &:hover {
-      transform: scale(0.9);
-      background-color: var(--accent);
-    }
-  }
-}
-
-#libraryItem {
-  display: flex;
-  align-items: center;
-  width: 45vmin;
-  background-color: var(--onBg);
-  margin: 2.5vmin;
+#superBar {
+  position: fixed;
+  bottom: 0;
+  background-color: var(--accent);
+  width: 90%;
+  margin: 5%;
   border-radius: var(--roundness);
   overflow: hidden;
 
-  svg {
-    width: 4rem;
-    background-color: var(--onBg);
-    border-radius: var(--roundness);
-  }
-
-  p {
-    margin-left: 1rem;
+  @media(orientation:landscape) {
+    display: flex;
+    justify-content: space-between;
   }
 }

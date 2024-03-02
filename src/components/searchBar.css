@@ -1,20 +1,3 @@
-#superBar {
-  position: fixed;
-  bottom: 0;
-  background-color: var(--accent);
-  width: 90%;
-  margin: 5%;
-  border-radius: var(--roundness);
-  overflow: hidden;
-
-  @media(orientation:landscape) {
-    display: flex;
-    justify-content: space-between;
-  }
-}
-
-
-
 #SearchBar {
   height: auto;
   width: 100%;
@@ -29,13 +12,12 @@
   }
 
   #suggestions {
-    display: block;
     user-select: none;
     list-style-type: none;
     padding: 0;
     position: fixed;
-    bottom: calc(1rem + 13%);
-    height: 10rem;
+    bottom: calc(1rem + 11.5vh);
+    height: 11rem;
     width: 86.5%;
     overflow-y: scroll;
     background-color: var(--bg);
@@ -100,28 +82,4 @@
     }
   }
 
-}
-
-#MiniPlayer {
-  padding: 0 2%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  p {
-    font-size: large;
-  }
-
-  button {
-    background: none;
-    border: none;
-    color: inherit;
-    font-size: x-large;
-    transform: scale(1.3);
-    transition: all 0.4s;
-
-    &:active {
-      transform: scale(1);
-    }
-  }
 }
