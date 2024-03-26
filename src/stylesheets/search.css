@@ -78,3 +78,12 @@
   background-color: var(--text);
   color: var(--bg);
 }
+
+h1.featuredPlaylists {
+  background: var(--onBg);
+  padding: 2%;
+  border-radius: var(--roundness);
+  display: flex;
+  justify-content: center;
+  align-items: center
+}

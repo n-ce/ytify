@@ -221,7 +221,6 @@ if (msn) {
   });
 }
 
-
 export function autoQueue(data: Recommendation[]) {
   const queueIds = [...streamHistory];
   const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
@@ -229,7 +228,11 @@ export function autoQueue(data: Recommendation[]) {
     queueIds.push(<string>item.dataset.id);
 
   data.forEach(stream => {
-    if (!queueIds.includes(stream.videoId))
+    if (
+      stream.lengthSeconds > 60 &&
+      stream.lengthSeconds < 3600 &&
+      !queueIds.includes(stream.videoId)
+    )
       appendToQueuelist({
         id: stream.videoId,
         title: stream.title,

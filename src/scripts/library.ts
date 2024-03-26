@@ -1,5 +1,5 @@
 import { audio, favButton, favIcon } from "../lib/dom";
-import { $, domainResolver, getCollection, getDB, notify, removeSaved, saveDB, superClick } from "../lib/utils";
+import { $, hostResolver, getCollection, getDB, notify, removeSaved, saveDB, superClick } from "../lib/utils";
 import { listToQ } from "./queue";
 import { atpSelector } from "./superModal";
 import { render, html } from "lit";
@@ -38,7 +38,7 @@ cleanBtn.addEventListener('click', () => {
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
-  anchor.href = domainResolver('/watch?v=' + data.id);
+  anchor.href = hostResolver('/watch?v=' + data.id);
   anchor.onclick = e => e.preventDefault();
 
   render(html`

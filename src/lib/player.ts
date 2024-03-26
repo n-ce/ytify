@@ -20,12 +20,21 @@ codecSelector.addEventListener('change', async () => {
   audio.currentTime = timeOfSwitch;
 });
 
+
 const codecSaved = getSaved('codec');
-if (codecSaved)
-  codecSelector.selectedIndex = parseInt(codecSaved);
-// set AAC as default for safari
-else if (navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') <= -1)
-  codecSelector.selectedIndex = 1;
+
+codecSaved ?
+  (codecSelector.selectedIndex = parseInt(codecSaved)) :
+  navigator.mediaCapabilities.decodingInfo({
+    type: 'file',
+    audio: {
+      contentType: 'audio/ogg;codecs=opus'
+    }
+  }).then(res => {
+    // sets AAC as default for non-supported devices
+    if (!res.supported)
+      codecSelector.selectedIndex = 1;
+  });
 
 /////////////////////////////////////////////////////////////
 
@@ -44,7 +53,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id + '?fields=title,lengthSeconds,adaptiveFormats,author,authorUrl,authorThumbnails,recommendedVideos')
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
       const i = invidiousInstances.selectedIndex;

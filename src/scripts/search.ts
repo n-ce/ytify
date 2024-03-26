@@ -35,7 +35,7 @@ function searchLoader() {
 
   if (!text) {
     searchlist.innerHTML = '';
-    cH();
+    insertYtmPls();
     return;
   }
 
@@ -71,12 +71,21 @@ function searchLoader() {
         type u = StreamItem & {
           uploaded: number
         }
-        const temp: u[] = [];
+        items = (<u[]>items)
+          .filter(i => i.type === 'stream')
+          .sort((a, b) => b.uploaded - a.uploaded);
 
-        for (const item of items)
-          if (item.type === 'stream' && !temp.includes(item))
-            temp.push(item);
-        items = temp.sort((a, b) => b.uploaded - a.uploaded);
+        const uniqueSet = new Set(items);
+        items = Array.from(uniqueSet);
+
+        // Deduplication algorithm taken from https://www.techiediaries.com/find-duplicate-objects-in-array-angular
+
+        items = items.reduce((acc: any, item: any) => {
+          if (!acc.some((obj: any) => obj.uploaded === item.uploaded))
+            acc.push(item);
+          return acc;
+        }, []);
+
       }
 
       // filter livestreams & shorts & append rest
@@ -223,11 +232,28 @@ if (params.has('q')) {
   searchLoader();
 }
 
-// Community Highlights
-const cH = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Curated.md')
-  .then(res => res.text())
-  .then(res => JSON.parse(res.substring(3)))
-  .then(data => searchlist.appendChild(itemsLoader(data)));
+// YouTube Music Featured Playlists
 
-if (!location.search)
-  cH();
+function insertYtmPls() {
+  fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+    .then(res => res.text())
+    .then(text => text.split('\n'))
+    .then(data => {
+      const array = [];
+      for (let i = 0; i < data.length; i += 4)
+        array.push({
+          "type": "playlist",
+          "name": data[i + 1],
+          "uploaderName": "YouTube Music",
+          "url": '/playlists/' + data[i + 2],
+          "thumbnail": '/' + data[i + 3]
+        });
+
+      searchlist.appendChild(itemsLoader(<StreamItem[]>array));
+    });
+
+}
+
+params.has('q') ?
+  (searchlist.innerHTML = '') :
+  insertYtmPls();

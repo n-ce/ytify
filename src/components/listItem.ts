@@ -69,8 +69,7 @@ export class ListItem extends LitElement {
   render() {
     const img = getSaved('img') ?
       blankImage :
-      thumbnailProxies.value + this.thumbnail;
-
+      thumbnailProxies.value + this.thumbnail + '=s176-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com';
     return html`
         <img
         style=${'opacity:' + this.unravel}

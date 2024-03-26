@@ -1,4 +1,7 @@
 // import in order of site usage to minimize loading time
+if (import.meta.env.DEV)
+  await import('eruda').then(eruda => eruda.default.init());
+
 import '../stylesheets/style.css';
 import './api';
 import './router';

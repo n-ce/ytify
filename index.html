@@ -117,8 +117,15 @@
       </span>
       <ul id="suggestions"></ul>
       <div id="searchlist">
-        <h1 style="background:var(--onBg);padding:4% 2%;border-radius:var(--roundness);text-align:center">
-          Community Highlights
+        <h1 class="featuredPlaylists">
+          <svg xmlns="http://www.w3.org/2000/svg" width="3rem" height="3rem" viewBox="0 0 176 176"
+            style="transform:scale(0.7)">
+            <circle cx="88" cy="88" r="77" fill="var(--text)" />
+            <path fill="var(--bg)"
+              d="M88 46a42 42 0 1 1 0 84 42 42 0 0 1 0-84m0-4a46 46 0 1 0 0 92 46 46 0 0 0 0-92z" />
+            <path fill="var(--bg)" d="m72 111 39-24-39-22z" />
+          </svg>
+          <label>Featured Playlists</label>
         </h1>
       </div>
     </section>
@@ -214,11 +221,12 @@
         </select>
       </span>
       <span>
-        <label for="linkOrigin">Domain for links</label>
-        <select id="linkOrigin">
+        <label for="linkHost">Links host</label>
+        <select id="linkHost">
           <option value="https://youtube.com">YouTube</option>
           <option value="https://ytify.netlify.app">ytify</option>
           <option value="https://piped.video">Piped</option>
+          <option value="https://yewtu.be">Invidious</option>
         </select>
       </span>
 
