@@ -14,8 +14,8 @@ const defData: apiList = {
     custom: false
   },
   'image': {
-    name: 'r4fo.com 🇩🇪',
-    url: 'https://pipedproxy.r4fo.com',
+    name: 'lunar.icu 🇩🇪',
+    url: 'https://piped-proxy.lunar.icu',
     custom: false
   }
 };
@@ -34,7 +34,7 @@ if (serialisedList !== '{}') {
     const name = data.name;
     const url = data.url;
     const custom = data.custom;
-    if (name === 'kavin.rocks 🌐' || name === 'r4fo.com 🇩🇪' || name === 'fdn.fr 🇫🇷') return;
+    if (name === 'kavin.rocks 🌐' || name === 'lunar.icu 🇩🇪' || name === 'fdn.fr 🇫🇷') return;
     if (custom) {
       const dom = instance.options[0];
       dom.value = url;
