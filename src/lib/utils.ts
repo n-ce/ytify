@@ -23,7 +23,13 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const imgUrl = (id: string, res: string, proxy: string = thumbnailProxies.value) => `${proxy}/vi_webp/${id}/${res}.webp?host=i.ytimg.com`;
+export const generateImageUrl = (
+  id: string,
+  res: string = 'mqdefault',
+  proxy: string = thumbnailProxies.value
+) => proxy + (id.startsWith('/') ?
+  `${id}=s176-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
+  `/vi_webp/${id}/${res}.webp?host=i.ytimg.com`);
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -95,7 +101,7 @@ export function setMetaData(
   authorUrl: string,
   music: boolean = false
 ) {
-  const imgX = imgUrl(id, 'maxresdefault');
+  const imgX = generateImageUrl(id, 'maxresdefault');
   if (!getSaved('img') && !music)
     img.src = imgX;
 
@@ -249,16 +255,28 @@ export function itemsLoader(itemsArray: StreamItem[]) {
       data-channel_url=${stream.uploaderUrl}
   />`;
 
-  function getThumbIdFromLink(url: string) {
-    if (!url) return;
-    if (!url.startsWith('https')) return url;
-    const l = new URL(url.replace(/&qhash=.{8}$/, ''));
-    return l.pathname.split('=')[0];
+  function getThumbIdFromLink(url: string, type: string) {
+    // for featured playlists
+    if (url.startsWith('/')) return url;
+
+    const l = new URL(url.replace(/&qhash=.{8}$/, '')).pathname;
+
+    return type === 'playlist' ?
+      l.split('/')[2] :
+      l.split('=')[0];
   }
 
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
-      thumbnail=${getThumbIdFromLink(item.thumbnail)}
+      thumbnail=${getSaved('img') && item.thumbnail ?
+      blankImage :
+      generateImageUrl(
+        getThumbIdFromLink(
+          item.thumbnail,
+          item.type
+        )
+      )
+    }
       uploader_data=${item.description || item.uploaderName}
       stats=${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :

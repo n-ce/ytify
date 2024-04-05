@@ -1,6 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { blankImage, getSaved, imgUrl, sqrThumb } from "../lib/utils";
+import { blankImage, getSaved, generateImageUrl, sqrThumb } from "../lib/utils";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -34,7 +34,7 @@ export class StreamItem extends LitElement {
 	render() {
 
 		if (getSaved('img') !== 'off') {
-			const img = imgUrl(<string>this.dataset.id, 'mqdefault');
+			const img = generateImageUrl(<string>this.dataset.id, 'mqdefault');
 			if (location.search.endsWith('songs')) {
 				const x = new Image();
 				x.onload = () => this.tsrc = sqrThumb(x);

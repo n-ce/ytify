@@ -1,24 +1,24 @@
 {
   "name": "ytify",
-  "private": true,
-  "version": "6.8.3",
+  "version": "6.8.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "update": "npx npm-check-updates -u"
+  },
+  "dependencies": {
+    "lit": "^3.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
     "eruda": "^3.0.1",
-    "typescript": "^5.4.3",
-    "vite": "^5.2.6",
-    "vite-plugin-pwa": "^0.19.7"
+    "typescript": "^5.4.4",
+    "vite": "^5.2.8",
+    "vite-plugin-pwa": "^0.19.8"
   },
   "browserslist": [
     "defaults"
-  ],
-  "dependencies": {
-    "lit": "^3.1.2"
-  }
+  ]
 }
