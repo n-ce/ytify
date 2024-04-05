@@ -269,21 +269,21 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const listItem = (item: StreamItem) => html`<list-item
       title=${item.name}
-      thumbnail=${getSaved('img') && item.thumbnail ?
-      blankImage :
+      thumbnail=${!getSaved('img') && item.thumbnail ?
       generateImageUrl(
         getThumbIdFromLink(
           item.thumbnail
         )
-      )
+      ) : blankImage
     }
-      uploader_data=${item.description || item.uploaderName}
-      stats=${item.subscribers > 0 ?
+    uploader_data = ${item.description || item.uploaderName}
+    stats = ${item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
-      (item.videos > 0 ? item.videos + ' streams' : '')}
-      type=${item.type}
-      url=${item.url}
-  />`;
+      (item.videos > 0 ? item.videos + ' streams' : '')
+    }
+    type = ${item.type}
+    url = ${item.url}
+    />`;
 
   const fragment = document.createDocumentFragment();
 
