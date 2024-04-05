@@ -15,7 +15,7 @@ export class ListItem extends LitElement {
     this.thumbnail = this.thumbnail.includes('rj') ? this.thumbnail.replace('rj', 'rw') : '/logo192.png';
   }
 
-  handleLoad(e) {
+  handleLoad(e:Event) {
     this.unravel = '1';
     if ((e.target as HTMLImageElement).naturalHeight === 90)
       this.thumbnail = this.thumbnail
