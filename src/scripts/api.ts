@@ -125,7 +125,7 @@ async function fetchAPIdata() {
 
     if (!audioData || !audioData.adaptiveFormats) continue;
 
-    dataUsage += (new Blob([JSON.stringify(audioData)])).size;
+    dataUsage += (new Blob([JSON.stringify(audioData)])).size / 1024;
 
     const audioURL = audioData.adaptiveFormats[0].url;
 
