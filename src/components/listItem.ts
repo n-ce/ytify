@@ -1,16 +1,27 @@
 import { LitElement, css, html } from "lit";
-import { customElement, property, query, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { getSaved } from "../lib/utils";
 
 @customElement('list-item')
 export class ListItem extends LitElement {
 
-  @query('img') img!: HTMLImageElement;
   @state() unravel = '0';
   @property() title!: string;
   @property() stats!: string;
   @property() thumbnail!: string;
   @property() uploader_data!: string;
+
+  handleError() {
+    this.thumbnail = this.thumbnail.includes('rj') ? this.thumbnail.replace('rj', 'rw') : '/logo192.png';
+  }
+
+  handleLoad(e) {
+    this.unravel = '1';
+    if ((e.target as HTMLImageElement).naturalHeight === 90)
+      this.thumbnail = this.thumbnail
+        .replace('_webp', '')
+        .replace('webp', 'jpg')
+  }
 
   render() {
     return html`
@@ -18,8 +29,8 @@ export class ListItem extends LitElement {
         style=${'opacity:' + this.unravel}
         loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
         src=${this.thumbnail}
-        @error=${() => this.img.src = '/logo192.png'}
-        @load=${() => this.unravel = '1'}
+        @error=${this.handleError}
+        @load=${this.handleLoad}
         />
         <div style=${'opacity:' + this.unravel}>
           <p id='title'>${this.title}</p>
