@@ -1,6 +1,6 @@
 import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../lib/dom";
 import player from "../lib/player";
-import { getSaved, generateImageUrl, notify, removeSaved, save } from "../lib/utils";
+import { getSaved, generateImageUrl, notify, removeSaved, save, supportsOpus } from "../lib/utils";
 
 
 const defData: apiList = {
@@ -50,6 +50,8 @@ const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <s
 
 async function fetchAPIdata() {
 
+  const startTime = performance.now();
+
   if (apiRefreshBtn.textContent?.includes('Generating')) {
     apiRefreshBtn.textContent = 'Instances Generation Stopped';
     throw new Error('Generation was abruptly stopped');
@@ -66,17 +68,17 @@ async function fetchAPIdata() {
       apiRefreshBtn.textContent = error;
     });
 
-  let dataUsage = (new Blob([JSON.stringify(pipData)])).size / 1024;
+  let dataUsage = (new Blob([JSON.stringify(pipData)])).size;
 
-  const invData = await fetch('https://api.invidious.io/instances.json')
+  const invData = await fetch('https://i2-a.vercel.app')
     .then(res => res.json())
     .catch(e => {
-      const error = 'fetching invidious instances failed with error : ' + JSON.stringify(e.message);
+      const error = 'Fetching invidious instances failed with error : ' + JSON.stringify(e.message);
       notify(error);
       apiRefreshBtn.textContent = error;
     });
 
-  dataUsage += (new Blob([JSON.stringify(invData)])).size / 1024;
+  dataUsage += (new Blob([JSON.stringify(invData)])).size;
 
   const rate = 100 / (pipData?.length + invData?.length);
   let num = 0;
@@ -99,53 +101,56 @@ async function fetchAPIdata() {
       const testImg = new Image();
 
       testImg.onload = () => testImg.width === 120 ?
-        res(dataUsage += 0.08) : rej('load failure');
+        res(dataUsage += 82) : rej('Failed to load');
 
-      testImg.onerror = () => rej('server failure');
+      testImg.onerror = () => rej('Failed to load');
       testImg.src = generateImageUrl('1SLr62VBBjw', 'default', imgPrxy);
     })).then(() => {
       if (![...thumbnailProxies.options].map(_ => _.value).includes(imgPrxy))
         thumbnailProxies.add(new Option(name, imgPrxy))
     })
-      .catch(() => console.log(`Loading thumbnail via ${imgPrxy} failed`));
+      .catch(e => console.log(`${e} thumbnail via ${imgPrxy}`));
   }
+
+  const [audioSize, audioFormat] = await supportsOpus() ? [457, 1] : [7331, 0];
+
+  const getAudioURL = (index = 2): Promise<string> => fetch(pipedInstances.options[index].value + '/streams/NwmIu9iPkR0')
+    .then(res => res.json())
+    .then(json => {
+      dataUsage += (new Blob([JSON.stringify(json)])).size;
+      return json.audioStreams[audioFormat].url;
+    })
+    .catch((e: string) => {
+      console.log(`Failed to fetch audio test data via ${pipedInstances.options[index].value}: ${e}`);
+      return getAudioURL(index + 1);
+    });
+  const audioURL = await getAudioURL();
 
   for await (const instance of invData) {
     temp = num.toFixed();
     num += rate;
-    txtReplace(temp, num.toFixed())
+    txtReplace(temp, num.toFixed());
 
-    if (!instance[1].cors || !instance[1].api || instance[1].type !== 'https') continue;
-
-    const [, dom, ain] = instance[0].split('.');
-    const instanceName = [dom, ain].join('.') + ' ' + instance[1].flag;
-    const url = instance[1].uri;
-
-    const audioData = await fetch(url + '/api/v1/videos/NwmIu9iPkR0').then(res => res.json()).catch(() => console.log('Failed to fetch Audio data via ' + url));
-
-    if (!audioData || !audioData.adaptiveFormats) continue;
-
-    dataUsage += (new Blob([JSON.stringify(audioData)])).size / 1024;
-
-    const audioURL = audioData.adaptiveFormats[0].url;
+    const [instanceName, url] = instance.split(',');
 
     await (new Promise((res, rej) => {
       const audioElement = new Audio();
-      audioElement.onloadedmetadata = () => res(dataUsage += 3.53);
-      audioElement.onerror = () => rej('response failure');
-
+      audioElement.onloadedmetadata = () => res(dataUsage += audioSize);
+      audioElement.onerror = () => rej('Failed to play audio');
       audioElement.src = audioURL.replace(new URL(audioURL).origin, url);
     }))
       .then(() => {
         if (![...invidiousInstances.options].map(_ => _.value).includes(url))
           invidiousInstances.add(new Option(instanceName, url))
       })
-      .catch(e => console.log(`${e} when playing audio via ${url}`));
+      .catch(e => console.log(`${e} via ${url}`));
   }
 
   txtReplace('100% Generating', 'Regenerate');
 
-  notify(`Instances successfully added. ${Math.ceil(dataUsage)}KB data was used.`);
+  const timeTaken = ((performance.now() - startTime) / 1000);
+
+  notify(`Instances successfully added in ${Math.ceil(timeTaken)} seconds, ${Math.ceil(dataUsage / 1024)}KB data was used.`);
 }
 
 
@@ -174,7 +179,7 @@ Object.entries(iMap).forEach(array => {
     const custom = name.startsWith('Custom');
 
     if (custom) {
-      url = <string>prompt('Enter the URL');
+      url = <string>prompt(`Enter the ${type} instance URL such as ${instance.options[1].value}`);
       if (!url) return;
       selectedOption.value = url;
       const [, dom, ain] = new URL(url).hostname.split('.');

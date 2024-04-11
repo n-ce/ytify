@@ -228,16 +228,18 @@ export function autoQueue(data: Recommendation[]) {
     queueIds.push(<string>item.dataset.id);
 
   data.forEach(stream => {
+    const rsId = stream.url.slice(9);
     if (
-      stream.lengthSeconds > 60 &&
-      stream.lengthSeconds < 3600 &&
-      !queueIds.includes(stream.videoId)
+      stream.type === 'stream' &&
+      stream.duration > 60 &&
+      stream.duration < 3600 &&
+      !queueIds.includes(rsId)
     )
       appendToQueuelist({
-        id: stream.videoId,
+        id: rsId,
         title: stream.title,
-        author: stream.author,
-        duration: convertSStoHHMMSS(stream.lengthSeconds),
+        author: stream.uploaderName,
+        duration: convertSStoHHMMSS(stream.duration),
       })
   });
 }

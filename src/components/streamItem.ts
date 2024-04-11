@@ -1,6 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { blankImage, getSaved, generateImageUrl, sqrThumb } from "../lib/utils";
+import { thumbnailProxies } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -31,6 +32,20 @@ export class StreamItem extends LitElement {
 		}
 	}
 
+	handleThumbnailError() {
+
+		const index = thumbnailProxies.selectedIndex;
+		const currentImgPrxy = thumbnailProxies.value;
+		const nextImgPrxy = thumbnailProxies.options[index + 1].value;
+
+		this.unravel = '1';
+
+		if (!this.thumbnail.src.includes(currentImgPrxy)) return;
+
+		this.thumbnail.src = this.tsrc.replace(currentImgPrxy, nextImgPrxy);
+
+	}
+
 	render() {
 
 		if (getSaved('img') !== 'off') {
@@ -51,7 +66,7 @@ export class StreamItem extends LitElement {
 						id='thumbnail'
 						loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
 						crossorigin='anonymous'
-						@error=${() => this.unravel = '1'}
+						@error=${this.handleThumbnailError}
 						@load=${this.handleThumbnailLoad}
 						src=${this.tsrc}
 					/>

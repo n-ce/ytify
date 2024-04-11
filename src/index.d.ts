@@ -1,5 +1,7 @@
 declare global {
 
+  const imsc: any;
+
   type apiList = {
     [index: string]: {
       name: string,
@@ -39,11 +41,12 @@ declare global {
   }
 
   type Recommendation = {
-    lengthSeconds: number,
-    videoId: string,
+    duration: number,
+    url: string,
     title: string,
-    authorUrl: string,
-    author: string
+    uploaderUrl: string,
+    uploaderName: string,
+    type: string
   };
 
   type Library = {

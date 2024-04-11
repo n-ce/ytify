@@ -34,7 +34,9 @@
 
 <body>
   <canvas class="hide"></canvas>
-  <audio></audio>
+  <audio>
+    <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
+  </audio>
   <nav>
     <a href="/" id="/">
       <i class="ri-home-line"></i>
@@ -62,15 +64,18 @@
   </nav>
   <main>
     <section id="home">
+      <article class="hide" id="subtitleContainer"></article>
+
       <img id="img" src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.8</a>
+        <a id="title" href="" target="_blank">ytify 6.9</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
         </select>
+        <select id="subtitleSelector" class="hide"></select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
@@ -234,18 +239,20 @@
       <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
 
       <h3>Search</h3>
-      <toggle-switch id="defaultFilterSongs">Filter Songs by Default</toggle-switch>
+      <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
+      <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
 
       <h3>Playback</h3>
       <span>
-        <label for="invidiousInstances">Invidious Instance</label>
+        <label for="invidiousInstances">Proxy</label>
         <select id="invidiousInstances">
           <option value="">Custom</option>
           <option value="https://invidious.fdn.fr" selected>fdn.fr 🇫🇷</option>
         </select>
       </span>
       <toggle-switch id="autoQueueSwitch" checked>Auto-Queue</toggle-switch>
+      <toggle-switch id="musicModeSwitch" checked>Music Mode for Auto-Queue</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <span>
         <label for="CodecPreference">Codec Preference</label>
@@ -366,6 +373,9 @@
           <option value="1.50">1.50x</option>
           <option value="1.75">1.75x</option>
           <option value="2.00">2.00x</option>
+          <option value="2.50">2.50x</option>
+          <option value="3.00">3.00x</option>
+          <option value="3.50">3.50x</option>
           <option value="4.00">4.00x</option>
         </select>
       </div>

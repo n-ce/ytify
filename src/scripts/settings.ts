@@ -1,9 +1,10 @@
 import { audio, img, searchFilters } from "../lib/dom";
-import player from "../lib/player";
 import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
+import player from "../lib/player";
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
+const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueueSwitch');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
@@ -14,6 +15,8 @@ const discover = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
 const history = <HTMLDetailsElement>document.getElementById('history');
 
+export { ytmPlsSwitch };
+
 /////////////////////////////////////////////////////////////
 
 startupTabSelector.addEventListener('change', () => {
@@ -23,12 +26,14 @@ startupTabSelector.addEventListener('change', () => {
     removeSaved('startupTab');
 });
 
-const savedStartupTab = getSaved('startupTab');
+const savedStartupTab = getSaved('startupTab') || '';
 if (savedStartupTab) {
   startupTabSelector.value = savedStartupTab;
   if (location.pathname === '/')
     (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
 }
+
+/////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////
@@ -41,10 +46,25 @@ fullscreenSwitch.addEventListener('click', () => {
 
 /////////////////////////////////////////////////////////////
 
+ytmPlsSwitch.addEventListener('click', () => {
+  getSaved('featuredPlaylists') ?
+    removeSaved('featuredPlaylists') :
+    save('featuredPlaylists', 'off');
+  location.assign('/search');
+});
+
+if (getSaved('featuredPlaylists')) {
+  ytmPlsSwitch.removeAttribute('checked');
+  (<HTMLHeadingElement>document.querySelector('h1.featuredPlaylists')).textContent = 'Search Results Appear Here.';
+}
+
+/////////////////////////////////////////////////////////////
+
 defaultFilterSongs.addEventListener('click', () => {
   getSaved('defaultFilter') ?
     removeSaved('defaultFilter') :
     save('defaultFilter', 'songs');
+  location.assign('/search');
 });
 
 if (getSaved('defaultFilter')) {

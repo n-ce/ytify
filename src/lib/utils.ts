@@ -1,7 +1,6 @@
 import { html, render } from "lit";
-import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, superModal, thumbnailProxies } from "./dom";
+import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
 import { removeFromCollection } from "../scripts/library";
-
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -25,6 +24,13 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
+export const supportsOpus = (): Promise<boolean> => navigator.mediaCapabilities.decodingInfo({
+  type: 'file',
+  audio: {
+    contentType: 'audio/ogg;codecs=opus'
+  }
+}).then(res => res.supported);
+
 export const generateImageUrl = (
   id: string,
   res: string = 'mqdefault',
@@ -43,16 +49,6 @@ export function notify(text: string) {
   document.body.appendChild(el);
 }
 
-const linkHost = (<HTMLSelectElement>document.getElementById('linkHost'));
-const savedLinkHost = getSaved('linkHost');
-if (savedLinkHost)
-  linkHost.value = savedLinkHost;
-
-linkHost.addEventListener('change', () => {
-  linkHost.selectedIndex === 0 ?
-    removeSaved('linkHost') :
-    save('linkHost', linkHost.value);
-});
 
 export const hostResolver = (url: string) =>
   linkHost.value + (linkHost.value.includes('ytify') ? url.
@@ -93,6 +89,19 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
 img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
 img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
 
+
+const linkHost = <HTMLSelectElement>document.getElementById('linkHost');
+
+const savedLinkHost = getSaved('linkHost') || '';
+if (savedLinkHost)
+  linkHost.value = savedLinkHost;
+
+linkHost.addEventListener('change', () => {
+  linkHost.selectedIndex === 0 ?
+    removeSaved('linkHost') :
+    save('linkHost', linkHost.value);
+  location.reload();
+});
 
 export function setMetaData(
   id: string,
@@ -331,4 +340,47 @@ export function superClick(e: Event) {
     // data binding for open channel action
     listContainer.dataset.url = url;
   }
+}
+
+
+export async function parseTTML() {
+
+  const myTrack = audio.textTracks[0];
+  myTrack.mode = "hidden";
+  const d = img.getBoundingClientRect();
+
+  subtitleContainer.style.top = Math.floor(d.y) + 'px';
+  subtitleContainer.style.left = Math.floor(d.x) + 'px';
+
+
+  fetch(subtitleTrack.src)
+    .then(res => res.text())
+    .then(text => {
+      const imscDoc = imsc.fromXML(text);
+      const timeEvents = imscDoc.getMediaTimeEvents();
+      const telen = timeEvents.length;
+
+      for (let i = 0; i < telen; i++) {
+        const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
+
+        myCue.onenter = () => {
+          const subtitleActive = subtitleContainer.firstChild;
+          if (subtitleActive)
+            subtitleContainer.removeChild(subtitleActive)
+          imsc.renderHTML(
+            imsc.generateISD(imscDoc, myCue.startTime),
+            subtitleContainer,
+            img,
+            Math.floor(d.height),
+            Math.floor(d.width)
+          );
+        }
+        myCue.onexit = () => {
+          const subtitleActive = subtitleContainer.firstChild;
+          if (subtitleActive)
+            subtitleContainer.removeChild(subtitleActive)
+        }
+        myTrack.addCue(myCue);
+      }
+    });
 }

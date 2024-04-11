@@ -39,3 +39,8 @@ export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectio
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());
 
+export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
+
+export const subtitleContainer = <HTMLDivElement>document.getElementById('subtitleContainer');
+
+export const subtitleSelector = <HTMLSelectElement>document.getElementById('subtitleSelector');

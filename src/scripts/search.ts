@@ -1,6 +1,7 @@
 import { loadingScreen, pipedInstances, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
+import { ytmPlsSwitch } from "./settings";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchIcon = <HTMLButtonElement>searchFilters.nextElementSibling;
@@ -234,26 +235,26 @@ if (params.has('q')) {
 
 // YouTube Music Featured Playlists
 
+
 function insertYtmPls() {
-  fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
-    .then(res => res.text())
-    .then(text => text.split('\n'))
-    .then(data => {
-      const array = [];
-      for (let i = 0; i < data.length; i += 4)
-        array.push({
-          "type": "playlist",
-          "name": data[i + 1],
-          "uploaderName": "YouTube Music",
-          "url": '/playlists/' + data[i + 2],
-          "thumbnail": '/' + data[i + 3]
-        });
 
-      searchlist.appendChild(itemsLoader(<StreamItem[]>array));
-    });
+  if (ytmPlsSwitch.hasAttribute('checked'))
+    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+      .then(res => res.text())
+      .then(text => text.split('\n'))
+      .then(data => {
+        const array = [];
+        for (let i = 0; i < data.length; i += 4)
+          array.push(<StreamItem>{
+            "type": "playlist",
+            "name": data[i + 1],
+            "uploaderName": "YouTube Music",
+            "url": '/playlists/' + data[i + 2],
+            "thumbnail": '/' + data[i + 3]
+          });
 
+        searchlist.appendChild(itemsLoader(array));
+      });
 }
 
-params.has('q') ?
-  (searchlist.innerHTML = '') :
-  insertYtmPls();
+if (!params.has('q')) insertYtmPls();

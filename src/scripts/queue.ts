@@ -8,13 +8,14 @@ const [clearQBtn, shuffleQBtn, removeQBtn] = <HTMLCollectionOf<HTMLButtonElement
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
-
 export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) {
   if (!data.id) return;
 
   if (queueArray.includes(data.id)) return;
 
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
+
+  if (removeQBtn.classList.contains('delete')) removeQBtn.click();
 
   prepend ?
     queueArray.unshift(data.id) :
@@ -29,6 +30,8 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
   prepend ?
     queuelist.prepend(queueItem) :
     queuelist.appendChild(queueItem);
+
+  queuelist.dataset.array = '?a=' + queueArray.join('');
 }
 
 queuelist.addEventListener('click', e => {
@@ -41,6 +44,8 @@ queuelist.addEventListener('click', e => {
   const index = queueArray.indexOf(id);
   queueArray.splice(index, 1);
   queuelist.children[index].remove();
+
+  queuelist.dataset.array = '?a=' + queueArray.join('');
 });
 
 

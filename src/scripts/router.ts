@@ -1,4 +1,4 @@
-import { audio, searchFilters, superInput, superModal } from "../lib/dom";
+import { audio, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchList, params } from "../lib/utils";
 
 
@@ -32,7 +32,7 @@ for (const anchor of anchors) {
     if (anchor.id !== location.pathname) {
       const sParamInHome = params.has('s') && inHome;
       const sParam = '?s=' + params.get('s');
-      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : ''
+      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? queuelist.dataset.array || '' : '';
 
       history.pushState({}, '',
         anchor.id + (
