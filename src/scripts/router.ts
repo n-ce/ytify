@@ -67,7 +67,7 @@ if (errorParam) {
       searchFilters.value = x.get('f') || 'all';
     }
     if (route === '/upcoming')
-      upcomingInjector(query);
+      upcomingInjector(query.substring(2));
   }
   else route = errorParam;
 }
