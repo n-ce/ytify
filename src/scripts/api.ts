@@ -46,11 +46,11 @@ if (serialisedList !== '{}') {
   });
 }
 
-const txtReplace = (init: string, now: string) => apiRefreshBtn.textContent = <string>(<string>apiRefreshBtn.textContent).replace(init, now);
 
 async function fetchAPIdata() {
 
   const startTime = performance.now();
+  const wordReplace = (init: string, now: string) => apiRefreshBtn.textContent = <string>(<string>apiRefreshBtn.textContent).replace(init, now);
 
   if (apiRefreshBtn.textContent?.includes('Generating')) {
     apiRefreshBtn.textContent = 'Instances Generation Stopped';
@@ -58,7 +58,7 @@ async function fetchAPIdata() {
   }
   else apiRefreshBtn.textContent = 'Regenerate Instances';
 
-  txtReplace('Regenerate', ' 0% Generating');
+  wordReplace('Regenerate', ' 0% Generating');
 
   const pipData = await fetch('https://piped-instances.kavin.rocks')
     .then(res => res.json())
@@ -87,7 +87,7 @@ async function fetchAPIdata() {
   for await (const instance of pipData) {
     temp = num.toFixed();
     num += rate;
-    txtReplace(temp, num.toFixed());
+    wordReplace(temp, num.toFixed());
 
     const name = instance.name + ' ' + instance.locations;
     const url = instance.api_url;
@@ -129,7 +129,7 @@ async function fetchAPIdata() {
   for await (const instance of invData) {
     temp = num.toFixed();
     num += rate;
-    txtReplace(temp, num.toFixed());
+    wordReplace(temp, num.toFixed());
 
     const [instanceName, url] = instance.split(',');
 
@@ -138,6 +138,7 @@ async function fetchAPIdata() {
       audioElement.onloadedmetadata = () => res(dataUsage += audioSize);
       audioElement.onerror = () => rej('Failed to play audio');
       audioElement.src = audioURL.replace(new URL(audioURL).origin, url);
+      console.log(audioElement.src)
     }))
       .then(() => {
         if (![...invidiousInstances.options].map(_ => _.value).includes(url))
@@ -146,7 +147,7 @@ async function fetchAPIdata() {
       .catch(e => console.log(`${e} via ${url}`));
   }
 
-  txtReplace('100% Generating', 'Regenerate');
+  wordReplace('100% Generating', 'Regenerate');
 
   const timeTaken = ((performance.now() - startTime) / 1000);
 

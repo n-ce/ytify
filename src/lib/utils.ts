@@ -1,6 +1,7 @@
 import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
 import { removeFromCollection } from "../scripts/library";
+import { StreamItem } from "../components/streamItem";
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -209,7 +210,18 @@ export function fetchList(url: string, mix = false) {
             .then(res => res.json())
             .catch(e => console.log(e));
           if (!data) return;
-          listContainer.appendChild(itemsLoader(data.relatedStreams));
+          const existingItems: string[] = [];
+          for (const item of listContainer.children)
+            existingItems.push((<HTMLAnchorElement>item).href.slice(-11))
+
+          listContainer.appendChild(
+            itemsLoader(
+              data.relatedStreams.filter(
+                item => !existingItems.includes(
+                  item.url.slice(-11))
+              )
+            )
+          );
           return data.nextpage;
         });
 
