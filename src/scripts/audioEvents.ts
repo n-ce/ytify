@@ -245,24 +245,25 @@ export function autoQueue(data: Recommendation[]) {
 }
 
 
-const getData = (id: string): Promise<DOMStringMap> =>
-  fetch('https://p2-a.vercel.app?id=' + id)
-    .then(res => res.json())
-    .catch(e => {
-      console.log(id, e);
-      return { id: '' }
-    })
 
 // upcoming queries
 
+export async function upcomingInjector(query: string) {
+  const array = [];
+  for (let i = 0; i < query.length; i += 11)
+    array.push(query.slice(i, i + 11));
+  for await (const id of array)
+    fetch('https://p2-a.vercel.app?id=' + id)
+      .then(res => res.json())
+      .then(data => appendToQueuelist(data))
+      .catch(e => {
+        console.log(id, e);
+        return { id: '' }
+      })
+}
+
 if (params.has('a')) {
   const query = <string>params.get('a');
-  addEventListener('DOMContentLoaded', async () => {
-    const array = [];
-    for (let i = 0; i < query.length; i += 11)
-      array.push(query.slice(i, i + 11));
-    for await (const item of array)
-      appendToQueuelist(await getData(item))
-  });
+  addEventListener('DOMContentLoaded', () => upcomingInjector(query));
 }
 

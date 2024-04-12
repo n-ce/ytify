@@ -1,5 +1,6 @@
 import { audio, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchList, params } from "../lib/utils";
+import { upcomingInjector } from "./audioEvents";
 
 
 const anchors = document.querySelectorAll('nav a');
@@ -65,6 +66,8 @@ if (errorParam) {
       superInput.value = x.get('q') || '';
       searchFilters.value = x.get('f') || 'all';
     }
+    if (route === '/upcoming')
+      upcomingInjector(query);
   }
   else route = errorParam;
 }
