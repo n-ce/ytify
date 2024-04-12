@@ -22,10 +22,12 @@ codecSelector.addEventListener('change', async () => {
 
 
 const codecSaved = getSaved('codec');
+setTimeout(async () => {
+  codecSelector.selectedIndex = codecSaved ?
+    parseInt(codecSaved) :
+    (await supportsOpus() ? 0 : 1)
+});
 
-codecSelector.selectedIndex = codecSaved ?
-  parseInt(codecSaved) :
-  (await supportsOpus() ? 0 : 1);
 
 
 /////////////////////////////////////////////////////////////
