@@ -6,7 +6,6 @@
   position: sticky;
   z-index: 1;
   top: 0;
-  backdrop-filter: none;
   background-color: var(--onBg);
   backdrop-filter: blur(2vmin);
   border-radius: var(--roundness);

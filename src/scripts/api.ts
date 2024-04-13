@@ -20,6 +20,8 @@ const defData: apiList = {
     custom: false
   }
 };
+
+
 const clone = JSON.stringify(defData);
 const iMap = { 'piped': pipedInstances, 'invidious': invidiousInstances, 'image': thumbnailProxies };
 const apiRefreshBtn = <HTMLButtonElement>document.getElementById('apiRefreshBtn');
@@ -173,12 +175,13 @@ if (getSaved('unifiedInstances') !== 'disabled') {
   const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
   const unifiedInstancesSelector = <HTMLSelectElement>document.getElementById('unifiedInstanceSelector');
 
+
   fetch(unifiedInstancesAPIurl)
     .then(res => res.text())
     .then(text => JSON.parse(text.slice(3)))
-    .then(json => {
+    .then((json) => {
       for (const type in iMap)
-        (<any>iMap)[type].innerHTML = '';
+        iMap[type as keyof typeof iMap].innerHTML = '';
 
       for (const data in json) {
         unifiedInstancesSelector.add(new Option(data));
@@ -186,7 +189,7 @@ if (getSaved('unifiedInstances') !== 'disabled') {
         const iData = json[data];
 
         for (const newMap in iData)
-          (iMap as any)[newMap].add(new Option(data, iData[newMap]));
+          iMap[newMap as keyof typeof iMap].add(new Option(data, iData[newMap]));
 
       }
     })
