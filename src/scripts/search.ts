@@ -32,25 +32,23 @@ function setObserver(callback: () => Promise<string>) {
 
 // Get search results of input
 function searchLoader() {
+
   const text = superInput.value;
-
-  if (!text) {
-    searchlist.innerHTML = '';
-    insertYtmPls();
-    return;
-  }
-
-  loadingScreen.showModal();
-
-  searchlist.innerHTML = '';
-
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
   const sortByTime = searchFilters.selectedIndex === 1;
 
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
+  searchlist.innerHTML = '';
 
+  if (!text) {
+    insertYtmPls();
+    history.replaceState({}, '', location.origin + location.pathname);
+    return
+  }
+
+  loadingScreen.showModal();
 
   fetch(pipedInstances.value + '/' + query)
     .then(res => res.json())
@@ -175,7 +173,8 @@ superInput.addEventListener('input', async () => {
 
 let index = 0;
 
-superInput.addEventListener('keydown', _ => {
+superInput.addEventListener('keypress', _ => {
+  _.preventDefault();
   if (_.key === 'Enter') return searchLoader();
   if (_.key === 'Backspace' ||
     !suggestions.hasChildNodes() ||

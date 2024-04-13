@@ -134,11 +134,13 @@ async function fetchAPIdata() {
     const [instanceName, url] = instance.split(',');
 
     await (new Promise((res, rej) => {
+
       const audioElement = new Audio();
+
       audioElement.onloadedmetadata = () => res(dataUsage += audioSize);
       audioElement.onerror = () => rej('Failed to play audio');
       audioElement.src = audioURL.replace(new URL(audioURL).origin, url);
-      console.log(audioElement.src)
+
     }))
       .then(() => {
         if (![...invidiousInstances.options].map(_ => _.value).includes(url))
@@ -152,22 +154,79 @@ async function fetchAPIdata() {
   const timeTaken = ((performance.now() - startTime) / 1000);
 
   notify(`Instances successfully added in ${Math.ceil(timeTaken)} seconds, ${Math.ceil(dataUsage / 1024)}KB data was used.`);
+
 }
 
 
 const apiAutoFetchSwitch = <HTMLElement>document.getElementById('apiAutoFetchSwitch');
-apiAutoFetchSwitch.addEventListener('click', () => {
+
+// Unified Instance Architechture
+
+if (getSaved('unifiedInstances') !== 'disabled') {
+
+  removeSaved('apiList_2');
+  removeSaved('apiAutoFetch');
+
+  apiRefreshBtn.remove();
+  apiAutoFetchSwitch.remove();
+
+  const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
+  const unifiedInstancesSelector = <HTMLSelectElement>document.getElementById('unifiedInstanceSelector');
+
+  fetch(unifiedInstancesAPIurl)
+    .then(res => res.text())
+    .then(text => JSON.parse(text.slice(3)))
+    .then(json => {
+      for (const type in iMap)
+        (<any>iMap)[type].innerHTML = '';
+
+      for (const data in json) {
+        unifiedInstancesSelector.add(new Option(data));
+
+        const iData = json[data];
+
+        for (const newMap in iData)
+          (iMap as any)[newMap].add(new Option(data, iData[newMap]));
+
+      }
+    })
+    .then(() => {
+
+      unifiedInstancesSelector.addEventListener('change', () => {
+        const slctIdx = unifiedInstancesSelector.selectedIndex;
+        slctIdx ?
+          save('unifiedInstance', String(slctIdx)) :
+          removeSaved('unifiedInstance');
+
+        [pipedInstances, invidiousInstances, thumbnailProxies].forEach(
+          i =>
+            i.selectedIndex = unifiedInstancesSelector.selectedIndex
+        )
+      });
+
+      const index = parseInt(getSaved('unifiedInstance') || '0');
+
+      unifiedInstancesSelector.selectedIndex = index;
+
+      unifiedInstancesSelector.dispatchEvent(new Event('change'));
+    });
+
+} else {
+  // Classic Instance Architechture
+
+  apiAutoFetchSwitch.addEventListener('click', () => {
+    getSaved('apiAutoFetch') ?
+      removeSaved('apiAutoFetch') :
+      save('apiAutoFetch', 'false');
+  });
+
   getSaved('apiAutoFetch') ?
-    removeSaved('apiAutoFetch') :
-    save('apiAutoFetch', 'false');
-})
+    apiAutoFetchSwitch.toggleAttribute('checked') :
+    addEventListener('DOMContentLoaded', fetchAPIdata);
 
-getSaved('apiAutoFetch') ?
-  apiAutoFetchSwitch.toggleAttribute('checked') :
-  addEventListener('DOMContentLoaded', fetchAPIdata);
+  apiRefreshBtn.addEventListener('click', fetchAPIdata);
 
-apiRefreshBtn.addEventListener('click', fetchAPIdata);
-
+}
 
 // Instance Selector change event
 Object.entries(iMap).forEach(array => {

@@ -101,7 +101,7 @@
 
 
     <section id="search">
-      <span id="superInputContainer">
+      <form id="superInputContainer">
         <input type="search" id="superInput" autocomplete="off" placeholder='Search or enter YT URL' />
         <select id="searchFilters">
           <optgroup label="YouTube">
@@ -119,7 +119,7 @@
           </optgroup>
         </select>
         <button aria-label="search" class="ri-search-2-line"></button>
-      </span>
+      </form>
       <ul id="suggestions"></ul>
       <div id="searchlist">
         <h1 class="featuredPlaylists">
@@ -208,6 +208,17 @@
 
 
     <section id="settings">
+      <br>
+
+      <details id="unifiedInstanceContainer">
+        <summary align="center">Unified Instances</summary>
+        Enables seamless experience across the ytify platform using the same instance for data, audio & images.
+        If you want to use your own instances you have to disable this.
+        <toggle-switch id="unifiedInstanceSwitch" checked>
+          <select id="unifiedInstanceSelector"></select>
+        </toggle-switch>
+      </details>
+
       <span>
         <label for="pipedInstances">Piped Instance</label>
         <select id="pipedInstances">

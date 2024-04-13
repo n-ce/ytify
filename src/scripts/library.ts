@@ -161,7 +161,7 @@ export function createPlaylist(title: string) {
 
 // setup initial dom state
 
-addEventListener('DOMContentLoaded', () => {
+function loadLibrary() {
   const initialData = getDB();
 
   const initialKeys = Object.keys(initialData);
@@ -193,7 +193,12 @@ addEventListener('DOMContentLoaded', () => {
 
   for (const collection in initialData)
     addListToCollection(collection, initialData[collection], initialData);
-});
+}
+
+location.pathname === '/library' ?
+  addEventListener('DOMContentLoaded', loadLibrary) :
+  setTimeout(loadLibrary, 1500);
+
 
 // favorites button & data
 

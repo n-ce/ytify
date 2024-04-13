@@ -1,7 +1,6 @@
 import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
 import { removeFromCollection } from "../scripts/library";
-import { StreamItem } from "../components/streamItem";
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -10,6 +9,7 @@ export const params = (new URL(location.href)).searchParams;
 export const $ = document.createElement.bind(document);
 
 export const save = localStorage.setItem.bind(localStorage);
+
 
 export const getSaved = localStorage.getItem.bind(localStorage);
 
@@ -217,7 +217,7 @@ export function fetchList(url: string, mix = false) {
           listContainer.appendChild(
             itemsLoader(
               data.relatedStreams.filter(
-                item => !existingItems.includes(
+                (item: StreamItem) => !existingItems.includes(
                   item.url.slice(-11))
               )
             )

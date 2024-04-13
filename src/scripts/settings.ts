@@ -1,4 +1,4 @@
-import { audio, img, searchFilters } from "../lib/dom";
+import { audio, img, invidiousInstances, pipedInstances, searchFilters, thumbnailProxies } from "../lib/dom";
 import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
 import player from "../lib/player";
 
@@ -34,6 +34,27 @@ if (savedStartupTab) {
 }
 
 /////////////////////////////////////////////////////////////
+
+const unifiedInstanceSwitch = <HTMLElement>document.getElementById('unifiedInstanceSwitch');
+
+if (getSaved('unifiedInstances')) {
+  unifiedInstanceSwitch.toggleAttribute('checked');
+}
+else {
+  [pipedInstances, invidiousInstances, thumbnailProxies].forEach(i => {
+    i.parentElement?.classList.add('hide')
+  })
+}
+
+unifiedInstanceSwitch.addEventListener('click', (e) => {
+  if ((<HTMLSelectElement>e.target).matches('select')) {
+    return;
+  }
+  getSaved('unifiedInstances') ?
+    removeSaved('unifiedInstances') :
+    save('unifiedInstances', 'disabled');
+  location.reload();
+})
 
 
 /////////////////////////////////////////////////////////////

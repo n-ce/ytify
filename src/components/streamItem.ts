@@ -16,8 +16,8 @@ export class StreamItem extends LitElement {
 	@property() views!: string
 	@property() uploaded!: string
 
-	@state() tsrc = blankImage;
-	@state() unravel = '0';
+	@state() tsrc = blankImage
+	@state() unravel = '0'
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {

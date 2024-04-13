@@ -1,4 +1,4 @@
-import { audio, favButton, favIcon, playButton, pipedInstances, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
+import { audio, favButton, favIcon, playButton, pipedInstances, subtitleSelector, subtitleTrack, subtitleContainer, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus } from "./utils";
 import { addListToCollection } from "../scripts/library";
 import { autoQueue } from "../scripts/audioEvents";
@@ -104,10 +104,12 @@ export default async function player(id: string | null = '') {
   }, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
 
-    const xtest = new URL(_.url);
-    const ytest = _.url.replace(xtest.origin, 'https://invidious.fdn.fr')
+    const oldUrl = new URL(_.url);
+
+    const newUrl = _.url.replace(oldUrl.origin, invidiousInstances.value);
+
     // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec}`, ytest));
+    bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
 
 
     // find preferred bitrate
