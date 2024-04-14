@@ -1,4 +1,4 @@
-import { img, canvas, context } from "../lib/dom";
+import { img, canvas, context, unifiedInstances } from "../lib/dom";
 import player from "../lib/player";
 import { blankImage, getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
 
@@ -159,9 +159,14 @@ roundnessChanger.addEventListener('change', () => {
     save('roundness', roundnessChanger.value)
 })
 
-setTimeout(() => {
+
+const intervalId = setInterval(() => {
+  if (getSaved('unifiedInstance') !== 'disabled' && unifiedInstances.length === 1) return;
+
   const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
 
   streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
-}, 1000);
+
+  clearInterval(intervalId);
+});
 

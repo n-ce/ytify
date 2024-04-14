@@ -374,11 +374,9 @@ export async function parseTTML() {
     .then(text => {
 
       const imscDoc = imsc.fromXML(text);
-      console.log(imscDoc);
       const timeEvents = imscDoc.getMediaTimeEvents();
       const telen = timeEvents.length;
 
-      console.log(d.height, d.width)
       for (let i = 0; i < telen; i++) {
         const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
 

@@ -20,7 +20,8 @@ footer>span {
   align-items: center;
   background-color: var(--onBg);
   border-bottom: var(--border);
-  margin-bottom: 2vmin;
+  margin-bottom: 3vmin;
+
 }
 
 footer span p {
@@ -35,7 +36,6 @@ footer span p {
   cursor: pointer;
   margin: 0;
   background: none;
-  z-index: 1;
 }
 
 [type="range"]::-webkit-slider-runnable-track {
