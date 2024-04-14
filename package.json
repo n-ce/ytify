@@ -15,7 +15,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.19",
     "eruda": "^3.0.1",
-    "typescript": "^5.4.4",
+    "typescript": "^5.4.5",
     "vite": "^5.2.8",
     "vite-plugin-pwa": "^0.19.8"
   },

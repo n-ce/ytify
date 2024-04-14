@@ -28,7 +28,7 @@ declare global {
     playlistType: string,
     uploadedDate: string,
     uploaderName: string,
-    uploaderAvatar: string
+    uploaderAvatar: string,
   }
 
   type CollectionItem = {
@@ -46,7 +46,11 @@ declare global {
     title: string,
     uploaderUrl: string,
     uploaderName: string,
-    type: string
+    type: string,
+    author: string,
+    authorUrl: string,
+    lengthSeconds: number,
+    videoId: string
   };
 
   type Library = {

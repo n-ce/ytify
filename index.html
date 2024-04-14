@@ -208,16 +208,13 @@
 
 
     <section id="settings">
-      <br>
 
-      <details id="unifiedInstanceContainer">
-        <summary align="center">Unified Instances</summary>
-        Enables seamless experience across the ytify platform using the same instance for data, audio & images.
-        If you want to use your own instances you have to disable this.
-        <toggle-switch id="unifiedInstanceSwitch" checked>
-          <select id="unifiedInstanceSelector"></select>
-        </toggle-switch>
-      </details>
+      <span>
+        <label for="unifiedInstances">Unified Instance ℹ️</label>
+        <select id="unifiedInstances">
+          <option>Disabled</option>
+        </select>
+      </span>
 
       <span>
         <label for="pipedInstances">Piped Instance</label>
@@ -247,7 +244,6 @@
       </span>
 
       <toggle-switch id="apiAutoFetchSwitch" checked>Automatically Fetch Instances</toggle-switch>
-      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
 
       <h3>Search</h3>
       <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
@@ -307,6 +303,8 @@
         </select>
       </span>
       <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
+      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+
 
       <h3>Actions</h3>
 

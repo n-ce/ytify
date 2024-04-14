@@ -174,7 +174,7 @@ details {
   background-color: var(--onBg);
   color: var(--text);
   padding: 2vmin;
-  margin-bottom: 4vmin;
+  margin-top: 4vmin;
   border: var(--border);
   border-radius: var(--roundness);
 }

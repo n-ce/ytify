@@ -1,5 +1,5 @@
-import { audio, favButton, favIcon, playButton, pipedInstances, subtitleSelector, subtitleTrack, subtitleContainer, invidiousInstances } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus } from "./utils";
+import { audio, favButton, favIcon, playButton, invidiousInstances } from "./dom";
+import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";
 import { autoQueue } from "../scripts/audioEvents";
 
@@ -16,19 +16,25 @@ codecSelector.addEventListener('change', async () => {
 
   audio.pause();
   const timeOfSwitch = audio.currentTime;
-  await player(audio.dataset.id);
+  await invPlayer(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
 });
 
 
 const codecSaved = getSaved('codec');
-setTimeout(async () => {
-  codecSelector.selectedIndex = codecSaved ?
-    parseInt(codecSaved) :
-    (await supportsOpus() ? 0 : 1)
-});
 
-
+codecSaved ?
+  (codecSelector.selectedIndex = parseInt(codecSaved)) :
+  navigator.mediaCapabilities.decodingInfo({
+    type: 'file',
+    audio: {
+      contentType: 'audio/ogg;codecs=opus'
+    }
+  }).then(res => {
+    // sets AAC as default for non-supported devices
+    if (!res.supported)
+      codecSelector.selectedIndex = 1;
+  });
 
 /////////////////////////////////////////////////////////////
 
@@ -41,48 +47,37 @@ bitrateSelector.addEventListener('change', () => {
 
 /////////////////////////////////////////////////////////////
 
-subtitleSelector.addEventListener('change', () => {
-  subtitleTrack.src = subtitleSelector.value;
-  subtitleSelector.value ?
-    subtitleContainer.classList.remove('hide') :
-    subtitleContainer.classList.add('hide');
-  parseTTML();
-});
-
-/////////////////////////////////////////////////////////////
-
-export default async function player(id: string | null = '') {
+export default async function invPlayer(id: string | null = '') {
 
   if (!id) return;
-  if (getSaved('unifiedInstances') === 'disabled')
-    return import("./player.invidious").then(mod => mod.default(id))
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(pipedInstances.value + '/streams/' + id)
+  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
-      const i = pipedInstances.selectedIndex;
-      if (i < pipedInstances.length - 1) {
+      const i = invidiousInstances.selectedIndex;
+      if (i < invidiousInstances.length - 1) {
         notify('switched playback instance from ' +
-          pipedInstances.options[i].value
+          invidiousInstances.options[i].value
           + ' to ' +
-          pipedInstances.options[i + 1].value
+          invidiousInstances.options[i + 1].value
           + ' due to error: ' + err.message
         );
-        pipedInstances.selectedIndex = i + 1;
-        player(id);
+        invidiousInstances.selectedIndex = i + 1;
+        invPlayer(id);
         return;
       }
       notify(err.message);
       playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      pipedInstances.selectedIndex = 0;
+      invidiousInstances.selectedIndex = 0;
     });
 
-  if (!data?.audioStreams?.length)
-    return notify('No audio streams available');
+  if (!data?.adaptiveFormats?.length)
+    return;
 
-  const audioStreams = data.audioStreams
+  const audioStreams = data.adaptiveFormats
+    .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
@@ -99,20 +94,20 @@ export default async function player(id: string | null = '') {
   bitrateSelector.innerHTML = '';
 
   audioStreams.forEach((_: {
-    codec: string,
+    type: string,
     url: string,
     quality: string,
     bitrate: string,
+    encoding: string
   }, i: number) => {
-    const codec = _.codec === 'opus' ? 'opus' : 'aac';
+    const bitrate = parseInt(_.bitrate);
+    const codec = _.type.includes('opus') ? 'opus' : 'aac';
+    const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
 
-    const oldUrl = new URL(_.url);
-
-    const newUrl = _.url.replace(oldUrl.origin, invidiousInstances.value);
-
+    // proxy the url
+    const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
     // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
-
+    bitrateSelector.add(new Option(quality, url));
 
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
@@ -127,16 +122,16 @@ export default async function player(id: string | null = '') {
   // remove ' - Topic' from name if it exists
 
   let music = false;
-  if (data.uploader.endsWith(' - Topic')) {
+  if (data.author.endsWith(' - Topic')) {
     music = true;
-    data.uploader = data.uploader.replace(' - Topic', '');
+    data.author = data.author.replace(' - Topic', '');
   }
 
   setMetaData(
     id,
     data.title,
-    data.uploader,
-    data.uploaderUrl,
+    data.author,
+    data.authorUrl,
     music
   );
 
@@ -148,9 +143,9 @@ export default async function player(id: string | null = '') {
 
   audio.dataset.id = id;
   audio.dataset.title = data.title;
-  audio.dataset.author = data.uploader;
-  audio.dataset.duration = convertSStoHHMMSS(data.duration);
-  audio.dataset.channelUrl = data.uploaderUrl;
+  audio.dataset.author = data.author;
+  audio.dataset.duration = convertSStoHHMMSS(data.lengthSeconds);
+  audio.dataset.channelUrl = data.authorUrl;
 
 
   // favbutton state
@@ -168,7 +163,7 @@ export default async function player(id: string | null = '') {
 
 
   if (!getSaved('autoQueue'))
-    autoQueue(data.relatedStreams);
+    autoQueue(data.recommendedVideos, true);
 
   if (getSaved('discover') === 'off') return;
 
@@ -179,23 +174,20 @@ export default async function player(id: string | null = '') {
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
-    data.relatedStreams.forEach(
+    data.recommendedVideos.forEach(
       (stream: Recommendation) => {
-        if (
-          stream.type !== 'stream' ||
-          stream.duration < 100 || stream.duration > 3000) return;
+        if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
-        const rsId = stream.url.slice(9);
-
+        const rsId = stream.videoId;
         // merges previous discover items with current related streams
         db.discover.hasOwnProperty(rsId) ?
           (<number>db.discover[rsId].frequency)++ :
           db.discover[rsId] = {
             id: rsId,
             title: stream.title,
-            author: stream.uploaderName,
-            duration: convertSStoHHMMSS(stream.duration),
-            channelUrl: stream.uploaderUrl,
+            author: stream.author,
+            duration: convertSStoHHMMSS(stream.lengthSeconds),
+            channelUrl: stream.authorUrl,
             frequency: 1
           }
       });

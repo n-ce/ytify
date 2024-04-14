@@ -1,4 +1,4 @@
-import { audio, pipedInstances, invidiousInstances, thumbnailProxies } from "../lib/dom";
+import { audio, pipedInstances, invidiousInstances, thumbnailProxies, unifiedInstances } from "../lib/dom";
 import player from "../lib/player";
 import { getSaved, generateImageUrl, notify, removeSaved, save, supportsOpus } from "../lib/utils";
 
@@ -164,7 +164,7 @@ const apiAutoFetchSwitch = <HTMLElement>document.getElementById('apiAutoFetchSwi
 
 // Unified Instance Architechture
 
-if (getSaved('unifiedInstances') !== 'disabled') {
+if (getSaved('unifiedInstance') !== 'disabled') {
 
   removeSaved('apiList_2');
   removeSaved('apiAutoFetch');
@@ -173,8 +173,6 @@ if (getSaved('unifiedInstances') !== 'disabled') {
   apiAutoFetchSwitch.remove();
 
   const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
-  const unifiedInstancesSelector = <HTMLSelectElement>document.getElementById('unifiedInstanceSelector');
-
 
   fetch(unifiedInstancesAPIurl)
     .then(res => res.text())
@@ -184,7 +182,7 @@ if (getSaved('unifiedInstances') !== 'disabled') {
         iMap[type as keyof typeof iMap].innerHTML = '';
 
       for (const data in json) {
-        unifiedInstancesSelector.add(new Option(data));
+        unifiedInstances.add(new Option(data));
 
         const iData = json[data];
 
@@ -195,23 +193,24 @@ if (getSaved('unifiedInstances') !== 'disabled') {
     })
     .then(() => {
 
-      unifiedInstancesSelector.addEventListener('change', () => {
-        const slctIdx = unifiedInstancesSelector.selectedIndex;
-        slctIdx ?
-          save('unifiedInstance', String(slctIdx)) :
-          removeSaved('unifiedInstance');
+      unifiedInstances.addEventListener('change', () => {
+        const selected = `${unifiedInstances.selectedIndex || 'disabled'}`;
+
+        selected === '1' ?
+          removeSaved('unifiedInstance') :
+          save('unifiedInstance', selected);
 
         [pipedInstances, invidiousInstances, thumbnailProxies].forEach(
           i =>
-            i.selectedIndex = unifiedInstancesSelector.selectedIndex
+            i.selectedIndex = unifiedInstances.selectedIndex - 1
         )
       });
 
-      const index = parseInt(getSaved('unifiedInstance') || '0');
+      const index = parseInt(getSaved('unifiedInstance') || '1');
 
-      unifiedInstancesSelector.selectedIndex = index;
+      unifiedInstances.selectedIndex = index;
 
-      unifiedInstancesSelector.dispatchEvent(new Event('change'));
+      unifiedInstances.dispatchEvent(new Event('change'));
     });
 
 } else {

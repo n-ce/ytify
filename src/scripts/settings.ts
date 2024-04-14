@@ -1,4 +1,4 @@
-import { audio, img, invidiousInstances, pipedInstances, searchFilters, thumbnailProxies } from "../lib/dom";
+import { audio, img, invidiousInstances, pipedInstances, searchFilters, thumbnailProxies, unifiedInstances } from "../lib/dom";
 import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
 import player from "../lib/player";
 
@@ -19,6 +19,27 @@ export { ytmPlsSwitch };
 
 /////////////////////////////////////////////////////////////
 
+const unifiedInstanceState = getSaved('unifiedInstance');
+const unifiedInstanceLabel = <HTMLLabelElement>unifiedInstances.previousElementSibling;
+
+unifiedInstanceState !== 'disabled' ?
+  [pipedInstances, invidiousInstances, thumbnailProxies].forEach(i => {
+    (<HTMLSpanElement>i.parentElement).classList.add('hide')
+  })
+  :
+  unifiedInstanceLabel.textContent = 'Click here to enable Unified Instances ✅';
+
+unifiedInstanceLabel.addEventListener('click', () => {
+  if (unifiedInstanceState === 'disabled') {
+    removeSaved('unifiedInstance');
+    location.reload();
+  } else {
+    alert('Enables seamless experience across the ytify platform using the same instance for data, audio & images. Switch to classic instances mode by selecting disabled, if you want to use your own custom instance or prefer that. Note : Subtitles are not supported through the classic instance structure.');
+  }
+});
+
+/////////////////////////////////////////////////////////////
+
 startupTabSelector.addEventListener('change', () => {
   const tab = startupTabSelector.value;
   tab ?
@@ -32,30 +53,6 @@ if (savedStartupTab) {
   if (location.pathname === '/')
     (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
 }
-
-/////////////////////////////////////////////////////////////
-
-const unifiedInstanceSwitch = <HTMLElement>document.getElementById('unifiedInstanceSwitch');
-
-if (getSaved('unifiedInstances')) {
-  unifiedInstanceSwitch.toggleAttribute('checked');
-}
-else {
-  [pipedInstances, invidiousInstances, thumbnailProxies].forEach(i => {
-    i.parentElement?.classList.add('hide')
-  })
-}
-
-unifiedInstanceSwitch.addEventListener('click', (e) => {
-  if ((<HTMLSelectElement>e.target).matches('select')) {
-    return;
-  }
-  getSaved('unifiedInstances') ?
-    removeSaved('unifiedInstances') :
-    save('unifiedInstances', 'disabled');
-  location.reload();
-})
-
 
 /////////////////////////////////////////////////////////////
 

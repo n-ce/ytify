@@ -221,26 +221,44 @@ if (msn) {
   });
 }
 
-export function autoQueue(data: Recommendation[]) {
+export function autoQueue(data: Recommendation[], invidious = false) {
   const queueIds = [...streamHistory];
   const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
   for (const item of items)
     queueIds.push(<string>item.dataset.id);
 
   data.forEach(stream => {
-    const rsId = stream.url.slice(9);
-    if (
-      stream.type === 'stream' &&
-      stream.duration > 60 &&
-      stream.duration < 3600 &&
-      !queueIds.includes(rsId)
-    )
-      appendToQueuelist({
-        id: rsId,
-        title: stream.title,
-        author: stream.uploaderName,
-        duration: convertSStoHHMMSS(stream.duration),
-      })
+    if (invidious) {
+
+      if (
+        stream.lengthSeconds > 60 &&
+        stream.lengthSeconds < 3600 &&
+        !queueIds.includes(stream.videoId)
+      )
+        appendToQueuelist({
+          id: stream.videoId,
+          title: stream.title,
+          author: stream.author,
+          duration: convertSStoHHMMSS(stream.lengthSeconds),
+        })
+
+    } else {
+
+      const rsId = stream.url.slice(9);
+      if (
+        stream.type === 'stream' &&
+        stream.duration > 60 &&
+        stream.duration < 3600 &&
+        !queueIds.includes(rsId)
+      )
+        appendToQueuelist({
+          id: rsId,
+          title: stream.title,
+          author: stream.uploaderName,
+          duration: convertSStoHHMMSS(stream.duration),
+        })
+
+    }
   });
 }
 
@@ -264,6 +282,6 @@ export async function upcomingInjector(query: string) {
 
 if (params.has('a')) {
   const query = <string>params.get('a');
-  addEventListener('DOMContentLoaded', () => upcomingInjector(query));
+  upcomingInjector(query);
 }
 
