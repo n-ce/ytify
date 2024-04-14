@@ -1,7 +1,5 @@
 declare global {
 
-  const imsc: any;
-
   type apiList = {
     [index: string]: {
       name: string,
@@ -77,4 +75,6 @@ declare global {
 
 }
 
+
 export { };
+

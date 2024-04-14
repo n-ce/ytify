@@ -2,6 +2,8 @@ import { html, render } from "lit";
 import { audio, canvas, context, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, pipedInstances, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, thumbnailProxies } from "./dom";
 import { removeFromCollection } from "../scripts/library";
 
+
+
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 export const params = (new URL(location.href)).searchParams;
@@ -357,6 +359,8 @@ export function superClick(e: Event) {
 
 export async function parseTTML() {
 
+  const imsc = await import('imsc/dist/imsc.all.min.js');
+
   const myTrack = audio.textTracks[0];
   myTrack.mode = "hidden";
   const d = img.getBoundingClientRect();
@@ -368,17 +372,20 @@ export async function parseTTML() {
   fetch(subtitleTrack.src)
     .then(res => res.text())
     .then(text => {
+
       const imscDoc = imsc.fromXML(text);
+      console.log(imscDoc);
       const timeEvents = imscDoc.getMediaTimeEvents();
       const telen = timeEvents.length;
 
+      console.log(d.height, d.width)
       for (let i = 0; i < telen; i++) {
         const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
 
         myCue.onenter = () => {
           const subtitleActive = subtitleContainer.firstChild;
           if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive)
+            subtitleContainer.removeChild(subtitleActive);
           imsc.renderHTML(
             imsc.generateISD(imscDoc, myCue.startTime),
             subtitleContainer,

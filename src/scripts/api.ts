@@ -200,6 +200,8 @@ if (getSaved('unifiedInstance') !== 'disabled') {
           removeSaved('unifiedInstance') :
           save('unifiedInstance', selected);
 
+        if (selected === 'disabled') location.reload();
+
         [pipedInstances, invidiousInstances, thumbnailProxies].forEach(
           i =>
             i.selectedIndex = unifiedInstances.selectedIndex - 1

@@ -1,3 +1,12 @@
+/*
+Why does this exist ?
+
+Acts as a fallback to support playback through invidious without using unified instances
+
+Destined to be deprecated when adaptive streaming is implemented.
+*/
+
+
 import { audio, favButton, favIcon, playButton, invidiousInstances } from "./dom";
 import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
 import { addListToCollection } from "../scripts/library";

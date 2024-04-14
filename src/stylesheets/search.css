@@ -17,7 +17,7 @@
 
 #superInputContainer:focus-within {
   backdrop-filter: none;
-  background-color: var(--onBg);
+  background-color: var(--bg);
 }
 
 #superInput {

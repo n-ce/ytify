@@ -159,8 +159,9 @@ roundnessChanger.addEventListener('change', () => {
     save('roundness', roundnessChanger.value)
 })
 
+setTimeout(() => {
+  const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
 
-const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
-
-streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
+  streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
+}, 1000);
 

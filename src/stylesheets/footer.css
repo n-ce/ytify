@@ -35,6 +35,7 @@ footer span p {
   cursor: pointer;
   margin: 0;
   background: none;
+  z-index: 1;
 }
 
 [type="range"]::-webkit-slider-runnable-track {

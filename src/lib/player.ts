@@ -124,6 +124,21 @@ export default async function player(id: string | null = '') {
   bitrateSelector.selectedIndex = index;
   audio.src = bitrateSelector.value;
 
+  // Subtitle data dom injection
+
+  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
+  subtitleSelector.classList.remove('hide');
+  subtitleContainer.innerHTML = '';
+  if (data.subtitles.length)
+    for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
+  else {
+    subtitleTrack.src = '';
+    subtitleContainer.classList.add('hide');
+    subtitleSelector.classList.add('hide');
+    parseTTML();
+  }
+
+
   // remove ' - Topic' from name if it exists
 
   let music = false;
