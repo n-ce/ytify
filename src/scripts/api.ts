@@ -15,8 +15,8 @@ const defData: apiList = {
     custom: false
   },
   'image': {
-    name: 'lunar.icu 🇩🇪',
-    url: 'https://piped-proxy.lunar.icu',
+    name: 'leptons.xyz 🇦🇹',
+    url: 'https://pipedproxy.leptons.xyz',
     custom: false
   }
 };
@@ -37,7 +37,9 @@ if (serialisedList !== '{}') {
     const name = data.name;
     const url = data.url;
     const custom = data.custom;
-    if (name === 'kavin.rocks 🌐' || name === 'lunar.icu 🇩🇪' || name === 'fdn.fr 🇫🇷') return;
+    if (key === 'piped' && name === 'kavin.rocks 🌐') return;
+    if (key === 'image' && name === 'leptons.xyz 🇦🇹') return;
+    if (key === 'invidious' && name === 'fdn.fr 🇫🇷') return;
     if (custom) {
       const dom = instance.options[0];
       dom.value = url;
