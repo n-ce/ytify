@@ -6,8 +6,6 @@ import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
 const streamHistory: string[] = [];
-const removeHistory: string[] = [];
-
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');

@@ -180,7 +180,9 @@ if (getSaved('unifiedInstance') !== 'disabled') {
     .then((json) => {
 
       let average = 0;
-      const tzar = Object.values(json).map((i: any) => parseInt(i.timezone.slice(3)));
+
+      const tzar = (<{ [index: string]: string }[]>Object.values(json)).map((i) => parseInt(i.timezone.slice(3)));
+
       for (const i of tzar)
         average += i
 

@@ -1,4 +1,4 @@
-import { listContainer, superModal } from "../lib/dom";
+import { superModal } from "../lib/dom";
 import player from "../lib/player";
 import { $, fetchList, notify } from "../lib/utils";
 import { addToCollection, createPlaylist } from "./library";
