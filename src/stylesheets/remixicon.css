@@ -19,12 +19,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.ri-home-line:before {
+  content: "\ee2b";
+}
+
 .ri-search-2-line:before {
   content: "\f0cd";
 }
 
-.ri-home-line:before {
-  content: "\ee2b";
+.ri-stack-line:before {
+  content: "\f181";
+}
+
+.ri-settings-line:before {
+  content: "\f0ee";
 }
 
 .ri-skip-back-line:before {
@@ -35,8 +43,76 @@
   content: "\f144";
 }
 
+.ri-replay-15-line:before {
+  content: "\f354";
+}
+
+.ri-forward-15-line:before {
+  content: "\f32d";
+}
+
+.ri-play-circle-fill:before {
+  content: "\f008";
+}
+
+.ri-pause-circle-fill:before {
+  content: "\efd5";
+}
+
+.ri-stop-circle-fill:before {
+  content: "\f19e";
+}
+
+.ri-loader-3-line:before {
+  content: "\eec4";
+}
+
+.ri-close-line:before {
+  content: "\eb99";
+}
+
+.ri-shuffle-line:before {
+  content: "\f124";
+}
+
+.ri-subtract-line:before {
+  content: "\f1af";
+}
+
+.ri-filter-2-line:before {
+  content: "\ed23";
+}
+
+.ri-volume-down-fill:before {
+  content: "\f29b";
+}
+
+.ri-volume-mute-fill:before {
+  content: "\f29d";
+}
+
+.ri-volume-up-fill:before {
+  content: "\f2a1";
+}
+
 .ri-repeat-line:before {
   content: "\f074";
+}
+
+.ri-play-list-add-line:before {
+  content: "\f00f";
+}
+
+.ri-play-list-2-fill:before {
+  content: "\f00c";
+}
+
+.ri-compass-3-line:before {
+  content: "\ebbe";
+}
+
+.ri-memories-line:before {
+  content: "\f341";
 }
 
 .ri-heart-line:before {
@@ -47,118 +123,42 @@
   content: "\ee0e";
 }
 
-.ri-replay-15-line:before {
-  content: "\f354";
+.ri-calendar-schedule-line:before {
+  content: "\f3f3";
 }
 
-.ri-forward-15-line:before {
-  content: "\f32d";
+.ri-import-line:before {
+  content: "\f447";
 }
 
-.ri-settings-line:before {
-  content: "\f0ee";
+.ri-export-line:before {
+  content: "\f437";
 }
 
-.ri-loader-3-line:before {
-  content: "\eec4";
-}
-
-.ri-youtube-line:before {
-  content: "\f2d5";
-}
-
-.ri-volume-down-line:before {
-  content: "\f29c";
-}
-
-.ri-volume-mute-line:before {
-  content: "\f29e";
-}
-
-.ri-volume-up-line:before {
-  content: "\f2a2";
-}
-
-.ri-rfid-line:before {
-  content: "\f3bb";
-}
-
-.ri-download-2-line:before {
-  content: "\ec54";
-}
-
-.ri-play-list-add-line:before {
-  content: "\f00f";
-}
-
-.ri-pause-circle-fill:before {
-  content: "\efd5";
-}
-
-.ri-play-circle-fill:before {
-  content: "\f008";
-}
-
-.ri-stop-circle-fill:before {
-  content: "\f19e";
-}
-
-.ri-shuffle-line:before {
-  content: "\f124";
-}
-
-.ri-close-line:before {
-  content: "\eb99";
-}
-
-.ri-delete-bin-7-line:before {
-  content: "\ec28";
+.ri-delete-bin-2-line:before {
+  content: "\ec1e";
 }
 
 .ri-list-check-2:before {
   content: "\eeb9";
 }
 
-.ri-play-line:before {
-  content: "\f00b";
+.ri-play-large-line:before {
+  content: "\f509";
 }
 
-.ri-subtract-line:before {
-  content: "\f1af";
+.ri-radio-line:before {
+  content: "\f052";
 }
 
-.ri-stack-line:before {
-  content: "\f181";
+.ri-download-2-fill:before {
+  content: "\ec53";
 }
 
-.ri-history-line:before {
-  content: "\ee17";
+.ri-youtube-line:before {
+  content: "\f2d5";
 }
 
-.ri-play-list-2-line:before {
-  content: "\f00d";
-}
-
-.ri-compass-3-line:before {
-  content: "\ebbe";
-}
-
-.ri-edit-line:before {
-  content: "\ec86";
-}
-
-.ri-login-circle-line:before {
-  content: "\eed6";
-}
-
-.ri-logout-circle-line:before {
-  content: "\eedc";
-}
-
-.ri-tv-line:before {
-  content: "\f237";
-}
-
-.ri-calendar-schedule-line:before {
-  content: "\f3f3";
+.ri-external-link-line:before {
+  content: "\ecaf";
 }

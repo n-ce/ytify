@@ -126,16 +126,22 @@ export default async function player(id: string | null = '') {
 
   // Subtitle data dom injection
 
-  subtitleSelector.innerHTML = '<option value="">Subtitles</option>';
+  for (const option of subtitleSelector.options)
+    if (option.textContent !== 'Subtitles') option.remove();
+
   subtitleSelector.classList.remove('hide');
   subtitleContainer.innerHTML = '';
+
   if (data.subtitles.length)
-    for (const subtitles of data.subtitles) subtitleSelector.add(new Option(subtitles.name, subtitles.url));
+    for (const subtitles of data.subtitles)
+      subtitleSelector.add(
+        new Option(subtitles.name, subtitles.url)
+      );
   else {
     subtitleTrack.src = '';
     subtitleContainer.classList.add('hide');
     subtitleSelector.classList.add('hide');
-    parseTTML();
+    subtitleContainer.firstChild?.remove();
   }
 
 

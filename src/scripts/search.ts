@@ -173,9 +173,11 @@ superInput.addEventListener('input', async () => {
 
 let index = 0;
 
-superInput.addEventListener('keypress', _ => {
-  _.preventDefault();
-  if (_.key === 'Enter') return searchLoader();
+superInput.addEventListener('keydown', _ => {
+  if (_.key === 'Enter') {
+    searchLoader();
+    _.preventDefault();
+  }
   if (_.key === 'Backspace' ||
     !suggestions.hasChildNodes() ||
     getSaved('search_suggestions')) return;

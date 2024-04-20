@@ -6,6 +6,9 @@ import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
 const streamHistory: string[] = [];
+const removeHistory: string[] = [];
+
+
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
@@ -221,7 +224,10 @@ if (msn) {
   });
 }
 
-export function autoQueue(data: Recommendation[], invidious = false) {
+
+
+export function autoQueue(data: Recommendation[], invidious: boolean = false) {
+
   const queueIds = [...streamHistory];
   const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
   for (const item of items)
@@ -230,16 +236,17 @@ export function autoQueue(data: Recommendation[], invidious = false) {
   data.forEach(stream => {
     if (invidious) {
 
+      const duration = stream.lengthSeconds;
       if (
-        stream.lengthSeconds > 60 &&
-        stream.lengthSeconds < 3600 &&
+        duration > 60 &&
+        duration < 3600 &&
         !queueIds.includes(stream.videoId)
       )
         appendToQueuelist({
           id: stream.videoId,
           title: stream.title,
           author: stream.author,
-          duration: convertSStoHHMMSS(stream.lengthSeconds),
+          duration: convertSStoHHMMSS(duration),
         })
 
     } else {
@@ -261,7 +268,6 @@ export function autoQueue(data: Recommendation[], invidious = false) {
     }
   });
 }
-
 
 
 // upcoming queries

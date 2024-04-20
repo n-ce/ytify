@@ -227,7 +227,8 @@ export function fetchList(url: string, mix = false) {
           return data.nextpage;
         });
 
-      openInYtBtn.innerHTML = '<i class="ri-youtube-line"></i> ' + group.name;
+
+      openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
       saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${url.includes('channel') ? 'Subscribe' : 'Save'}`;
 
       if (mix) playAllBtn.click();
@@ -239,6 +240,7 @@ export function fetchList(url: string, mix = false) {
             .join('=')
             .substring(1)
         );
+        listContainer.dataset.url = url;
         document.title = group.name + ' - ytify';
       }
     })
@@ -351,8 +353,6 @@ export function superClick(e: Event) {
         url.replace('?list=', 's/') :
         url
     );
-    // data binding for open channel action
-    listContainer.dataset.url = url;
   }
 }
 

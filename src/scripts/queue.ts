@@ -4,7 +4,7 @@ import { $ } from "../lib/utils";
 
 const queueArray: string[] = [];
 
-const [clearQBtn, shuffleQBtn, removeQBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;
+const [clearQBtn, shuffleQBtn, removeQBtn, filterG10Btn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
@@ -12,6 +12,10 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
   if (!data.id) return;
 
   if (queueArray.includes(data.id)) return;
+
+  if (filterG10Btn.classList.contains('filter'))
+    if (isLongerThan10Min(<string>data.duration))
+      return;
 
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
 
@@ -83,3 +87,28 @@ removeQBtn.addEventListener('click', () => {
   );
   removeQBtn.classList.toggle('delete');
 });
+
+
+
+
+filterG10Btn.addEventListener('click', () => {
+
+  filterG10Btn.classList.toggle('filter');
+
+  queuelist.querySelectorAll('stream-item').forEach((el, index) => {
+    const duration = (<HTMLElement>el).dataset.duration as string
+    if (isLongerThan10Min(duration)) {
+      queueArray.splice(index, 1);
+      el.remove();
+    }
+
+  });
+});
+
+function isLongerThan10Min(duration: string) {
+  const hhmmss = duration.split(':');
+  return !(
+    hhmmss.length === 2 &&
+    parseInt(hhmmss[0]) < 10
+  );
+}

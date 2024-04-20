@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 
   <meta name="description"
-    content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link or search a video up and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
+    content="48kb/s to 160kb/s youtube audio streaming website. Copy a youtube video link or search a video up and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="white">
@@ -35,7 +35,7 @@
 <body>
   <canvas class="hide"></canvas>
   <audio>
-    <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" srclang="en" />
+    <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
   </audio>
   <nav>
     <a href="/" id="/">
@@ -75,7 +75,9 @@
         <select id="bitrateSelector">
           <option>Bitrate</option>
         </select>
-        <select id="subtitleSelector" class="hide"></select>
+        <select id="subtitleSelector" class="hide">
+          <option>Subtitles</option>
+        </select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
@@ -93,7 +95,11 @@
         <button>
           <i class="ri-subtract-line"></i> Remove
         </button>
+        <button>
+          <i class="ri-filter-2-line"></i> Filter >10:00
+        </button>
       </span>
+      <br>
       <div id="queuelist">
         <h1 align="center">upcoming streams show here</h1>
       </div>
@@ -154,7 +160,7 @@
 
       <details id="history">
         <summary>
-          <i class="ri-history-line"></i> History
+          <i class="ri-memories-line"></i> History
         </summary>
         <button>
           <i class="ri-close-line"></i> Clear All
@@ -196,12 +202,12 @@
       <br>
       <div>
         <label id="importBtn" for="upload">
-          <i class="ri-login-circle-line"></i> Import</label>
+          <i class="ri-import-line"></i> Import</label>
         <input type="file" id="upload" class="hide">
         <label id="exportBtn">
-          <i class="ri-logout-circle-line"></i> Export</label>
+          <i class="ri-export-line"></i> Export</label>
         <label id="cleanLibraryBtn">
-          <i class="ri-delete-bin-7-line"></i> Clean</label>
+          <i class="ri-delete-bin-2-line"></i> Clean</label>
       </div>
       <br>
     </section>
@@ -258,8 +264,8 @@
           <option value="https://invidious.fdn.fr" selected>fdn.fr 🇫🇷</option>
         </select>
       </span>
-      <toggle-switch id="autoQueueSwitch" checked>Auto-Queue</toggle-switch>
-      <toggle-switch id="musicModeSwitch" checked>Music Mode for Auto-Queue</toggle-switch>
+
+      <toggle-switch checked id="autoQueue">Auto-Queue</toggle-switch>
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <span>
         <label for="CodecPreference">Codec Preference</label>
@@ -334,7 +340,7 @@
     <section id="list">
       <span id="listTools">
         <button id="playAllBtn">
-          <i class="ri-play-line"></i> Play
+          <i class="ri-play-large-line"></i> Play
         </button>
         <button id="enqueueAllBtn">
           <i class="ri-list-check-2"></i> Enqueue
@@ -343,7 +349,7 @@
           <i class="ri-stack-line"></i> Save
         </button>
         <button id="openInYT">
-          <i class="ri-youtube-line"></i> Open In YouTube
+          <i class="ri-external-link-line"></i> Open In YouTube
         </button>
       </span>
       <br>
@@ -393,7 +399,7 @@
 
   <dialog id="superModal">
     <ul>
-      <li><i class="ri-play-line"></i>Play Now</li>
+      <li><i class="ri-play-large-line"></i>Play Now</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
       <li>
         <i class="ri-play-list-add-line"></i>
@@ -404,8 +410,8 @@
           <option value="listenLater">Listen Later</option>
         </select>
       </li>
-      <li><i class="ri-rfid-line"></i>Start Radio</li>
-      <li><i class="ri-download-2-line"></i>Download</li>
+      <li><i class="ri-radio-line"></i>Start Radio</li>
+      <li><i class="ri-download-2-fill"></i>Download</li>
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
   </dialog>

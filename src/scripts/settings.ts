@@ -6,7 +6,7 @@ const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTa
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
-const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueueSwitch');
+const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueue');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
 const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
@@ -24,7 +24,7 @@ const unifiedInstanceLabel = <HTMLLabelElement>unifiedInstances.previousElementS
 
 unifiedInstanceState !== 'disabled' ?
   [pipedInstances, invidiousInstances, thumbnailProxies].forEach(i => {
-    (<HTMLSpanElement>i.parentElement).classList.add('hide')
+    (<HTMLSpanElement>i.parentElement).classList.add('hide');
   })
   :
   unifiedInstanceLabel.textContent = 'Click here to enable Unified Instances ✅';
@@ -93,9 +93,9 @@ if (getSaved('defaultFilter')) {
 /////////////////////////////////////////////////////////////
 
 autoQueueSwitch.addEventListener('click', () => {
-  getSaved('autoQueue') ?
-    removeSaved('autoQueue') :
-    save('autoQueue', 'off');
+  autoQueueSwitch.hasAttribute('checked') ?
+    save('autoQueue', 'off') :
+    removeSaved('autoQueue');
 });
 
 if (getSaved('autoQueue') === 'off')

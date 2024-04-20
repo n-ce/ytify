@@ -218,44 +218,38 @@ list-item:hover {
   background-color: #800 !important;
 }
 
-
-#queuetools {
-  height: 10vmin;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  position: sticky;
-  top: calc(100% - 10vmin);
-  z-index: 3;
+.filter {
+  background-color: #077 !important;
 }
 
 
-#queuetools button,
-#listTools button,
-details button,
-#settings button {
-  border: var(--border);
-  border-radius: var(--roundness);
-  background: var(--text);
-  color: var(--bg);
-  font-family: inherit;
-  font-size: inherit;
-  padding: 1vmin 2vmin;
-  margin: 1vmin 2vmin;
+details,
+#queuetools,
+#listTools,
+#settings {
+  button {
+    border: var(--border);
+    border-radius: var(--roundness);
+    background: var(--text);
+    color: var(--bg);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1vmin 2vmin;
+    margin: 1vmin 2vmin;
+  }
 }
 
-#queuetools button:hover,
-#listTools button:hover,
-details button:hover {
-  background-color: var(--bg);
-  color: var(--text);
+#queuetools,
+#listTools,
+details {
+  button:hover {
+    background-color: var(--bg);
+    color: var(--text);
+  }
 }
 
-#queuelist {
-  width: 100%;
-  height: 100%;
-  margin-top: -10vmin;
-}
+
+
 
 #loadingScreen {
   background-color: var(--bg);

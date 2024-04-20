@@ -178,10 +178,31 @@ if (getSaved('unifiedInstance') !== 'disabled') {
     .then(res => res.text())
     .then(text => JSON.parse(text.slice(3)))
     .then((json) => {
+
+      let average = 0;
+      const tzar = Object.values(json).map((i: any) => parseInt(i.timezone.slice(3)));
+      for (const i of tzar)
+        average += i
+
+      const tzmy = new Date().getTimezoneOffset() / 60;
+
+      if (average < tzmy) {
+
+        const reversedKeys = Object.keys(json).reverse();
+
+        const reversedObject: typeof json = {};
+        for (const key of reversedKeys)
+          reversedObject[key] = json[key];
+
+        json = reversedObject;
+      }
+
       for (const type in iMap)
         iMap[type as keyof typeof iMap].innerHTML = '';
 
       for (const data in json) {
+        delete json[data].timezone;
+
         unifiedInstances.add(new Option(data));
 
         const iData = json[data];
