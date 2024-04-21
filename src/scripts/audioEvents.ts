@@ -231,12 +231,12 @@ type virtualQ = {
   title: string
   duration: string,
   author: string,
-  frequency?: number
 }
 
-const virtualQueue: {
+const storedData: {
   [index: string]: virtualQ
 } = {};
+const frequencyQueue: { [index: string]: number } = {};
 
 export function autoQueue(data: Recommendation[]) {
 
@@ -254,17 +254,17 @@ export function autoQueue(data: Recommendation[]) {
   for (let i = 0; i < tLen; i++)
     queueIds.push(trash.slice(11));
 
-  if (Object.keys(virtualQueue).length) {
-    const dataArray = Object.entries(virtualQueue);
+  if (Object.keys(storedData).length) {
+    const dataArray = Object.entries(frequencyQueue);
 
-    dataArray.sort((a, b) => <number>b[1].frequency - <number>a[1].frequency);
+    dataArray.sort((a, b) => b[1] - a[1]);
 
-    const hf = dataArray[0][1].frequency || 0;
+    const hf = dataArray[0][1] || 0;
     if (hf > 1) {
-      dataArray.filter((a) => a[1].frequency === hf).forEach(a => {
-        delete a[1].frequency;
-        if (!trash.includes(a[1].id))
-          appendToQueuelist(a[1])
+      dataArray.filter((a) => a[1] === hf).forEach(a => {
+        if (trash.includes(a[0])) return;
+        appendToQueuelist(storedData[a[0]]);
+        delete storedData[a[0]];
       })
     }
   }
@@ -288,11 +288,11 @@ export function autoQueue(data: Recommendation[]) {
 
     function virtualQueueHandler(streamData: virtualQ) {
 
-      if (virtualQueue.hasOwnProperty(id))
-        (<number>virtualQueue[id].frequency)++;
+      if (storedData.hasOwnProperty(id))
+        <number>frequencyQueue[id]++;
       else {
-        streamData.frequency = 1;
-        virtualQueue[id] = streamData;
+        storedData[id] = streamData;
+        frequencyQueue[id] = 1;
       }
 
     }

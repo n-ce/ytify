@@ -1,4 +1,5 @@
-import { instanceSelector } from "../lib/dom";
+import { audio, instanceSelector } from "../lib/dom";
+import player from "../lib/player";
 import { getSaved, removeSaved, save } from "../lib/utils";
 
 const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
@@ -31,7 +32,7 @@ fetch(unifiedInstancesAPIurl)
 
   });
 
-instanceSelector.addEventListener('change', () => {
+instanceSelector.addEventListener('change', async () => {
   const index = instanceSelector.selectedIndex;
   if (index === 0) {
     const n = prompt('Enter Name of your instance :');
@@ -55,6 +56,10 @@ instanceSelector.addEventListener('change', () => {
     removeSaved('apiList_3') :
     save('apiList_3', instanceSelector.value);
 
+  audio.pause();
+  const timeOfSwitch = audio.currentTime;
+  await player(audio.dataset.id);
+  audio.currentTime = timeOfSwitch;
 });
 
 

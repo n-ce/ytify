@@ -64,6 +64,7 @@ export default async function player(id: string | null = '') {
 
   const apiIndex = instanceSelector.selectedIndex;
   const apiUrl = getApi('piped', apiIndex);
+  console.log(apiUrl)
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
@@ -108,7 +109,7 @@ export default async function player(id: string | null = '') {
 
     const oldUrl = new URL(_.url);
 
-    const newUrl = _.url.replace(oldUrl.origin, instanceSelector.value);
+    const newUrl = _.url.replace(oldUrl.origin, getApi('invidious'));
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
