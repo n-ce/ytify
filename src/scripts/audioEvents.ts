@@ -1,9 +1,13 @@
-import { audio, playButton, queuelist, superInput } from "../lib/dom";
+import { audio, playButton, queuelist } from "../lib/dom";
+import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getCollection, getSaved, params } from "../lib/utils";
-import { addToCollection } from "./library";
+import { convertSStoHHMMSS, getSaved } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
+
+
+// temp fix for circular dependency conflicts
+const params = (new URL(location.href)).searchParams;
 
 const streamHistory: string[] = [];
 
@@ -70,7 +74,7 @@ audio.addEventListener('pause', () => {
 
 let isPlayable = false;
 const playableCheckerID = setInterval(() => {
-  if (superInput.value || streamHistory.length || params.has('url') || params.has('text') || location.pathname === '/library') {
+  if (streamHistory.length || params.has('url') || params.has('text') || !params.has('s')) {
     isPlayable = true;
     clearInterval(playableCheckerID);
   }
@@ -178,9 +182,8 @@ volumeIcon.addEventListener('click', () => {
   audio.volume = audio.volume ? 0 : 1;
   volumeIcon.classList.replace(
     volumeIcon.className,
-    volumeIcon.className.includes('mute') ?
-      'ri-volume-up-line' :
-      'ri-volume-mute-line'
+    `ri-volume-${volumeIcon.className.includes('mute') ? 'up' : 'mute'
+    }-fill`
   );
 });
 
@@ -189,8 +192,8 @@ volumeChanger.addEventListener('input', () => {
   volumeIcon.classList.replace(
     volumeIcon.className,
     audio.volume ?
-      `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-line` :
-      'ri-volume-mute-line');
+      `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-fill` :
+      'ri-volume-mute-fill');
 });
 
 
@@ -223,69 +226,109 @@ if (msn) {
 }
 
 
+type virtualQ = {
+  id: string,
+  title: string
+  duration: string,
+  author: string,
+  frequency?: number
+}
 
-export function autoQueue(data: Recommendation[], invidious: boolean = false) {
+const virtualQueue: {
+  [index: string]: virtualQ
+} = {};
+
+export function autoQueue(data: Recommendation[]) {
 
   const queueIds = [...streamHistory];
-  const items = <HTMLCollectionOf<HTMLElement>>queuelist.children;
-  for (const item of items)
-    queueIds.push(<string>item.dataset.id);
+  const items = queuelist.dataset.array || '';
+  const trash = sessionStorage.getItem('trashHistory') || '';
+
+  // convert items string to array
+  const iLen = items.length / 11;
+  for (let i = 0; i < iLen; i++)
+    queueIds.push(items.slice(11));
+
+  // convert trash string to array
+  const tLen = trash.length / 11;
+  for (let i = 0; i < tLen; i++)
+    queueIds.push(trash.slice(11));
+
+  if (Object.keys(virtualQueue).length) {
+    const dataArray = Object.entries(virtualQueue);
+
+    dataArray.sort((a, b) => <number>b[1].frequency - <number>a[1].frequency);
+
+    const hf = dataArray[0][1].frequency || 0;
+    if (hf > 1) {
+      dataArray.filter((a) => a[1].frequency === hf).forEach(a => {
+        delete a[1].frequency;
+        if (!trash.includes(a[1].id))
+          appendToQueuelist(a[1])
+      })
+    }
+  }
 
   data.forEach(stream => {
-    if (invidious) {
 
-      const duration = stream.lengthSeconds;
-      if (
-        duration > 60 &&
-        duration < 3600 &&
-        !queueIds.includes(stream.videoId)
-      )
-        appendToQueuelist({
-          id: stream.videoId,
-          title: stream.title,
-          author: stream.author,
-          duration: convertSStoHHMMSS(duration),
-        })
+    const id = stream.videoId ||
+      stream.url.slice(9);
+    const author = stream.author || stream.uploaderName;
+    const duration = stream.lengthSeconds || stream.duration;
 
-    } else {
+    if ('type' in stream && stream.type !== 'stream')
+      return;
 
-      const rsId = stream.url.slice(9);
-      if (
-        stream.type === 'stream' &&
-        stream.duration > 60 &&
-        stream.duration < 3600 &&
-        !queueIds.includes(rsId)
-      )
-        appendToQueuelist({
-          id: rsId,
-          title: stream.title,
-          author: stream.uploaderName,
-          duration: convertSStoHHMMSS(stream.duration),
-        })
+    const streamData = {
+      id: id,
+      title: stream.title,
+      author: author,
+      duration: convertSStoHHMMSS(duration),
+    };
+
+    function virtualQueueHandler(streamData: virtualQ) {
+
+      if (virtualQueue.hasOwnProperty(id))
+        (<number>virtualQueue[id].frequency)++;
+      else {
+        streamData.frequency = 1;
+        virtualQueue[id] = streamData;
+      }
 
     }
+
+    if (
+      duration > 60 &&
+      duration < 3600 &&
+      !queueIds.includes(id)
+    )
+      items ?
+        virtualQueueHandler(streamData) :
+        appendToQueuelist(streamData);
+
   });
 }
 
 
 // upcoming queries
 
-export async function upcomingInjector(query: string) {
-  const array = [];
-  for (let i = 0; i < query.length; i += 11)
-    array.push(query.slice(i, i + 11));
-  for await (const id of array)
-    fetch('https://p2-a.vercel.app?id=' + id)
-      .then(res => res.json())
-      .then(data => appendToQueuelist(data))
-      .catch(e => {
-        console.log(id, e);
-        return { id: '' }
-      })
-}
+const queueParam = params.get('a');
+if (queueParam && queueParam.length > 10) {
+  addEventListener('DOMContentLoaded', async () => {
+    const array = [];
+    for (let i = 0; i < queueParam.length; i += 11)
+      array.push(queueParam.slice(i, i + 11));
 
-if (params.has('a')) {
-  const query = <string>params.get('a');
-  upcomingInjector(query);
+    const appendItem = (id: string) =>
+      fetch('https://p2-a.vercel.app?id=' + id)
+        .then(res => res.json())
+        .then(data => appendToQueuelist(data))
+        .catch(() => {
+          console.log(`Fetching Queue Item ${id} Failed.`);
+          appendItem(id);
+        });
+    for await (const id of array)
+      await appendItem(id);
+  });
 }
 

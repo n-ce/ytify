@@ -1,16 +1,15 @@
 /*
 Why does this exist ?
 
-Acts as a fallback to support playback through invidious without using unified instances
+Acts as a fallback to support playback through invidious without using custom instances
 
 Destined to be deprecated when adaptive streaming is implemented.
 */
 
-
-import { audio, favButton, favIcon, playButton, invidiousInstances } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, notify, params, removeSaved, save, setMetaData } from "./utils";
-import { addListToCollection } from "../scripts/library";
+import { audio, favButton, favIcon, instanceSelector, playButton } from "./dom";
+import { convertSStoHHMMSS, getSaved, notify, params, removeSaved, save, getApi, setMetaData } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
+import { getDB, addListToCollection } from "./libraryUtils";
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -62,25 +61,24 @@ export default async function invPlayer(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(invidiousInstances.value + '/api/v1/videos/' + id)
+  const apiIndex = instanceSelector.selectedIndex;
+  const apiUrl = getApi('invidious');
+
+  const data = await fetch(apiUrl + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
-      const i = invidiousInstances.selectedIndex;
-      if (i < invidiousInstances.length - 1) {
-        notify('switched playback instance from ' +
-          invidiousInstances.options[i].value
-          + ' to ' +
-          invidiousInstances.options[i + 1].value
-          + ' due to error: ' + err.message
-        );
-        invidiousInstances.selectedIndex = i + 1;
+      if (apiIndex < instanceSelector.length - 1) {
+        notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
+        instanceSelector.selectedIndex++;
         invPlayer(id);
         return;
       }
       notify(err.message);
       playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      invidiousInstances.selectedIndex = 0;
+      instanceSelector.selectedIndex = 0;
     });
+
+
 
   if (!data?.adaptiveFormats?.length)
     return;
@@ -114,7 +112,7 @@ export default async function invPlayer(id: string | null = '') {
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
 
     // proxy the url
-    const url = (_.url).replace(new URL(_.url).origin, invidiousInstances.value);
+    const url = (_.url).replace(new URL(_.url).origin, getApi('invidious'));
     // add to DOM
     bitrateSelector.add(new Option(quality, url));
 
@@ -171,8 +169,8 @@ export default async function invPlayer(id: string | null = '') {
   }
 
 
-  if (!getSaved('autoQueue'))
-    autoQueue(data.recommendedVideos, true);
+  if (getSaved('autoQueue') !== 'off')
+    autoQueue(data.recommendedVideos);
 
   if (getSaved('discover') === 'off') return;
 

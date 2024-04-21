@@ -1,7 +1,7 @@
 import { superModal } from "../lib/dom";
+import { createPlaylist, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { $, fetchList, notify } from "../lib/utils";
-import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;

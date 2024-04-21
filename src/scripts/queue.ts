@@ -1,10 +1,12 @@
+
+
+import { $, removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
-import { $ } from "../lib/utils";
 
 const queueArray: string[] = [];
 
-const [clearQBtn, shuffleQBtn, removeQBtn, filterG10Btn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;
+const [clearQBtn, shuffleQBtn, removeQBtn, filterG10Btn, autoQueueBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
@@ -35,21 +37,21 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queuelist.prepend(queueItem) :
     queuelist.appendChild(queueItem);
 
-  queuelist.dataset.array = '?a=' + queueArray.join('');
 }
 
 queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLElement;
   if (!queueItem.matches('stream-item')) return;
   const id = queueItem.dataset.id || '';
-  if (!queueItem.classList.contains('delete'))
+  if (!queueItem.classList.contains('delete')) {
+    const trashHistory = sessionStorage.getItem('trashHistory');
+    sessionStorage.setItem('trashHistory', trashHistory + id);
     player(id);
-
+  }
   const index = queueArray.indexOf(id);
   queueArray.splice(index, 1);
   queuelist.children[index].remove();
 
-  queuelist.dataset.array = '?a=' + queueArray.join('');
 });
 
 
@@ -105,6 +107,19 @@ filterG10Btn.addEventListener('click', () => {
   });
 });
 
+
+autoQueueBtn.addEventListener('click', () => {
+  autoQueueBtn.classList.contains('checked') ?
+    save('autoQueue', 'off') :
+    removeSaved('autoQueue');
+  autoQueueBtn.classList.toggle('checked');
+});
+
+
+if (localStorage.getItem('autoQueue') === 'off')
+  autoQueueBtn.classList.remove('checked');
+
+
 function isLongerThan10Min(duration: string) {
   const hhmmss = duration.split(':');
   return !(
@@ -112,3 +127,25 @@ function isLongerThan10Min(duration: string) {
     parseInt(hhmmss[0]) < 10
   );
 }
+
+// queuelist mutation observer
+
+new MutationObserver(m => {
+  for (const mutation of m) {
+    if (mutation.type === "childList") {
+      const array = queueArray.join('');
+      queuelist.dataset.array = array;
+
+      if (location.pathname === '/upcoming') {
+        history.replaceState({}, '',
+          location.pathname + (
+            array ?
+              `?a=${array}` : ''
+          )
+        );
+      }
+    }
+  }
+}).observe(queuelist, { childList: true });
+
+

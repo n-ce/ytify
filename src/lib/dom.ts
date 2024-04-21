@@ -4,13 +4,7 @@ export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 
 export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
 
-export const unifiedInstances = <HTMLSelectElement>document.getElementById('unifiedInstances');
-
-export const pipedInstances = <HTMLSelectElement>document.getElementById('pipedInstances');
-
-export const invidiousInstances = <HTMLSelectElement>document.getElementById('invidiousInstances');
-
-export const thumbnailProxies = <HTMLSelectElement>document.getElementById('thumbnailProxies');
+export const instanceSelector = <HTMLSelectElement>document.getElementById('instances');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 

@@ -16,6 +16,8 @@
   --shadowColor: transparent;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundness: 2vmin;
+  --defaultBg: var(--text);
+  --defaultText: var(--bg);
 }
 
 @font-face {
@@ -215,13 +217,19 @@ list-item:hover {
 }
 
 .delete {
-  background-color: #800 !important;
+  --defaultBg: #800;
+  --defaultText: #eaa;
 }
 
 .filter {
-  background-color: #077 !important;
+  --defaultBg: #055;
+  --defaultText: #6dd;
 }
 
+.checked {
+  --defaultBg: #505;
+  --defaultText: #faf;
+}
 
 details,
 #queuetools,
@@ -230,25 +238,14 @@ details,
   button {
     border: var(--border);
     border-radius: var(--roundness);
-    background: var(--text);
-    color: var(--bg);
+    background: var(--defaultBg);
+    color: var(--defaultText);
     font-family: inherit;
     font-size: inherit;
     padding: 1vmin 2vmin;
     margin: 1vmin 2vmin;
   }
 }
-
-#queuetools,
-#listTools,
-details {
-  button:hover {
-    background-color: var(--bg);
-    color: var(--text);
-  }
-}
-
-
 
 
 #loadingScreen {

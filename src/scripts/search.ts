@@ -1,6 +1,6 @@
-import { loadingScreen, pipedInstances, searchFilters, superInput } from "../lib/dom";
+import { instanceSelector, loadingScreen, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
+import { $, getSaved, getApi, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
 import { ytmPlsSwitch } from "./settings";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
@@ -13,7 +13,7 @@ const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestion
 let nextPageToken = '';
 
 const loadMoreResults = (token: string, query: string) =>
-  fetch(`${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
+  fetch(`${getApi('piped')}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
     .then(res => res.json())
     .catch(x => console.log('e:' + x))
 
@@ -50,12 +50,12 @@ function searchLoader() {
 
   loadingScreen.showModal();
 
-  fetch(pipedInstances.value + '/' + query)
+  fetch(getApi('piped') + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
-      if (!items) throw new Error('Search couldn\'t be resolved on ' + pipedInstances.value);
+      if (!items) throw new Error('Search couldn\'t be resolved on ' + getApi('piped'));
 
       if (sortByTime && nextPageToken) {
         for (let i = 0; i < 3; i++) {
@@ -104,20 +104,15 @@ function searchLoader() {
     })
     .catch(err => {
       if (err.message === 'nextpage error') return;
-      const i = pipedInstances.selectedIndex;
-      if (i < pipedInstances.length - 1) {
-        notify('search error :  switching instance from ' +
-          pipedInstances.options[i].value
-          + ' to ' +
-          pipedInstances.options[i + 1].value
-          + ' due to error ' + err.message
-        );
-        pipedInstances.selectedIndex = i + 1;
+      const i = instanceSelector.selectedIndex;
+      if (i < instanceSelector.length - 1) {
+        notify(`search error :  switching instance from ${getApi('piped')} to ${getApi('piped', i + 1)} due to error ${err.message}`);
+        instanceSelector.selectedIndex++;
         searchLoader();
         return;
       }
       notify(err.message);
-      pipedInstances.selectedIndex = 0;
+      instanceSelector.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
 
@@ -149,7 +144,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(pipedInstances.value + '/suggestions/?query=' + text).then(res => res.json());
+  const data = await fetch(getApi('piped') + '/suggestions/?query=' + text).then(res => res.json());
 
   if (!data.length) return;
 

@@ -1,6 +1,7 @@
-import { img, canvas, context, unifiedInstances } from "../lib/dom";
+import { img, canvas, context, instanceSelector } from "../lib/dom";
+import { blankImage } from "../lib/imageUtils";
 import player from "../lib/player";
-import { blankImage, getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
+import { getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
@@ -161,7 +162,7 @@ roundnessChanger.addEventListener('change', () => {
 
 
 const intervalId = setInterval(() => {
-  if (getSaved('unifiedInstance') !== 'disabled' && unifiedInstances.length === 1) return;
+  if (instanceSelector.length === 1) return;
 
   const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
 

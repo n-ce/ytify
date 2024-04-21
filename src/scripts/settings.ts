@@ -1,12 +1,13 @@
-import { audio, img, invidiousInstances, pipedInstances, searchFilters, thumbnailProxies, unifiedInstances } from "../lib/dom";
-import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
+import { audio, img, searchFilters } from "../lib/dom";
+import { getSaved, removeSaved, save } from "../lib/utils";
 import player from "../lib/player";
+import { blankImage } from "../lib/imageUtils";
+import { getDB, saveDB } from "../lib/libraryUtils";
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
-const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueue');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
 const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
@@ -17,26 +18,6 @@ const history = <HTMLDetailsElement>document.getElementById('history');
 
 export { ytmPlsSwitch };
 
-/////////////////////////////////////////////////////////////
-
-const unifiedInstanceState = getSaved('unifiedInstance');
-const unifiedInstanceLabel = <HTMLLabelElement>unifiedInstances.previousElementSibling;
-
-unifiedInstanceState !== 'disabled' ?
-  [pipedInstances, invidiousInstances, thumbnailProxies].forEach(i => {
-    (<HTMLSpanElement>i.parentElement).classList.add('hide');
-  })
-  :
-  unifiedInstanceLabel.textContent = 'Click here to enable Unified Instances ✅';
-
-unifiedInstanceLabel.addEventListener('click', () => {
-  if (unifiedInstanceState === 'disabled') {
-    removeSaved('unifiedInstance');
-    location.reload();
-  } else {
-    alert('Enables seamless experience across the ytify platform using the same instance for data, audio & images. Switch to classic instances mode by selecting disabled, if you want to use your own custom instance or prefer that. Note : Subtitles are not supported through the classic instance structure.');
-  }
-});
 
 /////////////////////////////////////////////////////////////
 
@@ -89,17 +70,6 @@ if (getSaved('defaultFilter')) {
   defaultFilterSongs.setAttribute('checked', '');
   searchFilters.value = 'music_songs';
 }
-
-/////////////////////////////////////////////////////////////
-
-autoQueueSwitch.addEventListener('click', () => {
-  autoQueueSwitch.hasAttribute('checked') ?
-    save('autoQueue', 'off') :
-    removeSaved('autoQueue');
-});
-
-if (getSaved('autoQueue') === 'off')
-  autoQueueSwitch.removeAttribute('checked');
 
 /////////////////////////////////////////////////////////////
 

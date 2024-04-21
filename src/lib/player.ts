@@ -1,7 +1,10 @@
-import { audio, favButton, favIcon, playButton, pipedInstances, subtitleSelector, subtitleTrack, subtitleContainer, invidiousInstances } from "./dom";
-import { convertSStoHHMMSS, getDB, getSaved, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus } from "./utils";
-import { addListToCollection } from "../scripts/library";
+import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
+import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
+import { getDB, addListToCollection } from "./libraryUtils";
+
+// temp fix for circular dependency conflicts
+const getSaved = localStorage.getItem.bind(localStorage);
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -54,29 +57,26 @@ subtitleSelector.addEventListener('change', () => {
 export default async function player(id: string | null = '') {
 
   if (!id) return;
-  if (getSaved('unifiedInstances') === 'disabled')
+  if (instanceSelector.selectedIndex === 0)
     return import("./player.invidious").then(mod => mod.default(id))
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = await fetch(pipedInstances.value + '/streams/' + id)
+  const apiIndex = instanceSelector.selectedIndex;
+  const apiUrl = getApi('piped', apiIndex);
+
+  const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
     .catch(err => {
-      const i = pipedInstances.selectedIndex;
-      if (i < pipedInstances.length - 1) {
-        notify('switched playback instance from ' +
-          pipedInstances.options[i].value
-          + ' to ' +
-          pipedInstances.options[i + 1].value
-          + ' due to error: ' + err.message
-        );
-        pipedInstances.selectedIndex = i + 1;
+      if (apiIndex < instanceSelector.length - 1) {
+        notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
+        instanceSelector.selectedIndex++;
         player(id);
         return;
       }
       notify(err.message);
       playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      pipedInstances.selectedIndex = 0;
+      instanceSelector.selectedIndex = 0;
     });
 
   if (!data?.audioStreams?.length)
@@ -108,7 +108,7 @@ export default async function player(id: string | null = '') {
 
     const oldUrl = new URL(_.url);
 
-    const newUrl = _.url.replace(oldUrl.origin, invidiousInstances.value);
+    const newUrl = _.url.replace(oldUrl.origin, instanceSelector.value);
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
