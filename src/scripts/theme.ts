@@ -1,4 +1,4 @@
-import { img, canvas, context, instanceSelector } from "../lib/dom";
+import { img, canvas, context } from "../lib/dom";
 import { blankImage } from "../lib/imageUtils";
 import player from "../lib/player";
 import { getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
