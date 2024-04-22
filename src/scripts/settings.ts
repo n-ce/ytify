@@ -5,7 +5,6 @@ import { blankImage } from "../lib/imageUtils";
 import { getDB, saveDB } from "../lib/libraryUtils";
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
-const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
@@ -15,6 +14,8 @@ const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitc
 const discover = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
 const history = <HTMLDetailsElement>document.getElementById('history');
+const bottomNavSwitch = <HTMLElement>document.getElementById('bottomNavSwitch');
+const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 
 export { ytmPlsSwitch };
 
@@ -34,14 +35,6 @@ if (savedStartupTab) {
   if (location.pathname === '/')
     (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
 }
-
-/////////////////////////////////////////////////////////////
-
-fullscreenSwitch.addEventListener('click', () => {
-  document.fullscreenElement ?
-    document.exitFullscreen() :
-    document.documentElement.requestFullscreen();
-});
 
 /////////////////////////////////////////////////////////////
 
@@ -91,7 +84,7 @@ if (getSaved('hq') == 'true')
 thumbnailSwitch.addEventListener('click', () => {
   getSaved('img') ?
     removeSaved('img') :
-    localStorage.setItem('img', 'off');
+    save('img', 'off');
   location.reload();
 });
 
@@ -106,7 +99,7 @@ if (getSaved('img')) {
 lazyLoadSwitch.addEventListener('click', () => {
   getSaved('lazyImg') ?
     removeSaved('lazyImg') :
-    localStorage.setItem('lazyImg', 'true');
+    save('lazyImg', 'true');
 });
 
 if (getSaved('lazyImg'))
@@ -156,6 +149,33 @@ if (getSaved('history')) {
   historySwitch.removeAttribute('checked');
   history.classList.add('hide')
 }
+
+
+/////////////////////////////////////////////////////////////
+
+bottomNavSwitch.addEventListener('click', () => {
+  const state = getSaved('bottomNav');
+  state ?
+    removeSaved('bottomNav') :
+    save('bottomNav', 'true');
+
+  document.body.style.flexDirection = `column${state ? '' : '-reverse'}`;
+  (<HTMLDivElement>document.querySelector('nav')).style.padding = state ? '5% 3% 0 3%' : '0 3% 5% 3%';
+});
+
+if (getSaved('bottomNav')) {
+  bottomNavSwitch.toggleAttribute('checked');
+  document.body.style.flexDirection = 'column-reverse';
+  (<HTMLDivElement>document.querySelector('nav')).style.padding = '0 3% 5% 3%';
+}
+
+/////////////////////////////////////////////////////////////
+
+fullscreenSwitch.addEventListener('click', () => {
+  document.fullscreenElement ?
+    document.exitFullscreen() :
+    document.documentElement.requestFullscreen();
+});
 
 /////////////////////////////////////////////////////////////
 

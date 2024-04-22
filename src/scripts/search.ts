@@ -9,7 +9,6 @@ const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
 
 
-
 let nextPageToken = '';
 
 const loadMoreResults = (token: string, query: string) =>

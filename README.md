@@ -41,7 +41,7 @@ or
 ```
 3. Move to Directory, Update & Install Dependencies
 ```
-cd ytify ; npm update; npm i
+cd ytify ; npm run update; npm i
 ```
 4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts)
 `injectEruda(false),`
