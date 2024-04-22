@@ -16,22 +16,20 @@ const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelec
 
 /////////////////////////////////////////////////////////////
 
-export default async function invPlayer(id: string | null = '') {
+export default async function invPlayer(id: string | null = '', instance = 0) {
 
   if (!id) return;
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const apiIndex = instanceSelector.selectedIndex;
-  const apiUrl = getApi('invidious');
+  const apiUrl = getApi('invidious', instance);
 
   const data = await fetch(apiUrl + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
-      if (apiIndex < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
-        instanceSelector.selectedIndex++;
-        invPlayer(id);
+      if (instance < instanceSelector.length - 1) {
+        notify(`switched playback instance from ${apiUrl} to ${getApi('invidious', instance + 1)} due to error: ${err.message}`);
+        invPlayer(id, instance + 1);
         return;
       }
       notify(err.message);
@@ -73,7 +71,7 @@ export default async function invPlayer(id: string | null = '') {
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
 
     // proxy the url
-    const url = (_.url).replace(new URL(_.url).origin, getApi('invidious'));
+    const url = (_.url).replace(new URL(_.url).origin, getApi('invidious', instance));
     // add to DOM
     bitrateSelector.add(new Option(quality, url));
 
