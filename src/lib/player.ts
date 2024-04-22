@@ -1,10 +1,8 @@
 import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
-import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi } from "./utils";
+import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
-// temp fix for circular dependency conflicts
-const getSaved = localStorage.getItem.bind(localStorage);
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -188,7 +186,7 @@ export default async function player(id: string | null = '') {
   }
 
 
-  if (!getSaved('autoQueue'))
+  if (getSaved('autoQueue') !== 'off')
     autoQueue(data.relatedStreams);
 
   if (getSaved('discover') === 'off') return;

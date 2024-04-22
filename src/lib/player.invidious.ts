@@ -3,55 +3,16 @@ Why does this exist ?
 
 Acts as a fallback to support playback through invidious without using custom instances
 
-Destined to be deprecated when adaptive streaming is implemented.
+Destined to be deprecated when adaptive streaming via piped is implemented.
 */
 
 import { audio, favButton, favIcon, instanceSelector, playButton } from "./dom";
-import { convertSStoHHMMSS, getSaved, notify, params, removeSaved, save, getApi, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
-
-/////////////////////////////////////////////////////////////
-
-codecSelector.addEventListener('change', async () => {
-  const i = codecSelector.selectedIndex;
-  i ?
-    save('codec', String(i)) :
-    removeSaved('codec');
-
-  audio.pause();
-  const timeOfSwitch = audio.currentTime;
-  await invPlayer(audio.dataset.id);
-  audio.currentTime = timeOfSwitch;
-});
-
-
-const codecSaved = getSaved('codec');
-
-codecSaved ?
-  (codecSelector.selectedIndex = parseInt(codecSaved)) :
-  navigator.mediaCapabilities.decodingInfo({
-    type: 'file',
-    audio: {
-      contentType: 'audio/ogg;codecs=opus'
-    }
-  }).then(res => {
-    // sets AAC as default for non-supported devices
-    if (!res.supported)
-      codecSelector.selectedIndex = 1;
-  });
-
-/////////////////////////////////////////////////////////////
-
-bitrateSelector.addEventListener('change', () => {
-  const timeOfSwitch = audio.currentTime;
-  audio.src = bitrateSelector.value;
-  audio.currentTime = timeOfSwitch;
-  audio.play();
-});
 
 /////////////////////////////////////////////////////////////
 

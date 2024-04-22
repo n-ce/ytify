@@ -1,13 +1,10 @@
 import { audio, playButton, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getSaved } from "../lib/utils";
+import { convertSStoHHMMSS, params, getSaved } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
-
-// temp fix for circular dependency conflicts
-const params = (new URL(location.href)).searchParams;
 
 const streamHistory: string[] = [];
 

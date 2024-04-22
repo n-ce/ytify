@@ -1,6 +1,7 @@
 import { $, removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
+// import Sortable from "sortablejs";
 
 const queueArray: string[] = [];
 
@@ -42,6 +43,9 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queuelist.appendChild(queueItem);
 
 }
+
+
+//new Sortable(queuelist, {});
 
 queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLElement;
