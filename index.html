@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 
   <meta name="description"
-    content="32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link or search a video up and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
+    content="48kb/s to 160kb/s youtube audio streaming website. Copy a youtube video link or search a video up and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
   <meta name="author" content="Animesh Nath">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="white">
@@ -34,7 +34,9 @@
 
 <body>
   <canvas class="hide"></canvas>
-  <audio></audio>
+  <audio>
+    <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
+  </audio>
   <nav>
     <a href="/" id="/">
       <i class="ri-home-line"></i>
@@ -62,14 +64,19 @@
   </nav>
   <main>
     <section id="home">
+      <article class="hide" id="subtitleContainer"></article>
+
       <img id="img" src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.8</a>
+        <a id="title" href="" target="_blank">ytify 6.9</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
+        </select>
+        <select id="subtitleSelector" class="hide">
+          <option>Subtitles</option>
         </select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
@@ -88,7 +95,14 @@
         <button>
           <i class="ri-subtract-line"></i> Remove
         </button>
+        <button>
+          <i class="ri-filter-2-line"></i> Filter >10:00
+        </button>
+        <button class="checked" id="autoQueueBtn">
+          <i class="ri-list-check-2"></i> Auto-Queue
+        </button>
       </span>
+      <br>
       <div id="queuelist">
         <h1 align="center">upcoming streams show here</h1>
       </div>
@@ -96,7 +110,7 @@
 
 
     <section id="search">
-      <span id="superInputContainer">
+      <form id="superInputContainer">
         <input type="search" id="superInput" autocomplete="off" placeholder='Search or enter YT URL' />
         <select id="searchFilters">
           <optgroup label="YouTube">
@@ -114,7 +128,7 @@
           </optgroup>
         </select>
         <button aria-label="search" class="ri-search-2-line"></button>
-      </span>
+      </form>
       <ul id="suggestions"></ul>
       <div id="searchlist">
         <h1 class="featuredPlaylists">
@@ -149,7 +163,7 @@
 
       <details id="history">
         <summary>
-          <i class="ri-history-line"></i> History
+          <i class="ri-memories-line"></i> History
         </summary>
         <button>
           <i class="ri-close-line"></i> Clear All
@@ -191,25 +205,32 @@
       <br>
       <div>
         <label id="importBtn" for="upload">
-          <i class="ri-login-circle-line"></i> Import</label>
+          <i class="ri-import-line"></i> Import</label>
         <input type="file" id="upload" class="hide">
         <label id="exportBtn">
-          <i class="ri-logout-circle-line"></i> Export</label>
+          <i class="ri-export-line"></i> Export</label>
         <label id="cleanLibraryBtn">
-          <i class="ri-delete-bin-7-line"></i> Clean</label>
+          <i class="ri-delete-bin-2-line"></i> Clean</label>
       </div>
       <br>
+
     </section>
 
 
     <section id="settings">
+
       <span>
-        <label for="pipedInstances">Piped Instance</label>
-        <select id="pipedInstances">
-          <option value="">Custom</option>
-          <option value="https://pipedapi.kavin.rocks" selected>kavin.rocks 🌐</option>
+        <label for="instances">Instance</label>
+        <select id="instances">
+          <option value='{
+          "name":"Custom",
+          "piped":"https://pipedapi.kavin.rocks",
+          "image":"https://pipedproxy.r4fo.com",
+          "invidious":"https://invidious.fdn.fr"
+          }'>Custom</option>
         </select>
       </span>
+
       <span>
         <label for="startupTab">
           Default Tab on Startup
@@ -230,22 +251,13 @@
         </select>
       </span>
 
-      <toggle-switch id="apiAutoFetchSwitch" checked>Automatically Fetch Instances</toggle-switch>
-      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
-
       <h3>Search</h3>
-      <toggle-switch id="defaultFilterSongs">Filter Songs by Default</toggle-switch>
+      <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
+      <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
 
       <h3>Playback</h3>
-      <span>
-        <label for="invidiousInstances">Invidious Instance</label>
-        <select id="invidiousInstances">
-          <option value="">Custom</option>
-          <option value="https://invidious.fdn.fr" selected>fdn.fr 🇫🇷</option>
-        </select>
-      </span>
-      <toggle-switch id="autoQueueSwitch" checked>Auto-Queue</toggle-switch>
+
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
       <span>
         <label for="CodecPreference">Codec Preference</label>
@@ -257,13 +269,6 @@
       </span>
 
       <h3>Thumbnail</h3>
-      <span>
-        <label for="thumbnailProxies">Proxy</label>
-        <select id="thumbnailProxies">
-          <option value="">Custom</option>
-          <option value="https://pipedproxy.leptons.xyz" selected>leptons.xyz 🇦🇹</option>
-        </select>
-      </span>
       <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
       <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
 
@@ -289,10 +294,11 @@
         </select>
       </span>
       <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
+      <toggle-switch id="bottomNavSwitch">Bottom Navigation</toggle-switch>
+      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+
 
       <h3>Actions</h3>
-
-      <button id="apiRefreshBtn">Regenerate Instances</button>
 
       <button id="clearCacheBtn">Clear Caches</button>
 
@@ -318,7 +324,7 @@
     <section id="list">
       <span id="listTools">
         <button id="playAllBtn">
-          <i class="ri-play-line"></i> Play
+          <i class="ri-play-large-line"></i> Play
         </button>
         <button id="enqueueAllBtn">
           <i class="ri-list-check-2"></i> Enqueue
@@ -327,7 +333,7 @@
           <i class="ri-stack-line"></i> Save
         </button>
         <button id="openInYT">
-          <i class="ri-youtube-line"></i> Open In YouTube
+          <i class="ri-external-link-line"></i> Open In YouTube
         </button>
       </span>
       <br>
@@ -354,7 +360,7 @@
         </button>
 
         <span id="volumeContainer">
-          <label for="volumeChanger" class="ri-volume-up-line"></label>
+          <label for="volumeChanger" class="ri-volume-up-fill"></label>
           <input type="range" min="0" max="100" value="100" id="volumeChanger">
         </span>
         <select id="playSpeed">
@@ -377,7 +383,7 @@
 
   <dialog id="superModal">
     <ul>
-      <li><i class="ri-play-line"></i>Play Now</li>
+      <li><i class="ri-play-large-line"></i>Play Now</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
       <li>
         <i class="ri-play-list-add-line"></i>
@@ -388,8 +394,8 @@
           <option value="listenLater">Listen Later</option>
         </select>
       </li>
-      <li><i class="ri-rfid-line"></i>Start Radio</li>
-      <li><i class="ri-download-2-line"></i>Download</li>
+      <li><i class="ri-radio-line"></i>Start Radio</li>
+      <li><i class="ri-download-2-fill"></i>Download</li>
       <li><i class="ri-youtube-line"></i>View Channel</li>
     </ul>
   </dialog>

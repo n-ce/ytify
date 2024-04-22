@@ -20,7 +20,8 @@ footer>span {
   align-items: center;
   background-color: var(--onBg);
   border-bottom: var(--border);
-  margin-bottom: 2vmin;
+  margin-bottom: 3vmin;
+
 }
 
 footer span p {

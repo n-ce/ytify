@@ -1,6 +1,7 @@
-import { loadingScreen, pipedInstances, searchFilters, superInput } from "../lib/dom";
+import { instanceSelector, loadingScreen, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
+import { $, getSaved, getApi, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
+import { ytmPlsSwitch } from "./settings";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const searchIcon = <HTMLButtonElement>searchFilters.nextElementSibling;
@@ -8,11 +9,10 @@ const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
 
 
-
 let nextPageToken = '';
 
 const loadMoreResults = (token: string, query: string) =>
-  fetch(`${pipedInstances.value}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
+  fetch(`${getApi('piped')}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
     .then(res => res.json())
     .catch(x => console.log('e:' + x))
 
@@ -31,32 +31,30 @@ function setObserver(callback: () => Promise<string>) {
 
 // Get search results of input
 function searchLoader() {
+
   const text = superInput.value;
-
-  if (!text) {
-    searchlist.innerHTML = '';
-    insertYtmPls();
-    return;
-  }
-
-  loadingScreen.showModal();
-
-  searchlist.innerHTML = '';
-
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
   const sortByTime = searchFilters.selectedIndex === 1;
 
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
+  searchlist.innerHTML = '';
 
+  if (!text) {
+    insertYtmPls();
+    history.replaceState({}, '', location.origin + location.pathname);
+    return
+  }
 
-  fetch(pipedInstances.value + '/' + query)
+  loadingScreen.showModal();
+
+  fetch(getApi('piped') + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
       let items = searchResults.items;
       nextPageToken = searchResults.nextpage;
-      if (!items) throw new Error('Search couldn\'t be resolved on ' + pipedInstances.value);
+      if (!items) throw new Error('Search couldn\'t be resolved on ' + getApi('piped'));
 
       if (sortByTime && nextPageToken) {
         for (let i = 0; i < 3; i++) {
@@ -105,20 +103,15 @@ function searchLoader() {
     })
     .catch(err => {
       if (err.message === 'nextpage error') return;
-      const i = pipedInstances.selectedIndex;
-      if (i < pipedInstances.length - 1) {
-        notify('search error :  switching instance from ' +
-          pipedInstances.options[i].value
-          + ' to ' +
-          pipedInstances.options[i + 1].value
-          + ' due to error ' + err.message
-        );
-        pipedInstances.selectedIndex = i + 1;
+      const i = instanceSelector.selectedIndex;
+      if (i < instanceSelector.length - 1) {
+        notify(`search error :  switching instance from ${getApi('piped')} to ${getApi('piped', i + 1)} due to error ${err.message}`);
+        instanceSelector.selectedIndex++;
         searchLoader();
         return;
       }
       notify(err.message);
-      pipedInstances.selectedIndex = 0;
+      instanceSelector.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
 
@@ -150,7 +143,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(pipedInstances.value + '/suggestions/?query=' + text).then(res => res.json());
+  const data = await fetch(getApi('piped') + '/suggestions/?query=' + text).then(res => res.json());
 
   if (!data.length) return;
 
@@ -175,7 +168,10 @@ superInput.addEventListener('input', async () => {
 let index = 0;
 
 superInput.addEventListener('keydown', _ => {
-  if (_.key === 'Enter') return searchLoader();
+  if (_.key === 'Enter') {
+    searchLoader();
+    _.preventDefault();
+  }
   if (_.key === 'Backspace' ||
     !suggestions.hasChildNodes() ||
     getSaved('search_suggestions')) return;
@@ -234,26 +230,26 @@ if (params.has('q')) {
 
 // YouTube Music Featured Playlists
 
+
 function insertYtmPls() {
-  fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
-    .then(res => res.text())
-    .then(text => text.split('\n'))
-    .then(data => {
-      const array = [];
-      for (let i = 0; i < data.length; i += 4)
-        array.push({
-          "type": "playlist",
-          "name": data[i + 1],
-          "uploaderName": "YouTube Music",
-          "url": '/playlists/' + data[i + 2],
-          "thumbnail": '/' + data[i + 3]
-        });
 
-      searchlist.appendChild(itemsLoader(<StreamItem[]>array));
-    });
+  if (ytmPlsSwitch.hasAttribute('checked'))
+    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+      .then(res => res.text())
+      .then(text => text.split('\n'))
+      .then(data => {
+        const array = [];
+        for (let i = 0; i < data.length; i += 4)
+          array.push(<StreamItem>{
+            "type": "playlist",
+            "name": data[i + 1],
+            "uploaderName": "YouTube Music",
+            "url": '/playlists/' + data[i + 2],
+            "thumbnail": '/' + data[i + 3]
+          });
 
+        searchlist.appendChild(itemsLoader(array));
+      });
 }
 
-params.has('q') ?
-  (searchlist.innerHTML = '') :
-  insertYtmPls();
+if (!params.has('q')) insertYtmPls();

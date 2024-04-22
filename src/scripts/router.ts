@@ -1,6 +1,6 @@
-import { audio, searchFilters, superInput, superModal } from "../lib/dom";
+import { audio, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchList, params } from "../lib/utils";
-
+import { upcomingInjector } from "./audioEvents";
 
 const anchors = document.querySelectorAll('nav a');
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
@@ -32,7 +32,8 @@ for (const anchor of anchors) {
     if (anchor.id !== location.pathname) {
       const sParamInHome = params.has('s') && inHome;
       const sParam = '?s=' + params.get('s');
-      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : ''
+      const aParam = queuelist.dataset.array ? '?a=' + queuelist.dataset.array : '';
+      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? aParam : '';
 
       history.pushState({}, '',
         anchor.id + (
@@ -65,6 +66,9 @@ if (errorParam) {
       superInput.value = x.get('q') || '';
       searchFilters.value = x.get('f') || 'all';
     }
+    if (route === '/upcoming')
+      upcomingInjector(query.slice(2))
+
   }
   else route = errorParam;
 }

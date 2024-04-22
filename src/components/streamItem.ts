@@ -1,6 +1,8 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { blankImage, getSaved, generateImageUrl, sqrThumb } from "../lib/utils";
+import { getSaved, getApi } from "../lib/utils";
+import { blankImage, generateImageUrl, sqrThumb } from "../lib/imageUtils";
+import { instanceSelector } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -15,8 +17,8 @@ export class StreamItem extends LitElement {
 	@property() views!: string
 	@property() uploaded!: string
 
-	@state() tsrc = blankImage;
-	@state() unravel = '0';
+	@state() tsrc = blankImage
+	@state() unravel = '0'
 
 	handleThumbnailLoad() {
 		if (this.thumbnail.naturalWidth !== 120) {
@@ -29,6 +31,20 @@ export class StreamItem extends LitElement {
 			this.classList.add('delete');
 			this.click();
 		}
+	}
+
+	handleThumbnailError() {
+
+		const index = instanceSelector.selectedIndex;
+		const currentImgPrxy = getApi('image', index);
+		const nextImgPrxy = getApi('image', index + 1);
+
+		this.unravel = '1';
+
+		if (!this.thumbnail.src.includes(currentImgPrxy)) return;
+
+		this.thumbnail.src = this.tsrc.replace(currentImgPrxy, nextImgPrxy);
+
 	}
 
 	render() {
@@ -51,7 +67,7 @@ export class StreamItem extends LitElement {
 						id='thumbnail'
 						loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
 						crossorigin='anonymous'
-						@error=${() => this.unravel = '1'}
+						@error=${this.handleThumbnailError}
 						@load=${this.handleThumbnailLoad}
 						src=${this.tsrc}
 					/>

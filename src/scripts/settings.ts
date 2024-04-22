@@ -1,18 +1,26 @@
 import { audio, img, searchFilters } from "../lib/dom";
+import { getSaved, removeSaved, save } from "../lib/utils";
 import player from "../lib/player";
-import { blankImage, getDB, getSaved, removeSaved, save, saveDB } from "../lib/utils";
+import { blankImage } from "../lib/imageUtils";
+import { getDB, saveDB } from "../lib/libraryUtils";
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
-const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
+const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
-const autoQueueSwitch = <HTMLElement>document.getElementById('autoQueueSwitch');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
 const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
-const discover = <HTMLDetailsElement>document.getElementById('discover');
+const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
-const history = <HTMLDetailsElement>document.getElementById('history');
+const historyContainer = <HTMLDetailsElement>document.getElementById('history');
+const bottomNavSwitch = <HTMLElement>document.getElementById('bottomNavSwitch');
+const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
+const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
+const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
+
+export { ytmPlsSwitch };
+
 
 /////////////////////////////////////////////////////////////
 
@@ -23,21 +31,26 @@ startupTabSelector.addEventListener('change', () => {
     removeSaved('startupTab');
 });
 
-const savedStartupTab = getSaved('startupTab');
+const savedStartupTab = getSaved('startupTab') || '';
 if (savedStartupTab) {
   startupTabSelector.value = savedStartupTab;
   if (location.pathname === '/')
     (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
 }
 
-
 /////////////////////////////////////////////////////////////
 
-fullscreenSwitch.addEventListener('click', () => {
-  document.fullscreenElement ?
-    document.exitFullscreen() :
-    document.documentElement.requestFullscreen();
+ytmPlsSwitch.addEventListener('click', () => {
+  getSaved('featuredPlaylists') ?
+    removeSaved('featuredPlaylists') :
+    save('featuredPlaylists', 'off');
+  location.assign('/search');
 });
+
+if (getSaved('featuredPlaylists')) {
+  ytmPlsSwitch.removeAttribute('checked');
+  (<HTMLHeadingElement>document.querySelector('h1.featuredPlaylists')).textContent = 'Search Results Appear Here.';
+}
 
 /////////////////////////////////////////////////////////////
 
@@ -45,23 +58,13 @@ defaultFilterSongs.addEventListener('click', () => {
   getSaved('defaultFilter') ?
     removeSaved('defaultFilter') :
     save('defaultFilter', 'songs');
+  location.assign('/search');
 });
 
 if (getSaved('defaultFilter')) {
   defaultFilterSongs.setAttribute('checked', '');
   searchFilters.value = 'music_songs';
 }
-
-/////////////////////////////////////////////////////////////
-
-autoQueueSwitch.addEventListener('click', () => {
-  getSaved('autoQueue') ?
-    removeSaved('autoQueue') :
-    save('autoQueue', 'off');
-});
-
-if (getSaved('autoQueue') === 'off')
-  autoQueueSwitch.removeAttribute('checked');
 
 /////////////////////////////////////////////////////////////
 
@@ -83,7 +86,7 @@ if (getSaved('hq') == 'true')
 thumbnailSwitch.addEventListener('click', () => {
   getSaved('img') ?
     removeSaved('img') :
-    localStorage.setItem('img', 'off');
+    save('img', 'off');
   location.reload();
 });
 
@@ -98,7 +101,7 @@ if (getSaved('img')) {
 lazyLoadSwitch.addEventListener('click', () => {
   getSaved('lazyImg') ?
     removeSaved('lazyImg') :
-    localStorage.setItem('lazyImg', 'true');
+    save('lazyImg', 'true');
 });
 
 if (getSaved('lazyImg'))
@@ -113,18 +116,18 @@ discoverSwitch.addEventListener('click', () => {
       return discoverSwitch.toggleAttribute('checked');
     delete db.discover;
     saveDB(db);
-    discover.classList.add('hide');
+    discoverContainer.classList.add('hide');
     save('discover', 'off');
 
   } else {
-    discover.classList.remove('hide');
+    discoverContainer.classList.remove('hide');
     removeSaved('discover');
   }
 });
 
 if (getSaved('discover')) {
   discoverSwitch.removeAttribute('checked');
-  discover.classList.add('hide');
+  discoverContainer.classList.add('hide');
 }
 
 /////////////////////////////////////////////////////////////
@@ -135,32 +138,68 @@ historySwitch.addEventListener('click', () => {
     if (!confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) return historySwitch.toggleAttribute('checked');
     delete db.history;
     saveDB(db);
-    history.classList.add('hide');
+    historyContainer.classList.add('hide');
     save('history', 'off')
   }
   else {
-    history.classList.remove('hide');
+    historyContainer.classList.remove('hide');
     removeSaved('history');
   }
 });
 
 if (getSaved('history')) {
   historySwitch.removeAttribute('checked');
-  history.classList.add('hide')
+  historyContainer.classList.add('hide')
+}
+
+
+/////////////////////////////////////////////////////////////
+
+bottomNavSwitch.addEventListener('click', () => {
+  const state = getSaved('bottomNav');
+  state ?
+    removeSaved('bottomNav') :
+    save('bottomNav', 'true');
+
+  document.body.style.flexDirection = `column${state ? '' : '-reverse'}`;
+  (<HTMLDivElement>document.querySelector('nav')).style.padding = state ? '5% 3% 0 3%' : '0 3% 5% 3%';
+});
+
+if (getSaved('bottomNav')) {
+  bottomNavSwitch.toggleAttribute('checked');
+  document.body.style.flexDirection = 'column-reverse';
+  (<HTMLDivElement>document.querySelector('nav')).style.padding = '0 3% 5% 3%';
 }
 
 /////////////////////////////////////////////////////////////
 
-document.getElementById('clearCacheBtn')?.addEventListener('click', () => {
+fullscreenSwitch.addEventListener('click', () => {
+  document.fullscreenElement ?
+    document.exitFullscreen() :
+    document.documentElement.requestFullscreen();
+});
+
+/////////////////////////////////////////////////////////////
+
+clearCacheBtn.addEventListener('click', () => {
   self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
   navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
   location.reload();
 });
 
-document.getElementById('restoreSettingsBtn')?.addEventListener('click', () => {
-  for (let i = 0; i < localStorage.length; i++)
-    if (localStorage.key(i) !== 'library')
-      removeSaved(<string>localStorage.key(i));
+restoreSettingsBtn.addEventListener('click', () => {
+  const temp = getSaved('library');
+  localStorage.clear();
+
+  if (temp)
+    save('library', temp);
+
   location.reload();
 });
 
+// emergency use
+if (location.search === '?reset') {
+  history.replaceState({}, '', location.pathname);
+  clearCacheBtn.click();
+  restoreSettingsBtn.click();
+}

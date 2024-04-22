@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "6.8.5",
+  "version": "6.9.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,13 +9,14 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "lit": "^3.1.2"
+    "imsc": "^1.1.5",
+    "lit": "^3.1.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
     "eruda": "^3.0.1",
-    "typescript": "^5.4.4",
-    "vite": "^5.2.8",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10",
     "vite-plugin-pwa": "^0.19.8"
   },
   "browserslist": [

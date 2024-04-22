@@ -6,12 +6,18 @@
   position: sticky;
   z-index: 1;
   top: 0;
-  backdrop-filter: blur(2vmin);
   background-color: var(--onBg);
+  backdrop-filter: blur(2vmin);
   border-radius: var(--roundness);
   border: var(--border);
   box-shadow: var(--shadow);
   display: flex;
+  transition: all 0.4s;
+}
+
+#superInputContainer:focus-within {
+  backdrop-filter: none;
+  background-color: var(--bg);
 }
 
 #superInput {
@@ -53,7 +59,7 @@
   overflow-y: scroll;
   position: absolute;
   z-index: 1;
-  margin-top: 11.2vmin;
+  margin-top: 11.9vmin;
   width: 80vmin;
   background-color: var(--bg);
   list-style-type: none;

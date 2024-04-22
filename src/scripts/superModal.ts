@@ -1,7 +1,7 @@
-import { listContainer, superModal } from "../lib/dom";
+import { superModal } from "../lib/dom";
+import { createPlaylist, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { $, fetchList, notify } from "../lib/utils";
-import { addToCollection, createPlaylist } from "./library";
 import { appendToQueuelist } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;
@@ -79,9 +79,8 @@ downloadBtn.addEventListener('click', () => {
 
 openChannelBtn.addEventListener('click', () => {
   // data binding for save list & open in yt btn
-  (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-youtube-line"></i> ' + <string>superModal.dataset.author;
+  (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-external-link-line"></i> ' + <string>superModal.dataset.author;
   const channelUrl = <string>superModal.dataset.channelUrl;
-  listContainer.dataset.url = channelUrl;
   fetchList(channelUrl);
   superModal.click();
 })

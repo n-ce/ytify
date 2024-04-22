@@ -1,7 +1,7 @@
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { addListToCollection, createPlaylist } from './library';
-import { notify } from '../lib/utils';
+import { hostResolver, notify } from '../lib/utils';
+import { addListToCollection, createPlaylist } from '../lib/libraryUtils';
 
 playAllBtn.addEventListener('click', () => {
   clearQ();
@@ -14,6 +14,7 @@ enqueueBtn.onclick = () => listToQ(listContainer);
 saveListBtn.addEventListener('click', () => {
   if (saveListBtn.textContent === ' Subscribe') {
     notify('This has not been implemented yet.');
+    // document.getElementById('library')?.appendChild(itemsLoader([saveListBtn.dataset]))
     saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Subscribed';
     return;
   }
@@ -39,4 +40,4 @@ saveListBtn.addEventListener('click', () => {
   saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Saved';
 });
 
-openInYtBtn.onclick = () => open('https://youtube.com' + listContainer.dataset.url);
+openInYtBtn.onclick = () => open(hostResolver(<string>listContainer.dataset.url));

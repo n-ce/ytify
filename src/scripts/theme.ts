@@ -1,6 +1,7 @@
 import { img, canvas, context } from "../lib/dom";
+import { blankImage } from "../lib/imageUtils";
 import player from "../lib/player";
-import { blankImage, getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
+import { getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
@@ -163,4 +164,3 @@ roundnessChanger.addEventListener('change', () => {
 const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
 
 streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
-

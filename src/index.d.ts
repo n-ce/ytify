@@ -26,7 +26,7 @@ declare global {
     playlistType: string,
     uploadedDate: string,
     uploaderName: string,
-    uploaderAvatar: string
+    uploaderAvatar: string,
   }
 
   type CollectionItem = {
@@ -39,11 +39,16 @@ declare global {
   }
 
   type Recommendation = {
-    lengthSeconds: number,
-    videoId: string,
+    duration: number,
+    url: string,
     title: string,
+    uploaderUrl: string,
+    uploaderName: string,
+    type: string,
+    author: string,
     authorUrl: string,
-    author: string
+    lengthSeconds: number,
+    videoId: string
   };
 
   type Library = {
@@ -70,4 +75,6 @@ declare global {
 
 }
 
+
 export { };
+
