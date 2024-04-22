@@ -11,11 +11,13 @@ const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
 const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
-const discover = <HTMLDetailsElement>document.getElementById('discover');
+const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
-const history = <HTMLDetailsElement>document.getElementById('history');
+const historyContainer = <HTMLDetailsElement>document.getElementById('history');
 const bottomNavSwitch = <HTMLElement>document.getElementById('bottomNavSwitch');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
+const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
+const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
 
 export { ytmPlsSwitch };
 
@@ -114,18 +116,18 @@ discoverSwitch.addEventListener('click', () => {
       return discoverSwitch.toggleAttribute('checked');
     delete db.discover;
     saveDB(db);
-    discover.classList.add('hide');
+    discoverContainer.classList.add('hide');
     save('discover', 'off');
 
   } else {
-    discover.classList.remove('hide');
+    discoverContainer.classList.remove('hide');
     removeSaved('discover');
   }
 });
 
 if (getSaved('discover')) {
   discoverSwitch.removeAttribute('checked');
-  discover.classList.add('hide');
+  discoverContainer.classList.add('hide');
 }
 
 /////////////////////////////////////////////////////////////
@@ -136,18 +138,18 @@ historySwitch.addEventListener('click', () => {
     if (!confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) return historySwitch.toggleAttribute('checked');
     delete db.history;
     saveDB(db);
-    history.classList.add('hide');
+    historyContainer.classList.add('hide');
     save('history', 'off')
   }
   else {
-    history.classList.remove('hide');
+    historyContainer.classList.remove('hide');
     removeSaved('history');
   }
 });
 
 if (getSaved('history')) {
   historySwitch.removeAttribute('checked');
-  history.classList.add('hide')
+  historyContainer.classList.add('hide')
 }
 
 
@@ -179,16 +181,25 @@ fullscreenSwitch.addEventListener('click', () => {
 
 /////////////////////////////////////////////////////////////
 
-document.getElementById('clearCacheBtn')?.addEventListener('click', () => {
+clearCacheBtn.addEventListener('click', () => {
   self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
   navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
   location.reload();
 });
 
-document.getElementById('restoreSettingsBtn')?.addEventListener('click', () => {
-  for (let i = 0; i < localStorage.length; i++)
-    if (localStorage.key(i) !== 'library')
-      removeSaved(<string>localStorage.key(i));
+restoreSettingsBtn.addEventListener('click', () => {
+  const temp = getSaved('library');
+  localStorage.clear();
+
+  if (temp)
+    save('library', temp);
+
   location.reload();
 });
 
+// emergency use
+if (location.search === '?reset') {
+  history.pushState({}, '', location.pathname);
+  clearCacheBtn.click();
+  restoreSettingsBtn.click();
+}
