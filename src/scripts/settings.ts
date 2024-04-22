@@ -199,7 +199,7 @@ restoreSettingsBtn.addEventListener('click', () => {
 
 // emergency use
 if (location.search === '?reset') {
-  history.pushState({}, '', location.pathname);
+  history.replaceState({}, '', location.pathname);
   clearCacheBtn.click();
   restoreSettingsBtn.click();
 }
