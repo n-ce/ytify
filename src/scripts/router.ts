@@ -66,7 +66,7 @@ if (errorParam) {
       searchFilters.value = x.get('f') || 'all';
     }
     if (route === '/upcoming')
-      location.assign(errorParam)
+      addEventListener('DOMContentLoaded, () => location.replace(errorParam));
 
   }
   else route = errorParam;
