@@ -162,4 +162,5 @@ roundnessChanger.addEventListener('change', () => {
 
 
 const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+
 streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();

@@ -14,10 +14,9 @@ fetch(unifiedInstancesAPIurl)
 
     const savedApi = getSaved('apiList_3');
 
-    if (!savedApi) {
-      instanceSelector.selectedIndex = 1;
+    if (!savedApi)
       return;
-    }
+
     const api = JSON.parse(savedApi);
     const names = json.map(v => v.name);
     const index = names.findIndex(v => v === api.name);
