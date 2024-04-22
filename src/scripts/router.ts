@@ -66,7 +66,7 @@ if (errorParam) {
       searchFilters.value = x.get('f') || 'all';
     }
     if (route === '/upcoming')
-      location.replace(errorParam)
+      location.assign(errorParam)
 
   }
   else route = errorParam;
