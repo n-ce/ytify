@@ -65,9 +65,10 @@ if (errorParam) {
       superInput.value = x.get('q') || '';
       searchFilters.value = x.get('f') || 'all';
     }
-    if (route === '/upcoming')
-      location.assign(location.origin + errorParam);
-
+    if (route === '/upcoming') {
+      history.replaceState({}, '', errorParam);
+      location.reload();
+    }
   }
   else route = errorParam;
 }
