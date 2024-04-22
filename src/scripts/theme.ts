@@ -161,13 +161,5 @@ roundnessChanger.addEventListener('change', () => {
 })
 
 
-const intervalId = setInterval(() => {
-  if (instanceSelector.length === 1) return;
-
-  const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
-
-  streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
-
-  clearInterval(intervalId);
-});
-
+const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
