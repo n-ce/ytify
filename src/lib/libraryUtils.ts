@@ -91,7 +91,7 @@ export function createPlaylist(title: string) {
 
   render(html`
     <summary>
-      <i class="ri-play-list-2-line"></i> ${title}
+      <i class="ri-play-list-2-fill"></i> ${title}
     </summary>
     <button @click=${() => {
       atpOption.remove();
@@ -128,5 +128,5 @@ export function createPlaylist(title: string) {
     <div @click=${superClick}></div>
   `, details);
 
-  library.insertBefore(details, <HTMLBRElement>document.querySelector('br'));
+  library.insertBefore(details, library.querySelector('br') as HTMLBRElement);
 }
