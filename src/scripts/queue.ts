@@ -1,12 +1,16 @@
-
-
 import { $, removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 
 const queueArray: string[] = [];
 
-const [clearQBtn, shuffleQBtn, removeQBtn, filterG10Btn, autoQueueBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('queuetools')).children;
+const [
+  clearQBtn,
+  shuffleQBtn,
+  removeQBtn,
+  filterG10Btn,
+  autoQueueBtn
+] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
@@ -43,23 +47,24 @@ queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLElement;
   if (!queueItem.matches('stream-item')) return;
   const id = queueItem.dataset.id || '';
-  if (!queueItem.classList.contains('delete')) {
+  if (queueItem.classList.contains('delete')) {
     const trashHistory = sessionStorage.getItem('trashHistory');
     sessionStorage.setItem('trashHistory', trashHistory + id);
-    player(id);
-  }
+  } else player(id);
+
   const index = queueArray.indexOf(id);
+
   queueArray.splice(index, 1);
   queuelist.children[index].remove();
-
 });
 
 
 // clones any list items from the provided container to queue
 
 export function listToQ(container: HTMLDivElement) {
-  container.querySelectorAll('stream-item').forEach(item => {
-    appendToQueuelist((<HTMLElement>item).dataset);
+  const items = container.querySelectorAll('stream-item') as NodeListOf<HTMLElement>;
+  items.forEach(item => {
+    appendToQueuelist(item.dataset);
   });
   upcomingBtn.click();
 }
@@ -84,9 +89,9 @@ shuffleQBtn.addEventListener('click', () => {
 });
 
 removeQBtn.addEventListener('click', () => {
-  queuelist.querySelectorAll('stream-item').forEach((el) =>
+  queuelist.querySelectorAll('stream-item').forEach(el => {
     el.classList.toggle('delete')
-  );
+  });
   removeQBtn.classList.toggle('delete');
 });
 
@@ -96,13 +101,17 @@ removeQBtn.addEventListener('click', () => {
 filterG10Btn.addEventListener('click', () => {
 
   filterG10Btn.classList.toggle('filter');
+  // Prevent Queue Conflicts
+  if (removeQBtn.classList.contains('delete'))
+    removeQBtn.click();
 
-  queuelist.querySelectorAll('stream-item').forEach((el, index) => {
-    const duration = (<HTMLElement>el).dataset.duration as string
-    if (isLongerThan10Min(duration)) {
-      queueArray.splice(index, 1);
-      el.remove();
-    }
+  const items = queuelist.querySelectorAll('stream-item') as NodeListOf<HTMLElement>;
+  items.forEach(el => {
+    const duration = el.dataset.duration as string
+    if (!isLongerThan10Min(duration))
+      return;
+    el.classList.add('delete');
+    el.click()
 
   });
 });

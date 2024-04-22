@@ -64,7 +64,6 @@ export default async function player(id: string | null = '') {
 
   const apiIndex = instanceSelector.selectedIndex;
   const apiUrl = getApi('piped', apiIndex);
-  console.log(apiUrl)
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())

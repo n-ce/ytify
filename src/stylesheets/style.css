@@ -219,6 +219,8 @@ list-item:hover {
 .delete {
   --defaultBg: #800;
   --defaultText: #eaa;
+  --onBg: #800;
+  --text: #eaa;
 }
 
 .filter {

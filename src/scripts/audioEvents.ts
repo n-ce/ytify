@@ -86,6 +86,11 @@ audio.addEventListener('loadeddata', () => {
   if (isPlayable) audio.play();
   historyID = audio.dataset.id;
   clearTimeout(historyTimeoutId);
+
+  // persist playback speed
+  if (playSpeed.value !== '1.00')
+    audio.playbackRate = parseFloat(playSpeed.value);
+
 });
 
 
@@ -105,6 +110,7 @@ playSpeed.addEventListener('change', () => {
   updatePositionState();
   playSpeed.blur();
 });
+
 
 
 seekFwdButton.addEventListener('click', () => {
