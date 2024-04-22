@@ -100,7 +100,7 @@ export function createPlaylist(title: string) {
       delete db[details.id];
       saveDB(db);
     }}>
-      <i class="ri-delete-bin-7-line"></i> Delete
+      <i class="ri-delete-bin-2-line"></i> Delete
     </button>
     <button @click=${() => {
       details.querySelectorAll('stream-item').forEach(el => el.classList.toggle('delete'));
