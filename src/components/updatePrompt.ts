@@ -26,7 +26,8 @@ export class UpdatePrompt extends LitElement {
   }
   ul {
     overflow: scroll;
-    margin-left:-3.2ch;
+    margin-left: -3.2ch;
+    max-height: 80dvh;
   }
   ul li:first-child {
     list-style-type:none;

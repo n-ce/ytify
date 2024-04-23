@@ -44,16 +44,6 @@
   text-align: right;
 }
 
-#search button {
-  background: none;
-  color: inherit;
-  border: none;
-  padding: 0;
-  margin: 0;
-  font-size: x-large;
-}
-
-
 #suggestions {
   max-height: 25vmax;
   overflow-y: scroll;

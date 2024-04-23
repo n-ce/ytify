@@ -4,7 +4,6 @@ import { $, getSaved, getApi, save, itemsLoader, idFromURL, params, notify, remo
 import { ytmPlsSwitch } from "./settings";
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
-const searchIcon = <HTMLButtonElement>searchFilters.nextElementSibling;
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
 
@@ -199,13 +198,16 @@ superInput.addEventListener('keydown', _ => {
 
 });
 
+// CTRL + K focus search bar
+document.addEventListener("keydown", function(event) {
+  if (event.ctrlKey && event.key === "K")
+    superInput.focus();
+});
 
 
 searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
-
-searchIcon.addEventListener('click', searchLoader);
 
 suggestionsSwitch.addEventListener('click', () => {
   getSaved('searchSuggestions') ?
