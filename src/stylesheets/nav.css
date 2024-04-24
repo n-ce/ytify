@@ -19,15 +19,20 @@ nav a.active {
   opacity: 1;
 }
 
+
 @media(orientation:portrait) {
 
   nav {
+    --navPadding: 5% 3% 0;
     height: auto;
     justify-content: space-around;
     width: 94%;
-    padding: 5% 3% 0;
+    padding: var(--navPadding);
   }
 
+  .reverseNav {
+    --navPadding: 0 3% 5%;
+  }
 
   nav a {
     height: 100%;

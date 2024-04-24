@@ -14,7 +14,7 @@ const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitc
 const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
 const historyContainer = <HTMLDetailsElement>document.getElementById('history');
-const bottomNavSwitch = <HTMLElement>document.getElementById('bottomNavSwitch');
+const reverseNavSwitch = <HTMLElement>document.getElementById('reverseNavSwitch');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
 const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
@@ -155,20 +155,21 @@ if (getSaved('history')) {
 
 /////////////////////////////////////////////////////////////
 
-bottomNavSwitch.addEventListener('click', () => {
-  const state = getSaved('bottomNav');
-  state ?
-    removeSaved('bottomNav') :
-    save('bottomNav', 'true');
+const nav = document.querySelector('nav') as HTMLDivElement;
 
-  document.body.style.flexDirection = `column${state ? '' : '-reverse'}`;
-  (<HTMLDivElement>document.querySelector('nav')).style.padding = state ? '5% 3% 0 3%' : '0 3% 5% 3%';
+reverseNavSwitch.addEventListener('click', () => {
+  getSaved('reverseNav') ?
+    removeSaved('reverseNav') :
+    save('reverseNav', 'true');
+
+  document.body.classList.toggle('reverseNav');
+  nav.classList.toggle('reverseNav');
 });
 
-if (getSaved('bottomNav')) {
-  bottomNavSwitch.toggleAttribute('checked');
-  document.body.style.flexDirection = 'column-reverse';
-  (<HTMLDivElement>document.querySelector('nav')).style.padding = '0 3% 5% 3%';
+if (getSaved('reverseNav')) {
+  reverseNavSwitch.toggleAttribute('checked');
+  document.body.classList.toggle('reverseNav');
+  nav.classList.add('reverseNav');
 }
 
 /////////////////////////////////////////////////////////////

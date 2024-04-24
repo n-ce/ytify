@@ -71,7 +71,7 @@ input::-moz-range-thumb {
 
 
 #volumeContainer {
-  height: 40%;
+  height: 50%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -120,11 +120,14 @@ input::-moz-range-thumb {
 
 
 
-
 @media(orientation:landscape) {
   #playerControls {
     display: flex;
     justify-content: space-evenly;
+  }
+
+  #volumeContainer {
+    height: 60%;
   }
 }
 
@@ -160,7 +163,7 @@ input::-moz-range-thumb {
 
   #loopButton {
     grid-area: F;
-    width: 15vw;
+    width: 15vmin;
     font-size: medium !important;
     font-weight: bold;
   }
@@ -174,7 +177,7 @@ input::-moz-range-thumb {
   #playSpeed {
     grid-area: H;
     font-weight: bold;
-    width: 15vmin;
+    width: 7ch;
     margin: auto;
   }
 

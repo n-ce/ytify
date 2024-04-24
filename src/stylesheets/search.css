@@ -36,12 +36,12 @@
 
 #searchFilters {
   font-size: medium;
-  max-width: 10ch;
+  max-width: 9ch;
   padding: 0;
-  margin-right: 1vmin;
   border: none;
   color: inherit;
   text-align: right;
+  appearance: none;
 }
 
 #suggestions {

@@ -70,7 +70,12 @@ section.view {
 
 @media(orientation:portrait) {
   body {
-    flex-direction: column;
+    --navDirection: column;
+    flex-direction: var(--navDirection);
+  }
+
+  .reverseNav {
+    --navDirection: column-reverse;
   }
 
   main {
@@ -87,6 +92,16 @@ section.view {
 
 
 @media(orientation:landscape) {
+
+  body {
+    --navDirection: row;
+    flex-direction: var(--navDirection);
+  }
+
+  .reverseNav {
+    --navDirection: row-reverse;
+  }
+
   main {
     height: 96dvh;
     width: calc(80% - 4dvh);
