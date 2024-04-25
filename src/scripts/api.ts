@@ -14,8 +14,10 @@ fetch(unifiedInstancesAPIurl)
 
     const savedApi = getSaved('apiList_3');
 
-    if (!savedApi)
+    if (!savedApi) {
+      instanceSelector.selectedIndex = 1;
       return;
+    }
 
     const api = JSON.parse(savedApi);
     const names = json.map(v => v.name);
@@ -54,6 +56,8 @@ instanceSelector.addEventListener('change', async () => {
   index === 1 ?
     removeSaved('apiList_3') :
     save('apiList_3', instanceSelector.value);
+
+  if (audio.dataset.playbackState !== 'playing') return;
 
   audio.pause();
   const timeOfSwitch = audio.currentTime;
