@@ -6,7 +6,7 @@ import { appendToQueuelist } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;
 
-const [playNow, enqueue, li_atps, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
+const [playNow, enqueue, enqueueNext ,li_atps, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
 
 export const atpSelector = <HTMLSelectElement>li_atps.lastElementChild;
 
@@ -28,6 +28,10 @@ enqueue.addEventListener('click', () => {
   superModal.click();
 });
 
+enqueueNext.addEventListener('click', () => {
+  appendToQueuelist(superModal.dataset, true);
+  superModal.click();
+});
 
 startRadio.addEventListener('click', async () => {
   superModal.click();

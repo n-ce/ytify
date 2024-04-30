@@ -143,6 +143,10 @@
   content: "\eeb9";
 }
 
+.ri-insert-row-top:before {
+  content: "\ee64";
+}
+
 .ri-play-large-line:before {
   content: "\f509";
 }
