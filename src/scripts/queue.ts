@@ -3,7 +3,7 @@ import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
-// import Sortable from "sortablejs";
+import Sortable, { SortableEvent } from "sortablejs";
 
 const queueArray: string[] = [];
 
@@ -56,8 +56,12 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 }
 
-
-//new Sortable(queuelist, {});
+const queueListSortable = new Sortable(queuelist, {
+  onUpdate: function(event: SortableEvent) {
+    if (event.oldIndex == null || event.newIndex == null) return
+    queueArray.splice(event.newIndex, 0, queueArray.splice(event.oldIndex, 1)[0])
+  }
+})
 
 queuelist.addEventListener('dblclick', e => {
   const queueItem = e.target as HTMLElement;
@@ -74,6 +78,19 @@ queuelist.addEventListener('dblclick', e => {
   queuelist.children[index].remove();
 });
 
+queuelist.addEventListener('click', e => {
+  const queueItem = e.target as HTMLElement;
+  if (!queueItem.matches('stream-item')) return;
+  const id = queueItem.dataset.id || '';
+  if (queueItem.classList.contains('delete')) {
+    const trashHistory = sessionStorage.getItem('trashHistory');
+    sessionStorage.setItem('trashHistory', trashHistory + id);
+
+    const index = queueArray.indexOf(id);
+    queueArray.splice(index, 1);
+    queuelist.children[index].remove();
+  }
+});
 
 // clones any list items from the provided container to queue
 
@@ -105,7 +122,8 @@ shuffleQBtn.addEventListener('click', () => {
 });
 
 removeQBtn.addEventListener('click', () => {
-  queuelist.querySelectorAll('.streamItem').forEach(el => {
+  queueListSortable.option('disabled', !queueListSortable.option('disabled'))
+  queuelist.querySelectorAll('stream-item').forEach(el => {
     el.classList.toggle('delete')
   });
   removeQBtn.classList.toggle('delete');
