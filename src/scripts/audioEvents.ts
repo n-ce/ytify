@@ -177,8 +177,9 @@ playPrevButton.addEventListener('click', () => {
 
 function onEnd() {
   playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-  if (queuelist.childElementCount)
-    firstItemInQueue().click();
+  if (queuelist.childElementCount){
+    firstItemInQueue().dispatchEvent(new MouseEvent("dblclick", { bubbles: true, view: window }));
+  }
 }
 
 audio.addEventListener('ended', onEnd);

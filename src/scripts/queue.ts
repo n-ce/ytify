@@ -59,12 +59,9 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 //new Sortable(queuelist, {});
 
-queuelist.addEventListener('click', e => {
-
-  e.preventDefault();
-
-  const queueItem = e.target as HTMLAnchorElement;
-  if (!queueItem.classList.contains('streamItem')) return;
+queuelist.addEventListener('dblclick', e => {
+  const queueItem = e.target as HTMLElement;
+  if (!queueItem.matches('stream-item')) return;
   const id = queueItem.dataset.id || '';
   if (queueItem.classList.contains('delete')) {
     const trashHistory = sessionStorage.getItem('trashHistory');
