@@ -143,10 +143,6 @@
   content: "\eeb9";
 }
 
-ri-skip-forward-line:before {
-  content: "\f144";
-}
-
 .ri-play-large-line:before {
   content: "\f509";
 }
