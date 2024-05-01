@@ -143,8 +143,8 @@
   content: "\eeb9";
 }
 
-.ri-insert-row-top:before {
-  content: "\ee64";
+ri-skip-forward-line:before {
+  content: "\f144";
 }
 
 .ri-play-large-line:before {
