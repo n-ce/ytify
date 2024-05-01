@@ -4,8 +4,6 @@ import { hostResolver, notify } from '../lib/utils';
 import { addListToCollection, createPlaylist, getDB, saveDB } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
 
-
-
 listBtnsContainer.addEventListener('click', e => {
   const btn = e.target as HTMLButtonElement;
   if (!btn.matches('button'))
@@ -19,7 +17,7 @@ listBtnsContainer.addEventListener('click', e => {
   if (btn === playAllBtn) {
     clearQ();
     listToQ(listContainer);
-    firstItemInQueue().click();
+    firstItemInQueue().dispatchEvent(new MouseEvent("dblclick", { bubbles: true, view: window }));
   }
   else if (btn === enqueueBtn)
     listToQ(listContainer);
