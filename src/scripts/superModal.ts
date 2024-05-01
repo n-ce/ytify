@@ -28,6 +28,7 @@ playNext.addEventListener('click', () => {
   superModal.click();
 });
 
+
 enqueue.addEventListener('click', () => {
   appendToQueuelist(superModal.dataset);
   superModal.click();
