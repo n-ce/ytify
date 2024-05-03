@@ -10,7 +10,7 @@ export default async (req: Request, context: Context) => {
 
 
   return new Response(
-    JSON.stringify(data)
+    JSON.stringify(context.params)
   );
 };
 
