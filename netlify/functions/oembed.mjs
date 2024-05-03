@@ -1,4 +1,4 @@
 export default async (req, context) => {
-  return new Response("Hello, world!");
+  return new Response(JSON.stringify(req));
 };
 
