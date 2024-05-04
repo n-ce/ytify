@@ -20,7 +20,7 @@ export default async (request: Request, context: Context) => {
   <meta property="og:image" content="https://i.ytimg.com/vi/${id}/hqdefault.jpg">
   `
 
-  const updatedPage = page.replace(standardOG, newOG).replace('ytify 6.9', 'test body change response');
+  const updatedPage = page.replace(standardOG, newOG).replace('48-160kbps Opus YouTube Audio Streaming Web App.', 'test head change response');
   return new Response(updatedPage, response);
 };
 
