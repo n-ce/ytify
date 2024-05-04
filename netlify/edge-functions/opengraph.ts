@@ -9,7 +9,7 @@ export default async (request: Request, context: Context) => {
   const id = new URL(request.url).searchParams.get('s');
 
   const response = await context.next();
-  const page = await response.text();
+  let page = await response.text();
 
   if (id)
     await fetch('https://pipedapi.drgns.space/streams/' + id)
@@ -18,19 +18,19 @@ export default async (request: Request, context: Context) => {
         keywords = data.tags;
         url += '?s=' + id;
         description = data.description;
-        page
+        page = page
           .replace('"ytify"', `"${data.title}"`)
           .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl);
       });
 
-  const updatedPage = page
+  page = page
     .replace('-keywords', keywords)
     .replace('-description', description)
     .replace('-url', url)
 
 
 
-  return new Response(updatedPage, response);
+  return new Response(page, response);
 };
 
 export const config: Config = {
