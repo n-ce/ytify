@@ -20,7 +20,7 @@ export default async (request: Request, context: Context) => {
         description = data.description;
         page
           .replace('"ytify"', `"${data.title}"`)
-          .replaceAll('/ytify_thumbnail_min.webp', data.thumbnail);
+          .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl);
       });
 
   const updatedPage = page
