@@ -1,33 +1,35 @@
 import { Context, Config } from "@netlify/edge-functions";
 
+let keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
+let thumbnail = '/ytify_thumbnail_min.webp';
+let title = 'ytify';
+let description = '48-160kbps Opus YouTube Audio Streaming Web App.';
+let url = 'https://ytify.netlify.app'
+
 export default async (request: Request, context: Context) => {
 
-  const url = new URL(request.url);
-  const id = url.searchParams.get('s');
+  const id = new URL(request.url).searchParams.get('s');
 
-  const og = id ? (await fetch('https://pipedapi.drgns.space/streams/' + id)
-    .then(res => res.json())
-    .then(data => `
-  <meta property="og:title" content="${data.title}">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ytify.netlify.app?s=${id}">
-  <meta property="og:description" content="${data.description}">
-  <meta property="og:image" content="${data.thumbnailUrl}">
-  `)) : `
-  <meta property="og:title" content="ytify">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ytify.netlify.app">
-  <meta property="og:description" content="48-160kbps Opus YouTube Audio Streaming Web App.">
-  <meta property="og:image" content="/ytify_thumbnail_min.webp">
-  `;
+  if (id)
+    await fetch('https://pipedapi.drgns.space/streams/' + id)
+      .then(res => res.json())
+      .then(data => {
+        title = data.title;
+        url += '?s=' + id;
+        description = data.description;
+        thumbnail = data.thumbnailUrl;
+      });
 
   const response = await context.next();
   const page = await response.text();
-  const injectionPoint = '<!-- OG Injection Point -->';
+  const updatedPage = page
+    .replace('{thumbnail}', thumbnail)
+    .replace('{title}', title)
+    .replace('{keywords}', keywords)
+    .replace('{description}', description)
+    .replace('{url}', url);
 
 
-
-  const updatedPage = page.replace(injectionPoint, og);
   return new Response(updatedPage, response);
 };
 
