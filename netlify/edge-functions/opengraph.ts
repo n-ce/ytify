@@ -20,14 +20,15 @@ export default async (request: Request, context: Context) => {
         title = data.title;
         url += '?s=' + id;
         description = data.description;
-        page.replaceAll('/ytify_thumbnail_min.webp', data.thumbnail);
+        page
+          .replace('"ytify"', `"${data.title}"`)
+          .replaceAll('/ytify_thumbnail_min.webp', data.thumbnail);
       });
 
   const updatedPage = page
-    .replace('{title}', title)
-    .replace('{keywords}', keywords)
-    .replace('{description}', description)
-    .replace('{url}', url)
+    .replace('-keywords', keywords)
+    .replace('-description', description)
+    .replace('-url', url)
 
 
 
