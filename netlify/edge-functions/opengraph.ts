@@ -1,34 +1,29 @@
 import { Context, Config } from "@netlify/edge-functions";
 
-let keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
-let description = '48-160kbps Opus YouTube Audio Streaming Web App.';
-let url = 'https://ytify.netlify.app'
+const keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
+const description = '48-160kbps Opus YouTube Audio Streaming Web App.';
+const url = 'https://ytify.netlify.app';
 
 export default async (request: Request, context: Context) => {
 
   const id = new URL(request.url).searchParams.get('s');
 
+
+  if (!id) return;
+
   const response = await context.next();
   let page = await response.text();
 
-  if (id)
-    await fetch('https://pipedapi.drgns.space/streams/' + id)
-      .then(res => res.json())
-      .then(data => {
-        keywords = data.tags;
-        url += '?s=' + id;
-        description = data.description;
-        page = page
-          .replace('"ytify"', `"${data.title}"`)
-          .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl);
-      });
-
-  page = page
-    .replace('-keywords', keywords)
-    .replace('-description', description)
-    .replace('-url', url)
-
-
+  await fetch('https://pipedapi.drgns.space/streams/' + id)
+    .then(res => res.json())
+    .then(data => {
+      page = page
+        .replace(keywords, data.tags)
+        .replace(description, data.description)
+        .replace('"ytify"', `"${data.title}"`)
+        .replace(url, `${url}?s=${id}`)
+        .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl);
+    });
 
   return new Response(page, response);
 };
