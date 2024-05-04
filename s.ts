@@ -5,7 +5,7 @@ export default async (request: Request, context: Context) => {
   // Just return what was requested without transforming it, 
   // unless we fnd the query parameter for this demo
   const url = new URL(request.url);
-  if (url.searchParams.has('s'))
+  if (!url.searchParams.has('s'))
     return;
 
 
