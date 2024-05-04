@@ -14,6 +14,7 @@ export default async (request: Request, context: Context) => {
     await fetch('https://pipedapi.drgns.space/streams/' + id)
       .then(res => res.json())
       .then(data => {
+        keywords = data.tags;
         title = data.title;
         url += '?s=' + id;
         description = data.description;
