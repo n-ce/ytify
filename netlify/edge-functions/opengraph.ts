@@ -1,7 +1,6 @@
 import { Context, Config } from "@netlify/edge-functions";
 
 let keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
-let title = 'ytify';
 let description = '48-160kbps Opus YouTube Audio Streaming Web App.';
 let url = 'https://ytify.netlify.app'
 
@@ -17,7 +16,6 @@ export default async (request: Request, context: Context) => {
       .then(res => res.json())
       .then(data => {
         keywords = data.tags;
-        title = data.title;
         url += '?s=' + id;
         description = data.description;
         page
