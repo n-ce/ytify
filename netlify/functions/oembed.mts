@@ -1,4 +1,4 @@
-import type { Context } from '@netlify/functions';
+import type { Config, Context } from '@netlify/edge-functions';
 const api = 'http://noembed.com/embed?url=https://youtube.com/watch?v=';
 
 export default async (req: Request, context: Context) => {
