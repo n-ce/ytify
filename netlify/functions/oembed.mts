@@ -9,3 +9,6 @@ export default async (req: Request, context: Context) => {
   return Response.json(data);
 };
 
+export const config: Config = {
+  path: "/*",
+};
