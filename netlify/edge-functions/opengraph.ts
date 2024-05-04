@@ -24,7 +24,7 @@ export default async (request: Request, context: Context) => {
   const response = await context.next();
   const page = await response.text();
   const updatedPage = page
-    .replace('{thumbnail}', thumbnail)
+    .replaceAll('{thumbnail}', thumbnail)
     .replace('{title}', title)
     .replace('{keywords}', keywords)
     .replace('{description}', description)
