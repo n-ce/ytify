@@ -18,7 +18,7 @@ export default async (request: Request, context: Context) => {
 
   const standardOG = `
   <meta property="og:url" content="https://ytify.netlify.app">
-  <meta property="og:description" content="32-128kbps Opus YouTube Audio Streaming Web App.">
+  <meta property="og:description" content="48-160kbps Opus YouTube Audio Streaming Web App.">
   <meta property="og:image" content="/ytify_thumbnail_min.webp">
   `;
   const newOG = `
