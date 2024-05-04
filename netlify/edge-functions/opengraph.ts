@@ -10,6 +10,9 @@ export default async (request: Request, context: Context) => {
 
   const id = new URL(request.url).searchParams.get('s');
 
+  const response = await context.next();
+  const page = await response.text();
+
   if (id)
     await fetch('https://pipedapi.drgns.space/streams/' + id)
       .then(res => res.json())
@@ -18,17 +21,15 @@ export default async (request: Request, context: Context) => {
         title = data.title;
         url += '?s=' + id;
         description = data.description;
-        thumbnail = data.thumbnailUrl;
+        page.replaceAll(thumbnail, data.thumbnail);
       });
 
-  const response = await context.next();
-  const page = await response.text();
   const updatedPage = page
-    .replaceAll('{thumbnail}', thumbnail)
     .replace('{title}', title)
     .replace('{keywords}', keywords)
     .replace('{description}', description)
-    .replace('{url}', url);
+    .replace('{url}', url)
+
 
 
   return new Response(updatedPage, response);
