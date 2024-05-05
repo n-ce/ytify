@@ -1,7 +1,7 @@
 import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import autoprefixer from 'autoprefixer';
-
+import solidPlugin from 'vite-plugin-solid';
 
 const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
   name: 'erudaInjector',
@@ -29,6 +29,7 @@ const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
 export default defineConfig(({ command }) => ({
   plugins: [
     injectEruda(command === 'serve'),
+    solidPlugin(),
     VitePWA({
       manifest: {
         "short_name": "Ytify",

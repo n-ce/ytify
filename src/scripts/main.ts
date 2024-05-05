@@ -16,15 +16,13 @@ import '../components/toggleSwitch';
 if (import.meta.env.PROD)
   import('virtual:pwa-register').then(pwa => {
 
-    const updater = document.createElement('update-prompt') as HTMLElement & { handleUpdate(): void };
-
-    updater.handleUpdate = pwa.registerSW({
+    const handleUpdate = pwa.registerSW({
       async onNeedRefresh() {
-        const { html, render } = await import('lit');
-        import('../components/updatePrompt').then(() => render(
-          html`<dialog id='changelog' open>${updater}</dialog>`,
-          document.body
-        ));
+        import('../components/UpdatePrompt').then(mod =>
+          import('solid-js/web').then(solid => solid.render(
+            () => mod.default(handleUpdate),
+            document.body
+          )));
       }
     });
   });

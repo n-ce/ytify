@@ -254,7 +254,8 @@ list-item:hover {
 details,
 #queuetools,
 #listTools,
-#settings {
+#settings,
+#changelog {
   button {
     border: var(--border);
     border-radius: var(--roundness);
@@ -290,21 +291,4 @@ details,
 
 .ri-loader-3-line {
   animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
-}
-
-
-#changelog {
-  position: fixed;
-  z-index: 4;
-  width: calc(100% - 10dvmin);
-  height: calc(100% - 10dvmin);
-  background-color: var(--bg);
-  animation: zoomout 0.5s ease-in-out forwards;
-}
-
-@keyframes zoomout {
-  from {
-    transform: scale(2);
-    opacity: 0;
-  }
 }

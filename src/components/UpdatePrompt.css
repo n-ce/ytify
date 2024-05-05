@@ -1,0 +1,50 @@
+#changelog {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  z-index: 4;
+  width: calc(100% - 10dvmin);
+  height: calc(100% - 10dvmin);
+  background-color: var(--bg);
+  animation: zoomout 0.5s ease-in-out forwards;
+
+
+  @keyframes zoomout {
+    from {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  ul {
+    background-color: var(--onBg);
+    border-radius: calc(var(--roundness) + 0.75vmin);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    border: var(--border);
+    padding: 2vmin;
+    overflow: hidden scroll;
+    max-height: 80dvh;
+    max-width: calc(100% - 10dvmin);
+
+    li {
+      &:first-child {
+        list-style-type: none;
+        font-size: 1.5rem;
+        font-weight: bolder;
+        margin-bottom: 5%;
+      }
+    }
+
+    hr {
+      border: 1px solid var(--text);
+      opacity: 0.5;
+    }
+  }
+
+  span {
+    display: flex;
+    justify-content: space-between;
+  }
+
+}
