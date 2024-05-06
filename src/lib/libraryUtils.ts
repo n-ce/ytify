@@ -1,7 +1,9 @@
-import { render, html } from "lit";
-import { $, getSaved, hostResolver, notify, save, superClick } from "./utils";
+import { $, getSaved, notify, save, superClick } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import { listToQ } from "../scripts/queue";
+import StreamItem from "../components/StreamItem";
+import { render } from "solid-js/web";
+import { html, render as lit } from "lit";
 
 
 const library = document.getElementById('library') as HTMLDivElement;
@@ -14,20 +16,25 @@ export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
-  const anchor = $('a');
-  anchor.href = hostResolver('/watch?v=' + data.id);
-  anchor.onclick = e => e.preventDefault();
+  const imgLoad = getSaved('img') ? false : true;
+  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
+  const fragment = document.createDocumentFragment();
 
-  render(html`
-    <stream-item
-      data-id=${data.id} 
-      data-title=${data.title}
-      data-author=${data.author}
-      data-duration=${data.duration}
-      data-channel_url=${data.channelUrl}
-    />`,
-    anchor);
-  return anchor;
+  render(
+    () => StreamItem(
+      data.id as string,
+      `/watch?v=${data.id}`,
+      data.title as string,
+      data.author as string,
+      data.duration as string,
+      '',
+      data.channelUrl as string,
+      '',
+      imgLoad,
+      imgLoadStyle
+    ),
+    fragment);
+  return fragment;
 }
 
 export function removeFromCollection(collection: string, id: string) {
@@ -89,7 +96,7 @@ export function createPlaylist(title: string) {
   atpSelector.add(new Option(title, title));
   const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${details.id}"]`);
 
-  render(html`
+  lit(html`
     <summary>
       <i class="ri-play-list-2-fill"></i> ${title}
     </summary>

@@ -109,11 +109,13 @@ if (getSaved('lazyImg'))
 
 /////////////////////////////////////////////////////////////
 
-discoverSwitch.addEventListener('click', () => {
+discoverSwitch.addEventListener('click', (e) => {
   if (discoverSwitch.hasAttribute('checked')) {
     const db = getDB();
-    if (!confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`))
-      return discoverSwitch.toggleAttribute('checked');
+    if (!confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`)) {
+      e.stopImmediatePropagation();
+      return;
+    }
     delete db.discover;
     saveDB(db);
     discoverContainer.classList.add('hide');
@@ -132,10 +134,14 @@ if (getSaved('discover')) {
 
 /////////////////////////////////////////////////////////////
 
-historySwitch.addEventListener('click', () => {
+historySwitch.addEventListener('click', (e) => {
   if (historySwitch.hasAttribute('checked')) {
     const db = getDB();
-    if (!confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) return historySwitch.toggleAttribute('checked');
+    if (!confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) {
+      e.stopImmediatePropagation()
+      return;
+    }
+    historySwitch.toggleAttribute('checked');
     delete db.history;
     saveDB(db);
     historyContainer.classList.add('hide');
