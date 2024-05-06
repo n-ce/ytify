@@ -27,7 +27,7 @@ saveListBtn.addEventListener('click', () => {
 
   const list: { [index: string]: DOMStringMap } = {};
   listContainer
-    .querySelectorAll('stream-item')
+    .querySelectorAll('.streamItem')
     .forEach(_ => {
       const sender = (<HTMLElement>_).dataset;
       const id = <string>sender.id;

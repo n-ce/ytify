@@ -110,7 +110,7 @@ export function createPlaylist(title: string) {
       <i class="ri-delete-bin-2-line"></i> Delete
     </button>
     <button @click=${() => {
-      details.querySelectorAll('stream-item').forEach(el => el.classList.toggle('delete'));
+      details.querySelectorAll('.streamItem').forEach(el => el.classList.toggle('delete'));
       details.classList.toggle('delete');
     }}>
       <i class="ri-subtract-line"></i> Remove

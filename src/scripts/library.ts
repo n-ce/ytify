@@ -30,7 +30,7 @@ exportBtn.addEventListener('click', () => {
 cleanBtn.addEventListener('click', () => {
 
   const library = document.getElementById('library') as HTMLDivElement;
-  const libraryItems = library.getElementsByTagName('stream-item');
+  const libraryItems = library.getElementsByClassName('streamItem');
 
   if (!confirm('Are you sure you want to clear ' + libraryItems.length + ' items from the library?')) return;
   removeSaved('library');
@@ -62,7 +62,7 @@ function loadLibrary() {
       container.innerHTML = '';
     })
     removeBtn.addEventListener('click', () => {
-      container.querySelectorAll('stream-item').forEach(e => e.classList.toggle('delete'));
+      container.querySelectorAll('.streamItem').forEach(e => e.classList.toggle('delete'));
       removeBtn.classList.toggle('delete');
     })
 

@@ -220,15 +220,6 @@ a {
   color: inherit;
 }
 
-stream-item,
-list-item {
-  transition: all 0.3s ease-out;
-}
-
-stream-item:hover,
-list-item:hover {
-  transform: scale(0.95);
-}
 
 .hide {
   display: none !important;

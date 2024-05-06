@@ -9,8 +9,6 @@ import './list';
 import './settings';
 import './library';
 import './audioEvents';
-import '../components/streamItem';
-import '../components/listItem';
 import '../components/toggleSwitch';
 
 if (import.meta.env.PROD)
