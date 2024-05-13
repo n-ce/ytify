@@ -1,22 +1,20 @@
 #library {
   h2 {
     width: 80%;
+    margin: 2rem 0;
   }
 
   #collections {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto;
     align-items: center;
     user-select: none;
-    overflow: scroll;
     border-radius: calc(var(--roundness)*1.5);
 
-    @media(orientation:portrait) {
-
-      width: 92%;
-    }
+    @media(orientation:portrait) {}
 
     @media(orientation:landscape) {
-      width: 100%;
+      grid-template-columns: auto auto auto auto;
     }
   }
 
@@ -44,7 +42,7 @@
 
   }
 
-  div {
+  div:last-child {
     display: flex;
     margin-top: 1vmin;
 
