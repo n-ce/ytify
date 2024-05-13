@@ -143,6 +143,7 @@ select {
 }
 
 dialog[open] {
+  margin: auto;
   background: none;
   border: none;
   animation: boing 0.3s ease-in-out forwards;

@@ -11,23 +11,18 @@
 }
 
 body {
-  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 img,
-svg,
-video,
-canvas,
-picture {
+svg {
   display: block;
   max-width: 100%;
 }
 
 input,
 button,
-select,
-textarea {
+select {
   font: inherit;
 }
 

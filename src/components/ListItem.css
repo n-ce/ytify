@@ -1,13 +1,16 @@
 .listItem {
-  height: 4.5rem;
-  width: 100%;
+  width: 48%;
+  height: auto;
   background-color: var(--onBg);
-  margin-bottom: 4%;
-  padding: 1vmin;
+  margin: 1%;
+  padding: 1dvmin;
   border-radius: calc(var(--roundness) + 0.75vmin);
-  display: flex;
-  gap: 1vmin;
   transition: all 0.3s ease-out;
+  display: inline-block;
+
+  @media(orientation:landscape) {
+    width: 23%;
+  }
 
   * {
     pointer-events: none;
@@ -26,32 +29,31 @@
 
 
   img {
-    height: 100%;
+    height: auto;
+    width: 100%;
     border-radius: var(--roundness);
   }
 
   div {
     display: flex;
     flex-direction: column;
-    height: 100%;
   }
 
   p.title {
-    font-size: 1rem;
-    height: 1rem;
-    line-height: 1rem;
-    overflow: hidden;
-  }
-
-  p.uData {
-    font-size: small;
+    font-size: medium;
     height: 2rem;
     line-height: 1rem;
     overflow: hidden;
   }
 
+  p.uData {
+    font-size: x-small;
+    line-height: 0.8rem;
+    overflow: hidden;
+  }
+
   p.stats {
-    font-size: medium;
+    font-size: small;
     height: 1rem;
     line-height: 1rem;
   }
