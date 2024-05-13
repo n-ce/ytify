@@ -1,0 +1,55 @@
+#listTools {
+
+  &.playlist {
+
+    #clearListBtn,
+    #removeFromListBtn,
+    #renameCollectionBtn,
+    #deleteCollectionBtn {
+      display: none
+    }
+  }
+
+  &.channel {
+    button {
+      display: none;
+    }
+
+    #importListBtn,
+    #viewOnYTBtn {
+      display: inline-block !important;
+    }
+  }
+
+  &.reserved {
+    button {
+      display: none;
+    }
+
+    #clearListBtn,
+    #removeFromListBtn {
+      display: inline-block !important;
+    }
+  }
+
+  &.collection {
+
+    #playAllBtn,
+    #clearListBtn,
+    #importListBtn,
+    #subscribeListBtn,
+    #viewOnYTBtn {
+      display: none;
+    }
+
+  }
+}
+
+#playlist {
+  width: 92%;
+
+  &.reverse {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}

@@ -70,8 +70,13 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
     const codec = _.type.includes('opus') ? 'opus' : 'aac';
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
 
-    // proxy the url
-    const url = (_.url).replace(new URL(_.url).origin, getApi('invidious', instance));
+    const oldUrl = new URL(_.url);
+
+    // only proxy music streams
+    const host = data.category === 'Music' ? getApi('invidious', instance) : `https://${oldUrl.searchParams.get('host')}`;
+
+    const url = _.url.replace(oldUrl.origin, host);
+
     // add to DOM
     bitrateSelector.add(new Option(quality, url));
 

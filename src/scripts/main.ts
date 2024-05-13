@@ -10,6 +10,9 @@ import './settings';
 import './library';
 import './audioEvents';
 import '../components/toggleSwitch';
+import eruda from 'eruda';
+
+eruda.init();
 
 if (import.meta.env.PROD)
   import('virtual:pwa-register').then(pwa => {
@@ -25,3 +28,6 @@ if (import.meta.env.PROD)
     });
   });
 
+
+
+document.getElementById('version')!.textContent += _VERSION;

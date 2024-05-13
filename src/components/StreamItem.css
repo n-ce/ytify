@@ -1,17 +1,18 @@
 .streamItem {
-	height: 20vmin;
-	width: calc(100% - 2vmin);
+	height: 20dvmin;
+	width: 100%;
 	user-select: none;
 	background-color: var(--onBg);
 	padding: 1vmin;
-	margin-bottom: 1vmin;
+	margin-bottom: 4%;
 	border-radius: calc(var(--roundness) + 0.75vmin);
 	display: flex;
-	transition: all 0.3s ease-out;
+	column-gap: 0.5rem;
+	transition: transform 0.2s ease-out;
 
 	* {
 		pointer-events: none;
-		transition: all 0.4s;
+		transition: opacity 0.4s;
 	}
 
 	&:hover {
@@ -25,8 +26,6 @@
 	}
 
 	p {
-		margin: 0;
-		padding: 0;
 		font-size: smaller;
 		overflow: hidden;
 	}
@@ -34,8 +33,7 @@
 	span {
 		position: relative;
 		z-index: 0;
-		height: 20vmin;
-		margin-right: 1vmin;
+		height: 100%;
 	}
 
 	.thumbnail {
@@ -45,22 +43,20 @@
 
 	.duration {
 		position: absolute;
-		margin: 0;
-		padding: 0.5vmin 1vmin;
+		padding: 0 1vmin;
 		bottom: 1.1vmin;
 		right: 1.2vmin;
-		background-color: #0007;
+		background-color: #000a;
 		color: #fffc;
-		font-weight: bold;
 		font-size: small;
-		border-radius: 1vmin;
+		font-family: monospace;
+		border-radius: calc(var(--roundness)*1.1);
 	}
 
 	.title {
-		font-size: 1rem;
-		line-height: 1.3rem;
-		height: 2.6rem;
-		word-break: break-all;
+		font-size: 90%;
+		height: 60%;
+		line-height: 120%;
 		overflow: hidden;
 	}
 
@@ -72,24 +68,24 @@
 	.metadata {
 		display: flex;
 		flex-direction: column;
-		height: 100%;
-		width: 90%;
+		width: 60%;
 	}
 
 	.avu {
 		display: flex;
 		flex-direction: column;
-		font-size: 1rem;
+		font-size: 80%;
 		opacity: 0.8;
 	}
 
 	.author {
-		line-height: 1rem;
-		max-height: 1rem;
+		line-height: 100%;
+		max-height: 100%;
 		overflow: hidden;
 	}
 
 	@media(orientation:landscape) {
+
 		.avu {
 			width: 100%;
 			display: inline-flex;
@@ -97,12 +93,6 @@
 			justify-content: space-between;
 		}
 
-		.title {
-			height: 50%;
-		}
 
-		.author {
-			height: initial;
-		}
 	}
 }

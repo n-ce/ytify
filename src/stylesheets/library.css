@@ -1,0 +1,61 @@
+#library {
+  h2 {
+    width: 80%;
+  }
+
+  #collections {
+    display: flex;
+    align-items: center;
+    user-select: none;
+    overflow: scroll;
+    border-radius: calc(var(--roundness)*1.5);
+
+    @media(orientation:portrait) {
+
+      width: 92%;
+    }
+
+    @media(orientation:landscape) {
+      width: 100%;
+    }
+  }
+
+
+  a.collectionItem {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 90%;
+    aspect-ratio: 1;
+    margin: 0 4%;
+    padding: 2%;
+    font-size: larger;
+    background-color: var(--onBg);
+    color: var(--text);
+    border: var(--border);
+    border-radius: calc(var(--roundness)*1.5);
+
+    i {
+      font-size: xx-large;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+  }
+
+  div {
+    display: flex;
+    margin-top: 1vmin;
+
+    label {
+      background-color: var(--onBg);
+      color: var(--text);
+      border: var(--border);
+      border-radius: var(--roundness);
+      padding: 1vmin;
+      margin: 0 3vmin;
+      font-size: large;
+    }
+  }
+}

@@ -36,19 +36,20 @@ fetch(unifiedInstancesAPIurl)
 instanceSelector.addEventListener('change', async () => {
   const index = instanceSelector.selectedIndex;
   if (index === 0) {
-    const n = prompt('Enter Name of your instance :');
-    const p = prompt('Enter Piped API URL :')
-    const t = prompt('Enter Piped Proxy URL (OPTIONAL) :');
-    const i = prompt('Enter Invidious API URL (OPTIONAL) : ')
     const current = JSON.parse(instanceSelector.value);
+    const n = prompt('Enter Name of your instance :');
+    const p = prompt('Enter Piped API URL (OPTIONAL) :', current.piped)
+    const t = prompt('Enter Piped Proxy URL (OPTIONAL) :', current.image);
+    const i = prompt('Enter Invidious API URL (OPTIONAL) :', current.invidious)
     if (n)
-      current.name = n;
+      current.name = instanceSelector.options[0].textContent = n;
     if (p)
       current.piped = p;
     if (t)
       current.image = t;
     if (i)
       current.invidious = i;
+
     save('apiList_3', JSON.stringify(current));
     return;
   }

@@ -57,8 +57,14 @@ audio.addEventListener('playing', () => {
   if (!getSaved('history') ||
     firstElementInHistory.dataset.id !== id)
     historyTimeoutId = window.setTimeout(() => {
-      if (historyID === audio.dataset.id)
+      if (historyID === audio.dataset.id) {
         addToCollection('history', audio.dataset);
+        // just in case we are already in the history collection 
+        if (params.get('collection') === 'history')
+          document.getElementById('history')!.click();
+
+
+      }
     }, 1e4);
 });
 

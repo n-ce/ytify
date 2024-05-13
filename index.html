@@ -72,7 +72,7 @@
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.9</a>
+        <a id="title" href="" target="_blank">ytify 7 alpha</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
@@ -83,6 +83,43 @@
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
+      <footer>
+
+        <span>
+          <p id="currentDuration">00:00</p>
+          <input type="range" value="0" id="progress" />
+          <p id="fullDuration">00:00</p>
+        </span>
+
+        <div id="playerControls">
+          <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
+          <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
+          <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
+          <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
+          <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
+          <button class="ri-repeat-line" id="loopButton" aria-label="loop">
+          </button>
+
+          <span id="volumeContainer">
+            <label for="volumeChanger" class="ri-volume-up-fill"></label>
+            <input type="range" min="0" max="100" value="100" id="volumeChanger">
+          </span>
+          <select id="playSpeed">
+            <option value="0.25">0.25x</option>
+            <option value="0.50">0.50x</option>
+            <option value="0.75">0.75x</option>
+            <option value="1.00" selected>1.00x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.50">1.50x</option>
+            <option value="1.75">1.75x</option>
+            <option value="2.00">2.00x</option>
+            <option value="2.50">2.50x</option>
+            <option value="3.00">3.00x</option>
+            <option value="3.50">3.50x</option>
+            <option value="4.00">4.00x</option>
+          </select>
+        </div>
+      </footer>
     </section>
 
 
@@ -98,8 +135,7 @@
           <i class="ri-subtract-line"></i> Remove
         </button>
         <button>
-          <i class="ri-filter-2-line"></i> Filter >10:00
-        </button>
+          <i class="ri-filter-2-line"></i> Filter &lt;10:00 </button>
         <button class="checked" id="autoQueueBtn">
           <i class="ri-list-check-2"></i> Auto-Queue
         </button>
@@ -118,7 +154,6 @@
         <select id="searchFilters">
           <optgroup label="YouTube">
             <option value="all">All</option>
-            <option value="all">By Time</option>
             <option value="videos">Videos</option>
             <option value="channels">Channels</option>
             <option value="playlists">Playlists</option>
@@ -128,6 +163,10 @@
             <option value="music_videos">Videos</option>
             <option value="music_albums">Albums</option>
             <option value="music_playlists">Playlists</option>
+          </optgroup>
+          <optgroup label="Sort 'All' By">
+            <option value="all">Time</option>
+            <option value="all">Views</option>
           </optgroup>
         </select>
       </form>
@@ -148,63 +187,41 @@
 
 
     <section id="library">
-      <details id="discover">
-        <summary>
+
+      <h2 id="greeting">Welcome</h2>
+
+      <span id="collections" align="center">
+        <a class="collectionItem" id="discover" href="/list?collection=discover">
           <i class="ri-compass-3-line"></i> Discover
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <div>
-          <h2>Listen more to discover more.</h2>
-        </div>
-      </details>
+        </a>
 
-      <details id="history">
-        <summary>
+        <a class="collectionItem" id="history" href="/list?collection=history">
           <i class="ri-memories-line"></i> History
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <div></div>
-      </details>
+        </a>
 
-      <details id="favorites">
-        <summary>
+        <a class="collectionItem" id="favorites" href="/list?collection=favorites">
           <i class="ri-heart-fill"></i> Favorites
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <button>
-          <i class="ri-list-check-2"></i> Enqueue
-        </button>
-        <div></div>
-      </details>
+        </a>
 
-      <details id="listenLater">
-        <summary>
+        <a class="collectionItem" id="listenLater" href="/list?collection=listenLater">
           <i class="ri-calendar-schedule-line"></i> Listen Later
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <div></div>
-      </details>
-      <br>
+        </a>
+      </span>
+
+      <h2>Featured Playlists</h2>
+      <span id="featuredPls">
+      </span>
+      <h2>Your Playlists</h2>
+      <span id="importedPls">
+      </span>
+      <h2>Subscribed Playlists</h2>
+
+      <span id="subscribedPls"></span>
+
+      <h2>Channels</h2>
+
+      <span id="channels"></span>
+
       <div>
         <label id="importBtn" for="upload">
           <i class="ri-import-line"></i> Import</label>
@@ -219,107 +236,114 @@
 
 
     <section id="settings">
-
-      <span>
-        <label for="instances">Instance</label>
-        <select id="instances">
-          <option value='{
+      <div>
+        <h3 id="version">ytify </h3>
+        <span>
+          <label for="instances">Instance</label>
+          <select id="instances">
+            <option value='{
           "name":"Custom",
           "piped":"https://pipedapi.kavin.rocks",
           "image":"https://pipedproxy.r4fo.com",
           "invidious":"https://invidious.fdn.fr"
           }'>Custom</option>
-        </select>
-      </span>
+          </select>
+        </span>
 
-      <span>
-        <label for="startupTab">
-          Default Tab on Startup
-        </label>
-        <select id="startupTab">
-          <option value="">Home</option>
-          <option value="/search">Search</option>
-          <option value="/library">Library</option>
-        </select>
-      </span>
-      <span>
-        <label for="linkHost">Links host</label>
-        <select id="linkHost">
-          <option value="https://youtube.com">YouTube</option>
-          <option value="https://ytify.netlify.app">ytify</option>
-          <option value="https://piped.video">Piped</option>
-          <option value="https://yewtu.be">Invidious</option>
-        </select>
-      </span>
+        <span>
+          <label for="startupTab">
+            Default Tab on Startup
+          </label>
+          <select id="startupTab">
+            <option value="">Home</option>
+            <option value="/search">Search</option>
+            <option value="/library">Library</option>
+          </select>
+        </span>
+        <span>
+          <label for="linkHost">Links host</label>
+          <select id="linkHost">
+            <option value="https://youtube.com">YouTube</option>
+            <option value="https://ytify.netlify.app">ytify</option>
+            <option value="https://piped.video">Piped</option>
+            <option value="https://yewtu.be">Invidious</option>
+          </select>
+        </span>
+      </div>
+      <div>
+        <h3>Search</h3>
+        <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
+        <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
+        <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
+      </div>
 
-      <h3>Search</h3>
-      <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
-      <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
-      <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
+      <div>
+        <h3>Playback</h3>
 
-      <h3>Playback</h3>
+        <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
+        <span>
+          <label for="CodecPreference">Codec Preference</label>
+          <select id="CodecPreference">
+            <option value="opus">Opus</option>
+            <option value="aac">AAC</option>
+            <option value="">Any</option>
+          </select>
+        </span>
+      </div>
+      <div>
+        <h3>Thumbnail</h3>
+        <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
+        <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
+      </div>
+      <div>
+        <h3>Library</h3>
+        <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
+        <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
+      </div>
+      <div>
+        <h3>Interface</h3>
+        <span>
+          <label for="roundnessChanger">Roundness</label>
+          <select id="roundnessChanger">
+            <option value="none">None</option>
+            <option value="1vmin">Light</option>
+            <option value="2vmin" selected>Medium</option>
+            <option value="4vmin">Heavy</option>
+          </select>
+        </span>
+        <span>
+          <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
+            <option value="auto">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </span>
+        <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
+        <toggle-switch id="reverseNavSwitch">Reverse Navigation</toggle-switch>
+        <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+      </div>
+      <div>
+        <h3>Actions</h3>
 
-      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
-      <span>
-        <label for="CodecPreference">Codec Preference</label>
-        <select id="CodecPreference">
-          <option value="opus">Opus</option>
-          <option value="aac">AAC</option>
-          <option value="">Any</option>
-        </select>
-      </span>
+        <button id="clearCacheBtn">Clear Caches</button>
 
-      <h3>Thumbnail</h3>
-      <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
-      <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
+        <button id="restoreSettingsBtn">Restore Settings</button>
 
-      <h3>Library</h3>
-      <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
-      <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
+        <a href="https://github.com/n-ce/ytify/wiki/troubleshooting" target="_blank">Help</a>
 
-      <h3>Interface</h3>
-      <span>
-        <label for="roundnessChanger">Roundness</label>
-        <select id="roundnessChanger">
-          <option value="none">None</option>
-          <option value="1vmin">Light</option>
-          <option value="2vmin" selected>Medium</option>
-          <option value="4vmin">Heavy</option>
-        </select>
-      </span>
-      <span>
-        <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
-          <option value="auto">System</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </span>
-      <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
-      <toggle-switch id="reverseNavSwitch">Reverse Navigation</toggle-switch>
-      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+        <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
 
+        <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
 
-      <h3>Actions</h3>
+        <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
 
-      <button id="clearCacheBtn">Clear Caches</button>
+        <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
 
-      <button id="restoreSettingsBtn">Restore Settings</button>
-
-      <a href="https://github.com/n-ce/ytify/wiki/troubleshooting" target="_blank">Help</a>
-
-      <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
-
-      <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
-
-      <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
-
-      <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
-
-      <form netlify name='feedback' method='POST'>
-        <input type="text" name="->" id="netlifyForm"
-          placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
-      </form>
-
+        <form netlify name='feedback' method='POST'>
+          <input type="text" name="->" id="netlifyForm"
+            placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
+        </form>
+      </div>
     </section>
 
     <section id="list">
@@ -330,12 +354,28 @@
         <button id="enqueueAllBtn">
           <i class="ri-list-check-2"></i> Enqueue
         </button>
-        <button id="saveListBtn">
-          <i class="ri-stack-line"></i> Save
+        <button id="importListBtn">
+          <i class="ri-import-line"></i> Import
         </button>
-        <button id="openInYT">
-          <i class="ri-external-link-line"></i> Open In YouTube
+        <button id="subscribeListBtn">
+          <i class="ri-stack-line"></i> Subscribe
         </button>
+        <button id="viewOnYTBtn">
+          <i class="ri-external-link-line"></i> View on YouTube
+        </button>
+        <button id="clearListBtn">
+          <i class="ri-close-line"></i> Clear All
+        </button>
+        <button id="removeFromListBtn">
+          <i class="ri-subtract-line"></i> Remove
+        </button>
+        <button id="deleteCollectionBtn">
+          <i class="ri-delete-bin-2-line"></i> Delete
+        </button>
+        <button id="renameCollectionBtn">
+          <i class="ri-edit-line"></i> Rename
+        </button>
+
       </span>
       <br>
       <div id="playlist">
@@ -343,43 +383,6 @@
       </div>
     </section>
 
-    <footer>
-
-      <span>
-        <p id="currentDuration">00:00</p>
-        <input type="range" value="0" id="progress" />
-        <p id="fullDuration">00:00</p>
-      </span>
-
-      <div id="playerControls">
-        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
-        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
-        <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
-        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
-        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
-        <button class="ri-repeat-line" id="loopButton" aria-label="loop">
-        </button>
-
-        <span id="volumeContainer">
-          <label for="volumeChanger" class="ri-volume-up-fill"></label>
-          <input type="range" min="0" max="100" value="100" id="volumeChanger">
-        </span>
-        <select id="playSpeed">
-          <option value="0.25">0.25x</option>
-          <option value="0.50">0.50x</option>
-          <option value="0.75">0.75x</option>
-          <option value="1.00" selected>1.00x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.50">1.50x</option>
-          <option value="1.75">1.75x</option>
-          <option value="2.00">2.00x</option>
-          <option value="2.50">2.50x</option>
-          <option value="3.00">3.00x</option>
-          <option value="3.50">3.50x</option>
-          <option value="4.00">4.00x</option>
-        </select>
-      </div>
-    </footer>
   </main>
 
   <dialog id="superModal">

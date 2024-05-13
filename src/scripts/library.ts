@@ -1,12 +1,18 @@
-import { audio, favButton, favIcon } from "../lib/dom";
-import { addListToCollection, addToCollection, createPlaylist, getCollection, getDB, removeFromCollection, reservedCollections, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, removeSaved, superClick } from "../lib/utils";
-import { listToQ } from "./queue";
+import { render } from "solid-js/web";
+import StreamItem from "../components/StreamItem";
+import { audio, favButton, favIcon, listAnchor, listBtnsContainer, listContainer } from "../lib/dom";
+import { addToCollection, createPlaylist, getDB, removeFromCollection, reservedCollections, saveDB, toCollection } from "../lib/libraryUtils";
+import { $, getSaved, params, removeSaved } from "../lib/utils";
+
 
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
+const greeting = document.getElementById('greeting') as HTMLHeadingElement;
+const hours = new Date().getHours();
+
+greeting.textContent = 'Good ' + (hours < 12 ? 'Morning' : hours < 17 ? 'Afternoon' : 'Evening');
 
 
 importBtn.addEventListener('change', async () => {
@@ -40,43 +46,18 @@ cleanBtn.addEventListener('click', () => {
 
 // setup initial dom state
 
-function loadLibrary() {
+addEventListener('DOMContentLoaded', () => {
   const initialData = getDB();
 
   const initialKeys = Object.keys(initialData);
 
-  for (const key of initialKeys) {
+  for (const key of initialKeys)
     if (!reservedCollections.includes(key)) {
       createPlaylist(key);
       continue;
     }
-    const container = getCollection(key);
-    const [clearBtn, removeBtn, enqueueBtn] = (<HTMLDetailsElement>container.parentElement).querySelectorAll('button');
+});
 
-    container.addEventListener('click', superClick);
-
-    clearBtn.addEventListener('click', () => {
-      const db = getDB();
-      delete db[key];
-      saveDB(db);
-      container.innerHTML = '';
-    })
-    removeBtn.addEventListener('click', () => {
-      container.querySelectorAll('.streamItem').forEach(e => e.classList.toggle('delete'));
-      removeBtn.classList.toggle('delete');
-    })
-
-    if (key === 'favorites')
-      enqueueBtn.onclick = () => listToQ(container);
-  }
-
-  for (const collection in initialData)
-    addListToCollection(collection, initialData[collection], initialData);
-}
-
-location.pathname === '/library' ?
-  addEventListener('DOMContentLoaded', loadLibrary) :
-  setTimeout(loadLibrary, 1500);
 
 
 // favorites button & data
@@ -91,3 +72,69 @@ favButton.addEventListener('click', () => {
   favIcon.classList.toggle('ri-heart-fill');
 });
 
+
+function fetchCollection(collection: string) {
+  const db = getDB();
+  const data = db[collection];
+
+  const fragment = document.createDocumentFragment();
+
+  const imgLoad = getSaved('img') ? false : true;
+  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
+
+
+  for (const item in data)
+    render(() => StreamItem(
+      data[item].id as string,
+      `/watch?v=${data[item].id}`,
+      data[item].title as string,
+      data[item].author as string,
+      data[item].duration as string,
+      '',
+      data[item].channelUrl as string,
+      '',
+      imgLoad,
+      imgLoadStyle
+    ), fragment);
+
+  if (!fragment.childElementCount) {
+    alert('No items found');
+    return;
+  }
+
+  listContainer.replaceChildren(fragment);
+
+  const isReversed = listContainer.classList.contains('reverse');
+
+  if (reservedCollections.includes(collection)) {
+    if (!isReversed)
+      listContainer.classList.add('reverse');
+  }
+  else if (isReversed)
+    listContainer.classList.remove('reverse');
+
+
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : 'collection';
+
+  listAnchor.dataset.id = collection;
+
+  listAnchor.click();
+  history.replaceState({}, '',
+    location.origin + location.pathname +
+    '?collection=' + collection);
+}
+
+
+const collections = <HTMLSpanElement>document.getElementById('collections');
+
+collections.addEventListener('click', e => {
+  e.preventDefault();
+  const elm = e.target as HTMLParagraphElement;
+  if (!elm.classList.contains('collectionItem')) return;
+
+  const id = elm.id;
+  fetchCollection(id);
+});
+
+if (params.has('collection'))
+  fetchCollection(<string>params.get('collection'))

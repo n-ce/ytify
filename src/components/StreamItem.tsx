@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js';
 import './StreamItem.css';
 import { instanceSelector } from '../lib/dom';
-import { getApi } from '../lib/utils';
+import { getApi, getSaved } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
 
 
@@ -13,9 +13,9 @@ export default function StreamItem(
   duration: string,
   uploaded: string | undefined,
   channelUrl: string,
-  views: string | undefined,
-  imgLoad: boolean,
-  imgLoadStyle: 'eager' | 'lazy',
+  views: string | undefined = '',
+  imgLoad: boolean = (getSaved('img') ? false : true),
+  imgLoadStyle: 'eager' | 'lazy' = (getSaved('lazyImg') ? 'lazy' : 'eager'),
   imgYTM: string = ''
 ) {
 
@@ -24,8 +24,8 @@ export default function StreamItem(
   let parent!: HTMLAnchorElement;
 
 
-  function handleThumbnailLoad() {
-    const img = parent.firstElementChild as HTMLImageElement;
+  function handleThumbnailLoad(e: Event) {
+    const img = e.target as HTMLImageElement;
     const store = tsrc();
 
     if (img.naturalWidth !== 120) {
@@ -56,7 +56,7 @@ export default function StreamItem(
   }
 
   if (imgLoad)
-    setTsrc(generateImageUrl(imgYTM || id, 'mqdefault'));
+    setTsrc(generateImageUrl(imgYTM || id, 'mq'));
 
   return (
     <a

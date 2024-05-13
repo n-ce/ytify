@@ -1,6 +1,6 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer } from "./dom";
 import { removeFromCollection } from "./libraryUtils";
-import { blankImage, generateImageUrl, sqrThumb } from "./imageUtils";
+import { blankImage, generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
@@ -15,7 +15,7 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (type: string, index: number | '' = '') => JSON.parse(index ? instanceSelector.options[index].value : instanceSelector.value)[type];
+export const getApi = (type: string, index: number = -1) => JSON.parse((index > -1) ? instanceSelector.options[index].value : instanceSelector.value)[type];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -28,6 +28,11 @@ export const supportsOpus = (): Promise<boolean> => navigator.mediaCapabilities.
   }
 }).then(res => res.supported);
 
+export const hostResolver = (url: string) =>
+  linkHost.value + (linkHost.value.includes('ytify') ? url.
+    startsWith('/watch') ?
+    ('?s' + url.slice(8)) :
+    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 export function notify(text: string) {
   const el = $('p');
@@ -38,13 +43,6 @@ export function notify(text: string) {
   setTimeout(clear, 8e3);
   document.body.appendChild(el);
 }
-
-
-export const hostResolver = (url: string) =>
-  linkHost.value + (linkHost.value.includes('ytify') ? url.
-    startsWith('/watch') ?
-    ('?s' + url.slice(8)) :
-    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 
 export function convertSStoHHMMSS(seconds: number): string {
@@ -64,7 +62,7 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 const linkHost = <HTMLSelectElement>document.getElementById('linkHost');
 
-const savedLinkHost = getSaved('linkHost') || '';
+const savedLinkHost = getSaved('linkHost');
 if (savedLinkHost)
   linkHost.value = savedLinkHost;
 
@@ -82,7 +80,7 @@ export function setMetaData(
   authorUrl: string,
   music: boolean = false
 ) {
-  const imgX = generateImageUrl(id, 'maxresdefault');
+  const imgX = generateImageUrl(id, 'maxres');
   if (!getSaved('img') && !music)
     img.src = imgX;
 
@@ -168,6 +166,7 @@ export async function fetchList(url: string, mix = false) {
       group.relatedStreams
     )
   );
+
   listAnchor.click();
   listSection.scrollTo(0, 0);
 
@@ -209,6 +208,8 @@ export async function fetchList(url: string, mix = false) {
 
   const type = url.includes('channel') ? 'channel' : 'playlist';
 
+  listBtnsContainer.className = type;
+
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
   saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${type === 'channel' ? 'Subscribe' : 'Save'}`;
   saveListBtn.dataset.url = url;
@@ -240,7 +241,7 @@ if (params.has('channel') || params.has('playlists'))
       .split('=')
       .join('/')
   );
-2
+
 export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
@@ -248,17 +249,6 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   const imgLoad = getSaved('img') ? false : true;
   const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
 
-  function getThumbIdFromLink(url: string) {
-    // for featured playlists
-    if (url.startsWith('/')) return url;
-
-    const l = new URL(url);
-    const p = l.pathname;
-
-    return l.search.includes('ytimg') ?
-      p.split('/')[2] :
-      p.split('=')[0];
-  }
 
   const streamItem = (stream: StreamItem) => StreamItem(
     stream.url.substring(9),
@@ -309,10 +299,7 @@ export function superClick(e: Event) {
   if (elem.classList.contains('streamItem')) {
     const eld = elem.dataset;
     if (elem.classList.contains('delete')) {
-      const anchor = elem.parentElement as HTMLAnchorElement;
-      const div = anchor.parentElement as HTMLDivElement;
-      const details = div.parentElement as HTMLDetailsElement;
-      removeFromCollection(details.id, eld.id as string);
+      removeFromCollection(listAnchor.dataset.id as string, eld.id as string);
       return;
     }
     superModal.showModal();

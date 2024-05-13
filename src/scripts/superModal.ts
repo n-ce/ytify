@@ -45,7 +45,8 @@ atpSelector.addEventListener('change', () => {
   let title;
   if (!atpSelector.value) return;
   if (atpSelector.value === '+pl') {
-    title = prompt('Playlist Title')
+    title = prompt('Playlist Title')?.trim();
+
     if (title)
       createPlaylist(title);
   }

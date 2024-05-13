@@ -30,7 +30,9 @@ export const favButton = <HTMLInputElement>document.getElementById('favButton');
 
 export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 
-export const [playAllBtn, enqueueBtn, saveListBtn, openInYtBtn] = <HTMLCollectionOf<HTMLButtonElement>>(<HTMLSpanElement>document.getElementById('listTools')).children;
+export const listBtnsContainer = <HTMLSpanElement>document.getElementById('listTools');
+
+export const [playAllBtn, enqueueBtn, importListBtn, saveListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn] = <HTMLCollectionOf<HTMLButtonElement>>listBtnsContainer.children;
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());

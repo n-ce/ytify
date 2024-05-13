@@ -1,10 +1,9 @@
 #superInputContainer {
   height: auto;
-  width: calc(100% - 8.3vmin);
+  width: 92%;
   padding: 2.4vmin 4vmin;
-  margin-bottom: 2vmin;
   position: sticky;
-  z-index: 1;
+  z-index: 2;
   top: 0;
   background-color: var(--onBg);
   backdrop-filter: blur(2vmin);
@@ -13,11 +12,11 @@
   box-shadow: var(--shadow);
   display: flex;
   transition: all 0.4s;
-}
 
-#superInputContainer:focus-within {
-  backdrop-filter: none;
-  background-color: var(--bg);
+  &:focus-within {
+    backdrop-filter: none;
+    background-color: var(--bg);
+  }
 }
 
 #superInput {
@@ -27,11 +26,11 @@
   background: none;
   color: inherit;
   font-size: medium;
-}
 
-#superInput::placeholder {
-  color: inherit;
-  opacity: 75%;
+  &::placeholder {
+    color: inherit;
+    opacity: 75%;
+  }
 }
 
 #searchFilters {
@@ -48,9 +47,9 @@
   max-height: 25vmax;
   overflow-y: scroll;
   position: absolute;
-  z-index: 1;
-  margin-top: 11.9vmin;
   width: 80vmin;
+  z-index: 1;
+  margin-top: calc(1.5rem + 4.8vmin);
   background-color: var(--bg);
   list-style-type: none;
   padding: 0;
@@ -59,27 +58,33 @@
   box-shadow: var(--shadow);
   display: none;
   user-select: none;
-}
 
-#suggestions li {
-  background-color: var(--onBg);
-  font-weight: bold;
-  padding: 1vmin 3vmin;
-  margin-top: 0.4vmin;
-}
+  li {
+    background-color: var(--onBg);
+    font-weight: bold;
+    padding: 1vmin 3vmin;
+    margin-top: 0.4vmin;
 
-#suggestions li:hover,
-#suggestions li:focus,
-#suggestions li.hover {
-  background-color: var(--text);
-  color: var(--bg);
+    &:hover,
+    &:focus,
+    &.hover {
+      background-color: var(--text);
+      color: var(--bg);
+    }
+  }
 }
 
 h1.featuredPlaylists {
   background: var(--onBg);
   padding: 2%;
+  margin: 4% 0;
   border-radius: var(--roundness);
   display: flex;
   justify-content: center;
   align-items: center
+}
+
+#searchlist {
+  margin-top: 8%;
+  width: 92%;
 }

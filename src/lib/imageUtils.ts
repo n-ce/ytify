@@ -12,11 +12,11 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 // Generates both channel and stream thumbnails
 export const generateImageUrl = (
   id: string,
-  res: string = 'mqdefault',
+  res: string = 'mq',
   proxy: string = getApi('image')
 ) => proxy + (id.startsWith('/') ?
   `${id}=s176-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
-  `/vi_webp/${id}/${res}.webp?host=i.ytimg.com`);
+  `/vi_webp/${id}/${res}default.webp?host=i.ytimg.com`);
 
 // Square Image Generator 
 export function sqrThumb(canvasImg: HTMLImageElement) {
@@ -30,4 +30,17 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
   const offsetY = (height - side) / 2;
   context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
   return canvas.toDataURL();
+}
+
+
+export function getThumbIdFromLink(url: string) {
+  // for featured playlists
+  if (url.startsWith('/')) return url;
+
+  const l = new URL(url);
+  const p = l.pathname;
+
+  return l.search.includes('ytimg') ?
+    p.split('/')[2] :
+    p.split('=')[0];
 }

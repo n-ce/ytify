@@ -64,7 +64,14 @@ export default async function player(id: string | null = '') {
   const apiUrl = getApi('piped', apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)
-    .then(res => res.json())
+    .then(async res => {
+      const response = res.json();
+      if (!res.ok)
+        throw new Error(
+          (await response).message
+        );
+      return response;
+    })
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
         notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
@@ -77,7 +84,8 @@ export default async function player(id: string | null = '') {
       instanceSelector.selectedIndex = 0;
     });
 
-  if (!data?.audioStreams?.length)
+
+  if (data && !data.audioStreams?.length)
     return notify('No audio streams available');
 
   const audioStreams = data.audioStreams
@@ -101,15 +109,19 @@ export default async function player(id: string | null = '') {
     url: string,
     quality: string,
     bitrate: string,
+    contentLength: number
   }, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
 
     const oldUrl = new URL(_.url);
 
-    const newUrl = _.url.replace(oldUrl.origin, getApi('invidious'));
+    // only proxy music streams
+    const host = data.category === 'Music' ? getApi('invidious') : `https://${oldUrl.searchParams.get('host')}`;
+
+    const newUrl = _.url.replace(oldUrl.origin, host);
 
     // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
+    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${(_.contentLength / (1024 * 1024)).toFixed(2)} MB`, newUrl));
 
 
     // find preferred bitrate
@@ -242,5 +254,11 @@ export default async function player(id: string | null = '') {
 
     // convert the new merged+randomized discover back to object and inject it
     addListToCollection('discover', Object.fromEntries(array), db);
+
+    // just in case we are already in the discover collection 
+    if (params.get('collection') === 'discover')
+      document.getElementById('discover')!.click();
+
+
   }, 20000);
 }

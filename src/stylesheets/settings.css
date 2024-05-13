@@ -1,53 +1,56 @@
 #settings {
   width: auto;
-  background-color: var(--onBg);
-  padding: 0 4vmin;
-  border: var(--border);
-  border-radius: var(--roundness);
-}
+  padding: 4%;
+  row-gap: 3%;
 
-#settings.view {
-  display: block;
-}
+  div {
+    background-color: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+    padding: 2% 4%;
+    width: 100%;
 
-#settings h3 {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4%;
-  border-bottom: dotted;
-}
+    h3 {
+      margin-bottom: 2%;
+    }
 
-#settings span {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  overflow: hidden;
-  margin: 4vmin 0;
-}
+    toggle-switch,
+    span {
+      margin-bottom: 2%;
+    }
 
-#settings select {
-  background-color: var(--onBg);
-  font-size: inherit;
-  border: var(--border);
-  padding: 1vmin;
-  max-width: calc(100% - 15ch);
-}
+    span {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
 
-#settings a {
-  background-color: var(--onBg);
-  padding: 1vmin;
-  border: var(--border);
-  border-radius: var(--roundness);
-  display: inline-block;
-  margin-bottom: 4vmin;
-  margin-right: 2vmin;
-}
+      select {
+        background-color: var(--onBg);
+        font-size: inherit;
+        border: var(--border);
+        padding: 1vmin;
+        max-width: calc(100% - 15ch);
+      }
+    }
 
-#settings button {
-  margin: 0 2vmin 4vmin 0 !important;
-  background-color: var(--onBg) !important;
-  color: var(--text) !important;
+    a {
+      background-color: var(--onBg);
+      padding: 1vmin;
+      border: var(--border);
+      border-radius: var(--roundness);
+      display: inline-block;
+      margin-bottom: 4vmin;
+      margin-right: 2vmin;
+    }
+
+    button {
+      margin: 0 2vmin 4vmin 0 !important;
+      background-color: var(--onBg) !important;
+      color: var(--text) !important;
+    }
+  }
 }
 
 #netlifyForm {
@@ -59,9 +62,9 @@
   padding: 1vmin;
   width: calc(100% - 2.3vmin);
   margin-bottom: 5%;
-}
 
-#netlifyForm::placeholder {
-  color: inherit;
-  opacity: 75%;
+  &::placeholder {
+    color: inherit;
+    opacity: 75%;
+  }
 }

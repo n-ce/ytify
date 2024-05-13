@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url("/remixicon.woff2") format("woff2");
+  src: url("remixicon.woff2?t=1715106529706") format("woff2");
   font-display: swap;
 }
 
@@ -49,18 +49,6 @@
 
 .ri-forward-15-line:before {
   content: "\f32d";
-}
-
-.ri-play-circle-fill:before {
-  content: "\f008";
-}
-
-.ri-pause-circle-fill:before {
-  content: "\efd5";
-}
-
-.ri-stop-circle-fill:before {
-  content: "\f19e";
 }
 
 .ri-loader-3-line:before {
@@ -161,4 +149,24 @@
 
 .ri-external-link-line:before {
   content: "\ecaf";
+}
+
+.ri-play-circle-fill:before {
+  content: "\f008";
+}
+
+.ri-pause-circle-fill:before {
+  content: "\efd5";
+}
+
+.ri-stop-circle-fill:before {
+  content: "\f19e";
+}
+
+.ri-draggable:before {
+  content: "\f38f";
+}
+
+.ri-edit-line:before {
+  content: "\ec86";
 }

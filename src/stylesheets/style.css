@@ -1,8 +1,11 @@
+@import 'reset.css';
 @import 'remixicon.css';
 @import 'nav.css';
 @import 'footer.css';
 @import 'home.css';
 @import 'search.css';
+@import 'library.css';
+@import 'list.css';
 @import 'settings.css';
 @import 'superModal.css';
 @import 'snackbar.css';
@@ -30,8 +33,6 @@
 
 html,
 body {
-  margin: 0;
-  padding: 0;
   height: 100dvh;
 }
 
@@ -52,9 +53,9 @@ main {
 section {
   display: none;
   flex-direction: column;
+  overflow: scroll;
   align-items: center;
   width: 100%;
-  overflow-y: auto;
   animation: appear 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
@@ -81,14 +82,12 @@ section.view {
   }
 
   main {
-    height: calc(100dvh - 6%);
-    width: 94%;
-    padding: 3%;
+    height: 100%;
+    width: 100%;
   }
 
   section {
-    height: calc(75dvh - 5dvw);
-    margin-bottom: 5dvw;
+    height: calc(96dvh - 2.25rem);
   }
 }
 
@@ -105,14 +104,12 @@ section.view {
   }
 
   main {
-    height: 96dvh;
+    height: 100%;
     width: calc(80% - 4dvh);
     padding: 2dvh;
   }
 
   section {
-    height: calc(80% - 2dvh);
-    margin-bottom: 2dvh;
     --pageTransitionEffect: translateY(100%);
   }
 }
@@ -148,9 +145,6 @@ select {
 dialog[open] {
   background: none;
   border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   animation: boing 0.3s ease-in-out forwards;
 }
 
@@ -172,47 +166,6 @@ dialog::backdrop {
   }
 }
 
-
-#library>div {
-  display: flex;
-  margin-top: 1vmin;
-}
-
-#library>div>label {
-  background-color: var(--onBg);
-  color: var(--text);
-  border: var(--border);
-  border-radius: var(--roundness);
-  padding: 1vmin;
-  margin: 0 3vmin;
-  font-size: large;
-}
-
-
-details {
-  width: calc(100% - 4.3vmin);
-  background-color: var(--onBg);
-  color: var(--text);
-  padding: 2vmin;
-  margin-top: 4vmin;
-  border: var(--border);
-  border-radius: var(--roundness);
-}
-
-details>div {
-  margin-top: 3vmin;
-}
-
-details>summary {
-  list-style: none;
-  font-size: larger;
-  transition: all 0.3s ease-in-out;
-}
-
-details[open]>summary {
-  font-size: xx-large;
-  margin-bottom: 3vmin;
-}
 
 
 a {
@@ -242,7 +195,6 @@ a {
   --defaultText: #faf;
 }
 
-details,
 #queuetools,
 #listTools,
 #settings,
@@ -282,4 +234,17 @@ details,
 
 .ri-loader-3-line {
   animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+}
+
+
+
+#queuetools,
+#listTools {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  backdrop-filter: blur(0.5rem);
+  border-bottom-left-radius: var(--roundness);
+  border-bottom-right-radius: var(--roundness);
+  padding: 2vmin 0;
 }
