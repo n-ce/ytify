@@ -23,7 +23,7 @@ nav a.active {
 @media(orientation:portrait) {
 
   nav {
-    height: auto;
+    height: fit-content;
     justify-content: space-around;
     width: 96%;
     padding: 2% 0;

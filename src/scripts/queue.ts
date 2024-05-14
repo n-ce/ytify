@@ -11,7 +11,8 @@ const [
   clearQBtn,
   shuffleQBtn,
   removeQBtn,
-  filterG10Btn,
+  filterMusicBtn,
+  filterLT10Btn,
   autoQueueBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
@@ -22,7 +23,7 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
   if (queueArray.includes(data.id)) return;
 
-  if (filterG10Btn.classList.contains('filter'))
+  if (filterLT10Btn.classList.contains('filter'))
     if (isLongerThan10Min(<string>data.duration))
       return;
 
@@ -116,9 +117,9 @@ removeQBtn.addEventListener('click', () => {
 
 
 
-filterG10Btn.addEventListener('click', () => {
+filterLT10Btn.addEventListener('click', () => {
 
-  filterG10Btn.classList.toggle('filter');
+  filterLT10Btn.classList.toggle('filter');
   // Prevent Queue Conflicts
   if (removeQBtn.classList.contains('delete'))
     removeQBtn.click();
@@ -176,3 +177,6 @@ new MutationObserver(m => {
 }).observe(queuelist, { childList: true });
 
 
+filterMusicBtn.addEventListener('click', () => {
+  console.log(true)
+});

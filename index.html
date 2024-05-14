@@ -36,8 +36,9 @@
 
 <body>
   <canvas class="hide"></canvas>
-  <audio preload="metadata">
+  <audio>
     <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
+    <source type="audio/mpegurl">
   </audio>
   <nav>
     <a href="/" id="/">
@@ -135,7 +136,11 @@
           <i class="ri-subtract-line"></i> Remove
         </button>
         <button>
-          <i class="ri-filter-2-line"></i> Filter &lt;10:00 </button>
+          <i class="ri-filter-2-line"></i> Filter &lt;10:00
+        </button>
+        <button>
+          <i class="ri-filter-2-line"></i> Filter Music
+        </button>
         <button class="checked" id="autoQueueBtn">
           <i class="ri-list-check-2"></i> Auto-Queue
         </button>
@@ -290,7 +295,9 @@
             <option value="">Any</option>
           </select>
         </span>
+        <toggle-switch id="HLS_Switch">Enable HLS</toggle-switch>
       </div>
+
       <div>
         <h3>Thumbnail</h3>
         <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>

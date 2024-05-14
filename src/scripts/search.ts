@@ -88,7 +88,7 @@ function searchLoader() {
       // filter livestreams & shorts & append rest
       searchlist.appendChild(
         itemsLoader(
-          items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
+          items.filter((item: StreamItem) => !item.isShort)
         ));
       // load more results when 3rd last element is visible
 

@@ -87,7 +87,7 @@ section.view {
   }
 
   section {
-    height: calc(96dvh - 2.25rem);
+    height: 100%;
   }
 }
 

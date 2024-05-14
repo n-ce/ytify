@@ -6,6 +6,7 @@ import { getDB, addListToCollection } from "./libraryUtils";
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
+const switchHLS = <HTMLElement>document.getElementById('HLS_Switch');
 
 /////////////////////////////////////////////////////////////
 
@@ -52,6 +53,18 @@ subtitleSelector.addEventListener('change', () => {
 
 /////////////////////////////////////////////////////////////
 
+
+if (getSaved('HLS'))
+  switchHLS.toggleAttribute('checked');
+
+switchHLS.addEventListener('click', () => {
+  getSaved('HLS') ?
+    removeSaved('HLS') :
+    save('HLS', 'true');
+});
+
+/////////////////////////////////////////////////////////////
+
 export default async function player(id: string | null = '') {
 
   if (!id) return;
@@ -88,15 +101,17 @@ export default async function player(id: string | null = '') {
     });
 
 
-  if (data && !data.audioStreams?.length)
-    return notify('No audio streams available');
+  if (!data && !data.hasOwnProperty('audioStreams'))
+    return notify('No data found');
+
+
 
   const audioStreams = data.audioStreams
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
 
-  if (!noOfBitrates) {
+  if (!noOfBitrates && !switchHLS.hasAttribute('checked')) {
     notify('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
@@ -106,26 +121,38 @@ export default async function player(id: string | null = '') {
   let index = -1;
 
   bitrateSelector.innerHTML = '';
+  const isMusic = data.category === 'Music';
+  const ivApi = getApi('invidious');
+  const hlsOn = switchHLS.hasAttribute('checked');
+
+  function proxyHandler(url: string) {
+
+    const oldUrl = new URL(url);
+
+    if (isMusic && hlsOn) return url;
+
+    // only proxy music streams
+    const host = isMusic ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
+
+    return url.replace(oldUrl.origin, host);
+  }
+
 
   audioStreams.forEach((_: {
     codec: string,
     url: string,
     quality: string,
     bitrate: string,
-    contentLength: number
+    contentLength: number,
+    mimeType: string
   }, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
 
-    const oldUrl = new URL(_.url);
-
-    // only proxy music streams
-    const host = data.category === 'Music' ? getApi('invidious') : `https://${oldUrl.searchParams.get('host')}`;
-
-    const newUrl = _.url.replace(oldUrl.origin, host);
 
     // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${(_.contentLength / (1024 * 1024)).toFixed(2)} MB`, newUrl));
+    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${(_.contentLength / (1024 * 1024)).toFixed(2)} MB`, proxyHandler(_.url)));
 
+    (<HTMLOptionElement>bitrateSelector.lastElementChild).dataset.type = _.mimeType;
 
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
@@ -135,8 +162,23 @@ export default async function player(id: string | null = '') {
 
 
   bitrateSelector.selectedIndex = index;
-  audio.src = bitrateSelector.value;
 
+  if (hlsOn) {
+
+    import('hls.js').then(h => {
+      const hls = new h.default();
+      hls.attachMedia(audio);
+      hls.on(h.Events.MEDIA_ATTACHED,
+        () => {
+          hls.loadSource(data.hls);
+        }
+      );
+    });
+  } else
+
+    audio.src = bitrateSelector.value;
+
+  console.log(data.hls, proxyHandler(data.hls))
   // Subtitle data dom injection
 
   for (const option of subtitleSelector.options)

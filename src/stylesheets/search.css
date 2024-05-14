@@ -27,10 +27,11 @@
   color: inherit;
   font-size: medium;
 
-  &::placeholder {
-    color: inherit;
-    opacity: 75%;
-  }
+}
+
+#superInput::placeholder {
+  color: inherit;
+  opacity: 75%;
 }
 
 #searchFilters {
