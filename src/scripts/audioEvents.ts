@@ -328,23 +328,14 @@ export function autoQueue(data: Recommendation[]) {
 
 
 // upcoming queries
-export async function upcomingInjector(queueParam: string) {
+export const upcomingInjector = async (queueParam: string) =>
+  fetch(`${location.origin}/upcoming?id=${queueParam}`)
+    .then(res => res.json())
+    .then(data => {
+      for (const stream of data)
+        appendToQueuelist(stream)
+    });
 
-  const array = [];
-  for (let i = 0; i < queueParam.length; i += 11)
-    array.push(queueParam.slice(i, i + 11));
-
-  const appendItem = (id: string) =>
-    fetch(`${location.origin}/upcoming?id=${id}`)
-      .then(res => res.json())
-      .then(data => appendToQueuelist(data))
-      .catch(() => {
-        console.log(`Fetching Queue Item ${id} Failed.`);
-        appendItem(id);
-      });
-  for await (const id of array)
-    await appendItem(id);
-}
 const queueParam = params.get('a');
 if (queueParam && queueParam.length > 10) {
   addEventListener('DOMContentLoaded', async () => upcomingInjector(queueParam));

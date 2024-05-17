@@ -57,9 +57,13 @@ export default async (request: Request, _: Context) => {
     }))
     .catch(() => getData(id))
 
-  const data = await getData(uid);
+  const array = [];
+  for (let i = 0; i < uid.length; i += 11)
+    array.push(uid.slice(i, i + 11));
 
-  return new Response(JSON.stringify(data), {
+  const response = array.map(async id => await getData(id));
+
+  return new Response(JSON.stringify(response), {
     headers: { 'content-type': 'application/json' },
   });
 };
