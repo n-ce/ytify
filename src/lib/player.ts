@@ -71,7 +71,7 @@ export default async function player(id: string | null = '') {
 
   if (!id) return;
 
-  if (instanceSelector.selectedIndex === 0) {
+  if (!instanceSelector.selectedIndex) {
     import("./player.invidious").then(mod => mod.default(id));
     return;
   }

@@ -11,7 +11,6 @@ const [
   clearQBtn,
   shuffleQBtn,
   removeQBtn,
-  filterMusicBtn,
   filterLT10Btn,
   autoQueueBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
@@ -173,6 +172,3 @@ new MutationObserver(m => {
 }).observe(queuelist, { childList: true });
 
 
-filterMusicBtn.addEventListener('click', () => {
-  console.log(true)
-});

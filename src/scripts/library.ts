@@ -2,18 +2,13 @@ import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
 import { audio, favButton, favIcon, listAnchor, listBtnsContainer, listContainer } from "../lib/dom";
 import { addToCollection, createPlaylist, getDB, removeFromCollection, reservedCollections, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, params, removeSaved } from "../lib/utils";
+import { $, itemsLoader, params, removeSaved } from "../lib/utils";
 
 
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
-const greeting = document.getElementById('greeting') as HTMLHeadingElement;
-const hours = new Date().getHours();
-
-greeting.textContent = 'Good ' + (hours < 12 ? 'Morning' : hours < 17 ? 'Afternoon' : 'Evening');
-
 
 importBtn.addEventListener('change', async () => {
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
@@ -120,16 +115,47 @@ function fetchCollection(collection: string) {
 
 const collections = <HTMLSpanElement>document.getElementById('collections');
 
+const reservedSuperCollections = ['ytm_pls', 'urpls', 'ytpls', 'channels',];
 collections.addEventListener('click', e => {
   e.preventDefault();
-  console.log(e);
 
   const elm = e.target as HTMLParagraphElement;
   if (!elm.classList.contains('collectionItem')) return;
-
   const id = elm.id;
-  fetchCollection(id);
+  if (reservedSuperCollections.includes(id))
+    loadSuperCollection(id);
+  else
+    fetchCollection(id);
 });
 
 if (params.has('collection'))
   fetchCollection(<string>params.get('collection'))
+
+
+
+
+
+function loadSuperCollection(id: string) {
+
+  if (id === 'ytm_pls') {
+
+    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+      .then(res => res.text())
+      .then(text => text.split('\n'))
+      .then(data => {
+        const array = [];
+        for (let i = 0; i < data.length; i += 4)
+          array.push(<StreamItem>{
+            "type": "playlist",
+            "name": data[i + 1],
+            "uploaderName": "YouTube Music",
+            "url": '/playlists/' + data[i + 2],
+            "thumbnail": '/' + data[i + 3]
+          });
+
+        listContainer.replaceChildren(itemsLoader(array));
+        listAnchor.click();
+      });
+  }
+
+}

@@ -5,7 +5,6 @@ import { blankImage } from "../lib/imageUtils";
 import { getDB, saveDB } from "../lib/libraryUtils";
 
 const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
-const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
@@ -18,8 +17,6 @@ const reverseNavSwitch = <HTMLElement>document.getElementById('reverseNavSwitch'
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
 const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
-
-export { ytmPlsSwitch };
 
 
 /////////////////////////////////////////////////////////////
@@ -36,20 +33,6 @@ if (savedStartupTab) {
   startupTabSelector.value = savedStartupTab;
   if (location.pathname === '/')
     (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
-}
-
-/////////////////////////////////////////////////////////////
-
-ytmPlsSwitch.addEventListener('click', () => {
-  getSaved('featuredPlaylists') ?
-    removeSaved('featuredPlaylists') :
-    save('featuredPlaylists', 'off');
-  location.assign('/search');
-});
-
-if (getSaved('featuredPlaylists')) {
-  ytmPlsSwitch.removeAttribute('checked');
-  (<HTMLHeadingElement>document.querySelector('h1.featuredPlaylists')).textContent = 'Search Results Appear Here.';
 }
 
 /////////////////////////////////////////////////////////////

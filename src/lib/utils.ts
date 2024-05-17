@@ -246,6 +246,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
+
   const streamItem = (stream: StreamItem) => StreamItem({
     id: stream.url.substring(9),
     href: hostResolver(stream.url),
@@ -263,7 +264,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
       (item.videos > 0 ? item.videos + ' streams' : ''),
-    !getSaved('img') && item.thumbnail ?
+    item.thumbnail ?
       generateImageUrl(
         getThumbIdFromLink(
           item.thumbnail
@@ -276,6 +277,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   const fragment = document.createDocumentFragment();
   for (const item of itemsArray)
     render(() => item.type === 'stream' ? streamItem(item) : listItem(item), fragment);
+
 
   return fragment;
 }

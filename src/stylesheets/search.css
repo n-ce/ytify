@@ -75,16 +75,6 @@
   }
 }
 
-h1.featuredPlaylists {
-  background: var(--onBg);
-  padding: 2%;
-  margin: 4% 0;
-  border-radius: var(--roundness);
-  display: flex;
-  justify-content: center;
-  align-items: center
-}
-
 #searchlist {
   margin-top: 8%;
   width: 92%;
