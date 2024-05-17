@@ -1,24 +1,27 @@
 nav {
   display: flex;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    opacity: 50%;
+
+    p,
+    i {
+      pointer-events: none;
+    }
+
+    &:hover {
+      opacity: 75%;
+    }
+
+    &.active {
+      opacity: 1;
+    }
+  }
 }
-
-nav a {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  align-items: center;
-  opacity: 50%;
-}
-
-
-nav a:hover {
-  opacity: 75%;
-}
-
-nav a.active {
-  opacity: 1;
-}
-
 
 @media(orientation:portrait) {
 

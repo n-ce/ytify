@@ -2,7 +2,8 @@ import { audio, queuelist, searchFilters, superInput, superModal } from "../lib/
 import { fetchList, params } from "../lib/utils";
 import { appendToQueuelist } from "./queue";
 
-const anchors = document.querySelectorAll('nav a');
+const nav = document.querySelector('nav') as HTMLDivElement;
+const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
 const upcomingInjector = (param: string) => fetch(`${location.origin}/upcoming?id=${param}`)
@@ -14,7 +15,6 @@ const upcomingInjector = (param: string) => fetch(`${location.origin}/upcoming?i
 
 if (queueParam)
   addEventListener('DOMContentLoaded', () => upcomingInjector(queueParam));
-
 
 
 function showSection(id: string) {
@@ -34,34 +34,34 @@ function showSection(id: string) {
 }
 
 
+nav.addEventListener('click', (e: Event) => {
+  e.preventDefault();
 
-for (const anchor of anchors) {
-  anchor.addEventListener('click', _ => {
-    _.preventDefault();
+  const anchor = e.target as HTMLAnchorElement;
 
-    const inHome = anchor.id === '/';
+  const inHome = anchor.id === '/';
 
-    if (anchor.id !== location.pathname) {
-      const sParamInHome = params.has('s') && inHome;
-      const sParam = '?s=' + params.get('s');
-      const aParam = queuelist.dataset.array ? '?a=' + queuelist.dataset.array : '';
-      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? aParam : '';
+  if (anchor.id !== location.pathname) {
+    const sParamInHome = params.has('s') && inHome;
+    const sParam = '?s=' + params.get('s');
+    const aParam = queuelist.dataset.array ? '?a=' + queuelist.dataset.array : '';
+    const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? aParam : '';
 
-      history.pushState({}, '',
-        anchor.id + (
-          sParamInHome ? sParam : otherQuery
-        )
-      );
+    history.pushState({}, '',
+      anchor.id + (
+        sParamInHome ? sParam : otherQuery
+      )
+    );
 
-      const routeName = anchor.lastElementChild?.textContent;
-      const homeTitle = audio.dataset.title || 'Home';
-      document.title = (
-        inHome ? homeTitle : routeName
-      ) + ' - ytify';
-    }
-    showSection(anchor.id);
-  })
-}
+    const routeName = anchor.lastElementChild?.textContent;
+    const homeTitle = audio.dataset.title || 'Home';
+    document.title = (
+      inHome ? homeTitle : routeName
+    ) + ' - ytify';
+  }
+  showSection(anchor.id);
+});
+
 
 // load section if name found in address else load home
 let route;
@@ -85,6 +85,7 @@ if (errorParam) {
   else route = errorParam;
 }
 else route = routes.find(route => location.pathname === route);
+
 const anchor = <HTMLAnchorElement>document.getElementById(route || '/');
 anchor.click();
 
