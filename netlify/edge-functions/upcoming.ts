@@ -41,6 +41,10 @@ export default async (request: Request, _: Context) => {
 
   if (!uid) return;
 
+  const array = [];
+  for (let i = 0; i < uid.length; i += 11)
+    array.push(uid.slice(i, i + 11));
+
   const getData = async (
     id: string,
     api: string = instanceArray[getIndex()]
@@ -57,11 +61,9 @@ export default async (request: Request, _: Context) => {
     }))
     .catch(() => getData(id))
 
-  const array = [];
-  for (let i = 0; i < uid.length; i += 11)
-    array.push(uid.slice(i, i + 11));
 
-  const response = array.map(async id => await getData(id));
+  const promises = array.map(async (id) => await getData(id));
+  const response = await Promise.all(promises);
 
   return new Response(JSON.stringify(response), {
     headers: { 'content-type': 'application/json' },

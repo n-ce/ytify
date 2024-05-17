@@ -325,19 +325,3 @@ export function autoQueue(data: Recommendation[]) {
 
   });
 }
-
-
-// upcoming queries
-export const upcomingInjector = async (queueParam: string) =>
-  fetch(`${location.origin}/upcoming?id=${queueParam}`)
-    .then(res => res.json())
-    .then(data => {
-      for (const stream of data)
-        appendToQueuelist(stream)
-    });
-
-const queueParam = params.get('a');
-if (queueParam && queueParam.length > 10) {
-  addEventListener('DOMContentLoaded', async () => upcomingInjector(queueParam));
-}
-

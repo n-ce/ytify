@@ -1,9 +1,20 @@
 import { audio, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchList, params } from "../lib/utils";
-import { upcomingInjector } from "./audioEvents";
+import { appendToQueuelist } from "./queue";
 
 const anchors = document.querySelectorAll('nav a');
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
+const queueParam = params.get('a');
+const upcomingInjector = (param: string) => fetch(`${location.origin}/upcoming?id=${param}`)
+  .then(res => res.json())
+  .then(data => {
+    for (const stream of data)
+      appendToQueuelist(stream)
+  })
+
+if (queueParam)
+  addEventListener('DOMContentLoaded', () => upcomingInjector(queueParam));
+
 
 
 function showSection(id: string) {
@@ -21,6 +32,7 @@ function showSection(id: string) {
     }
   })
 }
+
 
 
 for (const anchor of anchors) {
@@ -82,3 +94,5 @@ onpopstate = () =>
   superModal.open ?
     superModal.close() :
     showSection(location.pathname);
+
+
