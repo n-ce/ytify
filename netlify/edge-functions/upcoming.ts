@@ -21,12 +21,12 @@ const instanceArray = await fetch('https://piped-instances.kavin.rocks')
   .then(data => data.map((i: { api_url: string }) => i.api_url + '/streams/'))
   .catch(() => ['https://pipedapi.kavin.rocks/streams/']);
 
-fetch('https://api.invidious.io/instances.json')
+await fetch('https://api.invidious.io/instances.json')
   .then(res => res.json())
   .then(data => {
-    data
-      .filter((i: any) => i[1].cors && i[1].api)
-      .forEach((i: any) => instanceArray.push(i[1].url + '/api/v1/videos/'));
+    for (const i of data)
+      if (i[1].cors && i[1].api)
+        instanceArray.push(i[1].uri + '/api/v1/videos/')
 
   })
   .catch(() => ['https://invidious.fdn.fr/api/v1/videos/']);
