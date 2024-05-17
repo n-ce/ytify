@@ -19,15 +19,14 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const fragment = document.createDocumentFragment();
 
   render(
-    () => StreamItem(
-      data.id as string,
-      `/watch?v=${data.id}`,
-      data.title as string,
-      data.author as string,
-      data.duration as string,
-      '',
-      data.channelUrl as string
-    ),
+    () => StreamItem({
+      id: data.id || '',
+      href: `/watch?v=${data.id}`,
+      title: data.title || '',
+      author: data.author || '',
+      duration: data.duration || '',
+      channelUrl: data.channelUrl || ''
+    }),
     fragment);
   return fragment;
 }
