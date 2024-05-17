@@ -335,7 +335,7 @@ export async function upcomingInjector(queueParam: string) {
     array.push(queueParam.slice(i, i + 11));
 
   const appendItem = (id: string) =>
-    fetch(`${location.origin}?id=${id}`)
+    fetch(`${location.origin}/upcoming?id=${id}`)
       .then(res => res.json())
       .then(data => appendToQueuelist(data))
       .catch(() => {
