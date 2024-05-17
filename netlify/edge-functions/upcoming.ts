@@ -19,17 +19,17 @@ function convertSStoHHMMSS(seconds: number) {
 const instanceArray = await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
   .then(data => data.map((i: { api_url: string }) => i.api_url + '/streams/'))
-  .catch(() => ['https://pipedapi.kavin.rocks']);
+  .catch(() => ['https://pipedapi.kavin.rocks/streams/']);
 
 fetch('https://api.invidious.io/instances.json')
   .then(res => res.json())
   .then(data => {
-    const array = data
+    data
       .filter((i: any) => i[1].cors && i[1].api)
-      .map((i: any) => i[1].url + '/api/v1/videos/');
-    instanceArray.push(array);
+      .forEach((i: any) => instanceArray.push(i[1].url + '/api/v1/videos/'));
+
   })
-  .catch(() => ['https://invidious.fdn.fr']);
+  .catch(() => ['https://invidious.fdn.fr/api/v1/videos/']);
 
 
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
