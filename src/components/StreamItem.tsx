@@ -1,23 +1,33 @@
-import { createSignal } from 'solid-js';
+import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { instanceSelector } from '../lib/dom';
 import { getApi, getSaved } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
 
 
-export default function StreamItem(
+export default function StreamItem(data: {
   id: string,
-  href: string,
   title: string,
   author: string,
   duration: string,
-  uploaded: string | undefined,
-  channelUrl: string,
-  views: string | undefined = '',
-  imgLoad: boolean = (getSaved('img') ? false : true),
-  imgLoadStyle: 'eager' | 'lazy' = (getSaved('lazyImg') ? 'lazy' : 'eager'),
-  imgYTM: string = ''
-) {
+  href?: string,
+  uploaded?: string,
+  channelUrl?: string,
+  views?: string,
+  imgLoad?: boolean,
+  imgLoadStyle?: 'eager' | 'lazy',
+  imgYTM?: string,
+  draggable?: boolean
+}) {
+
+  const keys = Object.keys(data);
+
+  if (!keys.includes('imgLoad'))
+    data.imgLoad = getSaved('img') ? false : true;
+
+  if (!keys.includes('imgLoadStyle'))
+    data.imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
+
 
   const [tsrc, setTsrc] = createSignal('');
 
@@ -55,38 +65,41 @@ export default function StreamItem(
     setTsrc(store.replace(currentImgPrxy, nextImgPrxy));
   }
 
-  if (imgLoad)
-    setTsrc(generateImageUrl(imgYTM || id, 'mq'));
+  if (data.imgLoad)
+    setTsrc(generateImageUrl(data.imgYTM || data.id, 'mq'));
 
   return (
     <a
       class='streamItem ravel'
-      href={href}
+      href={data.href}
       ref={parent}
-      data-id={id}
-      data-title={title}
-      data-author={author}
-      data-channel_url={channelUrl}
-      data-duration={duration}
+      data-id={data.id}
+      data-title={data.title}
+      data-author={data.author}
+      data-channel_url={data.channelUrl}
+      data-duration={data.duration}
     >
       <span>
         <img
           class='thumbnail'
-          loading={imgLoadStyle}
+          loading={data.imgLoadStyle}
           crossorigin='anonymous'
           onerror={handleThumbnailError}
           onload={handleThumbnailLoad}
           src={tsrc()}
         />
-        <p class='duration'>{duration}</p>
+        <p class='duration'>{data.duration}</p>
       </span>
       <div class='metadata'>
-        <p class='title'>{title}</p>
+        <p class='title'>{data.title}</p>
         <div class='avu'>
-          <p class='author'>{author}</p>
-          <p class='viewsXuploaded'>{(views || '') + (uploaded ? ' • ' + uploaded.replace('Streamed ', '') : '')}</p>
+          <p class='author'>{data.author}</p>
+          <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
         </div>
       </div>
+      <Show when={data.draggable}>
+        <i class="ri-draggable"></i>
+      </Show>
     </a>
   )
 }

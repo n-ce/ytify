@@ -40,15 +40,15 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
   const fragment = document.createDocumentFragment();
 
-  render(() => StreamItem(
-    data.id as string,
-    '',
-    data.title as string,
-    data.author as string,
-    data.duration as string,
-    '',
-    '', '', imgLoad, imgLoadStyle
-  ), fragment);
+  render(() => StreamItem({
+    id: data.id || '',
+    title: data.title || '',
+    author: data.author || '',
+    duration: data.duration || '',
+    imgLoad: imgLoad,
+    imgLoadStyle: imgLoadStyle,
+    draggable: true
+  }), fragment);
 
   prepend ?
     queuelist.prepend(fragment) :

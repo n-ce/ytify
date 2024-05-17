@@ -250,21 +250,19 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
 
 
-  const streamItem = (stream: StreamItem) => StreamItem(
-    stream.url.substring(9),
-    hostResolver(stream.url),
-    stream.title,
-    stream.uploaderName,
-    convertSStoHHMMSS(stream.duration),
-    stream.uploadedDate,
-    stream.uploaderUrl,
-    (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    imgLoad,
-    imgLoadStyle,
-    stream.thumbnail.length > 40 ? getThumbIdFromLink(stream.thumbnail) : ''
-  )
-
-
+  const streamItem = (stream: StreamItem) => StreamItem({
+    id: stream.url.substring(9),
+    href: hostResolver(stream.url),
+    title: stream.title,
+    author: stream.uploaderName,
+    duration: convertSStoHHMMSS(stream.duration),
+    uploaded: stream.uploadedDate,
+    channelUrl: stream.uploaderUrl,
+    views: (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
+    imgLoad: imgLoad,
+    imgLoadStyle: imgLoadStyle,
+    imgYTM: stream.thumbnail.length > 40 ? getThumbIdFromLink(stream.thumbnail) : ''
+  })
 
   const listItem = (item: StreamItem) => ListItem(
     item.name,

@@ -1,4 +1,4 @@
-import { Context, Config } from "@netlify/edge-functions";
+import { Context, Config } from '@netlify/edge-functions';
 
 const keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
 const description = '48-160kbps Opus YouTube Audio Streaming Web App.';
@@ -29,5 +29,5 @@ export default async (request: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: "/*",
+  path: '/*',
 };

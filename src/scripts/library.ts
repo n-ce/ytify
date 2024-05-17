@@ -83,20 +83,19 @@ function fetchCollection(collection: string) {
   const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
 
 
-  for (const item in data)
-    render(() => StreamItem(
-      data[item].id as string,
-      `/watch?v=${data[item].id}`,
-      data[item].title as string,
-      data[item].author as string,
-      data[item].duration as string,
-      '',
-      data[item].channelUrl as string,
-      '',
-      imgLoad,
-      imgLoadStyle
-    ), fragment);
-
+  for (const item in data) {
+    const d = data[item];
+    render(() => StreamItem({
+      id: d.id || '',
+      href: `/watch?v=${data[item].id}`,
+      title: d.title || '',
+      author: d.author || '',
+      duration: d.duration || '',
+      channelUrl: d.channelUrl || '',
+      imgLoad: imgLoad,
+      imgLoadStyle: imgLoadStyle
+    }), fragment);
+  }
   if (!fragment.childElementCount) {
     alert('No items found');
     return;
@@ -129,6 +128,8 @@ const collections = <HTMLSpanElement>document.getElementById('collections');
 
 collections.addEventListener('click', e => {
   e.preventDefault();
+  console.log(e);
+
   const elm = e.target as HTMLParagraphElement;
   if (!elm.classList.contains('collectionItem')) return;
 

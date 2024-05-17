@@ -1,6 +1,6 @@
 import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
 import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
-import { autoQueue } from "../scripts/audioEvents";
+import { autoQueue, hls } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
 
@@ -61,7 +61,9 @@ switchHLS.addEventListener('click', () => {
   getSaved('HLS') ?
     removeSaved('HLS') :
     save('HLS', 'true');
+
 });
+
 
 /////////////////////////////////////////////////////////////
 
@@ -110,8 +112,9 @@ export default async function player(id: string | null = '') {
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
+  const hlsOn = switchHLS.hasAttribute('checked');
 
-  if (!noOfBitrates && !switchHLS.hasAttribute('checked')) {
+  if (!noOfBitrates && !hlsOn) {
     notify('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
@@ -123,7 +126,6 @@ export default async function player(id: string | null = '') {
   bitrateSelector.innerHTML = '';
   const isMusic = data.category === 'Music';
   const ivApi = getApi('invidious');
-  const hlsOn = switchHLS.hasAttribute('checked');
 
   function proxyHandler(url: string) {
 
@@ -153,7 +155,6 @@ export default async function player(id: string | null = '') {
     bitrateSelector.add(new Option(`${_.quality} ${codec} - ${(_.contentLength / (1024 * 1024)).toFixed(2)} MB`, proxyHandler(_.url)));
 
     (<HTMLOptionElement>bitrateSelector.lastElementChild).dataset.type = _.mimeType;
-
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
     const hqPref = getSaved('hq') ? noOfBitrates : 0;
@@ -164,21 +165,11 @@ export default async function player(id: string | null = '') {
   bitrateSelector.selectedIndex = index;
 
   if (hlsOn) {
-
-    import('hls.js').then(h => {
-      const hls = new h.default();
-      hls.attachMedia(audio);
-      hls.on(h.Events.MEDIA_ATTACHED,
-        () => {
-          hls.loadSource(data.hls);
-        }
-      );
-    });
+    audio.src = '';
+    hls.loadSource(proxyHandler(data.hls));
   } else
-
     audio.src = bitrateSelector.value;
 
-  console.log(data.hls, proxyHandler(data.hls))
   // Subtitle data dom injection
 
   for (const option of subtitleSelector.options)

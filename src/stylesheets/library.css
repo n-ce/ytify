@@ -33,11 +33,13 @@
     border: var(--border);
     border-radius: calc(var(--roundness)*1.5);
 
+
     i {
       font-size: xx-large;
       display: flex;
       justify-content: center;
       align-items: center;
+      pointer-events: none;
     }
 
   }
