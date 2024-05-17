@@ -2,7 +2,7 @@ import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
 import { audio, favButton, favIcon, listAnchor, listBtnsContainer, listContainer } from "../lib/dom";
 import { addToCollection, createPlaylist, getDB, removeFromCollection, reservedCollections, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, getSaved, params, removeSaved } from "../lib/utils";
+import { $, params, removeSaved } from "../lib/utils";
 
 
 
@@ -79,10 +79,6 @@ function fetchCollection(collection: string) {
 
   const fragment = document.createDocumentFragment();
 
-  const imgLoad = getSaved('img') ? false : true;
-  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
-
-
   for (const item in data) {
     const d = data[item];
     render(() => StreamItem({
@@ -91,9 +87,7 @@ function fetchCollection(collection: string) {
       title: d.title || '',
       author: d.author || '',
       duration: d.duration || '',
-      channelUrl: d.channelUrl || '',
-      imgLoad: imgLoad,
-      imgLoadStyle: imgLoadStyle
+      channelUrl: d.channelUrl || ''
     }), fragment);
   }
   if (!fragment.childElementCount) {

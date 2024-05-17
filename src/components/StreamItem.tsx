@@ -14,22 +14,13 @@ export default function StreamItem(data: {
   uploaded?: string,
   channelUrl?: string,
   views?: string,
-  imgLoad?: boolean,
-  imgLoadStyle?: 'eager' | 'lazy',
   imgYTM?: string,
   draggable?: boolean
 }) {
 
-  const keys = Object.keys(data);
-
-  if (!keys.includes('imgLoad'))
-    data.imgLoad = getSaved('img') ? false : true;
-
-  if (!keys.includes('imgLoadStyle'))
-    data.imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
-
 
   const [tsrc, setTsrc] = createSignal('');
+  const showImage = getSaved('img') ? false : true;
 
   let parent!: HTMLAnchorElement;
 
@@ -65,12 +56,12 @@ export default function StreamItem(data: {
     setTsrc(store.replace(currentImgPrxy, nextImgPrxy));
   }
 
-  if (data.imgLoad)
+  if (showImage)
     setTsrc(generateImageUrl(data.imgYTM || data.id, 'mq'));
 
   return (
     <a
-      class='streamItem ravel'
+      class={'streamItem ' + (showImage ? 'ravel' : '')}
       href={data.href}
       ref={parent}
       data-id={data.id}
@@ -80,14 +71,16 @@ export default function StreamItem(data: {
       data-duration={data.duration}
     >
       <span>
-        <img
-          class='thumbnail'
-          loading={data.imgLoadStyle}
-          crossorigin='anonymous'
-          onerror={handleThumbnailError}
-          onload={handleThumbnailLoad}
-          src={tsrc()}
-        />
+        <Show when={showImage}>
+          <img
+            class='thumbnail'
+            loading={getSaved('lazyImg') ? 'lazy' : 'eager'}
+            crossorigin='anonymous'
+            onerror={handleThumbnailError}
+            onload={handleThumbnailLoad}
+            src={tsrc()}
+          />
+        </Show>
         <p class='duration'>{data.duration}</p>
       </span>
       <div class='metadata'>

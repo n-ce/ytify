@@ -1,4 +1,4 @@
-import { getSaved, removeSaved, save } from "../lib/utils";
+import { removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
@@ -35,8 +35,6 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queueArray.unshift(data.id) :
     queueArray.push(data.id);
 
-  const imgLoad = getSaved('img') ? false : true;
-  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
 
   const fragment = document.createDocumentFragment();
 
@@ -45,8 +43,6 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     title: data.title || '',
     author: data.author || '',
     duration: data.duration || '',
-    imgLoad: imgLoad,
-    imgLoadStyle: imgLoadStyle,
     draggable: true
   }), fragment);
 

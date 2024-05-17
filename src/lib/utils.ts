@@ -246,10 +246,6 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
-  const imgLoad = getSaved('img') ? false : true;
-  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
-
-
   const streamItem = (stream: StreamItem) => StreamItem({
     id: stream.url.substring(9),
     href: hostResolver(stream.url),
@@ -259,8 +255,6 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     uploaded: stream.uploadedDate,
     channelUrl: stream.uploaderUrl,
     views: (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    imgLoad: imgLoad,
-    imgLoadStyle: imgLoadStyle,
     imgYTM: stream.thumbnail.length > 40 ? getThumbIdFromLink(stream.thumbnail) : ''
   })
 
@@ -269,15 +263,14 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
       (item.videos > 0 ? item.videos + ' streams' : ''),
-    imgLoad && item.thumbnail ?
+    !getSaved('img') && item.thumbnail ?
       generateImageUrl(
         getThumbIdFromLink(
           item.thumbnail
         )
       ) : blankImage,
     item.description || item.uploaderName,
-    item.url,
-    imgLoadStyle
+    item.url
   )
 
   const fragment = document.createDocumentFragment();
