@@ -22,16 +22,18 @@ const pipedInstanceArray = async () => fetch('https://piped-instances.kavin.rock
 
 export default async (request: Request, _: Context) => {
 
-  const id = new URL(request.url).searchParams.get('id');
+  const uid = new URL(request.url).searchParams.get('id');
 
-  if (!id) return;
+  if (!uid) return;
 
   const instanceArray = await pipedInstanceArray();
 
-  const api = instanceArray[Math.floor(Math.random() * instanceArray.length)];
+  const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
-
-  const data = await fetch(`${api}/streams/${id}`)
+  const getData = async (
+    id: string,
+    api: string = instanceArray[getIndex()]
+  ): Promise<any> => await fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(json => ({
       'id': id,
@@ -42,6 +44,9 @@ export default async (request: Request, _: Context) => {
       'thumbnailUrl': json.thumbnailUrl,
       'source': api
     }))
+    .catch(() => getData(id))
+
+  const data = await getData(uid);
 
   return new Response(JSON.stringify(data), {
     headers: { 'content-type': 'application/json' },

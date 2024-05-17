@@ -335,7 +335,7 @@ export async function upcomingInjector(queueParam: string) {
     array.push(queueParam.slice(i, i + 11));
 
   const appendItem = (id: string) =>
-    fetch('https://p2-a.vercel.app?id=' + id)
+    fetch(`${location.origin}?id=${id}`)
       .then(res => res.json())
       .then(data => appendToQueuelist(data))
       .catch(() => {
