@@ -25,8 +25,6 @@ listBtnsContainer.addEventListener('click', e => {
   else if (btn === enqueueBtn)
     listToQ(listContainer);
 
-  else if (btn === importListBtn)
-    console.log('savelist');
   else if (btn === subscribeListBtn) {
     console.log(getThumbIdFromLink(listContainer.dataset.thumbnail || ''))
   }
