@@ -58,6 +58,18 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
   let index = -1;
 
   bitrateSelector.innerHTML = '';
+  const isMusic = data.category === 'Music';
+  const ivApi = getApi('invidious');
+
+  function proxyHandler(url: string) {
+
+    const oldUrl = new URL(url);
+
+    // only proxy music streams
+    const host = isMusic ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
+
+    return url.replace(oldUrl.origin, host);
+  }
 
   audioStreams.forEach((_: {
     type: string,
@@ -70,15 +82,8 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
     const codec = _.type.includes('opus') ? 'opus' : 'aac';
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
 
-    const oldUrl = new URL(_.url);
-
-    // only proxy music streams
-    const host = data.category === 'Music' ? getApi('invidious', instance) : `https://${oldUrl.searchParams.get('host')}`;
-
-    const url = _.url.replace(oldUrl.origin, host);
-
     // add to DOM
-    bitrateSelector.add(new Option(quality, url));
+    bitrateSelector.add(new Option(quality, proxyHandler(_.url)));
 
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;

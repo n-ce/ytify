@@ -6,7 +6,7 @@ import { appendToQueuelist } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;
 
-const [playNow,  playNext, enqueue, li_atps, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
+const [playNow, playNext, enqueue, li_atps, startRadio, downloadBtn, openChannelBtn] = <HTMLCollectionOf<HTMLLIElement>>superModalList.children;
 
 export const atpSelector = <HTMLSelectElement>li_atps.lastElementChild;
 
@@ -85,8 +85,9 @@ downloadBtn.addEventListener('click', () => {
 
 openChannelBtn.addEventListener('click', () => {
   // data binding for save list & open in yt btn
-  (<HTMLButtonElement>document.getElementById('openInYT')).innerHTML = '<i class="ri-external-link-line"></i> ' + <string>superModal.dataset.author;
+  (<HTMLButtonElement>document.getElementById('viewOnYTBtn')).innerHTML = '<i class="ri-external-link-line"></i> ' + <string>superModal.dataset.author;
   const channelUrl = <string>superModal.dataset.channel_url;
+
   fetchList(channelUrl);
   superModal.click();
 })

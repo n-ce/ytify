@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer } from "./dom";
 import { removeFromCollection } from "./libraryUtils";
 import { blankImage, generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
@@ -211,11 +211,10 @@ export async function fetchList(url: string, mix = false) {
   listBtnsContainer.className = type;
 
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
-  saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${type === 'channel' ? 'Subscribe' : 'Save'}`;
-  saveListBtn.dataset.url = url;
-  saveListBtn.dataset.thumbnail = group.avatarUrl;
-  saveListBtn.dataset.type = type;
-  saveListBtn.dataset.name = group.name;
+  listContainer.dataset.url = url;
+  listContainer.dataset.thumbnail = group.avatarUrl;
+  listContainer.dataset.type = type;
+  listContainer.dataset.name = group.name;
 
   if (mix) playAllBtn.click();
   else {

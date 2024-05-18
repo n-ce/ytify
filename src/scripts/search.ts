@@ -197,7 +197,7 @@ superInput.addEventListener('keydown', _ => {
 });
 
 // CTRL + K focus search bar
-document.addEventListener("keydown", function(event) {
+document.addEventListener('keydown', (event) => {
   if (event.ctrlKey && event.key === "K")
     superInput.focus();
 });

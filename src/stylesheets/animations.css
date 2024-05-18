@@ -1,0 +1,56 @@
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: var(--pageTransitionEffect);
+  }
+}
+
+@keyframes boing {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes dialogAppear {
+  from {
+    background-color: transparent;
+  }
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0turn)
+  }
+
+  to {
+    transform: rotate(1turn)
+  }
+}
+
+@keyframes like {
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes zoomout {
+  from {
+    transform: scale(2);
+    opacity: 0;
+  }
+}

@@ -14,7 +14,7 @@
     "solid-js": "^1.8.17"
   },
   "devDependencies": {
-    "@netlify/edge-functions": "^2.6.1",
+    "@netlify/edge-functions": "^2.8.0",
     "autoprefixer": "^10.4.19",
     "eruda": "^3.0.1",
     "typescript": "^5.4.5",

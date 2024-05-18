@@ -32,7 +32,7 @@ export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 
 export const listBtnsContainer = <HTMLSpanElement>document.getElementById('listTools');
 
-export const [playAllBtn, enqueueBtn, importListBtn, saveListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn] = <HTMLCollectionOf<HTMLButtonElement>>listBtnsContainer.children;
+export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn] = <HTMLCollectionOf<HTMLButtonElement>>listBtnsContainer.children;
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());

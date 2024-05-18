@@ -1,47 +1,42 @@
 #library {
-  h2 {
-    width: 80%;
-    margin: 2rem 0;
-  }
 
   #collections {
     display: grid;
-    grid-template-columns: auto auto;
+    width: 100%;
     align-items: center;
+    justify-content: space-evenly;
     user-select: none;
     border-radius: calc(var(--roundness)*1.5);
 
-    @media(orientation:portrait) {}
+    @media(orientation:portrait) {
+      grid-template-columns: auto auto;
+    }
 
     @media(orientation:landscape) {
       grid-template-columns: auto auto auto auto;
     }
-  }
 
 
-  a.collectionItem {
-    display: inline-flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 90%;
-    aspect-ratio: 1;
-    margin: 0 4%;
-    padding: 2%;
-    font-size: larger;
-    background-color: var(--onBg);
-    color: var(--text);
-    border: var(--border);
-    border-radius: calc(var(--roundness)*1.5);
-
-
-    i {
-      font-size: xx-large;
-      display: flex;
+    a.collectionItem {
+      display: inline-flex;
+      flex-direction: column;
       justify-content: center;
-      align-items: center;
-      pointer-events: none;
-    }
+      height: calc(7rem + 4%);
+      aspect-ratio: 1;
+      padding: 2%;
+      font-size: large;
+      background-color: var(--onBg);
+      color: var(--text);
+      border: var(--border);
+      border-radius: calc(var(--roundness)*1.5);
 
+
+      i {
+        font-size: 2rem;
+        pointer-events: none;
+      }
+
+    }
   }
 
   div:last-child {
