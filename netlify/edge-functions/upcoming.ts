@@ -1,6 +1,6 @@
 // handles upcoming query requests to restore queue from any where
 
-import { Context, Config } from '@netlify/edge-functions';
+import { Config } from '@netlify/edge-functions';
 
 function convertSStoHHMMSS(seconds: number) {
   if (seconds < 0) return '';
@@ -35,7 +35,7 @@ await fetch('https://api.invidious.io/instances.json')
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
 
-export default async (request: Request, _: Context) => {
+export default async (request: Request) => {
 
   const uid = new URL(request.url).searchParams.get('id');
 
@@ -48,7 +48,7 @@ export default async (request: Request, _: Context) => {
   const getData = async (
     id: string,
     api: string = instanceArray[getIndex()]
-  ): Promise<any> => await fetch(api + id)
+  ): Promise<Record<'id' | 'title' | 'author' | 'authorId' | 'duration' | 'duration' | 'thumbnailUrl' | 'source', string>> => await fetch(api + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
