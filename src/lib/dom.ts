@@ -1,5 +1,7 @@
 export const img = <HTMLImageElement>document.getElementById('img');
 
+export const miniPlayerThumb = <HTMLImageElement>document.getElementById('mpImg');
+
 export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 
 export const context = <CanvasRenderingContext2D>canvas.getContext('2d');

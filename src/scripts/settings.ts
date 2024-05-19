@@ -4,7 +4,7 @@ import player from "../lib/player";
 import { blankImage } from "../lib/imageUtils";
 import { getDB, saveDB } from "../lib/libraryUtils";
 
-const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
+const startupTabSwitch = <HTMLElement>document.getElementById('startupTab');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
@@ -21,19 +21,15 @@ const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSe
 
 /////////////////////////////////////////////////////////////
 
-startupTabSelector.addEventListener('change', () => {
-  const tab = startupTabSelector.value;
-  tab ?
-    save('startupTab', tab) :
-    removeSaved('startupTab');
+startupTabSwitch.addEventListener('click', () => {
+  getSaved('startupTab') ?
+    removeSaved('startupTab') :
+    save('startupTab', 'search');
 });
 
-const savedStartupTab = getSaved('startupTab') || '';
-if (savedStartupTab) {
-  startupTabSelector.value = savedStartupTab;
-  if (location.pathname === '/')
-    (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
-}
+if (getSaved('startupTab'))
+  startupTabSwitch.toggleAttribute('checked');
+
 
 /////////////////////////////////////////////////////////////
 
@@ -45,7 +41,7 @@ defaultFilterSongs.addEventListener('click', () => {
 });
 
 if (getSaved('defaultFilter')) {
-  defaultFilterSongs.setAttribute('checked', '');
+  defaultFilterSongs.toggleAttribute('checked');
   searchFilters.value = 'music_songs';
 }
 

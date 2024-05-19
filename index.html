@@ -40,31 +40,40 @@
     <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
     <source type="audio/mpegurl">
   </audio>
-  <nav>
-    <a href="/" id="/">
-      <i class="ri-home-line"></i>
-      <p>Home</p>
-    </a>
-    <a href="/upcoming" id="/upcoming">
-      <i class="ri-skip-forward-line"></i>
-      <p>Upcoming</p>
-    </a>
-    <a href="/search" id="/search">
-      <i class="ri-search-2-line"></i>
-      <p>Search</p>
-    </a>
-    <a href="/library" id="/library">
-      <i class="ri-stack-line"></i>
-      <p>Library</p>
-    </a>
-    <a href="/settings" id="/settings">
-      <i class="ri-settings-line"></i>
-      <p>Settings</p>
-    </a>
-    <a href="/list" id="/list" class="hide">
-      <p>list</p>
-    </a>
-  </nav>
+  <header>
+    <nav>
+      <a href="/" id="/" class="hide">
+        <i class="ri-home-line"></i>
+        <p>Home</p>
+      </a>
+      <a href="/upcoming" id="/upcoming">
+        <i class="ri-skip-forward-line"></i>
+        <p>Upcoming</p>
+      </a>
+      <a href="/search" id="/search">
+        <i class="ri-search-2-line"></i>
+        <p>Search</p>
+      </a>
+      <a href="/library" id="/library">
+        <i class="ri-stack-line"></i>
+        <p>Library</p>
+      </a>
+      <a href="/settings" id="/settings">
+        <i class="ri-settings-line"></i>
+        <p>Settings</p>
+      </a>
+      <a href="/list" id="/list" class="hide">
+        <p>list</p>
+      </a>
+    </nav>
+    <div id="miniPlayer">
+      <img src="/ytify_thumbnail_min.webp" id="mpImg">
+      <div>
+        <p>Now Playing</p>
+        <button class="ri-play-circle-fill"></button>
+      </div>
+    </div>
+  </header>
   <main>
     <section id="home">
       <article class="hide" id="subtitleContainer"></article>
@@ -144,7 +153,7 @@
       </span>
       <br>
       <div id="queuelist">
-        <h1 align="center">upcoming streams show here</h1>
+        <h1>upcoming streams show here</h1>
       </div>
     </section>
 
@@ -255,16 +264,6 @@
         </span>
 
         <span>
-          <label for="startupTab">
-            Default Tab on Startup
-          </label>
-          <select id="startupTab">
-            <option value="">Home</option>
-            <option value="/search">Search</option>
-            <option value="/library">Library</option>
-          </select>
-        </span>
-        <span>
           <label for="linkHost">Links host</label>
           <select id="linkHost">
             <option value="https://youtube.com">YouTube</option>
@@ -274,9 +273,11 @@
           </select>
         </span>
       </div>
+
       <div>
         <h3>Search</h3>
-        <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
+        <toggle-switch id="startupTab">Search as Default Tab</toggle-switch>
+        <toggle-switch id="defaultFilterSongs">Songs as Default Filter</toggle-switch>
         <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
       </div>
 

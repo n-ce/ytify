@@ -1,5 +1,5 @@
 import { audio, loadingScreen, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
-import { fetchList, params } from "../lib/utils";
+import { fetchList, getSaved, params } from "../lib/utils";
 import { appendToQueuelist } from "./queue";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
@@ -21,7 +21,7 @@ function upcomingInjector(param: string) {
 }
 
 if (queueParam)
-  addEventListener('DOMContentLoaded', () => upcomingInjector(queueParam));
+  upcomingInjector(queueParam)
 
 
 function showSection(id: string) {
@@ -45,6 +45,8 @@ nav.addEventListener('click', (e: Event) => {
   e.preventDefault();
 
   const anchor = e.target as HTMLAnchorElement;
+
+  if (!anchor.matches('a')) return;
 
   const inHome = anchor.id === '/';
 
@@ -70,7 +72,7 @@ nav.addEventListener('click', (e: Event) => {
 });
 
 
-// load section if name found in address else load home
+// load section if name found in address else load library
 let route;
 const errorParam = params.get('e');
 if (errorParam) {
@@ -91,10 +93,13 @@ if (errorParam) {
   }
   else route = errorParam;
 }
-else route = routes.find(route => location.pathname === route);
+else {
+  route = routes.find(route => location.pathname === route) || '/';
+  if (route === '/' && !params.has('s'))
+    route = getSaved('startupTab') ? '/search' : '/library';
+}
 
-const anchor = <HTMLAnchorElement>document.getElementById(route || '/');
-anchor.click();
+(<HTMLAnchorElement>document.getElementById(route)).click();
 
 // enables back button functionality
 

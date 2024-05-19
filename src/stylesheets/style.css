@@ -45,9 +45,11 @@ body {
   transition: all 0.4s;
   font-family: 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
+
   main {
     display: flex;
     flex-direction: column;
+
 
     section {
       display: none;
@@ -60,6 +62,7 @@ body {
       &.view {
         display: flex;
       }
+
     }
   }
 }
@@ -70,12 +73,18 @@ body {
     --navDirection: column;
     flex-direction: var(--navDirection);
 
+    header {
+      width: 92%;
+      display: flex;
+      flex-direction: var(--navDirection);
+    }
+
     main {
       height: 100%;
       width: 100%;
 
       section {
-        height: calc(100dvh - 3.2rem)
+        height: calc(93dvh - 3.2rem);
       }
     }
   }
@@ -92,6 +101,13 @@ body {
   body {
     --navDirection: row;
     flex-direction: var(--navDirection);
+  }
+
+  header {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .reverseNav {
@@ -221,4 +237,15 @@ a {
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
   padding: 2vmin 0;
+}
+
+#upcoming {
+
+  #queuelist {
+    width: 92%;
+  }
+
+  #queuetools {
+    width: calc(92% + 3vmin);
+  }
 }
