@@ -58,7 +58,7 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
   let index = -1;
 
   bitrateSelector.innerHTML = '';
-  const isMusic = data.category === 'Music';
+  const isMusic = data.genre === 'Music';
   const ivApi = getApi('invidious');
 
   function proxyHandler(url: string) {

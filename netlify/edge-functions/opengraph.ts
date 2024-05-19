@@ -19,7 +19,7 @@ export default async (request: Request, context: Context) => {
     .then(data => {
       page = page
         .replace(keywords, data.tags)
-        .replace(description, data.description)
+        .replace(description, data.description.toString())
         .replace('"ytify"', `"${data.title}"`)
         .replace(url, `${url}?s=${id}`)
         .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl);
