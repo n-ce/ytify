@@ -9,8 +9,8 @@ import './list';
 import './settings';
 import './library';
 import './audioEvents';
+import './miniPlayer';
 import '../components/toggleSwitch';
-
 
 if (import.meta.env.PROD)
   import('eruda').then(eruda => eruda.default.init());
@@ -32,3 +32,4 @@ if (import.meta.env.PROD)
 
 
 document.getElementById('version')!.textContent += _VERSION;
+

@@ -53,71 +53,18 @@ nav {
 @media(orientation:landscape) {
 
   nav {
-    height: 100dvh;
     flex-direction: column;
-    width: 100%;
+    justify-content: space-around;
     font-size: large;
-    justify-content: center;
 
     a {
-      width: auto;
-      height: 12%;
-      margin: 1dvh;
+      margin-bottom: 2dvh;
+
+      i {
+        margin-right: 5%;
+      }
     }
 
-    i {
-      margin: 0 1vw;
-    }
-  }
-
-}
-
-#miniPlayer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--onBg);
-  border: var(--border);
-  border-radius: var(--roundness);
-  column-gap: 1dvh;
-  box-shadow: var(--shadow);
-
-  img {
-    height: calc(5dvmax + 2dvh);
-    border-radius: var(--roundness);
-  }
-
-  div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 1dvh;
-
-    p {
-      user-select: none;
-    }
-
-    button {
-      color: inherit;
-      border: none;
-      background: none;
-      padding: 0;
-      margin: 0;
-      font-size: 5dvmax;
-      transform: scale(1.1);
-    }
-  }
-
-  @media(orientation:landscape) {
-    flex-direction: column;
-    margin: 0 0 calc(1dvh + 1vw) calc(1dvh + 1vw);
-
-    img {
-      width: 100%;
-      height: auto;
-
-    }
   }
 
 }

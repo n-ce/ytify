@@ -78,14 +78,7 @@ export default async function player(id: string | null = '') {
   const apiUrl = getApi('piped', apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)
-    .then(async res => {
-      const response = res.json();
-      if (!res.ok)
-        throw new Error(
-          (await response).message
-        );
-      return response;
-    })
+    .then(res => res.json())
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
         notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);

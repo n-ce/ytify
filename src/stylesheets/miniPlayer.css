@@ -1,0 +1,55 @@
+#miniPlayer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--onBg);
+  border: var(--border);
+  border-radius: var(--roundness);
+  box-shadow: var(--shadow);
+
+  img {
+    height: calc(5dvmax + 2dvh);
+    border-radius: calc(var(--roundness) * 0.9);
+    transform: scale(0.87);
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1dvh;
+
+    a {
+      user-select: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 65vw;
+    }
+
+
+    button {
+      color: inherit;
+      border: none;
+      background: none;
+      padding: 0;
+      margin: 0;
+      font-size: 5dvmax;
+      transform: scale(1.1);
+    }
+  }
+
+  @media(orientation:landscape) {
+    flex-direction: column;
+
+    img {
+      width: 100%;
+      height: auto;
+      transform: scale(0.93);
+    }
+  }
+
+}

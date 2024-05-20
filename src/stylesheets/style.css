@@ -1,6 +1,7 @@
 @import 'reset.css';
 @import 'remixicon.css';
 @import 'nav.css';
+@import 'miniPlayer.css';
 @import 'footer.css';
 @import 'home.css';
 @import 'search.css';
@@ -108,6 +109,8 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    padding: 2%;
   }
 
   .reverseNav {

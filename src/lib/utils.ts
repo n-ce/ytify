@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, miniPlayerThumb } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title } from "./dom";
 import { removeFromCollection } from "./libraryUtils";
 import { blankImage, generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
@@ -82,12 +82,10 @@ export function setMetaData(
 ) {
   const imgX = generateImageUrl(id, 'maxres');
   if (!getSaved('img') && !music)
-    img.src =
-      miniPlayerThumb.src = imgX;
+    img.src = imgX;
 
   img.alt = streamName;
 
-  const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = hostResolver(`/watch?v=${id}`);
   title.textContent = streamName;
   title.onclick = _ => {
@@ -118,8 +116,7 @@ export function setMetaData(
   canvasImg.onload = () => {
     const sqrImg = getSaved('img') ? blankImage : sqrThumb(canvasImg);
     if (music)
-      img.src =
-        miniPlayerThumb.src = sqrImg;
+      img.src = sqrImg;
 
     if ('mediaSession' in navigator) {
       navigator.mediaSession.setPositionState();

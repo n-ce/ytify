@@ -1,6 +1,8 @@
 export const img = <HTMLImageElement>document.getElementById('img');
 
-export const miniPlayerThumb = <HTMLImageElement>document.getElementById('mpImg');
+export const title = <HTMLAnchorElement>document.getElementById('title');
+
+export const miniPlayer = <HTMLDivElement>document.getElementById('miniPlayer');
 
 export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 

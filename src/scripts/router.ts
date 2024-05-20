@@ -1,5 +1,6 @@
 import { audio, loadingScreen, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchList, getSaved, params } from "../lib/utils";
+import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
@@ -21,7 +22,7 @@ function upcomingInjector(param: string) {
 }
 
 if (queueParam)
-  upcomingInjector(queueParam)
+  upcomingInjector(queueParam);
 
 
 function showSection(id: string) {
@@ -29,6 +30,8 @@ function showSection(id: string) {
     if (id === '/') id += 'home';
     if (route === '/') route += 'home';
     const section = <HTMLDivElement>document.getElementById(route.substring(1));
+
+    miniPlayerRoutingHandler(id === '/home');
 
     if (route === id) {
       section.classList.add('view');
@@ -107,5 +110,6 @@ onpopstate = () =>
   superModal.open ?
     superModal.close() :
     showSection(location.pathname);
+
 
 

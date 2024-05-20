@@ -1,18 +1,23 @@
 #home {
   align-items: center;
+
+  #img {
+    border: var(--border);
+    border-radius: var(--roundness);
+    box-shadow: var(--shadow);
+  }
+
 }
 
 #subtitleContainer {
   pointer-events: none;
   position: absolute;
+
+  span {
+    font-size: medium !important;
+    font-family: 'Noto Sans';
+  }
 }
-
-
-#subtitleContainer span {
-  font-size: medium !important;
-  font-family: 'Noto Sans';
-}
-
 
 #subtitleContainer div div div div {
   border-radius: var(--roundness);
@@ -26,44 +31,40 @@
   grid-template-areas:
     "A A A A"
     "B C D E";
+
+  #title {
+    font-size: larger;
+    font-weight: bold;
+    margin-bottom: 5%;
+    grid-area: A;
+  }
+
+  #author {
+    font-size: small;
+    display: flex;
+    align-items: center;
+    grid-area: B;
+  }
+
+  select {
+    font-family: inherit;
+    font-size: small;
+    text-align: right;
+
+
+    #subtitleSelector {
+      max-width: 10ch;
+      grid-area: D;
+    }
+  }
 }
 
-#img {
-  border: var(--border);
-  border-radius: var(--roundness);
-  box-shadow: var(--shadow);
-}
 
-
-#title {
-  font-size: larger;
-  font-weight: bold;
-  margin-bottom: 5%;
-  grid-area: A;
-}
-
-#author {
-  font-size: small;
-  display: flex;
-  align-items: center;
-  grid-area: B;
-}
-
-#metadata select {
-  font-family: inherit;
-  font-size: small;
-  text-align: right;
-}
 
 #bitrateSelector {
-  max-width: 15ch;
-  grid-area: C;
+  background: var(--onBg);
 }
 
-#subtitleSelector {
-  max-width: 10ch;
-  grid-area: D;
-}
 
 #favButton {
   display: none;
