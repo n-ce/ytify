@@ -305,4 +305,4 @@ export function autoQueue(data: Recommendation[]) {
 
 
 
-};
+}
