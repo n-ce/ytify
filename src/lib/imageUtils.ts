@@ -2,10 +2,6 @@ import { canvas, context, img } from "./dom";
 import { getApi } from "./utils";
 
 
-img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
-
-img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
-
 
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -44,3 +40,11 @@ export function getThumbIdFromLink(url: string) {
     p.split('/')[2] :
     p.split('=')[0];
 }
+
+
+
+img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
+
+img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
+
+img.src = blankImage;

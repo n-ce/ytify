@@ -1,9 +1,12 @@
 import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { instanceSelector } from '../lib/dom';
-import { getApi, getSaved } from '../lib/utils';
+import { getApi } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
 
+// workaround "cannot access 'getSaved' before initialization"
+const s = localStorage.getItem('imgLoad');
+const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
 
 export default function StreamItem(data: {
   id: string,
@@ -20,7 +23,6 @@ export default function StreamItem(data: {
 
 
   const [tsrc, setTsrc] = createSignal('');
-  const showImage = getSaved('img') ? false : true;
 
   let parent!: HTMLAnchorElement;
 
@@ -73,8 +75,7 @@ export default function StreamItem(data: {
       <span>
         <Show when={showImage}>
           <img
-            class='thumbnail'
-            loading={getSaved('lazyImg') ? 'lazy' : 'eager'}
+            loading={showImage}
             crossorigin='anonymous'
             onerror={handleThumbnailError}
             onload={handleThumbnailLoad}

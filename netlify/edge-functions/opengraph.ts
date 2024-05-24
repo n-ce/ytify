@@ -1,7 +1,7 @@
 import { Context, Config } from '@netlify/edge-functions';
 
 const keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
-const description = '48-160kbps Opus YouTube Audio Streaming Web App.';
+const description = "48-160kbps Opus YouTube Audio Streaming Web App.";
 const url = 'https://ytify.netlify.app';
 
 export default async (request: Request, context: Context) => {
@@ -19,7 +19,7 @@ export default async (request: Request, context: Context) => {
     .then(data => {
       page = page
         .replace(keywords, data.tags)
-        .replace(description, data.description.toString())
+        .replace(description, data.uploader)
         .replace('"ytify"', `"${data.title}"`)
         .replace(url, `${url}?s=${id}`)
         .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl);

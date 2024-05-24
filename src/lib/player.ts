@@ -1,4 +1,4 @@
-import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
+import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor } from "./dom";
 import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
 import { autoQueue, hls } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
@@ -95,6 +95,27 @@ export default async function player(id: string | null = '') {
   if (!data && !data.hasOwnProperty('audioStreams'))
     return notify('No data found');
 
+  audio.dataset.id = id;
+  audio.dataset.title = data.title;
+  audio.dataset.author = data.uploader;
+  audio.dataset.duration = convertSStoHHMMSS(data.duration);
+  audio.dataset.channelUrl = data.uploaderUrl;
+
+  // remove ' - Topic' from name if it exists
+
+  let music = false;
+  if (data.uploader.endsWith(' - Topic')) {
+    music = true;
+    data.uploader = data.uploader.replace(' - Topic', '');
+  }
+
+  setMetaData(
+    id,
+    data.title,
+    data.uploader,
+    data.uploaderUrl,
+    music
+  );
 
 
   const audioStreams = data.audioStreams
@@ -138,10 +159,10 @@ export default async function player(id: string | null = '') {
     mimeType: string
   }, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
-
+    const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
 
     // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${(_.contentLength / (1024 * 1024)).toFixed(2)} MB`, proxyHandler(_.url)));
+    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));
 
     (<HTMLOptionElement>bitrateSelector.lastElementChild).dataset.type = _.mimeType;
     // find preferred bitrate
@@ -180,33 +201,11 @@ export default async function player(id: string | null = '') {
   }
 
 
-  // remove ' - Topic' from name if it exists
-
-  let music = false;
-  if (data.uploader.endsWith(' - Topic')) {
-    music = true;
-    data.uploader = data.uploader.replace(' - Topic', '');
-  }
-
-  setMetaData(
-    id,
-    data.title,
-    data.uploader,
-    data.uploaderUrl,
-    music
-  );
-
 
   params.set('s', id);
 
   if (location.pathname === '/')
     history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
-
-  audio.dataset.id = id;
-  audio.dataset.title = data.title;
-  audio.dataset.author = data.uploader;
-  audio.dataset.duration = convertSStoHHMMSS(data.duration);
-  audio.dataset.channelUrl = data.uploaderUrl;
 
 
   // favbutton state
@@ -281,7 +280,7 @@ export default async function player(id: string | null = '') {
     addListToCollection('discover', Object.fromEntries(array), db);
 
     // just in case we are already in the discover collection 
-    if (params.get('collection') === 'discover')
+    if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
       document.getElementById('discover')!.click();
 
 

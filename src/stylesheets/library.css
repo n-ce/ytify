@@ -1,56 +1,56 @@
 #library {
+  width: 100%;
 
-  #collections {
-    display: grid;
+  div:first-child {
     width: 100%;
-    align-items: center;
-    justify-content: space-evenly;
-    user-select: none;
-    border-radius: calc(var(--roundness)*1.5);
-
-    @media(orientation:portrait) {
-      grid-template-columns: auto auto;
-    }
-
-    @media(orientation:landscape) {
-      grid-template-columns: auto auto auto auto;
-    }
+    display: grid;
+    justify-content: center;
+    grid-template-columns: auto auto;
+    gap: 1rem;
+    margin-top: 1rem;
 
 
-    a.collectionItem {
-      display: inline-flex;
-      flex-direction: column;
-      justify-content: center;
-      height: calc(7rem + 4%);
-      aspect-ratio: 1;
-      padding: 2%;
-      font-size: large;
-      background-color: var(--onBg);
-      color: var(--text);
+    a {
       border: var(--border);
-      border-radius: calc(var(--roundness)*1.5);
-
+      background: var(--onBg);
+      border-radius: var(--roundness);
+      width: 10rem;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
 
       i {
-        font-size: 2rem;
         pointer-events: none;
+        font-size: 1.2rem;
+        margin-right: 0.4rem;
       }
-
     }
+
+  }
+
+  select {
+    margin: 1rem 0 1% 0;
+    background: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+    padding: 0.25rem 0.5rem;
+  }
+
+  #superCollectionList {
+    width: calc(100% - 2rem);
   }
 
   div:last-child {
     display: flex;
-    margin-top: 1vmin;
+    width: 100%;
+    margin: 5% 0;
+    justify-content: space-around;
 
     label {
-      background-color: var(--onBg);
-      color: var(--text);
-      border: var(--border);
-      border-radius: var(--roundness);
-      padding: 1vmin;
-      margin: 0 3vmin;
-      font-size: large;
+      &:hover {
+        transform: scale(1.1);
+        border-bottom: var(--border);
+      }
     }
   }
 }

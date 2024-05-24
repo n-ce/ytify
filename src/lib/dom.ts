@@ -2,6 +2,8 @@ export const img = <HTMLImageElement>document.getElementById('img');
 
 export const title = <HTMLAnchorElement>document.getElementById('title');
 
+export const progress = <HTMLInputElement>document.getElementById('progress');
+
 export const miniPlayer = <HTMLDivElement>document.getElementById('miniPlayer');
 
 export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
@@ -9,6 +11,8 @@ export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
 
 export const instanceSelector = <HTMLSelectElement>document.getElementById('instances');
+
+export const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 

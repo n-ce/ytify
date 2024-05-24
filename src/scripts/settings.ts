@@ -1,14 +1,12 @@
-import { audio, img, searchFilters } from "../lib/dom";
+import { audio, searchFilters } from "../lib/dom";
 import { getSaved, removeSaved, save } from "../lib/utils";
 import player from "../lib/player";
-import { blankImage } from "../lib/imageUtils";
 import { getDB, saveDB } from "../lib/libraryUtils";
 
 const startupTabSwitch = <HTMLElement>document.getElementById('startupTab');
+const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
-const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
-const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
@@ -29,6 +27,21 @@ startupTabSwitch.addEventListener('click', () => {
 
 if (getSaved('startupTab'))
   startupTabSwitch.toggleAttribute('checked');
+
+/////////////////////////////////////////////////////////////
+
+imgLoadSelector.addEventListener('change', () => {
+  const val = imgLoadSelector.value;
+  val === 'eager' ?
+    removeSaved('imgLoad') :
+    save('imgLoad', val);
+  location.reload();
+});
+
+const savedImgLoad = getSaved('imgLoad')
+
+if (savedImgLoad)
+  imgLoadSelector.value = savedImgLoad;
 
 
 /////////////////////////////////////////////////////////////
@@ -60,35 +73,8 @@ qualitySwitch.addEventListener('click', async () => {
 if (getSaved('hq') == 'true')
   qualitySwitch.toggleAttribute('checked');
 
-/////////////////////////////////////////////////////////////
-
-thumbnailSwitch.addEventListener('click', () => {
-  getSaved('img') ?
-    removeSaved('img') :
-    save('img', 'off');
-  location.reload();
-});
-
-if (getSaved('img')) {
-  thumbnailSwitch.removeAttribute('checked');
-  img.src = blankImage;
-  img.classList.toggle('hide');
-}
-
-/////////////////////////////////////////////////////////////
-
-lazyLoadSwitch.addEventListener('click', () => {
-  getSaved('lazyImg') ?
-    removeSaved('lazyImg') :
-    save('lazyImg', 'true');
-});
-
-if (getSaved('lazyImg'))
-  lazyLoadSwitch.toggleAttribute('checked');
-
-/////////////////////////////////////////////////////////////
-
 discoverSwitch.addEventListener('click', (e) => {
+
   if (discoverSwitch.hasAttribute('checked')) {
     const db = getDB();
     if (!confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`)) {

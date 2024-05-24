@@ -6,7 +6,7 @@ Acts as a fallback to support playback through invidious without using custom in
 Destined to be deprecated when adaptive streaming via piped is implemented.
 */
 
-import { audio, favButton, favIcon, instanceSelector, playButton } from "./dom";
+import { audio, favButton, favIcon, instanceSelector, listAnchor, playButton } from "./dom";
 import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
@@ -42,8 +42,10 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
   if (!data?.adaptiveFormats?.length)
     return;
 
+  type audioStream = Record<'type' | 'url' | 'quality' | 'bitrate' | 'encoding' | 'clen', string>;
+
   const audioStreams = data.adaptiveFormats
-    .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
+    .filter((_: audioStream) => _.hasOwnProperty('audioChannels'))
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
@@ -71,19 +73,17 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
     return url.replace(oldUrl.origin, host);
   }
 
-  audioStreams.forEach((_: {
-    type: string,
-    url: string,
-    quality: string,
-    bitrate: string,
-    encoding: string
-  }, i: number) => {
+  audioStreams.forEach((
+    _: audioStream,
+    i: number
+  ) => {
     const bitrate = parseInt(_.bitrate);
     const codec = _.type.includes('opus') ? 'opus' : 'aac';
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
+    const size = (parseInt(_.clen) / (1024 * 1024)).toFixed(2) + ' MB';
 
     // add to DOM
-    bitrateSelector.add(new Option(quality, proxyHandler(_.url)));
+    bitrateSelector.add(new Option(`${quality} - ${size}`, proxyHandler(_.url)));
 
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
@@ -191,5 +191,10 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
 
     // convert the new merged+randomized discover back to object and inject it
     addListToCollection('discover', Object.fromEntries(array), db);
+
+    // just in case we are already in the discover collection 
+    if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
+      document.getElementById('discover')!.click();
+
   }, 20000);
 }

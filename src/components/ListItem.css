@@ -2,8 +2,9 @@
   width: 48%;
   height: auto;
   background-color: var(--onBg);
-  margin: 1%;
   padding: 1dvmin;
+  margin: 1%;
+  border: var(--border);
   border-radius: calc(var(--roundness) + 0.75vmin);
   transition: all 0.3s ease-out;
   display: inline-block;

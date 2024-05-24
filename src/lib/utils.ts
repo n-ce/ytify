@@ -73,6 +73,9 @@ linkHost.addEventListener('change', () => {
   location.reload();
 });
 
+
+const showImg = getSaved('imgLoad') !== 'off';
+
 export function setMetaData(
   id: string,
   streamName: string,
@@ -81,7 +84,8 @@ export function setMetaData(
   music: boolean = false
 ) {
   const imgX = generateImageUrl(id, 'maxres');
-  if (!getSaved('img') && !music)
+
+  if (showImg && !music)
     img.src = imgX;
 
   img.alt = streamName;
@@ -114,7 +118,7 @@ export function setMetaData(
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    const sqrImg = getSaved('img') ? blankImage : sqrThumb(canvasImg);
+    const sqrImg = showImg ? sqrThumb(canvasImg) : blankImage;
     if (music)
       img.src = sqrImg;
 
@@ -250,7 +254,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     href: hostResolver(stream.url),
     title: stream.title,
     author: stream.uploaderName,
-    duration: convertSStoHHMMSS(stream.duration),
+    duration: stream.duration > 0 ? convertSStoHHMMSS(stream.duration) : 'LIVE',
     uploaded: stream.uploadedDate,
     channelUrl: stream.uploaderUrl,
     views: (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
