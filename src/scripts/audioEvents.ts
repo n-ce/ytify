@@ -299,10 +299,10 @@ export function autoQueue(data: Recommendation[]) {
   });
 
   const freqArr = Object.entries(frequencyQueue).sort((a, b) => b[1] - a[1]);
-  console.log(freqArr);
 
   const sortedObj = Object.fromEntries(freqArr);
 
+  console.log(sortedObj);
 
 
 }
