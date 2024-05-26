@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title } from "./dom";
 import { removeFromCollection } from "./libraryUtils";
 import { blankImage, generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
@@ -73,6 +73,9 @@ linkHost.addEventListener('change', () => {
   location.reload();
 });
 
+
+const showImg = getSaved('imgLoad') !== 'off';
+
 export function setMetaData(
   id: string,
   streamName: string,
@@ -81,12 +84,12 @@ export function setMetaData(
   music: boolean = false
 ) {
   const imgX = generateImageUrl(id, 'maxres');
-  if (!getSaved('img') && !music)
+
+  if (showImg && !music)
     img.src = imgX;
 
   img.alt = streamName;
 
-  const title = <HTMLAnchorElement>document.getElementById('title');
   title.href = hostResolver(`/watch?v=${id}`);
   title.textContent = streamName;
   title.onclick = _ => {
@@ -115,7 +118,7 @@ export function setMetaData(
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    const sqrImg = getSaved('img') ? blankImage : sqrThumb(canvasImg);
+    const sqrImg = showImg ? sqrThumb(canvasImg) : blankImage;
     if (music)
       img.src = sqrImg;
 
@@ -211,11 +214,10 @@ export async function fetchList(url: string, mix = false) {
   listBtnsContainer.className = type;
 
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
-  saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${type === 'channel' ? 'Subscribe' : 'Save'}`;
-  saveListBtn.dataset.url = url;
-  saveListBtn.dataset.thumbnail = group.avatarUrl;
-  saveListBtn.dataset.type = type;
-  saveListBtn.dataset.name = group.name;
+  listContainer.dataset.url = url;
+  listContainer.dataset.thumbnail = group.avatarUrl;
+  listContainer.dataset.type = type;
+  listContainer.dataset.name = group.name;
 
   if (mix) playAllBtn.click();
   else {
@@ -246,45 +248,38 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
-  const imgLoad = getSaved('img') ? false : true;
-  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
 
-
-  const streamItem = (stream: StreamItem) => StreamItem(
-    stream.url.substring(9),
-    hostResolver(stream.url),
-    stream.title,
-    stream.uploaderName,
-    convertSStoHHMMSS(stream.duration),
-    stream.uploadedDate,
-    stream.uploaderUrl,
-    (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    imgLoad,
-    imgLoadStyle,
-    stream.thumbnail.length > 40 ? getThumbIdFromLink(stream.thumbnail) : ''
-  )
-
-
+  const streamItem = (stream: StreamItem) => StreamItem({
+    id: stream.url.substring(9),
+    href: hostResolver(stream.url),
+    title: stream.title,
+    author: stream.uploaderName,
+    duration: stream.duration > 0 ? convertSStoHHMMSS(stream.duration) : 'LIVE',
+    uploaded: stream.uploadedDate,
+    channelUrl: stream.uploaderUrl,
+    views: (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
+    imgYTM: stream.thumbnail.length > 40 ? getThumbIdFromLink(stream.thumbnail) : ''
+  })
 
   const listItem = (item: StreamItem) => ListItem(
     item.name,
     item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
       (item.videos > 0 ? item.videos + ' streams' : ''),
-    imgLoad && item.thumbnail ?
+    item.thumbnail ?
       generateImageUrl(
         getThumbIdFromLink(
           item.thumbnail
         )
       ) : blankImage,
     item.description || item.uploaderName,
-    item.url,
-    imgLoadStyle
+    item.url
   )
 
   const fragment = document.createDocumentFragment();
   for (const item of itemsArray)
     render(() => item.type === 'stream' ? streamItem(item) : listItem(item), fragment);
+
 
   return fragment;
 }

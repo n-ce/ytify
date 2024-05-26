@@ -1,15 +1,12 @@
-import { audio, img, searchFilters } from "../lib/dom";
+import { audio, searchFilters } from "../lib/dom";
 import { getSaved, removeSaved, save } from "../lib/utils";
 import player from "../lib/player";
-import { blankImage } from "../lib/imageUtils";
 import { getDB, saveDB } from "../lib/libraryUtils";
 
-const startupTabSelector = <HTMLSelectElement>document.getElementById('startupTab');
-const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwitch');
+const startupTabSwitch = <HTMLElement>document.getElementById('startupTab');
+const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
-const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
-const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
@@ -19,38 +16,33 @@ const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch'
 const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
 const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
 
-export { ytmPlsSwitch };
-
 
 /////////////////////////////////////////////////////////////
 
-startupTabSelector.addEventListener('change', () => {
-  const tab = startupTabSelector.value;
-  tab ?
-    save('startupTab', tab) :
-    removeSaved('startupTab');
+startupTabSwitch.addEventListener('click', () => {
+  getSaved('startupTab') ?
+    removeSaved('startupTab') :
+    save('startupTab', 'search');
 });
 
-const savedStartupTab = getSaved('startupTab') || '';
-if (savedStartupTab) {
-  startupTabSelector.value = savedStartupTab;
-  if (location.pathname === '/')
-    (<HTMLAnchorElement>document.getElementById(savedStartupTab)).click();
-}
+if (getSaved('startupTab'))
+  startupTabSwitch.toggleAttribute('checked');
 
 /////////////////////////////////////////////////////////////
 
-ytmPlsSwitch.addEventListener('click', () => {
-  getSaved('featuredPlaylists') ?
-    removeSaved('featuredPlaylists') :
-    save('featuredPlaylists', 'off');
-  location.assign('/search');
+imgLoadSelector.addEventListener('change', () => {
+  const val = imgLoadSelector.value;
+  val === 'eager' ?
+    removeSaved('imgLoad') :
+    save('imgLoad', val);
+  location.reload();
 });
 
-if (getSaved('featuredPlaylists')) {
-  ytmPlsSwitch.removeAttribute('checked');
-  (<HTMLHeadingElement>document.querySelector('h1.featuredPlaylists')).textContent = 'Search Results Appear Here.';
-}
+const savedImgLoad = getSaved('imgLoad')
+
+if (savedImgLoad)
+  imgLoadSelector.value = savedImgLoad;
+
 
 /////////////////////////////////////////////////////////////
 
@@ -62,7 +54,7 @@ defaultFilterSongs.addEventListener('click', () => {
 });
 
 if (getSaved('defaultFilter')) {
-  defaultFilterSongs.setAttribute('checked', '');
+  defaultFilterSongs.toggleAttribute('checked');
   searchFilters.value = 'music_songs';
 }
 
@@ -81,35 +73,8 @@ qualitySwitch.addEventListener('click', async () => {
 if (getSaved('hq') == 'true')
   qualitySwitch.toggleAttribute('checked');
 
-/////////////////////////////////////////////////////////////
-
-thumbnailSwitch.addEventListener('click', () => {
-  getSaved('img') ?
-    removeSaved('img') :
-    save('img', 'off');
-  location.reload();
-});
-
-if (getSaved('img')) {
-  thumbnailSwitch.removeAttribute('checked');
-  img.src = blankImage;
-  img.classList.toggle('hide');
-}
-
-/////////////////////////////////////////////////////////////
-
-lazyLoadSwitch.addEventListener('click', () => {
-  getSaved('lazyImg') ?
-    removeSaved('lazyImg') :
-    save('lazyImg', 'true');
-});
-
-if (getSaved('lazyImg'))
-  lazyLoadSwitch.toggleAttribute('checked');
-
-/////////////////////////////////////////////////////////////
-
 discoverSwitch.addEventListener('click', (e) => {
+
   if (discoverSwitch.hasAttribute('checked')) {
     const db = getDB();
     if (!confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`)) {

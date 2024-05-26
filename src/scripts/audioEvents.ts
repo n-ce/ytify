@@ -1,4 +1,5 @@
-import { audio, playButton, queuelist } from "../lib/dom";
+import Hls from "hls.js";
+import { audio, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, params, getSaved } from "../lib/utils";
@@ -11,7 +12,6 @@ const streamHistory: string[] = [];
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
-const progress = <HTMLInputElement>document.getElementById('progress');
 const currentDuration = <HTMLParagraphElement>document.getElementById('currentDuration');
 const fullDuration = <HTMLParagraphElement>document.getElementById('fullDuration');
 const playPrevButton = <HTMLButtonElement>document.getElementById('playPrevButton');
@@ -157,6 +157,13 @@ audio.addEventListener('loadedmetadata', () => {
   fullDuration.textContent = convertSStoHHMMSS(audio.duration);
 });
 
+const hls = new Hls();
+
+hls.attachMedia(audio);
+hls.on(Hls.Events.MANIFEST_PARSED, () => {
+  audio.play();
+});
+export { hls };
 
 loopButton.addEventListener('click', () => {
   loopButton.classList.toggle('on');
@@ -236,48 +243,33 @@ if (msn) {
 }
 
 
-type virtualQ = {
-  id: string,
-  title: string
-  duration: string,
-  author: string,
-}
+if (params.has('s'))
+  player(params.get('s'));
 
-const storedData: {
-  [index: string]: virtualQ
-} = {};
+
+
+/*
+Understanding AutoQueue
+
+first stream loads, emits a bunch of recommended streams, all pushed to queue
+second stream loads, emits a bunch of recommended streams, all pushed it to a virtual queue
+third stream loads, continue pushing to virtual queue
+and so on till the last stream in the original queue
+where we analyse all the items in the virtual queue by frequency of appearance
+
+sometimes users will remove items from queue manually, we need to account for this using the trashHistory array
+
+we filter out the trashHistory from the virtualqueue and push only the most recurring streams into the original queue
+
+*/
+
+
+const virtualQ = new Map();
 const frequencyQueue: { [index: string]: number } = {};
 
 export function autoQueue(data: Recommendation[]) {
 
-  const queueIds = [...streamHistory];
-  const items = queuelist.dataset.array || '';
-  const trash = sessionStorage.getItem('trashHistory') || '';
-
-  // convert items string to array
-  const iLen = items.length / 11;
-  for (let i = 0; i < iLen; i++)
-    queueIds.push(items.slice(11));
-
-  // convert trash string to array
-  const tLen = trash.length / 11;
-  for (let i = 0; i < tLen; i++)
-    queueIds.push(trash.slice(11));
-
-  if (Object.keys(storedData).length) {
-    const dataArray = Object.entries(frequencyQueue);
-
-    dataArray.sort((a, b) => b[1] - a[1]);
-
-    const hf = dataArray[0][1] || 0;
-    if (hf > 1) {
-      dataArray.filter((a) => a[1] === hf).forEach(a => {
-        if (trash.includes(a[0])) return;
-        appendToQueuelist(storedData[a[0]]);
-        delete storedData[a[0]];
-      })
-    }
-  }
+  const init = queuelist.querySelectorAll('div').length === 0;
 
   data.forEach(stream => {
 
@@ -296,50 +288,22 @@ export function autoQueue(data: Recommendation[]) {
       duration: convertSStoHHMMSS(duration),
     };
 
-    function virtualQueueHandler(streamData: virtualQ) {
-
-      if (storedData.hasOwnProperty(id))
-        <number>frequencyQueue[id]++;
-      else {
-        storedData[id] = streamData;
-        frequencyQueue[id] = 1;
-      }
-
+    if (virtualQ.has(id))
+      frequencyQueue[id]++;
+    else {
+      virtualQ.set(id, streamData);
+      frequencyQueue[id] = 1;
     }
 
-    if (
-      duration > 60 &&
-      duration < 3600 &&
-      !queueIds.includes(id)
-    )
-      items ?
-        virtualQueueHandler(streamData) :
-        appendToQueuelist(streamData);
-
+    if (init)
+      appendToQueuelist(streamData)
   });
+
+  const freqArr = Object.entries(frequencyQueue).sort((a, b) => b[1] - a[1]);
+
+  const sortedObj = Object.fromEntries(freqArr);
+
+  console.log(sortedObj);
+
+
 }
-
-
-// upcoming queries
-export async function upcomingInjector(queueParam: string) {
-
-  const array = [];
-  for (let i = 0; i < queueParam.length; i += 11)
-    array.push(queueParam.slice(i, i + 11));
-
-  const appendItem = (id: string) =>
-    fetch('https://p2-a.vercel.app?id=' + id)
-      .then(res => res.json())
-      .then(data => appendToQueuelist(data))
-      .catch(() => {
-        console.log(`Fetching Queue Item ${id} Failed.`);
-        appendItem(id);
-      });
-  for await (const id of array)
-    await appendItem(id);
-}
-const queueParam = params.get('a');
-if (queueParam && queueParam.length > 10) {
-  addEventListener('DOMContentLoaded', async () => upcomingInjector(queueParam));
-}
-

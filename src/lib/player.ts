@@ -1,6 +1,6 @@
-import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
+import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor } from "./dom";
 import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
-import { autoQueue } from "../scripts/audioEvents";
+import { autoQueue, hls } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
 
@@ -61,18 +61,16 @@ switchHLS.addEventListener('click', () => {
   getSaved('HLS') ?
     removeSaved('HLS') :
     save('HLS', 'true');
+
 });
+
 
 /////////////////////////////////////////////////////////////
 
 export default async function player(id: string | null = '') {
 
   if (!id) return;
-
-  if (instanceSelector.selectedIndex === 0) {
-    import("./player.invidious").then(mod => mod.default(id));
-    return;
-  }
+  if (instanceSelector.selectedIndex === 0) return import('./player.invidious').then(pi => pi.default(id));
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
@@ -80,14 +78,7 @@ export default async function player(id: string | null = '') {
   const apiUrl = getApi('piped', apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)
-    .then(async res => {
-      const response = res.json();
-      if (!res.ok)
-        throw new Error(
-          (await response).message
-        );
-      return response;
-    })
+    .then(res => res.json())
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
         notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
@@ -104,14 +95,36 @@ export default async function player(id: string | null = '') {
   if (!data && !data.hasOwnProperty('audioStreams'))
     return notify('No data found');
 
+  audio.dataset.id = id;
+  audio.dataset.title = data.title;
+  audio.dataset.author = data.uploader;
+  audio.dataset.duration = convertSStoHHMMSS(data.duration);
+  audio.dataset.channelUrl = data.uploaderUrl;
+
+  // remove ' - Topic' from name if it exists
+
+  let music = false;
+  if (data.uploader.endsWith(' - Topic')) {
+    music = true;
+    data.uploader = data.uploader.replace(' - Topic', '');
+  }
+
+  setMetaData(
+    id,
+    data.title,
+    data.uploader,
+    data.uploaderUrl,
+    music
+  );
 
 
   const audioStreams = data.audioStreams
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
+  const hlsOn = switchHLS.hasAttribute('checked');
 
-  if (!noOfBitrates && !switchHLS.hasAttribute('checked')) {
+  if (!noOfBitrates && !hlsOn) {
     notify('NO AUDIO STREAMS AVAILABLE.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
@@ -123,7 +136,6 @@ export default async function player(id: string | null = '') {
   bitrateSelector.innerHTML = '';
   const isMusic = data.category === 'Music';
   const ivApi = getApi('invidious');
-  const hlsOn = switchHLS.hasAttribute('checked');
 
   function proxyHandler(url: string) {
 
@@ -147,13 +159,12 @@ export default async function player(id: string | null = '') {
     mimeType: string
   }, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
-
+    const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
 
     // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${(_.contentLength / (1024 * 1024)).toFixed(2)} MB`, proxyHandler(_.url)));
+    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));
 
     (<HTMLOptionElement>bitrateSelector.lastElementChild).dataset.type = _.mimeType;
-
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
     const hqPref = getSaved('hq') ? noOfBitrates : 0;
@@ -164,21 +175,11 @@ export default async function player(id: string | null = '') {
   bitrateSelector.selectedIndex = index;
 
   if (hlsOn) {
-
-    import('hls.js').then(h => {
-      const hls = new h.default();
-      hls.attachMedia(audio);
-      hls.on(h.Events.MEDIA_ATTACHED,
-        () => {
-          hls.loadSource(data.hls);
-        }
-      );
-    });
+    audio.src = '';
+    hls.loadSource(proxyHandler(data.hls));
   } else
-
     audio.src = bitrateSelector.value;
 
-  console.log(data.hls, proxyHandler(data.hls))
   // Subtitle data dom injection
 
   for (const option of subtitleSelector.options)
@@ -200,33 +201,11 @@ export default async function player(id: string | null = '') {
   }
 
 
-  // remove ' - Topic' from name if it exists
-
-  let music = false;
-  if (data.uploader.endsWith(' - Topic')) {
-    music = true;
-    data.uploader = data.uploader.replace(' - Topic', '');
-  }
-
-  setMetaData(
-    id,
-    data.title,
-    data.uploader,
-    data.uploaderUrl,
-    music
-  );
-
 
   params.set('s', id);
 
   if (location.pathname === '/')
     history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
-
-  audio.dataset.id = id;
-  audio.dataset.title = data.title;
-  audio.dataset.author = data.uploader;
-  audio.dataset.duration = convertSStoHHMMSS(data.duration);
-  audio.dataset.channelUrl = data.uploaderUrl;
 
 
   // favbutton state
@@ -301,7 +280,7 @@ export default async function player(id: string | null = '') {
     addListToCollection('discover', Object.fromEntries(array), db);
 
     // just in case we are already in the discover collection 
-    if (params.get('collection') === 'discover')
+    if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
       document.getElementById('discover')!.click();
 
 

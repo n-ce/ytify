@@ -1,6 +1,7 @@
 @import 'reset.css';
 @import 'remixicon.css';
 @import 'nav.css';
+@import 'miniPlayer.css';
 @import 'footer.css';
 @import 'home.css';
 @import 'search.css';
@@ -9,6 +10,7 @@
 @import 'settings.css';
 @import 'superModal.css';
 @import 'snackbar.css';
+@import 'animations.css';
 
 :root {
   --bg: transparent;
@@ -43,52 +45,55 @@ body {
   align-items: center;
   transition: all 0.4s;
   font-family: 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-}
-
-section {
-  display: none;
-  flex-direction: column;
-  overflow: scroll;
-  align-items: center;
-  width: 100%;
-  animation: appear 0.2s cubic-bezier(0.19, 1, 0.22, 1);
-}
 
 
-@keyframes appear {
-  from {
-    opacity: 0;
-    transform: var(--pageTransitionEffect);
+  main {
+    display: flex;
+    flex-direction: column;
+
+
+    section {
+      display: none;
+      flex-direction: column;
+      overflow: scroll;
+      align-items: center;
+      width: 100%;
+      animation: appear 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+
+      &.view {
+        display: flex;
+      }
+
+    }
   }
 }
 
-section.view {
-  display: flex;
-}
 
 @media(orientation:portrait) {
   body {
     --navDirection: column;
     flex-direction: var(--navDirection);
+
+    header {
+      width: 92%;
+      display: flex;
+      flex-direction: var(--navDirection);
+    }
+
+    main {
+      height: 100%;
+      width: 100%;
+
+      section {
+        height: calc(93dvh - 3.2rem);
+      }
+    }
   }
 
   .reverseNav {
     --navDirection: column-reverse;
   }
 
-  main {
-    height: 100%;
-    width: 100%;
-  }
-
-  section {
-    height: 100%;
-  }
 }
 
 
@@ -97,6 +102,15 @@ section.view {
   body {
     --navDirection: row;
     flex-direction: var(--navDirection);
+  }
+
+  header {
+    width: 20%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2%;
   }
 
   .reverseNav {
@@ -121,10 +135,10 @@ section.view {
 button {
   transition: all 0.3s ease;
   user-select: none;
-}
 
-button:active {
-  transform: scale(0.8);
+  &:active {
+    transform: scale(0.8);
+  }
 }
 
 
@@ -149,22 +163,10 @@ dialog[open] {
   animation: boing 0.3s ease-in-out forwards;
 }
 
-@keyframes boing {
-  from {
-    transform: scale(0);
-    opacity: 0;
-  }
-}
 
 dialog::backdrop {
   background-color: #0007;
-  animation: x 0.3s ease-in-out forwards;
-}
-
-@keyframes x {
-  from {
-    background-color: transparent;
-  }
+  animation: dialogAppear 0.3s ease-in-out forwards;
 }
 
 
@@ -217,19 +219,9 @@ a {
   background-color: var(--bg);
   color: var(--text);
   border-radius: var(--roundness);
-}
 
-#loadingScreen i {
-  font-size: xx-large;
-}
-
-@keyframes spinner {
-  from {
-    transform: rotate(0turn)
-  }
-
-  to {
-    transform: rotate(1turn)
+  i {
+    font-size: xx-large;
   }
 }
 
@@ -248,4 +240,15 @@ a {
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
   padding: 2vmin 0;
+}
+
+#upcoming {
+
+  #queuelist {
+    width: 92%;
+  }
+
+  #queuetools {
+    width: calc(92% + 3vmin);
+  }
 }

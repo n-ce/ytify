@@ -40,44 +40,49 @@
     <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
     <source type="audio/mpegurl">
   </audio>
-  <nav>
-    <a href="/" id="/">
-      <i class="ri-home-line"></i>
-      <p>Home</p>
-    </a>
-    <a href="/upcoming" id="/upcoming">
-      <i class="ri-skip-forward-line"></i>
-      <p>Upcoming</p>
-    </a>
-    <a href="/search" id="/search">
-      <i class="ri-search-2-line"></i>
-      <p>Search</p>
-    </a>
-    <a href="/library" id="/library">
-      <i class="ri-stack-line"></i>
-      <p>Library</p>
-    </a>
-    <a href="/settings" id="/settings">
-      <i class="ri-settings-line"></i>
-      <p>Settings</p>
-    </a>
-    <a href="/list" id="/list" class="hide">
-      <p>list</p>
-    </a>
-  </nav>
+  <header>
+    <nav>
+      <a href="/" id="/" class="hide">
+        <p>Home</p>
+      </a>
+      <a href="/upcoming" id="/upcoming">
+        <i class="ri-skip-forward-line"></i>
+        <p>Upcoming</p>
+      </a>
+      <a href="/search" id="/search">
+        <i class="ri-search-2-line"></i>
+        <p>Search</p>
+      </a>
+      <a href="/library" id="/library">
+        <i class="ri-stack-line"></i>
+        <p>Library</p>
+      </a>
+      <a href="/settings" id="/settings">
+        <i class="ri-settings-line"></i>
+        <p>Settings</p>
+      </a>
+      <a href="/list" id="/list" class="hide">
+        <p>list</p>
+      </a>
+    </nav>
+    <div id="miniPlayer">
+      <input type="range" value="0" id="progress" />
+      <img id="img" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
+      <div>
+        <a id="title" href="" target="_blank">Now Playing</a>
+        <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
+      </div>
+    </div>
+  </header>
   <main>
     <section id="home">
+      <!-- image -->
+
       <article class="hide" id="subtitleContainer"></article>
 
-      <img id="img" src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
-        alt="Current Playing Media Thumbnail">
-
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 7 alpha</a>
+        <!-- title -->
         <a id="author" href="" target="_blank">Channel</a>
-        <select id="bitrateSelector">
-          <option>Bitrate</option>
-        </select>
         <select id="subtitleSelector" class="hide">
           <option>Subtitles</option>
         </select>
@@ -88,14 +93,16 @@
 
         <span>
           <p id="currentDuration">00:00</p>
-          <input type="range" value="0" id="progress" />
+          <!-- progress -->
           <p id="fullDuration">00:00</p>
         </span>
 
         <div id="playerControls">
           <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
           <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
-          <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
+
+          <!-- play button -->
+
           <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
           <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
           <button class="ri-repeat-line" id="loopButton" aria-label="loop">
@@ -121,6 +128,9 @@
           </select>
         </div>
       </footer>
+      <select id="bitrateSelector">
+        <option>Bitrate</option>
+      </select>
     </section>
 
 
@@ -138,16 +148,13 @@
         <button>
           <i class="ri-filter-2-line"></i> Filter &lt;10:00
         </button>
-        <button>
-          <i class="ri-filter-2-line"></i> Filter Music
-        </button>
         <button class="checked" id="autoQueueBtn">
           <i class="ri-list-check-2"></i> Auto-Queue
         </button>
       </span>
       <br>
       <div id="queuelist">
-        <h1 align="center">upcoming streams show here</h1>
+        <h1>upcoming streams show here</h1>
       </div>
     </section>
 
@@ -177,25 +184,16 @@
       </form>
       <ul id="suggestions"></ul>
       <div id="searchlist">
-        <h1 class="featuredPlaylists">
-          <svg xmlns="http://www.w3.org/2000/svg" width="3rem" height="3rem" viewBox="0 0 176 176"
-            style="transform:scale(0.7)">
-            <circle cx="88" cy="88" r="77" fill="var(--text)" />
-            <path fill="var(--bg)"
-              d="M88 46a42 42 0 1 1 0 84 42 42 0 0 1 0-84m0-4a46 46 0 1 0 0 92 46 46 0 0 0 0-92z" />
-            <path fill="var(--bg)" d="m72 111 39-24-39-22z" />
-          </svg>
-          <label>Featured Playlists</label>
-        </h1>
+        <h1> Your Search Results will show here</h1>
       </div>
     </section>
 
 
     <section id="library">
 
-      <h2 id="greeting">Welcome</h2>
 
-      <div id="collections" align="center">
+      <div id="collections">
+
         <a class="collectionItem" id="discover" href="/list?collection=discover">
           <i class="ri-compass-3-line"></i>Discover
         </a>
@@ -211,22 +209,16 @@
         <a class="collectionItem" id="listenLater" href="/list?collection=listenLater">
           <i class="ri-calendar-schedule-line"></i>Listen Later
         </a>
-
-        <a class="collectionItem" id="ftrdpls" href="/list?collection=listenLater">
-          <i class="ri-play-list-line"></i>Featured Playlists
-        </a>
-
-        <a class="collectionItem" id="YPLs" href="/list?collection=listenLater">
-          <i class="ri-calendar-schedule-line"></i>Your Playlists
-        </a>
-        <a class="collectionItem" id="ytpls" href="/list?collection=listenLater">
-          <i class="ri-calendar-schedule-line"></i>Youtube Playlists
-        </a>
-        <a class="collectionItem" id="channels" href="/list?collection=listenLater">
-          <i class="ri-calendar-schedule-line"></i>Channels
-        </a>
-
       </div>
+      <select id="superCollectionSelector">
+        <option value="ytm_pls">Featured Playlists</option>
+        <option value="ur_pls">Your Playlists</option>
+        <option value="sub_pls">Subscribed Playlists</option>
+        <option value="channels">Channels
+        </option>
+      </select>
+
+      <div id="superCollectionList"></div>
 
       <div>
         <label id="importBtn" for="upload">
@@ -238,12 +230,21 @@
           <i class="ri-delete-bin-2-line"></i> Clean</label>
       </div>
 
+
     </section>
 
 
     <section id="settings">
       <div>
-        <h3 id="version">ytify </h3>
+        <b>
+          <svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 4172 4172" width="1.5rem" height="1.5rem"
+            style="transform: scale(1.5);overflow:hidden;">
+
+            <path fill="var(--text)"
+              d="m1368 3037-55-10-23-6a369 369 0 0 1-57-19 552 552 0 0 1-266-246 437 437 0 0 1-31-74 590 590 0 0 1-18-245l5-25c7-35 21-77 35-105l9-19a522 522 0 0 1 679-236c1 5-1 77-3 91a1059 1059 0 0 1-24 119 274 274 0 0 1-19 53c-1 0-7-5-14-13-40-46-95-77-160-91a290 290 0 0 0-186 542 287 287 0 0 0 202 23c61-15 120-54 159-105a1108 1108 0 0 0 149-360 1296 1296 0 0 0 27-274 1164 1164 0 0 0-226-667 146 146 0 0 1-21-39l-4-9-4-11c-8-16-18-53-24-84-5-27-5-72 0-95 10-49 32-84 69-115 24-20 50-34 87-47a740 740 0 0 1 79-19c23-4 134-6 167-3a1364 1364 0 0 1 446 118l20 8 20 8 18 8a2232 2232 0 0 1 652 439 1008 1008 0 0 1 234 338c4 5 16 57 20 83 2 17 1 63-3 79-18 83-71 135-171 167-34 11-106 20-130 16-43-7-194-7-249 0-67 9-142 23-179 34l-34 10a974 974 0 0 0-94 33 1245 1245 0 0 0-170 84 1182 1182 0 0 0-405 414 529 529 0 0 1-347 244c-40 9-112 11-160 6zm1441-892 14-2c21-2 58-13 76-22 34-17 54-37 67-69 6-16 7-19 7-44 1-26 1-28-6-54-32-125-167-280-368-420-80-56-200-124-282-159l-26-12a1286 1286 0 0 0-124-47c-39-14-128-36-170-42l-18-3c-19-3-41-4-87-4-56 0-71 2-105 13-68 23-101 65-101 130a201 201 0 0 0 17 82c3 9 21 46 31 64 68 112 187 227 351 338a1827 1827 0 0 0 446 214 1084 1084 0 0 0 219 39c1 1 50-1 59-2z" />
+          </svg>
+          <p id="version"> ytify </p>
+        </b>
         <span>
           <label for="instances">Instance</label>
           <select id="instances">
@@ -257,16 +258,6 @@
         </span>
 
         <span>
-          <label for="startupTab">
-            Default Tab on Startup
-          </label>
-          <select id="startupTab">
-            <option value="">Home</option>
-            <option value="/search">Search</option>
-            <option value="/library">Library</option>
-          </select>
-        </span>
-        <span>
           <label for="linkHost">Links host</label>
           <select id="linkHost">
             <option value="https://youtube.com">YouTube</option>
@@ -275,16 +266,31 @@
             <option value="https://yewtu.be">Invidious</option>
           </select>
         </span>
+        <span>
+          <label for="imgLoad">Image Loading Strategy</label>
+          <select id="imgLoad">
+            <option value="eager">Eager</option>
+            <option value="lazy">Lazy</option>
+            <option value="off">Do not Load</option>
+          </select>
+        </span>
       </div>
+
       <div>
-        <h3>Search</h3>
-        <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
-        <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
+        <b>
+          <i class="ri-search-2-line"> </i>
+          <p>Search</p>
+        </b>
+        <toggle-switch id="startupTab">Search as Default Tab</toggle-switch>
+        <toggle-switch id="defaultFilterSongs">Songs as Default Filter</toggle-switch>
         <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
       </div>
 
       <div>
-        <h3>Playback</h3>
+        <b>
+          <i class="ri-play-large-line"></i>
+          <p>Playback</p>
+        </b>
 
         <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
         <span>
@@ -295,21 +301,32 @@
             <option value="">Any</option>
           </select>
         </span>
-        <toggle-switch id="HLS_Switch">Enable HLS</toggle-switch>
+        <toggle-switch id="HLS_Switch">HLS / Live Streaming</toggle-switch>
+        <span>
+          <label for="loadingTimeout">Loading Timeout</label>
+          <select id="loadingTimeout">
+            <option value="15">15 seconds</option>
+            <option value="30">30 seconds</option>
+            <option value="0">Do not Timeout</option>
+          </select>
+        </span>
       </div>
 
       <div>
-        <h3>Thumbnail</h3>
-        <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
-        <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
-      </div>
-      <div>
-        <h3>Library</h3>
+        <b>
+          <i class="ri-stack-line"></i>
+          <p> Library</p>
+        </b>
         <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
         <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
       </div>
+
       <div>
-        <h3>Interface</h3>
+        <b>
+          <i class="ri-palette-line"></i>
+          <p>Interface</p>
+        </b>
+
         <span>
           <label for="roundnessChanger">Roundness</label>
           <select id="roundnessChanger">
@@ -321,7 +338,7 @@
         </span>
         <span>
           <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
-            <option value="auto">System</option>
+            <option value="auto" selected>System</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
           </select>
@@ -330,8 +347,8 @@
         <toggle-switch id="reverseNavSwitch">Reverse Navigation</toggle-switch>
         <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
       </div>
+
       <div>
-        <h3>Actions</h3>
 
         <button id="clearCacheBtn">Clear Caches</button>
 
@@ -348,8 +365,8 @@
         <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
 
         <form netlify name='feedback' method='POST'>
-          <input type="text" name="->" id="netlifyForm"
-            placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
+          <textarea name="->" id="feedback"
+            placeholder="Anonymously Enter your feedback (bugs, feature requests) here:"></textarea>
         </form>
       </div>
     </section>

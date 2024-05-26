@@ -15,7 +15,7 @@
       display: none;
     }
 
-    #importListBtn,
+    #subscribeListBtn,
     #viewOnYTBtn {
       display: inline-block !important;
     }
@@ -46,10 +46,15 @@
 }
 
 #playlist {
-  width: 92%;
+  width: 100%;
 
   &.reverse {
     display: flex;
     flex-direction: column-reverse;
   }
+}
+
+#list {
+  width: 92%;
+  margin: auto;
 }

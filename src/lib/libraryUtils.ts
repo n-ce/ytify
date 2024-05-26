@@ -1,4 +1,4 @@
-import { $, getSaved, notify, save } from "./utils";
+import { getSaved, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
@@ -19,15 +19,14 @@ export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const fragment = document.createDocumentFragment();
 
   render(
-    () => StreamItem(
-      data.id as string,
-      `/watch?v=${data.id}`,
-      data.title as string,
-      data.author as string,
-      data.duration as string,
-      '',
-      data.channelUrl as string
-    ),
+    () => StreamItem({
+      id: data.id || '',
+      href: `/watch?v=${data.id}`,
+      title: data.title || '',
+      author: data.author || '',
+      duration: data.duration || '',
+      channelUrl: data.channelUrl || ''
+    }),
     fragment);
   return fragment;
 }
@@ -76,17 +75,6 @@ export function createPlaylist(title: string) {
   if (library.contains(document.getElementById(title)))
     return notify('This Playlist Already Exists!');
 
-  const a = $('a');
-  a.id = title;
-  a.className = 'collectionItem';
-  a.href = '/list?collection=' + title;
-
-  const i = $('i');
-  i.className = 'ri-play-list-2-fill';
-
-  a.append(i, title);
 
   atpSelector.add(new Option(title, title));
-  const collections = document.getElementById('collections') as HTMLSpanElement;
-  collections.appendChild(a);
 }

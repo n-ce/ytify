@@ -1,4 +1,4 @@
-import { getSaved, removeSaved, save } from "../lib/utils";
+import { removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
@@ -11,7 +11,6 @@ const [
   clearQBtn,
   shuffleQBtn,
   removeQBtn,
-  filterMusicBtn,
   filterLT10Btn,
   autoQueueBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
@@ -35,20 +34,16 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
     queueArray.unshift(data.id) :
     queueArray.push(data.id);
 
-  const imgLoad = getSaved('img') ? false : true;
-  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
 
   const fragment = document.createDocumentFragment();
 
-  render(() => StreamItem(
-    data.id as string,
-    '',
-    data.title as string,
-    data.author as string,
-    data.duration as string,
-    '',
-    '', '', imgLoad, imgLoadStyle
-  ), fragment);
+  render(() => StreamItem({
+    id: data.id || '',
+    title: data.title || '',
+    author: data.author || '',
+    duration: data.duration || '',
+    draggable: true
+  }), fragment);
 
   prepend ?
     queuelist.prepend(fragment) :
@@ -192,6 +187,3 @@ new MutationObserver(m => {
 }).observe(queuelist, { childList: true });
 
 
-filterMusicBtn.addEventListener('click', () => {
-  console.log(true)
-});

@@ -1,9 +1,28 @@
-import { audio, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
-import { fetchList, params } from "../lib/utils";
-import { upcomingInjector } from "./audioEvents";
+import { audio, loadingScreen, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
+import { fetchList, getSaved, params } from "../lib/utils";
+import { miniPlayerRoutingHandler } from "./miniPlayer";
+import { appendToQueuelist } from "./queue";
 
-const anchors = document.querySelectorAll('nav a');
+const nav = document.querySelector('nav') as HTMLDivElement;
+const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
+const queueParam = params.get('a');
+
+
+function upcomingInjector(param: string) {
+  loadingScreen.showModal();
+
+  fetch(`${location.origin}/upcoming?id=${param}`)
+    .then(res => res.json())
+    .then(data => {
+      loadingScreen.close();
+      for (const stream of data)
+        appendToQueuelist(stream)
+    })
+}
+
+if (queueParam)
+  upcomingInjector(queueParam);
 
 
 function showSection(id: string) {
@@ -11,6 +30,8 @@ function showSection(id: string) {
     if (id === '/') id += 'home';
     if (route === '/') route += 'home';
     const section = <HTMLDivElement>document.getElementById(route.substring(1));
+
+    miniPlayerRoutingHandler(id === '/home');
 
     if (route === id) {
       section.classList.add('view');
@@ -23,35 +44,38 @@ function showSection(id: string) {
 }
 
 
-for (const anchor of anchors) {
-  anchor.addEventListener('click', _ => {
-    _.preventDefault();
+nav.addEventListener('click', (e: Event) => {
+  e.preventDefault();
 
-    const inHome = anchor.id === '/';
+  const anchor = e.target as HTMLAnchorElement;
 
-    if (anchor.id !== location.pathname) {
-      const sParamInHome = params.has('s') && inHome;
-      const sParam = '?s=' + params.get('s');
-      const aParam = queuelist.dataset.array ? '?a=' + queuelist.dataset.array : '';
-      const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? aParam : '';
+  if (!anchor.matches('a')) return;
 
-      history.pushState({}, '',
-        anchor.id + (
-          sParamInHome ? sParam : otherQuery
-        )
-      );
+  const inHome = anchor.id === '/';
 
-      const routeName = anchor.lastElementChild?.textContent;
-      const homeTitle = audio.dataset.title || 'Home';
-      document.title = (
-        inHome ? homeTitle : routeName
-      ) + ' - ytify';
-    }
-    showSection(anchor.id);
-  })
-}
+  if (anchor.id !== location.pathname) {
+    const sParamInHome = params.has('s') && inHome;
+    const sParam = '?s=' + params.get('s');
+    const aParam = queuelist.dataset.array ? '?a=' + queuelist.dataset.array : '';
+    const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? aParam : '';
 
-// load section if name found in address else load home
+    history.pushState({}, '',
+      anchor.id + (
+        sParamInHome ? sParam : otherQuery
+      )
+    );
+
+    const routeName = anchor.lastElementChild?.textContent;
+    const homeTitle = audio.dataset.title || 'Home';
+    document.title = (
+      inHome ? homeTitle : routeName
+    ) + ' - ytify';
+  }
+  showSection(anchor.id);
+});
+
+
+// load section if name found in address else load library
 let route;
 const errorParam = params.get('e');
 if (errorParam) {
@@ -72,9 +96,13 @@ if (errorParam) {
   }
   else route = errorParam;
 }
-else route = routes.find(route => location.pathname === route);
-const anchor = <HTMLAnchorElement>document.getElementById(route || '/');
-anchor.click();
+else {
+  route = routes.find(route => location.pathname === route) || '/';
+  if (route === '/' && !params.has('s'))
+    route = getSaved('startupTab') ? '/search' : '/library';
+}
+
+(<HTMLAnchorElement>document.getElementById(route)).click();
 
 // enables back button functionality
 
@@ -82,3 +110,6 @@ onpopstate = () =>
   superModal.open ?
     superModal.close() :
     showSection(location.pathname);
+
+
+

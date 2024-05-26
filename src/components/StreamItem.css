@@ -4,6 +4,7 @@
 	background-color: var(--onBg);
 	padding: 1dvmin;
 	margin-bottom: 2dvmin;
+	border: var(--border);
 	border-radius: calc(var(--roundness) + 0.75vmin);
 	transition: transform 0.2s ease-out;
 	display: flex;
@@ -32,7 +33,7 @@
 		margin-right: 1vmin;
 
 
-		.thumbnail {
+		img {
 			width: 100%;
 			border-radius: var(--roundness);
 		}

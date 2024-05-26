@@ -7,31 +7,39 @@
     background-color: var(--onBg);
     border: var(--border);
     border-radius: var(--roundness);
-    padding: 2% 4%;
     width: 100%;
 
-    h3 {
-      margin-bottom: 2%;
+    b {
+      display: flex;
+      align-items: center;
+      column-gap: 1vmin;
+      margin: 2%;
+
+      i {
+        font-size: 1.2rem;
+      }
+
+      svg {
+        overflow: hidden;
+      }
     }
 
     toggle-switch,
     span {
-      margin-bottom: 4%;
+      width: calc(100% - 2ch);
+      margin: 1ch auto;
     }
 
     span {
-      width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      overflow: hidden;
 
       select {
         background-color: var(--onBg);
         font-size: inherit;
         border: var(--border);
-        padding: 1vmin;
-        max-width: calc(100% - 15ch);
+        padding: 0.5vmin 1vmin;
       }
     }
 
@@ -41,30 +49,35 @@
       border: var(--border);
       border-radius: var(--roundness);
       display: inline-block;
-      margin-bottom: 4vmin;
       margin-right: 2vmin;
+      margin-bottom: 4%;
     }
 
     button {
-      margin: 0 2vmin 4vmin 0 !important;
+      margin-left: 0;
+      margin-bottom: 4%;
       background-color: var(--onBg) !important;
       color: var(--text) !important;
     }
   }
-}
 
-#netlifyForm {
-  font-size: medium;
-  background-color: var(--onBg);
-  border: var(--border);
-  border-radius: var(--roundness);
-  color: inherit;
-  padding: 1vmin;
-  width: calc(100% - 2.3vmin);
-  margin-bottom: 5%;
+  div:last-child {
+    background: none;
+    border: none;
 
-  &::placeholder {
-    color: inherit;
-    opacity: 75%;
+    #feedback {
+      font-size: medium;
+      background-color: var(--onBg);
+      border: var(--border);
+      border-radius: var(--roundness);
+      color: inherit;
+      padding: 1vmin;
+      width: 100%;
+      resize: none;
+
+      &::placeholder {
+        color: inherit;
+      }
+    }
   }
 }

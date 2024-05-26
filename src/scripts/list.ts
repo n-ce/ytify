@@ -1,8 +1,9 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, saveListBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
 import { addListToCollection, createPlaylist, getDB, saveDB } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
+import { getThumbIdFromLink } from '../lib/imageUtils';
 
 listBtnsContainer.addEventListener('click', e => {
   const btn = e.target as HTMLButtonElement;
@@ -22,8 +23,9 @@ listBtnsContainer.addEventListener('click', e => {
   else if (btn === enqueueBtn)
     listToQ(listContainer);
 
-  else if (btn === saveListBtn)
-    console.log('savelist');
+  else if (btn === subscribeListBtn) {
+    console.log(getThumbIdFromLink(listContainer.dataset.thumbnail || ''))
+  }
 
   else if (btn === openInYtBtn)
     open(hostResolver(<string>listContainer.dataset.url));

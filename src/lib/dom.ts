@@ -1,10 +1,18 @@
 export const img = <HTMLImageElement>document.getElementById('img');
 
+export const title = <HTMLAnchorElement>document.getElementById('title');
+
+export const progress = <HTMLInputElement>document.getElementById('progress');
+
+export const miniPlayer = <HTMLDivElement>document.getElementById('miniPlayer');
+
 export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 
 export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
 
 export const instanceSelector = <HTMLSelectElement>document.getElementById('instances');
+
+export const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 
@@ -32,7 +40,7 @@ export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 
 export const listBtnsContainer = <HTMLSpanElement>document.getElementById('listTools');
 
-export const [playAllBtn, enqueueBtn, importListBtn, saveListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn] = <HTMLCollectionOf<HTMLButtonElement>>listBtnsContainer.children;
+export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn] = <HTMLCollectionOf<HTMLButtonElement>>listBtnsContainer.children;
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());

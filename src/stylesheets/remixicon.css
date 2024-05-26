@@ -19,10 +19,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ri-home-line:before {
-  content: "\ee2b";
-}
-
 .ri-search-2-line:before {
   content: "\f0cd";
 }
@@ -169,4 +165,20 @@
 
 .ri-edit-line:before {
   content: "\ec86";
+}
+
+.ri-more-fill:before {
+  content: "\ef78";
+}
+
+.ri-image-fill:before {
+  content: "\ee4a";
+}
+
+.ri-palette-line:before {
+  content: "\efc5";
+}
+
+.ri-links-line:before {
+  content: "\eeb8";
 }

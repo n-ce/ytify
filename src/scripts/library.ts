@@ -2,18 +2,13 @@ import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
 import { audio, favButton, favIcon, listAnchor, listBtnsContainer, listContainer } from "../lib/dom";
 import { addToCollection, createPlaylist, getDB, removeFromCollection, reservedCollections, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, getSaved, params, removeSaved } from "../lib/utils";
+import { $, fetchList, getSaved, hostResolver, itemsLoader, params, removeSaved, save } from "../lib/utils";
 
 
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
-const greeting = document.getElementById('greeting') as HTMLHeadingElement;
-const hours = new Date().getHours();
-
-greeting.textContent = 'Good ' + (hours < 12 ? 'Morning' : hours < 17 ? 'Afternoon' : 'Evening');
-
 
 importBtn.addEventListener('change', async () => {
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
@@ -79,24 +74,17 @@ function fetchCollection(collection: string) {
 
   const fragment = document.createDocumentFragment();
 
-  const imgLoad = getSaved('img') ? false : true;
-  const imgLoadStyle = getSaved('lazyImg') ? 'lazy' : 'eager';
-
-
-  for (const item in data)
-    render(() => StreamItem(
-      data[item].id as string,
-      `/watch?v=${data[item].id}`,
-      data[item].title as string,
-      data[item].author as string,
-      data[item].duration as string,
-      '',
-      data[item].channelUrl as string,
-      '',
-      imgLoad,
-      imgLoadStyle
-    ), fragment);
-
+  for (const item in data) {
+    const d = data[item];
+    render(() => StreamItem({
+      id: d.id || '',
+      href: hostResolver(`/watch?v=${data[item].id}`),
+      title: d.title || '',
+      author: d.author || '',
+      duration: d.duration || '',
+      channelUrl: d.channelUrl || ''
+    }), fragment);
+  }
   if (!fragment.childElementCount) {
     alert('No items found');
     return;
@@ -125,16 +113,79 @@ function fetchCollection(collection: string) {
 }
 
 
-const collections = <HTMLSpanElement>document.getElementById('collections');
 
-collections.addEventListener('click', e => {
+const collectionContainer = document.getElementById('collections')!;
+
+collectionContainer.addEventListener('click', e => {
   e.preventDefault();
-  const elm = e.target as HTMLParagraphElement;
-  if (!elm.classList.contains('collectionItem')) return;
-
-  const id = elm.id;
-  fetchCollection(id);
+  const elm = e.target as HTMLAnchorElement;
+  if (elm.classList.contains('collectionItem'))
+    fetchCollection(elm.id);
 });
 
 if (params.has('collection'))
   fetchCollection(<string>params.get('collection'))
+
+
+const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLSelectElement;
+superCollectionSelector.addEventListener('change', () => {
+  const val = superCollectionSelector.value;
+  val === 'ytm_pls' ?
+    removeSaved('defaultSuperCollection') :
+    save('defaultSuperCollection', val);
+
+  superCollectionLoader(val);
+});
+
+
+const sdsc = getSaved('defaultSuperCollection');
+
+if (sdsc) {
+  superCollectionSelector.value = sdsc;
+}
+else loadFeaturedPls();
+
+
+function loadFeaturedPls() {
+  fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+    .then(res => res.text())
+    .then(text => text.split('\n'))
+    .then(data => {
+      const array = [];
+      for (let i = 0; i < data.length; i += 4)
+        array.push(<StreamItem>{
+          "type": "playlist",
+          "name": data[i + 1],
+          "uploaderName": "YouTube Music",
+          "url": '/playlists/' + data[i + 2],
+          "thumbnail": '/' + data[i + 3]
+        });
+
+      document.getElementById('superCollectionList')!.replaceChildren(itemsLoader(array));
+    });
+}
+
+const superCollectionList = document.getElementById('superCollectionList')!;
+superCollectionList.addEventListener('click', (e) => {
+  e.preventDefault();
+
+  const elm = e.target as HTMLAnchorElement;
+
+  if (elm.dataset.url && superCollectionSelector.value === 'ytm_pls')
+    fetchList(elm.dataset.url)
+});
+
+
+function superCollectionLoader(name: string) {
+
+  if (name === 'ytm_pls')
+    loadFeaturedPls();
+  else if (name === 'channels')
+    console.log(name)
+  else if (name === 'ur_pls')
+    console.log(name)
+  else if (name === 'sub_pls')
+    console.log(name)
+
+
+}

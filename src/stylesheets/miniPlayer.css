@@ -1,0 +1,81 @@
+#miniPlayer {
+  display: flex;
+  background: var(--onBg);
+  border: var(--border);
+  border-radius: var(--roundness);
+  box-shadow: var(--shadow);
+
+  input {
+    position: fixed;
+    width: 92%;
+    height: 1vmin;
+    pointer-events: none;
+    appearance: none;
+    overflow: hidden;
+    background: none;
+    ;
+
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      border: none;
+      transform: none;
+      box-shadow: -55vw 0 0 55vw var(--text);
+    }
+
+    &::-moz-range-thumb {}
+
+  }
+
+  img {
+    border-radius: calc(var(--roundness) * 0.9);
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1dvh;
+
+    a {
+      pointer-events: none;
+      margin: 0;
+      padding: 0;
+      height: 4dvmax;
+      line-height: 4dvmax;
+      overflow: hidden;
+    }
+
+
+    button {
+      color: inherit;
+      border: none;
+      background: none;
+      padding: 0;
+      margin: 0;
+      font-size: 5dvmax;
+      transform: scale(1.1);
+    }
+  }
+
+
+  @media(orientation:portrait) {
+    height: calc(5dvmax + 2dvh);
+
+    img {
+      height: 100%;
+    }
+  }
+
+  @media(orientation:landscape) {
+    flex-direction: column;
+
+    img {
+      width: 100%;
+      height: auto;
+      transform: scale(0.93);
+    }
+  }
+
+}

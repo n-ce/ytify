@@ -1,7 +1,10 @@
 import { hostResolver } from '../lib/utils';
 import './ListItem.css';
+import { Show, createSignal } from 'solid-js';
 
-import { createSignal } from 'solid-js';
+// workaround "cannot access 'getSaved' before initialization"
+const s = localStorage.getItem('imgLoad');
+const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
 
 export default function ListItem(
   title: string,
@@ -9,7 +12,6 @@ export default function ListItem(
   thumbnail: string,
   uploader_data: string,
   url: string,
-  imgLoading: 'eager' | 'lazy',
 ) {
   const [getThumbnail, setThumbnail] = createSignal(thumbnail);
 
@@ -31,17 +33,19 @@ export default function ListItem(
 
   return (
     <a
-      class='listItem ravel'
+      class={'listItem ' + (showImage ? 'ravel' : '')}
       href={hostResolver(url)}
       data-url={url}
 
     >
-      <img
-        loading={imgLoading}
-        src={getThumbnail()}
-        onError={handleError}
-        onLoad={handleLoad}
-      />
+      <Show when={showImage}>
+        <img
+          loading={showImage as 'lazy' | 'eager' | undefined}
+          src={getThumbnail()}
+          onError={handleError}
+          onLoad={handleLoad}
+        />
+      </Show>
       <div>
         <p class="title">{title}</p>
         <p class="uData">{uploader_data}</p>

@@ -4,7 +4,7 @@
   padding: 2.4vmin 4vmin;
   position: sticky;
   z-index: 2;
-  top: 0;
+  top: 1%;
   background-color: var(--onBg);
   backdrop-filter: blur(2vmin);
   border-radius: var(--roundness);
@@ -73,16 +73,6 @@
       color: var(--bg);
     }
   }
-}
-
-h1.featuredPlaylists {
-  background: var(--onBg);
-  padding: 2%;
-  margin: 4% 0;
-  border-radius: var(--roundness);
-  display: flex;
-  justify-content: center;
-  align-items: center
 }
 
 #searchlist {

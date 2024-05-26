@@ -1,7 +1,7 @@
 import { instanceSelector, loadingScreen, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, getApi, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
-import { ytmPlsSwitch } from "./settings";
+
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
@@ -31,7 +31,6 @@ function setObserver(callback: () => Promise<string>) {
 // Get search results of input
 function searchLoader() {
 
-  const text = superInput.value;
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
@@ -40,8 +39,7 @@ function searchLoader() {
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
 
-  if (!text) {
-    insertYtmPls();
+  if (!superInput.value) {
     history.replaceState({}, '', location.origin + location.pathname);
     return
   }
@@ -199,7 +197,7 @@ superInput.addEventListener('keydown', _ => {
 });
 
 // CTRL + K focus search bar
-document.addEventListener("keydown", function(event) {
+document.addEventListener('keydown', (event) => {
   if (event.ctrlKey && event.key === "K")
     superInput.focus();
 });
@@ -230,28 +228,3 @@ if (params.has('q')) {
   searchLoader();
 }
 
-// YouTube Music Featured Playlists
-
-
-function insertYtmPls() {
-
-  if (ytmPlsSwitch.hasAttribute('checked'))
-    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
-      .then(res => res.text())
-      .then(text => text.split('\n'))
-      .then(data => {
-        const array = [];
-        for (let i = 0; i < data.length; i += 4)
-          array.push(<StreamItem>{
-            "type": "playlist",
-            "name": data[i + 1],
-            "uploaderName": "YouTube Music",
-            "url": '/playlists/' + data[i + 2],
-            "thumbnail": '/' + data[i + 3]
-          });
-
-        searchlist.appendChild(itemsLoader(array));
-      });
-}
-
-if (!params.has('q')) insertYtmPls();
