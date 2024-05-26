@@ -150,8 +150,8 @@ systemDark.addEventListener('change', themer);
 
 
 imgLoadSelector.value === 'off' ?
-  audio.addEventListener('loadstart', themer) :
-  themer();
+  themer() :
+  audio.addEventListener('loadstart', themer);
 
 
 
