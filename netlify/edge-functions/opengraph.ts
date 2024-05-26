@@ -25,7 +25,11 @@ export default async (request: Request, context: Context) => {
         .replace('"ytify"', `"${data.title}"`)
         .replace(url, `${url}?s=${id}`)
         .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl)
-        .replace('<!-- og:audio insertion point -->', `<meta property="og:audio" content="${audioSrc}">`);
+        .replace('<!-- og:audio insertion point -->', `
+          <meta property="og:audio" content="${audioSrc}">
+          <meta property="og:audio:secure_url" content="${audioSrc}">
+          <meta property="og:audio:type" content="audio/mpeg">
+          `);
     });
 
   return new Response(page, response);
