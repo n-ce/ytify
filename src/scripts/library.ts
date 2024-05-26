@@ -82,7 +82,7 @@ function fetchCollection(collection: string) {
       title: d.title || '',
       author: d.author || '',
       duration: d.duration || '',
-      channelUrl: d.channelUrl || ''
+      channelUrl: d.channel_url || ''
     }), fragment);
   }
   if (!fragment.childElementCount) {
@@ -139,31 +139,25 @@ superCollectionSelector.addEventListener('change', () => {
 
 
 const sdsc = getSaved('defaultSuperCollection');
-
-if (sdsc) {
+if (sdsc)
   superCollectionSelector.value = sdsc;
-}
-else loadFeaturedPls();
 
 
-function loadFeaturedPls() {
-  fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
-    .then(res => res.text())
-    .then(text => text.split('\n'))
-    .then(data => {
-      const array = [];
-      for (let i = 0; i < data.length; i += 4)
-        array.push(<StreamItem>{
-          "type": "playlist",
-          "name": data[i + 1],
-          "uploaderName": "YouTube Music",
-          "url": '/playlists/' + data[i + 2],
-          "thumbnail": '/' + data[i + 3]
-        });
-
-      document.getElementById('superCollectionList')!.replaceChildren(itemsLoader(array));
-    });
-}
+const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+  .then(res => res.text())
+  .then(text => text.split('\n'))
+  .then(data => {
+    const array = [];
+    for (let i = 0; i < data.length; i += 4)
+      array.push(<StreamItem>{
+        "type": "playlist",
+        "name": data[i + 1],
+        "uploaderName": "YouTube Music",
+        "url": '/playlists/' + data[i + 2],
+        "thumbnail": '/' + data[i + 3]
+      });
+    return itemsLoader(array);
+  });
 
 const superCollectionList = document.getElementById('superCollectionList')!;
 superCollectionList.addEventListener('click', (e) => {
@@ -171,21 +165,44 @@ superCollectionList.addEventListener('click', (e) => {
 
   const elm = e.target as HTMLAnchorElement;
 
-  if (elm.dataset.url && superCollectionSelector.value === 'ytm_pls')
+  if (superCollectionSelector.value === 'ur_pls' && elm.textContent)
+    fetchCollection(elm.textContent);
+  if (elm.dataset.url)
     fetchList(elm.dataset.url)
 });
 
 
-function superCollectionLoader(name: string) {
+function createCollectionItems(names: string[]) {
+  const fragment = document.createDocumentFragment();
+  names.forEach(v => {
+    const a = $('a');
+    a.href = '/list?collection=' + v;
+    a.className = 'ur_pls_item';
+    const i = $('i');
+    i.className = 'ri-play-list-2-fill';
+    a.append(i, v);
+    fragment.appendChild(a);
+  });
 
-  if (name === 'ytm_pls')
-    loadFeaturedPls();
-  else if (name === 'channels')
-    console.log(name)
-  else if (name === 'ur_pls')
-    console.log(name)
-  else if (name === 'sub_pls')
-    console.log(name)
-
+  return fragment;
 
 }
+
+
+async function superCollectionLoader(name: string) {
+
+  const container = document.getElementById('superCollectionList') as HTMLDivElement;
+  const db = getDB();
+  const filterOut = reservedCollections.concat(['channels', 'playlists']);
+
+  const keys = Object.keys(db).filter(v => !filterOut.includes(v));
+
+  container.replaceChildren(
+    name === 'ytm_pls' ?
+      await loadFeaturedPls() :
+      name === 'ur_pls' ?
+        createCollectionItems(keys) : 'No items Found'
+  );
+
+}
+superCollectionLoader(superCollectionSelector.value);

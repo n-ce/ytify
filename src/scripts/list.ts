@@ -3,7 +3,7 @@ import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
 import { addListToCollection, createPlaylist, getDB, saveDB } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
-import { getThumbIdFromLink } from '../lib/imageUtils';
+
 
 
 
@@ -26,7 +26,9 @@ listBtnsContainer.addEventListener('click', e => {
     listToQ(listContainer);
 
   else if (btn === subscribeListBtn) {
-    console.log(getThumbIdFromLink(listContainer.dataset.thumbnail || ''))
+
+    console.log(listContainer.dataset.thumbnail);
+
   }
 
   else if (btn === openInYtBtn)
@@ -49,13 +51,17 @@ listBtnsContainer.addEventListener('click', e => {
       .forEach(_ => {
         const sender = (<HTMLElement>_).dataset;
         const sid = <string>sender.id;
-        list[sid] = {};
-        ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
-          .forEach($ => list[sid][$] = sender[$]);
+        list[sid] = {
+          'id': sender.id,
+          'title': sender.title,
+          'author': sender.author,
+          'duration': sender.duration,
+          'channel_url': sender.channel_url
+        };
       });
 
     addListToCollection(listTitle, list);
-    notify('The list has been imported to library as ' + listTitle);
+    notify(listTitle + ' has been imported to your playlists.');
   }
   else if (btn === deleteCollectionBtn) {
 

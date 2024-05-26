@@ -38,6 +38,20 @@
 
   #superCollectionList {
     width: calc(100% - 2rem);
+
+    a.ur_pls_item {
+      background: var(--onBg);
+      display: flex;
+      align-items: center;
+      padding: 2vmin;
+      margin-top: 2vmin;
+      border: var(--border);
+      border-radius: var(--roundness);
+
+      i {
+        margin-right: 2vmin;
+      }
+    }
   }
 
   div:last-child {

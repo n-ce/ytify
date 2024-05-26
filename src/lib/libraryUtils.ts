@@ -1,12 +1,9 @@
 import { getSaved, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
-import StreamItem from "../components/StreamItem";
-import { render } from "solid-js/web";
 import { listContainer } from "./dom";
 
 
 
-const library = document.getElementById('library') as HTMLDivElement;
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater'];
 
 export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
@@ -15,21 +12,6 @@ export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
-export function createCollectionItem(data: CollectionItem | DOMStringMap) {
-  const fragment = document.createDocumentFragment();
-
-  render(
-    () => StreamItem({
-      id: data.id || '',
-      href: `/watch?v=${data.id}`,
-      title: data.title || '',
-      author: data.author || '',
-      duration: data.duration || '',
-      channelUrl: data.channelUrl || ''
-    }),
-    fragment);
-  return fragment;
-}
 
 export function removeFromCollection(collection: string, id: string) {
   const db = getDB();
@@ -57,9 +39,6 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
 
-  if (!reservedCollections.includes(collection))
-    return;
-
   if (collection === 'discover')
     db.discover = {};
 
@@ -71,10 +50,12 @@ export function addListToCollection(collection: string, list: { [index: string]:
 }
 
 export function createPlaylist(title: string) {
+  const notAllowedStrings = reservedCollections.concat(['channels', 'playlists']);
 
-  if (library.contains(document.getElementById(title)))
-    return notify('This Playlist Already Exists!');
+  for (const opt of atpSelector.options)
+    notAllowedStrings.push(opt.value)
 
-
-  atpSelector.add(new Option(title, title));
+  notAllowedStrings.includes(title) ?
+    notify('This Playlist Already Exists!') :
+    atpSelector.add(new Option(title, title));
 }

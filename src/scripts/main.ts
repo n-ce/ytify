@@ -29,7 +29,3 @@ if (import.meta.env.PROD)
     });
   });
 
-
-
-document.getElementById('version')!.textContent += _VERSION;
-

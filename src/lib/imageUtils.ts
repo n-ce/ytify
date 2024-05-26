@@ -11,7 +11,7 @@ export const generateImageUrl = (
   res: string = 'mq',
   proxy: string = getApi('image')
 ) => proxy + (id.startsWith('/') ?
-  `${id}=s176-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
+  `${id}=s352-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
   `/vi_webp/${id}/${res}default.webp?host=i.ytimg.com`);
 
 // Square Image Generator 

@@ -215,9 +215,9 @@ export async function fetchList(url: string, mix = false) {
 
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
   listContainer.dataset.url = url;
-  listContainer.dataset.thumbnail = group.avatarUrl;
   listContainer.dataset.type = type;
   listContainer.dataset.name = group.name;
+  listContainer.dataset.thumbnail ??= group.relatedStreams[0].thumbnail;
 
   if (mix) playAllBtn.click();
   else {
@@ -299,10 +299,8 @@ export function superClick(e: Event) {
     }
     superModal.showModal();
     history.pushState({}, '', '#');
-    const smd = superModal.dataset;
     for (const x in eld)
-      smd[x] = eld[x]
-
+      superModal.dataset[x] = eld[x]
   }
 
   if (elem.classList.contains('listItem')) {
@@ -312,6 +310,7 @@ export function superClick(e: Event) {
         url :
         url.replace('?list=', 's/')
     );
+    listContainer.dataset.thumbnail = elem.dataset.thumbnail;
   }
 }
 

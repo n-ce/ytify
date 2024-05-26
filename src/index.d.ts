@@ -34,7 +34,7 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string,
+    channel_url: string,
     frequency?: number
   }
 
