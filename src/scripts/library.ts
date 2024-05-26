@@ -82,7 +82,7 @@ function fetchCollection(collection: string) {
       title: d.title || '',
       author: d.author || '',
       duration: d.duration || '',
-      channelUrl: d.channel_url || ''
+      channelUrl: d.channelUrl || ''
     }), fragment);
   }
   if (!fragment.childElementCount) {
