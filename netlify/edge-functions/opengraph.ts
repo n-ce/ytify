@@ -3,6 +3,7 @@ import { Context, Config } from '@netlify/edge-functions';
 const keywords = 'ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic';
 const description = "48-160kbps Opus YouTube Audio Streaming Web App.";
 const url = 'https://ytify.netlify.app';
+const type = '<meta property="og:type" content="website">';
 
 export default async (request: Request, context: Context) => {
 
@@ -16,7 +17,7 @@ export default async (request: Request, context: Context) => {
 
   await fetch('https://pipedapi.drgns.space/streams/' + id)
     .then(res => res.json())
-    .then(data => {
+    .then((data) => {
       const audioSrc = data.audioStreams.find((v: { itag: number }) => v.itag == 139).url;
 
       page = page
@@ -24,11 +25,13 @@ export default async (request: Request, context: Context) => {
         .replace(description, data.uploader)
         .replace('"ytify"', `"${data.title}"`)
         .replace(url, `${url}?s=${id}`)
+        .replace(type, type.replace('website', 'music.song'))
         .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl)
         .replace('<!-- og:audio insertion point -->', `
           <meta property="og:audio" content="${audioSrc}">
           <meta property="og:audio:secure_url" content="${audioSrc}">
           <meta property="og:audio:type" content="audio/mpeg">
+          <meta property="music.duration" content="${data.duration}">
           `);
     });
 
