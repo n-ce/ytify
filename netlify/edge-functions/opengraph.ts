@@ -27,12 +27,12 @@ export default async (request: Request, context: Context) => {
         .replace(url, `${url}?s=${id}`)
         .replace(type, type.replace('website', 'music.song'))
         .replaceAll('/ytify_thumbnail_min.webp', data.thumbnailUrl)
-        .replace('<!-- og:audio insertion point -->', `
-          <meta property="og:audio" content="${audioSrc}">
+        .replace('<!-- og:audio insertion point -->',
+          `<meta property="og:audio" content="${audioSrc}">
           <meta property="og:audio:secure_url" content="${audioSrc}">
           <meta property="og:audio:type" content="audio/mpeg">
-          <meta property="music.duration" content="${data.duration}">
-          `);
+          <meta property="music.duration" content="${data.duration}">`
+        );
     });
 
   return new Response(page, response);
