@@ -2,15 +2,23 @@ import { audio, instanceSelector } from "../lib/dom";
 import player from "../lib/player";
 import { getSaved, removeSaved, save } from "../lib/utils";
 
-const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
+const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances_v2.md';
 
 
 addEventListener('DOMContentLoaded', () => {
 
   fetch(unifiedInstancesAPIurl)
     .then(res => res.text())
-    .then(text => JSON.parse(text.slice(3)))
-    .then((json: { [index: string]: string }[]) => {
+    .then(text => {
+
+      const json = JSON.parse(text.slice(5)).map((v: string[]) => ({
+        name: `${v[0]} ${v[1]}`,
+        piped: `https://${v[2]}.${v[0]}`,
+        invidious: `https://${v[3]}.${v[0]}`,
+        image: `https://${v[4]}.${v[0]}`
+      }))
+
+
       // add to DOM
       for (const api of json)
         instanceSelector.add(new Option(api.name, JSON.stringify(api)))
@@ -23,8 +31,8 @@ addEventListener('DOMContentLoaded', () => {
       }
 
       const api = JSON.parse(savedApi);
-      const names = json.map(v => v.name);
-      const index = names.findIndex(v => v === api.name);
+      const names = json.map((v: { name: string }) => v.name);
+      const index = names.findIndex((v: { name: string }) => v === api.name);
 
       if (index >= 0)
         instanceSelector.selectedIndex = index + 1;

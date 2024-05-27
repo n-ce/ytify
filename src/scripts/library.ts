@@ -107,6 +107,7 @@ function fetchCollection(collection: string) {
   listAnchor.dataset.id = collection;
 
   listAnchor.click();
+  listContainer.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
     '?collection=' + collection);
