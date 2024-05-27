@@ -35,7 +35,7 @@ export default async (request: Request, context: Context) => {
       <meta property="og:audio:type" content="audio/aac">
       <meta property="music.duration" content="${data.lengthSeconds}">`
     )
-    .replace('"website"', '"music.song"'))
+    .replace('"website"', '"music.song"');
 
 
   return new Response(newPage, response);

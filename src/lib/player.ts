@@ -70,7 +70,6 @@ switchHLS.addEventListener('click', () => {
 export default async function player(id: string | null = '') {
 
   if (!id) return;
-  if (instanceSelector.selectedIndex === 0) return import('./player.invidious').then(pi => pi.default(id));
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 

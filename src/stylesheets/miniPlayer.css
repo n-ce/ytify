@@ -23,8 +23,6 @@
       box-shadow: -55vw 0 0 55vw var(--text);
     }
 
-    &::-moz-range-thumb {}
-
   }
 
   img {
