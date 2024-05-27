@@ -11,6 +11,7 @@ export default async (request: Request, context: Context) => {
   if (id?.length !== 11) return;
 
   const response = await context.next();
+  const page = await response.text();
   const instance = 'https://invidious.fdn.fr';
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
 
@@ -21,7 +22,7 @@ export default async (request: Request, context: Context) => {
   if (data.genre === 'Music')
     audioSrc = audioSrc.replace(new URL(audioSrc).origin, instance);
 
-  const newPage = await response.text().then(page => page
+  const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
     .replace('"ytify"', `"${data.title}"`)
     .replace(<string>context.site.url, `${context.site.url}?s=${id}`)
