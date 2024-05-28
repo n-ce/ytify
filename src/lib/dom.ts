@@ -50,3 +50,5 @@ export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
 export const subtitleContainer = <HTMLDivElement>document.getElementById('subtitleContainer');
 
 export const subtitleSelector = <HTMLSelectElement>document.getElementById('subtitleSelector');
+
+export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLSelectElement;

@@ -1,7 +1,8 @@
-import { audio, searchFilters } from "../lib/dom";
+import { audio, img, searchFilters } from "../lib/dom";
 import { getSaved, removeSaved, save } from "../lib/utils";
 import player from "../lib/player";
 import { getDB, saveDB } from "../lib/libraryUtils";
+import { themer, cssVar } from "./theme";
 
 const startupTabSwitch = <HTMLElement>document.getElementById('startupTab');
 const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
@@ -11,7 +12,8 @@ const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitc
 const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
 const historyContainer = <HTMLDetailsElement>document.getElementById('history');
-const reverseNavSwitch = <HTMLElement>document.getElementById('reverseNavSwitch');
+const roundnessChanger = <HTMLSelectElement>document.getElementById('roundnessChanger');
+const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContrastSwitch');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
 const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
 const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
@@ -42,6 +44,12 @@ const savedImgLoad = getSaved('imgLoad')
 
 if (savedImgLoad)
   imgLoadSelector.value = savedImgLoad;
+
+if (imgLoadSelector.value === 'off') {
+  themer();
+  img.remove();
+}
+else audio.addEventListener('loadstart', themer);
 
 
 /////////////////////////////////////////////////////////////
@@ -126,23 +134,30 @@ if (getSaved('history')) {
 
 /////////////////////////////////////////////////////////////
 
-const nav = document.querySelector('nav') as HTMLDivElement;
 
-reverseNavSwitch.addEventListener('click', () => {
-  getSaved('reverseNav') ?
-    removeSaved('reverseNav') :
-    save('reverseNav', 'true');
-
-  document.body.classList.toggle('reverseNav');
-  nav.classList.toggle('reverseNav');
-});
-
-if (getSaved('reverseNav')) {
-  reverseNavSwitch.toggleAttribute('checked');
-  document.body.classList.toggle('reverseNav');
-  nav.classList.add('reverseNav');
+if (getSaved('roundness')) {
+  roundnessChanger.value = getSaved('roundness') || '2vmin';
+  cssVar('--roundness', roundnessChanger.value);
 }
 
+roundnessChanger.addEventListener('change', () => {
+  cssVar('--roundness', roundnessChanger.value);
+  roundnessChanger.value === '2vmin' ?
+    removeSaved('roundness') :
+    save('roundness', roundnessChanger.value)
+})
+/////////////////////////////////////////////////////////////
+
+
+highContrastSwitch.addEventListener('click', () => {
+  getSaved('highContrast') ?
+    removeSaved('highContrast') :
+    save('highContrast', 'true');
+  themer();
+})
+
+if (getSaved('highContrast'))
+  highContrastSwitch.toggleAttribute('checked');
 /////////////////////////////////////////////////////////////
 
 fullscreenSwitch.addEventListener('click', () => {

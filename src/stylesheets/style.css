@@ -71,13 +71,12 @@ body {
 
 @media(orientation:portrait) {
   body {
-    --navDirection: column;
-    flex-direction: var(--navDirection);
+    flex-direction: column-reverse;
 
     header {
       width: 92%;
       display: flex;
-      flex-direction: var(--navDirection);
+      flex-direction: column-reverse;
     }
 
     main {
@@ -90,19 +89,11 @@ body {
     }
   }
 
-  .reverseNav {
-    --navDirection: column-reverse;
-  }
-
 }
 
 
 @media(orientation:landscape) {
 
-  body {
-    --navDirection: row;
-    flex-direction: var(--navDirection);
-  }
 
   header {
     width: 20%;
@@ -113,13 +104,9 @@ body {
     padding: 2%;
   }
 
-  .reverseNav {
-    --navDirection: row-reverse;
-  }
-
   main {
     height: 100%;
-    width: calc(80% - 4dvh);
+    width: 100%;
     padding: 2dvh;
   }
 

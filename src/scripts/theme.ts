@@ -1,4 +1,4 @@
-import { canvas, context, audio, imgLoadSelector } from "../lib/dom";
+import { canvas, context, audio } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
 import { getSaved, removeSaved, save } from "../lib/utils";
 
@@ -8,7 +8,6 @@ const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
 const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
-const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContrastSwitch');
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
@@ -121,15 +120,6 @@ function themer() {
   canvasImg.src = generateImageUrl(audio.dataset.id || '1SLr62VBBjw');
 }
 
-highContrastSwitch.addEventListener('click', () => {
-  getSaved('highContrast') ?
-    removeSaved('highContrast') :
-    save('highContrast', 'true');
-  themer();
-})
-
-if (getSaved('highContrast'))
-  highContrastSwitch.toggleAttribute('checked');
 
 
 
@@ -146,26 +136,10 @@ if (savedTheme)
 
 systemDark.addEventListener('change', themer);
 
+export { themer, cssVar };
 
 
 
-imgLoadSelector.value === 'off' ?
-  themer() :
-  audio.addEventListener('loadstart', themer);
 
-
-
-const roundnessChanger = <HTMLSelectElement>document.getElementById('roundnessChanger');
-if (getSaved('roundness')) {
-  roundnessChanger.value = getSaved('roundness') || '2vmin';
-  cssVar('--roundness', roundnessChanger.value);
-}
-
-roundnessChanger.addEventListener('change', () => {
-  cssVar('--roundness', roundnessChanger.value);
-  roundnessChanger.value === '2vmin' ?
-    removeSaved('roundness') :
-    save('roundness', roundnessChanger.value)
-})
 
 

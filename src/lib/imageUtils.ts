@@ -31,7 +31,7 @@ export function sqrThumb(canvasImg: HTMLImageElement) {
 
 export function getThumbIdFromLink(url: string) {
   // for featured playlists
-  if (url.startsWith('/')) return url;
+  if (url.startsWith('/') || url.length === 11) return url;
 
   const l = new URL(url);
   const p = l.pathname;
@@ -48,3 +48,4 @@ img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres'
 img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
 
 img.src = blankImage;
+

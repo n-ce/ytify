@@ -1,8 +1,9 @@
 import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
-import { addListToCollection, createPlaylist, getDB, saveDB } from '../lib/libraryUtils';
+import { addListToCollection, createPlaylist, getDB, saveDB, toCollection } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
+import { getThumbIdFromLink } from '../lib/imageUtils';
 
 
 
@@ -14,7 +15,8 @@ listBtnsContainer.addEventListener('click', e => {
 
   const db = getDB();
   const id = <string>listAnchor.dataset.id;
-  const a = <HTMLAnchorElement>document.getElementById(id);
+
+
   const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${id}"]`);
 
   if (btn === playAllBtn) {
@@ -26,8 +28,29 @@ listBtnsContainer.addEventListener('click', e => {
     listToQ(listContainer);
 
   else if (btn === subscribeListBtn) {
+    const lcd = <{ [index: string]: string }>listContainer.dataset;
 
-    console.log(listContainer.dataset.thumbnail);
+    const state = ['Subscribe', 'Subscribed'];
+    const dom = subscribeListBtn.innerHTML;
+
+    if (dom.includes(state[1])) {
+      delete db[lcd.type][lcd.id];
+      state.reverse();
+    }
+    else {
+      const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
+        id: lcd.id,
+        name: lcd.name,
+        thumbnail: getThumbIdFromLink(lcd.thumbnail)
+      };
+
+      if (lcd.type === 'playlists')
+        dataset.uploader = lcd.uploader;
+
+      toCollection(lcd.type, dataset, db);
+    }
+    subscribeListBtn.innerHTML = dom.replace(state[0], state[1]);
+    saveDB(db);
 
   }
 
@@ -66,8 +89,7 @@ listBtnsContainer.addEventListener('click', e => {
   else if (btn === deleteCollectionBtn) {
 
     atpOption.remove();
-    a.remove();
-    delete db[a.id];
+    delete db[id];
     saveDB(db);
     history.back();
   }
@@ -82,10 +104,9 @@ listBtnsContainer.addEventListener('click', e => {
     if (!newTitle) return;
     atpOption.text = newTitle;
     atpOption.value = newTitle;
-    a.id = newTitle;
-    a.innerHTML = a.innerHTML.replace(id, newTitle);
     db[newTitle] = db[id];
     delete db[id];
     saveDB(db);
   }
 })
+

@@ -6,6 +6,7 @@
   box-shadow: var(--shadow);
 
   input {
+    display: none;
     position: fixed;
     width: 92%;
     height: 1vmin;
