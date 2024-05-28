@@ -1,11 +1,8 @@
 #miniPlayer {
   display: flex;
-  background: var(--onBg);
-  border: var(--border);
-  border-radius: var(--roundness);
-  box-shadow: var(--shadow);
 
   input {
+    display: none;
     position: fixed;
     width: 92%;
     height: 1vmin;
@@ -23,13 +20,13 @@
       box-shadow: -55vw 0 0 55vw var(--text);
     }
 
-    &::-moz-range-thumb {}
-
   }
 
   img {
-    border-radius: calc(var(--roundness) * 0.9);
+    transform: scale(0.8) translateX(-1%);
+    border-radius: calc(var(--roundness) * 1.4);
   }
+
 
   div {
     display: flex;
@@ -62,6 +59,9 @@
 
   @media(orientation:portrait) {
     height: calc(5dvmax + 2dvh);
+    background: var(--onBg);
+    border-bottom: var(--border);
+    border-radius: calc(var(--roundness) * 1.5) calc(var(--roundness) * 1.5) 0 0;
 
     img {
       height: 100%;
@@ -74,8 +74,7 @@
     img {
       width: 100%;
       height: auto;
-      transform: scale(0.93);
+      border-radius: var(--roundness);
     }
   }
-
 }

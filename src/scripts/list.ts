@@ -1,7 +1,7 @@
 import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
-import { addListToCollection, createPlaylist, getDB, saveDB } from '../lib/libraryUtils';
+import { addListToCollection, createPlaylist, getDB, saveDB, toCollection } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
 import { getThumbIdFromLink } from '../lib/imageUtils';
 
@@ -12,7 +12,8 @@ listBtnsContainer.addEventListener('click', e => {
 
   const db = getDB();
   const id = <string>listAnchor.dataset.id;
-  const a = <HTMLAnchorElement>document.getElementById(id);
+
+
   const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${id}"]`);
 
   if (btn === playAllBtn) {
@@ -24,7 +25,30 @@ listBtnsContainer.addEventListener('click', e => {
     listToQ(listContainer);
 
   else if (btn === subscribeListBtn) {
-    console.log(getThumbIdFromLink(listContainer.dataset.thumbnail || ''))
+    const lcd = <{ [index: string]: string }>listContainer.dataset;
+
+    const state = ['Subscribe', 'Subscribed'];
+    const dom = subscribeListBtn.innerHTML;
+
+    if (dom.includes(state[1])) {
+      delete db[lcd.type][lcd.id];
+      state.reverse();
+    }
+    else {
+      const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
+        id: lcd.id,
+        name: lcd.name,
+        thumbnail: getThumbIdFromLink(lcd.thumbnail)
+      };
+
+      if (lcd.type === 'playlists')
+        dataset.uploader = lcd.uploader;
+
+      toCollection(lcd.type, dataset, db);
+    }
+    subscribeListBtn.innerHTML = dom.replace(state[0], state[1]);
+    saveDB(db);
+
   }
 
   else if (btn === openInYtBtn)
@@ -47,19 +71,22 @@ listBtnsContainer.addEventListener('click', e => {
       .forEach(_ => {
         const sender = (<HTMLElement>_).dataset;
         const sid = <string>sender.id;
-        list[sid] = {};
-        ['id', 'title', 'author', 'duration', 'thumbnail', 'channelUrl']
-          .forEach($ => list[sid][$] = sender[$]);
+        list[sid] = {
+          'id': sender.id,
+          'title': sender.title,
+          'author': sender.author,
+          'duration': sender.duration,
+          'channel_url': sender.channel_url
+        };
       });
 
     addListToCollection(listTitle, list);
-    notify('The list has been imported to library as ' + listTitle);
+    notify(listTitle + ' has been imported to your playlists.');
   }
   else if (btn === deleteCollectionBtn) {
 
     atpOption.remove();
-    a.remove();
-    delete db[a.id];
+    delete db[id];
     saveDB(db);
     history.back();
   }
@@ -74,10 +101,9 @@ listBtnsContainer.addEventListener('click', e => {
     if (!newTitle) return;
     atpOption.text = newTitle;
     atpOption.value = newTitle;
-    a.id = newTitle;
-    a.innerHTML = a.innerHTML.replace(id, newTitle);
     db[newTitle] = db[id];
     delete db[id];
     saveDB(db);
   }
 })
+

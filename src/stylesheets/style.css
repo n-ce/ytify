@@ -58,7 +58,6 @@ body {
       overflow: scroll;
       align-items: center;
       width: 100%;
-      animation: appear 0.2s cubic-bezier(0.19, 1, 0.22, 1);
 
       &.view {
         display: flex;
@@ -71,14 +70,17 @@ body {
 
 @media(orientation:portrait) {
   body {
-    --navDirection: column;
-    flex-direction: var(--navDirection);
+    flex-direction: column-reverse;
 
     header {
-      width: 92%;
+      width: 100%;
       display: flex;
-      flex-direction: var(--navDirection);
+      justify-content: space-between;
+      flex-direction: column-reverse;
+      background: var(--onBg);
+      border-radius: calc(var(--roundness) * 1.5) calc(var(--roundness) * 1.5) 0 0;
     }
+
 
     main {
       height: 100%;
@@ -86,12 +88,9 @@ body {
 
       section {
         height: calc(93dvh - 3.2rem);
+        animation: fromRight 0.2s cubic-bezier(0.19, 1, 0.22, 1);
       }
     }
-  }
-
-  .reverseNav {
-    --navDirection: column-reverse;
   }
 
 }
@@ -99,10 +98,6 @@ body {
 
 @media(orientation:landscape) {
 
-  body {
-    --navDirection: row;
-    flex-direction: var(--navDirection);
-  }
 
   header {
     width: 20%;
@@ -111,20 +106,18 @@ body {
     flex-direction: column;
     justify-content: space-between;
     padding: 2%;
-  }
-
-  .reverseNav {
-    --navDirection: row-reverse;
+    background: var(--onBg);
+    border-radius: 0 calc(var(--roundness) * 1.5) calc(var(--roundness) * 1.5) 0;
   }
 
   main {
     height: 100%;
-    width: calc(80% - 4dvh);
+    width: 100%;
     padding: 2dvh;
   }
 
   section {
-    --pageTransitionEffect: translateY(100%);
+    animation: fromBelow 0.2s cubic-bezier(0.19, 1, 0.22, 1);
   }
 }
 

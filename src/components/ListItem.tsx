@@ -36,7 +36,7 @@ export default function ListItem(
       class={'listItem ' + (showImage ? 'ravel' : '')}
       href={hostResolver(url)}
       data-url={url}
-
+      data-thumbnail={thumbnail}
     >
       <Show when={showImage}>
         <img

@@ -1,7 +1,21 @@
-@keyframes appear {
+@keyframes fromRight {
   from {
     opacity: 0;
-    transform: var(--pageTransitionEffect);
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes fromBelow {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
   }
 }
 

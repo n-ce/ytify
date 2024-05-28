@@ -1,4 +1,5 @@
 import { audio, loadingScreen, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
+import { superCollectionLoader } from "../lib/libraryUtils";
 import { fetchList, getSaved, params } from "../lib/utils";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
@@ -31,7 +32,10 @@ function showSection(id: string) {
     if (route === '/') route += 'home';
     const section = <HTMLDivElement>document.getElementById(route.substring(1));
 
-    miniPlayerRoutingHandler(id === '/home');
+    miniPlayerRoutingHandler(id === '/home', nav.parentElement!.classList);
+
+    if (route === '/library')
+      superCollectionLoader(getSaved('defaultSuperCollection') || 'collections');
 
     if (route === id) {
       section.classList.add('view');

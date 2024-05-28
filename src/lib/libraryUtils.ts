@@ -1,13 +1,12 @@
-import { getSaved, notify, save } from "./utils";
+import { $, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
-import StreamItem from "../components/StreamItem";
+import { listAnchor, listBtnsContainer, listContainer } from "./dom";
 import { render } from "solid-js/web";
-import { listContainer } from "./dom";
+import StreamItem from "../components/StreamItem";
 
 
 
-const library = document.getElementById('library') as HTMLDivElement;
-export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater'];
+export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
 export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
 
@@ -15,21 +14,6 @@ export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
-export function createCollectionItem(data: CollectionItem | DOMStringMap) {
-  const fragment = document.createDocumentFragment();
-
-  render(
-    () => StreamItem({
-      id: data.id || '',
-      href: `/watch?v=${data.id}`,
-      title: data.title || '',
-      author: data.author || '',
-      duration: data.duration || '',
-      channelUrl: data.channelUrl || ''
-    }),
-    fragment);
-  return fragment;
-}
 
 export function removeFromCollection(collection: string, id: string) {
   const db = getDB();
@@ -57,9 +41,6 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
 
-  if (!reservedCollections.includes(collection))
-    return;
-
   if (collection === 'discover')
     db.discover = {};
 
@@ -71,10 +52,147 @@ export function addListToCollection(collection: string, list: { [index: string]:
 }
 
 export function createPlaylist(title: string) {
-
-  if (library.contains(document.getElementById(title)))
-    return notify('This Playlist Already Exists!');
-
-
-  atpSelector.add(new Option(title, title));
+  reservedCollections
+    .concat(
+      [...atpSelector.options].slice(2).map(opt => opt.value)
+    )
+    .includes(title) ?
+    notify('This Playlist Already Exists!') :
+    atpSelector.add(new Option(title, title));
 }
+
+
+export function fetchCollection(collection: string) {
+  const db = getDB();
+  const data = db[collection];
+
+  const fragment = document.createDocumentFragment();
+
+  for (const item in data) {
+    const d = data[item];
+    render(() => StreamItem({
+      id: d.id || '',
+      href: hostResolver(`/watch?v=${data[item].id}`),
+      title: d.title || '',
+      author: d.author || '',
+      duration: d.duration || '',
+      channelUrl: d.channelUrl || ''
+    }), fragment);
+  }
+  if (!fragment.childElementCount) {
+    alert('No items found');
+    return;
+  }
+
+  listContainer.replaceChildren(fragment);
+
+  const isReversed = listContainer.classList.contains('reverse');
+
+  if (reservedCollections.includes(collection)) {
+    if (!isReversed)
+      listContainer.classList.add('reverse');
+  }
+  else if (isReversed)
+    listContainer.classList.remove('reverse');
+
+
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : 'collection';
+
+  listAnchor.dataset.id = collection;
+
+  listAnchor.click();
+  listContainer.scrollTo(0, 0);
+  history.replaceState({}, '',
+    location.origin + location.pathname +
+    '?collection=' + collection);
+}
+
+
+export async function superCollectionLoader(name: string) {
+  const db = getDB();
+
+  const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
+    .then(res => res.text())
+    .then(text => text.split('\n'))
+    .then(data => {
+      const array = [];
+      for (let i = 0; i < data.length; i += 4)
+        array.push(<StreamItem>{
+          "type": "playlist",
+          "name": data[i + 1],
+          "uploaderName": "YouTube Music",
+          "url": '/playlists/' + data[i + 2],
+          "thumbnail": '/' + data[i + 3]
+        });
+      return itemsLoader(array);
+    });
+
+  function loadUrPls() {
+    const fragment = document.createDocumentFragment();
+    const pls = Object.keys(db).filter(v => !reservedCollections.includes(v));
+    pls.forEach(v => {
+      const a = $('a');
+      a.href = '/list?collection=' + v;
+      a.className = 'ur_pls_item';
+      const i = $('i');
+      i.className = 'ri-play-list-2-fill';
+      a.append(i, v);
+      fragment.appendChild(a);
+    });
+    return pls.length ? fragment : 'No Imported Playlists Found';
+  }
+
+  function loadSubPls() {
+
+    if (!Object(db).hasOwnProperty('playlists'))
+      return 'No Subscribed Playlists Found';
+
+    const array = [];
+    const pls = db.playlists as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
+
+    for (const pl in pls) {
+      array.push(<StreamItem>{
+        type: 'playlist',
+        name: pls[pl].name,
+        uploaderName: pls[pl].uploader,
+        url: '/playlists/' + pls[pl].id,
+        thumbnail: pls[pl].thumbnail
+      });
+    }
+    return itemsLoader(array);
+  }
+
+  function loadChannels() {
+    if (!Object(db).hasOwnProperty('channels'))
+      return 'You have not subscribed to any channels';
+
+    const array = [];
+    const pls = db.channels as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
+
+    for (const pl in pls) {
+      array.push(<StreamItem>{
+        type: 'channel',
+        name: pls[pl].name,
+        uploaderName: pls[pl].uploader,
+        url: '/channel/' + pls[pl].id,
+        thumbnail: pls[pl].thumbnail
+      });
+    }
+    return itemsLoader(array);
+
+  }
+
+  const container = document.getElementById('superCollectionList') as HTMLDivElement;
+  container.replaceChildren(
+    name === 'featured' ?
+      await loadFeaturedPls() :
+      name === 'collections' ?
+        loadUrPls() :
+        name === 'playlists' ?
+          loadSubPls()
+          : name === 'channels' ?
+            loadChannels() :
+            'No Items Found'
+  );
+}
+

@@ -1,5 +1,5 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title } from "./dom";
-import { removeFromCollection } from "./libraryUtils";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn } from "./dom";
+import { getDB, removeFromCollection } from "./libraryUtils";
 import { blankImage, generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
@@ -214,10 +214,20 @@ export async function fetchList(url: string, mix = false) {
   listBtnsContainer.className = type;
 
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
-  listContainer.dataset.url = url;
-  listContainer.dataset.thumbnail = group.avatarUrl;
-  listContainer.dataset.type = type;
-  listContainer.dataset.name = group.name;
+
+  const lcd = listContainer.dataset;
+  lcd.url = url;
+  lcd.type = type + 's';
+  lcd.name = group.name;
+  lcd.id = url.slice(type === 'playlist' ? 11 : 9);
+  lcd.uploader = group.uploader || group.name;
+  lcd.thumbnail = lcd.thumbnail?.startsWith(url) ? lcd.thumbnail.slice(url.length) :
+    group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
+
+  const db = Object(getDB());
+
+  subscribeListBtn.innerHTML = `<i class="ri-stack-line"></i> Subscribe${db.hasOwnProperty(lcd.type) && db[lcd.type].hasOwnProperty(lcd.id) ? 'd' : ''
+    }`;
 
   if (mix) playAllBtn.click();
   else {
@@ -299,19 +309,16 @@ export function superClick(e: Event) {
     }
     superModal.showModal();
     history.pushState({}, '', '#');
-    const smd = superModal.dataset;
     for (const x in eld)
-      smd[x] = eld[x]
-
+      superModal.dataset[x] = eld[x]
   }
 
   if (elem.classList.contains('listItem')) {
-    const url = elem.dataset.url as string;
-    fetchList(
-      url.startsWith('/channel') ?
-        url :
-        url.replace('?list=', 's/')
-    );
+    let url = elem.dataset.url as string;
+    if (!url.startsWith('/channel'))
+      url = url.replace('?list=', 's/')
+    fetchList(url);
+    listContainer.dataset.thumbnail = url + elem.dataset.thumbnail;
   }
 }
 

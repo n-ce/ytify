@@ -1,14 +1,14 @@
-import { render } from "solid-js/web";
-import StreamItem from "../components/StreamItem";
-import { audio, favButton, favIcon, listAnchor, listBtnsContainer, listContainer } from "../lib/dom";
-import { addToCollection, createPlaylist, getDB, removeFromCollection, reservedCollections, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, fetchList, getSaved, hostResolver, itemsLoader, params, removeSaved, save } from "../lib/utils";
+import { audio, favButton, favIcon, superCollectionSelector } from "../lib/dom";
+import { addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
+import { $, fetchList, getSaved, params, removeSaved, save } from "../lib/utils";
 
 
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
+const collectionContainer = document.getElementById('collections') as HTMLDivElement;
+const superCollectionList = document.getElementById('superCollectionList')!;
 
 importBtn.addEventListener('change', async () => {
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
@@ -30,28 +30,19 @@ exportBtn.addEventListener('click', () => {
 
 cleanBtn.addEventListener('click', () => {
 
-  const library = document.getElementById('library') as HTMLDivElement;
-  const libraryItems = library.getElementsByClassName('streamItem');
-
-  if (!confirm('Are you sure you want to clear ' + libraryItems.length + ' items from the library?')) return;
+  let items = 0;
+  const db = getDB();
+  for (const collection in db) {
+    const collx = db[collection];
+    for (const _ in collx)
+      items++;
+  }
+  if (!confirm('Are you sure you want to clear ' + items + ' items from the library?')) return;
   removeSaved('library');
   location.reload();
 });
 
 
-// setup initial dom state
-
-addEventListener('DOMContentLoaded', () => {
-  const initialData = getDB();
-
-  const initialKeys = Object.keys(initialData);
-
-  for (const key of initialKeys)
-    if (!reservedCollections.includes(key)) {
-      createPlaylist(key);
-      continue;
-    }
-});
 
 
 
@@ -68,53 +59,9 @@ favButton.addEventListener('click', () => {
 });
 
 
-function fetchCollection(collection: string) {
-  const db = getDB();
-  const data = db[collection];
-
-  const fragment = document.createDocumentFragment();
-
-  for (const item in data) {
-    const d = data[item];
-    render(() => StreamItem({
-      id: d.id || '',
-      href: hostResolver(`/watch?v=${data[item].id}`),
-      title: d.title || '',
-      author: d.author || '',
-      duration: d.duration || '',
-      channelUrl: d.channelUrl || ''
-    }), fragment);
-  }
-  if (!fragment.childElementCount) {
-    alert('No items found');
-    return;
-  }
-
-  listContainer.replaceChildren(fragment);
-
-  const isReversed = listContainer.classList.contains('reverse');
-
-  if (reservedCollections.includes(collection)) {
-    if (!isReversed)
-      listContainer.classList.add('reverse');
-  }
-  else if (isReversed)
-    listContainer.classList.remove('reverse');
-
-
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : 'collection';
-
-  listAnchor.dataset.id = collection;
-
-  listAnchor.click();
-  history.replaceState({}, '',
-    location.origin + location.pathname +
-    '?collection=' + collection);
-}
 
 
 
-const collectionContainer = document.getElementById('collections')!;
 
 collectionContainer.addEventListener('click', e => {
   e.preventDefault();
@@ -127,10 +74,9 @@ if (params.has('collection'))
   fetchCollection(<string>params.get('collection'))
 
 
-const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLSelectElement;
 superCollectionSelector.addEventListener('change', () => {
   const val = superCollectionSelector.value;
-  val === 'ytm_pls' ?
+  val === 'collections' ?
     removeSaved('defaultSuperCollection') :
     save('defaultSuperCollection', val);
 
@@ -139,53 +85,30 @@ superCollectionSelector.addEventListener('change', () => {
 
 
 const sdsc = getSaved('defaultSuperCollection');
-
-if (sdsc) {
+if (sdsc)
   superCollectionSelector.value = sdsc;
-}
-else loadFeaturedPls();
 
 
-function loadFeaturedPls() {
-  fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
-    .then(res => res.text())
-    .then(text => text.split('\n'))
-    .then(data => {
-      const array = [];
-      for (let i = 0; i < data.length; i += 4)
-        array.push(<StreamItem>{
-          "type": "playlist",
-          "name": data[i + 1],
-          "uploaderName": "YouTube Music",
-          "url": '/playlists/' + data[i + 2],
-          "thumbnail": '/' + data[i + 3]
-        });
-
-      document.getElementById('superCollectionList')!.replaceChildren(itemsLoader(array));
-    });
-}
-
-const superCollectionList = document.getElementById('superCollectionList')!;
 superCollectionList.addEventListener('click', (e) => {
   e.preventDefault();
 
   const elm = e.target as HTMLAnchorElement;
 
-  if (elm.dataset.url && superCollectionSelector.value === 'ytm_pls')
+  if (superCollectionSelector.value === 'collections' && elm.textContent)
+    fetchCollection(elm.textContent);
+  if (elm.dataset.url)
     fetchList(elm.dataset.url)
 });
 
 
-function superCollectionLoader(name: string) {
+// setup initial dom state
 
-  if (name === 'ytm_pls')
-    loadFeaturedPls();
-  else if (name === 'channels')
-    console.log(name)
-  else if (name === 'ur_pls')
-    console.log(name)
-  else if (name === 'sub_pls')
-    console.log(name)
+addEventListener('DOMContentLoaded', () => {
 
+  const initialKeys = Object.keys(getDB());
 
-}
+  for (const key of initialKeys)
+    if (!reservedCollections.includes(key))
+      createPlaylist(key);
+
+});
