@@ -26,10 +26,12 @@ nav {
 @media(orientation:portrait) {
 
   nav {
+
     height: fit-content;
     justify-content: space-around;
     width: 100%;
     padding: 2% 0;
+    background: var(--onBg);
 
     a {
       height: 100%;

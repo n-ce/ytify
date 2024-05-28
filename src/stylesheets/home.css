@@ -3,6 +3,8 @@
   height: 100%;
   align-items: center;
 
+
+
   #img {
     border: var(--border);
     border-radius: var(--roundness);
@@ -99,13 +101,16 @@
   #home {
     flex-direction: column;
     justify-content: space-evenly;
+    animation: fromBelow 0.4s;
   }
 }
+
 
 @media(orientation:landscape) {
   #home {
     flex-direction: row;
     justify-content: space-between;
+    animation: fromLeft 0.4s;
   }
 
   img {
