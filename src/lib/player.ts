@@ -79,15 +79,13 @@ export default async function player(id: string | null = '') {
   if (apiIndex === 0)
     return import('./player.invidious').then(player => player.default(id));
 
-
-
   const apiUrl = getApi('piped', apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
+        notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
         instanceSelector.selectedIndex++;
         player(id);
         return;
@@ -98,8 +96,11 @@ export default async function player(id: string | null = '') {
     });
 
 
-  if (!data && !data.hasOwnProperty('audioStreams'))
-    return notify('No data found');
+  if (!data || !data.hasOwnProperty('audioStreams')) {
+    notify('No Audio Streams Found.');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    return;
+  }
 
   audio.dataset.id = id;
   audio.dataset.title = data.title;

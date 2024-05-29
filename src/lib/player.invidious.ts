@@ -16,19 +16,14 @@ const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelec
 
 /////////////////////////////////////////////////////////////
 
-export default async function invPlayer(id: string | null = '', instance = 0) {
-
-  if (!id) return;
-
-  playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+export default async function invPlayer(id: string, instance = 0) {
 
   const apiUrl = getApi('invidious', instance);
-
   const data = await fetch(apiUrl + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
       if (instance < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi('invidious', instance + 1)} due to error: ${err.message}`);
+        notify(`switched instance from ${apiUrl} to ${getApi('invidious', instance + 1)} due to error: ${err.message}`);
         invPlayer(id, instance + 1);
         return;
       }
@@ -38,9 +33,11 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
     });
 
 
-
-  if (!data?.adaptiveFormats?.length)
+  if (!data || !data?.adaptiveFormats?.length) {
+    notify('No Audio Streams Found');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
+  }
 
   type audioStream = Record<'type' | 'url' | 'quality' | 'bitrate' | 'encoding' | 'clen', string>;
 

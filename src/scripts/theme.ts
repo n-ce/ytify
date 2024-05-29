@@ -1,6 +1,6 @@
 import { canvas, context, audio } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
-import { getSaved, removeSaved, save } from "../lib/utils";
+import { getSaved, params, removeSaved, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
@@ -68,6 +68,7 @@ const palette: Scheme = {
 };
 
 
+
 function themer() {
 
   const canvasImg = new Image();
@@ -117,10 +118,8 @@ function themer() {
     tabColor.content = palette[scheme].bg(r, g, b);
   }
   canvasImg.crossOrigin = '';
-  canvasImg.src = generateImageUrl(audio.dataset.id || '1SLr62VBBjw');
+  canvasImg.src = generateImageUrl(audio.dataset.id || params.get('s') || '1SLr62VBBjw');
 }
-
-
 
 
 themeSelector.addEventListener('change', () => {
