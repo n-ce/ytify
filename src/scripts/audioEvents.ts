@@ -242,8 +242,7 @@ if (msn) {
 }
 
 
-if (params.has('s'))
-  player(params.get('s'));
+player(params.get('s') || params.get('url') || params.get('text'));
 
 
 

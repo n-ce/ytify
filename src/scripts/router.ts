@@ -102,7 +102,8 @@ if (errorParam) {
 }
 else {
   route = routes.find(route => location.pathname === route) || '/';
-  if (route === '/' && !params.has('s'))
+  const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
+  if (route === '/' && !hasStreamQuery)
     route = getSaved('startupTab') ? '/search' : '/library';
 }
 
