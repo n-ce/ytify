@@ -213,7 +213,7 @@ searchlist.addEventListener('dblclick', (e) => {
 });
 searchlist.addEventListener('click', e => {
   e.preventDefault();
-  dblTimer = setTimeout(() => {
+  dblTimer = window.setTimeout(() => {
     if (secondClick) {
       secondClick = false;
       return;
