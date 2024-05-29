@@ -74,6 +74,13 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const apiIndex = instanceSelector.selectedIndex;
+
+  // fallback for custom instances do not support unified instance architecture
+  if (apiIndex === 0)
+    return import('./player.invidious').then(player => player.default(id));
+
+
+
   const apiUrl = getApi('piped', apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)

@@ -22,10 +22,7 @@
 
   }
 
-  img {
-    transform: scale(0.8) translateX(-1%);
-    border-radius: calc(var(--roundness) * 1.4);
-  }
+  img {}
 
 
   div {
@@ -59,12 +56,18 @@
 
   @media(orientation:portrait) {
     height: calc(5dvmax + 2dvh);
-    background: var(--onBg);
-    border-bottom: var(--border);
-    border-radius: calc(var(--roundness) * 1.5) calc(var(--roundness) * 1.5) 0 0;
+    margin: 2%;
+    margin-bottom: 0;
 
     img {
       height: 100%;
+      margin-right: 2%;
+      border-radius: var(--roundness);
+    }
+
+    div {
+      background: var(--onBg);
+      border-radius: var(--roundness);
     }
   }
 

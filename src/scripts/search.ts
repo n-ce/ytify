@@ -203,7 +203,28 @@ document.addEventListener('keydown', (event) => {
 });
 
 
-searchlist.addEventListener('click', superClick);
+let dblTimer = 0;
+let secondClick = false;
+
+searchlist.addEventListener('dblclick', (e) => {
+  clearTimeout(dblTimer);
+  superClick(e);
+  secondClick = true;
+});
+searchlist.addEventListener('click', e => {
+  e.preventDefault();
+  dblTimer = setTimeout(() => {
+    if (secondClick) {
+      secondClick = false;
+      return;
+    }
+
+    const elem = e.target as HTMLAnchorElement;
+
+    if (elem.classList.contains('streamItem'))
+      player(elem.dataset.id);
+  }, 600);
+});
 
 searchFilters.addEventListener('change', searchLoader);
 

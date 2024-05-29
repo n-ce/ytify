@@ -6,6 +6,7 @@ import { appendToQueuelist } from "./queue";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
+const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
 
@@ -25,26 +26,24 @@ function upcomingInjector(param: string) {
 if (queueParam)
   upcomingInjector(queueParam);
 
+let prevPageIdx = routes.indexOf(location.pathname);
 
 function showSection(id: string) {
-  routes.forEach((route, index) => {
-    if (id === '/') id += 'home';
-    if (route === '/') route += 'home';
-    const section = <HTMLDivElement>document.getElementById(route.substring(1));
+  const routeIdx = routes.indexOf(id);
+  miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
 
-    miniPlayerRoutingHandler(id === '/home', nav.parentElement!.classList);
+  // Enables Reactivity to declare db modifications into UI
+  if (id === '/library')
+    superCollectionLoader(getSaved('defaultSuperCollection') || 'collections');
 
-    if (route === '/library')
-      superCollectionLoader(getSaved('defaultSuperCollection') || 'collections');
+  sections[routeIdx].classList.add('view');
+  anchors[routeIdx].classList.add('active');
 
-    if (route === id) {
-      section.classList.add('view');
-      anchors[index].classList.add('active');
-    } else {
-      section.classList.remove('view');
-      anchors[index].classList.remove('active');
-    }
-  })
+  if (prevPageIdx !== routeIdx) {
+    sections[prevPageIdx].classList.remove('view');
+    anchors[prevPageIdx].classList.remove('active');
+  }
+  prevPageIdx = routeIdx;
 }
 
 
@@ -107,6 +106,7 @@ else {
     route = getSaved('startupTab') ? '/search' : '/library';
 }
 
+// necessary to use a click event 
 (<HTMLAnchorElement>document.getElementById(route)).click();
 
 // enables back button functionality

@@ -19,8 +19,7 @@ miniPlayer.addEventListener('click', (e) => {
 
 export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) {
 
-  const metadata =
-    document.getElementById('metadata') as HTMLElement;
+  const metadata = document.getElementById('metadata') as HTMLElement;
   const pc = document.getElementById('playerControls') as HTMLElement;
   const sp = pc.previousElementSibling as HTMLElement;
   const seekFwd = document.getElementById('seekFwdButton') as HTMLElement;

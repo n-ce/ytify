@@ -2,7 +2,7 @@ import Hls from "hls.js";
 import { audio, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, params, getSaved } from "../lib/utils";
+import { convertSStoHHMMSS, params, getSaved, idFromURL } from "../lib/utils";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
@@ -242,7 +242,7 @@ if (msn) {
 }
 
 
-player(params.get('s') || params.get('url') || params.get('text'));
+player(params.get('s') || idFromURL(params.get('url') || params.get('text')));
 
 
 
