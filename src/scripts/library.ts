@@ -184,7 +184,7 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
 
   // logout
   const controller = new AbortController();
-  const timeoutId: number = setTimeout(() => controller.abort());
+  const timeoutId: number = window.setTimeout(() => controller.abort());
 
   const logoutResponse = await fetch(instance + '/logout', {
     method: 'POST',

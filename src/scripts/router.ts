@@ -34,7 +34,7 @@ function showSection(id: string) {
 
   // Enables Reactivity to declare db modifications into UI
   if (id === '/library')
-    superCollectionLoader(getSaved('defaultSuperCollection') || 'collections');
+    superCollectionLoader(getSaved('defaultSuperCollection') as 'feed' || 'collections');
 
   sections[routeIdx].classList.add('view');
   const a = anchors[routeIdx];
