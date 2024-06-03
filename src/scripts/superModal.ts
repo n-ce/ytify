@@ -80,8 +80,9 @@ downloadBtn.addEventListener('click', () => {
 
 openChannelBtn.addEventListener('click', () => {
   // data binding for save list & open in yt btn
-  (<HTMLButtonElement>document.getElementById('viewOnYTBtn')).innerHTML = '<i class="ri-external-link-line"></i> ' + <string>superModal.dataset.author;
+  const smd = superModal.dataset;
+  (<HTMLButtonElement>document.getElementById('viewOnYTBtn')).innerHTML = '<i class="ri-external-link-line"></i> ' + <string>smd.author;
 
-  fetchList(superModal.dataset.channelUrl);
+  fetchList(smd.channelUrl || smd.channel_url);
   superModal.click();
 })

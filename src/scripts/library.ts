@@ -1,6 +1,6 @@
 import { audio, favButton, favIcon, superCollectionSelector } from "../lib/dom";
-import { addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
-import { $, fetchList, getSaved, params, removeSaved, save } from "../lib/utils";
+import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
+import { $, convertSStoHHMMSS, fetchList, getSaved, notify, params, removeSaved, save } from "../lib/utils";
 
 
 
@@ -80,7 +80,7 @@ superCollectionSelector.addEventListener('change', () => {
     removeSaved('defaultSuperCollection') :
     save('defaultSuperCollection', val);
 
-  superCollectionLoader(val);
+  superCollectionLoader(val as 'feed');
 });
 
 
@@ -110,5 +110,94 @@ addEventListener('DOMContentLoaded', () => {
   for (const key of initialKeys)
     if (!reservedCollections.includes(key))
       createPlaylist(key);
+
+});
+
+
+
+// piped import playlists into ytify collections
+
+document.getElementById('pipedPlsImport')!.addEventListener('click', async () => {
+  const instance = prompt('Enter the Piped Authentication Instance API URL :', 'https://pipedapi.kavin.rocks');
+  if (!instance) return;
+
+  const username = prompt('Enter Username :');
+  if (!username) return;
+
+  const password = prompt('Enter Password :');
+  if (!password) return;
+
+  // login 
+  const authId = await fetch(instance + '/login', {
+    method: 'POST',
+    body: JSON.stringify({
+      username: username,
+      password: password
+    })
+  })
+    .then(res => res.json())
+    .catch(e => notify(`Failed to Login, Error : ${e}`));
+
+  if (!authId) return;
+
+
+  notify('Succesfully logged in to account.');
+
+  // fetch
+  const playlists = await fetch(instance + '/user/playlists', {
+    headers: {
+      Authorization: authId.token
+    }
+  }).then(res => res.json())
+    .catch(e => notify(`Failed to Find Playlists, Error : ${e}`));
+
+  notify('Succesfully fetched playlists from account.');
+
+  // import 
+  await Promise.all(playlists.map(async (playlist: {
+    id: string
+  }) => {
+    await fetch(instance + '/playlists/' + playlist.id)
+      .then(res => res.json())
+      .then(data => {
+        const listTitle = data.name;
+
+        createPlaylist(listTitle);
+        const list: { [index: string]: CollectionItem } = {};
+        const streams = data.relatedStreams
+        for (const i of streams)
+          list[i.title] = {
+            id: i.url.slice(9),
+            title: i.title,
+            author: i.uploaderName,
+            duration: convertSStoHHMMSS(i.duration),
+            channelUrl: i.uploaderUrl
+          }
+        addListToCollection(listTitle, list);
+      })
+  }));
+
+  notify('Succesfully imported playlists from your piped account into ytify as collections');
+
+  // Refresh without reload
+  superCollectionLoader('collections');
+
+  // logout
+  const controller = new AbortController();
+  const timeoutId: number = setTimeout(() => controller.abort());
+
+  const logoutResponse = await fetch(instance + '/logout', {
+    method: 'POST',
+    signal: controller.signal,
+    headers: {
+      Authorization: authId.token
+    }
+  }).then(res => {
+    clearTimeout(timeoutId);
+    return res;
+  });
+
+  if (logoutResponse.ok)
+    notify('Succesfully logged out of your piped account.');
 
 });

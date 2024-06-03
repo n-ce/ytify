@@ -1,6 +1,6 @@
-import { $, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
+import { $, getApi, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
-import { listAnchor, listBtnsContainer, listContainer } from "./dom";
+import { listAnchor, listBtnsContainer, listContainer, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
 
@@ -66,6 +66,11 @@ export function fetchCollection(collection: string) {
   const db = getDB();
   const data = db[collection];
 
+  if (collection === 'discover')
+    for (const i in data)
+      if (data[i].frequency === 1)
+        delete db.discover[i];
+
   const fragment = document.createDocumentFragment();
 
   for (const item in data) {
@@ -108,7 +113,7 @@ export function fetchCollection(collection: string) {
 }
 
 
-export async function superCollectionLoader(name: string) {
+export async function superCollectionLoader(name: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists') {
   const db = getDB();
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
@@ -182,6 +187,28 @@ export async function superCollectionLoader(name: string) {
 
   }
 
+  async function loadFeed() {
+    if (!Object(db).hasOwnProperty('channels'))
+      return 'You have not subscribed to any channels';
+
+    const channels = Object.keys(db.channels);
+
+    loadingScreen.showModal();
+    const initApi = getApi('piped');
+    const fetchItems = (api: string) => fetch(api + '/feed/unauthenticated?channels=' + channels.join(','))
+      .then(res => res.json())
+      .catch((): {} => {
+        const nextApi = getApi('piped', 0);
+        if (nextApi === initApi) return {};
+        notify(`${initApi} was not able to return the subscription feed. Retrying with ${nextApi}.`);
+        return fetchItems(nextApi);
+      })
+      .finally(() => loadingScreen.close());
+
+    return itemsLoader(await fetchItems(initApi));
+  }
+
+
   const container = document.getElementById('superCollectionList') as HTMLDivElement;
   container.replaceChildren(
     name === 'featured' ?
@@ -192,7 +219,7 @@ export async function superCollectionLoader(name: string) {
           loadSubPls()
           : name === 'channels' ?
             loadChannels() :
-            'No Items Found'
+            await loadFeed()
   );
 }
 

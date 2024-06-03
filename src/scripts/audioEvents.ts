@@ -53,7 +53,7 @@ audio.addEventListener('playing', () => {
   if (!streamHistory.includes(ad.id))
     streamHistory.push(ad.id);
   const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
-  if (!getSaved('history') ||
+  if (getSaved('history') !== 'off' ||
     firstElementInHistory.dataset.id !== ad.id)
     historyTimeoutId = window.setTimeout(() => {
       if (historyID === ad.id) {
@@ -61,7 +61,6 @@ audio.addEventListener('playing', () => {
         // just in case we are already in the history collection 
         if (params.get('collection') === 'history')
           document.getElementById('history')!.click();
-
 
       }
     }, 1e4);
@@ -246,7 +245,6 @@ player(params.get('s') || idFromURL(params.get('url') || params.get('text')));
 /*
 Understanding AutoQueue
 
-first stream loads, emits a bunch of recommended streams, all pushed to queue
 second stream loads, emits a bunch of recommended streams, all pushed it to a virtual queue
 third stream loads, continue pushing to virtual queue
 and so on till the last stream in the original queue
@@ -290,6 +288,7 @@ export function autoQueue(data: Recommendation[]) {
       frequencyQueue[id] = 1;
     }
 
+    // first stream loads, emits a bunch of recommended streams, all pushed to queue
     if (init)
       appendToQueuelist(streamData)
   });
