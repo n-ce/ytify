@@ -88,7 +88,7 @@ export async function setMetaData(
     artist: authorName,
   };
 
-  let imgx = generateImageUrl(id, 'maxres');
+  const imgx = generateImageUrl(id, 'maxres');
   if (showImg) {
     img.src = music ? await sqrThumb(imgx) : imgx;
     metadataObj.artwork = [
