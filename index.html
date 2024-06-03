@@ -68,7 +68,6 @@
       </a>
     </nav>
     <div id="miniPlayer">
-      <input type="range" value="0" id="progress" />
       <img id="img" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
       <div>
         <a id="title" href="" target="_blank">Now Playing</a>
@@ -78,61 +77,72 @@
   </header>
   <main>
     <section id="home">
-      <!-- image -->
 
       <article class="hide" id="subtitleContainer"></article>
 
-      <div id="metadata">
-        <!-- title -->
-        <a id="author" href="" target="_blank">Channel</a>
-        <select id="subtitleSelector" class="hide">
+      <div id="upperLayer">
+        <!-- image -->
+        <div id="meta">
+          <!-- title -->
+          <p id="author">Channel</p>
+
+          <div id="upperButtonLayer">
+            <span id="volumeContainer">
+              <label for="volumeChanger" class="ri-volume-up-fill"></label>
+              <input type="range" min="0" max="100" value="100" id="volumeChanger">
+            </span>
+            <i class="ri-repeat-line" id="loopButton" aria-label="loop"></i>
+            <input type="checkbox" id="favButton" />
+            <label for="favButton" class="ri-heart-line" aria-label="like"></label>
+            <i class="ri-more-2-fill" id="moreBtn" aria-label="more"></i>
+          </div>
+        </div>
+      </div>
+
+      <span id="trackline">
+        <input type="range" value="0" id="progress" />
+        <div>
+          <p id="currentDuration">00:00</p>
+          <p id="fullDuration">00:00</p>
+        </div>
+      </span>
+
+      <div id="playerControls">
+        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
+        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
+
+        <!-- play button -->
+
+        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
+        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
+
+      </div>
+
+      <div id="selectors">
+
+        <select id="playSpeed">
+          <option value="0.25">0.25x</option>
+          <option value="0.50">0.50x</option>
+          <option value="0.75">0.75x</option>
+          <option value="1.00" selected>1.00x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.50">1.50x</option>
+          <option value="1.75">1.75x</option>
+          <option value="2.00">2.00x</option>
+          <option value="2.50">2.50x</option>
+          <option value="3.00">3.00x</option>
+          <option value="3.50">3.50x</option>
+          <option value="4.00">4.00x</option>
+        </select>
+
+        <select id="bitrateSelector">
+          <option>Bitrate</option>
+        </select>
+        <select id="subtitleSelector">
           <option>Subtitles</option>
         </select>
-        <input type="checkbox" id="favButton" />
-        <label for="favButton" class="ri-heart-line" aria-label="like"></label>
       </div>
-      <footer>
 
-        <span>
-          <p id="currentDuration">00:00</p>
-          <!-- progress -->
-          <p id="fullDuration">00:00</p>
-        </span>
-
-        <div id="playerControls">
-          <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
-          <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
-
-          <!-- play button -->
-
-          <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
-          <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
-          <button class="ri-repeat-line" id="loopButton" aria-label="loop">
-          </button>
-
-          <span id="volumeContainer">
-            <label for="volumeChanger" class="ri-volume-up-fill"></label>
-            <input type="range" min="0" max="100" value="100" id="volumeChanger">
-          </span>
-          <select id="playSpeed">
-            <option value="0.25">0.25x</option>
-            <option value="0.50">0.50x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1.00" selected>1.00x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.50">1.50x</option>
-            <option value="1.75">1.75x</option>
-            <option value="2.00">2.00x</option>
-            <option value="2.50">2.50x</option>
-            <option value="3.00">3.00x</option>
-            <option value="3.50">3.50x</option>
-            <option value="4.00">4.00x</option>
-          </select>
-        </div>
-      </footer>
-      <select id="bitrateSelector">
-        <option>Bitrate</option>
-      </select>
     </section>
 
 
@@ -285,7 +295,6 @@
           <i class="ri-search-2-line"></i>
           <p>Search</p>
         </b>
-        <toggle-switch id="startupTab">Search as Default Tab</toggle-switch>
         <toggle-switch id="defaultFilterSongs">Songs as Default Filter</toggle-switch>
         <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
       </div>
@@ -306,6 +315,7 @@
           </select>
         </span>
         <toggle-switch id="HLS_Switch">HLS / Live Streaming</toggle-switch>
+        <toggle-switch id="enforceProxySwitch">Proxy Non-Music Streams</toggle-switch>
         <span>
           <label for="loadingTimeout">Loading Timeout</label>
           <select id="loadingTimeout">
@@ -321,13 +331,14 @@
           <i class="ri-stack-line"></i>
           <p> Library</p>
         </b>
+        <toggle-switch id="startupTab">Set as Default Tab</toggle-switch>
         <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
         <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
       </div>
 
       <div>
         <b>
-          <i class="ri-palette-line"></i>
+          <i class="ri-t-shirt-2-line"></i>
           <p>Interface</p>
         </b>
 
@@ -415,7 +426,6 @@
 
   <dialog id="superModal">
     <ul>
-      <li><i class="ri-play-large-line"></i>Play Now</li>
       <li><i class="ri-skip-forward-line"></i>Play Next</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
       <li>

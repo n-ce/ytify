@@ -9,8 +9,10 @@
 	transition: transform 0.2s ease-out;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 
-	* {
+	div,
+	span {
 		pointer-events: none;
 		transition: opacity 0.4s;
 	}
@@ -29,31 +31,47 @@
 	span {
 		position: relative;
 		z-index: 0;
-		width: 50dvmin;
+		max-width: 34.7vmin;
 		margin-right: 1vmin;
 
-
 		img {
+			height: 19.5vmin;
 			width: 100%;
 			border-radius: var(--roundness);
 		}
 
+
 		.duration {
 			position: absolute;
 			padding: 0 1vmin;
-			bottom: 1.1vmin;
+			bottom: 1.2vmin;
 			right: 1.2vmin;
 			background-color: #000a;
 			color: #fffc;
-			font-family: monospace;
-			border-radius: calc(var(--roundness)*1.1);
+			border-radius: calc(var(--roundness)*0.6);
+			font-size: 0.8rem;
 		}
 	}
 
 	div {
-		width: 100%;
+		height: 19.5vmin;
+		width: calc(100% - 40vmin);
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+
+		.title {
+			max-height: 10vmin;
+			line-height: 5vmin;
+			font-size: 100%;
+			overflow: hidden;
+		}
 
 		.avu {
+			height: 9.5vmin;
+			overflow: hidden;
+			line-height: 4.75vmin;
+			width: 100%;
 			font-size: small;
 			opacity: 0.8;
 
@@ -62,6 +80,16 @@
 				justify-content: space-between;
 			}
 		}
+	}
+
+	i {
+		height: 19.5vmin;
+		font-size: 1.2rem;
+		padding: 0 0.25rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
 	}
 
 }

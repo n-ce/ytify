@@ -22,6 +22,7 @@ export default async function invPlayer(id: string, instance = 0) {
   const data = await fetch(apiUrl + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
+      playButton.classList.replace(playButton.className, 'ri-loader-3-line');
       if (instance < instanceSelector.length - 1) {
         notify(`switched instance from ${apiUrl} to ${getApi('invidious', instance + 1)} due to error: ${err.message}`);
         invPlayer(id, instance + 1);
@@ -57,11 +58,12 @@ export default async function invPlayer(id: string, instance = 0) {
   let index = -1;
 
   bitrateSelector.innerHTML = '';
-  const isMusic = data.genre === 'Music';
+
+  const enforceProxy = getSaved('enforceProxy') === 'true';
+  const isMusic = enforceProxy || data.genre === 'Music';
   const ivApi = getApi('invidious');
 
   function proxyHandler(url: string) {
-
     const oldUrl = new URL(url);
 
     // only proxy music streams
@@ -93,18 +95,16 @@ export default async function invPlayer(id: string, instance = 0) {
   audio.src = bitrateSelector.value;
 
   // remove ' - Topic' from name if it exists
-
   let music = false;
   if (data.author.endsWith(' - Topic')) {
     music = true;
-    data.author = data.author.replace(' - Topic', '');
+    data.author = data.author.slice(0, -8);
   }
 
   setMetaData(
     id,
     data.title,
     data.author,
-    data.authorUrl,
     music
   );
 

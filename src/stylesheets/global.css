@@ -2,12 +2,11 @@
 @import 'remixicon.css';
 @import 'nav.css';
 @import 'miniPlayer.css';
-@import 'footer.css';
 @import 'home.css';
 @import 'search.css';
 @import 'library.css';
-@import 'list.css';
 @import 'settings.css';
+@import 'list.css';
 @import 'superModal.css';
 @import 'snackbar.css';
 @import 'animations.css';
@@ -67,6 +66,8 @@ h6 {
 
 
 button {
+  background: none;
+  border: none;
   transition: all 0.3s ease;
   user-select: none;
 

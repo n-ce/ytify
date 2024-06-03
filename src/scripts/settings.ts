@@ -8,6 +8,7 @@ const startupTabSwitch = <HTMLElement>document.getElementById('startupTab');
 const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
+const enforceProxySwitch = <HTMLElement>document.getElementById('enforceProxySwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
@@ -80,6 +81,18 @@ qualitySwitch.addEventListener('click', async () => {
 
 if (getSaved('hq') == 'true')
   qualitySwitch.toggleAttribute('checked');
+
+/////////////////////////////////////////////////////////////
+
+enforceProxySwitch.addEventListener('click', () => {
+  getSaved('enforceProxy') ?
+    removeSaved('enforceProxy') :
+    save('enforceProxy', 'true');
+});
+
+if (getSaved('enforceProxy') === 'true') enforceProxySwitch.toggleAttribute('checked');
+
+/////////////////////////////////////////////////////////////
 
 discoverSwitch.addEventListener('click', (e) => {
 

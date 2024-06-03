@@ -42,7 +42,7 @@
   }
 }
 
-@keyframes like {
+@keyframes toggle {
   50% {
     transform: scale(0.9);
   }

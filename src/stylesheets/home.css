@@ -1,122 +1,141 @@
 #home {
+  height: auto;
+  gap: 5vmin;
   width: 100%;
-  height: 100%;
-  align-items: center;
-  background: linear-gradient(transparent, var(--onBg));
+  padding: 5%;
+  background: var(--onBg);
+  --rx2: calc(var(--roundness)*1.5);
+
+
+  #upperLayer {
+    width: 100%;
+
+
+    img {
+      border: var(--border);
+      border-radius: var(--roundness);
+      width: 100%;
+
+    }
+
+    #meta {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      #title {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      #upperButtonLayer {
+        margin-top: 5vmin;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        * {
+          font-size: 1.4rem;
+          line-height: 1.4rem;
+          margin: 0;
+          padding: 0;
+        }
+
+        #favButton {
+          display: none;
+        }
+      }
+    }
 
 
 
-  #img {
-    border: var(--border);
-    border-radius: var(--roundness);
-    box-shadow: var(--shadow);
+
   }
 
-}
+  #trackline {
+    width: 100%;
 
-#subtitleContainer {
-  pointer-events: none;
-  position: absolute;
+    input {
+      width: 100%;
+    }
 
-  span {
-    font-size: medium !important;
-    font-family: 'Noto Sans';
-  }
-}
+    div {
+      display: flex;
+      justify-content: space-between;
+    }
 
-#subtitleContainer div div div div {
-  border-radius: var(--roundness);
-  overflow: hidden;
-}
-
-#metadata {
-  width: 96%;
-  padding: 0 2%;
-  display: grid;
-  grid-template-areas:
-    "A A A A"
-    "B C D E";
-
-  #title {
-    font-size: larger;
-    font-weight: bold;
-    margin-bottom: 5%;
-    grid-area: A;
   }
 
-  #author {
-    font-size: small;
+
+  #playerControls {
+    width: 100%;
     display: flex;
-    align-items: center;
-    grid-area: B;
-  }
+    justify-content: space-between;
 
-  select {
-    font-family: inherit;
-    font-size: small;
-    text-align: right;
+    button {
+      font-size: 1.6rem;
+      color: var(--text);
+      padding: 0;
+    }
 
-
-    #subtitleSelector {
-      max-width: 10ch;
-      grid-area: D;
+    #playButton {
+      transform: scale(1.5)
     }
   }
-}
 
-
-
-#bitrateSelector {
-  background: var(--onBg);
-  font-size: small;
-}
-
-
-#favButton {
-  display: none;
-}
-
-#favButton+label {
-  text-align: right;
-  font-size: x-large;
-  font-weight: bold;
-  grid-area: E;
-}
-
-#favButton:checked+label {
-  animation: like 0.4s ease-in-out;
-}
-
-@keyframes like {
-  50% {
-    transform: scale(0.9);
-  }
-}
-
-@media(orientation:portrait) {
-  #img {
-    height: 52vw;
-    width: auto;
-  }
-
-  #home {
-    flex-direction: column;
-    justify-content: space-evenly;
-    animation: fromBelow 0.4s;
-  }
-}
-
-
-@media(orientation:landscape) {
-  #home {
-    flex-direction: row;
+  #selectors {
+    display: flex;
+    width: 100%;
     justify-content: space-between;
-    animation: fromLeft 0.4s;
+
+    select {
+      font-size: 0.8rem;
+      border-radius: 0;
+    }
+
+
   }
 
-  img {
-    width: auto;
-    height: 45%;
+  @media(orientation:portrait) {
+    margin-top: auto;
+    border-radius: var(--rx2) var(--rx2) 0 0;
+    border-top: var(--border);
+    flex-direction: column;
+    animation-name: fromBelow;
+
+    img {
+      margin-bottom: 5%;
+    }
+
+    #volumeContainer input {
+      display: none;
+    }
+  }
+
+  @media(orientation:landscape) {
+    width: calc(100% - 12vmin);
+    margin: auto;
+    border: var(--border);
+    border-radius: var(--rx2);
+    padding: 4vmin 8vmin;
+    animation-name: fromLeft;
+
+    #upperLayer {
+      display: flex;
+      justify-content: center;
+
+      img {
+        margin: auto;
+        height: 6.6rem;
+        width: auto;
+      }
+
+      #meta {
+
+        width: 62%;
+      }
+    }
   }
 
 }

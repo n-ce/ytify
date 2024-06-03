@@ -8,6 +8,7 @@ import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
 const streamHistory: string[] = [];
+const ad = audio.dataset as { [index: string]: string };
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
@@ -22,7 +23,6 @@ const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 
 const msn = 'mediaSession' in navigator;
-const ms = msn ? navigator.mediaSession : playButton.dataset;
 function updatePositionState() {
   if (msn)
     if ('setPositionState' in navigator.mediaSession)
@@ -36,8 +36,8 @@ function updatePositionState() {
 
 
 playButton.addEventListener('click', () => {
-  if (!audio.dataset.id) return;
-  ms.playbackState === 'playing' ?
+  if (!ad.id) return;
+  ad.playbackState === 'playing' ?
     audio.pause() :
     audio.play();
 });
@@ -49,16 +49,15 @@ let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
-  ms.playbackState = 'playing';
-  const id = <string>audio.dataset.id;
-  if (!streamHistory.includes(id))
-    streamHistory.push(id);
+  ad.playbackState = 'playing';
+  if (!streamHistory.includes(ad.id))
+    streamHistory.push(ad.id);
   const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
   if (!getSaved('history') ||
-    firstElementInHistory.dataset.id !== id)
+    firstElementInHistory.dataset.id !== ad.id)
     historyTimeoutId = window.setTimeout(() => {
-      if (historyID === audio.dataset.id) {
-        addToCollection('history', audio.dataset);
+      if (historyID === ad.id) {
+        addToCollection('history', ad);
         // just in case we are already in the history collection 
         if (params.get('collection') === 'history')
           document.getElementById('history')!.click();
@@ -70,7 +69,7 @@ audio.addEventListener('playing', () => {
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
-  ms.playbackState = 'paused';
+  ad.playbackState = 'paused';
   clearTimeout(historyTimeoutId);
 });
 
@@ -87,7 +86,7 @@ const playableCheckerID = setInterval(() => {
 audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
-  historyID = audio.dataset.id;
+  historyID = ad.id;
   clearTimeout(historyTimeoutId);
 
   // persist playback speed
@@ -174,7 +173,7 @@ loopButton.addEventListener('click', () => {
 
 playPrevButton.addEventListener('click', () => {
   if (streamHistory.length > 1) {
-    appendToQueuelist(audio.dataset, true);
+    appendToQueuelist(ad, true);
     streamHistory.pop();
     player(streamHistory[streamHistory.length - 1]);
   }
@@ -217,11 +216,9 @@ volumeChanger.addEventListener('input', () => {
 if (msn) {
   navigator.mediaSession.setActionHandler('play', () => {
     audio.play();
-    ms.playbackState = 'playing';
   });
   navigator.mediaSession.setActionHandler('pause', () => {
     audio.pause();
-    ms.playbackState = 'paused'
   });
   navigator.mediaSession.setActionHandler("seekforward", () => {
     audio.currentTime += 15;

@@ -70,7 +70,6 @@ const palette: Scheme = {
 
 
 function themer() {
-
   const canvasImg = new Image();
   canvasImg.onload = () => {
 
@@ -118,7 +117,9 @@ function themer() {
     tabColor.content = palette[scheme].bg(r, g, b);
   }
   canvasImg.crossOrigin = '';
-  canvasImg.src = generateImageUrl(audio.dataset.id || params.get('s') || '1SLr62VBBjw');
+  const temp = generateImageUrl(audio.dataset.id || params.get('s') || '1SLr62VBBjw');
+  if (canvasImg.src !== temp) canvasImg.src = temp;
+
 }
 
 

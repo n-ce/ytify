@@ -16,7 +16,8 @@ codecSelector.addEventListener('change', async () => {
     save('codec', String(i)) :
     removeSaved('codec');
 
-  audio.pause();
+  if (audio.dataset.playbackState === 'playing')
+    audio.pause();
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
@@ -35,6 +36,8 @@ setTimeout(async () => {
 /////////////////////////////////////////////////////////////
 
 bitrateSelector.addEventListener('change', () => {
+  if (audio.dataset.playbackState === 'playing')
+    audio.pause();
   const timeOfSwitch = audio.currentTime;
   audio.src = bitrateSelector.value;
   audio.currentTime = timeOfSwitch;
@@ -108,19 +111,19 @@ export default async function player(id: string | null = '') {
   audio.dataset.duration = convertSStoHHMMSS(data.duration);
   audio.dataset.channelUrl = data.uploaderUrl;
 
+
   // remove ' - Topic' from name if it exists
 
   let music = false;
   if (data.uploader.endsWith(' - Topic')) {
     music = true;
-    data.uploader = data.uploader.replace(' - Topic', '');
+    data.uploader = data.uploader.slice(0, -8);
   }
 
   setMetaData(
     id,
     data.title,
     data.uploader,
-    data.uploaderUrl,
     music
   );
 
@@ -141,13 +144,16 @@ export default async function player(id: string | null = '') {
   let index = -1;
 
   bitrateSelector.innerHTML = '';
-  const isMusic = data.category === 'Music';
+
+  const enforceProxy = getSaved('enforceProxy') === 'true';
+  const isMusic = enforceProxy || data.category === 'Music';
   const ivApi = getApi('invidious');
 
   function proxyHandler(url: string) {
 
     const oldUrl = new URL(url);
 
+    // hls streams are proxied by default
     if (isMusic && hlsOn) return url;
 
     // only proxy music streams

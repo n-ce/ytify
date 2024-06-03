@@ -17,10 +17,9 @@ export default function StreamItem(data: {
   uploaded?: string,
   channelUrl?: string,
   views?: string,
-  imgYTM?: string,
+  img?: string,
   draggable?: boolean
 }) {
-
 
   const [tsrc, setTsrc] = createSignal('');
 
@@ -59,7 +58,7 @@ export default function StreamItem(data: {
   }
 
   if (showImage)
-    setTsrc(generateImageUrl(data.imgYTM || data.id, 'mq'));
+    setTsrc(generateImageUrl(data.img || data.id, 'mq'));
 
   return (
     <a
@@ -71,6 +70,7 @@ export default function StreamItem(data: {
       data-author={data.author}
       data-channel_url={data.channelUrl}
       data-duration={data.duration}
+      data-thumbnail={tsrc()}
     >
       <span>
         <Show when={showImage}>
@@ -91,9 +91,7 @@ export default function StreamItem(data: {
           <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
         </div>
       </div>
-      <Show when={data.draggable}>
-        <i class="ri-draggable"></i>
-      </Show>
+      <i class={`ri-${data.draggable ? 'draggable' : 'more-2-fill'}`}></i>
     </a>
   )
 }

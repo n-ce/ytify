@@ -1,4 +1,4 @@
-import '../stylesheets/style.css';
+import '../stylesheets/global.css';
 import './api';
 import './router';
 import './theme';

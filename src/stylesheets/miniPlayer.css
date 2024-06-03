@@ -2,30 +2,11 @@
   display: flex;
   column-gap: 2%;
 
-  input {
-    display: none;
-    position: fixed;
-    width: 92%;
-    height: 1vmin;
-    pointer-events: none;
-    appearance: none;
-    overflow: hidden;
-    background: none;
-    ;
-
-
-    &::-webkit-slider-thumb {
-      appearance: none;
-      border: none;
-      transform: none;
-      box-shadow: -55vw 0 0 55vw var(--text);
-    }
-
-  }
 
   img,
   div {
     border-radius: var(--roundness);
+    border: var(--border);
   }
 
   div {
@@ -33,11 +14,13 @@
     align-items: center;
     width: 100%;
 
+
     a {
       pointer-events: none;
       overflow: hidden;
       font-size: 1rem;
       line-height: 1.5rem;
+      z-index: 1;
     }
 
 
@@ -49,6 +32,7 @@
       padding: 0;
       font-size: 1.2rem;
       transform: scale(1.8);
+      z-index: 1;
 
       &:active {
         transform: scale(1.6);
@@ -68,7 +52,6 @@
     img,
     div {
       background-color: var(--onBg);
-      box-shadow: var(--shadow);
     }
 
     div a {

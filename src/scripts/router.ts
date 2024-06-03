@@ -37,11 +37,20 @@ function showSection(id: string) {
     superCollectionLoader(getSaved('defaultSuperCollection') || 'collections');
 
   sections[routeIdx].classList.add('view');
-  anchors[routeIdx].classList.add('active');
+  const a = anchors[routeIdx];
+  a.classList.add('active');
+  const ai = a.firstElementChild!.classList;
+  if (ai.length)
+    ai.replace(ai[0], ai[0].replace('line', 'fill'));
 
   if (prevPageIdx !== routeIdx) {
     sections[prevPageIdx].classList.remove('view');
-    anchors[prevPageIdx].classList.remove('active');
+    const ap = anchors[prevPageIdx];
+    ap.classList.remove('active');
+    const aip = ap.firstElementChild!.classList;
+    if (aip.length)
+      aip.replace(aip[0], aip[0].replace('fill', 'line'));
+
   }
   prevPageIdx = routeIdx;
 }
@@ -103,7 +112,7 @@ else {
   route = routes.find(route => location.pathname === route) || '/';
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
   if (route === '/' && !hasStreamQuery)
-    route = getSaved('startupTab') ? '/search' : '/library';
+    route = getSaved('startupTab') ? '/library' : '/search';
 }
 
 // necessary to use a click event 
