@@ -202,7 +202,7 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
       })
       .finally(() => loadingScreen.close());
 
-    return itemsLoader(fetchItems(initApi));
+    return itemsLoader(fetchItems);
   }
 
 
