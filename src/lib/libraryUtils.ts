@@ -191,21 +191,18 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
     if (!Object(db).hasOwnProperty('channels'))
       return 'You have not subscribed to any channels';
 
-    const channels = Object.keys(db.channels);
-
     loadingScreen.showModal();
+
+    const channels = Object.keys(db.channels);
     const initApi = getApi('piped');
-    const fetchItems = (api: string) => fetch(api + '/feed/unauthenticated?channels=' + channels.join(','))
+    const fetchItems = await fetch(initApi + '/feed/unauthenticated?channels=' + channels.join(','))
       .then(res => res.json())
-      .catch((): {} => {
-        const nextApi = getApi('piped', 0);
-        if (nextApi === initApi) return {};
-        notify(`${initApi} was not able to return the subscription feed. Retrying with ${nextApi}.`);
-        return fetchItems(nextApi);
+      .catch(() => {
+        notify(`${initApi} was not able to return the subscription feed. Retry with another instance.`);
       })
       .finally(() => loadingScreen.close());
 
-    return itemsLoader(await fetchItems(initApi));
+    return itemsLoader(fetchItems(initApi));
   }
 
 
