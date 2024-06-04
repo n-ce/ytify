@@ -6,6 +6,7 @@ import StreamItem from "../components/StreamItem";
 
 
 
+
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
 export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
@@ -62,31 +63,54 @@ export function createPlaylist(title: string) {
 }
 
 
-export function fetchCollection(collection: string) {
-  const db = getDB();
-  const data = db[collection];
-
-  if (collection === 'discover')
-    for (const i in data)
-      if (data[i].frequency === 1)
-        delete db.discover[i];
+export function fetchCollection(collection: string, publicId: string = '') {
 
   const fragment = document.createDocumentFragment();
+  console.log(publicId)
+  // this means it does not exist in db and is a public collection
+  if (publicId) {
+    loadingScreen.showModal();
+    fetch(`${location.origin}/public?id=${publicId}`)
+      .then(res => res.json())
+      .then(data => {
+        for (const d of data)
+          render(() => StreamItem({
+            id: d.id || '',
+            href: hostResolver(`/watch?v=${d.id}`),
+            title: d.title || '',
+            author: d.author || '',
+            duration: d.duration || '',
+            channelUrl: d.channelUrl || ''
+          }), fragment);
+      })
+      .finally(() => loadingScreen.close());
 
-  for (const item in data) {
-    const d = data[item];
-    render(() => StreamItem({
-      id: d.id || '',
-      href: hostResolver(`/watch?v=${data[item].id}`),
-      title: d.title || '',
-      author: d.author || '',
-      duration: d.duration || '',
-      channelUrl: d.channelUrl || ''
-    }), fragment);
-  }
-  if (!fragment.childElementCount) {
-    alert('No items found');
-    return;
+  } else {
+
+    const db = getDB();
+    const data = db[collection];
+
+    if (collection === 'discover')
+      for (const i in data)
+        if (data[i].frequency as number < 2)
+          delete db.discover[i];
+
+
+    for (const item in data) {
+      const d = data[item];
+      render(() => StreamItem({
+        id: d.id || '',
+        href: hostResolver(`/watch?v=${d.id}`),
+        title: d.title || '',
+        author: d.author || '',
+        duration: d.duration || '',
+        channelUrl: d.channelUrl || ''
+      }), fragment);
+    }
+    if (!fragment.childElementCount) {
+      alert('No items found');
+      return;
+    }
   }
 
   listContainer.replaceChildren(fragment);

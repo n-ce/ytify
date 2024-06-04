@@ -11,16 +11,16 @@ const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
 
 
-function upcomingInjector(param: string) {
+export function upcomingInjector(param: string) {
   loadingScreen.showModal();
 
-  fetch(`${location.origin}/upcoming?id=${param}`)
+  fetch(`${location.origin}/public?id=${param}`)
     .then(res => res.json())
     .then(data => {
-      loadingScreen.close();
       for (const stream of data)
         appendToQueuelist(stream)
     })
+    .finally(() => loadingScreen.close());
 }
 
 if (queueParam)

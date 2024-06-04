@@ -1,4 +1,4 @@
-// handles upcoming query requests to restore queue from any where
+// handles upcoming query & public collection requests to restore queue from any where
 
 import { Config } from '@netlify/edge-functions';
 
@@ -71,5 +71,5 @@ export default async (request: Request) => {
 };
 
 export const config: Config = {
-  path: '/upcoming',
+  path: '/public',
 };

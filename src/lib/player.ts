@@ -78,7 +78,7 @@ export default async function player(id: string | null = '') {
 
   const apiIndex = instanceSelector.selectedIndex;
 
-  // fallback for custom instances do not support unified instance architecture
+  // fallback for custom instances which do not support unified instance architecture
   if (apiIndex === 0)
     return import('./player.invidious').then(player => player.default(id));
 

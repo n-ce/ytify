@@ -1,7 +1,7 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, shareCollectionButton, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
-import { addListToCollection, createPlaylist, getDB, saveDB, toCollection } from '../lib/libraryUtils';
+import { addListToCollection, createPlaylist, getDB, reservedCollections, saveDB, toCollection } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
 import { getThumbIdFromLink } from '../lib/imageUtils';
 
@@ -107,6 +107,24 @@ listBtnsContainer.addEventListener('click', e => {
     db[newTitle] = db[id];
     delete db[id];
     saveDB(db);
+  }
+  else if (btn === shareCollectionButton) {
+    let url = location.href;
+    async function setClipboard(text: string) {
+      const type = "text/plain";
+      const blob = new Blob([text], { type });
+      const data = [new ClipboardItem({ [type]: blob })];
+      await navigator.clipboard.write(data);
+    }
+    if (reservedCollections.includes(id)) {
+      alert('This is a reserved collection which cannot be shared');
+      return;
+    }
+    const shareId = Object.keys(db[id]).join('');
+
+    setClipboard(url + '&shareId=' + shareId);
+
+
   }
 })
 

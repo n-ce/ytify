@@ -71,7 +71,7 @@ collectionContainer.addEventListener('click', e => {
 });
 
 if (params.has('collection'))
-  fetchCollection(<string>params.get('collection'))
+  fetchCollection(<string>params.get('collection'), params.get('shareId') || '')
 
 
 superCollectionSelector.addEventListener('change', () => {
