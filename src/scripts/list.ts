@@ -109,20 +109,17 @@ listBtnsContainer.addEventListener('click', e => {
     saveDB(db);
   }
   else if (btn === shareCollectionButton) {
-    let url = location.href;
-    async function setClipboard(text: string) {
-      const type = "text/plain";
-      const blob = new Blob([text], { type });
-      const data = [new ClipboardItem({ [type]: blob })];
-      await navigator.clipboard.write(data);
-    }
     if (reservedCollections.includes(id)) {
       alert('This is a reserved collection which cannot be shared');
       return;
     }
     const shareId = Object.keys(db[id]).join('');
 
-    setClipboard(url + '&shareId=' + shareId);
+    const text = location.href + '&shareId=' + shareId;
+    const type = "text/plain";
+    const blob = new Blob([text], { type });
+    const data = [new ClipboardItem({ [type]: blob })];
+    navigator.clipboard.write(data);
 
 
   }
