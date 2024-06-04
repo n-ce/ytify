@@ -130,16 +130,15 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
   // login 
   const authId = await fetch(instance + '/login', {
     method: 'POST',
-    body: JSON.stringify({
-      username: username,
-      password: password
-    })
+    body: JSON.stringify({ username, password })
   })
     .then(res => res.json())
     .catch(e => notify(`Failed to Login, Error : ${e}`));
 
-  if (!authId) return;
-
+  if (!authId) {
+    notify('No Auth Token Found! Aborted Login Process.');
+    return;
+  }
 
   notify('Succesfully logged in to account.');
 
@@ -150,14 +149,17 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
     }
   }).then(res => res.json())
     .catch(e => notify(`Failed to Find Playlists, Error : ${e}`));
+  if (playlists.length)
+    notify('Succesfully fetched playlists from account.')
+  else return;
 
-  notify('Succesfully fetched playlists from account.');
 
-  // import 
-  await Promise.all(playlists.map(async (playlist: {
+  // import
+
+  await Promise.all(playlists.map((playlist: {
     id: string
-  }) => {
-    await fetch(instance + '/playlists/' + playlist.id)
+  }) =>
+    fetch(instance + '/playlists/' + playlist.id)
       .then(res => res.json())
       .then(data => {
         const listTitle = data.name;
@@ -175,29 +177,29 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
           }
         addListToCollection(listTitle, list);
       })
-  }));
+  )).then(() => {
+    notify('Succesfully imported playlists from your piped account into ytify as collections');
+  })
+    .catch(e => {
+      notify('Could not successfully import all playlists, Error : ' + e);
+    });
 
-  notify('Succesfully imported playlists from your piped account into ytify as collections');
 
   // Refresh without reload
   superCollectionLoader('collections');
 
   // logout
-  const controller = new AbortController();
-  const timeoutId: number = window.setTimeout(() => controller.abort());
 
-  const logoutResponse = await fetch(instance + '/logout', {
+  fetch(instance + '/logout', {
     method: 'POST',
-    signal: controller.signal,
     headers: {
       Authorization: authId.token
     }
   }).then(res => {
-    clearTimeout(timeoutId);
-    return res;
+    notify(res.ok ?
+      'Succesfully logged out of your piped account.' :
+      'Couldn\'t logout successfully'
+    );
   });
-
-  if (logoutResponse.ok)
-    notify('Succesfully logged out of your piped account.');
 
 });
