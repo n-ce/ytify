@@ -245,6 +245,7 @@ player(params.get('s') || idFromURL(params.get('url') || params.get('text')));
 /*
 Understanding AutoQueue
 
+first stream loads, emits a bunch of recommended streams, all pushed to queue
 second stream loads, emits a bunch of recommended streams, all pushed it to a virtual queue
 third stream loads, continue pushing to virtual queue
 and so on till the last stream in the original queue
@@ -263,16 +264,21 @@ const frequencyQueue: { [index: string]: number } = {};
 export function autoQueue(data: Recommendation[]) {
 
   const init = queuelist.querySelectorAll('div').length === 0;
+  const trashHistory = sessionStorage.getItem('trashHistory');
 
   data.forEach(stream => {
 
-    const id = stream.videoId ||
-      stream.url.slice(9);
+    const id = stream.videoId || stream.url.slice(9);
     const author = stream.author || stream.uploaderName;
     const duration = stream.lengthSeconds || stream.duration;
 
     if ('type' in stream && stream.type !== 'stream')
       return;
+
+    if (
+      trashHistory?.includes(id) ||
+      streamHistory.includes(id)
+    ) return;
 
     const streamData = {
       id: id,
@@ -288,9 +294,13 @@ export function autoQueue(data: Recommendation[]) {
       frequencyQueue[id] = 1;
     }
 
-    // first stream loads, emits a bunch of recommended streams, all pushed to queue
-    if (init)
-      appendToQueuelist(streamData)
+
+    if (init) {
+      const data = streamData;
+
+      appendToQueuelist(data);
+    }
+
   });
 
   const freqArr = Object.entries(frequencyQueue).sort((a, b) => b[1] - a[1]);

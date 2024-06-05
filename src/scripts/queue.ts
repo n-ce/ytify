@@ -61,10 +61,11 @@ queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLAnchorElement;
   if (!queueItem.classList.contains('streamItem')) return;
   const id = queueItem.dataset.id || '';
-  if (queueItem.classList.contains('delete')) {
-    const trashHistory = sessionStorage.getItem('trashHistory');
-    sessionStorage.setItem('trashHistory', trashHistory + id);
-  } else player(id);
+  queueItem.classList.contains('delete') ?
+    sessionStorage.setItem(
+      'trashHistory',
+      sessionStorage.getItem('trashHistory') + id
+    ) : player(id);
 
   const index = queueArray.indexOf(id);
 

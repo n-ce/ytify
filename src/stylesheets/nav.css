@@ -13,10 +13,7 @@ nav {
       pointer-events: none;
     }
 
-    &:hover {
-      opacity: 75%;
-    }
-
+    &:hover,
     &.active {
       opacity: 1;
     }
