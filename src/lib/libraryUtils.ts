@@ -74,7 +74,7 @@ export async function fetchCollection(collection: string, publicId: string = '')
     fetch(`${location.origin}/public?id=${publicId}`)
       .then(res => res.json())
       .then(data => {
-        alert(data);
+        console.log(data);
         for (const d of data)
           render(() => StreamItem({
             id: d.id || '',
