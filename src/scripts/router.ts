@@ -1,5 +1,5 @@
 import { audio, loadingScreen, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
-import { superCollectionLoader } from "../lib/libraryUtils";
+import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { fetchList, getSaved, params } from "../lib/utils";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
@@ -96,7 +96,9 @@ if (errorParam) {
     route = _[0];
     const query = encodeURI(_[1]);
     if (route === '/list')
-      fetchList('/' + query.split('=').join('/'));
+      query.startsWith('?shareId') ?
+        fetchCollection('', query.split('=')[1]) :
+        fetchList('/' + query.split('=').join('/'));
     if (route === '/search') {
       const x = new URLSearchParams(query);
       superInput.value = x.get('q') || '';
