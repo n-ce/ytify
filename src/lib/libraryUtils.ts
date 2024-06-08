@@ -62,32 +62,13 @@ export function createPlaylist(title: string) {
 }
 
 
-export async function fetchCollection(collection: string, publicId: string = '') {
+export async function fetchCollection(collection: string | null, shareId: string | null = '') {
 
   const fragment = document.createDocumentFragment();
   const render = await import('solid-js/web').then(mod => mod.render);
   const StreamItem = await import('../components/StreamItem').then(mod => mod.default);
 
-  // this means it does not exist in db and is a public collection
-  if (publicId) {
-    loadingScreen.showModal();
-    await fetch(`${location.origin}/public?id=${publicId}`)
-      .then(res => res.json())
-      .then(data => {
-        for (const d of data)
-          render(() => StreamItem({
-            id: d.id || '',
-            href: hostResolver(`/watch?v=${d.id}`),
-            title: d.title || '',
-            author: d.author || '',
-            duration: d.duration || '',
-            channelUrl: d.channelUrl || ''
-          }), fragment);
-      })
-      .finally(() => loadingScreen.close());
-
-  } else {
-
+  if (collection) {
     const db = getDB();
     const data = db[collection];
 
@@ -112,13 +93,35 @@ export async function fetchCollection(collection: string, publicId: string = '')
       alert('No items found');
       return;
     }
+    listAnchor.dataset.id = collection;
+
+  } else {
+    // this means it does not exist in db and is a public collection
+
+    listBtnsContainer.className = 'publicPlaylist';
+    loadingScreen.showModal();
+    await fetch(`${location.origin}/public?id=${shareId}`)
+      .then(res => res.json())
+      .then(data => {
+        for (const d of data)
+          render(() => StreamItem({
+            id: d.id || '',
+            href: hostResolver(`/watch?v=${d.id}`),
+            title: d.title || '',
+            author: d.author || '',
+            duration: d.duration || '',
+            channelUrl: d.channelUrl || ''
+          }), fragment);
+      })
+      .finally(() => loadingScreen.close());
+
   }
 
   listContainer.replaceChildren(fragment);
 
   const isReversed = listContainer.classList.contains('reverse');
 
-  if (reservedCollections.includes(collection)) {
+  if (collection && reservedCollections.includes(collection)) {
     if (!isReversed)
       listContainer.classList.add('reverse');
   }
@@ -128,7 +131,6 @@ export async function fetchCollection(collection: string, publicId: string = '')
 
   listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : 'collection';
 
-  listAnchor.dataset.id = collection;
 
   listAnchor.click();
   listContainer.scrollTo(0, 0);
