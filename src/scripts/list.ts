@@ -115,7 +115,8 @@ listBtnsContainer.addEventListener('click', e => {
     }
     const shareId = Object.keys(db[id]).join('');
 
-    const text = location.href + '&shareId=' + shareId;
+    const text = location.origin + location.pathname + '?shareId=' + shareId;
+
     const type = "text/plain";
     const blob = new Blob([text], { type });
     const data = [new ClipboardItem({ [type]: blob })];
