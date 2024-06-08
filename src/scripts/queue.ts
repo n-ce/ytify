@@ -51,41 +51,35 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 }
 
-const queueListSortable = new Sortable(queuelist, {
-  onUpdate: function(event: SortableEvent) {
-    if (event.oldIndex == null || event.newIndex == null) return
-    queueArray.splice(event.newIndex, 0, queueArray.splice(event.oldIndex, 1)[0])
+new Sortable(queuelist, {
+  handle: '.ri-draggable',
+  onUpdate(e: SortableEvent) {
+    if (e.oldIndex == null || e.newIndex == null) return;
+    queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
   }
-})
-
-queuelist.addEventListener('dblclick', e => {
-  const queueItem = e.target as HTMLElement;
-  if (!queueItem.matches('stream-item')) return;
-  const id = queueItem.dataset.id || '';
-  if (queueItem.classList.contains('delete')) {
-    const trashHistory = sessionStorage.getItem('trashHistory');
-    sessionStorage.setItem('trashHistory', trashHistory + id);
-  } else player(id);
-
-  const index = queueArray.indexOf(id);
-
-  queueArray.splice(index, 1);
-  queuelist.children[index].remove();
 });
 
 queuelist.addEventListener('click', e => {
-  const queueItem = e.target as HTMLElement;
-  if (!queueItem.matches('stream-item')) return;
-  const id = queueItem.dataset.id || '';
-  if (queueItem.classList.contains('delete')) {
-    const trashHistory = sessionStorage.getItem('trashHistory');
-    sessionStorage.setItem('trashHistory', trashHistory + id);
 
-    const index = queueArray.indexOf(id);
-    queueArray.splice(index, 1);
-    queuelist.children[index].remove();
-  }
+  e.preventDefault();
+
+  const queueItem = e.target as HTMLAnchorElement;
+  if (!queueItem.classList.contains('streamItem')) return;
+  const id = queueItem.dataset.id || '';
+  queueItem.classList.contains('delete') ?
+    sessionStorage.setItem(
+      'trashHistory',
+      sessionStorage.getItem('trashHistory') + id
+    ) : player(id);
+
+  const index = queueArray.indexOf(id);
+
+
+  queueArray.splice(index, 1);
+
+  queuelist.children[index].remove();
 });
+
 
 // clones any list items from the provided container to queue
 
@@ -117,8 +111,7 @@ shuffleQBtn.addEventListener('click', () => {
 });
 
 removeQBtn.addEventListener('click', () => {
-  queueListSortable.option('disabled', !queueListSortable.option('disabled'))
-  queuelist.querySelectorAll('stream-item').forEach(el => {
+  queuelist.querySelectorAll('.streamItem').forEach(el => {
     el.classList.toggle('delete')
   });
   removeQBtn.classList.toggle('delete');
@@ -185,5 +178,3 @@ new MutationObserver(m => {
     }
   }
 }).observe(queuelist, { childList: true });
-
-
