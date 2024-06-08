@@ -129,7 +129,7 @@ export async function fetchCollection(collection: string | null, shareId: string
     listContainer.classList.remove('reverse');
 
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : 'collection';
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (collection ? 'collection' : 'publicCollection');
 
 
   listAnchor.click();

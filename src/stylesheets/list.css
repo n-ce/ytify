@@ -11,15 +11,6 @@
     }
   }
 
-  &.publicPlaylist {
-    button {
-      display: none;
-    }
-
-    #importListBtn {
-      display: inline-block !important;
-    }
-  }
 
   &.channel {
     button {
@@ -53,6 +44,16 @@
       display: none;
     }
 
+  }
+
+  &.publicCollection {
+    button {
+      display: none;
+    }
+
+    #importListBtn {
+      display: inline-block !important;
+    }
   }
 }
 
