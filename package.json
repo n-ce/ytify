@@ -14,9 +14,11 @@
     "solid-js": "^1.8.17"
   },
   "devDependencies": {
-    "@netlify/edge-functions": "^2.8.1",
+    "@netlify/edge-functions": "^2.6.1",
+    "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.19",
     "eruda": "^3.0.1",
+    "sortablejs": "^1.15.2"
     "typescript": "^5.4.5",
     "vite": "^5.2.12",
     "vite-plugin-pwa": "^0.20.0",

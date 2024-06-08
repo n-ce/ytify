@@ -3,7 +3,7 @@ import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
-// import Sortable from "sortablejs";
+import Sortable, { SortableEvent } from "sortablejs";
 
 const queueArray: string[] = [];
 
@@ -51,8 +51,13 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 }
 
-
-//new Sortable(queuelist, {});
+new Sortable(queuelist, {
+  handle: '.ri-draggable',
+  onUpdate(e: SortableEvent) {
+    if (e.oldIndex == null || e.newIndex == null) return;
+    queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
+  }
+});
 
 queuelist.addEventListener('click', e => {
 
@@ -69,7 +74,9 @@ queuelist.addEventListener('click', e => {
 
   const index = queueArray.indexOf(id);
 
+
   queueArray.splice(index, 1);
+
   queuelist.children[index].remove();
 });
 
@@ -171,5 +178,3 @@ new MutationObserver(m => {
     }
   }
 }).observe(queuelist, { childList: true });
-
-
