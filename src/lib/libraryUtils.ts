@@ -83,7 +83,6 @@ export async function fetchCollection(collection: string, publicId: string = '')
             duration: d.duration || '',
             channelUrl: d.channelUrl || ''
           }), fragment);
-        console.log(fragment);
       })
       .finally(() => loadingScreen.close());
 
@@ -116,6 +115,7 @@ export async function fetchCollection(collection: string, publicId: string = '')
   }
 
   listContainer.replaceChildren(fragment);
+  console.log(listContainer);
 
   const isReversed = listContainer.classList.contains('reverse');
 
