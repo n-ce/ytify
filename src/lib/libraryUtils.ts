@@ -136,7 +136,7 @@ export async function fetchCollection(collection: string | null, shareId: string
   listContainer.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    '?collection=' + collection);
+    (collection ? ('?collection=' + collection) : ('?shareId=' + shareId)));
 }
 
 
