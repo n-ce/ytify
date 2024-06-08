@@ -1,4 +1,3 @@
-import Hls from "hls.js";
 import { audio, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
@@ -155,13 +154,6 @@ audio.addEventListener('loadedmetadata', () => {
   fullDuration.textContent = convertSStoHHMMSS(audio.duration);
 });
 
-const hls = new Hls();
-
-hls.attachMedia(audio);
-hls.on(Hls.Events.MANIFEST_PARSED, () => {
-  audio.play();
-});
-export { hls };
 
 loopButton.addEventListener('click', () => {
   loopButton.classList.toggle('on');

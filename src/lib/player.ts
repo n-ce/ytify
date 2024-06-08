@@ -1,7 +1,8 @@
 import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor } from "./dom";
 import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
-import { autoQueue, hls } from "../scripts/audioEvents";
+import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
+import Hls from "hls.js";
 
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
@@ -65,6 +66,13 @@ switchHLS.addEventListener('click', () => {
     removeSaved('HLS') :
     save('HLS', 'true');
 
+});
+
+const hls = new Hls();
+
+hls.attachMedia(audio);
+hls.on(Hls.Events.MANIFEST_PARSED, () => {
+  audio.play();
 });
 
 
@@ -188,7 +196,6 @@ export default async function player(id: string | null = '') {
   bitrateSelector.selectedIndex = index;
 
   if (hlsOn) {
-    audio.src = '';
     hls.loadSource(proxyHandler(data.hls));
   } else
     audio.src = bitrateSelector.value;
