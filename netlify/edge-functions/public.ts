@@ -54,7 +54,7 @@ export default async (request: Request) => {
       'id': id,
       'title': json.title,
       'author': json.uploader || json.author,
-      'authorId': json.authorUrl || json.uploaderUrl.slice(9),
+      'authorId': (json.authorUrl || json.uploaderUrl).slice(9),
       'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds),
       'thumbnailUrl': json.thumbnailUrl || json.videoThumbnails[4].url,
       'source': api + id

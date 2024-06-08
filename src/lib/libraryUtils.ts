@@ -71,7 +71,7 @@ export async function fetchCollection(collection: string, publicId: string = '')
   // this means it does not exist in db and is a public collection
   if (publicId) {
     loadingScreen.showModal();
-    fetch(`${location.origin}/public?id=${publicId}`)
+    await fetch(`${location.origin}/public?id=${publicId}`)
       .then(res => res.json())
       .then(data => {
         for (const d of data)
@@ -115,7 +115,6 @@ export async function fetchCollection(collection: string, publicId: string = '')
   }
 
   listContainer.replaceChildren(fragment);
-  console.log(listContainer);
 
   const isReversed = listContainer.classList.contains('reverse');
 
