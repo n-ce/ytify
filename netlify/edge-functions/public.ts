@@ -1,4 +1,4 @@
-// handles upcoming query & public collection requests to restore queue from any where
+// handles upcoming query & public collection requests to restore stream lists from any state
 
 import { Config } from '@netlify/edge-functions';
 

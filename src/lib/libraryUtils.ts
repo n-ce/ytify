@@ -1,8 +1,7 @@
 import { $, getApi, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import { listAnchor, listBtnsContainer, listContainer, loadingScreen } from "./dom";
-import { render } from "solid-js/web";
-import StreamItem from "../components/StreamItem";
+
 
 
 
@@ -63,16 +62,19 @@ export function createPlaylist(title: string) {
 }
 
 
-export function fetchCollection(collection: string, publicId: string = '') {
+export async function fetchCollection(collection: string, publicId: string = '') {
 
   const fragment = document.createDocumentFragment();
-  console.log(publicId)
+  const render = await import('solid-js/web').then(mod => mod.render);
+  const StreamItem = await import('../components/StreamItem').then(mod => mod.default);
+
   // this means it does not exist in db and is a public collection
   if (publicId) {
     loadingScreen.showModal();
     fetch(`${location.origin}/public?id=${publicId}`)
       .then(res => res.json())
       .then(data => {
+        alert(data);
         for (const d of data)
           render(() => StreamItem({
             id: d.id || '',
