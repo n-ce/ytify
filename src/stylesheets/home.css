@@ -172,15 +172,12 @@ input[type="range"] {
   --brightness-hover: 180%;
   --brightness-down: 80%;
   --clip-edges: 0.125em;
-}
-
-
-/* === range commons === */
-input[type="range"] {
+  /* === range commons === */
   position: relative;
   background: #fff0;
   overflow: hidden;
 }
+
 
 input[type="range"]:active {
   cursor: grabbing;
