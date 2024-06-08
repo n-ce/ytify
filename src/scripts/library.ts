@@ -1,6 +1,6 @@
 import { audio, favButton, favIcon, superCollectionSelector } from "../lib/dom";
 import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
-import { $, convertSStoHHMMSS, fetchList, getSaved, notify, params, removeSaved, save } from "../lib/utils";
+import { $, convertSStoHHMMSS, getSaved, notify, params, removeSaved, save, superClick } from "../lib/utils";
 
 
 
@@ -30,16 +30,10 @@ exportBtn.addEventListener('click', () => {
 
 cleanBtn.addEventListener('click', () => {
 
-  let items = 0;
-  const db = getDB();
-  for (const collection in db) {
-    const collx = db[collection];
-    for (const _ in collx)
-      items++;
+  if (confirm(`Are you sure you want to clear ${Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0)} items from the library?`)) {
+    removeSaved('library');
+    location.reload();
   }
-  if (!confirm('Are you sure you want to clear ' + items + ' items from the library?')) return;
-  removeSaved('library');
-  location.reload();
 });
 
 
@@ -89,16 +83,7 @@ if (sdsc)
   superCollectionSelector.value = sdsc;
 
 
-superCollectionList.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  const elm = e.target as HTMLAnchorElement;
-
-  if (superCollectionSelector.value === 'collections' && elm.textContent)
-    fetchCollection(elm.textContent);
-  if (elm.dataset.url)
-    fetchList(elm.dataset.url)
-});
+superCollectionList.addEventListener('click', superClick);
 
 
 // setup initial dom state
@@ -117,7 +102,11 @@ addEventListener('DOMContentLoaded', () => {
 
 // piped import playlists into ytify collections
 
-document.getElementById('pipedPlsImport')!.addEventListener('click', async () => {
+const importPipedPlaylistsSwitch = document.getElementById('importPipedPlaylistsSwitch') as HTMLElement;
+
+importPipedPlaylistsSwitch.addEventListener('click', async (e) => {
+  e.stopImmediatePropagation();
+
   const instance = prompt('Enter the Piped Authentication Instance API URL :', 'https://pipedapi.kavin.rocks');
   if (!instance) return;
 
@@ -126,6 +115,8 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
 
   const password = prompt('Enter Password :');
   if (!password) return;
+
+  importPipedPlaylistsSwitch.toggleAttribute('checked');
 
   // login 
   const authId = await fetch(instance + '/login', {
@@ -184,8 +175,6 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
       notify('Could not successfully import all playlists, Error : ' + e);
     });
 
-
-  // Refresh without reload
   superCollectionLoader('collections');
 
   // logout
@@ -196,10 +185,11 @@ document.getElementById('pipedPlsImport')!.addEventListener('click', async () =>
       Authorization: authId.token
     }
   }).then(res => {
+    importPipedPlaylistsSwitch.toggleAttribute('checked');
     notify(res.ok ?
       'Succesfully logged out of your piped account.' :
       'Couldn\'t logout successfully'
     );
   });
-
 });
+

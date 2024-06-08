@@ -2,6 +2,7 @@
   width: auto;
   padding: 4%;
   row-gap: 3%;
+  user-select: none;
 
   div {
     background-color: var(--onBg);
@@ -65,19 +66,23 @@
     background: none;
     border: none;
 
-    #feedback {
-      font-size: medium;
-      background-color: var(--onBg);
-      border: var(--border);
-      border-radius: var(--roundness);
-      color: inherit;
-      padding: 1vmin;
-      width: 100%;
-      resize: none;
-
-      &::placeholder {
-        color: inherit;
-      }
-    }
   }
+}
+
+#netlifyForm {
+  font-family: inherit;
+  font-size: medium;
+  background-color: var(--onBg);
+  border: var(--border);
+  border-radius: var(--roundness);
+  color: inherit;
+  padding: 1vmin;
+  width: 100%;
+  resize: none;
+
+}
+
+#netlifyForm::placeholder {
+  color: inherit;
+  opacity: 0.7;
 }

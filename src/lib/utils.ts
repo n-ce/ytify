@@ -1,5 +1,5 @@
 import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn } from "./dom";
-import { getDB, removeFromCollection } from "./libraryUtils";
+import { fetchCollection, getDB, removeFromCollection } from "./libraryUtils";
 import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
@@ -298,15 +298,18 @@ export function superClick(e: Event) {
       removeFromCollection(listAnchor.dataset.id as string, eld.id as string)
       : player(eld.id);
 
-  if (elc('ri-more-2-fill')) {
+  else if (elc('ri-more-2-fill')) {
     superModal.showModal();
     history.pushState({}, '', '#');
     const elp = elem.parentElement?.dataset;
     for (const x in elp)
-      superModal.dataset[x] = elp[x]
+      superModal.dataset[x] = elp[x];
   }
 
-  if (elc('listItem')) {
+  else if (elc('ur_pls_item'))
+    fetchCollection(elem.textContent as string);
+
+  else if (elc('listItem')) {
     let url = eld.url as string;
     if (!url.startsWith('/channel'))
       url = url.replace('?list=', 's/')

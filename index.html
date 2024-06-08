@@ -241,9 +241,6 @@
         <label id="cleanLibraryBtn">
           <i class="ri-delete-bin-2-line"></i> Clean</label>
       </div>
-      <p id="pipedPlsImport">
-        Import Playlists From Piped
-      </p>
 
 
 
@@ -336,6 +333,7 @@
         <toggle-switch id="startupTab">Set as Default Tab</toggle-switch>
         <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
         <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
+        <toggle-switch id='importPipedPlaylistsSwitch'>Import Playlists From Piped</toggle-switch>
       </div>
 
       <div>
@@ -380,9 +378,10 @@
 
         <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
 
-        <form netlify name='feedback' method='POST' id="fdbk">
-          <textarea form="fdbk" name="->" id="feedback"
+        <form netlify name='feedback' method='POST'>
+          <textarea name="->" id="netlifyForm"
             placeholder="Anonymously Enter your feedback (bugs, feature requests) here:"></textarea>
+          <button type="submit">Submit Feedback</button>
         </form>
       </div>
     </section>
