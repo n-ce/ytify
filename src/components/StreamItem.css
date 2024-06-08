@@ -6,7 +6,6 @@
 	margin-bottom: 2dvmin;
 	border: var(--border);
 	border-radius: calc(var(--roundness) + 0.75vmin);
-	transition: transform 0.2s ease-out;
 	display: flex;
 	align-items: center;
 
