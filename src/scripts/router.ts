@@ -96,7 +96,7 @@ if (errorParam) {
     route = _[0];
     const query = encodeURI(_[1]);
     if (route === '/list')
-      query.startsWith('?shareId') ?
+      query.startsWith('shareId') ?
         fetchCollection('', query.split('=')[1]) :
         fetchList('/' + query.split('=').join('/'));
     if (route === '/search') {
