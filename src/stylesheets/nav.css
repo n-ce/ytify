@@ -13,10 +13,7 @@ nav {
       pointer-events: none;
     }
 
-    &:hover {
-      opacity: 75%;
-    }
-
+    &:hover,
     &.active {
       opacity: 1;
     }
@@ -26,12 +23,10 @@ nav {
 @media(orientation:portrait) {
 
   nav {
-
     height: fit-content;
     justify-content: space-around;
     width: 100%;
     padding: 2% 0;
-    background: var(--onBg);
 
     a {
       height: 100%;
@@ -39,13 +34,13 @@ nav {
       justify-content: space-evenly;
 
       i {
-        font-size: larger;
+        font-size: 1.2rem;
       }
 
       p {
         margin: 0;
         padding: 0;
-        font-size: small;
+        font-size: 0.8rem;
       }
     }
   }

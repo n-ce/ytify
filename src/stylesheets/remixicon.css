@@ -19,6 +19,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 .ri-search-2-line:before {
   content: "\f0cd";
 }
@@ -167,18 +168,30 @@
   content: "\ec86";
 }
 
-.ri-more-fill:before {
-  content: "\ef78";
+.ri-t-shirt-2-line:before {
+  content: "\f1d5";
 }
 
-.ri-image-fill:before {
-  content: "\ee4a";
+.ri-search-2-fill:before {
+  content: "\f0cc";
 }
 
-.ri-palette-line:before {
-  content: "\efc5";
+.ri-skip-forward-fill:before {
+  content: "\f143";
 }
 
-.ri-links-line:before {
-  content: "\eeb8";
+.ri-stack-fill:before {
+  content: "\f180";
+}
+
+.ri-settings-fill:before {
+  content: "\f0ed";
+}
+
+.ri-more-2-fill:before {
+  content: "\ef76";
+}
+
+.ri-link:before {
+  content: "\eeb2";
 }

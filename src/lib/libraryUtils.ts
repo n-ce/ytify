@@ -1,8 +1,8 @@
-import { $, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
+import { $, getApi, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
-import { listAnchor, listBtnsContainer, listContainer } from "./dom";
-import { render } from "solid-js/web";
-import StreamItem from "../components/StreamItem";
+import { listAnchor, listBtnsContainer, listContainer, loadingScreen } from "./dom";
+
+
 
 
 
@@ -62,33 +62,66 @@ export function createPlaylist(title: string) {
 }
 
 
-export function fetchCollection(collection: string) {
-  const db = getDB();
-  const data = db[collection];
+export async function fetchCollection(collection: string | null, shareId: string | null = '') {
 
   const fragment = document.createDocumentFragment();
+  const render = await import('solid-js/web').then(mod => mod.render);
+  const StreamItem = await import('../components/StreamItem').then(mod => mod.default);
 
-  for (const item in data) {
-    const d = data[item];
-    render(() => StreamItem({
-      id: d.id || '',
-      href: hostResolver(`/watch?v=${data[item].id}`),
-      title: d.title || '',
-      author: d.author || '',
-      duration: d.duration || '',
-      channelUrl: d.channelUrl || ''
-    }), fragment);
-  }
-  if (!fragment.childElementCount) {
-    alert('No items found');
-    return;
+  if (collection) {
+    const db = getDB();
+    const data = db[collection];
+
+    if (collection === 'discover')
+      for (const i in data)
+        if (data[i].frequency as number < 2)
+          delete db.discover[i];
+
+
+    for (const item in data) {
+      const d = data[item];
+      render(() => StreamItem({
+        id: d.id || '',
+        href: hostResolver(`/watch?v=${d.id}`),
+        title: d.title || '',
+        author: d.author || '',
+        duration: d.duration || '',
+        channelUrl: d.channelUrl || ''
+      }), fragment);
+    }
+    if (!fragment.childElementCount) {
+      alert('No items found');
+      return;
+    }
+    listAnchor.dataset.id = collection;
+
+  } else {
+    // this means it does not exist in db and is a public collection
+
+    listBtnsContainer.className = 'publicPlaylist';
+    loadingScreen.showModal();
+    await fetch(`${location.origin}/public?id=${shareId}`)
+      .then(res => res.json())
+      .then(data => {
+        for (const d of data)
+          render(() => StreamItem({
+            id: d.id || '',
+            href: hostResolver(`/watch?v=${d.id}`),
+            title: d.title || '',
+            author: d.author || '',
+            duration: d.duration || '',
+            channelUrl: d.channelUrl || ''
+          }), fragment);
+      })
+      .finally(() => loadingScreen.close());
+
   }
 
   listContainer.replaceChildren(fragment);
 
   const isReversed = listContainer.classList.contains('reverse');
 
-  if (reservedCollections.includes(collection)) {
+  if (collection && reservedCollections.includes(collection)) {
     if (!isReversed)
       listContainer.classList.add('reverse');
   }
@@ -96,19 +129,18 @@ export function fetchCollection(collection: string) {
     listContainer.classList.remove('reverse');
 
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : 'collection';
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (collection ? 'collection' : 'publicCollection');
 
-  listAnchor.dataset.id = collection;
 
   listAnchor.click();
   listContainer.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    '?collection=' + collection);
+    (collection ? ('?collection=' + collection) : ('?shareId=' + shareId)));
 }
 
 
-export async function superCollectionLoader(name: string) {
+export async function superCollectionLoader(name: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists') {
   const db = getDB();
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
@@ -182,6 +214,25 @@ export async function superCollectionLoader(name: string) {
 
   }
 
+  async function loadFeed() {
+    if (!Object(db).hasOwnProperty('channels'))
+      return 'You have not subscribed to any channels';
+
+    loadingScreen.showModal();
+
+    const channels = Object.keys(db.channels);
+    const initApi = getApi('piped');
+    const fetchItems = await fetch(initApi + '/feed/unauthenticated?channels=' + channels.join(','))
+      .then(res => res.json())
+      .catch(() => {
+        notify(`${initApi} was not able to return the subscription feed. Retry with another instance.`);
+      })
+      .finally(() => loadingScreen.close());
+
+    return itemsLoader(fetchItems);
+  }
+
+
   const container = document.getElementById('superCollectionList') as HTMLDivElement;
   container.replaceChildren(
     name === 'featured' ?
@@ -192,7 +243,7 @@ export async function superCollectionLoader(name: string) {
           loadSubPls()
           : name === 'channels' ?
             loadChannels() :
-            'No Items Found'
+            await loadFeed()
   );
 }
 

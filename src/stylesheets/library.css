@@ -54,16 +54,18 @@
     }
   }
 
-  div:last-child {
+  #libraryActions {
     display: flex;
     width: 100%;
     margin: 5% 0;
     justify-content: space-around;
+    user-select: none;
 
     label {
+      transition: transform 0.4s;
+
       &:hover {
         transform: scale(1.1);
-        border-bottom: var(--border);
       }
     }
   }

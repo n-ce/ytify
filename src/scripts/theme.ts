@@ -1,6 +1,6 @@
 import { canvas, context, audio } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
-import { getSaved, removeSaved, save } from "../lib/utils";
+import { getSaved, params, removeSaved, save } from "../lib/utils";
 
 
 const style = document.documentElement.style;
@@ -34,6 +34,11 @@ function accentDarkener(r: number, g: number, b: number) {
 
 }
 
+function colorDistance(color1: number[], color2: number[]) {
+  const [r1, g1, b1] = color1;
+  const [r2, g2, b2] = color2;
+  return Math.sqrt(((r1 - r2) ** 2) + ((g1 - g2) ** 2) + ((b1 - b2) ** 2));
+}
 
 
 const palette: Scheme = {
@@ -68,8 +73,8 @@ const palette: Scheme = {
 };
 
 
-function themer() {
 
+function themer() {
   const canvasImg = new Image();
   canvasImg.onload = () => {
 
@@ -84,20 +89,50 @@ function themer() {
 
 
     const data = context.getImageData(0, 0, side, side).data;
-
     const len = data.length;
+    const colorMap: {
+      [index: string]: { color: number[], count: number }
+    } = {};
 
-    let r = 0, g = 0, b = 0;
+    const tolerance = 10;
 
     for (let i = 0; i < len; i += 4) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
+
+      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+      const property = `${r}-${g}-${b}`;
+
+
+      let foundSimilar = false;
+      for (const color in colorMap) {
+        const cd = colorDistance([r, g, b], colorMap[color].color);
+
+        if (cd <= tolerance || cd > tolerance) {
+          colorMap[color].count++;
+          foundSimilar = true;
+          break;
+        }
+      }
+
+      if (!foundSimilar)
+        colorMap[property] = { color: [r, g, b], count: 1 };
+
+
     }
-    const amount = len / 4;
-    r = Math.floor(r / amount),
-      g = Math.floor(g / amount),
-      b = Math.floor(b / amount);
+
+    // Find dominant color group (considering similar colors)
+    let dominantColorGroup: number[] = [];
+    let maxCount = 0;
+
+    for (const color of Object.values(colorMap)) {
+      if (color.count > maxCount) {
+        maxCount = color.count;
+        dominantColorGroup = color.color;
+      }
+    }
+
+    const [r, g, b] = dominantColorGroup;
+
+
 
     const theme = themeSelector.selectedOptions[0].value;
     let light = 'light', dark = 'dark';
@@ -117,10 +152,10 @@ function themer() {
     tabColor.content = palette[scheme].bg(r, g, b);
   }
   canvasImg.crossOrigin = '';
-  canvasImg.src = generateImageUrl(audio.dataset.id || '1SLr62VBBjw');
+  const temp = generateImageUrl(audio.dataset.id || params.get('s') || '1SLr62VBBjw');
+  if (canvasImg.src !== temp) canvasImg.src = temp;
+
 }
-
-
 
 
 themeSelector.addEventListener('change', () => {

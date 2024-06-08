@@ -9,7 +9,7 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "hls.js": "^1.5.8",
+    "hls.js": "^1.5.11",
     "imsc": "^1.1.5",
     "solid-js": "^1.8.17"
   },

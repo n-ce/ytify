@@ -1,6 +1,6 @@
 import { audio, favButton, favIcon, superCollectionSelector } from "../lib/dom";
-import { addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
-import { $, fetchList, getSaved, params, removeSaved, save } from "../lib/utils";
+import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
+import { $, convertSStoHHMMSS, getSaved, notify, params, removeSaved, save, superClick } from "../lib/utils";
 
 
 
@@ -30,16 +30,10 @@ exportBtn.addEventListener('click', () => {
 
 cleanBtn.addEventListener('click', () => {
 
-  let items = 0;
-  const db = getDB();
-  for (const collection in db) {
-    const collx = db[collection];
-    for (const _ in collx)
-      items++;
+  if (confirm(`Are you sure you want to clear ${Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0)} items from the library?`)) {
+    removeSaved('library');
+    location.reload();
   }
-  if (!confirm('Are you sure you want to clear ' + items + ' items from the library?')) return;
-  removeSaved('library');
-  location.reload();
 });
 
 
@@ -70,8 +64,8 @@ collectionContainer.addEventListener('click', e => {
     fetchCollection(elm.id);
 });
 
-if (params.has('collection'))
-  fetchCollection(<string>params.get('collection'))
+if (params.has('collection') || params.has('shareId'))
+  fetchCollection(params.get('collection'), params.get('shareId'));
 
 
 superCollectionSelector.addEventListener('change', () => {
@@ -80,7 +74,7 @@ superCollectionSelector.addEventListener('change', () => {
     removeSaved('defaultSuperCollection') :
     save('defaultSuperCollection', val);
 
-  superCollectionLoader(val);
+  superCollectionLoader(val as 'feed');
 });
 
 
@@ -89,16 +83,7 @@ if (sdsc)
   superCollectionSelector.value = sdsc;
 
 
-superCollectionList.addEventListener('click', (e) => {
-  e.preventDefault();
-
-  const elm = e.target as HTMLAnchorElement;
-
-  if (superCollectionSelector.value === 'collections' && elm.textContent)
-    fetchCollection(elm.textContent);
-  if (elm.dataset.url)
-    fetchList(elm.dataset.url)
-});
+superCollectionList.addEventListener('click', superClick);
 
 
 // setup initial dom state
@@ -112,3 +97,99 @@ addEventListener('DOMContentLoaded', () => {
       createPlaylist(key);
 
 });
+
+
+
+// piped import playlists into ytify collections
+
+const importPipedPlaylistsSwitch = document.getElementById('importPipedPlaylistsSwitch') as HTMLElement;
+
+importPipedPlaylistsSwitch.addEventListener('click', async (e) => {
+  e.stopImmediatePropagation();
+
+  const instance = prompt('Enter the Piped Authentication Instance API URL :', 'https://pipedapi.kavin.rocks');
+  if (!instance) return;
+
+  const username = prompt('Enter Username :');
+  if (!username) return;
+
+  const password = prompt('Enter Password :');
+  if (!password) return;
+
+  importPipedPlaylistsSwitch.toggleAttribute('checked');
+
+  // login 
+  const authId = await fetch(instance + '/login', {
+    method: 'POST',
+    body: JSON.stringify({ username, password })
+  })
+    .then(res => res.json())
+    .catch(e => notify(`Failed to Login, Error : ${e}`));
+
+  if (!authId) {
+    notify('No Auth Token Found! Aborted Login Process.');
+    return;
+  }
+
+  notify('Succesfully logged in to account.');
+
+  // fetch
+  const playlists = await fetch(instance + '/user/playlists', {
+    headers: {
+      Authorization: authId.token
+    }
+  }).then(res => res.json())
+    .catch(e => notify(`Failed to Find Playlists, Error : ${e}`));
+  if (playlists.length)
+    notify('Succesfully fetched playlists from account.')
+  else return;
+
+
+  // import
+
+  await Promise.all(playlists.map((playlist: {
+    id: string
+  }) =>
+    fetch(instance + '/playlists/' + playlist.id)
+      .then(res => res.json())
+      .then(data => {
+        const listTitle = data.name;
+
+        createPlaylist(listTitle);
+        const list: { [index: string]: CollectionItem } = {};
+        const streams = data.relatedStreams
+        for (const i of streams)
+          list[i.title] = {
+            id: i.url.slice(9),
+            title: i.title,
+            author: i.uploaderName,
+            duration: convertSStoHHMMSS(i.duration),
+            channelUrl: i.uploaderUrl
+          }
+        addListToCollection(listTitle, list);
+      })
+  )).then(() => {
+    notify('Succesfully imported playlists from your piped account into ytify as collections');
+  })
+    .catch(e => {
+      notify('Could not successfully import all playlists, Error : ' + e);
+    });
+
+  superCollectionLoader('collections');
+
+  // logout
+
+  fetch(instance + '/logout', {
+    method: 'POST',
+    headers: {
+      Authorization: authId.token
+    }
+  }).then(res => {
+    importPipedPlaylistsSwitch.toggleAttribute('checked');
+    notify(res.ok ?
+      'Succesfully logged out of your piped account.' :
+      'Couldn\'t logout successfully'
+    );
+  });
+});
+

@@ -11,13 +11,6 @@
   animation: zoomout 0.5s ease-in-out forwards;
 
 
-  @keyframes zoomout {
-    from {
-      transform: scale(2);
-      opacity: 0;
-    }
-  }
-
   ul {
     background-color: var(--onBg);
     border-radius: calc(var(--roundness) + 0.75vmin);

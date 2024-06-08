@@ -202,7 +202,6 @@ document.addEventListener('keydown', (event) => {
     superInput.focus();
 });
 
-
 searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
@@ -228,3 +227,16 @@ if (params.has('q')) {
   searchLoader();
 }
 
+if (getSaved('hints') !== 'off')
+  addEventListener('DOMContentLoaded', () => {
+    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/usage.md').then(res => res.text())
+      .then(text => {
+        const ul = $('ul');
+        ul.innerHTML = text;
+        searchlist.appendChild(ul);
+        document.getElementById('offHints')!.onclick = () => {
+          save('hints', 'off');
+          location.reload();
+        }
+      });
+  })

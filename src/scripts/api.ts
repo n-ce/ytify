@@ -71,7 +71,8 @@ instanceSelector.addEventListener('change', async () => {
     removeSaved('apiList_3') :
     save('apiList_3', instanceSelector.value);
 
-  audio.pause();
+  if (audio.dataset.playbackState === 'playing')
+    audio.pause();
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;

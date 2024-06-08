@@ -1,9 +1,10 @@
 import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn } from "./dom";
-import { getDB, removeFromCollection } from "./libraryUtils";
-import { blankImage, generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
+import { fetchCollection, getDB, removeFromCollection } from "./libraryUtils";
+import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
+import player from "./player";
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -76,24 +77,36 @@ linkHost.addEventListener('change', () => {
 
 const showImg = getSaved('imgLoad') !== 'off';
 
-export function setMetaData(
+export async function setMetaData(
   id: string,
   streamName: string,
   authorName: string,
-  authorUrl: string,
   music: boolean = false
 ) {
-  const imgX = generateImageUrl(id, 'maxres');
+  const metadataObj: MediaMetadataInit = {
+    title: streamName,
+    artist: authorName,
+  };
 
-  if (showImg && !music)
-    img.src = imgX;
+  const imgx = generateImageUrl(id, 'maxres');
+  if (showImg) {
+    img.src = music ? await sqrThumb(imgx) : imgx;
+    metadataObj.artwork = [
+      { src: img.src, sizes: '96x96' },
+      { src: img.src, sizes: '128x128' },
+      { src: img.src, sizes: '192x192' },
+      { src: img.src, sizes: '256x256' },
+      { src: img.src, sizes: '384x384' },
+      { src: img.src, sizes: '512x512' },
+    ]
+    img.alt = streamName;
+  }
 
-  img.alt = streamName;
 
   title.href = hostResolver(`/watch?v=${id}`);
   title.textContent = streamName;
-  title.onclick = _ => {
-    _.preventDefault();
+  // using classic onclick to avoid attesting listeners
+  document.getElementById('moreBtn')!.onclick = () => {
     superModal.showModal();
     history.pushState({}, '', '#');
     const s = superModal.dataset;
@@ -105,47 +118,24 @@ export function setMetaData(
     s.channelUrl = a.channelUrl;
   }
 
-  const author = <HTMLAnchorElement>document.getElementById('author');
-  author.href = 'https://youtube.com' + authorUrl;
-  author.onclick = _ => {
-    _.preventDefault();
-    fetchList(authorUrl);
-  }
-  author.textContent = authorName;
+  document.getElementById('author')!.textContent = authorName;
 
   if (location.pathname === '/')
     document.title = streamName + ' - ytify';
 
-  const canvasImg = new Image();
-  canvasImg.onload = () => {
-    const sqrImg = showImg ? sqrThumb(canvasImg) : blankImage;
-    if (music)
-      img.src = sqrImg;
 
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.setPositionState();
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: streamName,
-        artist: authorName,
-        artwork: [
-          { src: sqrImg, sizes: '96x96' },
-          { src: sqrImg, sizes: '128x128' },
-          { src: sqrImg, sizes: '192x192' },
-          { src: sqrImg, sizes: '256x256' },
-          { src: sqrImg, sizes: '384x384' },
-          { src: sqrImg, sizes: '512x512' },
-        ]
-      });
-    }
-
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setPositionState();
+    navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
   }
-  canvasImg.crossOrigin = '';
-  canvasImg.src = imgX;
+
 }
 
 
 
-export async function fetchList(url: string, mix = false) {
+export async function fetchList(url: string | undefined, mix = false) {
+  if (!url)
+    return notify('No Channel URL provided');
 
   loadingScreen.showModal();
   const api = getApi('piped');
@@ -259,6 +249,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     throw new Error('No Data Found');
 
 
+
   const streamItem = (stream: StreamItem) => StreamItem({
     id: stream.url.substring(9),
     href: hostResolver(stream.url),
@@ -268,7 +259,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     uploaded: stream.uploadedDate,
     channelUrl: stream.uploaderUrl,
     views: (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    imgYTM: stream.thumbnail.length > 40 ? getThumbIdFromLink(stream.thumbnail) : ''
+    img: getThumbIdFromLink(stream.thumbnail)
   })
 
   const listItem = (item: StreamItem) => ListItem(
@@ -276,12 +267,11 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
       (item.videos > 0 ? item.videos + ' streams' : ''),
-    item.thumbnail ?
-      generateImageUrl(
-        getThumbIdFromLink(
-          item.thumbnail
-        )
-      ) : blankImage,
+    generateImageUrl(
+      getThumbIdFromLink(
+        item.thumbnail
+      )
+    ),
     item.description || item.uploaderName,
     item.url
   )
@@ -300,25 +290,31 @@ export function superClick(e: Event) {
   e.preventDefault();
 
   const elem = e.target as HTMLAnchorElement;
+  const eld = elem.dataset;
+  const elc = elem.classList.contains.bind(elem.classList);
 
-  if (elem.classList.contains('streamItem')) {
-    const eld = elem.dataset;
-    if (elem.classList.contains('delete')) {
-      removeFromCollection(listAnchor.dataset.id as string, eld.id as string);
-      return;
-    }
+  if (elc('streamItem'))
+    return elc('delete') ?
+      removeFromCollection(listAnchor.dataset.id as string, eld.id as string)
+      : player(eld.id);
+
+  else if (elc('ri-more-2-fill')) {
     superModal.showModal();
     history.pushState({}, '', '#');
-    for (const x in eld)
-      superModal.dataset[x] = eld[x]
+    const elp = elem.parentElement?.dataset;
+    for (const x in elp)
+      superModal.dataset[x] = elp[x];
   }
 
-  if (elem.classList.contains('listItem')) {
-    let url = elem.dataset.url as string;
+  else if (elc('ur_pls_item'))
+    fetchCollection(elem.textContent as string);
+
+  else if (elc('listItem')) {
+    let url = eld.url as string;
     if (!url.startsWith('/channel'))
       url = url.replace('?list=', 's/')
     fetchList(url);
-    listContainer.dataset.thumbnail = url + elem.dataset.thumbnail;
+    listContainer.dataset.thumbnail = url + eld.thumbnail;
   }
 }
 

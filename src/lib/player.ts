@@ -1,7 +1,8 @@
 import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor } from "./dom";
 import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
-import { autoQueue, hls } from "../scripts/audioEvents";
+import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
+import Hls from "hls.js";
 
 
 const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
@@ -16,7 +17,8 @@ codecSelector.addEventListener('change', async () => {
     save('codec', String(i)) :
     removeSaved('codec');
 
-  audio.pause();
+  if (audio.dataset.playbackState === 'playing')
+    audio.pause();
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
@@ -35,6 +37,8 @@ setTimeout(async () => {
 /////////////////////////////////////////////////////////////
 
 bitrateSelector.addEventListener('change', () => {
+  if (audio.dataset.playbackState === 'playing')
+    audio.pause();
   const timeOfSwitch = audio.currentTime;
   audio.src = bitrateSelector.value;
   audio.currentTime = timeOfSwitch;
@@ -64,6 +68,13 @@ switchHLS.addEventListener('click', () => {
 
 });
 
+const hls = new Hls();
+
+hls.attachMedia(audio);
+hls.on(Hls.Events.MANIFEST_PARSED, () => {
+  audio.play();
+});
+
 
 /////////////////////////////////////////////////////////////
 
@@ -74,13 +85,18 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const apiIndex = instanceSelector.selectedIndex;
+
+  // fallback for custom instances which do not support unified instance architecture
+  if (apiIndex === 0)
+    return import('./player.invidious').then(player => player.default(id));
+
   const apiUrl = getApi('piped', apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
+        notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
         instanceSelector.selectedIndex++;
         player(id);
         return;
@@ -91,8 +107,11 @@ export default async function player(id: string | null = '') {
     });
 
 
-  if (!data && !data.hasOwnProperty('audioStreams'))
-    return notify('No data found');
+  if (!data || !data.hasOwnProperty('audioStreams')) {
+    notify('No Audio Streams Found.');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    return;
+  }
 
   audio.dataset.id = id;
   audio.dataset.title = data.title;
@@ -100,19 +119,19 @@ export default async function player(id: string | null = '') {
   audio.dataset.duration = convertSStoHHMMSS(data.duration);
   audio.dataset.channelUrl = data.uploaderUrl;
 
+
   // remove ' - Topic' from name if it exists
 
   let music = false;
   if (data.uploader.endsWith(' - Topic')) {
     music = true;
-    data.uploader = data.uploader.replace(' - Topic', '');
+    data.uploader = data.uploader.slice(0, -8);
   }
 
   setMetaData(
     id,
     data.title,
     data.uploader,
-    data.uploaderUrl,
     music
   );
 
@@ -133,13 +152,16 @@ export default async function player(id: string | null = '') {
   let index = -1;
 
   bitrateSelector.innerHTML = '';
-  const isMusic = data.category === 'Music';
+
+  const enforceProxy = getSaved('enforceProxy') === 'true';
+  const isMusic = enforceProxy || data.category === 'Music';
   const ivApi = getApi('invidious');
 
   function proxyHandler(url: string) {
 
     const oldUrl = new URL(url);
 
+    // hls streams are proxied by default
     if (isMusic && hlsOn) return url;
 
     // only proxy music streams
@@ -174,7 +196,6 @@ export default async function player(id: string | null = '') {
   bitrateSelector.selectedIndex = index;
 
   if (hlsOn) {
-    audio.src = '';
     hls.loadSource(proxyHandler(data.hls));
   } else
     audio.src = bitrateSelector.value;

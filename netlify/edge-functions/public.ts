@@ -1,4 +1,4 @@
-// handles upcoming query requests to restore queue from any where
+// handles upcoming query & public collection requests to restore stream lists from any state
 
 import { Config } from '@netlify/edge-functions';
 
@@ -48,13 +48,13 @@ export default async (request: Request) => {
   const getData = async (
     id: string,
     api: string = instanceArray[getIndex()]
-  ): Promise<Record<'id' | 'title' | 'author' | 'authorId' | 'duration' | 'duration' | 'thumbnailUrl' | 'source', string>> => await fetch(api + id)
+  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'duration' | 'thumbnailUrl' | 'source', string>> => await fetch(api + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
       'title': json.title,
       'author': json.uploader || json.author,
-      'authorId': json.authorUrl || json.uploaderUrl.slice(9),
+      'channelUrl': json.authorUrl || json.uploaderUrl,
       'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds),
       'thumbnailUrl': json.thumbnailUrl || json.videoThumbnails[4].url,
       'source': api + id
@@ -71,5 +71,5 @@ export default async (request: Request) => {
 };
 
 export const config: Config = {
-  path: '/upcoming',
+  path: '/public',
 };

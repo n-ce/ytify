@@ -7,6 +7,7 @@ label {
   position: relative;
   display: inline-flex;
   pointer-events: none;
+  height: 1.35rem;
   width: 2rem;
 }
 
