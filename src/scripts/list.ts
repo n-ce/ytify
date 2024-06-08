@@ -5,6 +5,9 @@ import { addListToCollection, createPlaylist, getDB, saveDB, toCollection } from
 import { atpSelector } from './superModal';
 import { getThumbIdFromLink } from '../lib/imageUtils';
 
+
+
+
 listBtnsContainer.addEventListener('click', e => {
   const btn = e.target as HTMLButtonElement;
   if (!btn.matches('button'))
@@ -19,7 +22,7 @@ listBtnsContainer.addEventListener('click', e => {
   if (btn === playAllBtn) {
     clearQ();
     listToQ(listContainer);
-    firstItemInQueue().dispatchEvent(new MouseEvent("dblclick", { bubbles: true, view: window }));
+    firstItemInQueue().click();
   }
   else if (btn === enqueueBtn)
     listToQ(listContainer);
