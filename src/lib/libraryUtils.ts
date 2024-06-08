@@ -74,7 +74,6 @@ export async function fetchCollection(collection: string, publicId: string = '')
     fetch(`${location.origin}/public?id=${publicId}`)
       .then(res => res.json())
       .then(data => {
-        console.log(data);
         for (const d of data)
           render(() => StreamItem({
             id: d.id || '',
@@ -84,6 +83,7 @@ export async function fetchCollection(collection: string, publicId: string = '')
             duration: d.duration || '',
             channelUrl: d.channelUrl || ''
           }), fragment);
+        console.log(fragment);
       })
       .finally(() => loadingScreen.close());
 
