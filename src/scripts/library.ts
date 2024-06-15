@@ -102,10 +102,8 @@ addEventListener('DOMContentLoaded', () => {
 
 // piped import playlists into ytify collections
 
-const importPipedPlaylistsSwitch = document.getElementById('importPipedPlaylistsSwitch') as HTMLElement;
 
-importPipedPlaylistsSwitch.addEventListener('click', async (e) => {
-  e.stopImmediatePropagation();
+export async function pipedPlaylistsImporter(_: Event) {
 
   const instance = prompt('Enter the Piped Authentication Instance API URL :', 'https://pipedapi.kavin.rocks');
   if (!instance) return;
@@ -115,8 +113,6 @@ importPipedPlaylistsSwitch.addEventListener('click', async (e) => {
 
   const password = prompt('Enter Password :');
   if (!password) return;
-
-  importPipedPlaylistsSwitch.toggleAttribute('checked');
 
   // login 
   const authId = await fetch(instance + '/login', {
@@ -185,11 +181,10 @@ importPipedPlaylistsSwitch.addEventListener('click', async (e) => {
       Authorization: authId.token
     }
   }).then(res => {
-    importPipedPlaylistsSwitch.toggleAttribute('checked');
     notify(res.ok ?
       'Succesfully logged out of your piped account.' :
       'Couldn\'t logout successfully'
     );
   });
-});
+}
 

@@ -1,4 +1,4 @@
-import { removeSaved, save } from "../lib/utils";
+import { getSaved, removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
@@ -147,8 +147,10 @@ autoQueueBtn.addEventListener('click', () => {
 });
 
 
-if (localStorage.getItem('autoQueue') === 'off')
-  autoQueueBtn.classList.remove('checked');
+addEventListener('DOMContentLoaded', () => {
+  if (getSaved('autoQueue') === 'off')
+    autoQueueBtn.classList.remove('checked');
+});
 
 
 function isLongerThan10Min(duration: string) {

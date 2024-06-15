@@ -19,7 +19,7 @@ export function sqrThumb(src: string): Promise<string> {
 
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => {
+    img.onload = async () => {
       const width = img.width;
       const height = img.height;
       const side = Math.min(width, height);
@@ -28,7 +28,7 @@ export function sqrThumb(src: string): Promise<string> {
       const offsetX = (width - side) / 2;
       const offsetY = (height - side) / 2;
       context.drawImage(img, offsetX, offsetY, side, side, 0, 0, side, side);
-      resolve(canvas.toDataURL());
+      resolve(URL.createObjectURL(new Blob([await canvas.convertToBlob()])));
     };
     img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
     img.crossOrigin = '';

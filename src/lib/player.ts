@@ -1,43 +1,16 @@
-import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor } from "./dom";
-import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
+import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, instanceSelector } from "./dom";
+import { convertSStoHHMMSS, notify, params, parseTTML, setMetaData, getApi, getSaved } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
-import Hls from "hls.js";
+import { store } from "../store";
 
 
-const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
-const switchHLS = <HTMLElement>document.getElementById('HLS_Switch');
-
-/////////////////////////////////////////////////////////////
-
-codecSelector.addEventListener('change', async () => {
-  const i = codecSelector.selectedIndex;
-  i ?
-    save('codec', String(i)) :
-    removeSaved('codec');
-
-  if (audio.dataset.playbackState === 'playing')
-    audio.pause();
-  const timeOfSwitch = audio.currentTime;
-  await player(audio.dataset.id);
-  audio.currentTime = timeOfSwitch;
-});
-
-
-const codecSaved = getSaved('codec');
-setTimeout(async () => {
-  codecSelector.selectedIndex = codecSaved ?
-    parseInt(codecSaved) :
-    (await supportsOpus() ? 0 : 1)
-});
-
-
 
 /////////////////////////////////////////////////////////////
 
 bitrateSelector.addEventListener('change', () => {
-  if (audio.dataset.playbackState === 'playing')
+  if (store.player.playbackState === 'playing')
     audio.pause();
   const timeOfSwitch = audio.currentTime;
   audio.src = bitrateSelector.value;
@@ -55,28 +28,21 @@ subtitleSelector.addEventListener('change', () => {
   parseTTML();
 });
 
-/////////////////////////////////////////////////////////////
 
-
-if (getSaved('HLS'))
-  switchHLS.toggleAttribute('checked');
-
-switchHLS.addEventListener('click', () => {
-  getSaved('HLS') ?
-    removeSaved('HLS') :
-    save('HLS', 'true');
-
+let hlsOn = false;
+let hls: any;
+addEventListener('DOMContentLoaded', () => {
+  if (getSaved('HLS')) {
+    import('hls.js').then(mod => {
+      hls = new mod.default();
+      hls.attachMedia(audio);
+      hls.on(mod.default.Events.MANIFEST_PARSED, () => {
+        audio.play();
+      });
+      hlsOn = true;
+    })
+  }
 });
-
-const hls = new Hls();
-
-hls.attachMedia(audio);
-hls.on(Hls.Events.MANIFEST_PARSED, () => {
-  audio.play();
-});
-
-
-/////////////////////////////////////////////////////////////
 
 export default async function player(id: string | null = '') {
 
@@ -84,7 +50,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const apiIndex = instanceSelector.selectedIndex;
+  const apiIndex = instanceSelector?.selectedIndex || 1;
 
   // fallback for custom instances which do not support unified instance architecture
   if (apiIndex === 0)
@@ -140,7 +106,6 @@ export default async function player(id: string | null = '') {
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
-  const hlsOn = switchHLS.hasAttribute('checked');
 
   if (!noOfBitrates && !hlsOn) {
     notify('NO AUDIO STREAMS AVAILABLE.');
@@ -148,7 +113,7 @@ export default async function player(id: string | null = '') {
     return;
   }
 
-  const preferedCodec = codecSelector.value;
+  const preferedCodec = store.player.codec;
   let index = -1;
 
   bitrateSelector.innerHTML = '';

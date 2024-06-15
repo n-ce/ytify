@@ -1,10 +1,13 @@
-import { audio, playButton, progress, queuelist } from "../lib/dom";
+import { audio, instanceSelector, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, params, getSaved, idFromURL } from "../lib/utils";
+import { convertSStoHHMMSS, getSaved, params, } from "../lib/utils";
+import { store } from "../store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
+
+const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 const streamHistory: string[] = [];
 const ad = audio.dataset as { [index: string]: string };
@@ -36,7 +39,7 @@ function updatePositionState() {
 
 playButton.addEventListener('click', () => {
   if (!ad.id) return;
-  ad.playbackState === 'playing' ?
+  store.player.playbackState === 'playing' ?
     audio.pause() :
     audio.play();
 });
@@ -48,7 +51,7 @@ let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
-  ad.playbackState = 'playing';
+  store.player.playbackState = 'playing';
   if (!streamHistory.includes(ad.id))
     streamHistory.push(ad.id);
   const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
@@ -67,7 +70,7 @@ audio.addEventListener('playing', () => {
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
-  ad.playbackState = 'paused';
+  store.player.playbackState = 'paused';
   clearTimeout(historyTimeoutId);
 });
 
@@ -94,9 +97,19 @@ audio.addEventListener('loadeddata', () => {
 });
 
 
+let loadingTimeoutId = 0;
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+  const timeoutIn = getSaved('loadingTimeout') as '0' | '15' || '30';
+  if (timeoutIn !== '0') {
+    loadingTimeoutId = window.setTimeout(() => {
+      clearTimeout(loadingTimeoutId);
+      instanceSelector.selectedIndex++;
+      player(audio.dataset.id);
+    }, parseInt(timeoutIn));
+  }
   clearTimeout(historyTimeoutId);
+
 });
 
 
@@ -229,9 +242,9 @@ if (msn) {
   });
 }
 
-
-player(params.get('s') || idFromURL(params.get('url') || params.get('text')));
-
+addEventListener('DOMContentLoaded', () => {
+  player(params.get('s') || idFromURL(params.get('url') || params.get('text')));
+});
 
 
 /*

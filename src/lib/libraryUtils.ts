@@ -1,6 +1,8 @@
 import { $, getApi, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import { listAnchor, listBtnsContainer, listContainer, loadingScreen } from "./dom";
+import { render } from "solid-js/web";
+import StreamItem from "../components/StreamItem";
 
 
 
@@ -65,8 +67,6 @@ export function createPlaylist(title: string) {
 export async function fetchCollection(collection: string | null, shareId: string | null = '') {
 
   const fragment = document.createDocumentFragment();
-  const render = await import('solid-js/web').then(mod => mod.render);
-  const StreamItem = await import('../components/StreamItem').then(mod => mod.default);
 
   if (collection) {
     const db = getDB();

@@ -1,10 +1,7 @@
-import { hostResolver } from '../lib/utils';
+import { getSaved, hostResolver } from '../lib/utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
 
-// workaround "cannot access 'getSaved' before initialization"
-const s = localStorage.getItem('imgLoad');
-const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
 
 export default function ListItem(
   title: string,
@@ -14,6 +11,8 @@ export default function ListItem(
   url: string,
 ) {
   const [getThumbnail, setThumbnail] = createSignal(thumbnail);
+  const s = getSaved('imgLoad');
+  const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
 
   const handleError = () =>
     setThumbnail(

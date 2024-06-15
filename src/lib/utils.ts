@@ -1,10 +1,11 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn, instanceSelector } from "./dom";
 import { fetchCollection, getDB, removeFromCollection } from "./libraryUtils";
 import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import player from "./player";
+import { store } from "../store";
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -16,7 +17,10 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (type: string, index: number = -1) => JSON.parse((index > -1) ? instanceSelector.options[index].value : instanceSelector.value)[type];
+export const getApi = (type: string, index: number | '' = '') => JSON.parse(
+  (index ? instanceSelector?.options[index].value : instanceSelector?.value) ||
+  getSaved('apiList_3') || '{"name":"Custom","piped":"https://pipedapi.kavin.rocks","image":"https://pipedproxy.r4fo.com","invidious":"https://invidious.fdn.fr"}'
+)[type];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -30,7 +34,7 @@ export const supportsOpus = (): Promise<boolean> => navigator.mediaCapabilities.
 }).then(res => res.supported);
 
 export const hostResolver = (url: string) =>
-  linkHost.value + (linkHost.value.includes('ytify') ? url.
+  store.linkHost + (store.linkHost.includes('ytify') ? url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
     ('/list?' + url.slice(1).split('/').join('=')) : url);
@@ -61,18 +65,6 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-const linkHost = <HTMLSelectElement>document.getElementById('linkHost');
-
-const savedLinkHost = getSaved('linkHost');
-if (savedLinkHost)
-  linkHost.value = savedLinkHost;
-
-linkHost.addEventListener('change', () => {
-  linkHost.selectedIndex === 0 ?
-    removeSaved('linkHost') :
-    save('linkHost', linkHost.value);
-  location.reload();
-});
 
 
 const showImg = getSaved('imgLoad') !== 'off';
@@ -287,9 +279,10 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
 // TLDR : Stream Item Click Action
 export function superClick(e: Event) {
+  const elem = e.target as HTMLAnchorElement;
+  if (elem.target === '_blank') return;
   e.preventDefault();
 
-  const elem = e.target as HTMLAnchorElement;
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
 

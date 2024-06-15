@@ -45,6 +45,21 @@
         #favButton {
           display: none;
         }
+
+        #loopButton {
+          transition: all 0.5s cubic-bezier(0.47, 0, 0.745, 0.715);
+        }
+
+        #loopButton.on {
+          padding: 0.2rem;
+          font-size: 1rem;
+          line-height: 1rem;
+          background: var(--text);
+          color: var(--bg);
+          border-radius: var(--roundness);
+          transform: rotate(180deg);
+        }
+
       }
     }
 

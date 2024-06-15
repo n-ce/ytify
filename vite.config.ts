@@ -3,6 +3,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import autoprefixer from 'autoprefixer';
 import solidPlugin from 'vite-plugin-solid';
 
+
 const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
   name: 'erudaInjector',
   transformIndexHtml: html => ({

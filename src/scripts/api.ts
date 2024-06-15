@@ -1,13 +1,15 @@
-import { audio, instanceSelector } from "../lib/dom";
+import { audio } from "../lib/dom";
 import player from "../lib/player";
 import { getSaved, removeSaved, save } from "../lib/utils";
 
-const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances_v2.md';
 
 
-addEventListener('DOMContentLoaded', () => {
+export const fetchInstances = (
+  selector: HTMLSelectElement,
+  instanceAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances_v2.md'
+) =>
 
-  fetch(unifiedInstancesAPIurl)
+  fetch(instanceAPIurl)
     .then(res => res.text())
     .then(text => {
 
@@ -16,17 +18,17 @@ addEventListener('DOMContentLoaded', () => {
         piped: `https://${v[2]}.${v[0]}`,
         invidious: `https://${v[3]}.${v[0]}`,
         image: `https://${v[4]}.${v[0]}`
-      }))
+      }));
 
 
       // add to DOM
       for (const api of json)
-        instanceSelector.add(new Option(api.name, JSON.stringify(api)))
+        selector.add(new Option(api.name, JSON.stringify(api)));
 
       const savedApi = getSaved('apiList_3');
 
       if (!savedApi) {
-        instanceSelector.selectedIndex = 1;
+        selector.selectedIndex = 1;
         return;
       }
 
@@ -35,18 +37,17 @@ addEventListener('DOMContentLoaded', () => {
       const index = names.findIndex((v: { name: string }) => v === api.name);
 
       if (index >= 0)
-        instanceSelector.selectedIndex = index + 1;
+        selector.selectedIndex = index + 1;
       else {
-        const custom = instanceSelector.options[0];
+        const custom = selector.options[0];
         custom.textContent = api.name;
         custom.value = savedApi;
       }
 
     });
 
-});
-
-instanceSelector.addEventListener('change', async () => {
+export async function instanceChange(e: Event) {
+  const instanceSelector = e.target as HTMLSelectElement;
   const index = instanceSelector.selectedIndex;
   if (index === 0) {
     const current = JSON.parse(instanceSelector.value);
@@ -76,6 +77,6 @@ instanceSelector.addEventListener('change', async () => {
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
-});
+}
 
 

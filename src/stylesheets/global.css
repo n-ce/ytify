@@ -1,3 +1,4 @@
+@import 'animations.css';
 @import 'layout.css';
 @import 'remixicon.css';
 @import 'nav.css';
@@ -5,11 +6,9 @@
 @import 'home.css';
 @import 'search.css';
 @import 'library.css';
-@import 'settings.css';
 @import 'list.css';
 @import 'superModal.css';
 @import 'snackbar.css';
-@import 'animations.css';
 
 :root {
   --bg: transparent;

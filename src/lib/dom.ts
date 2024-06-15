@@ -6,13 +6,9 @@ export const progress = <HTMLInputElement>document.getElementById('progress');
 
 export const miniPlayer = <HTMLDivElement>document.getElementById('miniPlayer');
 
-export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
+export const canvas = new OffscreenCanvas(512, 512);
 
-export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
-
-export const instanceSelector = <HTMLSelectElement>document.getElementById('instances');
-
-export const imgLoadSelector = <HTMLSelectElement>document.getElementById('imgLoad');
+export const context = <OffscreenCanvasRenderingContext2D>canvas.getContext('2d');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 
@@ -21,6 +17,8 @@ export const searchFilters = <HTMLSelectElement>document.getElementById('searchF
 export const playButton = <HTMLButtonElement>document.getElementById('playButton');
 
 export const audio = <HTMLAudioElement>document.querySelector('audio');
+
+export const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement;
 
 export const superModal = <HTMLDialogElement>document.getElementById('superModal');
 

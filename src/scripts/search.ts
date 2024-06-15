@@ -1,13 +1,11 @@
 import { instanceSelector, loadingScreen, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getSaved, getApi, save, itemsLoader, idFromURL, params, notify, removeSaved, superClick } from "../lib/utils";
+import { $, getSaved, getApi, itemsLoader, idFromURL, params, notify, superClick } from "../lib/utils";
+import { fetchSearchResults } from "./search.invidious";
 
 
 const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
-const suggestionsSwitch = <HTMLSelectElement>document.getElementById('suggestionsSwitch');
-
-
 let nextPageToken = '';
 
 const loadMoreResults = (token: string, query: string) =>
@@ -34,7 +32,7 @@ function searchLoader() {
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
-  const sortByTime = searchFilters.selectedIndex === 1;
+  const useInvidious = searchFilters.selectedIndex > 7;
 
   superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
@@ -46,6 +44,12 @@ function searchLoader() {
 
   loadingScreen.showModal();
 
+  if (useInvidious) {
+    fetchSearchResults(superInput.value, searchFilters.value);
+    loadingScreen.close();
+    return;
+  }
+
   fetch(getApi('piped') + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
@@ -53,37 +57,8 @@ function searchLoader() {
       nextPageToken = searchResults.nextpage;
       if (!items) throw new Error('Search couldn\'t be resolved on ' + getApi('piped'));
 
-      if (sortByTime && nextPageToken) {
-        for (let i = 0; i < 3; i++) {
-          const data = await loadMoreResults(nextPageToken, query.substring(7));
-          if (!data)
-            throw new Error('nextpage error');
 
-          nextPageToken = data.nextpage;
-          items = items.concat(data.items);
-        }
-
-        type u = StreamItem & {
-          uploaded: number
-        }
-        items = (<u[]>items)
-          .filter(i => i.type === 'stream')
-          .sort((a, b) => b.uploaded - a.uploaded);
-
-        const uniqueSet = new Set(items);
-        items = Array.from(uniqueSet);
-
-        // Deduplication algorithm taken from https://www.techiediaries.com/find-duplicate-objects-in-array-angular
-
-        items = items.reduce((acc: any, item: any) => {
-          if (!acc.some((obj: any) => obj.uploaded === item.uploaded))
-            acc.push(item);
-          return acc;
-        }, []);
-
-      }
-
-      // filter livestreams & shorts & append rest
+      // filter out shorts
       searchlist.appendChild(
         itemsLoader(
           items.filter((item: StreamItem) => !item.isShort)
@@ -170,8 +145,9 @@ superInput.addEventListener('keydown', _ => {
     _.preventDefault();
   }
   if (_.key === 'Backspace' ||
-    !suggestions.hasChildNodes() ||
-    getSaved('search_suggestions')) return;
+    getSaved('search_suggestions') ||
+    !suggestions.hasChildNodes()
+  ) return;
 
   suggestions.childNodes.forEach(node => {
     if ((<HTMLLIElement>node).classList.contains('hover'))
@@ -206,16 +182,13 @@ searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
 
-suggestionsSwitch.addEventListener('click', () => {
-  getSaved('searchSuggestions') ?
-    removeSaved('searchSuggestions') :
-    save('searchSuggestions', 'off');
-  suggestions.style.display = 'none';
-
-});
-
 if (getSaved('searchSuggestions'))
-  suggestionsSwitch.removeAttribute('checked')
+  suggestions.remove();
+
+const savedSearchFilter = getSaved('searchFilter');
+if (savedSearchFilter)
+  searchFilters.value = savedSearchFilter;
+
 
 
 // search param /?q=
@@ -227,16 +200,3 @@ if (params.has('q')) {
   searchLoader();
 }
 
-if (getSaved('hints') !== 'off')
-  addEventListener('DOMContentLoaded', () => {
-    fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/usage.md').then(res => res.text())
-      .then(text => {
-        const ul = $('ul');
-        ul.innerHTML = text;
-        searchlist.appendChild(ul);
-        document.getElementById('offHints')!.onclick = () => {
-          save('hints', 'off');
-          location.reload();
-        }
-      });
-  })

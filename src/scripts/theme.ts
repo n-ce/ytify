@@ -1,23 +1,16 @@
 import { canvas, context, audio } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
-import { getSaved, params, removeSaved, save } from "../lib/utils";
+import { getSaved, params } from "../lib/utils";
 
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
-const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
-
-function accentLightener(r: number, g: number, b: number) {
-
-  const $ = (_: number) => _ + (204 - Math.max(r, g, b));
-
-  return `rgb(${$(r)}, ${$(g)},${$(b)})`;
-}
+const accentLightener = (r: number, g: number, b: number) => `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
 
 function accentDarkener(r: number, g: number, b: number) {
 
@@ -32,12 +25,6 @@ function accentDarkener(r: number, g: number, b: number) {
   return `rgb(${r - min}, ${g - min},${b - min})`;
 
 
-}
-
-function colorDistance(color1: number[], color2: number[]) {
-  const [r1, g1, b1] = color1;
-  const [r2, g2, b2] = color2;
-  return Math.sqrt(((r1 - r2) ** 2) + ((g1 - g2) ** 2) + ((b1 - b2) ** 2));
 }
 
 
@@ -62,6 +49,14 @@ const palette: Scheme = {
     text: '#000',
     borderColor: accentDarkener,
     shadowColor: '#0002'
+  }
+  /*,
+  hide_seek: {
+    bg: () => '#7b3f00',
+    onBg: '#4b0082',
+    text: '#000',
+    borderColor: () => '#000',
+    shadowColor: '#0004'
   },
   black: {
     bg: () => '#000',
@@ -69,7 +64,28 @@ const palette: Scheme = {
     text: '#fff',
     borderColor: accentLightener,
     shadowColor: 'transparent'
-  }
+  },
+  sepia: {
+    bg: () => '#704214',
+    onBg: '#fff4',
+    text: '#0007',
+    borderColor: () => '#0003',
+    shadowColor: '#0004'
+  },
+  whatsapp: {
+    bg: () => 'linear-gradient(mediumseagreen,seagreen)',
+    onBg: '#fffa',
+    text: '#030',
+    borderColor: () => '#030',
+    shadowColor: '#0004'
+  },
+  sun: {
+    bg: () => 'radial-gradient(red,yellow)',
+    onBg: '#fff7',
+    text: '#000',
+    borderColor: () => '#000',
+    shadowColor: '#0004'
+  }*/
 };
 
 
@@ -90,58 +106,64 @@ function themer() {
 
     const data = context.getImageData(0, 0, side, side).data;
     const len = data.length;
-    const colorMap: {
-      [index: string]: { color: number[], count: number }
-    } = {};
-
-    const tolerance = 10;
-
-    for (let i = 0; i < len; i += 4) {
-
-      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
-      const property = `${r}-${g}-${b}`;
 
 
-      let foundSimilar = false;
-      for (const color in colorMap) {
-        const cd = colorDistance([r, g, b], colorMap[color].color);
 
-        if (cd <= tolerance || cd > tolerance) {
-          colorMap[color].count++;
-          foundSimilar = true;
-          break;
+    const colorMap: { [index: string]: number } = {
+      '0-0-0': 0
+    };
+    let color: number[] = [];
+    let maxVal = 0;
+    const accuracy = 80;
+
+    for (let i = 0; i < len; i += accuracy) {
+
+      const c = [data[i], data[i + 1], data[i + 2]];
+      const prop = c.join('-');
+      const cmp = prop in colorMap ? colorMap[prop] : 0;
+      for (const key in colorMap) {
+        const ka = key.split('-').map(s => parseInt(s));
+
+        colorMap[prop] = (
+          ka.every((v, j) => Math.abs(v - c[j]) > 10)
+            ? cmp : 0) + 1;
+
+        if (i + accuracy === len) {
+          const val = colorMap[key];
+          if (val > maxVal) {
+            maxVal = val;
+            color = ka
+          }
         }
       }
 
-      if (!foundSimilar)
-        colorMap[property] = { color: [r, g, b], count: 1 };
-
-
     }
 
-    // Find dominant color group (considering similar colors)
-    let dominantColorGroup: number[] = [];
-    let maxCount = 0;
 
-    for (const color of Object.values(colorMap)) {
-      if (color.count > maxCount) {
-        maxCount = color.count;
-        dominantColorGroup = color.color;
-      }
-    }
+    /*
+    for light theme 
+    we must look for the most brightest dominant color group 
+    
+    check if it is light enough else lighten it up
+    
+    
+    1. Brighest dominant color group extractor
+    2. isLightEnough
+    3. 
+    */
 
-    const [r, g, b] = dominantColorGroup;
 
+    const [r, g, b] = color;
 
+    const theme = getSaved('theme') || 'auto';
+    const autoDark = systemDark.matches;
 
-    const theme = themeSelector.selectedOptions[0].value;
-    let light = 'light', dark = 'dark';
-    if (getSaved('highContrast'))
-      light = 'white', dark = 'black';
 
     const scheme = theme === 'auto' ?
-      (systemDark.matches ? dark : light) :
-      theme === 'light' ? light : dark;
+      autoDark ? 'dark' : 'light' :
+      theme === 'auto-hc' ?
+        autoDark ? 'black' : 'white' : theme;
+
 
 
     cssVar('--bg', palette[scheme].bg(r, g, b));
@@ -158,16 +180,6 @@ function themer() {
 }
 
 
-themeSelector.addEventListener('change', () => {
-  themer();
-  themeSelector.value === 'auto' ?
-    removeSaved('theme') :
-    save('theme', themeSelector.value);
-});
-
-const savedTheme = getSaved('theme');
-if (savedTheme)
-  themeSelector.value = savedTheme;
 
 systemDark.addEventListener('change', themer);
 

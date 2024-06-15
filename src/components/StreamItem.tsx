@@ -1,12 +1,9 @@
 import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { instanceSelector } from '../lib/dom';
-import { getApi } from '../lib/utils';
+import { getApi, getSaved } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
+import { instanceSelector } from '../lib/dom';
 
-// workaround "cannot access 'getSaved' before initialization"
-const s = localStorage.getItem('imgLoad');
-const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
 
 export default function StreamItem(data: {
   id: string,
@@ -22,20 +19,22 @@ export default function StreamItem(data: {
 }) {
 
   const [tsrc, setTsrc] = createSignal('');
+  const s = getSaved('imgLoad');
+  const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
 
   let parent!: HTMLAnchorElement;
 
 
   function handleThumbnailLoad(e: Event) {
     const img = e.target as HTMLImageElement;
-    const store = tsrc();
+    const t = tsrc();
 
     if (img.naturalWidth !== 120) {
       parent.classList.remove('ravel');
       return;
     }
-    if (store.includes('webp'))
-      setTsrc(store.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
+    if (t.includes('webp'))
+      setTsrc(t.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
     else { // most likely been removed from yt so remove it 
       parent.classList.add('delete');
       parent.click();
@@ -47,14 +46,14 @@ export default function StreamItem(data: {
     const index = instanceSelector.selectedIndex;
     const currentImgPrxy = getApi('image', index);
     const nextImgPrxy = getApi('image', index + 1);
-    const store = tsrc();
+    const t = tsrc();
 
     parent.classList.remove('ravel');
 
 
-    if (!store.includes(currentImgPrxy)) return;
+    if (!t.includes(currentImgPrxy)) return;
 
-    setTsrc(store.replace(currentImgPrxy, nextImgPrxy));
+    setTsrc(t.replace(currentImgPrxy, nextImgPrxy));
   }
 
   if (showImage)

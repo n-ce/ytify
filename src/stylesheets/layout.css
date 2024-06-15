@@ -4,7 +4,7 @@ body {
 }
 
 body {
-  background-color: var(--bg);
+  background: var(--bg);
   color: var(--text);
   display: flex;
   align-items: center;
