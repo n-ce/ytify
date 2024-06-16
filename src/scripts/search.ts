@@ -107,11 +107,12 @@ superInput.addEventListener('input', async () => {
     prevID = id;
     return;
   }
+  if (getSaved('search_suggestions')) return;
 
   suggestions.innerHTML = '';
   suggestions.style.display = 'none';
 
-  if (text.length < 3 || getSaved('search_suggestions')) return;
+  if (text.length < 3) return;
 
   suggestions.style.display = 'block';
 

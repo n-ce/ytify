@@ -100,7 +100,8 @@ audio.addEventListener('loadeddata', () => {
 let loadingTimeoutId = 0;
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  const timeoutIn = getSaved('loadingTimeout') as '0' | '15' || '30';
+  const timeoutIn = (getSaved('loadingTimeout') as '0' | '20' | '30') || '10';
+  console.log(timeoutIn);
   if (timeoutIn !== '0') {
     loadingTimeoutId = window.setTimeout(() => {
       clearTimeout(loadingTimeoutId);

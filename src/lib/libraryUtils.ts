@@ -1,6 +1,6 @@
 import { $, getApi, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
-import { listAnchor, listBtnsContainer, listContainer, loadingScreen } from "./dom";
+import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
 
@@ -77,7 +77,6 @@ export async function fetchCollection(collection: string | null, shareId: string
         if (data[i].frequency as number < 2)
           delete db.discover[i];
 
-
     for (const item in data) {
       const d = data[item];
       render(() => StreamItem({
@@ -117,7 +116,9 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   }
 
-  listContainer.replaceChildren(fragment);
+
+  listContainer.innerHTML = '';
+  listContainer.appendChild(fragment);
 
   const isReversed = listContainer.classList.contains('reverse');
 
@@ -131,12 +132,13 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (collection ? 'collection' : 'publicCollection');
 
+  if (location.pathname !== '/list') listAnchor.click();
 
-  listAnchor.click();
-  listContainer.scrollTo(0, 0);
+  listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
     (collection ? ('?collection=' + collection) : ('?shareId=' + shareId)));
+  document.title = (collection || 'Shared Playlist') + ' - ytify';
 }
 
 

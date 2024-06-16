@@ -145,6 +145,8 @@ export async function fetchList(url: string | undefined, mix = false) {
     })
     .finally(() => loadingScreen.close());
 
+  if (listContainer.classList.contains('reverse'))
+    listContainer.classList.remove('reverse');
   listContainer.innerHTML = '';
   listContainer.appendChild(
     itemsLoader(
@@ -165,7 +167,8 @@ export async function fetchList(url: string | undefined, mix = false) {
           if (token)
             setObserver(callback);
         }
-      })).observe(listContainer.children[listContainer.childElementCount - 3]);
+      }))
+      .observe(listContainer.children[listContainer.childElementCount - 3]);
   }
   if (!mix && token)
     setObserver(async () => {
@@ -177,9 +180,9 @@ export async function fetchList(url: string | undefined, mix = false) {
         .catch(e => console.log(e));
       if (!data) return;
       const existingItems: string[] = [];
-      for (const item of listContainer.children)
-        existingItems.push((<HTMLAnchorElement>item).href.slice(-11))
-
+      listContainer.querySelectorAll('.streamItem').forEach((v) => {
+        existingItems.push((v as HTMLElement).dataset.id as string);
+      });
       listContainer.appendChild(
         itemsLoader(
           data.relatedStreams.filter(

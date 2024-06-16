@@ -3,7 +3,7 @@ import { onMount } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { getSaved, removeSaved, save, supportsOpus } from "../lib/utils";
+import { $, getSaved, removeSaved, save, supportsOpus } from "../lib/utils";
 import { fetchInstances, instanceChange } from "../scripts/api";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
@@ -153,7 +153,7 @@ export default function Settings() {
         <ToggleSwitch
           id="defaultFilterSongs"
           name='Songs as Default Filter'
-          checked={getSaved('searchFilter') === 'songs'}
+          checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             getSaved('searchFilter') ?
               removeSaved('searchFilter') :
@@ -264,8 +264,9 @@ export default function Settings() {
             if (val) target.value = val;
           }}
         >
-          <option value="15">15 seconds</option>
           <option value="30">30 seconds</option>
+          <option value="20">20 seconds</option>
+          <option value="10" selected>10 seconds</option>
           <option value="0">Do not Timeout</option>
         </Selector>
 
@@ -413,6 +414,7 @@ function clearCache() {
   navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
   location.reload();
 }
+
 function restoreSettings() {
   const temp = getSaved('library');
   localStorage.clear();
@@ -423,6 +425,43 @@ function restoreSettings() {
   location.reload();
 }
 
+function extractSettings() {
+  const keys: { [index: string]: string } = {};
+  const len = localStorage.length;
+  for (let i = 0; i < len; i++) {
+    const key = localStorage.key(i) as string;
+    if (key === 'library') continue;
+    keys[key] = getSaved(key) as string;
+  }
+  return keys;
+
+}
+
+function exportSettings() {
+  const link = $('a');
+  link.download = 'ytify_settings.json';
+  link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(extractSettings(), undefined, 2))}`;
+  link.click();
+}
+
+async function importSettings(e: Event) {
+  e.preventDefault();
+  const newSettings = JSON.parse(
+    await (
+      (e.target as HTMLInputElement).files as FileList
+    )[0].text()
+  );
+
+  if (confirm('This will merge your current settings with the imported settings, continue?')) {
+    for (const key in newSettings)
+      save(key, newSettings[key]);
+
+    location.reload();
+  }
+
+}
+
+
 
 // emergency use
 if (location.search === '?reset') {
@@ -431,6 +470,10 @@ if (location.search === '?reset') {
   restoreSettings();
 }
 
+
+
+
 document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
-
+document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);
+document.getElementById('importSettingsBtn')!.addEventListener('change', importSettings);

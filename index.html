@@ -204,7 +204,7 @@
         margin-bottom:4%;
          " align="center">
           <img src="/ytify_banner.webp" style="
-          border-radius: calc(var(--roundness) / 1.4);" />
+          border-radius: calc(var(--roundness) / 1.4);" loading="lazy" />
           <br />
           Welcome to ytify, a fast, lightweight, personalisable, minimal and free audio streaming platform. Learn more
           about how to use
@@ -274,7 +274,11 @@
 
           <button id="restoreSettingsBtn" type="button">Restore Settings</button>
 
-          <a href="https://github.com/n-ce/ytify/wiki/troubleshooting" target="_blank">Help</a>
+          <button id="exportSettingsBtn" type="button">Export Settings</button>
+          <button type="button">
+            <label for="importSettingsBtn">Import Settings</label>
+            <input type="file" id="importSettingsBtn" class="hide">
+          </button>
 
           <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
 
