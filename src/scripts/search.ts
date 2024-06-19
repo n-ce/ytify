@@ -53,7 +53,7 @@ function searchLoader() {
   fetch(getApi('piped') + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
-      let items = searchResults.items;
+      const items = searchResults.items;
       nextPageToken = searchResults.nextpage;
       if (!items) throw new Error('Search couldn\'t be resolved on ' + getApi('piped'));
 

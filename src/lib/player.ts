@@ -3,6 +3,7 @@ import { convertSStoHHMMSS, notify, params, parseTTML, setMetaData, getApi, getS
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { store } from "../store";
+import Hls from "hls.js";
 
 
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -30,7 +31,7 @@ subtitleSelector.addEventListener('change', () => {
 
 
 let hlsOn = false;
-let hls: any;
+let hls: Hls;
 addEventListener('DOMContentLoaded', () => {
   if (getSaved('HLS')) {
     import('hls.js').then(mod => {

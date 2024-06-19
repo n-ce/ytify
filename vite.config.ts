@@ -28,6 +28,9 @@ const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
 
 
 export default defineConfig(({ command }) => ({
+  define: {
+    Version: JSON.stringify(process.env.npm_package_version),
+  },
   plugins: [
     injectEruda(command === 'serve'),
     solidPlugin(),
@@ -65,7 +68,7 @@ export default defineConfig(({ command }) => ({
         }
       },
       disable: command !== 'build',
-      includeAssets: ['*.woff2', 'ytify_thumbnail_min.webp']
+      includeAssets: ['*.woff2', 'ytify_banner.webp']
     })
   ],
   css: {

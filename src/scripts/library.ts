@@ -103,7 +103,7 @@ addEventListener('DOMContentLoaded', () => {
 // piped import playlists into ytify collections
 
 
-export async function pipedPlaylistsImporter(_: Event) {
+export async function pipedPlaylistsImporter() {
 
   const instance = prompt('Enter the Piped Authentication Instance API URL :', 'https://pipedapi.kavin.rocks');
   if (!instance) return;

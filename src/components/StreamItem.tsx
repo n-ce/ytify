@@ -2,7 +2,6 @@ import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { getApi, getSaved } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
-import { instanceSelector } from '../lib/dom';
 
 
 export default function StreamItem(data: {
@@ -43,7 +42,7 @@ export default function StreamItem(data: {
 
   function handleThumbnailError() {
 
-    const index = instanceSelector.selectedIndex;
+    const index = (document.getElementById('instanceSelector') as HTMLSelectElement).selectedIndex;
     const currentImgPrxy = getApi('image', index);
     const nextImgPrxy = getApi('image', index + 1);
     const t = tsrc();
