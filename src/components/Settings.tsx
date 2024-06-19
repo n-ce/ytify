@@ -1,5 +1,6 @@
 import './Settings.css';
-import { JSXElement, onMount } from "solid-js";
+import { onMount } from "solid-js";
+import type { JSXElement } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
 import player from "../lib/player";
@@ -234,6 +235,7 @@ export default function Settings() {
             getSaved('HLS') ?
               removeSaved('HLS') :
               save('HLS', 'true');
+            location.reload();
           }}
 
         />
@@ -255,7 +257,7 @@ export default function Settings() {
           onChange={e => {
             const val = (e.target as HTMLSelectElement).value;
 
-            val === '15' ?
+            val === '0' ?
               removeSaved('loadingTimeout') :
               save('loadingTimeout', val);
           }}
@@ -264,10 +266,12 @@ export default function Settings() {
             if (val) target.value = val;
           }}
         >
-          <option value="30">30 seconds</option>
-          <option value="20">20 seconds</option>
-          <option value="10" selected>10 seconds</option>
-          <option value="0">Do not Timeout</option>
+          <optgroup label='⚠️ Do not use if you have slow internet'>
+            <option value="30">30 seconds</option>
+            <option value="20">20 seconds</option>
+            <option value="10">10 seconds</option>
+            <option value="0" selected>No Timeout</option>
+          </optgroup>
         </Selector>
 
       </div>

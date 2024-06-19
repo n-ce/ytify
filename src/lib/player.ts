@@ -3,14 +3,32 @@ import { convertSStoHHMMSS, notify, params, parseTTML, setMetaData, getApi, getS
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { store } from "../store";
-import Hls from "hls.js";
+import type Hls from "hls.js";
 
 
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
 /////////////////////////////////////////////////////////////
 
-bitrateSelector.addEventListener('change', () => {
+let hlsOn = false;
+let hls: Hls;
+addEventListener('DOMContentLoaded', async () => {
+  if (getSaved('HLS')) {
+    bitrateSelector.remove();
+    import('hls.js').then(mod => {
+      hls = new mod.default();
+      hls.attachMedia(audio);
+      hls.on(mod.default.Events.MANIFEST_PARSED, () => {
+        audio.play();
+      });
+      hlsOn = true;
+    })
+  }
+});
+
+/////////////////////////////////////////////////////////////
+
+bitrateSelector?.addEventListener('change', () => {
   if (store.player.playbackState === 'playing')
     audio.pause();
   const timeOfSwitch = audio.currentTime;
@@ -29,21 +47,82 @@ subtitleSelector.addEventListener('change', () => {
   parseTTML();
 });
 
+/////////////////////////////////////////////////////////////
 
-let hlsOn = false;
-let hls: Hls;
-addEventListener('DOMContentLoaded', () => {
-  if (getSaved('HLS')) {
-    import('hls.js').then(mod => {
-      hls = new mod.default();
-      hls.attachMedia(audio);
-      hls.on(mod.default.Events.MANIFEST_PARSED, () => {
-        audio.play();
-      });
-      hlsOn = true;
-    })
+function setAudioStreams(audioStreams: {
+  codec: string,
+  url: string,
+  quality: string,
+  bitrate: string,
+  contentLength: number,
+  mimeType: string,
+}[], isMusic = false) {
+
+  const ivApi = getApi('invidious');
+  const preferedCodec = store.player.codec;
+  const noOfBitrates = audioStreams.length;
+  let index = -1;
+
+  if (!noOfBitrates) {
+    notify('NO AUDIO STREAMS AVAILABLE.');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    return;
   }
-});
+
+  function proxyHandler(url: string) {
+
+    const oldUrl = new URL(url);
+
+    if (isMusic || getSaved('enforceProxy')) return url;
+
+    // only proxy music streams
+    const host = isMusic ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
+
+    return url.replace(oldUrl.origin, host);
+  }
+
+  bitrateSelector.innerHTML = '';
+  audioStreams.forEach((_, i: number) => {
+    const codec = _.codec === 'opus' ? 'opus' : 'aac';
+    const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
+
+    // add to DOM
+    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));
+
+    (<HTMLOptionElement>bitrateSelector?.lastElementChild).dataset.type = _.mimeType;
+    // find preferred bitrate
+    const codecPref = preferedCodec ? codec === preferedCodec : true;
+    const hqPref = getSaved('hq') ? noOfBitrates : 0;
+    if (codecPref && index < hqPref) index = i;
+  });
+
+
+  bitrateSelector.selectedIndex = index;
+  audio.src = bitrateSelector.value;
+}
+
+function setSubtitles(subtitles: Record<'name' | 'url', string>[]) {
+
+  // Subtitle data dom injection
+
+  for (const option of subtitleSelector.options)
+    if (option.textContent !== 'Subtitles') option.remove();
+
+  subtitleSelector.classList.remove('hide');
+  subtitleContainer.innerHTML = '';
+
+  if (subtitles.length)
+    for (const subtitle of subtitles)
+      subtitleSelector.add(
+        new Option(subtitle.name, subtitle.url)
+      );
+  else {
+    subtitleTrack.src = '';
+    subtitleContainer.classList.add('hide');
+    subtitleSelector.classList.add('hide');
+    subtitleContainer.firstChild?.remove();
+  }
+}
 
 export default async function player(id: string | null = '') {
 
@@ -103,89 +182,19 @@ export default async function player(id: string | null = '') {
   );
 
 
-  const audioStreams = data.audioStreams
-    .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
-
-  const noOfBitrates = audioStreams.length;
-
-  if (!noOfBitrates && !hlsOn) {
-    notify('NO AUDIO STREAMS AVAILABLE.');
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    return;
-  }
-
-  const preferedCodec = store.player.codec;
-  let index = -1;
-
-  bitrateSelector.innerHTML = '';
-
-  const enforceProxy = getSaved('enforceProxy') === 'true';
-  const isMusic = enforceProxy || data.category === 'Music';
-  const ivApi = getApi('invidious');
-
-  function proxyHandler(url: string) {
-
-    const oldUrl = new URL(url);
-
-    // hls streams are proxied by default
-    if (isMusic && hlsOn) return url;
-
-    // only proxy music streams
-    const host = isMusic ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
-
-    return url.replace(oldUrl.origin, host);
-  }
-
-
-  audioStreams.forEach((_: {
-    codec: string,
-    url: string,
-    quality: string,
-    bitrate: string,
-    contentLength: number,
-    mimeType: string
-  }, i: number) => {
-    const codec = _.codec === 'opus' ? 'opus' : 'aac';
-    const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
-
-    // add to DOM
-    bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));
-
-    (<HTMLOptionElement>bitrateSelector.lastElementChild).dataset.type = _.mimeType;
-    // find preferred bitrate
-    const codecPref = preferedCodec ? codec === preferedCodec : true;
-    const hqPref = getSaved('hq') ? noOfBitrates : 0;
-    if (codecPref && index < hqPref) index = i;
-  });
-
-
-  bitrateSelector.selectedIndex = index;
 
   if (hlsOn) {
-    hls.loadSource(proxyHandler(data.hls));
-  } else
-    audio.src = bitrateSelector.value;
+    hls.loadSource(data.hls);
+    hls.currentLevel = 0;
+  } else {
 
-  // Subtitle data dom injection
+    const audioStreams = data.audioStreams
+      .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
-  for (const option of subtitleSelector.options)
-    if (option.textContent !== 'Subtitles') option.remove();
-
-  subtitleSelector.classList.remove('hide');
-  subtitleContainer.innerHTML = '';
-
-  if (data.subtitles.length)
-    for (const subtitles of data.subtitles)
-      subtitleSelector.add(
-        new Option(subtitles.name, subtitles.url)
-      );
-  else {
-    subtitleTrack.src = '';
-    subtitleContainer.classList.add('hide');
-    subtitleSelector.classList.add('hide');
-    subtitleContainer.firstChild?.remove();
+    setAudioStreams(audioStreams, data.category === 'Music');
   }
 
+  setSubtitles(data.subtitles);
 
 
   params.set('s', id);

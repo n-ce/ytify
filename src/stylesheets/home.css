@@ -177,7 +177,8 @@
 /* === range theme and appearance === */
 input[type="range"] {
   font-size: 1.5rem;
-  color: var(--text);
+  color: var(--bg);
+  filter: invert();
   --thumb-height: 0.625em;
   --track-height: 0.125em;
   --track-color: var(--onBg);

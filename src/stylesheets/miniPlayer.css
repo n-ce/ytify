@@ -21,6 +21,7 @@
       font-size: 1rem;
       line-height: 1.5rem;
       z-index: 1;
+      width: 100%;
     }
 
 
@@ -29,13 +30,13 @@
       border: none;
       background: none;
       margin: 0;
+      margin-left: 2%;
       padding: 0;
-      font-size: 1.2rem;
-      transform: scale(1.8);
+      font-size: 2rem;
       z-index: 1;
 
       &:active {
-        transform: scale(1.6);
+        transform: scale(0.8);
       }
     }
   }
