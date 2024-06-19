@@ -193,11 +193,12 @@ if (savedSearchFilter)
 
 
 // search param /?q=
-
-if (params.has('q')) {
-  superInput.value = params.get('q') || '';
-  if (params.has('f'))
-    searchFilters.value = params.get('f') || '';
-  searchLoader();
-}
+addEventListener('DOMContentLoaded', () => {
+  if (params.has('q')) {
+    superInput.value = params.get('q') || '';
+    if (params.has('f'))
+      searchFilters.value = params.get('f') || '';
+    searchLoader();
+  }
+});
 

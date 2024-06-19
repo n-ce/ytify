@@ -1,4 +1,4 @@
-import { audio, instanceSelector, playButton, progress, queuelist } from "../lib/dom";
+import { audio, instanceSelector, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, getSaved, params, } from "../lib/utils";
@@ -61,7 +61,7 @@ audio.addEventListener('playing', () => {
       if (historyID === ad.id) {
         addToCollection('history', ad);
         // just in case we are already in the history collection 
-        if (params.get('collection') === 'history')
+        if (listAnchor.classList.contains('view') && params.get('collection') === 'history')
           document.getElementById('history')!.click();
 
       }

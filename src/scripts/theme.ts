@@ -1,7 +1,8 @@
+import { extractColorsFromImageData } from "extract-colors";
 import { canvas, context, audio } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
 import { getSaved, params } from "../lib/utils";
-
+import { FinalColor } from "extract-colors/lib/types/Color";
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
@@ -11,6 +12,8 @@ const systemDark = matchMedia('(prefers-color-scheme:dark)');
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
 const accentLightener = (r: number, g: number, b: number) => `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
+
+
 
 function accentDarkener(r: number, g: number, b: number) {
 
@@ -26,7 +29,6 @@ function accentDarkener(r: number, g: number, b: number) {
 
 
 }
-
 
 const palette: Scheme = {
   light: {
@@ -49,14 +51,6 @@ const palette: Scheme = {
     text: '#000',
     borderColor: accentDarkener,
     shadowColor: '#0002'
-  }
-  /*,
-  hide_seek: {
-    bg: () => '#7b3f00',
-    onBg: '#4b0082',
-    text: '#000',
-    borderColor: () => '#000',
-    shadowColor: '#0004'
   },
   black: {
     bg: () => '#000',
@@ -64,33 +58,58 @@ const palette: Scheme = {
     text: '#fff',
     borderColor: accentLightener,
     shadowColor: 'transparent'
-  },
-  sepia: {
-    bg: () => '#704214',
-    onBg: '#fff4',
-    text: '#0007',
-    borderColor: () => '#0003',
-    shadowColor: '#0004'
-  },
-  whatsapp: {
-    bg: () => 'linear-gradient(mediumseagreen,seagreen)',
-    onBg: '#fffa',
-    text: '#030',
-    borderColor: () => '#030',
-    shadowColor: '#0004'
-  },
-  sun: {
-    bg: () => 'radial-gradient(red,yellow)',
-    onBg: '#fff7',
-    text: '#000',
-    borderColor: () => '#000',
-    shadowColor: '#0004'
-  }*/
+  }
 };
 
 
 
+function colorInjector(colorArray: FinalColor[]) {
+  const autoDark = systemDark.matches;
+  const theme = getSaved('theme') || 'auto';
+
+  const scheme = theme === 'auto' ?
+    autoDark ? 'dark' : 'light' :
+    theme === 'auto-hc' ?
+      autoDark ? 'black' : 'white' : theme;
+
+  const c = colorArray
+    .filter(v => v.saturation > 0.1)
+    .sort((a, b) => (b.area / b.lightness) / b.saturation - (a.area / a.lightness))[0];
+
+  const [r, g, b] = [
+    c?.red || colorArray[0].red,
+    c?.green || colorArray[0].green,
+    c?.blue || colorArray[0].blue
+  ];
+
+  cssVar('--bg', palette[scheme].bg(r, g, b));
+  cssVar('--onBg', palette[scheme].onBg);
+  cssVar('--text', palette[scheme].text);
+  cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
+  cssVar('--shadowColor', palette[scheme].shadowColor);
+  tabColor.content = palette[scheme].bg(r, g, b);
+}
+
+
 function themer() {
+  const id = audio.dataset.id || params.get('s');
+
+  if (!id) {
+    // intentional otherwise too fast to detect localStorage changes from events
+    setTimeout(() => colorInjector([{
+      'red': 127,
+      'blue': 127,
+      'green': 127,
+      'hex': '',
+      'area': 1,
+      'hue': 0,
+      'saturation': 1,
+      'lightness': 1,
+      'intensity': 1
+    }]));
+    return;
+  }
+
   const canvasImg = new Image();
   canvasImg.onload = () => {
 
@@ -104,78 +123,19 @@ function themer() {
     context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
 
 
-    const data = context.getImageData(0, 0, side, side).data;
-    const len = data.length;
+    colorInjector(
+      extractColorsFromImageData(
+        context.getImageData(
+          0, 0, side, side
+        )
+      )
+    );
 
-
-
-    const colorMap: { [index: string]: number } = {
-      '0-0-0': 0
-    };
-    let color: number[] = [];
-    let maxVal = 0;
-    const accuracy = 80;
-
-    for (let i = 0; i < len; i += accuracy) {
-
-      const c = [data[i], data[i + 1], data[i + 2]];
-      const prop = c.join('-');
-      const cmp = prop in colorMap ? colorMap[prop] : 0;
-      for (const key in colorMap) {
-        const ka = key.split('-').map(s => parseInt(s));
-
-        colorMap[prop] = (
-          ka.every((v, j) => Math.abs(v - c[j]) > 10)
-            ? cmp : 0) + 1;
-
-        if (i + accuracy === len) {
-          const val = colorMap[key];
-          if (val > maxVal) {
-            maxVal = val;
-            color = ka
-          }
-        }
-      }
-
-    }
-
-
-    /*
-    for light theme 
-    we must look for the most brightest dominant color group 
-    
-    check if it is light enough else lighten it up
-    
-    
-    1. Brighest dominant color group extractor
-    2. isLightEnough
-    3. 
-    */
-
-
-    const [r, g, b] = color;
-
-    const theme = getSaved('theme') || 'auto';
-    const autoDark = systemDark.matches;
-
-
-    const scheme = theme === 'auto' ?
-      autoDark ? 'dark' : 'light' :
-      theme === 'auto-hc' ?
-        autoDark ? 'black' : 'white' : theme;
-
-
-
-    cssVar('--bg', palette[scheme].bg(r, g, b));
-    cssVar('--onBg', palette[scheme].onBg);
-    cssVar('--text', palette[scheme].text);
-    cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
-    cssVar('--shadowColor', palette[scheme].shadowColor);
-    tabColor.content = palette[scheme].bg(r, g, b);
   }
   canvasImg.crossOrigin = '';
-  const temp = generateImageUrl(audio.dataset.id || params.get('s') || '1SLr62VBBjw');
+  const temp = generateImageUrl(id);
   if (canvasImg.src !== temp) canvasImg.src = temp;
+
 
 }
 

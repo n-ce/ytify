@@ -10,6 +10,7 @@
 	align-items: center;
 	position: relative;
 	transition: transform 0.4s;
+	overflow: hidden;
 
 	div,
 	span {
@@ -96,4 +97,8 @@
 		bottom: -0.5rem;
 	}
 
+}
+
+#queuelist>a {
+	transition: initial;
 }

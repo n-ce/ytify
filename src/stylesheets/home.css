@@ -47,7 +47,7 @@
         }
 
         #loopButton {
-          transition: all 0.5s cubic-bezier(0.47, 0, 0.745, 0.715);
+          transition: transform 0.5s cubic-bezier(0.47, 0, 0.745, 0.715);
         }
 
         #loopButton.on {

@@ -86,7 +86,7 @@ export default function Settings() {
           "piped":"https://pipedapi.kavin.rocks",
           "image":"https://pipedproxy.r4fo.com",
           "invidious":"https://invidious.fdn.fr"
-          }'>Custom</option>
+          }' selected>Custom</option>
         </Selector>
 
         <Selector
