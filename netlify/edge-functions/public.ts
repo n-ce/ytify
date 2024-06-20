@@ -1,20 +1,7 @@
 // handles upcoming query & public collection requests to restore stream lists from any state
 
 import { Config } from '@netlify/edge-functions';
-
-function convertSStoHHMMSS(seconds: number) {
-  if (seconds < 0) return '';
-  const hh = Math.floor(seconds / 3600);
-  seconds %= 3600;
-  const mm = Math.floor(seconds / 60);
-  const ss = Math.floor(seconds % 60);
-  let mmStr = String(mm);
-  let ssStr = String(ss);
-  if (mm < 10) mmStr = '0' + mmStr;
-  if (ss < 10) ssStr = '0' + ssStr;
-  return (hh > 0 ?
-    hh + ':' : '') + `${mmStr}:${ssStr}`;
-}
+import { convertSStoHHMMSS } from '../../src/lib/utils';
 
 const instanceArray = await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
@@ -53,7 +40,7 @@ export default async (request: Request) => {
     .then(json => ({
       'id': id,
       'title': json.title,
-      'author': json.uploader || json.author,
+      'author': (json.uploader || json.author).replace(' - Topic', ''),
       'channelUrl': json.authorUrl || json.uploaderUrl,
       'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds),
       'thumbnailUrl': json.thumbnailUrl || json.videoThumbnails[4].url,

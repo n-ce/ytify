@@ -11,7 +11,7 @@ import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData } from
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
-const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+const codecSelector = <HTMLSelectElement>document.getElementById('codecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
 /////////////////////////////////////////////////////////////

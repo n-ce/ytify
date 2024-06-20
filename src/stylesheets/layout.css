@@ -46,9 +46,10 @@ body {
     main {
       height: 100%;
       width: 100%;
-      padding: 2dvh;
+
 
       section {
+
         animation: fromBelow 0.2s cubic-bezier(0.19, 1, 0.22, 1);
       }
     }

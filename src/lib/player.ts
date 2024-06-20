@@ -10,18 +10,20 @@ const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelec
 
 /////////////////////////////////////////////////////////////
 
-let hlsOn = false;
 let hls: Hls;
 addEventListener('DOMContentLoaded', async () => {
   if (getSaved('HLS')) {
+    // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
+
     import('hls.js').then(mod => {
       hls = new mod.default();
       hls.attachMedia(audio);
       hls.on(mod.default.Events.MANIFEST_PARSED, () => {
+        // sets lowest bitrate
+        hls.currentLevel = 0;
         audio.play();
       });
-      hlsOn = true;
     })
   }
 });
@@ -182,17 +184,14 @@ export default async function player(id: string | null = '') {
   );
 
 
-
-  if (hlsOn) {
-    hls.loadSource(data.hls);
-    hls.currentLevel = 0;
-  } else {
-
-    const audioStreams = data.audioStreams
-      .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
-
-    setAudioStreams(audioStreams, data.category === 'Music');
-  }
+  hls ?
+    hls.loadSource(data.hls) :
+    setAudioStreams(
+      data.audioStreams.sort(
+        (a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate)
+      ),
+      data.category === 'Music'
+    );
 
   setSubtitles(data.subtitles);
 

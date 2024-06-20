@@ -264,8 +264,18 @@
 
 
     <section id="settings">
-      <div>
-        <form netlify name='feedback' method='POST'>
+
+      <select id="instanceSelector">
+        <option value='{
+          "name":"Custom",
+          "piped":"https://pipedapi.kavin.rocks",
+          "image":"https://pipedproxy.r4fo.com",
+          "invidious":"https://invidious.fdn.fr"
+          }'>Custom</option>
+      </select>
+
+      <div id="act">
+        <form netlify name="feedback" method="POST">
           <textarea name="->" id="netlifyForm"
             placeholder="Anonymously enter your feedback (bugs, feature requests) here:"></textarea>
           <button type="submit">Submit Feedback</button>

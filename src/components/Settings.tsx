@@ -1,11 +1,10 @@
 import './Settings.css';
-import { onMount } from "solid-js";
+import { Show, onMount } from "solid-js";
 import type { JSXElement } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { $, getSaved, removeSaved, save, supportsOpus } from "../lib/utils";
-import { fetchInstances, instanceChange } from "../scripts/api";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
 
@@ -76,19 +75,10 @@ export default function Settings() {
           </svg>
           <p>ytify {Version}</p>
         </b>
-        <Selector
-          id='instanceSelector'
-          label='Instance'
-          onChange={instanceChange}
-          onMount={fetchInstances}
-        >
-          <option value='{
-          "name":"Custom",
-          "piped":"https://pipedapi.kavin.rocks",
-          "image":"https://pipedproxy.r4fo.com",
-          "invidious":"https://invidious.fdn.fr"
-          }' selected>Custom</option>
-        </Selector>
+
+        <span id='isc'>
+          <label for='instanceSelector'>Instance</label>
+        </span>
 
         <Selector
           id='linkHost'
@@ -181,51 +171,65 @@ export default function Settings() {
           <p>Playback</p>
         </b>
 
-        <ToggleSwitch
-          id="qualitySwitch"
-          name='Highest Quality Audio'
-          checked={getSaved('hq') === 'true'}
-          onClick={async () => {
-            getSaved('hq') ?
-              removeSaved('hq') :
-              save('hq', 'true');
+        <Show when={!getSaved('HLS')}>
 
-            const timeOfSwitch = audio.currentTime;
-            await player(audio.dataset.id);
-            audio.currentTime = timeOfSwitch;
+          <ToggleSwitch
+            id="qualitySwitch"
+            name='Highest Quality Audio'
+            checked={getSaved('hq') === 'true'}
+            onClick={async () => {
+              getSaved('hq') ?
+                removeSaved('hq') :
+                save('hq', 'true');
 
-          }}
-        />
+              const timeOfSwitch = audio.currentTime;
+              await player(audio.dataset.id);
+              audio.currentTime = timeOfSwitch;
 
-        <Selector
-          label='Codec Preference'
-          id='CodecPreference'
-          onChange={async (e) => {
+            }}
+          />
 
-            const i = (e.target as HTMLSelectElement).selectedIndex;
-            i ?
-              save('codec', String(i)) :
-              removeSaved('codec');
+          <Selector
+            label='Codec Preference'
+            id='codecPreference'
+            onChange={async (e) => {
 
-            if (audio.dataset.playbackState === 'playing')
-              audio.pause();
-            const timeOfSwitch = audio.currentTime;
-            await player(audio.dataset.id);
-            audio.currentTime = timeOfSwitch;
-          }}
-          onMount={(target) => {
-            const codecSaved = getSaved('codec');
-            setTimeout(async () => {
-              target.selectedIndex = codecSaved ?
-                parseInt(codecSaved) :
-                (await supportsOpus() ? 0 : 1)
-            });
-          }}
-        >
-          <option value="opus">Opus</option>
-          <option value="aac">AAC</option>
-          <option value="">Any</option>
-        </Selector>
+              const i = (e.target as HTMLSelectElement).selectedIndex;
+              i ?
+                save('codec', String(i)) :
+                removeSaved('codec');
+
+              if (audio.dataset.playbackState === 'playing')
+                audio.pause();
+              const timeOfSwitch = audio.currentTime;
+              await player(audio.dataset.id);
+              audio.currentTime = timeOfSwitch;
+            }}
+            onMount={(target) => {
+              const codecSaved = getSaved('codec');
+              setTimeout(async () => {
+                target.selectedIndex = codecSaved ?
+                  parseInt(codecSaved) :
+                  (await supportsOpus() ? 0 : 1)
+              });
+            }}
+          >
+            <option value="opus">Opus</option>
+            <option value="aac">AAC</option>
+            <option value="">Any</option>
+          </Selector>
+
+          <ToggleSwitch
+            id="enforceProxySwitch"
+            name='Proxy Non-Music Streams'
+            checked={getSaved('enforceProxy') === 'true'}
+            onClick={() => {
+              getSaved('enforceProxy') ?
+                removeSaved('enforceProxy') :
+                save('enforceProxy', 'true');
+            }}
+          />
+        </Show>
 
         <ToggleSwitch
           id="HLS_Switch"
@@ -240,16 +244,6 @@ export default function Settings() {
 
         />
 
-        <ToggleSwitch
-          id="enforceProxySwitch"
-          name='Proxy Non-Music Streams'
-          checked={getSaved('enforceProxy') === 'true'}
-          onClick={() => {
-            getSaved('enforceProxy') ?
-              removeSaved('enforceProxy') :
-              save('enforceProxy', 'true');
-          }}
-        />
 
         <Selector
           label='Loading Timeout'

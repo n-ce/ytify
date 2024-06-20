@@ -10,10 +10,9 @@ import './list';
 import './library';
 import './audioEvents';
 import './miniPlayer';
+import { instanceSelector } from '../lib/dom';
+import { fetchInstances, instanceChange } from './api';
 
-
-if (import.meta.env.PROD)
-  import('eruda').then(eruda => eruda.default.init());
 
 if (import.meta.env.PROD)
   import('virtual:pwa-register').then(pwa => {
@@ -28,8 +27,22 @@ if (import.meta.env.PROD)
   });
 
 
-const frag = document.createDocumentFragment();
-render(Settings, frag);
 
-document.getElementById('settings')!.prepend(frag);
 
+
+/*
+instance selector is a vital part of the web app which should be available as quickly as possible to all the parts of the app, this is only possible through html, below are measures taken to extract the html area after it has been connected and retrofit it into the jsx component loaded later
+*/
+
+const settingsContainer = document.getElementById('settings') as HTMLDivElement;
+
+render(Settings, settingsContainer);
+
+// render appends Settings after act so we append act after Settings
+settingsContainer.appendChild(document.getElementById('act')!);
+// insert the instance selector inside the component area
+document.getElementById('isc')!.appendChild(instanceSelector);
+// onMount
+fetchInstances(instanceSelector);
+// onChange
+instanceSelector.addEventListener('change', instanceChange);
