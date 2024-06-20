@@ -7,10 +7,10 @@ import type Hls from "hls.js";
 
 
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
+let hls: Hls;
 
 /////////////////////////////////////////////////////////////
 
-let hls: Hls;
 addEventListener('DOMContentLoaded', async () => {
   if (getSaved('HLS')) {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
@@ -26,18 +26,16 @@ addEventListener('DOMContentLoaded', async () => {
       });
     })
   }
+  else bitrateSelector.addEventListener('change', () => {
+    if (store.player.playbackState === 'playing')
+      audio.pause();
+    const timeOfSwitch = audio.currentTime;
+    audio.src = bitrateSelector.value;
+    audio.currentTime = timeOfSwitch;
+    audio.play();
+  });
 });
 
-/////////////////////////////////////////////////////////////
-
-bitrateSelector?.addEventListener('change', () => {
-  if (store.player.playbackState === 'playing')
-    audio.pause();
-  const timeOfSwitch = audio.currentTime;
-  audio.src = bitrateSelector.value;
-  audio.currentTime = timeOfSwitch;
-  audio.play();
-});
 
 /////////////////////////////////////////////////////////////
 
@@ -132,10 +130,10 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const apiIndex = instanceSelector?.selectedIndex || 1;
+  const apiIndex = instanceSelector.selectedIndex;
 
   // fallback for custom instances which do not support unified instance architecture
-  if (apiIndex === 0)
+  if (apiIndex === 0 && !hls)
     return import('./player.invidious').then(player => player.default(id));
 
   const apiUrl = getApi('piped', apiIndex);
