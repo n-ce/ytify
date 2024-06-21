@@ -15,8 +15,6 @@ listBtnsContainer.addEventListener('click', e => {
 
   const db = getDB();
   const id = <string>listAnchor.dataset.id;
-
-
   const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${id}"]`);
 
   if (btn === playAllBtn) {

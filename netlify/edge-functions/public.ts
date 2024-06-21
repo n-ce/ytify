@@ -1,7 +1,22 @@
 // handles upcoming query & public collection requests to restore stream lists from any state
 
 import { Config } from '@netlify/edge-functions';
-import { convertSStoHHMMSS } from '../../src/lib/utils';
+
+
+export function convertSStoHHMMSS(seconds: number): string {
+  if (seconds < 0) return '';
+  const hh = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const mm = Math.floor(seconds / 60);
+  const ss = Math.floor(seconds % 60);
+  let mmStr = String(mm);
+  let ssStr = String(ss);
+  if (mm < 10) mmStr = '0' + mmStr;
+  if (ss < 10) ssStr = '0' + ssStr;
+  return (hh > 0 ?
+    hh + ':' : '') + `${mmStr}:${ssStr}`;
+}
+
 
 const instanceArray = await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
