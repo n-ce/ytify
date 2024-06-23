@@ -1,19 +1,25 @@
-import { audio } from "../lib/dom";
+import { audio, instanceSelector } from "../lib/dom";
 import player from "../lib/player";
 import { getSaved, removeSaved, save } from "../lib/utils";
+import { store } from "../store";
 
 
+const hlsOn = store.player.HLS;
 
-export const fetchInstances = (
-  selector: HTMLSelectElement,
-  instanceAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances_v2.md'
-) =>
+const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances_v2.md';
 
-  fetch(instanceAPIurl)
-    .then(res => res.text())
-    .then(text => {
+fetch(instanceAPIurl)
+  .then(res => hlsOn ? res.json() : res.text())
+  .then(text => {
 
-      const json = JSON.parse(text.slice(5)).map((v: string[]) => ({
+    const json = hlsOn ?
+      text.map((v: Record<'name' | 'locations' | 'api_url' | 'image_proxy_url', string>) => ({
+        name: `${v.name} ${v.locations}`,
+        piped: v.api_url,
+        invidious: 'https://invidious.fdn.fr',
+        image: v.image_proxy_url
+      })) :
+      JSON.parse(text.slice(5)).map((v: string[]) => ({
         name: `${v[0]} ${v[1]}`,
         piped: `https://${v[2]}.${v[0]}`,
         invidious: `https://${v[3]}.${v[0]}`,
@@ -21,33 +27,31 @@ export const fetchInstances = (
       }));
 
 
-      // add to DOM
-      for (const api of json)
-        selector.add(new Option(api.name, JSON.stringify(api)));
+    // add to DOM
+    for (const api of json)
+      instanceSelector.add(new Option(api.name, JSON.stringify(api)));
 
-      const savedApi = getSaved('apiList_3');
+    const savedApi = getSaved('apiList_3');
 
-      if (!savedApi) {
-        selector.selectedIndex = 1;
-        return;
-      }
+    if (!savedApi) {
+      instanceSelector.selectedIndex = 1;
+      return;
+    }
 
-      const api = JSON.parse(savedApi);
-      const names = json.map((v: { name: string }) => v.name);
-      const index = names.findIndex((v: { name: string }) => v === api.name);
+    const api = JSON.parse(savedApi);
+    const names = json.map((v: { name: string }) => v.name);
+    const index = names.findIndex((v: { name: string }) => v === api.name);
 
-      if (index >= 0)
-        selector.selectedIndex = index + 1;
-      else {
-        const custom = selector.options[0];
-        custom.textContent = api.name;
-        custom.value = savedApi;
-      }
+    if (index >= 0)
+      instanceSelector.selectedIndex = index + 1;
+    else {
+      const custom = instanceSelector.options[0];
+      custom.textContent = api.name;
+      custom.value = savedApi;
+    }
+  });
 
-    });
-
-export async function instanceChange(e: Event) {
-  const instanceSelector = e.target as HTMLSelectElement;
+instanceSelector.addEventListener('change', async () => {
   const index = instanceSelector.selectedIndex;
   if (index === 0) {
     const current = JSON.parse(instanceSelector.value);
@@ -77,6 +81,5 @@ export async function instanceChange(e: Event) {
   const timeOfSwitch = audio.currentTime;
   await player(audio.dataset.id);
   audio.currentTime = timeOfSwitch;
-}
 
-
+});

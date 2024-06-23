@@ -87,7 +87,12 @@ select {
   outline: none;
   color: var(--text);
   border: none;
-  border-radius: var(--roundness)
+  border-radius: var(--roundness);
+
+  /* fix white on white issue on dark mode */
+  option {
+    background: var(--bg);
+  }
 }
 
 dialog[open] {
@@ -169,7 +174,7 @@ a {
 #listTools {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 3;
   backdrop-filter: blur(0.5rem);
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);

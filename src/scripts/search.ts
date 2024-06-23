@@ -1,6 +1,7 @@
 import { instanceSelector, loadingScreen, searchFilters, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, getApi, itemsLoader, idFromURL, params, notify, superClick } from "../lib/utils";
+import { store } from "../store";
 import { fetchSearchResults } from "./search.invidious";
 
 
@@ -34,7 +35,7 @@ function searchLoader() {
   const query = 'search' + searchQuery + filterQuery;
   const useInvidious = searchFilters.selectedIndex > 7;
 
-  superInput.dataset.query = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
+  store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
 
   if (!superInput.value) {
@@ -87,7 +88,7 @@ function searchLoader() {
     })
     .finally(() => loadingScreen.close());
 
-  history.replaceState({}, '', location.origin + location.pathname + superInput.dataset.query.replace('filter', 'f'));
+  history.replaceState({}, '', location.origin + location.pathname + store.searchQuery.replace('filter', 'f'));
   suggestions.style.display = 'none';
 
 }

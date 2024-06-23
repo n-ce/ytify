@@ -1,4 +1,5 @@
-import { getSaved, hostResolver } from '../lib/utils';
+import { getApi, hostResolver } from '../lib/utils';
+import { store } from '../store';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
 
@@ -11,15 +12,30 @@ export default function ListItem(
   url: string,
 ) {
   const [getThumbnail, setThumbnail] = createSignal(thumbnail);
-  const s = getSaved('imgLoad');
-  const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
+  const showImage = (store.loadImage === 'off') ? undefined : store.loadImage;
 
-  const handleError = () =>
+  function handleError(e: Event) {
+    const img = e.target as HTMLImageElement;
+    img.parentElement!.classList.remove('ravel');
+
+
+    const index = (document.getElementById('instanceSelector') as HTMLSelectElement).selectedIndex;
+    const currentImgPrxy = getApi('image', index);
+    const nextImgPrxy = getApi('image', index + 1);
+    const t = getThumbnail();
+
     setThumbnail(
-      getThumbnail().includes('rj')
-        ? getThumbnail().replace('rj', 'rw')
-        : '/logo192.png'
+      getThumbnail().includes('rj?')
+        ? getThumbnail().replace('rj?', 'rw?')
+        : t.includes(currentImgPrxy) ?
+          setThumbnail(t.replace(currentImgPrxy, nextImgPrxy)) :
+          '/logo192.png'
     );
+
+  }
+
+
+
 
   function handleLoad(e: Event) {
     const img = e.target as HTMLImageElement;

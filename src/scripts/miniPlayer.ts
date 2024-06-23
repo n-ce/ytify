@@ -1,9 +1,9 @@
 import { img as imgX, miniPlayer, playButton, title } from '../lib/dom';
-import { getSaved } from '../lib/utils';
+import { store } from '../store';
 
 let img: HTMLImageElement | '' = imgX;
 
-if (getSaved('imgLoad') === 'off') {
+if (store.loadImage === 'off') {
   imgX.remove();
   img = '';
 }

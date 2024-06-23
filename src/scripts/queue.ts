@@ -4,6 +4,7 @@ import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
 import Sortable, { SortableEvent } from "sortablejs";
+import { store } from "../store";
 
 const queueArray: string[] = [];
 
@@ -166,14 +167,14 @@ function isLongerThan10Min(duration: string) {
 new MutationObserver(m => {
   for (const mutation of m) {
     if (mutation.type === "childList") {
-      const array = queueArray.join('');
-      queuelist.dataset.array = array;
+      const query = queueArray.join('');
+      store.upcomingQuery = query;
 
       if (location.pathname === '/upcoming') {
         history.replaceState({}, '',
           location.pathname + (
-            array ?
-              `?a=${array}` : ''
+            query ?
+              `?a=${query}` : ''
           )
         );
       }

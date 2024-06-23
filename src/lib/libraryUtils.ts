@@ -176,44 +176,24 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
     return pls.length ? fragment : 'No Imported Playlists Found';
   }
 
-  function loadSubPls() {
+  function loadSubList(type: string) {
 
-    if (!Object(db).hasOwnProperty('playlists'))
-      return 'No Subscribed Playlists Found';
+    if (!Object(db).hasOwnProperty(type))
+      return `No Subscribed ${type} Found`;
 
     const array = [];
-    const pls = db.playlists as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
+    const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
 
     for (const pl in pls) {
       array.push(<StreamItem>{
-        type: 'playlist',
+        type: type.slice(0, -1),
         name: pls[pl].name,
         uploaderName: pls[pl].uploader,
-        url: '/playlists/' + pls[pl].id,
+        url: `/${type === 'channels' ? type.slice(0, -1) : type}/` + pls[pl].id,
         thumbnail: pls[pl].thumbnail
       });
     }
     return itemsLoader(array);
-  }
-
-  function loadChannels() {
-    if (!Object(db).hasOwnProperty('channels'))
-      return 'You have not subscribed to any channels';
-
-    const array = [];
-    const pls = db.channels as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
-
-    for (const pl in pls) {
-      array.push(<StreamItem>{
-        type: 'channel',
-        name: pls[pl].name,
-        uploaderName: pls[pl].uploader,
-        url: '/channel/' + pls[pl].id,
-        thumbnail: pls[pl].thumbnail
-      });
-    }
-    return itemsLoader(array);
-
   }
 
   async function loadFeed() {
@@ -241,11 +221,9 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
       await loadFeaturedPls() :
       name === 'collections' ?
         loadUrPls() :
-        name === 'playlists' ?
-          loadSubPls()
-          : name === 'channels' ?
-            loadChannels() :
-            await loadFeed()
+        name === 'feed' ?
+          await loadFeed() :
+          loadSubList(name)
   );
 }
 

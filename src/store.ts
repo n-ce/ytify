@@ -11,11 +11,15 @@ export const store: {
     highContrast: boolean,
     roundness: 'none' | '2vmin' | '4vmin' | '8vmin'
   },
-  linkHost: string
+  loadImage: 'off' | 'lazy' | 'eager',
+  linkHost: string,
+  searchQuery: string,
+  upcomingQuery: string,
+  superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists'
 } = {
   player: {
     playbackState: 'none',
-    HLS: false,
+    HLS: Boolean(localStorage.getItem('HLS')),
     codec: 'opus',
     hq: false
 
@@ -25,6 +29,10 @@ export const store: {
     highContrast: false,
     roundness: '2vmin'
   },
+  loadImage: localStorage.getItem('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: 'https://youtube.com',
+  searchQuery: '',
+  upcomingQuery: '',
+  superCollectionType: 'featured'
 }
 

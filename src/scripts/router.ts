@@ -1,6 +1,7 @@
-import { audio, loadingScreen, queuelist, searchFilters, superInput, superModal } from "../lib/dom";
+import { audio, loadingScreen, searchFilters, superInput, superModal } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { fetchList, getSaved, params } from "../lib/utils";
+import { store } from "../store";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
 
@@ -68,8 +69,8 @@ nav.addEventListener('click', (e: Event) => {
   if (anchor.id !== location.pathname) {
     const sParamInHome = params.has('s') && inHome;
     const sParam = '?s=' + params.get('s');
-    const aParam = queuelist.dataset.array ? '?a=' + queuelist.dataset.array : '';
-    const otherQuery = anchor.id === '/search' ? superInput.dataset.query || '' : anchor.id === '/upcoming' ? aParam : '';
+    const aParam = store.upcomingQuery ? '?a=' + store.upcomingQuery : '';
+    const otherQuery = anchor.id === '/search' ? store.searchQuery : anchor.id === '/upcoming' ? aParam : '';
 
     history.pushState({}, '',
       anchor.id + (

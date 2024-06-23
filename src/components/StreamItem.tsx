@@ -1,7 +1,8 @@
 import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { getApi, getSaved } from '../lib/utils';
+import { getApi } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
+import { store } from '../store';
 
 
 export default function StreamItem(data: {
@@ -18,8 +19,7 @@ export default function StreamItem(data: {
 }) {
 
   const [tsrc, setTsrc] = createSignal('');
-  const s = getSaved('imgLoad');
-  const showImage = (s === 'off') ? undefined : s ? 'lazy' : 'eager';
+  const showImage = (store.loadImage === 'off') ? undefined : store.loadImage;
 
   let parent!: HTMLAnchorElement;
 
@@ -49,11 +49,11 @@ export default function StreamItem(data: {
 
     parent.classList.remove('ravel');
 
-
-    if (!t.includes(currentImgPrxy)) return;
-
-    setTsrc(t.replace(currentImgPrxy, nextImgPrxy));
+    if (t.includes(currentImgPrxy))
+      setTsrc(t.replace(currentImgPrxy, nextImgPrxy));
   }
+
+
 
   if (showImage)
     setTsrc(generateImageUrl(data.img || data.id, 'mq'));

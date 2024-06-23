@@ -96,6 +96,7 @@
         font-size: inherit;
         border: var(--border);
         padding: 0.5vmin 1vmin;
+        width: 50%;
       }
     }
 

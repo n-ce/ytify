@@ -95,6 +95,11 @@
 		position: absolute;
 		right: -1rem;
 		bottom: -0.5rem;
+		border-radius: 50%;
+
+		&:hover {
+			background: var(--onBg);
+		}
 	}
 
 }

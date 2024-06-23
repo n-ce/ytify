@@ -17,7 +17,7 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (type: string, index: number | '' = '') => JSON.parse(
+export const getApi = (type: 'piped' | 'invidious' | 'image', index: number | '' = '') => JSON.parse(
   (index ? instanceSelector?.options[index].value : instanceSelector?.value) ||
   getSaved('apiList_3') || '{"name":"Custom","piped":"https://pipedapi.kavin.rocks","image":"https://pipedproxy.r4fo.com","invidious":"https://invidious.fdn.fr"}'
 )[type];
@@ -67,7 +67,8 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 
 
-const showImg = getSaved('imgLoad') !== 'off';
+let more!: () => void;
+document.getElementById('moreBtn')!.addEventListener('click', () => more());
 
 export async function setMetaData(
   id: string,
@@ -81,7 +82,7 @@ export async function setMetaData(
   };
 
   const imgx = generateImageUrl(id, 'maxres');
-  if (showImg) {
+  if (store.loadImage !== 'off') {
     img.src = music ? await sqrThumb(imgx) : imgx;
     metadataObj.artwork = [
       { src: img.src, sizes: '96x96' },
@@ -97,8 +98,8 @@ export async function setMetaData(
 
   title.href = hostResolver(`/watch?v=${id}`);
   title.textContent = streamName;
-  // using classic onclick to avoid attesting listeners
-  document.getElementById('moreBtn')!.onclick = () => {
+
+  more = function() {
     superModal.showModal();
     history.pushState({}, '', '#');
     const s = superModal.dataset;

@@ -3,7 +3,7 @@
 import { Config } from '@netlify/edge-functions';
 
 
-export function convertSStoHHMMSS(seconds: number): string {
+function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
   const hh = Math.floor(seconds / 3600);
   seconds %= 3600;

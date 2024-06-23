@@ -1,17 +1,18 @@
 import '../stylesheets/global.css';
-import { render } from 'solid-js/web';
-import Settings from "../components/Settings";
 import './router';
 import './theme';
+import './api';
 import './search';
 import './superModal';
 import './queue';
 import './list';
-import './library';
 import './audioEvents';
 import './miniPlayer';
+import './library';
 import { instanceSelector } from '../lib/dom';
-import { fetchInstances, instanceChange } from './api';
+import { render } from 'solid-js/web';
+import Settings from "../components/Settings";
+
 
 
 if (import.meta.env.PROD)
@@ -42,7 +43,3 @@ render(Settings, settingsContainer);
 settingsContainer.appendChild(document.getElementById('act')!);
 // insert the instance selector inside the component area
 document.getElementById('isc')!.appendChild(instanceSelector);
-// onMount
-fetchInstances(instanceSelector);
-// onChange
-instanceSelector.addEventListener('change', instanceChange);

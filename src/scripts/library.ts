@@ -64,9 +64,6 @@ collectionContainer.addEventListener('click', e => {
     fetchCollection(elm.id);
 });
 
-if (params.has('collection') || params.has('shareId'))
-  fetchCollection(params.get('collection'), params.get('shareId'));
-
 
 superCollectionSelector.addEventListener('change', () => {
   const val = superCollectionSelector.value;
@@ -96,12 +93,13 @@ addEventListener('DOMContentLoaded', () => {
     if (!reservedCollections.includes(key))
       createPlaylist(key);
 
+  if (params.has('collection') || params.has('shareId'))
+    fetchCollection(params.get('collection'), params.get('shareId'));
 });
 
 
 
 // piped import playlists into ytify collections
-
 
 export async function pipedPlaylistsImporter() {
 

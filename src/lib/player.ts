@@ -12,7 +12,7 @@ let hls: Hls;
 /////////////////////////////////////////////////////////////
 
 addEventListener('DOMContentLoaded', async () => {
-  if (getSaved('HLS')) {
+  if (store.player.HLS) {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
 
@@ -24,6 +24,21 @@ addEventListener('DOMContentLoaded', async () => {
         hls.currentLevel = 0;
         audio.play();
       });
+      hls.on(mod.default.Events.ERROR, (e, d) => {
+        if (d.details !== 'manifestLoadError') return;
+
+        const apiIndex = instanceSelector.selectedIndex;
+        const apiUrl = getApi('piped', apiIndex);
+        if (apiIndex < instanceSelector.length - 1) {
+          notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to HLS manifest loading error.`);
+          instanceSelector.selectedIndex++;
+          player(audio.dataset.id);
+          return;
+        }
+        notify(e);
+        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+        instanceSelector.selectedIndex = 0;
+      })
     })
   }
   else bitrateSelector.addEventListener('change', () => {
@@ -133,7 +148,7 @@ export default async function player(id: string | null = '') {
   const apiIndex = instanceSelector.selectedIndex;
 
   // fallback for custom instances which do not support unified instance architecture
-  if (apiIndex === 0 && !hls)
+  if (apiIndex === 0 && !store.player.HLS)
     return import('./player.invidious').then(player => player.default(id));
 
   const apiUrl = getApi('piped', apiIndex);
