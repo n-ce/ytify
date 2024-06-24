@@ -151,15 +151,12 @@ export default async function player(id: string | null = '') {
 
   const apiIndex = instanceSelector.selectedIndex;
 
-
-
   // fallback for custom instances which do not support unified instance architecture
-  const { name_space_location, piped, invidious } = JSON.parse(instanceSelector.value);
-  const name = name_space_location.split(' ')[0];
+  const { piped, invidious } = JSON.parse(instanceSelector.value);
+  const hostA = piped.split('.');
+  const hostB = invidious.split('.');
 
-  if (piped.includes(name) && invidious.includes(name)
-    && !store.player.HLS
-  )
+  if (hostA[hostA.length - 2] !== hostB[hostB.length - 2] && !store.player.HLS)
     return import('./player.invidious').then(player => player.default(id));
 
   const apiUrl = piped;
