@@ -13,7 +13,7 @@
 :root {
   --bg: transparent;
   --onBg: transparent;
-  --text: transparent;
+  --text: black;
   --borderColor: transparent;
   --border: 0.1vmin solid var(--borderColor);
   --shadowColor: transparent;

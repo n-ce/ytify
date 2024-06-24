@@ -129,7 +129,7 @@
   }
 
   @media(orientation:landscape) {
-    width: calc(100% - 12vmin);
+    width: 80%;
     margin: auto;
     border: var(--border);
     border-radius: var(--rx2);

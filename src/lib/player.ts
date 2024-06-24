@@ -20,28 +20,24 @@ addEventListener('DOMContentLoaded', async () => {
       hls = new mod.default();
       hls.attachMedia(audio);
       hls.on(mod.default.Events.MANIFEST_PARSED, () => {
-        // sets lowest bitrate
-        hls.currentLevel = 0;
         audio.play();
       });
       hls.on(mod.default.Events.ERROR, (e, d) => {
 
-        console.log(d);
         if (d.details !== 'manifestLoadError') return;
-
-        audio.pause();
 
         const apiIndex = instanceSelector.selectedIndex;
         const apiUrl = getApi('piped', apiIndex);
         if (apiIndex < instanceSelector.length - 1) {
-          notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to HLS manifest loading error.`);
+          const nextApi = getApi('piped', apiIndex + 1)
+          notify(`switched instance from ${apiUrl} to ${nextApi} due to HLS manifest loading error.`);
           instanceSelector.selectedIndex++;
-          player(audio.dataset.id);
+          hls.loadSource((<string>d.url).replace(apiUrl, nextApi));
           return;
         }
         notify(e);
         playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-        instanceSelector.selectedIndex = 0;
+        instanceSelector.selectedIndex = 1;
       })
     })
   }
@@ -177,15 +173,9 @@ export default async function player(id: string | null = '') {
       }
       notify(err.message);
       playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      instanceSelector.selectedIndex = 0;
+      instanceSelector.selectedIndex = 1;
     });
 
-
-  if (!data || !data.hasOwnProperty('audioStreams')) {
-    notify('No Audio Streams Found.');
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    return;
-  }
 
   audio.dataset.id = id;
   audio.dataset.title = data.title;
