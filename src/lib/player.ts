@@ -27,6 +27,8 @@ addEventListener('DOMContentLoaded', async () => {
       hls.on(mod.default.Events.ERROR, (e, d) => {
         if (d.details !== 'manifestLoadError') return;
 
+        audio.pause();
+
         const apiIndex = instanceSelector.selectedIndex;
         const apiUrl = getApi('piped', apiIndex);
         if (apiIndex < instanceSelector.length - 1) {

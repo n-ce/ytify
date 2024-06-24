@@ -7,6 +7,7 @@ import player from "../lib/player";
 import { $, getSaved, removeSaved, save, supportsOpus } from "../lib/utils";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
+import { store } from '../store';
 
 
 
@@ -171,7 +172,7 @@ export default function Settings() {
           <p>Playback</p>
         </b>
 
-        <Show when={!getSaved('HLS')}>
+        <Show when={!store.player.HLS}>
 
           <ToggleSwitch
             id="qualitySwitch"
