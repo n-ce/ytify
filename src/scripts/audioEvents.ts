@@ -1,10 +1,9 @@
-import { audio, instanceSelector, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
+import { audio, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, getSaved, params, } from "../lib/utils";
 import { store } from "../store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
-
 
 
 const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
@@ -97,20 +96,8 @@ audio.addEventListener('loadeddata', () => {
 });
 
 
-let loadingTimeoutId = 0;
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  const timeoutIn = (getSaved('loadingTimeout') as '0' | '20' | '30') || '10';
-  console.log(timeoutIn);
-  if (timeoutIn !== '0') {
-    loadingTimeoutId = window.setTimeout(() => {
-      clearTimeout(loadingTimeoutId);
-      instanceSelector.selectedIndex++;
-      player(audio.dataset.id);
-    }, parseInt(timeoutIn));
-  }
-  clearTimeout(historyTimeoutId);
-
 });
 
 

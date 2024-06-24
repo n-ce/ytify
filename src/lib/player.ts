@@ -154,8 +154,8 @@ export default async function player(id: string | null = '') {
 
 
   // fallback for custom instances which do not support unified instance architecture
-  let { name, piped, invidious } = JSON.parse(instanceSelector.value);
-  name = name.split(' ')[0];
+  const { name_space_location, piped, invidious } = JSON.parse(instanceSelector.value);
+  const name = name_space_location.split(' ')[0];
 
   if (piped.includes(name) && invidious.includes(name)
     && !store.player.HLS

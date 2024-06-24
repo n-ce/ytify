@@ -239,30 +239,6 @@ export default function Settings() {
 
         />
 
-
-        <Selector
-          label='Loading Timeout'
-          id='loadingTimeout'
-          onChange={e => {
-            const val = (e.target as HTMLSelectElement).value;
-
-            val === '0' ?
-              removeSaved('loadingTimeout') :
-              save('loadingTimeout', val);
-          }}
-          onMount={target => {
-            const val = getSaved('loadingTimeout');
-            if (val) target.value = val;
-          }}
-        >
-          <optgroup label='⚠️ Do not use if you have slow internet'>
-            <option value="30">30 seconds</option>
-            <option value="20">20 seconds</option>
-            <option value="10">10 seconds</option>
-            <option value="0" selected>No Timeout</option>
-          </optgroup>
-        </Selector>
-
       </div>
 
       <div>

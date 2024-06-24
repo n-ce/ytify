@@ -5,9 +5,6 @@ import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
 
 
-
-
-
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
 export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
