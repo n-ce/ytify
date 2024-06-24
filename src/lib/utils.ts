@@ -67,7 +67,8 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 
 
-let more!: () => void;
+let more = () => undefined;
+
 document.getElementById('moreBtn')!.addEventListener('click', () => more());
 
 export async function setMetaData(

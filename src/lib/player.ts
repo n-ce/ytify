@@ -25,6 +25,8 @@ addEventListener('DOMContentLoaded', async () => {
         audio.play();
       });
       hls.on(mod.default.Events.ERROR, (e, d) => {
+
+        console.log(d);
         if (d.details !== 'manifestLoadError') return;
 
         audio.pause();
@@ -149,14 +151,26 @@ export default async function player(id: string | null = '') {
 
   const apiIndex = instanceSelector.selectedIndex;
 
+
+
   // fallback for custom instances which do not support unified instance architecture
-  if (apiIndex === 0 && !store.player.HLS)
+  let { name, piped, invidious } = JSON.parse(instanceSelector.value);
+  name = name.split(' ')[0];
+
+  if (piped.includes(name) && invidious.includes(name)
+    && !store.player.HLS
+  )
     return import('./player.invidious').then(player => player.default(id));
 
-  const apiUrl = getApi('piped', apiIndex);
+  const apiUrl = piped;
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
+    .then(res => {
+      if ('error' in res)
+        throw new Error(res.error)
+      else return res;
+    })
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
         notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);

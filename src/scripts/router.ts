@@ -1,4 +1,4 @@
-import { audio, loadingScreen, searchFilters, superInput, superModal } from "../lib/dom";
+import { audio, loadingScreen, searchFilters, superInput, superModal, ytifyIcon } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { fetchList, getSaved, params } from "../lib/utils";
 import { store } from "../store";
@@ -119,7 +119,9 @@ else {
 }
 
 // necessary to use a click event 
-(<HTMLAnchorElement>document.getElementById(route)).click();
+const goHome = () => (<HTMLAnchorElement>document.getElementById(route)).click();
+goHome();
+ytifyIcon.addEventListener('click', goHome);
 
 // enables back button functionality
 
@@ -127,6 +129,5 @@ onpopstate = () =>
   superModal.open ?
     superModal.close() :
     showSection(location.pathname);
-
 
 

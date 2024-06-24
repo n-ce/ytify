@@ -1,4 +1,4 @@
-import { audio, instanceSelector, listAnchor, playButton, progress, queuelist } from "../lib/dom";
+import { audio, instanceSelector, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, getSaved, params, } from "../lib/utils";
@@ -243,9 +243,17 @@ if (msn) {
   });
 }
 
-addEventListener('DOMContentLoaded', () => {
-  player(params.get('s') || idFromURL(params.get('url') || params.get('text')));
+addEventListener('DOMContentLoaded', async () => {
+  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+  if (id) {
+    loadingScreen.showModal();
+    await player(id);
+    loadingScreen.close();
+  }
+  else
+    document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
 });
+
 
 
 /*

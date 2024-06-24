@@ -1,4 +1,4 @@
-import { img as imgX, miniPlayer, playButton, title } from '../lib/dom';
+import { img as imgX, miniPlayer, playButton, title, ytifyIcon } from '../lib/dom';
 import { store } from '../store';
 
 let img: HTMLImageElement | '' = imgX;
@@ -14,7 +14,8 @@ miniPlayer.addEventListener('click', (e) => {
 
   if (!(<HTMLElement>e.target).matches('button'))
     document.getElementById('/')!.click();
-})
+});
+
 
 export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) {
 
@@ -23,11 +24,13 @@ export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) 
     document.getElementById('upperLayer')!.prepend(img);
     document.getElementById('meta')!.prepend(title);
     document.getElementById('playerControls')!.insertBefore(playButton, document.getElementById('seekFwdButton'));
+    document.getElementById('selectors')!.appendChild(ytifyIcon);
   }
   else if (header.contains('hide')) {
     header.remove('hide');
     miniPlayer.prepend(img);
     miniPlayer.lastElementChild!.append(title, playButton);
+    document.getElementById('ytifyIconContainer')!.prepend(ytifyIcon);
   }
 
 }

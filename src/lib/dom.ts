@@ -1,5 +1,7 @@
 export const img = <HTMLImageElement>document.getElementById('img');
 
+export const ytifyIcon = <HTMLElement>document.getElementById('ytifyIcon')
+
 export const title = <HTMLAnchorElement>document.getElementById('title');
 
 export const progress = <HTMLInputElement>document.getElementById('progress');
