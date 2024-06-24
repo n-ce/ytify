@@ -67,7 +67,7 @@ collectionContainer.addEventListener('click', e => {
 
 superCollectionSelector.addEventListener('change', () => {
   const val = superCollectionSelector.value;
-  val === 'collections' ?
+  val === 'featured' ?
     removeSaved('defaultSuperCollection') :
     save('defaultSuperCollection', val);
 

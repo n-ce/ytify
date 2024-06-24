@@ -170,7 +170,7 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
       a.append(i, v);
       fragment.appendChild(a);
     });
-    return pls.length ? fragment : 'No Imported Playlists Found';
+    return pls.length ? fragment : 'No Collections Found';
   }
 
   function loadSubList(type: string) {
