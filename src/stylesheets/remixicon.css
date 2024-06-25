@@ -19,9 +19,6 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ri-home-line:before {
-  content: "\ee2b";
-}
 
 .ri-search-2-line:before {
   content: "\f0cd";
@@ -49,18 +46,6 @@
 
 .ri-forward-15-line:before {
   content: "\f32d";
-}
-
-.ri-play-circle-fill:before {
-  content: "\f008";
-}
-
-.ri-pause-circle-fill:before {
-  content: "\efd5";
-}
-
-.ri-stop-circle-fill:before {
-  content: "\f19e";
 }
 
 .ri-loader-3-line:before {
@@ -161,4 +146,52 @@
 
 .ri-external-link-line:before {
   content: "\ecaf";
+}
+
+.ri-play-circle-fill:before {
+  content: "\f008";
+}
+
+.ri-pause-circle-fill:before {
+  content: "\efd5";
+}
+
+.ri-stop-circle-fill:before {
+  content: "\f19e";
+}
+
+.ri-draggable:before {
+  content: "\f38f";
+}
+
+.ri-edit-line:before {
+  content: "\ec86";
+}
+
+.ri-t-shirt-2-line:before {
+  content: "\f1d5";
+}
+
+.ri-search-2-fill:before {
+  content: "\f0cc";
+}
+
+.ri-skip-forward-fill:before {
+  content: "\f143";
+}
+
+.ri-stack-fill:before {
+  content: "\f180";
+}
+
+.ri-settings-fill:before {
+  content: "\f0ed";
+}
+
+.ri-more-2-fill:before {
+  content: "\ef76";
+}
+
+.ri-link:before {
+  content: "\eeb2";
 }

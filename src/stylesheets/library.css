@@ -1,0 +1,72 @@
+#library {
+  width: 100%;
+
+  div:first-child {
+    width: 100%;
+    display: grid;
+    justify-content: center;
+    grid-template-columns: auto auto;
+    gap: 1rem;
+    margin-top: 1rem;
+
+
+    a {
+      border: var(--border);
+      background: var(--onBg);
+      border-radius: var(--roundness);
+      width: 10rem;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+
+      i {
+        pointer-events: none;
+        font-size: 1.2rem;
+        margin-right: 0.4rem;
+      }
+    }
+
+  }
+
+  select {
+    margin: 1rem 0 1%;
+    background: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+    padding: 0.25rem 0.5rem;
+  }
+
+  #superCollectionList {
+    width: calc(100% - 2rem);
+
+    a.ur_pls_item {
+      background: var(--onBg);
+      display: flex;
+      align-items: center;
+      padding: 2vmin;
+      margin-top: 2vmin;
+      border: var(--border);
+      border-radius: var(--roundness);
+
+      i {
+        margin-right: 2vmin;
+      }
+    }
+  }
+
+  #libraryActions {
+    display: flex;
+    width: 100%;
+    margin: 5% 0;
+    justify-content: space-around;
+    user-select: none;
+
+    label {
+      transition: transform 0.4s;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
