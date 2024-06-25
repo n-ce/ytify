@@ -82,8 +82,10 @@
 
     >p {
       text-align: right;
-      margin: 4%;
-      text-decoration: underline;
+      margin: 3%;
+      padding: 1vmin;
+      background: linear-gradient(to right, transparent, var(--onBg));
+      border-radius: var(--roundness);
     }
 
     >span {

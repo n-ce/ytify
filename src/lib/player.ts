@@ -20,6 +20,7 @@ addEventListener('DOMContentLoaded', async () => {
       hls = new mod.default();
       hls.attachMedia(audio);
       hls.on(mod.default.Events.MANIFEST_PARSED, () => {
+        hls.currentLevel = 0;
         audio.play();
       });
       hls.on(mod.default.Events.ERROR, (e, d) => {

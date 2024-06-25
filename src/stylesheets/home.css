@@ -10,12 +10,9 @@
   #upperLayer {
     width: 100%;
 
-
     img {
       border: var(--border);
       border-radius: var(--roundness);
-      width: 100%;
-
     }
 
     #meta {
@@ -120,7 +117,12 @@
     animation-name: fromBelow;
 
     img {
-      margin-bottom: 5%;
+      width: 50dvh;
+      margin: auto;
+    }
+
+    #meta {
+      margin-top: 5%;
     }
 
     #volumeContainer input {

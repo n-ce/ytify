@@ -4,7 +4,6 @@ import { getApi } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
 import { store } from '../store';
 
-
 export default function StreamItem(data: {
   id: string,
   title: string,
@@ -71,7 +70,7 @@ export default function StreamItem(data: {
       data-thumbnail={tsrc()}
     >
       <span>
-        <Show when={showImage}>
+        <Show when={showImage} fallback={data.duration}>
           <img
             loading={showImage}
             crossorigin='anonymous'
@@ -79,8 +78,8 @@ export default function StreamItem(data: {
             onload={handleThumbnailLoad}
             src={tsrc()}
           />
+          <p class='duration'>{data.duration}</p>
         </Show>
-        <p class='duration'>{data.duration}</p>
       </span>
       <div class='metadata'>
         <p class='title'>{data.title}</p>
