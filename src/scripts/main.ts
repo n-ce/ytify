@@ -16,8 +16,7 @@ import Settings from "../components/Settings";
 
 
 
-if (import.meta.env.PROD) {
-  import('eruda').then(eruda => eruda.default.init());
+if (import.meta.env.PROD)
   import('virtual:pwa-register').then(pwa => {
     const handleUpdate = pwa.registerSW({
       onNeedRefresh() {
@@ -28,8 +27,6 @@ if (import.meta.env.PROD) {
       }
     });
   });
-
-}
 
 
 
