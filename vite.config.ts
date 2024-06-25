@@ -1,7 +1,6 @@
 import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import autoprefixer from 'autoprefixer';
-import postcssNesting from 'postcss-nesting';
 import solidPlugin from 'vite-plugin-solid';
 
 
@@ -74,7 +73,7 @@ export default defineConfig(({ command }) => ({
   ],
   css: {
     postcss: {
-      plugins: [autoprefixer(), postcssNesting()]
+      plugins: [autoprefixer()]
     }
   }
 }));

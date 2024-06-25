@@ -20,7 +20,6 @@
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.19",
     "eruda": "^3.0.1",
-    "postcss-nesting": "^12.1.5",
     "sortablejs": "^1.15.2",
     "typescript": "^5.5.2",
     "vite": "^5.3.1",
