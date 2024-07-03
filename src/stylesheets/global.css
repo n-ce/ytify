@@ -90,7 +90,8 @@ select {
   border-radius: var(--roundness);
 
   /* fix white on white issue on dark mode */
-  option {
+  option,
+  optgroup {
     background: var(--bg);
   }
 }

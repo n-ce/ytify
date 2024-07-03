@@ -1,5 +1,5 @@
-import { getSaved, removeSaved, save } from "../lib/utils";
-import { queuelist, upcomingBtn } from "../lib/dom";
+import { getSaved, goTo, removeSaved, save } from "../lib/utils";
+import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
@@ -29,7 +29,8 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
 
-  if (removeQBtn.classList.contains('delete')) removeQBtn.click();
+  if (removeQBtn.classList.contains('delete'))
+    removeQBtn.click();
 
   prepend ?
     queueArray.unshift(data.id) :
@@ -89,7 +90,7 @@ export function listToQ(container: HTMLDivElement) {
   items.forEach(item => {
     appendToQueuelist(item.dataset);
   });
-  upcomingBtn.click();
+  goTo('/upcoming');
 }
 
 export function clearQ() {

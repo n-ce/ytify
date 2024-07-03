@@ -1,4 +1,4 @@
-import { getApi, hostResolver } from '../lib/utils';
+import { hostResolver } from '../lib/utils';
 import { store } from '../store';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
@@ -19,17 +19,11 @@ export default function ListItem(
     img.parentElement!.classList.remove('ravel');
 
 
-    const index = (document.getElementById('instanceSelector') as HTMLSelectElement).selectedIndex;
-    const currentImgPrxy = getApi('image', index);
-    const nextImgPrxy = getApi('image', index + 1);
-    const t = getThumbnail();
-
     setThumbnail(
       getThumbnail().includes('rj?')
         ? getThumbnail().replace('rj?', 'rw?')
-        : t.includes(currentImgPrxy) ?
-          setThumbnail(t.replace(currentImgPrxy, nextImgPrxy)) :
-          '/logo192.png'
+        :
+        '/logo192.png'
     );
 
   }

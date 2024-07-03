@@ -1,7 +1,7 @@
 import { audio, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getSaved, params, } from "../lib/utils";
+import { convertSStoHHMMSS, getSaved, goTo, params } from "../lib/utils";
 import { store } from "../store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
@@ -61,7 +61,7 @@ audio.addEventListener('playing', () => {
         addToCollection('history', ad);
         // just in case we are already in the history collection 
         if (listAnchor.classList.contains('view') && params.get('collection') === 'history')
-          document.getElementById('history')!.click();
+          goTo('history');
 
       }
     }, 1e4);
@@ -156,6 +156,8 @@ audio.addEventListener('loadedmetadata', () => {
 });
 
 
+
+
 loopButton.addEventListener('click', () => {
   loopButton.classList.toggle('on');
   audio.loop = !audio.loop;
@@ -243,29 +245,18 @@ addEventListener('DOMContentLoaded', async () => {
 
 
 
-/*
-Understanding AutoQueue
-
-first stream loads, emits a bunch of recommended streams, all pushed to queue
-second stream loads, emits a bunch of recommended streams, all pushed it to a virtual queue
-third stream loads, continue pushing to virtual queue
-and so on till the last stream in the original queue
-where we analyse all the items in the virtual queue by frequency of appearance
-
-sometimes users will remove items from queue manually, we need to account for this using the trashHistory array
-
-we filter out the trashHistory from the virtualqueue and push only the most recurring streams into the original queue
-
-*/
-
+// AUTO-QUEUE
 
 const virtualQ = new Map();
 const frequencyQueue: { [index: string]: number } = {};
 
-export function autoQueue(data: Recommendation[]) {
+export function autoQueue(data: StreamItem[]) {
 
   const init = queuelist.querySelectorAll('div').length === 0;
+  // sometimes users will remove items from queue manually, we need to account for this using the trashHistory array
   const trashHistory = sessionStorage.getItem('trashHistory');
+
+  const initArray: DOMStringMap[] = [];
 
   data.forEach(stream => {
 
@@ -281,7 +272,7 @@ export function autoQueue(data: Recommendation[]) {
       streamHistory.includes(id)
     ) return;
 
-    const streamData = {
+    const streamData: DOMStringMap = {
       id: id,
       title: stream.title,
       author: author,
@@ -295,20 +286,21 @@ export function autoQueue(data: Recommendation[]) {
       frequencyQueue[id] = 1;
     }
 
+    initArray.push(streamData);
 
-    if (init) {
-      const data = streamData;
-
-      appendToQueuelist(data);
-    }
 
   });
 
-  const freqArr = Object.entries(frequencyQueue).sort((a, b) => b[1] - a[1]);
-
-  const sortedObj = Object.fromEntries(freqArr);
-
-  console.log(sortedObj);
-
+  // if queue empty all recommended streams are pushed to queue else they are pushed it to a virtual queue
+  init ?
+    initArray.forEach(s => {
+      appendToQueuelist(s);
+    }) :
+    Object.entries(frequencyQueue)
+      .sort((a, b) => b[1] - a[1])
+      .filter((v, _, a) => v[1] === a[0][1])
+      .forEach(v => {
+        appendToQueuelist(virtualQ.get(v[0]));
+      });
 
 }

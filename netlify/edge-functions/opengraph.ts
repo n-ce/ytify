@@ -23,7 +23,7 @@ export default async (request: Request, context: Context) => {
     audioSrc = audioSrc.replace(new URL(audioSrc).origin, instance);
 
   const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
+    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
     .replace(<string>context.site.url, `${context.site.url}?s=${id}`)
     .replaceAll('/ytify_thumbnail_min.webp', data.videoThumbnails.find((v: { quality: string }) => v.quality === 'medium').url)

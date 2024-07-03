@@ -14,6 +14,8 @@ export const context = <OffscreenCanvasRenderingContext2D>canvas.getContext('2d'
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 
+export const searchlist = <HTMLDivElement>document.getElementById('searchlist');
+
 export const searchFilters = <HTMLSelectElement>document.getElementById('searchFilters');
 
 export const playButton = <HTMLButtonElement>document.getElementById('playButton');
@@ -23,8 +25,6 @@ export const audio = <HTMLAudioElement>document.querySelector('audio');
 export const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement;
 
 export const superModal = <HTMLDialogElement>document.getElementById('superModal');
-
-export const upcomingBtn = <HTMLAnchorElement>document.getElementById('/upcoming');
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 

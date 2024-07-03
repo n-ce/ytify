@@ -11,6 +11,8 @@ export const store: {
     highContrast: boolean,
     roundness: 'none' | '2vmin' | '4vmin' | '8vmin'
   },
+  api: Record<'name' | 'piped' | 'invidious', string>[],
+  imageProxy: string,
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
   searchQuery: string,
@@ -29,6 +31,15 @@ export const store: {
     highContrast: false,
     roundness: '2vmin'
   },
+  api: [
+    {
+      name: 'Custom',
+      piped: 'https://pipedapi.kavin.rocks',
+      invidious: 'https://invidious.fdn.fr'
+    }
+  ],
+  // Hardcoded 
+  imageProxy: 'https://pipedimg.adminforge.de',
   loadImage: localStorage.getItem('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: 'https://youtube.com',
   searchQuery: '',

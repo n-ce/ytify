@@ -1,5 +1,5 @@
 import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, instanceSelector } from "./dom";
-import { convertSStoHHMMSS, notify, params, parseTTML, setMetaData, getApi, getSaved } from "./utils";
+import { convertSStoHHMMSS, notify, params, parseTTML, setMetaData, getApi, getSaved, goTo } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { store } from "../store";
@@ -149,14 +149,11 @@ export default async function player(id: string | null = '') {
   const apiIndex = instanceSelector.selectedIndex;
 
   // fallback for custom instances which do not support unified instance architecture
-  const { piped, invidious } = JSON.parse(instanceSelector.value);
-  const hostA = piped.split('.');
-  const hostB = invidious.split('.');
 
-  if (hostA[hostA.length - 2] !== hostB[hostB.length - 2] && !store.player.HLS)
+  if (apiIndex === 0 && !store.player.HLS)
     return import('./player.invidious').then(player => player.default(id));
 
-  const apiUrl = piped;
+  const apiUrl = store.api[apiIndex].piped;
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
@@ -246,7 +243,7 @@ export default async function player(id: string | null = '') {
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
     data.relatedStreams.forEach(
-      (stream: Recommendation) => {
+      (stream: StreamItem) => {
         if (
           stream.type !== 'stream' ||
           stream.duration < 100 || stream.duration > 3000) return;
@@ -292,7 +289,7 @@ export default async function player(id: string | null = '') {
 
     // just in case we are already in the discover collection 
     if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
-      document.getElementById('discover')!.click();
+      goTo('discover');
 
 
   }, 20000);

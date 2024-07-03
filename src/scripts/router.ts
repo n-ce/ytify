@@ -1,6 +1,6 @@
 import { audio, loadingScreen, searchFilters, superInput, superModal, ytifyIcon } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
-import { fetchList, getSaved, params } from "../lib/utils";
+import { fetchList, getSaved, goTo, params } from "../lib/utils";
 import { store } from "../store";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
@@ -89,7 +89,7 @@ nav.addEventListener('click', (e: Event) => {
 
 
 // load section if name found in address else load library
-let route;
+let route: string;
 const errorParam = params.get('e');
 if (errorParam) {
   if (errorParam.includes('?')) {
@@ -115,13 +115,16 @@ else {
   route = routes.find(route => location.pathname === route) || '/';
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
   if (route === '/' && !hasStreamQuery)
-    route = getSaved('startupTab') ? '/library' : '/search';
+    route = getSaved('startupTab') || '/search';
 }
 
 // necessary to use a click event 
-const goHome = () => (<HTMLAnchorElement>document.getElementById(route)).click();
-goHome();
-ytifyIcon.addEventListener('click', goHome);
+
+goTo(route);
+
+ytifyIcon.addEventListener('click', () => {
+  goTo(getSaved('startupTab') || '/search');
+});
 
 // enables back button functionality
 

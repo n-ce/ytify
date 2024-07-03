@@ -249,11 +249,11 @@ export default function Settings() {
         <ToggleSwitch
           id="startupTab"
           name='Set as Default Tab'
-          checked={getSaved('startupTab') === 'library'}
+          checked={getSaved('startupTab') === '/library'}
           onClick={() => {
             getSaved('startupTab') ?
               removeSaved('startupTab') :
-              save('startupTab', 'library')
+              save('startupTab', '/library')
           }}
         />
         <ToggleSwitch

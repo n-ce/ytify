@@ -1,8 +1,6 @@
-import { extractColorsFromImageData } from "extract-colors";
 import { canvas, context, audio } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
 import { getSaved, params } from "../lib/utils";
-import { FinalColor } from "extract-colors/lib/types/Color";
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
@@ -11,7 +9,30 @@ const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
-const accentLightener = (r: number, g: number, b: number) => `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
+const accentLightener = (r: number, g: number, b: number) => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const l = Math.max(r, g, b);
+  const s = l - Math.min(r, g, b);
+  const h = s
+    ? l === r
+      ? (g - b) / s
+      : l === g
+        ? 2 + (b - r) / s
+        : 4 + (r - g) / s
+    : 0;
+
+  const saturation =
+    100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
+  return `hsl(
+    ${60 * h < 0 ? 60 * h + 360 : 60 * h},
+    ${saturation}%,
+    ${80}%)`;
+}
+
+// `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
+
 
 
 
@@ -62,8 +83,7 @@ const palette: Scheme = {
 };
 
 
-
-function colorInjector(colorArray: FinalColor[]) {
+function colorInjector(colorArray: number[]) {
   const autoDark = systemDark.matches;
   const theme = getSaved('theme') || 'auto';
 
@@ -72,15 +92,7 @@ function colorInjector(colorArray: FinalColor[]) {
     theme === 'auto-hc' ?
       autoDark ? 'black' : 'white' : theme;
 
-  const c = colorArray
-    .filter(v => v.saturation > 0.1)
-    .sort((a, b) => (b.area / b.lightness) / b.saturation - (a.area / a.lightness))[0];
-
-  const [r, g, b] = [
-    c?.red || colorArray[0].red,
-    c?.green || colorArray[0].green,
-    c?.blue || colorArray[0].blue
-  ];
+  const [r, g, b] = colorArray;
 
   cssVar('--bg', palette[scheme].bg(r, g, b));
   cssVar('--onBg', palette[scheme].onBg);
@@ -96,17 +108,7 @@ function themer() {
 
   if (!id) {
     // intentional otherwise too fast to detect localStorage changes from events
-    setTimeout(() => colorInjector([{
-      'red': 127,
-      'blue': 127,
-      'green': 127,
-      'hex': '',
-      'area': 1,
-      'hue': 0,
-      'saturation': 1,
-      'lightness': 1,
-      'intensity': 1
-    }]));
+    setTimeout(() => colorInjector([127, 127, 127]));
     return;
   }
 
@@ -122,14 +124,21 @@ function themer() {
     const offsetY = (height - side) / 2;
     context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
 
+    const data = context.getImageData(0, 0, side, side).data;
+    const len = data.length;
+    let r = 0, g = 0, b = 0;
 
-    colorInjector(
-      extractColorsFromImageData(
-        context.getImageData(
-          0, 0, side, side
-        )
-      )
-    );
+    for (let i = 0; i < len; i += 4) {
+      r += data[i];
+      g += data[i + 1];
+      b += data[i + 2];
+    }
+    const amount = len / 4;
+    r = Math.floor(r / amount),
+      g = Math.floor(g / amount),
+      b = Math.floor(b / amount);
+
+    colorInjector([r, g, b]);
 
   }
   canvasImg.crossOrigin = '';

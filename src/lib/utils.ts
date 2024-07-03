@@ -17,10 +17,12 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (type: 'piped' | 'invidious' | 'image', index: number | '' = '') => JSON.parse(
-  (index ? instanceSelector?.options[index].value : instanceSelector?.value) ||
-  getSaved('apiList_3') || '{"name":"Custom","piped":"https://pipedapi.kavin.rocks","image":"https://pipedproxy.r4fo.com","invidious":"https://invidious.fdn.fr"}'
-)[type];
+export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
+
+export const getApi = (
+  type: 'piped' | 'invidious',
+  index: number = instanceSelector.selectedIndex || 0) =>
+  store.api[index][type];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -156,7 +158,7 @@ export async function fetchList(url: string | undefined, mix = false) {
     )
   );
 
-  listAnchor.click();
+  goTo('/list');
   listSection.scrollTo(0, 0);
 
   let token = group.nextpage;
@@ -248,15 +250,15 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
 
   const streamItem = (stream: StreamItem) => StreamItem({
-    id: stream.url.substring(9),
-    href: hostResolver(stream.url),
+    id: stream.videoId || stream.url.substring(9),
+    href: hostResolver(stream.url || 'https://youtu.be/' + stream.videoId),
     title: stream.title,
-    author: stream.uploaderName,
-    duration: stream.duration > 0 ? convertSStoHHMMSS(stream.duration) : 'LIVE',
-    uploaded: stream.uploadedDate,
-    channelUrl: stream.uploaderUrl,
-    views: (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    img: getThumbIdFromLink(stream.thumbnail)
+    author: stream.uploaderName || stream.author,
+    duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
+    uploaded: stream.uploadedDate || stream.publishedText,
+    channelUrl: stream.uploaderUrl || stream.authorUrl,
+    views: stream.viewCountText || (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
+    img: getThumbIdFromLink(stream.thumbnail || 'https://i.ytimg.com/vi_webp/' + stream.videoId + '/mqdefault.webp?host=i.ytimg.com')
   })
 
   const listItem = (item: StreamItem) => ListItem(
@@ -275,7 +277,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const fragment = document.createDocumentFragment();
   for (const item of itemsArray)
-    render(() => item.type === 'stream' ? streamItem(item) : listItem(item), fragment);
+    render(() => (item.type === 'stream' || item.type === 'video') ? streamItem(item) : listItem(item), fragment);
 
 
   return fragment;

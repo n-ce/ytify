@@ -1,4 +1,4 @@
-import { $, getApi, getSaved, hostResolver, itemsLoader, notify, save } from "./utils";
+import { $, getApi, getSaved, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
@@ -129,7 +129,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (collection ? 'collection' : 'publicCollection');
 
-  if (location.pathname !== '/list') listAnchor.click();
+  if (location.pathname !== '/list') goTo('/list');
 
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',

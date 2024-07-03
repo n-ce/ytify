@@ -1,6 +1,5 @@
 import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { getApi } from '../lib/utils';
 import { generateImageUrl } from '../lib/imageUtils';
 import { store } from '../store';
 
@@ -41,15 +40,8 @@ export default function StreamItem(data: {
 
   function handleThumbnailError() {
 
-    const index = (document.getElementById('instanceSelector') as HTMLSelectElement).selectedIndex;
-    const currentImgPrxy = getApi('image', index);
-    const nextImgPrxy = getApi('image', index + 1);
-    const t = tsrc();
-
     parent.classList.remove('ravel');
 
-    if (t.includes(currentImgPrxy))
-      setTsrc(t.replace(currentImgPrxy, nextImgPrxy));
   }
 
 

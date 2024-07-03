@@ -3,11 +3,11 @@ Why does this exist ?
 
 Acts as a fallback to support playback through invidious without using custom instances
 
-Destined to be deprecated when adaptive streaming via piped is implemented.
+Destined to be deprecated when dash streaming via piped is implemented.
 */
 
 import { audio, favButton, favIcon, instanceSelector, listAnchor, playButton } from "./dom";
-import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData } from "./utils";
+import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData, goTo } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
@@ -19,6 +19,7 @@ const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelec
 export default async function invPlayer(id: string, instance = 0) {
 
   const apiUrl = getApi('invidious', instance);
+
   const data = await fetch(apiUrl + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
@@ -61,7 +62,7 @@ export default async function invPlayer(id: string, instance = 0) {
 
   const enforceProxy = getSaved('enforceProxy') === 'true';
   const isMusic = enforceProxy || data.genre === 'Music';
-  const ivApi = getApi('invidious');
+  const ivApi = getApi('invidious', instance);
 
   function proxyHandler(url: string) {
     const oldUrl = new URL(url);
@@ -148,7 +149,7 @@ export default async function invPlayer(id: string, instance = 0) {
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
     data.recommendedVideos.forEach(
-      (stream: Recommendation) => {
+      (stream: StreamItem) => {
         if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
         const rsId = stream.videoId;
@@ -191,7 +192,7 @@ export default async function invPlayer(id: string, instance = 0) {
 
     // just in case we are already in the discover collection 
     if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
-      document.getElementById('discover')!.click();
+      goTo('discover');
 
   }, 20000);
 }

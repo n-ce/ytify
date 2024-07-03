@@ -1,11 +1,10 @@
-import { instanceSelector, loadingScreen, searchFilters, superInput } from "../lib/dom";
+import { instanceSelector, loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getSaved, getApi, itemsLoader, idFromURL, params, notify, superClick } from "../lib/utils";
 import { store } from "../store";
-import { fetchSearchResults } from "./search.invidious";
+import { fetchResultsWithInvidious } from "./search.invidious";
 
 
-const searchlist = <HTMLDivElement>document.getElementById('searchlist');
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
 let nextPageToken = '';
 
@@ -16,6 +15,9 @@ const loadMoreResults = (token: string, query: string) =>
 
 
 function setObserver(callback: () => Promise<string>) {
+
+  const items = searchlist.childElementCount;
+
   new IntersectionObserver((entries, observer) =>
     entries.forEach(async e => {
       if (e.isIntersecting) {
@@ -23,34 +25,10 @@ function setObserver(callback: () => Promise<string>) {
         observer.disconnect();
         setObserver(callback);
       }
-    })).observe(searchlist.children[searchlist.childElementCount - 5]);
+    })).observe(searchlist.children[items - (items > 5 ? 5 : 1)]);
 }
 
-
-// Get search results of input
-function searchLoader() {
-
-  const searchQuery = '?q=' + superInput.value;
-  const filterQuery = '&filter=' + searchFilters.value;
-  const query = 'search' + searchQuery + filterQuery;
-  const useInvidious = searchFilters.selectedIndex > 7;
-
-  store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
-  searchlist.innerHTML = '';
-
-  if (!superInput.value) {
-    history.replaceState({}, '', location.origin + location.pathname);
-    return
-  }
-
-  loadingScreen.showModal();
-
-  if (useInvidious) {
-    fetchSearchResults(superInput.value, searchFilters.value);
-    loadingScreen.close();
-    return;
-  }
-
+const fetchResultsWithPiped = (query: string) =>
   fetch(getApi('piped') + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
@@ -60,10 +38,9 @@ function searchLoader() {
 
 
       // filter out shorts
-      searchlist.appendChild(
-        itemsLoader(
-          items.filter((item: StreamItem) => !item.isShort)
-        ));
+      searchlist.appendChild(itemsLoader(
+        items.filter((item: StreamItem) => !item.isShort)
+      ));
       // load more results when 3rd last element is visible
 
       setObserver(async () => {
@@ -85,8 +62,32 @@ function searchLoader() {
       }
       notify(err.message);
       instanceSelector.selectedIndex = 0;
-    })
-    .finally(() => loadingScreen.close());
+    });
+
+
+// Get search results of input
+function searchLoader() {
+
+  const searchQuery = '?q=' + superInput.value;
+  const filterQuery = '&filter=' + searchFilters.value;
+  const query = 'search' + searchQuery + filterQuery;
+  const sortResults = searchFilters.selectedIndex > 7;
+
+  store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
+  searchlist.innerHTML = '';
+
+  if (!superInput.value) {
+    history.replaceState({}, '', location.origin + location.pathname);
+    return
+  }
+
+
+  loadingScreen.showModal();
+
+  (sortResults ?
+    fetchResultsWithInvidious(superInput.value, searchFilters.value) :
+    fetchResultsWithPiped(query)
+  ).finally(() => loadingScreen.close());
 
   history.replaceState({}, '', location.origin + location.pathname + store.searchQuery.replace('filter', 'f'));
   suggestions.style.display = 'none';

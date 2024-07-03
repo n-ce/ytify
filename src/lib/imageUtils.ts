@@ -1,5 +1,6 @@
+import { store } from "../store";
 import { canvas, context, img } from "./dom";
-import { getApi } from "./utils";
+
 
 
 
@@ -8,9 +9,8 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 // Generates both channel and stream thumbnails
 export const generateImageUrl = (
   id: string,
-  res: string = 'mq',
-  proxy: string = getApi('image')
-) => proxy + (id.startsWith('/') ?
+  res: string = 'mq'
+) => store.imageProxy + (id.startsWith('/') ?
   `${id}=s${res === 'maxres' ? 720 : 176}-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
   `/vi_webp/${id}/${res}default.webp?host=i.ytimg.com`);
 

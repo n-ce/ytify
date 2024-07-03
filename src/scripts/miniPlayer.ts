@@ -1,4 +1,5 @@
 import { img as imgX, miniPlayer, playButton, title, ytifyIcon } from '../lib/dom';
+import { goTo } from '../lib/utils';
 import { store } from '../store';
 
 let img: HTMLImageElement | '' = imgX;
@@ -11,9 +12,8 @@ if (store.loadImage === 'off') {
 
 miniPlayer.addEventListener('click', (e) => {
   e.preventDefault();
-
   if (!(<HTMLElement>e.target).matches('button'))
-    document.getElementById('/')!.click();
+    goTo('/');
 });
 
 
