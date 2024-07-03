@@ -227,7 +227,9 @@ export async function fetchList(url: string | undefined, mix = false) {
         .join('=')
         .substring(1)
     );
-    listContainer.dataset.url = url;
+
+    // replace string for youtube playlist link support
+    listContainer.dataset.url = url.replace('ts/', 't?list=');
     document.title = group.name + ' - ytify';
   }
 
