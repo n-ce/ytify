@@ -13,9 +13,7 @@ import { instanceSelector } from '../lib/dom';
 import { render } from 'solid-js/web';
 import Settings from "../components/Settings";
 
-if (import.meta.env.PROD) {
-
-  import('eruda').then(eruda => eruda.default.init());
+if (import.meta.env.PROD)
 
   import('virtual:pwa-register').then(pwa => {
     const handleUpdate = pwa.registerSW({
@@ -28,7 +26,6 @@ if (import.meta.env.PROD) {
     });
   });
 
-}
 
 /*
 instance selector is a vital part of the web app which should be available as quickly as possible to all the parts of the app, this is only possible through html, below are measures taken to extract the html area after it has been connected and retrofit it into the jsx component loaded later

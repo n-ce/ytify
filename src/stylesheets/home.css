@@ -144,7 +144,7 @@
 
       img {
         margin: auto;
-        height: 6.6rem;
+        max-height: 7rem;
         width: auto;
       }
 

@@ -16,7 +16,7 @@ export default function StreamItem(data: {
   draggable?: boolean
 }) {
 
-  const [tsrc, setTsrc] = createSignal('');
+  const [getImage, setImage] = createSignal('');
   const showImage = (store.loadImage === 'off') ? undefined : store.loadImage;
 
   let parent!: HTMLAnchorElement;
@@ -24,14 +24,14 @@ export default function StreamItem(data: {
 
   function handleThumbnailLoad(e: Event) {
     const img = e.target as HTMLImageElement;
-    const t = tsrc();
+    const src = getImage();
 
     if (img.naturalWidth !== 120) {
       parent.classList.remove('ravel');
       return;
     }
-    if (t.includes('webp'))
-      setTsrc(t.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
+    if (src.includes('webp'))
+      setImage(src.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
     else { // most likely been removed from yt so remove it 
       parent.classList.add('delete');
       parent.click();
@@ -40,14 +40,21 @@ export default function StreamItem(data: {
 
   function handleThumbnailError() {
 
-    parent.classList.remove('ravel');
+    const src = getImage();
 
+    setImage(
+      src.includes('vi_webp') ?
+        src.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
+        '/logo192.png'
+    );
+
+    parent.classList.remove('ravel');
   }
 
 
 
   if (showImage)
-    setTsrc(generateImageUrl(data.img || data.id, 'mq'));
+    setImage(generateImageUrl(data.img || data.id, 'mq'));
 
   return (
     <a
@@ -59,7 +66,7 @@ export default function StreamItem(data: {
       data-author={data.author}
       data-channel_url={data.channelUrl}
       data-duration={data.duration}
-      data-thumbnail={tsrc()}
+      data-thumbnail={getImage()}
     >
       <span>
         <Show when={showImage} fallback={data.duration}>
@@ -68,7 +75,7 @@ export default function StreamItem(data: {
             crossorigin='anonymous'
             onerror={handleThumbnailError}
             onload={handleThumbnailLoad}
-            src={tsrc()}
+            src={getImage()}
           />
           <p class='duration'>{data.duration}</p>
         </Show>

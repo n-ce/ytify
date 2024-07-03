@@ -20,7 +20,7 @@ body {
     section {
       display: none;
       flex-direction: column;
-      overflow: scroll;
+      overflow: auto;
       align-items: center;
       width: 100%;
 

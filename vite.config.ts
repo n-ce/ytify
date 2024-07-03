@@ -32,7 +32,7 @@ export default defineConfig(({ command }) => ({
     Version: JSON.stringify(process.env.npm_package_version),
   },
   plugins: [
-    injectEruda(true || command === 'serve'),
+    injectEruda(command === 'serve'),
     solidPlugin(),
     VitePWA({
       manifest: {
