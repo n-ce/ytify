@@ -83,7 +83,7 @@ export default function StreamItem(data: {
       <div class='metadata'>
         <p class='title'>{data.title}</p>
         <div class='avu'>
-          <p class='author'>{data.author}</p>
+          <p class='author'>{data.author.replace(' - Topic', '')}</p>
           <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
         </div>
       </div>

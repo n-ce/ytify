@@ -1,4 +1,4 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn, instanceSelector } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn, instanceSelector, subtitleSelector } from "./dom";
 import { fetchCollection, getDB, removeFromCollection } from "./libraryUtils";
 import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
 import { render } from 'solid-js/web';
@@ -329,8 +329,12 @@ export async function parseTTML() {
   myTrack.mode = "hidden";
   const d = img.getBoundingClientRect();
 
+
   subtitleContainer.style.top = Math.floor(d.y) + 'px';
   subtitleContainer.style.left = Math.floor(d.x) + 'px';
+  subtitleSelector.parentElement!.style.position = 'static';
+  subtitleSelector.style.top = Math.floor(d.y) + 'px';
+  subtitleSelector.style.left = Math.floor(d.x) + 'px';
 
 
   fetch(subtitleTrack.src)

@@ -6,9 +6,15 @@
   background: var(--onBg);
   --rx2: calc(var(--roundness)*1.5);
 
+  select {
+    font-size: 0.8rem;
+    border-radius: 0;
+  }
+
 
   #upperLayer {
     width: 100%;
+    position: relative;
 
     img {
       border: var(--border);
@@ -101,10 +107,6 @@
     width: 100%;
     justify-content: space-between;
 
-    select {
-      font-size: 0.8rem;
-      border-radius: 0;
-    }
 
 
   }
@@ -131,7 +133,7 @@
   }
 
   @media(orientation:landscape) {
-    width: 80%;
+    width: 90%;
     margin: auto;
     border: var(--border);
     border-radius: var(--rx2);
@@ -173,7 +175,29 @@
 }
 
 
+#subtitleContainer {
+  position: absolute;
+  pointer-events: none;
 
+  span {
+    font-size: medium !important;
+    font-family: 'Noto Sans';
+  }
+
+  div div div div {
+    border-radius: var(--roundness);
+    overflow: hidden;
+  }
+}
+
+#subtitleSelector {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0.2rem;
+  border-radius: calc(var(--roundness) / 1.4) !important;
+  background: var(--bg);
+}
 
 
 /* === range theme and appearance === */

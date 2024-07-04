@@ -72,7 +72,7 @@ function setAudioStreams(audioStreams: {
   bitrate: string,
   contentLength: number,
   mimeType: string,
-}[], isMusic = false) {
+}[], isMusic = false, isLive = false) {
 
   const ivApi = getApi('invidious');
   const preferedCodec = store.player.codec;
@@ -80,7 +80,11 @@ function setAudioStreams(audioStreams: {
   let index = -1;
 
   if (!noOfBitrates) {
-    notify('NO AUDIO STREAMS AVAILABLE.');
+    notify(
+      isLive ?
+        'Turn on HLS to listen to LiveStreams!' :
+        'No Audio Streams Found.'
+    );
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
@@ -197,14 +201,14 @@ export default async function player(id: string | null = '') {
     music
   );
 
-
   hls ?
     hls.loadSource(data.hls) :
     setAudioStreams(
       data.audioStreams.sort(
         (a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate)
       ),
-      data.category === 'Music'
+      data.category === 'Music',
+      data.livestream
     );
 
   setSubtitles(data.subtitles);
