@@ -7,6 +7,33 @@ import { getThumbIdFromLink } from '../lib/imageUtils';
 
 
 
+function subscribeList(db: Library) {
+
+  const lcd = <{ [index: string]: string }>listContainer.dataset;
+
+  const state = ['Subscribe', 'Subscribed'];
+  const dom = subscribeListBtn.innerHTML;
+
+  if (dom.includes(state[1])) {
+    delete db[lcd.type][lcd.id];
+    state.reverse();
+  }
+  else {
+    const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
+      id: lcd.id,
+      name: lcd.name,
+      thumbnail: getThumbIdFromLink(lcd.thumbnail)
+    };
+
+    if (lcd.type === 'playlists')
+      dataset.uploader = lcd.uploader;
+
+    toCollection(lcd.type, dataset, db);
+  }
+  subscribeListBtn.innerHTML = dom.replace(state[0], state[1]);
+  saveDB(db);
+}
+
 
 listBtnsContainer.addEventListener('click', e => {
   const btn = e.target as HTMLButtonElement;
@@ -25,32 +52,8 @@ listBtnsContainer.addEventListener('click', e => {
   else if (btn === enqueueBtn)
     listToQ(listContainer);
 
-  else if (btn === subscribeListBtn) {
-    const lcd = <{ [index: string]: string }>listContainer.dataset;
-
-    const state = ['Subscribe', 'Subscribed'];
-    const dom = subscribeListBtn.innerHTML;
-
-    if (dom.includes(state[1])) {
-      delete db[lcd.type][lcd.id];
-      state.reverse();
-    }
-    else {
-      const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
-        id: lcd.id,
-        name: lcd.name,
-        thumbnail: getThumbIdFromLink(lcd.thumbnail)
-      };
-
-      if (lcd.type === 'playlists')
-        dataset.uploader = lcd.uploader;
-
-      toCollection(lcd.type, dataset, db);
-    }
-    subscribeListBtn.innerHTML = dom.replace(state[0], state[1]);
-    saveDB(db);
-
-  }
+  else if (btn === subscribeListBtn)
+    subscribeList(db);
 
   else if (btn === openInYtBtn)
     open(hostResolver(<string>listContainer.dataset.url));
