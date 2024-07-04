@@ -60,6 +60,20 @@ export function createPlaylist(title: string) {
     atpSelector.add(new Option(title, title));
 }
 
+function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStringMap }, fragment: DocumentFragment) {
+
+  for (const item in data) {
+    const d = data[item];
+    render(() => StreamItem({
+      id: d.id || '',
+      href: hostResolver(`/watch?v=${d.id}`),
+      title: d.title || '',
+      author: d.author || '',
+      duration: d.duration || '',
+      channelUrl: d.channelUrl || ''
+    }), fragment);
+  }
+}
 
 export async function fetchCollection(collection: string | null, shareId: string | null = '') {
 
@@ -74,17 +88,8 @@ export async function fetchCollection(collection: string | null, shareId: string
         if (data[i].frequency as number < 2)
           delete db.discover[i];
 
-    for (const item in data) {
-      const d = data[item];
-      render(() => StreamItem({
-        id: d.id || '',
-        href: hostResolver(`/watch?v=${d.id}`),
-        title: d.title || '',
-        author: d.author || '',
-        duration: d.duration || '',
-        channelUrl: d.channelUrl || ''
-      }), fragment);
-    }
+    renderDataIntoFragment(data, fragment);
+
     if (!fragment.childElementCount) {
       alert('No items found');
       return;
@@ -99,15 +104,7 @@ export async function fetchCollection(collection: string | null, shareId: string
     await fetch(`${location.origin}/public?id=${shareId}`)
       .then(res => res.json())
       .then(data => {
-        for (const d of data)
-          render(() => StreamItem({
-            id: d.id || '',
-            href: hostResolver(`/watch?v=${d.id}`),
-            title: d.title || '',
-            author: d.author || '',
-            duration: d.duration || '',
-            channelUrl: d.channelUrl || ''
-          }), fragment);
+        renderDataIntoFragment(data, fragment);
       })
       .finally(() => loadingScreen.close());
 
