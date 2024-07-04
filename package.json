@@ -9,12 +9,12 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "hls.js": "^1.5.12",
+    "hls.js": "^1.5.13",
     "imsc": "^1.1.5",
     "solid-js": "^1.8.18"
   },
   "devDependencies": {
-    "@netlify/edge-functions": "^2.8.1",
+    "@netlify/edge-functions": "^2.9.0",
     "@types/node": "^20.14.9",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.19",
