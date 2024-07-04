@@ -1,0 +1,77 @@
+#miniPlayer {
+  display: flex;
+  column-gap: 2%;
+
+
+  img,
+  div {
+    border-radius: var(--roundness);
+    border: var(--border);
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    background-color: var(--onBg);
+    width: 100%;
+
+
+    a {
+      pointer-events: none;
+      overflow: hidden;
+      font-size: 1rem;
+      line-height: 1.5rem;
+      z-index: 1;
+      width: 100%;
+    }
+
+
+    button {
+      color: inherit;
+      border: none;
+      background: none;
+      margin: 0;
+      margin-left: 2%;
+      padding: 0;
+      font-size: 2rem;
+      z-index: 1;
+
+      &:active {
+        transform: scale(0.8);
+      }
+    }
+  }
+
+
+  @media(orientation:portrait) {
+    height: 2.5rem;
+    margin: 2% 2% 0;
+
+    img {
+      background-color: var(--onBg);
+      height: 100%;
+    }
+
+    div a {
+      height: 1.5rem;
+      margin-left: 1.5%;
+      width: calc(100% - 2.5rem);
+    }
+
+  }
+
+  @media(orientation:landscape) {
+    flex-direction: column;
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    div a {
+      height: 3rem;
+      width: 100%;
+    }
+
+  }
+}

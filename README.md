@@ -9,17 +9,24 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
+> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 ## What else are you getting ?
-- **Queue** 🚦: Add multiple streams to keep your audio streams going. 
-- **Playlists** 🎶: View YouTube playlists and queue them to the player. 
-- **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail. 
+- **Queue** 🚦:
+  - Add multiple streams to keep your audio streams going.
+  - You can share your queue with anyone just by sharing the url.
+  - Auto-Queue : automatically enqueues relevant streams.
+- **Playlists** 🎶:
+  - View YouTube playlists , queue them to the player. You can also both subscribe and import it into your own collection
+  - ytify Collections : create your own playlists disconnected from YouTube, share it with the world with share link.
+- **Theming** 🎨:
+  - Modern Autonomous themed UI based on stream thumbnail.
+  - High Contrast Mode for increased legibility.
 - **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
-- **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
-- **Library** 📚: Discover feed, history, favorites & custom playlists. 
+- **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
+- **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
 
-![ytify_6.7_landscape](https://github.com/n-ce/ytify/assets/69345507/e8854300-8caf-49a4-befa-6bfc659e86b6)
+![ytify_7.0_landscape](https://github.com/n-ce/ytify/assets/69345507/b5a48633-9544-4f6c-b2d0-d11a1fa2efbc)
 
 
 
@@ -29,15 +36,32 @@
 - So i decided to create an [issue](https://github.com/TeamNewPipe/NewPipe/issues/5838).
 - Upon finding no active resolution on the issue, I took it to myself and created this project on Jan 2022.
 
+
+## Usage 👆
+https://ytify.netlify.app is the only official location that the main branch is directly connected to.
+- Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
+- Join our Telegram Community [@ytifytg](https://t.me/ytifytg)
+- Join our Matrix Community
+[@ytify](https://matrix.to/#/!ytify:matrix.org)
+
+## Privacy Policy 👁️
+> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this. Everything else remains on your device only, which can also be cleared anytime.(Library>Clean, Settings>Restore Settings,Clear Caches)
+
+## License 📝
+> [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
+
+## Contributing 📋
+> This project is actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
+
 ## Development 🔧
 1. Prerequisites : Node.js , Beginner TypeScript Knowledge. 
 2. Clone repository with
 ```
-git clone https://github.com/n-ce/ytify
+git clone https://github.com/n-ce/ytify --depth 1
 ```
 or
 ```
- gh repo clone n-ce/ytify
+ gh repo clone n-ce/ytify -- --depth 1
 ```
 3. Move to Directory, Update & Install Dependencies
 ```
@@ -52,31 +76,12 @@ npm run dev -- --open
 ```
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
  
-## Usage 👆
-1. Visit the [Production Deployment](https://ytify.netlify.app/), or if you've installed the project, wherever you're hosting it.
-2. Change the bitrate of the content while you're streaming it on the `Home` tab.
-3. Use the `Search` tab to search for streams with keywords or a direct URL.
-4. Click on a stream to open a menu to either play, enqueue, or start a Radio of similar tracks and various other actions.
-5. Enjoy listening to music, podcast episodes, or other forms of audio even under low network conditions.
-6. Finding something new? Head over to `Discover` on the Library Tab.
-7. Want the Highest Quality Output always? Just turn on `Highest Quality` in Settings.
-8. Want to save more data or speed up ux? Just turn off `Load Thumbnails` in Settings.
-
-## Privacy Policy 👁️
-> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this. Everything else remains on your device only, which can also be cleared anytime using the clear data option in settings.
-
-## License 📝
-> [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
-
-## Contributing 📋
-> This project is actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
-
 ## Acknowledgements 🙏
-- [Piped](https://github.com/teampiped/piped) - YouTube Data API & Image Proxy
-- [Invidious](https://invidious.io) - YouTube Playback Proxy
+- [Piped](https://github.com/teampiped/piped) - YouTube Data API, Image Proxy & Adaptive Streaming Playback Proxy
+- [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Playback Proxy
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
-- [Lit](https://lit.dev) - Exceptional Web Component Library
-- [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms.
+- [Solid](https://github.com/solidjs/solid) - Delightful JSX Library
+- [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms, Edge Functions
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
 - [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
 - [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution.

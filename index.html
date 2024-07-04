@@ -6,81 +6,148 @@
 
   <meta name="description"
     content="48kb/s to 160kb/s youtube audio streaming website. Copy a youtube video link or search a video up and listen to it as an audio totally free. Background Playback, Queues, Themes for a great user experience.">
-  <meta name="author" content="Animesh Nath">
+  <meta name="author" content="n-ce">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="white">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="keywords"
     content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
+  <meta name="thumbnail" content="/ytify_thumbnail_min.webp">
 
   <!-- social media preview, more info https://ogp.me -->
-  <meta property="og:title" content="ytify">
+
   <meta property="og:type" content="website">
+  <meta property="og:title" content="ytify">
   <meta property="og:url" content="https://ytify.netlify.app">
-  <meta property="og:description" content="32-128kbps Opus YouTube Audio Streaming Web App.">
+  <meta property="og:site_name" content="ytify">
+  <meta property="og:description" content="48-160kbps Opus YouTube Audio Streaming Web App.">
   <meta property="og:image" content="/ytify_thumbnail_min.webp">
+  <!-- a4 -->
 
   <!-- tells google that this url is most important (e.g. not http (without s = secure))-->
-  <link rel="canonical" href="https://ytify.netlify.app/">
+  <link rel="canonical" href="https://ytify.netlify.app">
 
-  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-  <link rel="icon" type="image/png" href="/logo192.png" sizes="192x192" />
-  <link rel="icon" type="image/png" href="/logo512.png" sizes="512x512" />
+  <link rel="icon" type="image/png" href="/logo192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="/logo512.png" sizes="512x512">
   <link rel="apple-touch-icon" href="/logo192.png">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
 
 
   <title>ytify</title>
 </head>
 
 <body>
-  <canvas class="hide"></canvas>
   <audio>
     <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
+    <source type="audio/mpegurl">
   </audio>
-  <nav>
-    <a href="/" id="/">
-      <i class="ri-home-line"></i>
-      <p>Home</p>
-    </a>
-    <a href="/upcoming" id="/upcoming">
-      <i class="ri-skip-forward-line"></i>
-      <p>Upcoming</p>
-    </a>
-    <a href="/search" id="/search">
-      <i class="ri-search-2-line"></i>
-      <p>Search</p>
-    </a>
-    <a href="/library" id="/library">
-      <i class="ri-stack-line"></i>
-      <p>Library</p>
-    </a>
-    <a href="/settings" id="/settings">
-      <i class="ri-settings-line"></i>
-      <p>Settings</p>
-    </a>
-    <a href="/list" id="/list" class="hide">
-      <p>list</p>
-    </a>
-  </nav>
+  <header>
+    <nav>
+      <a href="/" id="/" class="hide">
+        <p>Home</p>
+      </a>
+      <a href="/upcoming" id="/upcoming">
+        <i class="ri-skip-forward-line"></i>
+        <p>Upcoming</p>
+      </a>
+      <a href="/search" id="/search">
+        <i class="ri-search-2-line"></i>
+        <p>Search</p>
+      </a>
+      <a href="/library" id="/library">
+        <i class="ri-stack-line"></i>
+        <p>Library</p>
+      </a>
+      <a href="/settings" id="/settings">
+        <i class="ri-settings-line"></i>
+        <p>Settings</p>
+      </a>
+      <a href="/list" id="/list" class="hide">
+        <p>list</p>
+      </a>
+    </nav>
+    <div id="miniPlayer">
+      <img id="img" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
+      <div>
+        <a id="title" href="" target="_blank">Now Playing</a>
+        <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
+      </div>
+    </div>
+  </header>
   <main>
     <section id="home">
-      <article class="hide" id="subtitleContainer"></article>
 
-      <img id="img" src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
-        alt="Current Playing Media Thumbnail">
 
-      <div id="metadata">
-        <a id="title" href="" target="_blank">ytify 6.9</a>
-        <a id="author" href="" target="_blank">Channel</a>
-        <select id="bitrateSelector">
-          <option>Bitrate</option>
-        </select>
+      <div id="upperLayer">
+        <article id="subtitleContainer" class="hide">
+        </article>
         <select id="subtitleSelector" class="hide">
           <option>Subtitles</option>
         </select>
-        <input type="checkbox" id="favButton" />
-        <label for="favButton" class="ri-heart-line" aria-label="like"></label>
+        <!-- image -->
+        <div id="meta">
+          <!-- title -->
+          <p id="author">Channel</p>
+
+          <div id="upperButtonLayer">
+            <span id="volumeContainer">
+              <label for="volumeChanger" class="ri-volume-up-fill"></label>
+              <input type="range" min="0" max="100" value="100" id="volumeChanger">
+            </span>
+            <i class="ri-repeat-line" id="loopButton" aria-label="loop"></i>
+            <input type="checkbox" id="favButton" />
+            <label for="favButton" class="ri-heart-line" aria-label="like"></label>
+            <i class="ri-more-2-fill" id="moreBtn" aria-label="more"></i>
+          </div>
+        </div>
       </div>
+
+      <span id="trackline">
+        <input type="range" value="0" id="progress" />
+        <div>
+          <p id="currentDuration">00:00</p>
+          <p id="fullDuration">00:00</p>
+        </div>
+      </span>
+
+      <div id="playerControls">
+        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
+        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
+
+        <!-- play button -->
+
+        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
+        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
+
+      </div>
+
+      <div id="selectors">
+
+        <select id="playSpeed">
+          <option value="0.25">0.25x</option>
+          <option value="0.50">0.50x</option>
+          <option value="0.75">0.75x</option>
+          <option value="1.00" selected>1.00x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.50">1.50x</option>
+          <option value="1.75">1.75x</option>
+          <option value="2.00">2.00x</option>
+          <option value="2.50">2.50x</option>
+          <option value="3.00">3.00x</option>
+          <option value="3.50">3.50x</option>
+          <option value="4.00">4.00x</option>
+        </select>
+        <select id="bitrateSelector">
+          <option>Bitrate</option>
+        </select>
+        <svg id="ytifyIcon" xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 4172 4172" width="1.5rem"
+          height="1.5rem" style="transform: scale(1.5);overflow:hidden;">
+
+          <path fill="var(--text)"
+            d="m1368 3037-55-10-23-6a369 369 0 0 1-57-19 552 552 0 0 1-266-246 437 437 0 0 1-31-74 590 590 0 0 1-18-245l5-25c7-35 21-77 35-105l9-19a522 522 0 0 1 679-236c1 5-1 77-3 91a1059 1059 0 0 1-24 119 274 274 0 0 1-19 53c-1 0-7-5-14-13-40-46-95-77-160-91a290 290 0 0 0-186 542 287 287 0 0 0 202 23c61-15 120-54 159-105a1108 1108 0 0 0 149-360 1296 1296 0 0 0 27-274 1164 1164 0 0 0-226-667 146 146 0 0 1-21-39l-4-9-4-11c-8-16-18-53-24-84-5-27-5-72 0-95 10-49 32-84 69-115 24-20 50-34 87-47a740 740 0 0 1 79-19c23-4 134-6 167-3a1364 1364 0 0 1 446 118l20 8 20 8 18 8a2232 2232 0 0 1 652 439 1008 1008 0 0 1 234 338c4 5 16 57 20 83 2 17 1 63-3 79-18 83-71 135-171 167-34 11-106 20-130 16-43-7-194-7-249 0-67 9-142 23-179 34l-34 10a974 974 0 0 0-94 33 1245 1245 0 0 0-170 84 1182 1182 0 0 0-405 414 529 529 0 0 1-347 244c-40 9-112 11-160 6zm1441-892 14-2c21-2 58-13 76-22 34-17 54-37 67-69 6-16 7-19 7-44 1-26 1-28-6-54-32-125-167-280-368-420-80-56-200-124-282-159l-26-12a1286 1286 0 0 0-124-47c-39-14-128-36-170-42l-18-3c-19-3-41-4-87-4-56 0-71 2-105 13-68 23-101 65-101 130a201 201 0 0 0 17 82c3 9 21 46 31 64 68 112 187 227 351 338a1827 1827 0 0 0 446 214 1084 1084 0 0 0 219 39c1 1 50-1 59-2z" />
+        </svg>
+      </div>
+
     </section>
 
 
@@ -96,7 +163,7 @@
           <i class="ri-subtract-line"></i> Remove
         </button>
         <button>
-          <i class="ri-filter-2-line"></i> Filter >10:00
+          <i class="ri-filter-2-line"></i> Filter &lt;10:00
         </button>
         <button class="checked" id="autoQueueBtn">
           <i class="ri-list-check-2"></i> Auto-Queue
@@ -104,7 +171,7 @@
       </span>
       <br>
       <div id="queuelist">
-        <h1 align="center">upcoming streams show here</h1>
+        <h1>upcoming streams show here</h1>
       </div>
     </section>
 
@@ -116,7 +183,6 @@
         <select id="searchFilters">
           <optgroup label="YouTube">
             <option value="all">All</option>
-            <option value="all">By Time</option>
             <option value="videos">Videos</option>
             <option value="channels">Channels</option>
             <option value="playlists">Playlists</option>
@@ -127,83 +193,68 @@
             <option value="music_albums">Albums</option>
             <option value="music_playlists">Playlists</option>
           </optgroup>
+          <optgroup label="Sort By">
+            <option value="date">Time</option>
+            <option value="views">Views</option>
+          </optgroup>
         </select>
       </form>
       <ul id="suggestions"></ul>
       <div id="searchlist">
-        <h1 class="featuredPlaylists">
-          <svg xmlns="http://www.w3.org/2000/svg" width="3rem" height="3rem" viewBox="0 0 176 176"
-            style="transform:scale(0.7)">
-            <circle cx="88" cy="88" r="77" fill="var(--text)" />
-            <path fill="var(--bg)"
-              d="M88 46a42 42 0 1 1 0 84 42 42 0 0 1 0-84m0-4a46 46 0 1 0 0 92 46 46 0 0 0 0-92z" />
-            <path fill="var(--bg)" d="m72 111 39-24-39-22z" />
-          </svg>
-          <label>Featured Playlists</label>
-        </h1>
+        <p style="
+        background: var(--onBg);
+        color: inherit;
+        padding: 5vmin;
+        box-shadow: var(--shadow);
+        border-radius: var(--roundness);
+        margin-bottom:4%;
+         " align="center">
+          <img src="/ytify_banner.webp" style="
+          border-radius: calc(var(--roundness) / 1.4);" loading="lazy" />
+          <br />
+          Welcome to ytify, a fast, lightweight, personalisable, minimal and free audio streaming platform. Learn more
+          about how to use
+          the WebApp effectively, <a href="https://github.com/n-ce/ytify/wiki/usage" style="text-decoration: underline;"
+            target="_blank">here</a>.
+        </p>
       </div>
     </section>
 
 
     <section id="library">
-      <details id="discover">
-        <summary>
-          <i class="ri-compass-3-line"></i> Discover
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <div>
-          <h2>Listen more to discover more.</h2>
-        </div>
-      </details>
 
-      <details id="history">
-        <summary>
-          <i class="ri-memories-line"></i> History
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <div></div>
-      </details>
 
-      <details id="favorites">
-        <summary>
-          <i class="ri-heart-fill"></i> Favorites
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <button>
-          <i class="ri-list-check-2"></i> Enqueue
-        </button>
-        <div></div>
-      </details>
+      <div id="collections">
 
-      <details id="listenLater">
-        <summary>
-          <i class="ri-calendar-schedule-line"></i> Listen Later
-        </summary>
-        <button>
-          <i class="ri-close-line"></i> Clear All
-        </button>
-        <button>
-          <i class="ri-subtract-line"></i> Remove
-        </button>
-        <div></div>
-      </details>
-      <br>
-      <div>
+        <a class="collectionItem" id="discover" href="/list?collection=discover">
+          <i class="ri-compass-3-line"></i>Discover
+        </a>
+
+        <a class="collectionItem" id="history" href="/list?collection=history">
+          <i class="ri-memories-line"></i>History
+        </a>
+
+        <a class="collectionItem" id="favorites" href="/list?collection=favorites">
+          <i class="ri-heart-fill"></i>Favorites
+        </a>
+
+        <a class="collectionItem" id="listenLater" href="/list?collection=listenLater">
+          <i class="ri-calendar-schedule-line"></i>Listen Later
+        </a>
+      </div>
+      <select id="superCollectionSelector">
+        <option value="collections">Your Collections</option>
+        <option value="featured" selected>Featured Playlists</option>
+        <option value="playlists">Subscribed Playlists</option>
+        <option value="channels">Subscribed Channels
+        </option>
+        <option value="feed">Subscription Feed
+        </option>
+      </select>
+
+      <div id="superCollectionList"></div>
+
+      <div id="libraryActions">
         <label id="importBtn" for="upload">
           <i class="ri-import-line"></i> Import</label>
         <input type="file" id="upload" class="hide">
@@ -218,106 +269,36 @@
 
     <section id="settings">
 
-      <span>
-        <label for="instances">Instance</label>
-        <select id="instances">
-          <option value='{
-          "name":"Custom",
-          "piped":"https://pipedapi.kavin.rocks",
-          "image":"https://pipedimg.adminforge.de",
-          "invidious":"https://invidious.fdn.fr"
-          }'>Custom</option>
-        </select>
-      </span>
+      <select id="instanceSelector">
+        <option>Custom</option>
+      </select>
 
-      <span>
-        <label for="startupTab">
-          Default Tab on Startup
-        </label>
-        <select id="startupTab">
-          <option value="">Home</option>
-          <option value="/search">Search</option>
-          <option value="/library">Library</option>
-        </select>
-      </span>
-      <span>
-        <label for="linkHost">Links host</label>
-        <select id="linkHost">
-          <option value="https://youtube.com">YouTube</option>
-          <option value="https://ytify.netlify.app">ytify</option>
-          <option value="https://piped.video">Piped</option>
-          <option value="https://yewtu.be">Invidious</option>
-        </select>
-      </span>
+      <div id="act">
+        <form netlify name="feedback" method="POST">
+          <textarea name="->" id="netlifyForm"
+            placeholder="Anonymously enter your feedback (bugs, feature requests) here:"></textarea>
+          <button type="submit">Submit Feedback</button>
 
-      <h3>Search</h3>
-      <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
-      <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
-      <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
+          <button id="clearCacheBtn" type="button">Clear Caches</button>
 
-      <h3>Playback</h3>
+          <button id="restoreSettingsBtn" type="button">Restore Settings</button>
 
-      <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
-      <span>
-        <label for="CodecPreference">Codec Preference</label>
-        <select id="CodecPreference">
-          <option value="opus">Opus</option>
-          <option value="aac">AAC</option>
-          <option value="">Any</option>
-        </select>
-      </span>
+          <button id="exportSettingsBtn" type="button">Export Settings</button>
+          <button type="button">
+            <label for="importSettingsBtn">Import Settings</label>
+            <input type="file" id="importSettingsBtn" class="hide">
+          </button>
 
-      <h3>Thumbnail</h3>
-      <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
-      <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
+          <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
 
-      <h3>Library</h3>
-      <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
-      <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
+          <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
 
-      <h3>Interface</h3>
-      <span>
-        <label for="roundnessChanger">Roundness</label>
-        <select id="roundnessChanger">
-          <option value="none">None</option>
-          <option value="1vmin">Light</option>
-          <option value="2vmin" selected>Medium</option>
-          <option value="4vmin">Heavy</option>
-        </select>
-      </span>
-      <span>
-        <label for="themeSelector">Theming Scheme</label><select id="themeSelector">
-          <option value="auto">System</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </span>
-      <toggle-switch id="highContrastSwitch">High Contrast Theme</toggle-switch>
-      <toggle-switch id="reverseNavSwitch">Reverse Navigation</toggle-switch>
-      <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
+          <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
 
+          <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
+        </form>
 
-      <h3>Actions</h3>
-
-      <button id="clearCacheBtn">Clear Caches</button>
-
-      <button id="restoreSettingsBtn">Restore Settings</button>
-
-      <a href="https://github.com/n-ce/ytify/wiki/troubleshooting" target="_blank">Help</a>
-
-      <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
-
-      <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
-
-      <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
-
-      <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
-
-      <form netlify name='feedback' method='POST'>
-        <input type="text" name="->" id="netlifyForm"
-          placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
-      </form>
-
+      </div>
     </section>
 
     <section id="list">
@@ -328,61 +309,42 @@
         <button id="enqueueAllBtn">
           <i class="ri-list-check-2"></i> Enqueue
         </button>
-        <button id="saveListBtn">
-          <i class="ri-stack-line"></i> Save
+        <button id="importListBtn">
+          <i class="ri-import-line"></i> Import
         </button>
-        <button id="openInYT">
-          <i class="ri-external-link-line"></i> Open In YouTube
+        <button id="subscribeListBtn">
+          <i class="ri-stack-line"></i> Subscribe
         </button>
+        <button id="viewOnYTBtn">
+          <i class="ri-external-link-line"></i> View on YouTube
+        </button>
+        <button id="clearListBtn">
+          <i class="ri-close-line"></i> Clear All
+        </button>
+        <button id="removeFromListBtn">
+          <i class="ri-subtract-line"></i> Remove
+        </button>
+        <button id="deleteCollectionBtn">
+          <i class="ri-delete-bin-2-line"></i> Delete
+        </button>
+        <button id="renameCollectionBtn">
+          <i class="ri-edit-line"></i> Rename
+        </button>
+        <button id="shareCollectionBtn">
+          <i class="ri-link"></i> Share
+        </button>
+
       </span>
       <br>
       <div id="playlist">
-        <h1>playlist or channel items show here</h1>
+        <h1>playlist, channel or your collection items show here</h1>
       </div>
     </section>
 
-    <footer>
-
-      <span>
-        <p id="currentDuration">00:00</p>
-        <input type="range" value="0" id="progress" />
-        <p id="fullDuration">00:00</p>
-      </span>
-
-      <div id="playerControls">
-        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
-        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
-        <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
-        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
-        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
-        <button class="ri-repeat-line" id="loopButton" aria-label="loop">
-        </button>
-
-        <span id="volumeContainer">
-          <label for="volumeChanger" class="ri-volume-up-fill"></label>
-          <input type="range" min="0" max="100" value="100" id="volumeChanger">
-        </span>
-        <select id="playSpeed">
-          <option value="0.25">0.25x</option>
-          <option value="0.50">0.50x</option>
-          <option value="0.75">0.75x</option>
-          <option value="1.00" selected>1.00x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.50">1.50x</option>
-          <option value="1.75">1.75x</option>
-          <option value="2.00">2.00x</option>
-          <option value="2.50">2.50x</option>
-          <option value="3.00">3.00x</option>
-          <option value="3.50">3.50x</option>
-          <option value="4.00">4.00x</option>
-        </select>
-      </div>
-    </footer>
   </main>
 
   <dialog id="superModal">
     <ul>
-      <li><i class="ri-play-large-line"></i>Play Now</li>
       <li><i class="ri-skip-forward-line"></i>Play Next</li>
       <li><i class="ri-list-check-2"></i>Enqueue</li>
       <li>

@@ -1,0 +1,199 @@
+@import 'animations.css';
+@import 'layout.css';
+@import 'remixicon.css';
+@import 'nav.css';
+@import 'miniPlayer.css';
+@import 'home.css';
+@import 'search.css';
+@import 'library.css';
+@import 'list.css';
+@import 'superModal.css';
+@import 'snackbar.css';
+
+:root {
+  --bg: transparent;
+  --onBg: transparent;
+  --text: black;
+  --borderColor: transparent;
+  --border: 0.1vmin solid var(--borderColor);
+  --shadowColor: transparent;
+  --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
+  --roundness: 2vmin;
+  --defaultBg: var(--text);
+  --defaultText: var(--bg);
+  --pageTransitionEffect: translateX(100%);
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: url("/NotoSans.woff2") format("woff2");
+  font-display: swap;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+
+button {
+  background: none;
+  border: none;
+  transition: all 0.3s ease;
+  user-select: none;
+
+  &:active {
+    transform: scale(0.8);
+  }
+}
+
+
+input {
+  font-family: inherit;
+  outline: none;
+}
+
+select {
+  font-family: inherit;
+  background: none;
+  outline: none;
+  color: var(--text);
+  border: none;
+  border-radius: var(--roundness);
+
+  /* fix white on white issue on dark mode */
+  option,
+  optgroup {
+    background: var(--bg);
+  }
+}
+
+dialog[open] {
+  margin: auto;
+  background: none;
+  border: none;
+  animation: boing 0.3s ease-in-out forwards;
+}
+
+
+dialog::backdrop {
+  background-color: #0007;
+  animation: dialogAppear 0.3s ease-in-out forwards;
+}
+
+
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.hide {
+  display: none !important;
+}
+
+.delete {
+  --defaultBg: #800;
+  --defaultText: #eaa;
+  --onBg: #800;
+  --text: #eaa;
+}
+
+.filter {
+  --defaultBg: #055;
+  --defaultText: #6dd;
+}
+
+.checked {
+  --defaultBg: #505;
+  --defaultText: #faf;
+}
+
+#queuetools,
+#listTools,
+#settings,
+#changelog {
+  button {
+    border: var(--border);
+    border-radius: var(--roundness);
+    background: var(--defaultBg);
+    color: var(--defaultText);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1vmin 2vmin;
+    margin: 1vmin 2vmin;
+  }
+}
+
+
+#loadingScreen {
+  background-color: var(--bg);
+  color: var(--text);
+  border-radius: var(--roundness);
+
+  i {
+    font-size: xx-large;
+  }
+}
+
+.ri-loader-3-line {
+  animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+}
+
+
+
+#queuetools,
+#listTools {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  backdrop-filter: blur(0.5rem);
+  border-bottom-left-radius: var(--roundness);
+  border-bottom-right-radius: var(--roundness);
+  padding: 2vmin 0;
+}
+
+#upcoming {
+
+  #queuelist {
+    width: 92%;
+  }
+
+  #queuetools {
+    width: calc(92% + 3vmin);
+  }
+}
+
+/* disable action during load events */
+#playButton.ri-loader-3-line {
+  pointer-events: none;
+}

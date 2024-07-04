@@ -1,7 +1,11 @@
-import { html, render } from "lit";
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
-import { removeFromCollection } from "./libraryUtils";
-import { blankImage, generateImageUrl, sqrThumb } from "./imageUtils";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn, instanceSelector, subtitleSelector } from "./dom";
+import { fetchCollection, getDB, removeFromCollection } from "./libraryUtils";
+import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
+import { render } from 'solid-js/web';
+import ListItem from "../components/ListItem";
+import StreamItem from "../components/StreamItem";
+import player from "./player";
+import { store } from "../store";
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -13,7 +17,12 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (type: string, index: number | '' = '') => JSON.parse(index ? instanceSelector.options[index].value : instanceSelector.value)[type];
+export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
+
+export const getApi = (
+  type: 'piped' | 'invidious',
+  index: number = instanceSelector.selectedIndex || 0) =>
+  store.api[index][type];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -26,6 +35,11 @@ export const supportsOpus = (): Promise<boolean> => navigator.mediaCapabilities.
   }
 }).then(res => res.supported);
 
+export const hostResolver = (url: string) =>
+  store.linkHost + (store.linkHost.includes('ytify') ? url.
+    startsWith('/watch') ?
+    ('?s' + url.slice(8)) :
+    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 export function notify(text: string) {
   const el = $('p');
@@ -36,13 +50,6 @@ export function notify(text: string) {
   setTimeout(clear, 8e3);
   document.body.appendChild(el);
 }
-
-
-export const hostResolver = (url: string) =>
-  linkHost.value + (linkHost.value.includes('ytify') ? url.
-    startsWith('/watch') ?
-    ('?s' + url.slice(8)) :
-    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 
 export function convertSStoHHMMSS(seconds: number): string {
@@ -60,37 +67,42 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-const linkHost = <HTMLSelectElement>document.getElementById('linkHost');
 
-const savedLinkHost = getSaved('linkHost') || '';
-if (savedLinkHost)
-  linkHost.value = savedLinkHost;
 
-linkHost.addEventListener('change', () => {
-  linkHost.selectedIndex === 0 ?
-    removeSaved('linkHost') :
-    save('linkHost', linkHost.value);
-  location.reload();
-});
+let more = () => undefined;
 
-export function setMetaData(
+document.getElementById('moreBtn')!.addEventListener('click', () => more());
+
+export async function setMetaData(
   id: string,
   streamName: string,
   authorName: string,
-  authorUrl: string,
   music: boolean = false
 ) {
-  const imgX = generateImageUrl(id, 'maxresdefault');
-  if (!getSaved('img') && !music)
-    img.src = imgX;
+  const metadataObj: MediaMetadataInit = {
+    title: streamName,
+    artist: authorName,
+  };
 
-  img.alt = streamName;
+  const imgx = generateImageUrl(id, 'maxres');
+  if (store.loadImage !== 'off') {
+    img.src = music ? await sqrThumb(imgx) : imgx;
+    metadataObj.artwork = [
+      { src: img.src, sizes: '96x96' },
+      { src: img.src, sizes: '128x128' },
+      { src: img.src, sizes: '192x192' },
+      { src: img.src, sizes: '256x256' },
+      { src: img.src, sizes: '384x384' },
+      { src: img.src, sizes: '512x512' },
+    ]
+    img.alt = streamName;
+  }
 
-  const title = <HTMLAnchorElement>document.getElementById('title');
+
   title.href = hostResolver(`/watch?v=${id}`);
   title.textContent = streamName;
-  title.onclick = _ => {
-    _.preventDefault();
+
+  more = function() {
     superModal.showModal();
     history.pushState({}, '', '#');
     const s = superModal.dataset;
@@ -102,120 +114,30 @@ export function setMetaData(
     s.channelUrl = a.channelUrl;
   }
 
-  const author = <HTMLAnchorElement>document.getElementById('author');
-  author.href = 'https://youtube.com' + authorUrl;
-  author.onclick = _ => {
-    _.preventDefault();
-    fetchList(authorUrl);
-  }
-  author.textContent = authorName;
+  document.getElementById('author')!.textContent = authorName;
 
   if (location.pathname === '/')
     document.title = streamName + ' - ytify';
 
-  const canvasImg = new Image();
-  canvasImg.onload = () => {
-    const sqrImg = getSaved('img') ? blankImage : sqrThumb(canvasImg);
-    if (music)
-      img.src = sqrImg;
 
-    if ('mediaSession' in navigator) {
-      navigator.mediaSession.setPositionState();
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: streamName,
-        artist: authorName,
-        artwork: [
-          { src: sqrImg, sizes: '96x96' },
-          { src: sqrImg, sizes: '128x128' },
-          { src: sqrImg, sizes: '192x192' },
-          { src: sqrImg, sizes: '256x256' },
-          { src: sqrImg, sizes: '384x384' },
-          { src: sqrImg, sizes: '512x512' },
-        ]
-      });
-    }
-
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.setPositionState();
+    navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
   }
-  canvasImg.crossOrigin = '';
-  canvasImg.src = imgX;
+
 }
 
 
 
-export function fetchList(url: string, mix = false) {
+export async function fetchList(url: string | undefined, mix = false) {
+  if (!url)
+    return notify('No Channel URL provided');
 
   loadingScreen.showModal();
+  const api = getApi('piped');
 
-  fetch(getApi('piped') + url)
+  const group = await fetch(api + url)
     .then(res => res.json())
-    .then(group => {
-      listContainer.innerHTML = '';
-      listContainer.appendChild(
-        itemsLoader(
-          group.relatedStreams
-        )
-      );
-      listAnchor.click();
-      listSection.scrollTo(0, 0);
-
-      let token = group.nextpage;
-      function setObserver(callback: () => Promise<string>) {
-        new IntersectionObserver((entries, observer) =>
-          entries.forEach(async e => {
-            if (e.isIntersecting) {
-              token = await callback();
-              observer.disconnect();
-              if (token)
-                setObserver(callback);
-            }
-          })).observe(listContainer.children[listContainer.childElementCount - 3]);
-      }
-      if (!mix && token)
-        setObserver(async () => {
-          const data = await fetch(
-            getApi('piped') + '/nextpage/' +
-            url.substring(1) + '?nextpage=' + encodeURIComponent(token)
-          )
-            .then(res => res.json())
-            .catch(e => console.log(e));
-          if (!data) return;
-          const existingItems: string[] = [];
-          for (const item of listContainer.children)
-            existingItems.push((<HTMLAnchorElement>item).href.slice(-11))
-
-          listContainer.appendChild(
-            itemsLoader(
-              data.relatedStreams.filter(
-                (item: StreamItem) => !existingItems.includes(
-                  item.url.slice(-11))
-              )
-            )
-          );
-          return data.nextpage;
-        });
-
-      const type = url.includes('channel') ? 'channel' : 'playlist';
-
-      openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
-      saveListBtn.innerHTML = `<i class="ri-stack-line"></i> ${type === 'channel' ? 'Subscribe' : 'Save'}`;
-      saveListBtn.dataset.url = url;
-      saveListBtn.dataset.thumbnail = group.avatarUrl;
-      saveListBtn.dataset.type = type;
-      saveListBtn.dataset.name = group.name;
-
-      if (mix) playAllBtn.click();
-      else {
-        history.replaceState({}, '',
-          location.origin + location.pathname +
-          '?' + url
-            .split('/')
-            .join('=')
-            .substring(1)
-        );
-        listContainer.dataset.url = url;
-        document.title = group.name + ' - ytify';
-      }
-    })
     .catch(err => {
       if (err.message !== 'No Data Found' && instanceSelector.selectedIndex < instanceSelector.length - 1) {
         instanceSelector.selectedIndex++;
@@ -226,6 +148,91 @@ export function fetchList(url: string, mix = false) {
       instanceSelector.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
+
+  if (listContainer.classList.contains('reverse'))
+    listContainer.classList.remove('reverse');
+  listContainer.innerHTML = '';
+  listContainer.appendChild(
+    itemsLoader(
+      group.relatedStreams
+    )
+  );
+
+  goTo('/list');
+  listSection.scrollTo(0, 0);
+
+  let token = group.nextpage;
+  function setObserver(callback: () => Promise<string>) {
+    new IntersectionObserver((entries, observer) =>
+      entries.forEach(async e => {
+        if (e.isIntersecting) {
+          token = await callback();
+          observer.disconnect();
+          if (token)
+            setObserver(callback);
+        }
+      }))
+      .observe(listContainer.children[listContainer.childElementCount - 3]);
+  }
+  if (!mix && token)
+    setObserver(async () => {
+      const data = await fetch(
+        api + '/nextpage/' +
+        url.substring(1) + '?nextpage=' + encodeURIComponent(token)
+      )
+        .then(res => res.json())
+        .catch(e => console.log(e));
+      if (!data) return;
+      const existingItems: string[] = [];
+      listContainer.querySelectorAll('.streamItem').forEach((v) => {
+        existingItems.push((v as HTMLElement).dataset.id as string);
+      });
+      listContainer.appendChild(
+        itemsLoader(
+          data.relatedStreams.filter(
+            (item: StreamItem) => !existingItems.includes(
+              item.url.slice(-11))
+          )
+        )
+      );
+      return data.nextpage;
+    });
+
+  const type = url.includes('channel') ? 'channel' : 'playlist';
+
+  listBtnsContainer.className = type;
+
+  openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
+
+  const lcd = listContainer.dataset;
+  lcd.url = url;
+  lcd.type = type + 's';
+  lcd.name = group.name;
+  lcd.id = url.slice(type === 'playlist' ? 11 : 9);
+  lcd.uploader = group.uploader || group.name;
+  lcd.thumbnail = lcd.thumbnail?.startsWith(url) ? lcd.thumbnail.slice(url.length) :
+    group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
+
+  const db = Object(getDB());
+
+  subscribeListBtn.innerHTML = `<i class="ri-stack-line"></i> Subscribe${db.hasOwnProperty(lcd.type) && db[lcd.type].hasOwnProperty(lcd.id) ? 'd' : ''
+    }`;
+
+  if (mix) playAllBtn.click();
+  else {
+    history.replaceState({}, '',
+      location.origin + location.pathname +
+      '?' + url
+        .split('/')
+        .join('=')
+        .substring(1)
+    );
+
+    // replace string for youtube playlist link support
+    listContainer.dataset.url = url.replace('ts/', 't?list=');
+    document.title = group.name + ' - ytify';
+  }
+
 }
 
 listContainer.addEventListener('click', superClick);
@@ -242,55 +249,38 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
-  const streamItem = (stream: StreamItem) => html`<stream-item 
-      data-id=${stream.url.substring(9)} 
-      data-title=${stream.title}
-      data-author=${stream.uploaderName}
-      views=${stream.views > 0 ? numFormatter(stream.views) + ' views' : ''}
-      data-duration=${convertSStoHHMMSS(stream.duration)}
-      uploaded=${stream.uploadedDate}
-      data-channel_url=${stream.uploaderUrl}
-  />`;
 
-  function getThumbIdFromLink(url: string) {
-    // for featured playlists
-    if (url.startsWith('/')) return url;
 
-    const l = new URL(url);
-    const p = l.pathname;
+  const streamItem = (stream: StreamItem) => StreamItem({
+    id: stream.videoId || stream.url.substring(9),
+    href: hostResolver(stream.url || 'https://youtu.be/' + stream.videoId),
+    title: stream.title,
+    author: stream.uploaderName || stream.author,
+    duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
+    uploaded: stream.uploadedDate || stream.publishedText,
+    channelUrl: stream.uploaderUrl || stream.authorUrl,
+    views: stream.viewCountText || (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
+    img: getThumbIdFromLink(stream.thumbnail || 'https://i.ytimg.com/vi_webp/' + stream.videoId + '/mqdefault.webp?host=i.ytimg.com')
+  })
 
-    return l.search.includes('ytimg') ?
-      p.split('/')[2] :
-      p.split('=')[0];
-  }
-
-  const listItem = (item: StreamItem) => html`<list-item
-      title=${item.name}
-      thumbnail=${!getSaved('img') && item.thumbnail ?
-      generateImageUrl(
-        getThumbIdFromLink(
-          item.thumbnail
-        )
-      ) : blankImage
-    }
-    uploader_data = ${item.description || item.uploaderName}
-    stats = ${item.subscribers > 0 ?
+  const listItem = (item: StreamItem) => ListItem(
+    item.name,
+    item.subscribers > 0 ?
       (numFormatter(item.subscribers) + ' subscribers') :
-      (item.videos > 0 ? item.videos + ' streams' : '')
-    }
-    type = ${item.type}
-    url = ${item.url}
-    />`;
+      (item.videos > 0 ? item.videos + ' streams' : ''),
+    generateImageUrl(
+      getThumbIdFromLink(
+        item.thumbnail
+      )
+    ),
+    item.description || item.uploaderName,
+    item.url
+  )
 
   const fragment = document.createDocumentFragment();
+  for (const item of itemsArray)
+    render(() => (item.type === 'stream' || item.type === 'video') ? streamItem(item) : listItem(item), fragment);
 
-  render(html`${itemsArray.map(item =>
-    html`<a href=${hostResolver(item.url)}>
-    ${item.type !== 'stream' ?
-        listItem(item) :
-        streamItem(item)}
-    </a>`
-  )}`, fragment);
 
   return fragment;
 }
@@ -298,35 +288,35 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
 // TLDR : Stream Item Click Action
 export function superClick(e: Event) {
+  const elem = e.target as HTMLAnchorElement;
+  if (elem.target === '_blank') return;
   e.preventDefault();
-  const elem = e.target as HTMLElement;
 
-  if (elem.matches('stream-item')) {
-    const eld = elem.dataset;
-    if (elem.classList.contains('delete')) {
-      const anchor = elem.parentElement as HTMLAnchorElement;
-      const div = anchor.parentElement as HTMLDivElement;
-      const details = div.parentElement as HTMLDetailsElement;
-      removeFromCollection(details.id, eld.id as string);
-      return;
-    }
+  const eld = elem.dataset;
+  const elc = elem.classList.contains.bind(elem.classList);
+
+  if (elc('streamItem'))
+    return elc('delete') ?
+      removeFromCollection(listAnchor.dataset.id as string, eld.id as string)
+      : player(eld.id);
+
+  else if (elc('ri-more-2-fill')) {
     superModal.showModal();
     history.pushState({}, '', '#');
-    const smd = superModal.dataset;
-    smd.id = eld.id
-    smd.title = eld.title;
-    smd.author = eld.author;
-    smd.channelUrl = eld.channel_url;
-    smd.duration = eld.duration;
+    const elp = elem.parentElement?.dataset;
+    for (const x in elp)
+      superModal.dataset[x] = elp[x];
   }
 
-  if (elem.matches('list-item')) {
-    const url = elem.getAttribute('url') as string;
-    fetchList(
-      elem.getAttribute('type') === 'playlist' ?
-        url.replace('?list=', 's/') :
-        url
-    );
+  else if (elc('ur_pls_item'))
+    fetchCollection(elem.textContent as string);
+
+  else if (elc('listItem')) {
+    let url = eld.url as string;
+    if (!url.startsWith('/channel'))
+      url = url.replace('?list=', 's/')
+    fetchList(url);
+    listContainer.dataset.thumbnail = url + eld.thumbnail;
   }
 }
 
@@ -339,8 +329,12 @@ export async function parseTTML() {
   myTrack.mode = "hidden";
   const d = img.getBoundingClientRect();
 
+
   subtitleContainer.style.top = Math.floor(d.y) + 'px';
   subtitleContainer.style.left = Math.floor(d.x) + 'px';
+  subtitleSelector.parentElement!.style.position = 'static';
+  subtitleSelector.style.top = Math.floor(d.y) + 'px';
+  subtitleSelector.style.left = Math.floor(d.x) + 'px';
 
 
   fetch(subtitleTrack.src)

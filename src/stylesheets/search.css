@@ -1,11 +1,10 @@
 #superInputContainer {
   height: auto;
-  width: calc(100% - 8.3vmin);
+  width: 92%;
   padding: 2.4vmin 4vmin;
-  margin-bottom: 2vmin;
   position: sticky;
-  z-index: 1;
-  top: 0;
+  z-index: 3;
+  top: 4vmin;
   background-color: var(--onBg);
   backdrop-filter: blur(2vmin);
   border-radius: var(--roundness);
@@ -13,11 +12,11 @@
   box-shadow: var(--shadow);
   display: flex;
   transition: all 0.4s;
-}
 
-#superInputContainer:focus-within {
-  backdrop-filter: none;
-  background-color: var(--bg);
+  &:focus-within {
+    backdrop-filter: none;
+    background-color: var(--bg);
+  }
 }
 
 #superInput {
@@ -27,6 +26,7 @@
   background: none;
   color: inherit;
   font-size: medium;
+
 }
 
 #superInput::placeholder {
@@ -48,9 +48,9 @@
   max-height: 25vmax;
   overflow-y: scroll;
   position: absolute;
-  z-index: 1;
-  margin-top: 11.9vmin;
   width: 80vmin;
+  z-index: 1;
+  margin-top: calc(1.5rem + 8.8vmin);
   background-color: var(--bg);
   list-style-type: none;
   padding: 0;
@@ -59,27 +59,24 @@
   box-shadow: var(--shadow);
   display: none;
   user-select: none;
+
+  li {
+    background-color: var(--onBg);
+    font-weight: bold;
+    padding: 1vmin 3vmin;
+    margin-top: 0.4vmin;
+
+    &:hover,
+    &:focus,
+    &.hover {
+      background-color: var(--text);
+      color: var(--bg);
+    }
+  }
 }
 
-#suggestions li {
-  background-color: var(--onBg);
-  font-weight: bold;
-  padding: 1vmin 3vmin;
-  margin-top: 0.4vmin;
-}
+#searchlist {
+  margin-top: 8%;
+  width: 92%;
 
-#suggestions li:hover,
-#suggestions li:focus,
-#suggestions li.hover {
-  background-color: var(--text);
-  color: var(--bg);
-}
-
-h1.featuredPlaylists {
-  background: var(--onBg);
-  padding: 2%;
-  border-radius: var(--roundness);
-  display: flex;
-  justify-content: center;
-  align-items: center
 }

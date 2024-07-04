@@ -1,25 +1,40 @@
-import { img, canvas, context } from "../lib/dom";
-import { blankImage } from "../lib/imageUtils";
-import player from "../lib/player";
-import { getSaved, idFromURL, params, removeSaved, save } from "../lib/utils";
-
+import { canvas, context, audio } from "../lib/dom";
+import { generateImageUrl } from "../lib/imageUtils";
+import { getSaved, params } from "../lib/utils";
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
-const themeSelector = <HTMLSelectElement>document.getElementById('themeSelector');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
-const highContrastSwitch = <HTMLSelectElement>document.getElementById('highContrastSwitch');
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
+const accentLightener = (r: number, g: number, b: number) => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const l = Math.max(r, g, b);
+  const s = l - Math.min(r, g, b);
+  const h = s
+    ? l === r
+      ? (g - b) / s
+      : l === g
+        ? 2 + (b - r) / s
+        : 4 + (r - g) / s
+    : 0;
 
-function accentLightener(r: number, g: number, b: number) {
-
-  const $ = (_: number) => _ + (204 - Math.max(r, g, b));
-
-  return `rgb(${$(r)}, ${$(g)},${$(b)})`;
+  const saturation =
+    100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
+  return `hsl(
+    ${60 * h < 0 ? 60 * h + 360 : 60 * h},
+    ${saturation}%,
+    ${80}%)`;
 }
+
+// `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
+
+
+
 
 function accentDarkener(r: number, g: number, b: number) {
 
@@ -35,8 +50,6 @@ function accentDarkener(r: number, g: number, b: number) {
 
 
 }
-
-
 
 const palette: Scheme = {
   light: {
@@ -70,97 +83,79 @@ const palette: Scheme = {
 };
 
 
+function colorInjector(colorArray: number[]) {
+  const autoDark = systemDark.matches;
+  const theme = getSaved('theme') || 'auto';
+
+  const scheme = theme === 'auto' ?
+    autoDark ? 'dark' : 'light' :
+    theme === 'auto-hc' ?
+      autoDark ? 'black' : 'white' : theme;
+
+  const [r, g, b] = colorArray;
+
+  cssVar('--bg', palette[scheme].bg(r, g, b));
+  cssVar('--onBg', palette[scheme].onBg);
+  cssVar('--text', palette[scheme].text);
+  cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
+  cssVar('--shadowColor', palette[scheme].shadowColor);
+  tabColor.content = palette[scheme].bg(r, g, b);
+}
+
+
 function themer() {
+  const id = audio.dataset.id || params.get('s');
+
+  if (!id) {
+    // intentional otherwise too fast to detect localStorage changes from events
+    setTimeout(() => colorInjector([127, 127, 127]));
+    return;
+  }
 
   const canvasImg = new Image();
   canvasImg.onload = () => {
-    if (canvasImg.width === 120) return;
-    canvas.height = canvasImg.height;
-    canvas.width = canvasImg.width;
-    context.drawImage(canvasImg, 0, 0);
 
-    const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
+    const height = canvasImg.height;
+    const width = canvasImg.width;
+    const side = Math.min(width, height);
+    canvas.width = canvas.height = side;
+
+    const offsetX = (width - side) / 2;
+    const offsetY = (height - side) / 2;
+    context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
+
+    const data = context.getImageData(0, 0, side, side).data;
     const len = data.length;
-
-    const nthPixel = 40; // sweet spot for getting high performance and accuracy
-
     let r = 0, g = 0, b = 0;
 
-    for (let i = 0; i < len; i += nthPixel) {
+    for (let i = 0; i < len; i += 4) {
       r += data[i];
       g += data[i + 1];
       b += data[i + 2];
     }
-    const amount = len / nthPixel;
+    const amount = len / 4;
     r = Math.floor(r / amount),
       g = Math.floor(g / amount),
       b = Math.floor(b / amount);
 
+    colorInjector([r, g, b]);
 
-    const theme = themeSelector.selectedOptions[0].value;
-    let light = 'light', dark = 'dark';
-    if (getSaved('highContrast'))
-      light = 'white', dark = 'black';
-
-    const scheme = theme === 'auto' ?
-      (systemDark.matches ? dark : light) :
-      theme === 'light' ? light : dark;
-
-
-    cssVar('--bg', palette[scheme].bg(r, g, b));
-    cssVar('--onBg', palette[scheme].onBg);
-    cssVar('--text', palette[scheme].text);
-    cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
-    cssVar('--shadowColor', palette[scheme].shadowColor);
-    tabColor.content = palette[scheme].bg(r, g, b);
   }
-
   canvasImg.crossOrigin = '';
-  canvasImg.src = img.src;
+  const temp = generateImageUrl(id);
+  if (canvasImg.src !== temp) canvasImg.src = temp;
+
+
 }
 
-highContrastSwitch.addEventListener('click', () => {
-  getSaved('highContrast') ?
-    removeSaved('highContrast') :
-    save('highContrast', 'true');
-  themer();
-})
 
-if (getSaved('highContrast'))
-  highContrastSwitch.toggleAttribute('checked');
-
-
-
-themeSelector.addEventListener('change', () => {
-  themer();
-  themeSelector.value === 'auto' ?
-    removeSaved('theme') :
-    save('theme', themeSelector.value);
-});
-
-
-themeSelector.value = getSaved('theme') || 'auto';
-
-img.addEventListener('load', themer);
 
 systemDark.addEventListener('change', themer);
 
+export { themer, cssVar };
 
 
-const roundnessChanger = <HTMLSelectElement>document.getElementById('roundnessChanger');
-if (getSaved('roundness')) {
-  roundnessChanger.value = getSaved('roundness') || '2vmin';
-  cssVar('--roundness', roundnessChanger.value);
-}
-
-roundnessChanger.addEventListener('change', () => {
-  cssVar('--roundness', roundnessChanger.value);
-  roundnessChanger.value === '2vmin' ?
-    removeSaved('roundness') :
-    save('roundness', roundnessChanger.value)
-})
 
 
-const streamQuery = params.get('s') || idFromURL(params.get('url') || params.get('text'));
 
-streamQuery ? player(streamQuery) : getSaved('img') ? img.src = blankImage : themer();
+

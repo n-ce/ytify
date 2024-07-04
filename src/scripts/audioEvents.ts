@@ -1,17 +1,19 @@
-import { audio, playButton, queuelist } from "../lib/dom";
+import { audio, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, params, getSaved } from "../lib/utils";
+import { convertSStoHHMMSS, getSaved, goTo, params } from "../lib/utils";
+import { store } from "../store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
+const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 const streamHistory: string[] = [];
+const ad = audio.dataset as { [index: string]: string };
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
-const progress = <HTMLInputElement>document.getElementById('progress');
 const currentDuration = <HTMLParagraphElement>document.getElementById('currentDuration');
 const fullDuration = <HTMLParagraphElement>document.getElementById('fullDuration');
 const playPrevButton = <HTMLButtonElement>document.getElementById('playPrevButton');
@@ -22,7 +24,6 @@ const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 
 const msn = 'mediaSession' in navigator;
-const ms = msn ? navigator.mediaSession : playButton.dataset;
 function updatePositionState() {
   if (msn)
     if ('setPositionState' in navigator.mediaSession)
@@ -36,8 +37,8 @@ function updatePositionState() {
 
 
 playButton.addEventListener('click', () => {
-  if (!audio.dataset.id) return;
-  ms.playbackState === 'playing' ?
+  if (!ad.id) return;
+  store.player.playbackState === 'playing' ?
     audio.pause() :
     audio.play();
 });
@@ -49,22 +50,26 @@ let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
-  ms.playbackState = 'playing';
-  const id = <string>audio.dataset.id;
-  if (!streamHistory.includes(id))
-    streamHistory.push(id);
+  store.player.playbackState = 'playing';
+  if (!streamHistory.includes(ad.id))
+    streamHistory.push(ad.id);
   const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
-  if (!getSaved('history') ||
-    firstElementInHistory.dataset.id !== id)
+  if (getSaved('history') !== 'off' ||
+    firstElementInHistory.dataset.id !== ad.id)
     historyTimeoutId = window.setTimeout(() => {
-      if (historyID === audio.dataset.id)
-        addToCollection('history', audio.dataset);
+      if (historyID === ad.id) {
+        addToCollection('history', ad);
+        // just in case we are already in the history collection 
+        if (listAnchor.classList.contains('view') && params.get('collection') === 'history')
+          goTo('history');
+
+      }
     }, 1e4);
 });
 
 audio.addEventListener('pause', () => {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
-  ms.playbackState = 'paused';
+  store.player.playbackState = 'paused';
   clearTimeout(historyTimeoutId);
 });
 
@@ -81,7 +86,7 @@ const playableCheckerID = setInterval(() => {
 audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
-  historyID = audio.dataset.id;
+  historyID = ad.id;
   clearTimeout(historyTimeoutId);
 
   // persist playback speed
@@ -93,7 +98,6 @@ audio.addEventListener('loadeddata', () => {
 
 audio.addEventListener('waiting', () => {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  clearTimeout(historyTimeoutId);
 });
 
 
@@ -152,6 +156,8 @@ audio.addEventListener('loadedmetadata', () => {
 });
 
 
+
+
 loopButton.addEventListener('click', () => {
   loopButton.classList.toggle('on');
   audio.loop = !audio.loop;
@@ -161,7 +167,7 @@ loopButton.addEventListener('click', () => {
 
 playPrevButton.addEventListener('click', () => {
   if (streamHistory.length > 1) {
-    appendToQueuelist(audio.dataset, true);
+    appendToQueuelist(ad, true);
     streamHistory.pop();
     player(streamHistory[streamHistory.length - 1]);
   }
@@ -204,11 +210,9 @@ volumeChanger.addEventListener('input', () => {
 if (msn) {
   navigator.mediaSession.setActionHandler('play', () => {
     audio.play();
-    ms.playbackState = 'playing';
   });
   navigator.mediaSession.setActionHandler('pause', () => {
     audio.pause();
-    ms.playbackState = 'paused'
   });
   navigator.mediaSession.setActionHandler("seekforward", () => {
     audio.currentTime += 15;
@@ -228,111 +232,75 @@ if (msn) {
   });
 }
 
+addEventListener('DOMContentLoaded', async () => {
+  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+  if (id) {
+    loadingScreen.showModal();
+    await player(id);
+    loadingScreen.close();
+  }
+  else
+    document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
+});
 
-type virtualQ = {
-  id: string,
-  title: string
-  duration: string,
-  author: string,
-}
 
-const storedData: {
-  [index: string]: virtualQ
-} = {};
+
+// AUTO-QUEUE
+
+const virtualQ = new Map();
 const frequencyQueue: { [index: string]: number } = {};
 
-export function autoQueue(data: Recommendation[]) {
+export function autoQueue(data: StreamItem[]) {
 
-  const queueIds = [...streamHistory];
-  const items = queuelist.dataset.array || '';
-  const trash = sessionStorage.getItem('trashHistory') || '';
+  const init = queuelist.querySelectorAll('div').length === 0;
+  // sometimes users will remove items from queue manually, we need to account for this using the trashHistory array
+  const trashHistory = sessionStorage.getItem('trashHistory');
 
-  // convert items string to array
-  const iLen = items.length / 11;
-  for (let i = 0; i < iLen; i++)
-    queueIds.push(items.slice(11));
-
-  // convert trash string to array
-  const tLen = trash.length / 11;
-  for (let i = 0; i < tLen; i++)
-    queueIds.push(trash.slice(11));
-
-  if (Object.keys(storedData).length) {
-    const dataArray = Object.entries(frequencyQueue);
-
-    dataArray.sort((a, b) => b[1] - a[1]);
-
-    const hf = dataArray[0][1] || 0;
-    if (hf > 1) {
-      dataArray.filter((a) => a[1] === hf).forEach(a => {
-        if (trash.includes(a[0])) return;
-        appendToQueuelist(storedData[a[0]]);
-        delete storedData[a[0]];
-      })
-    }
-  }
+  const initArray: DOMStringMap[] = [];
 
   data.forEach(stream => {
 
-    const id = stream.videoId ||
-      stream.url.slice(9);
+    const id = stream.videoId || stream.url.slice(9);
     const author = stream.author || stream.uploaderName;
     const duration = stream.lengthSeconds || stream.duration;
 
     if ('type' in stream && stream.type !== 'stream')
       return;
 
-    const streamData = {
+    if (
+      trashHistory?.includes(id) ||
+      streamHistory.includes(id)
+    ) return;
+
+    const streamData: DOMStringMap = {
       id: id,
       title: stream.title,
       author: author,
       duration: convertSStoHHMMSS(duration),
     };
 
-    function virtualQueueHandler(streamData: virtualQ) {
-
-      if (storedData.hasOwnProperty(id))
-        <number>frequencyQueue[id]++;
-      else {
-        storedData[id] = streamData;
-        frequencyQueue[id] = 1;
-      }
-
+    if (virtualQ.has(id))
+      frequencyQueue[id]++;
+    else {
+      virtualQ.set(id, streamData);
+      frequencyQueue[id] = 1;
     }
 
-    if (
-      duration > 60 &&
-      duration < 3600 &&
-      !queueIds.includes(id)
-    )
-      items ?
-        virtualQueueHandler(streamData) :
-        appendToQueuelist(streamData);
+    initArray.push(streamData);
+
 
   });
-}
 
-
-// upcoming queries
-export async function upcomingInjector(queueParam: string) {
-
-  const array = [];
-  for (let i = 0; i < queueParam.length; i += 11)
-    array.push(queueParam.slice(i, i + 11));
-
-  const appendItem = (id: string) =>
-    fetch('https://p2-a.vercel.app?id=' + id)
-      .then(res => res.json())
-      .then(data => appendToQueuelist(data))
-      .catch(() => {
-        console.log(`Fetching Queue Item ${id} Failed.`);
-        appendItem(id);
+  // if queue empty all recommended streams are pushed to queue else they are pushed it to a virtual queue
+  init ?
+    initArray.forEach(s => {
+      appendToQueuelist(s);
+    }) :
+    Object.entries(frequencyQueue)
+      .sort((a, b) => b[1] - a[1])
+      .filter((v, _, a) => v[1] === a[0][1])
+      .forEach(v => {
+        appendToQueuelist(virtualQ.get(v[0]));
       });
-  for await (const id of array)
-    await appendItem(id);
-}
-const queueParam = params.get('a');
-if (queueParam && queueParam.length > 10) {
-  addEventListener('DOMContentLoaded', async () => upcomingInjector(queueParam));
-}
 
+}

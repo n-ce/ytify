@@ -3,32 +3,29 @@ Why does this exist ?
 
 Acts as a fallback to support playback through invidious without using custom instances
 
-Destined to be deprecated when adaptive streaming via piped is implemented.
+Destined to be deprecated when dash streaming via piped is implemented.
 */
 
-import { audio, favButton, favIcon, instanceSelector, playButton } from "./dom";
-import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData } from "./utils";
+import { audio, favButton, favIcon, instanceSelector, listAnchor, playButton } from "./dom";
+import { convertSStoHHMMSS, getSaved, notify, params, getApi, setMetaData, goTo } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
-const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
+const codecSelector = <HTMLSelectElement>document.getElementById('codecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
 /////////////////////////////////////////////////////////////
 
-export default async function invPlayer(id: string | null = '', instance = 0) {
-
-  if (!id) return;
-
-  playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+export default async function invPlayer(id: string, instance = 0) {
 
   const apiUrl = getApi('invidious', instance);
 
   const data = await fetch(apiUrl + '/api/v1/videos/' + id)
     .then(res => res.json())
     .catch(err => {
+      playButton.classList.replace(playButton.className, 'ri-loader-3-line');
       if (instance < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi('invidious', instance + 1)} due to error: ${err.message}`);
+        notify(`switched instance from ${apiUrl} to ${getApi('invidious', instance + 1)} due to error: ${err.message}`);
         invPlayer(id, instance + 1);
         return;
       }
@@ -38,12 +35,16 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
     });
 
 
-
-  if (!data?.adaptiveFormats?.length)
+  if (!data || !data?.adaptiveFormats?.length) {
+    notify('No Audio Streams Found');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
+  }
+
+  type audioStream = Record<'type' | 'url' | 'quality' | 'bitrate' | 'encoding' | 'clen', string>;
 
   const audioStreams = data.adaptiveFormats
-    .filter((_: { audioChannels: string }) => _.hasOwnProperty('audioChannels'))
+    .filter((_: audioStream) => _.hasOwnProperty('audioChannels'))
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
 
   const noOfBitrates = audioStreams.length;
@@ -59,21 +60,30 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
 
   bitrateSelector.innerHTML = '';
 
-  audioStreams.forEach((_: {
-    type: string,
-    url: string,
-    quality: string,
-    bitrate: string,
-    encoding: string
-  }, i: number) => {
+  const enforceProxy = getSaved('enforceProxy') === 'true';
+  const isMusic = enforceProxy || data.genre === 'Music';
+  const ivApi = getApi('invidious', instance);
+
+  function proxyHandler(url: string) {
+    const oldUrl = new URL(url);
+
+    // only proxy music streams
+    const host = isMusic ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
+
+    return url.replace(oldUrl.origin, host);
+  }
+
+  audioStreams.forEach((
+    _: audioStream,
+    i: number
+  ) => {
     const bitrate = parseInt(_.bitrate);
     const codec = _.type.includes('opus') ? 'opus' : 'aac';
     const quality = Math.floor(bitrate / 1024) + ' kbps ' + codec;
+    const size = (parseInt(_.clen) / (1024 * 1024)).toFixed(2) + ' MB';
 
-    // proxy the url
-    const url = (_.url).replace(new URL(_.url).origin, getApi('invidious', instance));
     // add to DOM
-    bitrateSelector.add(new Option(quality, url));
+    bitrateSelector.add(new Option(`${quality} - ${size}`, proxyHandler(_.url)));
 
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
@@ -86,18 +96,16 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
   audio.src = bitrateSelector.value;
 
   // remove ' - Topic' from name if it exists
-
   let music = false;
   if (data.author.endsWith(' - Topic')) {
     music = true;
-    data.author = data.author.replace(' - Topic', '');
+    data.author = data.author.slice(0, -8);
   }
 
   setMetaData(
     id,
     data.title,
     data.author,
-    data.authorUrl,
     music
   );
 
@@ -141,7 +149,7 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
     data.recommendedVideos.forEach(
-      (stream: Recommendation) => {
+      (stream: StreamItem) => {
         if (stream.lengthSeconds < 100 || stream.lengthSeconds > 3000) return;
 
         const rsId = stream.videoId;
@@ -181,5 +189,10 @@ export default async function invPlayer(id: string | null = '', instance = 0) {
 
     // convert the new merged+randomized discover back to object and inject it
     addListToCollection('discover', Object.fromEntries(array), db);
+
+    // just in case we are already in the discover collection 
+    if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
+      goTo('discover');
+
   }, 20000);
 }
