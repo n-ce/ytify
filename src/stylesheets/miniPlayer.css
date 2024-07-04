@@ -12,6 +12,7 @@
   div {
     display: flex;
     align-items: center;
+    background-color: var(--onBg);
     width: 100%;
 
 
@@ -47,12 +48,8 @@
     margin: 2% 2% 0;
 
     img {
-      height: 100%;
-    }
-
-    img,
-    div {
       background-color: var(--onBg);
+      height: 100%;
     }
 
     div a {
