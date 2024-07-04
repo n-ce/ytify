@@ -9,15 +9,22 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music** and other Audio focused YouTube Videos, even under the lowest network conditions.
+> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 ## What else are you getting ?
-- **Queue** 🚦: Add multiple streams to keep your audio streams going. 
-- **Playlists** 🎶: View YouTube playlists and queue them to the player. 
-- **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail. 
+- **Queue** 🚦:
+  - Add multiple streams to keep your audio streams going.
+  - You can share your queue with anyone just by sharing the url.
+  - Auto-Queue : automatically enqueues relevant streams.
+- **Playlists** 🎶:
+  - View YouTube playlists , queue them to the player. You can also both subscribe and import it into your own collection
+  - ytify Collections : create your own playlists disconnected from YouTube, share it with the world with share link.
+- **Theming** 🎨:
+  - Modern Autonomous themed UI based on stream thumbnail.
+  - High Contrast Mode for increased legibility.
 - **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
-- **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners. 
-- **Library** 📚: Discover feed, history, favorites & custom playlists. 
+- **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
+- **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
 
 ![ytify_6.7_landscape](https://github.com/n-ce/ytify/assets/69345507/e8854300-8caf-49a4-befa-6bfc659e86b6)
 
@@ -33,11 +40,11 @@
 1. Prerequisites : Node.js , Beginner TypeScript Knowledge. 
 2. Clone repository with
 ```
-git clone https://github.com/n-ce/ytify
+git clone https://github.com/n-ce/ytify --depth 1
 ```
 or
 ```
- gh repo clone n-ce/ytify
+ gh repo clone n-ce/ytify -- --depth 1
 ```
 3. Move to Directory, Update & Install Dependencies
 ```
