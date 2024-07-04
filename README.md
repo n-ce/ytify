@@ -26,7 +26,7 @@
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
 - **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
 
-![ytify_6.7_landscape](https://github.com/n-ce/ytify/assets/69345507/e8854300-8caf-49a4-befa-6bfc659e86b6)
+![ytify_7.0_landscape](https://github.com/n-ce/ytify/assets/69345507/b5a48633-9544-4f6c-b2d0-d11a1fa2efbc)
 
 
 
