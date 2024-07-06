@@ -71,7 +71,7 @@ export default function Settings() {
           <p>ytify {Version}</p>
         </b>
 
-        <span id='isc'>
+        <span id='instanceSelectorContainer'>
           <label for='instanceSelector'>Instance</label>
         </span>
 
@@ -93,8 +93,8 @@ export default function Settings() {
           }}
         >
 
-          <option value="https://youtube.com">YouTube</option>
           <option value="https://ytify.netlify.app">ytify</option>
+          <option value="https://youtube.com">YouTube</option>
           <option value="https://piped.video">Piped</option>
           <option value="https://yewtu.be">Invidious</option>
         </Selector>
