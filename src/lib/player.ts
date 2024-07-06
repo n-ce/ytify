@@ -93,10 +93,10 @@ function setAudioStreams(audioStreams: {
 
     const oldUrl = new URL(url);
 
-    if (isMusic || getSaved('enforceProxy')) return url;
+    const useProxy = isMusic || getSaved('enforceProxy');
 
     // only proxy music streams
-    const host = isMusic ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
+    const host = useProxy ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
 
     return url.replace(oldUrl.origin, host);
   }
