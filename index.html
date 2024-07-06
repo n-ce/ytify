@@ -35,7 +35,6 @@
 <body>
   <canvas class="hide"></canvas>
   <audio>
-    <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
   </audio>
   <nav>
     <a href="/" id="/">
@@ -64,19 +63,15 @@
   </nav>
   <main>
     <section id="home">
-      <article class="hide" id="subtitleContainer"></article>
 
       <img id="img" src="/ytify_thumbnail_min.webp" height="100%" width="100%" crossorigin="anonymous"
         alt="Current Playing Media Thumbnail">
 
       <div id="metadata">
-        <a id="title" href="" target="_blank">ytify legacy</a>
+        <a id="title" href="" target="_blank">ytify 6.9 Lite</a>
         <a id="author" href="" target="_blank">Channel</a>
         <select id="bitrateSelector">
           <option>Bitrate</option>
-        </select>
-        <select id="subtitleSelector" class="hide">
-          <option>Subtitles</option>
         </select>
         <input type="checkbox" id="favButton" />
         <label for="favButton" class="ri-heart-line" aria-label="like"></label>
@@ -221,12 +216,7 @@
       <span>
         <label for="instances">Instance</label>
         <select id="instances">
-          <option value='{
-          "name":"Custom",
-          "piped":"https://pipedapi.kavin.rocks",
-          "image":"https://pipedimg.adminforge.de",
-          "invidious":"https://invidious.fdn.fr"
-          }'>Custom</option>
+          <option value="https://pipedapi.kavin.rocks">Custom</option>
         </select>
       </span>
 
@@ -312,11 +302,6 @@
       <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
 
       <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
-
-      <form netlify name='feedback' method='POST'>
-        <input type="text" name="->" id="netlifyForm"
-          placeholder="Anonymously Enter your feedback (bugs, feature requests) here:" />
-      </form>
 
     </section>
 

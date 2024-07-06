@@ -1,5 +1,5 @@
-import { audio, favButton, favIcon, playButton, instanceSelector, subtitleSelector, subtitleTrack, subtitleContainer } from "./dom";
-import { convertSStoHHMMSS, notify, params, parseTTML, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
+import { audio, favButton, favIcon, playButton, instanceSelector } from "./dom";
+import { convertSStoHHMMSS, notify, params, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 
@@ -42,32 +42,21 @@ bitrateSelector.addEventListener('change', () => {
 
 /////////////////////////////////////////////////////////////
 
-subtitleSelector.addEventListener('change', () => {
-  subtitleTrack.src = subtitleSelector.value;
-  subtitleSelector.value ?
-    subtitleContainer.classList.remove('hide') :
-    subtitleContainer.classList.add('hide');
-  parseTTML();
-});
-
-/////////////////////////////////////////////////////////////
-
 export default async function player(id: string | null = '') {
 
   if (!id) return;
-  if (instanceSelector.selectedIndex === 0)
-    return import("./player.invidious").then(mod => mod.default(id))
+  console.log(instanceSelector, instanceSelector.value)
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const apiIndex = instanceSelector.selectedIndex;
-  const apiUrl = getApi('piped', apiIndex);
+  const apiUrl = getApi(apiIndex);
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
+        notify(`switched playback instance from ${apiUrl} to ${getApi(apiIndex + 1)} due to error: ${err.message}`);
         instanceSelector.selectedIndex++;
         player(id);
         return;
@@ -106,7 +95,7 @@ export default async function player(id: string | null = '') {
 
     const oldUrl = new URL(_.url);
 
-    const newUrl = _.url.replace(oldUrl.origin, getApi('invidious'));
+    const newUrl = (data.category === 'Music') ? _.url : _.url.replace(oldUrl.origin, oldUrl.host);
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
@@ -121,26 +110,6 @@ export default async function player(id: string | null = '') {
 
   bitrateSelector.selectedIndex = index;
   audio.src = bitrateSelector.value;
-
-  // Subtitle data dom injection
-
-  for (const option of subtitleSelector.options)
-    if (option.textContent !== 'Subtitles') option.remove();
-
-  subtitleSelector.classList.remove('hide');
-  subtitleContainer.innerHTML = '';
-
-  if (data.subtitles.length)
-    for (const subtitles of data.subtitles)
-      subtitleSelector.add(
-        new Option(subtitles.name, subtitles.url)
-      );
-  else {
-    subtitleTrack.src = '';
-    subtitleContainer.classList.add('hide');
-    subtitleSelector.classList.add('hide');
-    subtitleContainer.firstChild?.remove();
-  }
 
 
   // remove ' - Topic' from name if it exists

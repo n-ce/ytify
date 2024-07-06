@@ -82,7 +82,7 @@ function themer() {
     const data = context.getImageData(0, 0, canvasImg.width, canvasImg.height).data;
     const len = data.length;
 
-    const nthPixel = 40; // sweet spot for getting high performance and accuracy
+    const nthPixel = 80;
 
     let r = 0, g = 0, b = 0;
 

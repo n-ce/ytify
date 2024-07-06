@@ -1,8 +1,7 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
-import { getSaved, getApi } from "../lib/utils";
+import { getSaved } from "../lib/utils";
 import { blankImage, generateImageUrl, sqrThumb } from "../lib/imageUtils";
-import { instanceSelector } from "../lib/dom";
 
 @customElement('stream-item')
 export class StreamItem extends LitElement {
@@ -34,16 +33,6 @@ export class StreamItem extends LitElement {
 	}
 
 	handleThumbnailError() {
-
-		const index = instanceSelector.selectedIndex;
-		const currentImgPrxy = getApi('image', index);
-		const nextImgPrxy = getApi('image', index + 1);
-
-		this.unravel = '1';
-
-		if (!this.thumbnail.src.includes(currentImgPrxy)) return;
-
-		this.thumbnail.src = this.tsrc.replace(currentImgPrxy, nextImgPrxy);
 
 	}
 

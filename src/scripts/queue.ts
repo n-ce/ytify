@@ -1,7 +1,6 @@
 import { $, removeSaved, save } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
-// import Sortable from "sortablejs";
 
 const queueArray: string[] = [];
 
@@ -44,8 +43,6 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 }
 
-
-//new Sortable(queuelist, {});
 
 queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLElement;
@@ -140,25 +137,4 @@ function isLongerThan10Min(duration: string) {
     parseInt(hhmmss[0]) < 10
   );
 }
-
-// queuelist mutation observer
-
-new MutationObserver(m => {
-  for (const mutation of m) {
-    if (mutation.type === "childList") {
-      const array = queueArray.join('');
-      queuelist.dataset.array = array;
-
-      if (location.pathname === '/upcoming') {
-        history.replaceState({}, '',
-          location.pathname + (
-            array ?
-              `?a=${array}` : ''
-          )
-        );
-      }
-    }
-  }
-}).observe(queuelist, { childList: true });
-
 

@@ -1,5 +1,5 @@
 import { canvas, context, img } from "./dom";
-import { getApi } from "./utils";
+
 
 
 img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
@@ -13,7 +13,7 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 export const generateImageUrl = (
   id: string,
   res: string = 'mqdefault',
-  proxy: string = getApi('image')
+  proxy: string = 'https://pipedproxy.r4fo.com'
 ) => proxy + (id.startsWith('/') ?
   `${id}=s176-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
   `/vi_webp/${id}/${res}.webp?host=i.ytimg.com`);

@@ -5,19 +5,16 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "update": "npx npm-check-updates -u"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "imsc": "^1.1.5",
-    "lit": "^3.1.3"
+    "lit": "latest"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.19",
-    "eruda": "^3.0.1",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.10",
-    "vite-plugin-pwa": "^0.19.8"
+    "autoprefixer": "latest",
+    "eruda": "latest",
+    "typescript": "latest",
+    "vite": "latest"
   },
   "browserslist": [
     "defaults"

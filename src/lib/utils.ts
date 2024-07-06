@@ -1,5 +1,5 @@
 import { html, render } from "lit";
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, subtitleContainer, subtitleTrack, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, superModal } from "./dom";
 import { removeFromCollection } from "./libraryUtils";
 import { blankImage, generateImageUrl, sqrThumb } from "./imageUtils";
 
@@ -13,7 +13,7 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (type: string, index: number | '' = '') => JSON.parse(index ? instanceSelector.options[index].value : instanceSelector.value)[type];
+export const getApi = (index: number | '' = '') => index ? instanceSelector.options[index].value : instanceSelector.value;
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -146,7 +146,7 @@ export function fetchList(url: string, mix = false) {
 
   loadingScreen.showModal();
 
-  fetch(getApi('piped') + url)
+  fetch(getApi() + url)
     .then(res => res.json())
     .then(group => {
       listContainer.innerHTML = '';
@@ -173,7 +173,7 @@ export function fetchList(url: string, mix = false) {
       if (!mix && token)
         setObserver(async () => {
           const data = await fetch(
-            getApi('piped') + '/nextpage/' +
+            getApi() + '/nextpage/' +
             url.substring(1) + '?nextpage=' + encodeURIComponent(token)
           )
             .then(res => res.json())
@@ -212,7 +212,9 @@ export function fetchList(url: string, mix = false) {
             .join('=')
             .substring(1)
         );
-        listContainer.dataset.url = url;
+        // replace string for youtube playlist link support
+        listContainer.dataset.url = url.replace('ts/', 't?list=');
+
         document.title = group.name + ' - ytify';
       }
     })
@@ -331,47 +333,3 @@ export function superClick(e: Event) {
 }
 
 
-export async function parseTTML() {
-
-  const imsc = await import('imsc/dist/imsc.all.min.js');
-
-  const myTrack = audio.textTracks[0];
-  myTrack.mode = "hidden";
-  const d = img.getBoundingClientRect();
-
-  subtitleContainer.style.top = Math.floor(d.y) + 'px';
-  subtitleContainer.style.left = Math.floor(d.x) + 'px';
-
-
-  fetch(subtitleTrack.src)
-    .then(res => res.text())
-    .then(text => {
-
-      const imscDoc = imsc.fromXML(text);
-      const timeEvents = imscDoc.getMediaTimeEvents();
-      const telen = timeEvents.length;
-
-      for (let i = 0; i < telen; i++) {
-        const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
-
-        myCue.onenter = () => {
-          const subtitleActive = subtitleContainer.firstChild;
-          if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive);
-          imsc.renderHTML(
-            imsc.generateISD(imscDoc, myCue.startTime),
-            subtitleContainer,
-            img,
-            Math.floor(d.height),
-            Math.floor(d.width)
-          );
-        }
-        myCue.onexit = () => {
-          const subtitleActive = subtitleContainer.firstChild;
-          if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive)
-        }
-        myTrack.addCue(myCue);
-      }
-    });
-}
