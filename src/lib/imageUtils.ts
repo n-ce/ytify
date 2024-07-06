@@ -13,9 +13,9 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 export const generateImageUrl = (
   id: string,
   res: string = 'mqdefault'
-) => id.startsWith('/') ?
-  `https://yt3.googleusercontent.com/${id}=s176-c-k-c0x00ffffff-no-rj` :
-  `https://i.ytimg.com/vi_webp/${id}/${res}.webp`;
+) => 'https://pipedproxy.r4fo.com/' + (id.startsWith('/') ?
+  `${id}=s176-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
+  `vi_webp/${id}/${res}.webp?host=i.ytimg.com`);
 
 // Square Image Generator 
 export function sqrThumb(canvasImg: HTMLImageElement) {
