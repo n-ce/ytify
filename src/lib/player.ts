@@ -45,7 +45,6 @@ bitrateSelector.addEventListener('change', () => {
 export default async function player(id: string | null = '') {
 
   if (!id) return;
-  console.log(instanceSelector, instanceSelector.value)
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
@@ -54,6 +53,11 @@ export default async function player(id: string | null = '') {
 
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
+    .then(res => {
+      if ('error' in res)
+        throw new Error(res.error)
+      else return res;
+    })
     .catch(err => {
       if (apiIndex < instanceSelector.length - 1) {
         notify(`switched playback instance from ${apiUrl} to ${getApi(apiIndex + 1)} due to error: ${err.message}`);
@@ -65,9 +69,6 @@ export default async function player(id: string | null = '') {
       playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
       instanceSelector.selectedIndex = 0;
     });
-
-  if (!data?.audioStreams?.length)
-    return notify('No audio streams available');
 
   const audioStreams = data.audioStreams
     .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
