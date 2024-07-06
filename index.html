@@ -273,10 +273,10 @@
         <option>Custom</option>
       </select>
 
-      <div id="act">
+      <div id="actionsContainer">
         <form netlify name="feedback" method="POST">
           <textarea name="->" id="netlifyForm"
-            placeholder="Anonymously enter your feedback (bugs, feature requests) here:"></textarea>
+            placeholder="Anonymously enter your feedback (bugs, feature requests) here:" required></textarea>
           <button type="submit">Submit Feedback</button>
 
           <button id="clearCacheBtn" type="button">Clear Caches</button>
@@ -296,6 +296,8 @@
           <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
 
           <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
+          
+          <a href="https://deploy-preview-193--ytify.netlify.app">Open v6.9 Lite (Old UI)</a>
         </form>
 
       </div>
@@ -366,7 +368,7 @@
     <i class="ri-loader-3-line"></i>
   </dialog>
 
-  <script src="/src/scripts/main.ts" type="module"></script>
+  <script src="/src/main.ts" type="module"></script>
 </body>
 
 </html>

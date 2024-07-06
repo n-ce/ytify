@@ -41,7 +41,7 @@ export const store: {
   // Hardcoded 
   imageProxy: 'https://pipedimg.adminforge.de',
   loadImage: localStorage.getItem('imgLoad') as 'off' | 'lazy' || 'eager',
-  linkHost: 'https://youtube.com',
+  linkHost: localStorage.getItem('linkHost') || location.origin,
   searchQuery: '',
   upcomingQuery: '',
   superCollectionType: 'featured'

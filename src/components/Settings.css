@@ -82,7 +82,7 @@
 
     >p {
       text-align: right;
-      margin: 3%;
+      margin: 1ch;
       padding: 1vmin;
       background: linear-gradient(to right, transparent, var(--onBg));
       border-radius: var(--roundness);

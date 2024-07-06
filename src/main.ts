@@ -1,24 +1,24 @@
-import '../stylesheets/global.css';
-import './router';
-import './theme';
-import './api';
-import './search';
-import './superModal';
-import './queue';
-import './list';
-import './audioEvents';
-import './miniPlayer';
-import './library';
-import { instanceSelector } from '../lib/dom';
+import './stylesheets/global.css';
+import './scripts/router';
+import './scripts/theme';
+import './scripts/api';
+import './scripts/search';
+import './scripts/superModal';
+import './scripts/queue';
+import './scripts/list';
+import './scripts/audioEvents';
+import './scripts/miniPlayer';
+import './scripts/library';
+import { instanceSelector } from './lib/dom';
 import { render } from 'solid-js/web';
-import Settings from "../components/Settings";
+import Settings from "./components/Settings";
 
 if (import.meta.env.PROD)
 
   import('virtual:pwa-register').then(pwa => {
     const handleUpdate = pwa.registerSW({
       onNeedRefresh() {
-        import('../components/UpdatePrompt').then(mod =>
+        import('./components/UpdatePrompt').then(mod =>
           render(() => mod.default(handleUpdate),
             document.body
           ));
@@ -36,6 +36,6 @@ const settingsContainer = document.getElementById('settings') as HTMLDivElement;
 render(Settings, settingsContainer);
 
 // render appends Settings after act so we append act after Settings
-settingsContainer.appendChild(document.getElementById('act')!);
+settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 // insert the instance selector inside the component area
-document.getElementById('isc')!.appendChild(instanceSelector);
+document.getElementById('instanceSelectorContainer')!.appendChild(instanceSelector);
