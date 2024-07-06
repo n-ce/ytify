@@ -16,7 +16,6 @@ const historySwitch = <HTMLElement>document.getElementById('historySwitch');
 const historyContainer = <HTMLDetailsElement>document.getElementById('history');
 const reverseNavSwitch = <HTMLElement>document.getElementById('reverseNavSwitch');
 const fullscreenSwitch = <HTMLElement>document.getElementById('fullscreenSwitch');
-const clearCacheBtn = <HTMLButtonElement>document.getElementById('clearCacheBtn');
 const restoreSettingsBtn = <HTMLButtonElement>document.getElementById('restoreSettingsBtn');
 
 export { ytmPlsSwitch };
@@ -182,11 +181,6 @@ fullscreenSwitch.addEventListener('click', () => {
 
 /////////////////////////////////////////////////////////////
 
-clearCacheBtn.addEventListener('click', () => {
-  self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-  navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-  location.reload();
-});
 
 restoreSettingsBtn.addEventListener('click', () => {
   const temp = getSaved('library');
@@ -201,6 +195,5 @@ restoreSettingsBtn.addEventListener('click', () => {
 // emergency use
 if (location.search === '?reset') {
   history.replaceState({}, '', location.pathname);
-  clearCacheBtn.click();
   restoreSettingsBtn.click();
 }
