@@ -17,5 +17,5 @@
 - [Five](https://deploy-preview-60--ytify.netlify.app/)
 - [Five.final](https://deploy-preview-118--ytify.netlify.app/)
 - [Six.beta](https://deploy-preview-124--ytify.netlify.app/)
-- [Six.Final](https://deploy-preview-191--ytify.netlify.app)
+- [Six.lite](https://deploy-preview-193--ytify.netlify.app)
 - [Seven](https://deploy-preview-187--ytify.netlify.app)
