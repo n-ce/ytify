@@ -13,7 +13,7 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 export const generateImageUrl = (
   id: string,
   res: string = 'mqdefault'
-) => 'https://wsrv.nl/' + (id.startsWith('/') ?
+) => 'https://wsrv.nl?url=' + (id.startsWith('/') ?
   `yt3.googleusercontent.com${id}=s176-c-k-c0x00ffffff-no-rj` :
   `i.ytimg.com/vi_webp/${id}/${res}.webp`);
 
