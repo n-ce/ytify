@@ -154,7 +154,7 @@ export default async function player(id: string | null = '') {
 
   // fallback for custom instances which do not support unified instance architecture
 
-  if (apiIndex > -1 /* && !store.player.HLS */)
+  if (apiIndex > -1 && !store.player.HLS)
     return import('./player.invidious').then(player => player.default(id));
 
   const apiUrl = store.api[apiIndex].piped;
