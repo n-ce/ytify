@@ -1,4 +1,4 @@
-import { $, getApi, getSaved, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
+import { $, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
@@ -7,7 +7,7 @@ import StreamItem from "../components/StreamItem";
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
-export const getDB = (): Library => JSON.parse(getSaved('library') || '{"discover":{}}');
+export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{"discover":{}}');
 
 export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 
@@ -15,6 +15,7 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 
 export function removeFromCollection(collection: string, id: string) {
+
   const db = getDB();
   delete db[collection][id];
   const item = listContainer.querySelector(`[data-id="${id}"]`) as HTMLAnchorElement;
@@ -64,14 +65,15 @@ function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStr
 
   for (const item in data) {
     const d = data[item];
-    render(() => StreamItem({
-      id: d.id || '',
-      href: hostResolver(`/watch?v=${d.id}`),
-      title: d.title || '',
-      author: d.author || '',
-      duration: d.duration || '',
-      channelUrl: d.channelUrl || ''
-    }), fragment);
+    if (d.id)
+      render(() => StreamItem({
+        id: d.id || '',
+        href: hostResolver(`/watch?v=${d.id}`),
+        title: d.title || '',
+        author: d.author || '',
+        duration: d.duration || '',
+        channelUrl: d.channelUrl || ''
+      }), fragment);
   }
 }
 
@@ -87,6 +89,8 @@ export async function fetchCollection(collection: string | null, shareId: string
       for (const i in data)
         if (data[i].frequency as number < 2)
           delete db.discover[i];
+
+    saveDB(db);
 
     renderDataIntoFragment(data, fragment);
 
@@ -131,7 +135,7 @@ export async function fetchCollection(collection: string | null, shareId: string
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    (collection ? ('?collection=' + collection) : ('?shareId=' + shareId)));
+    (collection ? ('?collection=' + collection) : ('?si=' + shareId)));
   document.title = (collection || 'Shared Playlist') + ' - ytify';
 }
 

@@ -1,4 +1,3 @@
-import { store } from "../store";
 import { canvas, context, img } from "./dom";
 
 
@@ -10,9 +9,10 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 export const generateImageUrl = (
   id: string,
   res: string = 'mq'
-) => store.imageProxy + (id.startsWith('/') ?
-  `${id}=s${res === 'maxres' ? 720 : 176}-c-k-c0x00ffffff-no-rj?host=yt3.googleusercontent.com` :
-  `/vi_webp/${id}/${res}default.webp?host=i.ytimg.com`);
+) => 'https://wsrv.nl?url=' + (id.startsWith('/') ?
+  `yt3.googleusercontent.com${id}=s176-c-k-c0x00ffffff-no-rj` :
+  `i.ytimg.com/vi_webp/${id}/${res}default.webp`);
+
 
 // Square Image Generator 
 export function sqrThumb(src: string): Promise<string> {

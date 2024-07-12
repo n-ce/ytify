@@ -4,31 +4,32 @@ import { hostResolver, notify } from '../lib/utils';
 import { addListToCollection, createPlaylist, getDB, reservedCollections, saveDB, toCollection } from '../lib/libraryUtils';
 import { atpSelector } from './superModal';
 import { getThumbIdFromLink } from '../lib/imageUtils';
+import { store } from '../store';
 
 
 
 function subscribeList(db: Library) {
 
-  const lcd = <{ [index: string]: string }>listContainer.dataset;
+  const l = store.list;
 
   const state = ['Subscribe', 'Subscribed'];
   const dom = subscribeListBtn.innerHTML;
 
   if (dom.includes(state[1])) {
-    delete db[lcd.type][lcd.id];
+    delete db[l.type][l.id];
     state.reverse();
   }
   else {
     const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
-      id: lcd.id,
-      name: lcd.name,
-      thumbnail: getThumbIdFromLink(lcd.thumbnail)
+      id: l.id,
+      name: l.name,
+      thumbnail: getThumbIdFromLink(l.thumbnail)
     };
 
-    if (lcd.type === 'playlists')
-      dataset.uploader = lcd.uploader;
+    if (l.type === 'playlists')
+      dataset.uploader = l.uploader;
 
-    toCollection(lcd.type, dataset, db);
+    toCollection(l.type, dataset, db);
   }
   subscribeListBtn.innerHTML = dom.replace(state[0], state[1]);
   saveDB(db);
@@ -56,14 +57,14 @@ listBtnsContainer.addEventListener('click', e => {
     subscribeList(db);
 
   else if (btn === openInYtBtn)
-    open(hostResolver(<string>listContainer.dataset.url));
+    open(hostResolver(<string>store.list.url));
 
   else if (btn === removeFromListBtn) {
     listContainer.querySelectorAll('.streamItem').forEach(e => e.classList.toggle('delete'));
     removeFromListBtn.classList.toggle('delete');
   }
   else if (btn === importListBtn) {
-    const listTitle = prompt('Set Title', <string>openInYtBtn.textContent?.substring(1));
+    const listTitle = prompt('Set Title', store.list.name);
 
     if (!listTitle) return;
 
@@ -116,7 +117,7 @@ listBtnsContainer.addEventListener('click', e => {
     }
     const shareId = Object.keys(db[id]).join('');
 
-    const text = location.origin + location.pathname + '?shareId=' + shareId;
+    const text = location.origin + location.pathname + '?si=' + shareId;
 
     const type = "text/plain";
     const blob = new Blob([text], { type });

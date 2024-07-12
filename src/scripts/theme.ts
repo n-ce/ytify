@@ -1,6 +1,6 @@
-import { canvas, context, audio } from "../lib/dom";
+import { canvas, context } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
-import { getSaved, params } from "../lib/utils";
+import { store, getSaved } from "../store";
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
@@ -23,11 +23,11 @@ const accentLightener = (r: number, g: number, b: number) => {
         : 4 + (r - g) / s
     : 0;
 
-  const saturation =
-    100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
+  const hue = 60 * h < 0 ? 60 * h + 360 : 60 * h;
+  const saturation = 100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
   return `hsl(
-    ${60 * h < 0 ? 60 * h + 360 : 60 * h},
-    ${saturation}%,
+    ${Math.floor(hue)},
+    ${Math.floor(saturation)}%,
     ${80}%)`;
 }
 
@@ -104,9 +104,8 @@ function colorInjector(colorArray: number[]) {
 
 
 function themer() {
-  const id = audio.dataset.id || params.get('s');
 
-  if (!id) {
+  if (!store.stream.id) {
     // intentional otherwise too fast to detect localStorage changes from events
     setTimeout(() => colorInjector([127, 127, 127]));
     return;
@@ -142,7 +141,7 @@ function themer() {
 
   }
   canvasImg.crossOrigin = '';
-  const temp = generateImageUrl(id);
+  const temp = generateImageUrl(store.stream.id);
   if (canvasImg.src !== temp) canvasImg.src = temp;
 
 

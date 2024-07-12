@@ -1,10 +1,10 @@
-import { getSaved, goTo, removeSaved, save } from "../lib/utils";
+import { goTo, removeSaved, save } from "../lib/utils";
 import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
 import Sortable, { SortableEvent } from "sortablejs";
-import { store } from "../store";
+import { store, getSaved } from "../store";
 
 const queueArray: string[] = [];
 

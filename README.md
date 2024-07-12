@@ -11,6 +11,8 @@
 
 > [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
+> As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018
+
 ## What else are you getting ?
 - **Queue** 🚦:
   - Add multiple streams to keep your audio streams going.

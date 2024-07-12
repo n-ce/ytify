@@ -5,15 +5,12 @@ import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import player from "./player";
-import { store } from "../store";
+import { params, store } from "../store";
 
-export const params = (new URL(location.href)).searchParams;
 
 export const $ = document.createElement.bind(document);
 
 export const save = localStorage.setItem.bind(localStorage);
-
-export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
@@ -40,6 +37,16 @@ export const hostResolver = (url: string) =>
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
     ('/list?' + url.slice(1).split('/').join('=')) : url);
+
+export async function quickSwitch() {
+  if (!store.stream.id) return;
+  if (store.player.playbackState === 'playing')
+    audio.pause();
+  const timeOfSwitch = audio.currentTime;
+  await player(store.stream.id);
+  audio.currentTime = timeOfSwitch;
+  audio.play();
+}
 
 export function notify(text: string) {
   const el = $('p');
@@ -106,7 +113,7 @@ export async function setMetaData(
     superModal.showModal();
     history.pushState({}, '', '#');
     const s = superModal.dataset;
-    const a = audio.dataset;
+    const a = store.stream;
     s.id = a.id;
     s.title = a.title;
     s.author = a.author;
@@ -204,22 +211,25 @@ export async function fetchList(url: string | undefined, mix = false) {
 
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
 
-  const lcd = listContainer.dataset;
-  lcd.url = url;
-  lcd.type = type + 's';
-  lcd.name = group.name;
-  lcd.id = url.slice(type === 'playlist' ? 11 : 9);
-  lcd.uploader = group.uploader || group.name;
-  lcd.thumbnail = lcd.thumbnail?.startsWith(url) ? lcd.thumbnail.slice(url.length) :
+  store.list.name = group.name;
+  store.list.url = url;
+  store.list.type = type + 's';
+  store.list.id = url.slice(type === 'playlist' ? 11 : 9);
+  store.list.uploader = group.uploader || group.name;
+  store.list.thumbnail = store.list.thumbnail?.startsWith(url) ? store.list.thumbnail.slice(url.length) :
     group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
 
   const db = Object(getDB());
 
-  subscribeListBtn.innerHTML = `<i class="ri-stack-line"></i> Subscribe${db.hasOwnProperty(lcd.type) && db[lcd.type].hasOwnProperty(lcd.id) ? 'd' : ''
+  subscribeListBtn.innerHTML = `<i class="ri-stack-line"></i> Subscribe${db.hasOwnProperty(store.list.type) && db[store.list.type].hasOwnProperty(store.list.id) ? 'd' : ''
     }`;
 
   if (mix) playAllBtn.click();
   else {
+    // replace string for youtube playlist link support
+    store.list.url = url.replace('ts/', 't?list=');
+    document.title = group.name + ' - ytify';
+
     history.replaceState({}, '',
       location.origin + location.pathname +
       '?' + url
@@ -228,9 +238,6 @@ export async function fetchList(url: string | undefined, mix = false) {
         .substring(1)
     );
 
-    // replace string for youtube playlist link support
-    listContainer.dataset.url = url.replace('ts/', 't?list=');
-    document.title = group.name + ' - ytify';
   }
 
 }
@@ -252,15 +259,15 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
 
   const streamItem = (stream: StreamItem) => StreamItem({
-    id: stream.videoId || stream.url.substring(9),
-    href: hostResolver(stream.url || 'https://youtu.be/' + stream.videoId),
+    id: stream.url.substring(9),
+    href: hostResolver(stream.url),
     title: stream.title,
-    author: stream.uploaderName || stream.author,
-    duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
-    uploaded: stream.uploadedDate || stream.publishedText,
-    channelUrl: stream.uploaderUrl || stream.authorUrl,
-    views: stream.viewCountText || (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    img: getThumbIdFromLink(stream.thumbnail || 'https://i.ytimg.com/vi_webp/' + stream.videoId + '/mqdefault.webp?host=i.ytimg.com')
+    author: stream.uploaderName,
+    duration: stream.duration > 0 ? convertSStoHHMMSS(stream.duration) : 'LIVE',
+    uploaded: stream.uploadedDate,
+    channelUrl: stream.uploaderUrl,
+    views: stream.views > 0 ? numFormatter(stream.views) + ' views' : '',
+    img: getThumbIdFromLink(stream.thumbnail)
   })
 
   const listItem = (item: StreamItem) => ListItem(
@@ -279,7 +286,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const fragment = document.createDocumentFragment();
   for (const item of itemsArray)
-    render(() => (item.type === 'stream' || item.type === 'video') ? streamItem(item) : listItem(item), fragment);
+    render(() => item.type === 'stream' ? streamItem(item) : listItem(item), fragment);
 
 
   return fragment;
@@ -316,7 +323,7 @@ export function superClick(e: Event) {
     if (!url.startsWith('/channel'))
       url = url.replace('?list=', 's/')
     fetchList(url);
-    listContainer.dataset.thumbnail = url + eld.thumbnail;
+    store.list.thumbnail = url + eld.thumbnail;
   }
 }
 

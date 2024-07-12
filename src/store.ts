@@ -1,31 +1,42 @@
+export const params = (new URL(location.href)).searchParams;
+
+export const getSaved = localStorage.getItem.bind(localStorage);
+
 export const store: {
   player: {
     playbackState: 'none' | 'playing' | 'paused',
     HLS: boolean,
     codec: 'any' | 'opus' | 'aac',
-    hq: boolean,
-
+    hq: boolean
   },
+  stream: Record<'id' | 'title' | 'author' | 'duration' | 'channelUrl', string>,
   theme: {
     scheme: 'auto' | 'light' | 'dark',
     highContrast: boolean,
     roundness: 'none' | '2vmin' | '4vmin' | '8vmin'
   },
   api: Record<'name' | 'piped' | 'invidious', string>[],
-  imageProxy: string,
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
   searchQuery: string,
   upcomingQuery: string,
-  superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists'
+  superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
+  list: Record<'name' | 'url' | 'type' | 'id' | 'uploader' | 'thumbnail', string>
 } = {
   player: {
     playbackState: 'none',
-    HLS: Boolean(localStorage.getItem('HLS')),
+    HLS: Boolean(getSaved('HLS')),
     codec: 'opus',
-    hq: false
-
+    hq: false,
   },
+  stream: {
+    id: params.get('s') || '',
+    title: '',
+    author: '',
+    duration: '',
+    channelUrl: ''
+  },
+
   theme: {
     scheme: 'auto',
     highContrast: false,
@@ -38,12 +49,18 @@ export const store: {
       invidious: 'https://invidious.fdn.fr'
     }
   ],
-  // Hardcoded 
-  imageProxy: 'https://pipedimg.adminforge.de',
-  loadImage: localStorage.getItem('imgLoad') as 'off' | 'lazy' || 'eager',
-  linkHost: localStorage.getItem('linkHost') || location.origin,
+  loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
+  linkHost: getSaved('linkHost') || location.origin,
   searchQuery: '',
   upcomingQuery: '',
-  superCollectionType: 'featured'
+  superCollectionType: 'featured',
+  list: {
+    name: '',
+    url: '',
+    type: '',
+    id: '',
+    uploader: '',
+    thumbnail: ''
+  }
 }
 

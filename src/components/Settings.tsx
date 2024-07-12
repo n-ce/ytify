@@ -1,14 +1,11 @@
 import './Settings.css';
-import { Show, onMount } from "solid-js";
-import type { JSXElement } from "solid-js";
+import { Show, onMount, JSXElement } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import player from "../lib/player";
-import { $, getSaved, removeSaved, save, supportsOpus } from "../lib/utils";
+import { $, quickSwitch, removeSaved, save, supportsOpus } from "../lib/utils";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
-import { store } from '../store';
-
+import { store, getSaved } from '../store';
 
 
 
@@ -177,10 +174,7 @@ export default function Settings() {
                 removeSaved('hq') :
                 save('hq', 'true');
 
-              const timeOfSwitch = audio.currentTime;
-              await player(audio.dataset.id);
-              audio.currentTime = timeOfSwitch;
-
+              quickSwitch();
             }}
           />
 
@@ -194,11 +188,8 @@ export default function Settings() {
                 save('codec', String(i)) :
                 removeSaved('codec');
 
-              if (audio.dataset.playbackState === 'playing')
-                audio.pause();
-              const timeOfSwitch = audio.currentTime;
-              await player(audio.dataset.id);
-              audio.currentTime = timeOfSwitch;
+              quickSwitch();
+
             }}
             onMount={(target) => {
               const codecSaved = getSaved('codec');
@@ -222,8 +213,23 @@ export default function Settings() {
               getSaved('enforceProxy') ?
                 removeSaved('enforceProxy') :
                 save('enforceProxy', 'true');
+              quickSwitch();
             }}
           />
+
+          <ToggleSwitch
+            id="useInvidiousProxySwitch"
+            name='Proxy Via Invidious'
+            checked={!getSaved('proxyViaInvidious')}
+            onClick={async () => {
+              getSaved('proxyViaInvidious') ?
+                removeSaved('proxyViaInvidious') :
+                save('proxyViaInvidious', 'false');
+
+              quickSwitch();
+            }}
+          />
+
         </Show>
 
         <ToggleSwitch

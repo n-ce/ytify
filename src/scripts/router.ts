@@ -1,7 +1,7 @@
-import { audio, loadingScreen, searchFilters, superInput, superModal, ytifyIcon } from "../lib/dom";
+import { loadingScreen, searchFilters, superInput, superModal, ytifyIcon } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
-import { fetchList, getSaved, goTo, params } from "../lib/utils";
-import { store } from "../store";
+import { fetchList, goTo } from "../lib/utils";
+import { getSaved, params, store } from "../store";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
 
@@ -79,7 +79,7 @@ nav.addEventListener('click', (e: Event) => {
     );
 
     const routeName = anchor.lastElementChild?.textContent;
-    const homeTitle = audio.dataset.title || 'Home';
+    const homeTitle = store.stream.title || 'Home';
     document.title = (
       inHome ? homeTitle : routeName
     ) + ' - ytify';
@@ -97,7 +97,7 @@ if (errorParam) {
     route = _[0];
     const query = encodeURI(_[1]);
     if (route === '/list')
-      query.startsWith('shareId') ?
+      query.startsWith('si') ?
         fetchCollection('', query.split('=')[1]) :
         fetchList('/' + query.split('=').join('/'));
     if (route === '/search') {

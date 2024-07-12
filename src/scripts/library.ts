@@ -1,6 +1,7 @@
-import { audio, favButton, favIcon, superCollectionSelector } from "../lib/dom";
+import { favButton, favIcon, superCollectionSelector } from "../lib/dom";
 import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
-import { $, convertSStoHHMMSS, getSaved, notify, params, removeSaved, save, superClick } from "../lib/utils";
+import { $, convertSStoHHMMSS, notify, removeSaved, save, superClick } from "../lib/utils";
+import { getSaved, params, store } from "../store";
 
 
 
@@ -43,11 +44,10 @@ cleanBtn.addEventListener('click', () => {
 // favorites button & data
 
 favButton.addEventListener('click', () => {
-  const id = audio.dataset.id;
-  if (!id) return;
+  if (store.stream.id) return;
   favButton.checked ?
-    addToCollection('favorites', audio.dataset) :
-    removeFromCollection('favorites', id);
+    addToCollection('favorites', store.stream) :
+    removeFromCollection('favorites', store.stream.id);
 
   favIcon.classList.toggle('ri-heart-fill');
 });
@@ -93,8 +93,8 @@ addEventListener('DOMContentLoaded', () => {
     if (!reservedCollections.includes(key))
       createPlaylist(key);
 
-  if (params.has('collection') || params.has('shareId'))
-    fetchCollection(params.get('collection'), params.get('shareId'));
+  if (params.has('collection') || params.has('si'))
+    fetchCollection(params.get('collection'), params.get('si'));
 });
 
 

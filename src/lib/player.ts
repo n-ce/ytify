@@ -1,8 +1,8 @@
 import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, instanceSelector } from "./dom";
-import { convertSStoHHMMSS, notify, params, parseTTML, setMetaData, getApi, getSaved, goTo } from "./utils";
+import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
-import { store } from "../store";
+import { params, store, getSaved } from "../store";
 import type Hls from "hls.js";
 
 
@@ -72,9 +72,8 @@ function setAudioStreams(audioStreams: {
   bitrate: string,
   contentLength: number,
   mimeType: string,
-}[], isMusic = false, isLive = false) {
+}[], isMusic = false, isLive = false, isCustomInstance = false) {
 
-  const ivApi = getApi('invidious');
   const preferedCodec = store.player.codec;
   const noOfBitrates = audioStreams.length;
   let index = -1;
@@ -90,13 +89,15 @@ function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
+    const proxyViaPiped = isCustomInstance || (getSaved('proxyViaInvidious') === 'false');
+    const useProxy = isMusic || getSaved('enforceProxy');
+
+    // use the default proxy url
+    if (proxyViaPiped && useProxy) return url;
 
     const oldUrl = new URL(url);
 
-    const useProxy = isMusic || getSaved('enforceProxy');
-
-    // only proxy music streams
-    const host = useProxy ? ivApi : `https://${oldUrl.searchParams.get('host')}`;
+    const host = useProxy ? getApi('invidious') : `https://${oldUrl.searchParams.get('host')}`;
 
     return url.replace(oldUrl.origin, host);
   }
@@ -151,14 +152,7 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const apiIndex = instanceSelector.selectedIndex;
-
-  // fallback for custom instances which do not support unified instance architecture
-
-  if (apiIndex > -1 && !store.player.HLS)
-    return import('./player.invidious').then(player => player.default(id));
-
   const apiUrl = store.api[apiIndex].piped;
-
   const data = await fetch(apiUrl + '/streams/' + id)
     .then(res => res.json())
     .then(res => {
@@ -179,11 +173,11 @@ export default async function player(id: string | null = '') {
     });
 
 
-  audio.dataset.id = id;
-  audio.dataset.title = data.title;
-  audio.dataset.author = data.uploader;
-  audio.dataset.duration = convertSStoHHMMSS(data.duration);
-  audio.dataset.channelUrl = data.uploaderUrl;
+  store.stream.id = id;
+  store.stream.title = data.title;
+  store.stream.author = data.uploader;
+  store.stream.duration = convertSStoHHMMSS(data.duration);
+  store.stream.channelUrl = data.uploaderUrl;
 
 
   // remove ' - Topic' from name if it exists
@@ -208,7 +202,8 @@ export default async function player(id: string | null = '') {
         (a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate)
       ),
       data.category === 'Music',
-      data.livestream
+      data.livestream,
+      apiIndex === 0
     );
 
   setSubtitles(data.subtitles);
@@ -242,7 +237,7 @@ export default async function player(id: string | null = '') {
   // related streams data injection as discovery data after 10 seconds
 
   setTimeout(() => {
-    if (id !== audio.dataset.id) return;
+    if (id !== store.stream.id) return;
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
