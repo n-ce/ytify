@@ -256,18 +256,16 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
-
-
   const streamItem = (stream: StreamItem) => StreamItem({
-    id: stream.url.substring(9),
-    href: hostResolver(stream.url),
+    id: stream.videoId || stream.url.substring(9),
+    href: hostResolver(stream.url || 'https://youtu.be/' + stream.videoId),
     title: stream.title,
-    author: stream.uploaderName,
-    duration: stream.duration > 0 ? convertSStoHHMMSS(stream.duration) : 'LIVE',
-    uploaded: stream.uploadedDate,
-    channelUrl: stream.uploaderUrl,
-    views: stream.views > 0 ? numFormatter(stream.views) + ' views' : '',
-    img: getThumbIdFromLink(stream.thumbnail)
+    author: stream.uploaderName || stream.author,
+    duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
+    uploaded: stream.uploadedDate || stream.publishedText,
+    channelUrl: stream.uploaderUrl || stream.authorUrl,
+    views: stream.viewCountText || (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
+    img: getThumbIdFromLink(stream.thumbnail || 'https://i.ytimg.com/vi_webp/' + stream.videoId + '/mqdefault.webp?host=i.ytimg.com')
   })
 
   const listItem = (item: StreamItem) => ListItem(
@@ -286,7 +284,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const fragment = document.createDocumentFragment();
   for (const item of itemsArray)
-    render(() => item.type === 'stream' ? streamItem(item) : listItem(item), fragment);
+    render(() => (item.type === 'stream' || item.type === 'video') ? streamItem(item) : listItem(item), fragment);
 
 
   return fragment;
