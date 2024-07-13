@@ -2,6 +2,7 @@ import { superModal } from "../lib/dom";
 import { createPlaylist, addToCollection } from "../lib/libraryUtils";
 
 import { $, fetchList, notify } from "../lib/utils";
+import { store } from "../store";
 import { appendToQueuelist } from "./queue";
 
 const superModalList = <HTMLUListElement>superModal.firstElementChild;
@@ -56,7 +57,7 @@ atpSelector.addEventListener('change', () => {
 
 downloadBtn.addEventListener('click', () => {
   superModal.click();
-  const provider = 'https://co.wuk.sh/api/json';
+  const provider = 'https://api.cobalt.tools/api/json';
   const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
   fetch(provider, {
     method: 'POST',
@@ -64,6 +65,7 @@ downloadBtn.addEventListener('click', () => {
     body: JSON.stringify({
       url: streamUrl,
       isAudioOnly: true,
+      aFormat: store.player.supportsOpus ? 'opus' : 'mp3',
       filenamePattern: 'basic'
     })
   })

@@ -2,7 +2,7 @@ import './Settings.css';
 import { Show, onMount, JSXElement } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { $, quickSwitch, removeSaved, save, supportsOpus } from "../lib/utils";
+import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
 import { store, getSaved } from '../store';
@@ -37,7 +37,7 @@ function ToggleSwitch(props: {
 function Selector(props: {
   label: string,
   id: string,
-  onChange: (e: Event) => void,
+  onChange: (e: { target: HTMLSelectElement }) => void,
   onMount: (target: HTMLSelectElement) => void,
   children: JSXElement
 }) {
@@ -76,10 +76,9 @@ export default function Settings() {
           id='linkHost'
           label='Links Host'
           onChange={(e) => {
-            const lh = e.target as HTMLSelectElement;
-            lh.selectedIndex === 0 ?
+            e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
-              save('linkHost', lh.value);
+              save('linkHost', e.target.value);
             location.reload();
 
           }}
@@ -100,7 +99,7 @@ export default function Settings() {
           label='Image Loading'
           id='imgLoad'
           onChange={(e) => {
-            const val = (e.target as HTMLSelectElement).value;
+            const val = e.target.value;
             val === 'eager' ?
               removeSaved('imgLoad') :
               save('imgLoad', val);
@@ -163,41 +162,44 @@ export default function Settings() {
           <p>Playback</p>
         </b>
 
+        <ToggleSwitch
+          id="qualitySwitch"
+          name='Highest Quality Audio'
+          checked={getSaved('hq') === 'true'}
+          onClick={async () => {
+            getSaved('hq') ?
+              removeSaved('hq') :
+              save('hq', 'true');
+
+            store.player.hq = !store.player.hq;
+
+            quickSwitch();
+          }}
+        />
+
         <Show when={!store.player.HLS}>
-
-          <ToggleSwitch
-            id="qualitySwitch"
-            name='Highest Quality Audio'
-            checked={getSaved('hq') === 'true'}
-            onClick={async () => {
-              getSaved('hq') ?
-                removeSaved('hq') :
-                save('hq', 'true');
-
-              quickSwitch();
-            }}
-          />
 
           <Selector
             label='Codec Preference'
             id='codecPreference'
             onChange={async (e) => {
 
-              const i = (e.target as HTMLSelectElement).selectedIndex;
+              const i = e.target.selectedIndex;
               i ?
                 save('codec', String(i)) :
                 removeSaved('codec');
 
+              store.player.codec = e.target.value as 'any';
               quickSwitch();
 
             }}
             onMount={(target) => {
               const codecSaved = getSaved('codec');
-              setTimeout(async () => {
-                target.selectedIndex = codecSaved ?
-                  parseInt(codecSaved) :
-                  (await supportsOpus() ? 0 : 1)
-              });
+              target.selectedIndex = codecSaved ?
+                parseInt(codecSaved) :
+                (store.player.supportsOpus ? 0 : 1)
+
+              store.player.codec = target.value as 'any';
             }}
           >
             <option value="opus">Opus</option>
@@ -315,11 +317,10 @@ export default function Settings() {
           label='Roundness'
           id='roundnessChanger'
           onChange={(e) => {
-            const rc = e.target as HTMLSelectElement;
-            cssVar('--roundness', rc.value);
-            rc.value === '2vmin' ?
+            cssVar('--roundness', e.target.value);
+            e.target.value === '2vmin' ?
               removeSaved('roundness') :
-              save('roundness', rc.value)
+              save('roundness', e.target.value)
           }}
           onMount={(target) => {
             if (getSaved('roundness')) {
@@ -338,11 +339,10 @@ export default function Settings() {
           label='Theming Scheme'
           id='themeSelector'
           onChange={(e) => {
-            const ts = e.target as HTMLSelectElement;
             themer();
-            ts.value === 'auto' ?
+            e.target.value === 'auto' ?
               removeSaved('theme') :
-              save('theme', ts.value);
+              save('theme', e.target.value);
           }}
           onMount={(target) => {
             target.value = (getSaved('theme') as 'light' | 'dark') || 'auto';

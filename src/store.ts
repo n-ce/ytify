@@ -1,3 +1,4 @@
+
 export const params = (new URL(location.href)).searchParams;
 
 export const getSaved = localStorage.getItem.bind(localStorage);
@@ -6,8 +7,9 @@ export const store: {
   player: {
     playbackState: 'none' | 'playing' | 'paused',
     HLS: boolean,
-    codec: 'any' | 'opus' | 'aac',
-    hq: boolean
+    hq: boolean,
+    codec: 'opus' | 'aac' | 'any'
+    supportsOpus: boolean
   },
   stream: Record<'id' | 'title' | 'author' | 'duration' | 'channelUrl', string>,
   theme: {
@@ -26,8 +28,14 @@ export const store: {
   player: {
     playbackState: 'none',
     HLS: Boolean(getSaved('HLS')),
+    hq: Boolean(getSaved('hq')),
     codec: 'opus',
-    hq: false,
+    supportsOpus: await navigator.mediaCapabilities.decodingInfo({
+      type: 'file',
+      audio: {
+        contentType: 'audio/ogg;codecs=opus'
+      }
+    }).then(res => res.supported)
   },
   stream: {
     id: params.get('s') || '',

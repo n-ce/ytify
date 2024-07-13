@@ -25,13 +25,6 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
-export const supportsOpus = (): Promise<boolean> => navigator.mediaCapabilities.decodingInfo({
-  type: 'file',
-  audio: {
-    contentType: 'audio/ogg;codecs=opus'
-  }
-}).then(res => res.supported);
-
 export const hostResolver = (url: string) =>
   store.linkHost + (store.linkHost.includes('ytify') ? url.
     startsWith('/watch') ?
@@ -155,6 +148,10 @@ export async function fetchList(url: string | undefined, mix = false) {
       instanceSelector.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
+
+  if (!group.relatedStreams.length)
+    return notify('No Data Found');
+
 
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');

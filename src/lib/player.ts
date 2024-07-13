@@ -20,7 +20,8 @@ addEventListener('DOMContentLoaded', async () => {
       hls = new mod.default();
       hls.attachMedia(audio);
       hls.on(mod.default.Events.MANIFEST_PARSED, () => {
-        hls.currentLevel = 0;
+        hls.currentLevel = store.player.hq ?
+          hls.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
         audio.play();
       });
       hls.on(mod.default.Events.ERROR, (e, d) => {
@@ -72,7 +73,10 @@ function setAudioStreams(audioStreams: {
   bitrate: string,
   contentLength: number,
   mimeType: string,
-}[], isMusic = false, isLive = false, isCustomInstance = false) {
+}[],
+  isMusic = false,
+  isLive = false,
+  isCustomInstance = false) {
 
   const preferedCodec = store.player.codec;
   const noOfBitrates = audioStreams.length;
@@ -113,7 +117,7 @@ function setAudioStreams(audioStreams: {
     (<HTMLOptionElement>bitrateSelector?.lastElementChild).dataset.type = _.mimeType;
     // find preferred bitrate
     const codecPref = preferedCodec ? codec === preferedCodec : true;
-    const hqPref = getSaved('hq') ? noOfBitrates : 0;
+    const hqPref = store.player.hq ? noOfBitrates : 0;
     if (codecPref && index < hqPref) index = i;
   });
 
@@ -172,6 +176,11 @@ export default async function player(id: string | null = '') {
       instanceSelector.selectedIndex = 1;
     });
 
+  if (!data) {
+    notify('Fetching failed no data received, Retrying...');
+    await player(id);
+    return;
+  }
 
   store.stream.id = id;
   store.stream.title = data.title;

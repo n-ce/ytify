@@ -47,7 +47,7 @@ https://ytify.netlify.app is the only official location that the main branch is 
 [@ytify](https://matrix.to/#/!ytify:matrix.org)
 
 ## Privacy Policy 👁️
-> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this. Everything else remains on your device only, which can also be cleared anytime.(Library>Clean, Settings>Restore Settings,Clear Caches)
+> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this. Everything else remains on your device only, which can also be cleared anytime.(Library>Clean, Settings>Restore Settings,Clear Caches). Why collect data? I do not possess a multitude of devices, the analytics help me figure out which devices are suffering from incompatibility or if a failed update has been made or if some API instance has stopped working.
 
 ## License 📝
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
@@ -79,10 +79,12 @@ npm run dev -- --open
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
  
 ## Acknowledgements 🙏
-- [Piped](https://github.com/teampiped/piped) - YouTube Data API, Image Proxy & Adaptive Streaming Playback Proxy
-- [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Playback Proxy
+- [Piped](https://github.com/teampiped/piped) - YouTube Data API & Adaptive Streaming Proxy
+- [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Proxy
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
+- [wsrv](https://wsrv.nl) - Image Proxy Provider
 - [Solid](https://github.com/solidjs/solid) - Delightful JSX Library
+- [HLS.js](https://github.com/video-dev/hls.js) - HLS Support Library
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms, Edge Functions
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
 - [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
