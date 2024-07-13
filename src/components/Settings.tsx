@@ -193,11 +193,11 @@ export default function Settings() {
               quickSwitch();
 
             }}
-            onMount={(target) => {
+            onMount={async (target) => {
               const codecSaved = getSaved('codec');
               target.selectedIndex = codecSaved ?
                 parseInt(codecSaved) :
-                (store.player.supportsOpus ? 0 : 1)
+                ((await store.player.supportsOpus) ? 0 : 1)
 
               store.player.codec = target.value as 'any';
             }}

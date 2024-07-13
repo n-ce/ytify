@@ -55,7 +55,7 @@ atpSelector.addEventListener('change', () => {
 });
 
 
-downloadBtn.addEventListener('click', () => {
+downloadBtn.addEventListener('click', async () => {
   superModal.click();
   const provider = 'https://api.cobalt.tools/api/json';
   const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
@@ -65,7 +65,7 @@ downloadBtn.addEventListener('click', () => {
     body: JSON.stringify({
       url: streamUrl,
       isAudioOnly: true,
-      aFormat: store.player.supportsOpus ? 'opus' : 'mp3',
+      aFormat: (await store.player.supportsOpus) ? 'opus' : 'mp3',
       filenamePattern: 'basic'
     })
   })

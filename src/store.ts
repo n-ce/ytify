@@ -9,7 +9,7 @@ export const store: {
     HLS: boolean,
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
-    supportsOpus: boolean
+    supportsOpus: Promise<boolean>
   },
   stream: Record<'id' | 'title' | 'author' | 'duration' | 'channelUrl', string>,
   theme: {
@@ -30,7 +30,7 @@ export const store: {
     HLS: Boolean(getSaved('HLS')),
     hq: Boolean(getSaved('hq')),
     codec: 'opus',
-    supportsOpus: await navigator.mediaCapabilities.decodingInfo({
+    supportsOpus: navigator.mediaCapabilities.decodingInfo({
       type: 'file',
       audio: {
         contentType: 'audio/ogg;codecs=opus'
