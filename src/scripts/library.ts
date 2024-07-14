@@ -44,7 +44,7 @@ cleanBtn.addEventListener('click', () => {
 // favorites button & data
 
 favButton.addEventListener('click', () => {
-  if (store.stream.id) return;
+  if (!store.stream.id) return;
   favButton.checked ?
     addToCollection('favorites', store.stream) :
     removeFromCollection('favorites', store.stream.id);

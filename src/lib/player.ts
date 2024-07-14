@@ -177,8 +177,7 @@ export default async function player(id: string | null = '') {
     });
 
   if (!data) {
-    notify('Fetching failed no data received, Retrying...');
-    await player(id);
+    notify('Fetching failed no data received');
     return;
   }
 

@@ -57,7 +57,8 @@ listBtnsContainer.addEventListener('click', e => {
     subscribeList(db);
 
   else if (btn === openInYtBtn)
-    open(hostResolver(<string>store.list.url));
+    open(['https://youtube.com', location.origin].includes(store.linkHost) ? ('https://youtube.com' + store.list.url) : hostResolver(store.list.url));
+
 
   else if (btn === removeFromListBtn) {
     listContainer.querySelectorAll('.streamItem').forEach(e => e.classList.toggle('delete'));

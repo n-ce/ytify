@@ -9,7 +9,7 @@ export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA
 export const generateImageUrl = (
   id: string,
   res: string = 'mq'
-) => 'https://wsrv.nl?url=' + (id.startsWith('/') ?
+) => 'https://wsrv.nl?url=https://' + (id.startsWith('/') ?
   `yt3.googleusercontent.com${id}=s176-c-k-c0x00ffffff-no-rj` :
   `i.ytimg.com/vi_webp/${id}/${res}default.webp`);
 
@@ -40,6 +40,9 @@ export function sqrThumb(src: string): Promise<string> {
 export function getThumbIdFromLink(url: string) {
   // for featured playlists
   if (url.startsWith('/') || url.length === 11) return url;
+  // simplify url 
+  if (url.includes('wsrv.nl'))
+    url = url.replace('wsrv.nl?url=', '');
 
   const l = new URL(url);
   const p = l.pathname;

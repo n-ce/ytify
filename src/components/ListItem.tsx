@@ -17,15 +17,7 @@ export default function ListItem(
   function handleError(e: Event) {
     const img = e.target as HTMLImageElement;
     img.parentElement!.classList.remove('ravel');
-
-
-    setThumbnail(
-      getThumbnail().includes('rj?')
-        ? getThumbnail().replace('rj?', 'rw?')
-        :
-        '/logo192.png'
-    );
-
+    setThumbnail('/logo192.png');
   }
 
 
@@ -34,9 +26,6 @@ export default function ListItem(
   function handleLoad(e: Event) {
     const img = e.target as HTMLImageElement;
     img.parentElement!.classList.remove('ravel');
-
-    if (img.naturalHeight === 90)
-      setThumbnail(getThumbnail().replace('_webp', '').replace('webp', 'jpg'));
   }
 
 
