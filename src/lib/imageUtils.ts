@@ -42,7 +42,7 @@ export function getThumbIdFromLink(url: string) {
   if (url.startsWith('/') || url.length === 11) return url;
   // simplify url 
   if (url.includes('wsrv.nl'))
-    url = url.replace('wsrv.nl?url=', '');
+    url = url.replace('https://wsrv.nl?url=', '');
 
   const l = new URL(url);
   const p = l.pathname;
