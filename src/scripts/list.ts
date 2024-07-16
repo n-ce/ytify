@@ -1,6 +1,6 @@
 import { enqueueBtn, listContainer, openInYtBtn, playAllBtn, saveListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver, notify } from '../lib/utils';
+import { notify } from '../lib/utils';
 import { addListToCollection, createPlaylist } from '../lib/libraryUtils';
 
 playAllBtn.addEventListener('click', () => {
@@ -40,4 +40,4 @@ saveListBtn.addEventListener('click', () => {
   saveListBtn.innerHTML = '<i class="ri-stack-line"></i> Saved';
 });
 
-openInYtBtn.onclick = () => open(hostResolver(<string>listContainer.dataset.url));
+openInYtBtn.onclick = () => open('https://youtube.com' + listContainer.dataset.url);

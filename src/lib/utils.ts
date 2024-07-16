@@ -1,5 +1,5 @@
 import { html, render } from "lit";
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, instanceSelector, playAllBtn, saveListBtn, superModal } from "./dom";
+import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, saveListBtn, superModal, instance } from "./dom";
 import { removeFromCollection } from "./libraryUtils";
 import { blankImage, generateImageUrl, sqrThumb } from "./imageUtils";
 
@@ -13,19 +13,9 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const getApi = (index: number | '' = '') => index ? instanceSelector.options[index].value : instanceSelector.value;
-
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
-
-export const supportsOpus = (): Promise<boolean> => navigator.mediaCapabilities.decodingInfo({
-  type: 'file',
-  audio: {
-    contentType: 'audio/ogg;codecs=opus'
-  }
-}).then(res => res.supported);
-
 
 export function notify(text: string) {
   const el = $('p');
@@ -36,13 +26,6 @@ export function notify(text: string) {
   setTimeout(clear, 8e3);
   document.body.appendChild(el);
 }
-
-
-export const hostResolver = (url: string) =>
-  linkHost.value + (linkHost.value.includes('ytify') ? url.
-    startsWith('/watch') ?
-    ('?s' + url.slice(8)) :
-    ('/list?' + url.slice(1).split('/').join('=')) : url);
 
 
 export function convertSStoHHMMSS(seconds: number): string {
@@ -60,19 +43,6 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-const linkHost = <HTMLSelectElement>document.getElementById('linkHost');
-
-const savedLinkHost = getSaved('linkHost') || '';
-if (savedLinkHost)
-  linkHost.value = savedLinkHost;
-
-linkHost.addEventListener('change', () => {
-  linkHost.selectedIndex === 0 ?
-    removeSaved('linkHost') :
-    save('linkHost', linkHost.value);
-  location.reload();
-});
-
 export function setMetaData(
   id: string,
   streamName: string,
@@ -87,7 +57,7 @@ export function setMetaData(
   img.alt = streamName;
 
   const title = <HTMLAnchorElement>document.getElementById('title');
-  title.href = hostResolver(`/watch?v=${id}`);
+  title.href = `https://youtube.com/watch?v=${id}`;
   title.textContent = streamName;
   title.onclick = _ => {
     _.preventDefault();
@@ -146,7 +116,7 @@ export function fetchList(url: string, mix = false) {
 
   loadingScreen.showModal();
 
-  fetch(getApi() + url)
+  fetch(instance.value + url)
     .then(res => res.json())
     .then(group => {
       listContainer.innerHTML = '';
@@ -173,7 +143,7 @@ export function fetchList(url: string, mix = false) {
       if (!mix && token)
         setObserver(async () => {
           const data = await fetch(
-            getApi() + '/nextpage/' +
+            instance.value + '/nextpage/' +
             url.substring(1) + '?nextpage=' + encodeURIComponent(token)
           )
             .then(res => res.json())
@@ -219,13 +189,7 @@ export function fetchList(url: string, mix = false) {
       }
     })
     .catch(err => {
-      if (err.message !== 'No Data Found' && instanceSelector.selectedIndex < instanceSelector.length - 1) {
-        instanceSelector.selectedIndex++;
-        fetchList(url, mix);
-        return;
-      }
       notify(mix ? 'No Mixes Found' : err.message);
-      instanceSelector.selectedIndex = 0;
     })
     .finally(() => loadingScreen.close());
 }
@@ -287,7 +251,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
   const fragment = document.createDocumentFragment();
 
   render(html`${itemsArray.map(item =>
-    html`<a href=${hostResolver(item.url)}>
+    html`<a href=${'https://youtube.com' + item.url}>
     ${item.type !== 'stream' ?
         listItem(item) :
         streamItem(item)}

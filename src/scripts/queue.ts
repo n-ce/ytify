@@ -1,4 +1,4 @@
-import { $, removeSaved, save } from "../lib/utils";
+import { $ } from "../lib/utils";
 import { queuelist, upcomingBtn } from "../lib/dom";
 import player from "../lib/player";
 
@@ -7,9 +7,7 @@ const queueArray: string[] = [];
 const [
   clearQBtn,
   shuffleQBtn,
-  removeQBtn,
-  filterG10Btn,
-  autoQueueBtn
+  removeQBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
@@ -19,9 +17,6 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
   if (queueArray.includes(data.id)) return;
 
-  if (filterG10Btn.classList.contains('filter'))
-    if (isLongerThan10Min(<string>data.duration))
-      return;
 
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
 
@@ -96,45 +91,4 @@ removeQBtn.addEventListener('click', () => {
   removeQBtn.classList.toggle('delete');
 });
 
-
-
-
-filterG10Btn.addEventListener('click', () => {
-
-  filterG10Btn.classList.toggle('filter');
-  // Prevent Queue Conflicts
-  if (removeQBtn.classList.contains('delete'))
-    removeQBtn.click();
-
-  const items = queuelist.querySelectorAll('stream-item') as NodeListOf<HTMLElement>;
-  items.forEach(el => {
-    const duration = el.dataset.duration as string
-    if (!isLongerThan10Min(duration))
-      return;
-    el.classList.add('delete');
-    el.click()
-
-  });
-});
-
-
-autoQueueBtn.addEventListener('click', () => {
-  autoQueueBtn.classList.contains('checked') ?
-    save('autoQueue', 'off') :
-    removeSaved('autoQueue');
-  autoQueueBtn.classList.toggle('checked');
-});
-
-
-if (localStorage.getItem('autoQueue') === 'off')
-  autoQueueBtn.classList.remove('checked');
-
-
-function isLongerThan10Min(duration: string) {
-  const hhmmss = duration.split(':');
-  return !(
-    hhmmss.length === 2 &&
-    parseInt(hhmmss[0]) < 10
-  );
-}
 

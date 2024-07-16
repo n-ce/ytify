@@ -9,7 +9,6 @@ const ytmPlsSwitch = <HTMLElement>document.getElementById('featuredPlaylistsSwit
 const defaultFilterSongs = <HTMLElement>document.getElementById('defaultFilterSongs');
 const qualitySwitch = <HTMLElement>document.getElementById('qualitySwitch');
 const thumbnailSwitch = <HTMLElement>document.getElementById('thumbnailSwitch');
-const lazyLoadSwitch = <HTMLElement>document.getElementById('lazyThumbSwitch');
 const discoverSwitch = <HTMLSelectElement>document.getElementById('discoverSwitch');
 const discoverContainer = <HTMLDetailsElement>document.getElementById('discover');
 const historySwitch = <HTMLElement>document.getElementById('historySwitch');
@@ -97,16 +96,6 @@ if (getSaved('img')) {
 
 /////////////////////////////////////////////////////////////
 
-lazyLoadSwitch.addEventListener('click', () => {
-  getSaved('lazyImg') ?
-    removeSaved('lazyImg') :
-    save('lazyImg', 'true');
-});
-
-if (getSaved('lazyImg'))
-  lazyLoadSwitch.toggleAttribute('checked');
-
-/////////////////////////////////////////////////////////////
 
 discoverSwitch.addEventListener('click', () => {
   if (discoverSwitch.hasAttribute('checked')) {

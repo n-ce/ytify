@@ -133,7 +133,8 @@ input {
   outline: none;
 }
 
-select {
+select,
+#instance {
   font-family: inherit;
   background: none;
   outline: none;

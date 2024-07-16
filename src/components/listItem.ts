@@ -1,6 +1,6 @@
 import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
-import { getSaved } from "../lib/utils";
+
 
 @customElement('list-item')
 export class ListItem extends LitElement {
@@ -15,7 +15,7 @@ export class ListItem extends LitElement {
     this.thumbnail = this.thumbnail.includes('rj') ? this.thumbnail.replace('rj', 'rw') : '/logo192.png';
   }
 
-  handleLoad(e:Event) {
+  handleLoad(e: Event) {
     this.unravel = '1';
     if ((e.target as HTMLImageElement).naturalHeight === 90)
       this.thumbnail = this.thumbnail
@@ -27,7 +27,6 @@ export class ListItem extends LitElement {
     return html`
         <img
         style=${'opacity:' + this.unravel}
-        loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
         src=${this.thumbnail}
         @error=${this.handleError}
         @load=${this.handleLoad}

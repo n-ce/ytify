@@ -4,7 +4,7 @@ export const canvas = <HTMLCanvasElement>document.querySelector('canvas');
 
 export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
 
-export const instanceSelector = <HTMLSelectElement>document.getElementById('instances');
+export const instance = <HTMLSelectElement>document.getElementById('instance');
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 

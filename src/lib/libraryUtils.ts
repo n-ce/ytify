@@ -1,5 +1,5 @@
 import { render, html } from "lit";
-import { $, getSaved, hostResolver, notify, save, superClick } from "./utils";
+import { $, getSaved, notify, save, superClick } from "./utils";
 import { atpSelector } from "../scripts/superModal";
 import { listToQ } from "../scripts/queue";
 
@@ -15,7 +15,7 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 export function createCollectionItem(data: CollectionItem | DOMStringMap) {
   const anchor = $('a');
-  anchor.href = hostResolver('/watch?v=' + data.id);
+  anchor.href = 'https://youtube.com/watch?v=' + data.id;
   anchor.onclick = e => e.preventDefault();
 
   render(html`
@@ -59,8 +59,11 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 }
 
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
+
   const fragment = document.createDocumentFragment();
+
   const dom = getCollection(collection);
+
   if (collection === 'discover') {
     db.discover = {};
     dom.innerHTML = '';

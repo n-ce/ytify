@@ -54,7 +54,6 @@ export class StreamItem extends LitElement {
 				<span style=${'opacity:' + this.unravel}>
 					<img 
 						id='thumbnail'
-						loading=${getSaved('lazyImg') ? 'lazy' : 'eager'}
 						crossorigin='anonymous'
 						@error=${this.handleThumbnailError}
 						@load=${this.handleThumbnailLoad}

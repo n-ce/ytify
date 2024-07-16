@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "6.9.4",
+  "version": "6.9.Lite",
   "type": "module",
   "scripts": {
     "dev": "vite",

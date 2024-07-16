@@ -34,8 +34,7 @@
 
 <body>
   <canvas class="hide"></canvas>
-  <audio>
-  </audio>
+  <audio></audio>
   <nav>
     <a href="/" id="/">
       <i class="ri-home-line"></i>
@@ -89,12 +88,6 @@
         </button>
         <button>
           <i class="ri-subtract-line"></i> Remove
-        </button>
-        <button>
-          <i class="ri-filter-2-line"></i> Filter >10:00
-        </button>
-        <button class="checked" id="autoQueueBtn">
-          <i class="ri-list-check-2"></i> Auto-Queue
         </button>
       </span>
       <br>
@@ -214,10 +207,9 @@
     <section id="settings">
 
       <span>
-        <label for="instances">Instance</label>
-        <select id="instances">
-          <option value="https://pipedapi.kavin.rocks">Custom</option>
-        </select>
+        <label for="instance">Piped Instance</label>
+        <input type="url" value="https://pipedapi.kavin.rocks" id="instance"
+          placeholder="Enter your instance API url" />
       </span>
 
       <span>
@@ -230,42 +222,18 @@
           <option value="/library">Library</option>
         </select>
       </span>
-      <span>
-        <label for="linkHost">Links host</label>
-        <select id="linkHost">
-          <option value="https://youtube.com">YouTube</option>
-          <option value="https://ytify.netlify.app">ytify</option>
-          <option value="https://piped.video">Piped</option>
-          <option value="https://yewtu.be">Invidious</option>
-        </select>
-      </span>
 
-      <h3>Search</h3>
       <toggle-switch id="featuredPlaylistsSwitch" checked>Featured Playlists</toggle-switch>
       <toggle-switch id="defaultFilterSongs">Set YouTube Music as Default</toggle-switch>
       <toggle-switch id="suggestionsSwitch" checked>Display Suggestions</toggle-switch>
 
-      <h3>Playback</h3>
-
       <toggle-switch id="qualitySwitch">Highest Quality Audio</toggle-switch>
-      <span>
-        <label for="CodecPreference">Codec Preference</label>
-        <select id="CodecPreference">
-          <option value="opus">Opus</option>
-          <option value="aac">AAC</option>
-          <option value="">Any</option>
-        </select>
-      </span>
 
-      <h3>Thumbnail</h3>
-      <toggle-switch id="thumbnailSwitch" checked>Load</toggle-switch>
-      <toggle-switch id="lazyThumbSwitch">Lazy Loading</toggle-switch>
+      <toggle-switch id="thumbnailSwitch" checked>Load Thumbnails</toggle-switch>
 
-      <h3>Library</h3>
       <toggle-switch id='discoverSwitch' checked>Store Discoveries</toggle-switch>
       <toggle-switch id='historySwitch' checked>Store History</toggle-switch>
 
-      <h3>Interface</h3>
       <span>
         <label for="roundnessChanger">Roundness</label>
         <select id="roundnessChanger">
@@ -286,12 +254,7 @@
       <toggle-switch id="reverseNavSwitch">Reverse Navigation</toggle-switch>
       <toggle-switch id="fullscreenSwitch">Toggle Fullscreen</toggle-switch>
 
-
-      <h3>Actions</h3>
-
       <button id="restoreSettingsBtn">Restore Settings</button>
-
-      <a href="https://github.com/n-ce/ytify/wiki/troubleshooting" target="_blank">Help</a>
 
       <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
 

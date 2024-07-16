@@ -1,37 +1,12 @@
-import { audio, favButton, favIcon, playButton, instanceSelector } from "./dom";
-import { convertSStoHHMMSS, notify, params, removeSaved, save, setMetaData, supportsOpus, getApi, getSaved } from "./utils";
-import { autoQueue } from "../scripts/audioEvents";
+import { audio, favButton, favIcon, instance, playButton } from "./dom";
+import { convertSStoHHMMSS, notify, params, setMetaData, getSaved } from "./utils";
 import { getDB, addListToCollection } from "./libraryUtils";
 
 
-const codecSelector = <HTMLSelectElement>document.getElementById('CodecPreference');
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
 /////////////////////////////////////////////////////////////
 
-codecSelector.addEventListener('change', async () => {
-  const i = codecSelector.selectedIndex;
-  i ?
-    save('codec', String(i)) :
-    removeSaved('codec');
-
-  audio.pause();
-  const timeOfSwitch = audio.currentTime;
-  await player(audio.dataset.id);
-  audio.currentTime = timeOfSwitch;
-});
-
-
-const codecSaved = getSaved('codec');
-setTimeout(async () => {
-  codecSelector.selectedIndex = codecSaved ?
-    parseInt(codecSaved) :
-    (await supportsOpus() ? 0 : 1)
-});
-
-
-
-/////////////////////////////////////////////////////////////
 
 bitrateSelector.addEventListener('change', () => {
   const timeOfSwitch = audio.currentTime;
@@ -40,39 +15,7 @@ bitrateSelector.addEventListener('change', () => {
   audio.play();
 });
 
-/////////////////////////////////////////////////////////////
-
-export default async function player(id: string | null = '') {
-
-  if (!id) return;
-
-  playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-
-  const apiIndex = instanceSelector.selectedIndex;
-  const apiUrl = getApi(apiIndex);
-
-  const data = await fetch(apiUrl + '/streams/' + id)
-    .then(res => res.json())
-    .then(res => {
-      if ('error' in res)
-        throw new Error(res.error)
-      else return res;
-    })
-    .catch(err => {
-      if (apiIndex < instanceSelector.length - 1) {
-        notify(`switched playback instance from ${apiUrl} to ${getApi(apiIndex + 1)} due to error: ${err.message}`);
-        instanceSelector.selectedIndex++;
-        player(id);
-        return;
-      }
-      notify(err.message);
-      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      instanceSelector.selectedIndex = 0;
-    });
-
-  const audioStreams = data.audioStreams
-    .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
-
+function resolveSrc(audioStreams: Record<'codec' | 'url' | 'quality' | 'bitrate', string>[], isMusic: boolean = true) {
   const noOfBitrates = audioStreams.length;
 
   if (!noOfBitrates) {
@@ -80,23 +23,18 @@ export default async function player(id: string | null = '') {
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
-
-  const preferedCodec = codecSelector.value;
+  const preferedCodec = 'opus';
   let index = -1;
 
   bitrateSelector.innerHTML = '';
 
-  audioStreams.forEach((_: {
-    codec: string,
-    url: string,
-    quality: string,
-    bitrate: string,
-  }, i: number) => {
+  audioStreams.forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
 
     const oldUrl = new URL(_.url);
 
-    const newUrl = (data.category === 'Music') ? _.url : _.url.replace(oldUrl.origin, oldUrl.host);
+    // Conditional Proxying
+    const newUrl = (isMusic) ? _.url : _.url.replace(oldUrl.origin, oldUrl.host);
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec}`, newUrl));
@@ -108,10 +46,35 @@ export default async function player(id: string | null = '') {
     if (codecPref && index < hqPref) index = i;
   });
 
-
   bitrateSelector.selectedIndex = index;
-  audio.src = bitrateSelector.value;
+  return bitrateSelector.value;
+}
+/////////////////////////////////////////////////////////////
 
+export default async function player(id: string | null = '') {
+
+  if (!id) return;
+
+  playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+
+  const data = await fetch(instance.value + '/streams/' + id)
+    .then(res => res.json())
+    .then(res => {
+      if ('error' in res)
+        throw new Error(res.error)
+      else return res;
+    })
+    .catch(err => {
+      notify(err.message);
+      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    });
+
+
+
+  audio.src = audio.canPlayType('audio/ogg') ? resolveSrc(
+    data.audioStreams
+      .sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate))
+    , data.category === 'Music') : data.hls;
 
   // remove ' - Topic' from name if it exists
 
@@ -156,8 +119,6 @@ export default async function player(id: string | null = '') {
   }
 
 
-  if (getSaved('autoQueue') !== 'off')
-    autoQueue(data.relatedStreams);
 
   if (getSaved('discover') === 'off') return;
 

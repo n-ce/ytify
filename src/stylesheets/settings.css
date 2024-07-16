@@ -10,13 +10,6 @@
   display: block;
 }
 
-#settings h3 {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4%;
-  border-bottom: dotted;
-}
-
 #settings span {
   width: 100%;
   display: flex;
@@ -26,8 +19,9 @@
   margin: 4vmin 0;
 }
 
-#settings select {
-  background-color: var(--onBg);
+#settings select,
+#settings input[type="url"] {
+  background-color: var(--onBg) !important;
   font-size: inherit;
   border: var(--border);
   padding: 1vmin;

@@ -43,9 +43,10 @@ cleanBtn.addEventListener('click', () => {
 function loadLibrary() {
   const initialData = getDB();
 
-  const initialKeys = Object.keys(initialData);
+  const initialKeys = Object.keys(initialData).filter((k) => k !== 'channels' && k !== 'playlists');
 
   for (const key of initialKeys) {
+
     if (!reservedCollections.includes(key)) {
       createPlaylist(key);
       continue;
