@@ -151,8 +151,7 @@ autoQueueBtn.addEventListener('click', () => {
 
 addEventListener('DOMContentLoaded', () => {
   if (getSaved('autoQueue') === 'off' || params.has('s'))
-    autoQueueBtn.classList.remove('checked');
-    
+    autoQueueBtn.click();    
 });
 
 
