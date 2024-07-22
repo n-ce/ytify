@@ -4,7 +4,7 @@ import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
 import Sortable, { SortableEvent } from "sortablejs";
-import { store, getSaved } from "../store";
+import { store, getSaved, params } from "../store";
 
 const queueArray: string[] = [];
 
@@ -150,8 +150,9 @@ autoQueueBtn.addEventListener('click', () => {
 
 
 addEventListener('DOMContentLoaded', () => {
-  if (getSaved('autoQueue') === 'off')
+  if (getSaved('autoQueue') === 'off' || params.has('s'))
     autoQueueBtn.classList.remove('checked');
+    
 });
 
 
