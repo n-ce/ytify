@@ -5,7 +5,7 @@ import { store, getSaved } from "../store";
 
 const hlsOn = store.player.HLS;
 
-const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
+const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/n-ce/Uma/main/unified_instances.txt';
 
 fetch(instanceAPIurl)
   .then(res => hlsOn ? res.json() : res.text())
