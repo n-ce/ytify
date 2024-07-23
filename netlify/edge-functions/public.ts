@@ -29,9 +29,8 @@ await fetch('https://api.invidious.io/instances.json')
     for (const i of data)
       if (i[1].cors && i[1].api)
         instanceArray.push(i[1].uri + '/api/v1/videos/')
-
   })
-  .catch(() => ['https://invidious.fdn.fr/api/v1/videos/']);
+  .catch(() => instanceArray.push('https://invidious.fdn.fr/api/v1/videos/'));
 
 
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
@@ -47,25 +46,20 @@ export default async (request: Request) => {
   for (let i = 0; i < uid.length; i += 11)
     array.push(uid.slice(i, i + 11));
 
-  const getData = async (
-    id: string,
-    api: string = instanceArray[getIndex()]
-  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'duration' | 'thumbnailUrl' | 'source', string>> => await fetch(api + id)
+  const getData = (
+    id: string
+  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
       'title': json.title,
       'author': (json.uploader || json.author).replace(' - Topic', ''),
       'channelUrl': json.authorUrl || json.uploaderUrl,
-      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds),
-      'thumbnailUrl': json.thumbnailUrl || json.videoThumbnails[4].url,
-      'source': api + id
+      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
     }))
     .catch(() => getData(id))
 
-
-  const promises = array.map(async (id) => await getData(id));
-  const response = await Promise.all(promises);
+  const response = await Promise.all(array.map(getData));
 
   return new Response(JSON.stringify(response), {
     headers: { 'content-type': 'application/json' },

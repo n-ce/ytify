@@ -87,7 +87,7 @@ listBtnsContainer.addEventListener('click', e => {
       });
 
     addListToCollection(listTitle, list);
-    notify(listTitle + ' has been imported to your playlists.');
+    notify(listTitle + ' has been imported to your collections.');
   }
   else if (btn === deleteCollectionBtn) {
 
@@ -117,14 +117,11 @@ listBtnsContainer.addEventListener('click', e => {
       return;
     }
     const shareId = Object.keys(db[id]).join('');
-
     const text = location.origin + location.pathname + '?si=' + shareId;
-
     const type = "text/plain";
     const blob = new Blob([text], { type });
     const data = [new ClipboardItem({ [type]: blob })];
     navigator.clipboard.write(data);
-
 
   }
 })
