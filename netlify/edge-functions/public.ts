@@ -48,8 +48,7 @@ export default async (request: Request) => {
 
   const getData = (
     id: string
-  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>>
-    => fetch(instanceArray[getIndex()] + id)
+  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
