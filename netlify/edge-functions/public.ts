@@ -47,17 +47,16 @@ export default async (request: Request) => {
     array.push(uid.slice(i, i + 11));
 
   const getData = (
-    id: string,
-    api: string = instanceArray[getIndex()]
-  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'source', string>> => fetch(api + id)
+    id: string
+  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>>
+    => fetch(instanceArray[getIndex()] + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
       'title': json.title,
       'author': (json.uploader || json.author).replace(' - Topic', ''),
       'channelUrl': json.authorUrl || json.uploaderUrl,
-      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds),
-      'source': api + id
+      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
     }))
     .catch(() => getData(id))
 
