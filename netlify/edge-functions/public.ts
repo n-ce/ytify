@@ -29,9 +29,8 @@ await fetch('https://api.invidious.io/instances.json')
     for (const i of data)
       if (i[1].cors && i[1].api)
         instanceArray.push(i[1].uri + '/api/v1/videos/')
-
   })
-  .catch(() => ['https://invidious.fdn.fr/api/v1/videos/']);
+  .catch(() => instanceArray.push('https://invidious.fdn.fr/api/v1/videos/'));
 
 
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
@@ -50,7 +49,8 @@ export default async (request: Request) => {
   const getData = async (
     id: string,
     api: string = instanceArray[getIndex()]
-  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'duration' | 'thumbnailUrl' | 'source', string>> => await fetch(api + id)
+  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'source', string>>
+    => await fetch(api + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
@@ -58,14 +58,11 @@ export default async (request: Request) => {
       'author': (json.uploader || json.author).replace(' - Topic', ''),
       'channelUrl': json.authorUrl || json.uploaderUrl,
       'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds),
-      'thumbnailUrl': json.thumbnailUrl || json.videoThumbnails[4].url,
       'source': api + id
     }))
     .catch(() => getData(id))
 
-
-  const promises = array.map(async (id) => await getData(id));
-  const response = await Promise.all(promises);
+  const response = await Promise.all(array.map(getData));
 
   return new Response(JSON.stringify(response), {
     headers: { 'content-type': 'application/json' },
