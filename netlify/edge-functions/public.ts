@@ -46,11 +46,10 @@ export default async (request: Request) => {
   for (let i = 0; i < uid.length; i += 11)
     array.push(uid.slice(i, i + 11));
 
-  const getData = async (
+  const getData = (
     id: string,
     api: string = instanceArray[getIndex()]
-  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'source', string>> => 
-    await fetch(api + id)
+  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration' | 'source', string>> => fetch(api + id)
     .then(res => res.json())
     .then(json => ({
       'id': id,
