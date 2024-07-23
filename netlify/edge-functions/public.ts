@@ -50,6 +50,11 @@ export default async (request: Request) => {
     id: string
   ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
     .then(res => res.json())
+    .then(res => {
+      if ('error' in res)
+        throw new Error(res.error)
+      else return res;
+    })
     .then(json => ({
       'id': id,
       'title': json.title,
