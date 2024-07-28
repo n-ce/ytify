@@ -1,4 +1,4 @@
-import { superModal } from "../lib/dom";
+import { loadingScreen, superModal } from "../lib/dom";
 import { createPlaylist, addToCollection } from "../lib/libraryUtils";
 
 import { $, fetchList, notify } from "../lib/utils";
@@ -59,6 +59,7 @@ downloadBtn.addEventListener('click', async () => {
   superModal.click();
   const provider = 'https://api.cobalt.tools/api/json';
   const streamUrl = 'https://youtu.be/' + superModal.dataset.id;
+  loadingScreen.showModal();
   fetch(provider, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -76,6 +77,7 @@ downloadBtn.addEventListener('click', async () => {
       anchor.click();
     })
     .catch(_ => notify(_))
+    .finally(() => loadingScreen.close());
 });
 
 

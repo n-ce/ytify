@@ -110,6 +110,7 @@ export async function fetchCollection(collection: string | null, shareId: string
       .then(data => {
         renderDataIntoFragment(data, fragment);
       })
+      .catch(() => notify('Failed to load the shared list, it may consist of a corrupted stream'))
       .finally(() => loadingScreen.close());
 
   }

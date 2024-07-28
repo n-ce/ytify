@@ -18,7 +18,7 @@ function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-const instanceArray = await fetch('https://piped-instances.kavin.rocks')
+const instanceArray: string[] = await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
   .then(data => data.map((i: { api_url: string }) => i.api_url + '/streams/'))
   .catch(() => ['https://pipedapi.kavin.rocks/streams/']);
@@ -46,9 +46,7 @@ export default async (request: Request) => {
   for (let i = 0; i < uid.length; i += 11)
     array.push(uid.slice(i, i + 11));
 
-  const getData = (
-    id: string
-  ): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
+  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
     .then(res => res.json())
     .then(res => {
       if ('error' in res)

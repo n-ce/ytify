@@ -3,7 +3,7 @@
   height: auto;
   background-color: var(--onBg);
   padding: 1dvmin;
-  margin: 1%;
+  margin: 2% 1%;
   border: var(--border);
   border-radius: calc(var(--roundness) + 0.75vmin);
   transition: all 0.3s ease-out;
@@ -33,6 +33,7 @@
     height: auto;
     width: 100%;
     border-radius: var(--roundness);
+    margin-bottom: 2vmin;
   }
 
   div {

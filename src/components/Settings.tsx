@@ -236,7 +236,7 @@ export default function Settings() {
 
         <ToggleSwitch
           id="HLS_Switch"
-          name='HLS / Live Streaming'
+          name='HTTP Live Streaming'
           checked={getSaved('HLS') === 'true'}
           onClick={() => {
             getSaved('HLS') ?

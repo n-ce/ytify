@@ -58,10 +58,17 @@ addEventListener('DOMContentLoaded', async () => {
 
 subtitleSelector.addEventListener('change', () => {
   subtitleTrack.src = subtitleSelector.value;
-  subtitleSelector.value ?
-    subtitleContainer.classList.remove('hide') :
+  if (subtitleSelector.selectedIndex > 0) {
+    subtitleContainer.classList.remove('hide')
+    parseTTML();
+  } else {
     subtitleContainer.classList.add('hide');
-  parseTTML();
+    subtitleContainer.style.top = '0';
+    subtitleContainer.style.left = '0';
+    subtitleSelector.parentElement!.style.position = 'relative';
+    subtitleSelector.style.top = '0'
+    subtitleSelector.style.left = '0';
+  }
 });
 
 /////////////////////////////////////////////////////////////
@@ -130,10 +137,8 @@ function setSubtitles(subtitles: Record<'name' | 'url', string>[]) {
 
   // Subtitle data dom injection
 
-  for (const option of subtitleSelector.options)
-    if (option.textContent !== 'Subtitles') option.remove();
-
   subtitleSelector.classList.remove('hide');
+  subtitleSelector.innerHTML = '<option>Subtitles</option>'
   subtitleContainer.innerHTML = '';
 
   if (subtitles.length)
@@ -176,10 +181,7 @@ export default async function player(id: string | null = '') {
       instanceSelector.selectedIndex = 1;
     });
 
-  if (!data) {
-    notify('Fetching failed no data received');
-    return;
-  }
+  if (!data) return;
 
   store.stream.id = id;
   store.stream.title = data.title;
@@ -237,7 +239,7 @@ export default async function player(id: string | null = '') {
   }
 
 
-  if (getSaved('autoQueue') !== 'off')
+  if (getSaved('autoQueue') === 'on')
     autoQueue(data.relatedStreams);
 
   if (getSaved('discover') === 'off') return;

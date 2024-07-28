@@ -326,7 +326,6 @@ export function superClick(e: Event) {
 export async function parseTTML() {
 
   const imsc = await import('imsc/dist/imsc.all.min.js');
-
   const myTrack = audio.textTracks[0];
   myTrack.mode = "hidden";
   const d = img.getBoundingClientRect();

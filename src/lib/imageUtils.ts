@@ -54,9 +54,11 @@ export function getThumbIdFromLink(url: string) {
 
 
 
-img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq').replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
+img.onload = () => img.naturalWidth === 120 ? img.src = img.src.replace('maxres', 'mq')
+  .replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
 
-img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq') : '';
+img.onerror = () => img.src.includes('max') ? img.src = img.src.replace('maxres', 'mq')
+  .replace('.webp', '.jpg').replace('vi_webp', 'vi') : '';
 
 img.src = blankImage;
 

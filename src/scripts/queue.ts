@@ -3,8 +3,8 @@ import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
-import Sortable, { SortableEvent } from "sortablejs";
-import { store, getSaved, params } from "../store";
+import type { SortableEvent } from "sortablejs";
+import { store, getSaved } from "../store";
 
 const queueArray: string[] = [];
 
@@ -53,13 +53,20 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 }
 
-new Sortable(queuelist, {
-  handle: '.ri-draggable',
-  onUpdate(e: SortableEvent) {
-    if (e.oldIndex == null || e.newIndex == null) return;
-    queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
-  }
-});
+
+
+
+addEventListener('DOMContentLoaded', () =>
+  import('sortablejs').then(mod =>
+    new mod.default(queuelist, {
+      handle: '.ri-draggable',
+      onUpdate(e: SortableEvent) {
+        if (e.oldIndex == null || e.newIndex == null) return;
+        queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
+      }
+    })
+  )
+);
 
 queuelist.addEventListener('click', e => {
 
@@ -143,16 +150,13 @@ filterLT10Btn.addEventListener('click', () => {
 
 autoQueueBtn.addEventListener('click', () => {
   autoQueueBtn.classList.contains('checked') ?
-    save('autoQueue', 'off') :
-    removeSaved('autoQueue');
+    removeSaved('autoQueue') :
+    save('autoQueue', 'on');
   autoQueueBtn.classList.toggle('checked');
 });
 
-
-addEventListener('DOMContentLoaded', () => {
-  if (getSaved('autoQueue') === 'off' || params.has('s'))
-    autoQueueBtn.click();    
-});
+if (getSaved('autoQueue') === 'on')
+  autoQueueBtn.className = 'checked';
 
 
 function isLongerThan10Min(duration: string) {
