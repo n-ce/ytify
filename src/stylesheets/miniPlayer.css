@@ -66,11 +66,19 @@
     img {
       width: 100%;
       height: auto;
+      margin-bottom: 2vw;
     }
 
-    div a {
-      height: 3rem;
-      width: 100%;
+    div {
+      background: none;
+      border: none;
+
+      a {
+        height: 3rem;
+        width: 100%;
+        line-height: 3rem;
+      }
+
     }
 
   }

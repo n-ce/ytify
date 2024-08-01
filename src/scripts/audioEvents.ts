@@ -1,7 +1,7 @@
 import { audio, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
@@ -199,12 +199,24 @@ volumeIcon.addEventListener('click', () => {
 
 volumeChanger.addEventListener('input', () => {
   audio.volume = parseFloat(volumeChanger.value) / 100;
+
+  audio.volume === 1 ?
+    removeSaved('volume') :
+    save('volume', volumeChanger.value);
+
+
   volumeIcon.classList.replace(
     volumeIcon.className,
     audio.volume ?
       `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-fill` :
       'ri-volume-mute-fill');
 });
+
+const savedVol = getSaved('volume');
+if (savedVol) {
+  volumeChanger.value = savedVol;
+  audio.volume = parseFloat(volumeChanger.value) / 100;
+}
 
 
 

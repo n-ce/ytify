@@ -51,6 +51,34 @@ export default defineConfig(({ command }) => ({
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "any maskable"
+          },
+          {
+            "src": "logo512.png",
+            "type": "image/png",
+            "sizes": "44x44",
+            "purpose": "any"
+          }
+        ],
+        "shortcuts": [
+          {
+            "name": "History",
+            "url": "/list?collection=history"
+          },
+          {
+            "name": "Favorites",
+            "url": "/list?collection=favorites"
+          },
+          {
+            "name": "Discover",
+            "url": "/list?collection=discover"
+          },
+          {
+            "name": "Listen Later",
+            "url": "/list?collection=listenLater"
+          },
+          {
+            "name": "Library",
+            "url": "/library"
           }
         ],
         "start_url": "/",

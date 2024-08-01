@@ -27,6 +27,7 @@
 - **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
 - **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
+- **Download** ⬇️ : Download any audio stream using the button on the 3 dot menu.
 
 ![ytify_7.0_landscape](https://github.com/n-ce/ytify/assets/69345507/b5a48633-9544-4f6c-b2d0-d11a1fa2efbc)
 
@@ -46,8 +47,6 @@ https://ytify.netlify.app is the only official location that the main branch is 
 - Join our Matrix Community
 [@ytify](https://matrix.to/#/!ytify:matrix.org)
 
-## Privacy Policy 👁️
-> We use [Beampipe](https://beampipe.io) Analytics for minimal site stats, only the browser user-agent data is collected anonymously for this. Everything else remains on your device only, which can also be cleared anytime.(Library>Clean, Settings>Restore Settings,Clear Caches). Why collect data? I do not possess a multitude of devices, the analytics help me figure out which devices are suffering from incompatibility or if a failed update has been made or if some API instance has stopped working.
 
 ## License 📝
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
