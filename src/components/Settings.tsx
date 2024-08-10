@@ -134,7 +134,7 @@ export default function Settings() {
         </b>
         <ToggleSwitch
           id="defaultFilterSongs"
-          name='Songs as Default Filter'
+          name='Set Songs as Default Filter'
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             getSaved('searchFilter') ?
@@ -177,7 +177,7 @@ export default function Settings() {
           }}
         />
 
-        <Show when={!store.player.HLS}>
+        <Show when={!getSaved('HLS')}>
 
           <Selector
             label='Codec Preference'

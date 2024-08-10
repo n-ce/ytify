@@ -2,27 +2,30 @@
   display: flex;
   column-gap: 2%;
 
-
-  img,
-  div {
+  img {
     border-radius: var(--roundness);
     border: var(--border);
   }
 
-  div {
+  #mp {
     display: flex;
     align-items: center;
-    background-color: var(--onBg);
     width: 100%;
+    overflow: hidden;
 
-
-    a {
+    #mptext {
       pointer-events: none;
-      overflow: hidden;
-      font-size: 1rem;
-      line-height: 1.5rem;
-      z-index: 1;
       width: 100%;
+      height: 100%;
+
+
+      #title {
+        height: 100%;
+      }
+
+      #author {
+        font-size: small !important;
+      }
     }
 
 
@@ -52,11 +55,6 @@
       height: 100%;
     }
 
-    div a {
-      height: 1.5rem;
-      margin-left: 1.5%;
-      width: calc(100% - 2.5rem);
-    }
 
   }
 
@@ -69,17 +67,14 @@
       margin-bottom: 2vw;
     }
 
-    div {
-      background: none;
-      border: none;
+    #mp {
+      max-height: 4rem;
 
-      a {
-        height: 3rem;
-        width: 100%;
-        line-height: 3rem;
+      #mptext {
+        width: 70%;
+
       }
 
     }
-
   }
 }

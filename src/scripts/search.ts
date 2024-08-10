@@ -1,7 +1,7 @@
 import { instanceSelector, loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getApi, itemsLoader, idFromURL, notify, superClick } from "../lib/utils";
-import { store, params, getSaved } from "../store";
+import { store, getSaved } from "../store";
 import { fetchResultsWithInvidious } from "./search.invidious";
 
 
@@ -71,7 +71,7 @@ function searchLoader() {
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
-  const sortResults = searchFilters.selectedIndex > 7;
+  const sortResults = searchFilters.selectedIndex > 8;
 
   store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
@@ -193,14 +193,4 @@ if (savedSearchFilter)
   searchFilters.value = savedSearchFilter;
 
 
-
-// search param /?q=
-addEventListener('DOMContentLoaded', () => {
-  if (params.has('q')) {
-    superInput.value = params.get('q') || '';
-    if (params.has('f'))
-      searchFilters.value = params.get('f') || '';
-    searchLoader();
-  }
-});
 

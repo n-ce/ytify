@@ -1,12 +1,10 @@
-import { audio, listAnchor, loadingScreen, playButton, progress, queuelist, ytifyIcon } from "../lib/dom";
+import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
-
-const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 const streamHistory: string[] = [];
 
@@ -244,18 +242,6 @@ if (msn) {
     updatePositionState();
   });
 }
-
-addEventListener('DOMContentLoaded', async () => {
-  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
-  if (id) {
-    loadingScreen.showModal();
-    await player(id);
-    loadingScreen.close();
-  }
-  else
-    document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
-});
-
 
 
 // AUTO-QUEUE

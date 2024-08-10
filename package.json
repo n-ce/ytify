@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "7.1.7",
+  "version": "7.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,19 +9,19 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "hls.js": "^1.5.13",
+    "hls.js": "^1.5.14",
     "imsc": "^1.1.5",
-    "solid-js": "^1.8.19",
+    "solid-js": "^1.8.20",
     "sortablejs": "^1.15.2"
   },
   "devDependencies": {
     "@netlify/edge-functions": "^2.10.0",
-    "@types/node": "^22.0.2",
+    "@types/node": "^22.1.0",
     "@types/sortablejs": "^1.15.8",
-    "autoprefixer": "^10.4.19",
-    "eruda": "^3.2.1",
+    "autoprefixer": "^10.4.20",
+    "eruda": "^3.2.2",
     "typescript": "^5.5.4",
-    "vite": "^5.3.5",
+    "vite": "^5.4.0",
     "vite-plugin-pwa": "^0.20.1",
     "vite-plugin-solid": "^2.10.2"
   },

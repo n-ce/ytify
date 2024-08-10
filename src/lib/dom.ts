@@ -4,6 +4,8 @@ export const ytifyIcon = <HTMLElement>document.getElementById('ytifyIcon')
 
 export const title = <HTMLAnchorElement>document.getElementById('title');
 
+export const author = <HTMLParagraphElement>document.getElementById('author');
+
 export const progress = <HTMLInputElement>document.getElementById('progress');
 
 export const miniPlayer = <HTMLDivElement>document.getElementById('miniPlayer');
@@ -24,7 +26,7 @@ export const audio = <HTMLAudioElement>document.querySelector('audio');
 
 export const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement;
 
-export const superModal = <HTMLDialogElement>document.getElementById('superModal');
+export const actionsMenu = <HTMLDialogElement>document.getElementById('actionsMenu');
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
@@ -44,6 +46,8 @@ export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtB
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());
+
+export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
 export const subtitleTrack = <HTMLTrackElement>audio.firstElementChild;
 

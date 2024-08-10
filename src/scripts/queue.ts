@@ -3,11 +3,9 @@ import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
-import type { SortableEvent } from "sortablejs";
 import { store, getSaved } from "../store";
 
-const queueArray: string[] = [];
-
+const queueArray = store.queue.array;
 const [
   clearQBtn,
   shuffleQBtn,
@@ -18,7 +16,7 @@ const [
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
-export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) {
+export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
 
   if (queueArray.includes(data.id)) return;
@@ -53,20 +51,6 @@ export function appendToQueuelist(data: DOMStringMap, prepend: boolean = false) 
 
 }
 
-
-
-
-addEventListener('DOMContentLoaded', () =>
-  import('sortablejs').then(mod =>
-    new mod.default(queuelist, {
-      handle: '.ri-draggable',
-      onUpdate(e: SortableEvent) {
-        if (e.oldIndex == null || e.newIndex == null) return;
-        queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
-      }
-    })
-  )
-);
 
 queuelist.addEventListener('click', e => {
 

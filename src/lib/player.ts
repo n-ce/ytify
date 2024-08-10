@@ -1,60 +1,9 @@
-import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, instanceSelector } from "./dom";
+import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, instanceSelector, bitrateSelector } from "./dom";
 import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { params, store, getSaved } from "../store";
-import type Hls from "hls.js";
 
-
-const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
-let hls: Hls;
-
-/////////////////////////////////////////////////////////////
-
-addEventListener('DOMContentLoaded', async () => {
-  if (store.player.HLS) {
-    // handling bitrates with HLS will increase complexity, better to detach from DOM
-    bitrateSelector.remove();
-
-    import('hls.js').then(mod => {
-      hls = new mod.default();
-      hls.attachMedia(audio);
-      hls.on(mod.default.Events.MANIFEST_PARSED, () => {
-        hls.currentLevel = store.player.hq ?
-          hls.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
-        audio.play();
-      });
-      hls.on(mod.default.Events.ERROR, (e, d) => {
-
-        if (d.details !== 'manifestLoadError') return;
-
-        const apiIndex = instanceSelector.selectedIndex;
-        const apiUrl = getApi('piped', apiIndex);
-        if (apiIndex < instanceSelector.length - 1) {
-          const nextApi = getApi('piped', apiIndex + 1)
-          notify(`switched instance from ${apiUrl} to ${nextApi} due to HLS manifest loading error.`);
-          instanceSelector.selectedIndex++;
-          hls.loadSource((<string>d.url).replace(apiUrl, nextApi));
-          return;
-        }
-        notify(e);
-        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-        instanceSelector.selectedIndex = 1;
-      })
-    })
-  }
-  else bitrateSelector.addEventListener('change', () => {
-    if (store.player.playbackState === 'playing')
-      audio.pause();
-    const timeOfSwitch = audio.currentTime;
-    audio.src = bitrateSelector.value;
-    audio.currentTime = timeOfSwitch;
-    audio.play();
-  });
-});
-
-
-/////////////////////////////////////////////////////////////
 
 subtitleSelector.addEventListener('change', () => {
   subtitleTrack.src = subtitleSelector.value;
@@ -190,23 +139,11 @@ export default async function player(id: string | null = '') {
   store.stream.channelUrl = data.uploaderUrl;
 
 
-  // remove ' - Topic' from name if it exists
+  setMetaData(store.stream);
 
-  let music = false;
-  if (data.uploader.endsWith(' - Topic')) {
-    music = true;
-    data.uploader = data.uploader.slice(0, -8);
-  }
-
-  setMetaData(
-    id,
-    data.title,
-    data.uploader,
-    music
-  );
-
-  hls ?
-    hls.loadSource(data.hls) :
+  const h = store.player.HLS;
+  h ?
+    h.loadSource(data.hls) :
     setAudioStreams(
       data.audioStreams.sort(
         (a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate)

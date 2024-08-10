@@ -1,0 +1,62 @@
+#actionsMenu {
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: 2dvmin 1dvmin;
+  width: 100%;
+  margin: 8dvmin auto;
+  margin-top: auto;
+  background: linear-gradient(to right, var(--bg), var(--onBg));
+  backdrop-filter: blur(10px);
+  border-radius: calc(var(--roundness) * 1.3);
+  animation: fromBelow 0.3s;
+  overflow: auto;
+
+
+  @media(orientation:landscape) {
+    width: max-content;
+    margin: auto 8dvmin;
+    margin-left: auto;
+    animation-name: fromRight;
+
+  }
+
+  ul {
+    list-style: none;
+    padding: 2dvmin;
+    width: auto;
+    display: grid;
+    gap: 2vmin;
+  }
+
+  li {
+    color: var(--text);
+    font-size: large;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 5dvmin;
+    padding: 1vmin 2vmin;
+    border: 0.1vmin solid transparent;
+    border-radius: var(--roundness);
+    transition: background 0.3s;
+
+
+    &:hover {
+      border: var(--border);
+      background: var(--onBg);
+    }
+
+    i {
+      font-weight: normal;
+      font-size: larger;
+    }
+  }
+
+}
+
+#playlistSelector {
+  font-weight: inherit;
+  font-size: inherit;
+  margin-left: -3px;
+  width: 9ch;
+}

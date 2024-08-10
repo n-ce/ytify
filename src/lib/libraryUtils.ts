@@ -1,5 +1,4 @@
 import { $, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
-import { atpSelector } from "../scripts/superModal";
 import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
@@ -52,13 +51,15 @@ export function addListToCollection(collection: string, list: { [index: string]:
 }
 
 export function createPlaylist(title: string) {
+  const playlistSelector = document.getElementById('playlistSelector') as HTMLSelectElement;
+
   reservedCollections
     .concat(
-      [...atpSelector.options].slice(2).map(opt => opt.value)
+      [...playlistSelector.options].slice(2).map(opt => opt.value)
     )
     .includes(title) ?
     notify('This Playlist Already Exists!') :
-    atpSelector.add(new Option(title, title));
+    playlistSelector.add(new Option(title, title));
 }
 
 function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStringMap }, fragment: DocumentFragment) {

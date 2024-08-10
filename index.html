@@ -68,9 +68,15 @@
     </nav>
     <div id="miniPlayer">
       <img id="img" crossorigin="anonymous" alt="Current Playing Media Thumbnail">
-      <div>
-        <a id="title" href="" target="_blank">Now Playing</a>
+      <div id="mp">
+
+        <div id="mptext">
+          <a id="title" href="" target="_blank">Now Playing</a>
+          <p id="author">Channel</p>
+        </div>
+
         <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
+
       </div>
     </div>
   </header>
@@ -87,7 +93,7 @@
         <!-- image -->
         <div id="meta">
           <!-- title -->
-          <p id="author">Channel</p>
+          <!-- author -->
 
           <div id="upperButtonLayer">
             <span id="volumeContainer">
@@ -189,6 +195,7 @@
           </optgroup>
           <optgroup label="YouTube Music">
             <option value="music_songs">Songs</option>
+            <option value="music_artists">Artists</option>
             <option value="music_videos">Videos</option>
             <option value="music_albums">Albums</option>
             <option value="music_playlists">Playlists</option>
@@ -345,24 +352,7 @@
 
   </main>
 
-  <dialog id="superModal">
-    <ul>
-      <li><i class="ri-skip-forward-line"></i>Play Next</li>
-      <li><i class="ri-list-check-2"></i>Enqueue</li>
-      <li>
-        <i class="ri-play-list-add-line"></i>
-        <select id="playlistSelector">
-          <option>Add To</option>
-          <option value="+pl">Create New Playlist</option>
-          <option value="favorites">Favorites</option>
-          <option value="listenLater">Listen Later</option>
-        </select>
-      </li>
-      <li><i class="ri-radio-line"></i>Start Radio</li>
-      <li><i class="ri-download-2-fill"></i>Download</li>
-      <li><i class="ri-youtube-line"></i>View Channel</li>
-    </ul>
-  </dialog>
+  <dialog id="actionsMenu"></dialog>
 
   <dialog id="loadingScreen">
     <i class="ri-loader-3-line"></i>

@@ -3,9 +3,9 @@ import { quickSwitch, removeSaved, save } from "../lib/utils";
 import { store, getSaved } from "../store";
 
 
-const hlsOn = store.player.HLS;
+const hlsOn = getSaved('HLS');
 
-const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/n-ce/Uma/main/unified_instances.txt';
+const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/n-ce/ytify/instances/unified_instances.txt';
 
 fetch(instanceAPIurl)
   .then(res => hlsOn ? res.json() : res.text())
@@ -15,14 +15,16 @@ fetch(instanceAPIurl)
       text.map((v: Record<'name' | 'locations' | 'api_url' | 'image_proxy_url', string>) => ({
         name: `${v.name} ${v.locations}`,
         piped: v.api_url,
-        invidious: 'https://invidious.fdn.fr'
+        invidious: 'https://invidious.fdn.fr',
+        hyperpipe: 'https://hyperpipeapi.onrender.com'
       })) :
       text.split('\n\n').map((v: string) => {
-        const [name, flag, pi, iv] = v.split(', ');
+        const [name, flag, pi, iv, hp] = v.split(', ');
         return {
           name: `${name} ${flag}`,
           piped: `https://${pi}.${name}`,
-          invidious: `https://${iv}.${name}`
+          invidious: `https://${iv}.${name}`,
+          hyperpipe: `https://${hp}.${name}`
         }
       });
 
@@ -33,7 +35,7 @@ fetch(instanceAPIurl)
       store.api.push(api);
     }
 
-    const savedApi = getSaved('apiList_5');
+    const savedApi = getSaved('apiList_6');
 
     if (!savedApi) {
       instanceSelector.selectedIndex = 1;
@@ -67,12 +69,12 @@ instanceSelector.addEventListener('change', async () => {
     if (p)
       current.piped = p;
 
-    save('apiList_5', JSON.stringify(current));
+    save('apiList_6', JSON.stringify(current));
 
   }
   else index === 1 ?
-    removeSaved('apiList_5') :
-    save('apiList_5', JSON.stringify(current));
+    removeSaved('apiList_6') :
+    save('apiList_6', JSON.stringify(current));
 
   quickSwitch();
 });
