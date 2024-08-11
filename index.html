@@ -249,15 +249,24 @@
           <i class="ri-calendar-schedule-line"></i>Listen Later
         </a>
       </div>
-      <select id="superCollectionSelector">
-        <option value="collections">Your Collections</option>
-        <option value="featured" selected>Featured Playlists</option>
-        <option value="playlists">Subscribed Playlists</option>
-        <option value="channels">Subscribed Channels
-        </option>
-        <option value="feed">Subscription Feed
-        </option>
-      </select>
+
+      <div id="superCollectionSelector">
+        <input type="radio" id="r.featured" name="superCollectionChips" value="featured" checked>
+        <label for="r.featured">Featured</label>
+        <input type="radio" id="r.collections" name="superCollectionChips" value="collections">
+        <label for="r.collections">Collections</label>
+        <input type="radio" id="r.playlists" name="superCollectionChips" value="playlists">
+        <label for="r.playlists">Playlists</label>
+        <input type="radio" id="r.albums" name="superCollectionChips" value="albums">
+        <label for="r.albums">Albums</label>
+        <input type="radio" id="r.artists" name="superCollectionChips" value="artists">
+        <label for="r.artists">Artists</label>
+        <input type="radio" id="r.channels" name="superCollectionChips" value="channels">
+        <label for="r.channels">Channels</label>
+
+        <input type="radio" id="r.feed" name="superCollectionChips" value="feed">
+        <label for="r.feed">Subscription Feed</label>
+      </div>
 
       <div id="superCollectionList"></div>
 

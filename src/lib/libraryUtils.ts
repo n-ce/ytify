@@ -142,7 +142,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 }
 
 
-export async function superCollectionLoader(name: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists') {
+export async function superCollectionLoader(name: SuperCollection) {
   const db = getDB();
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
@@ -176,7 +176,13 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
     return pls.length ? fragment : 'No Collections Found';
   }
 
+  // channels / playlists / artists / albums
   function loadSubList(type: string) {
+    let albums = false;
+    if (type === 'albums') {
+      albums = true;
+      type = 'playlists';
+    }
 
     if (!Object(db).hasOwnProperty(type))
       return `No Subscribed ${type} Found`;
@@ -185,15 +191,28 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
     const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
 
     for (const pl in pls) {
+      let name = pls[pl].name;
+
+      if (albums)
+        if (name.startsWith('Album –'))
+          name = name.substring(8)
+        else continue;
+      else
+        if (name.startsWith('Album –')) continue;
+
+
       array.push(<StreamItem>{
         type: type.slice(0, -1),
-        name: pls[pl].name,
+        name: name,
         uploaderName: pls[pl].uploader,
         url: `/${type === 'channels' ? type.slice(0, -1) : type}/` + pls[pl].id,
         thumbnail: pls[pl].thumbnail
       });
     }
-    return itemsLoader(array);
+
+    return array.length ?
+      itemsLoader(array) :
+      `No Subscribed ${type} Found`;
   }
 
   async function loadFeed() {

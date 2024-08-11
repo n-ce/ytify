@@ -1,27 +1,26 @@
 #library {
   width: 100%;
 
-  div:first-child {
-    width: 100%;
-    display: grid;
-    justify-content: center;
-    grid-template-columns: auto auto;
-    gap: 1rem;
-    margin-top: 1rem;
+  #collections {
+    margin: 4vmin;
+    margin-bottom: 0;
+    padding: 2vmin 0;
 
 
     a {
+      font-size: large;
       border: var(--border);
       background: var(--onBg);
       border-radius: var(--roundness);
-      width: 10rem;
-      padding: 0.5rem;
-      display: flex;
+      padding: 2vmin 3vmin;
+      margin: 1vmin 2vmin;
+      padding-right: calc(3vmin + 0.4rem);
+      display: inline-flex;
       align-items: center;
 
       i {
+        font-weight: initial;
         pointer-events: none;
-        font-size: 1.2rem;
         margin-right: 0.4rem;
       }
     }
@@ -69,4 +68,30 @@
       }
     }
   }
+}
+
+
+#superCollectionSelector {
+  padding: 2vmin;
+  margin: 0 2vmin;
+}
+
+input[type='radio'] {
+  display: none;
+
+  &:checked+label {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  &+label {
+    display: inline-block;
+    padding: 1vmin 2vmin;
+    margin: 1vmin 2vmin;
+    border-radius: var(--roundness);
+    border: var(--border);
+    background: var(--onBg);
+
+  }
+
 }

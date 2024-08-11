@@ -55,4 +55,4 @@ export const subtitleContainer = <HTMLDivElement>document.getElementById('subtit
 
 export const subtitleSelector = <HTMLSelectElement>document.getElementById('subtitleSelector');
 
-export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLSelectElement;
+export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLDivElement;

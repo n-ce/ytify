@@ -65,19 +65,23 @@ collectionContainer.addEventListener('click', e => {
 });
 
 
-superCollectionSelector.addEventListener('change', () => {
-  const val = superCollectionSelector.value;
-  val === 'featured' ?
-    removeSaved('defaultSuperCollection') :
-    save('defaultSuperCollection', val);
+superCollectionSelector.addEventListener('click', e => {
 
-  superCollectionLoader(val as 'feed');
+  const elm = e.target as HTMLInputElement & { value: SuperCollection };
+  if (!elm.value) return;
+
+
+  elm.value === 'featured' ?
+    removeSaved('defaultSuperCollection') :
+    save('defaultSuperCollection', elm.value);
+
+  superCollectionLoader(elm.value);
 });
 
 
 const sdsc = getSaved('defaultSuperCollection');
 if (sdsc)
-  superCollectionSelector.value = sdsc;
+  document.getElementById('r.' + sdsc)?.toggleAttribute('checked');
 
 
 superCollectionList.addEventListener('click', superClick);
