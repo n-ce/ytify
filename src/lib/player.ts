@@ -4,6 +4,7 @@ import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { params, store, getSaved } from "../store";
 import type Hls from "hls.js";
+import { fetchWithInvidious } from "../scripts/fetchWithInvidious";
 
 
 const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
@@ -24,7 +25,7 @@ addEventListener('DOMContentLoaded', async () => {
           hls.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
         audio.play();
       });
-      hls.on(mod.default.Events.ERROR, (e, d) => {
+      hls.on(mod.default.Events.ERROR, (_, d) => {
 
         if (d.details !== 'manifestLoadError') return;
 
@@ -32,12 +33,12 @@ addEventListener('DOMContentLoaded', async () => {
         const apiUrl = getApi('piped', apiIndex);
         if (apiIndex < instanceSelector.length - 1) {
           const nextApi = getApi('piped', apiIndex + 1)
-          notify(`switched instance from ${apiUrl} to ${nextApi} due to HLS manifest loading error.`);
+          //notify(`switched instance from ${apiUrl} to ${nextApi} due to HLS manifest loading error.`);
           instanceSelector.selectedIndex++;
           hls.loadSource((<string>d.url).replace(apiUrl, nextApi));
           return;
         }
-        notify(e);
+        //notify(e);
         playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
         instanceSelector.selectedIndex = 1;
       })
@@ -169,7 +170,7 @@ export default async function player(id: string | null = '') {
         throw new Error(res.error)
       else return res;
     })
-    .catch(err => {
+    .catch(async err => {
       if (apiIndex < instanceSelector.length - 1) {
         notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
         instanceSelector.selectedIndex++;
@@ -177,6 +178,10 @@ export default async function player(id: string | null = '') {
         return;
       }
       notify(err.message);
+      const res = await fetchWithInvidious(id)
+        .catch((e) => notify(e));
+
+      if (res) return res;
       playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
       instanceSelector.selectedIndex = 1;
     });
@@ -216,7 +221,7 @@ export default async function player(id: string | null = '') {
       apiIndex === 0
     );
 
-  setSubtitles(data.subtitles);
+  setSubtitles(data.subtitles || '');
 
 
   params.set('s', id);
@@ -251,7 +256,7 @@ export default async function player(id: string | null = '') {
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
-    data.relatedStreams.forEach(
+    data.relatedStreams?.forEach(
       (stream: StreamItem) => {
         if (
           stream.type !== 'stream' ||
