@@ -12,7 +12,7 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://invidious.fdn.fr';
+  const instance = 'https://invidious.jing.rocks';
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
 
   if (!data) return;
@@ -23,22 +23,15 @@ export default async (request: Request, context: Context) => {
   // Conditionally only proxy music streams
   if (data.genre === 'Music')
     audioSrc = audioSrc.replace(new URL(audioSrc).origin, instance);
+  const music = data.author.endsWith(' - Topic') ? '&w=720&h=720&fit=cover' : '';
+  if (music)
+    data.author = data.author.replace(' - Topic', '');
 
   const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
+    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
     .replace('"ytify"', `"${data.title}"`)
     .replace(<string>context.site.url, `${context.site.url}?s=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', data.videoThumbnails.find((v: { quality: string }) => v.quality === 'medium').url)
-    // for audio embedding
-    .replace('<!-- a4 -->',
-      `<meta property="og:audio" content="${audioSrc}">
-      <meta property="og:audio:secure_url" content="${audioSrc}">
-      <meta property="og:video" content="${audioSrc}">
-      <meta property="og:audio:type" content="audio/aac">
-      <meta property="music.duration" content="${data.lengthSeconds}">`
-    )
-    .replace('"website"', '"music.song"');
-
+    .replaceAll('/ytify_thumbnail_min.webp', `https://wsrv.nl?url=https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp${music}`);
 
   return new Response(newPage, response);
 };

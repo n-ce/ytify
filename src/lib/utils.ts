@@ -1,6 +1,6 @@
 import { audio, img, listAnchor, subtitleContainer, subtitleTrack, actionsMenu, title, instanceSelector, subtitleSelector, author } from "./dom";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
+import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
@@ -97,10 +97,10 @@ export async function setMetaData(
 
   // remove ' - Topic' from author name if it exists
 
-  let music = false;
+  let music = '';
   let authorText = stream.author;
   if (stream.author.endsWith(' - Topic')) {
-    music = true;
+    music = '&w=720&h=720&fit=cover';
     authorText = stream.author.slice(0, -8);
   }
 
@@ -109,9 +109,9 @@ export async function setMetaData(
     artist: authorText,
   };
 
-  const imgx = generateImageUrl(stream.id, 'maxres');
+  const imgX = generateImageUrl(stream.id, 'maxres', music);
   if (store.loadImage !== 'off') {
-    img.src = music ? await sqrThumb(imgx) : imgx;
+    img.src = imgX
     metadataObj.artwork = [
       { src: img.src, sizes: '96x96' },
       { src: img.src, sizes: '128x128' },
@@ -172,7 +172,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     generateImageUrl(
       getThumbIdFromLink(
         item.thumbnail
-      )
+      ), ''
     ),
     item.description || item.uploaderName,
     item.url

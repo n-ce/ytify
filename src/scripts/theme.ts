@@ -141,7 +141,7 @@ function themer() {
 
   }
   canvasImg.crossOrigin = '';
-  const temp = generateImageUrl(store.stream.id);
+  const temp = generateImageUrl(store.stream.id, 'mq');
   if (canvasImg.src !== temp) canvasImg.src = temp;
 
 

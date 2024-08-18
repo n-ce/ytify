@@ -72,7 +72,7 @@
 
 #superCollectionSelector {
   padding: 2vmin;
-  margin: 0 2vmin;
+  margin: 3vmin 2vmin 0;
 }
 
 input[type='radio'] {

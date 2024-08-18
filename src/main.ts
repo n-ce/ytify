@@ -35,27 +35,6 @@ async function main() {
   // insert the instance selector inside the component area
   document.getElementById('instanceSelectorContainer')!.appendChild(instanceSelector);
 
-  // params handling
-
-  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
-
-  if (id) {
-    loadingScreen.showModal();
-    await player(id);
-    loadingScreen.close();
-  }
-  else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
-
-  if (params.has('q')) {
-    superInput.value = params.get('q') || '';
-    if (params.has('f'))
-      searchFilters.value = params.get('f') || '';
-    superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
-  }
-
-  if (params.has('collection') || params.has('si'))
-    fetchCollection(params.get('collection'), params.get('si'));
-
 
 
   if (import.meta.env.PROD)
@@ -148,6 +127,27 @@ async function main() {
     if (!reservedCollections.includes(key))
       createPlaylist(key);
 
+
+  // params handling
+
+  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+
+  if (id) {
+    loadingScreen.showModal();
+    await player(id);
+    loadingScreen.close();
+  }
+  else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
+
+  if (params.has('q')) {
+    superInput.value = params.get('q') || '';
+    if (params.has('f'))
+      searchFilters.value = params.get('f') || '';
+    superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
+  }
+
+  if (params.has('collection') || params.has('si'))
+    fetchCollection(params.get('collection'), params.get('si'));
 
   // list loading
 

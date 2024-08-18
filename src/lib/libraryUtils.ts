@@ -18,8 +18,7 @@ export function removeFromCollection(collection: string, id: string) {
 
   const db = getDB();
   delete db[collection][id];
-  const item = listContainer.querySelector(`[data-id="${id}"]`) as HTMLAnchorElement;
-  item.remove();
+  listContainer.querySelector(`[data-id="${id}"]`)?.remove();
   saveDB(db);
 }
 

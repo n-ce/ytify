@@ -68,3 +68,9 @@
     opacity: 0;
   }
 }
+
+@keyframes like {
+  50% {
+    transform: scale(0.9);
+  }
+}
