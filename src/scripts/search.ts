@@ -23,7 +23,8 @@ function setObserver(callback: () => Promise<string>) {
       if (e.isIntersecting) {
         nextPageToken = await callback();
         observer.disconnect();
-        setObserver(callback);
+        if (nextPageToken !== 'null')
+          setObserver(callback);
       }
     })).observe(searchlist.children[items - (items > 5 ? 5 : 1)]);
 }
@@ -39,17 +40,17 @@ const fetchResultsWithPiped = (query: string) =>
 
       // filter out shorts
       searchlist.appendChild(itemsLoader(
-        items.filter((item: StreamItem) => !item.isShort)
+        items?.filter((item: StreamItem) => !item.isShort)
       ));
       // load more results when 3rd last element is visible
-
-      setObserver(async () => {
-        const data = await loadMoreResults(nextPageToken, query.substring(7));
-        searchlist.appendChild(itemsLoader(
-          data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-        ));
-        return data.nextpage;
-      });
+      if (nextPageToken !== 'null')
+        setObserver(async () => {
+          const data = await loadMoreResults(nextPageToken, query.substring(7));
+          searchlist.appendChild(itemsLoader(
+            data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
+          ));
+          return data.nextpage;
+        });
     })
     .catch(err => {
       if (err.message === 'nextpage error') return;

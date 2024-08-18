@@ -97,7 +97,7 @@
 
           <div id="upperButtonLayer">
             <span id="volumeContainer">
-              <label for="volumeChanger" class="ri-volume-up-fill"></label>
+              <label for="volumeChanger" aria-label="volume" class="ri-volume-up-fill"></label>
               <input type="range" min="0" max="100" value="100" id="volumeChanger">
             </span>
             <i class="ri-repeat-line" id="loopButton" aria-label="loop"></i>
@@ -224,6 +224,11 @@
           the WebApp effectively, <a href="https://github.com/n-ce/ytify/wiki/usage" style="text-decoration: underline;"
             target="_blank">here</a>.
         </p>
+        <p
+          style="background: linear-gradient(to bottom right,#f007,#f008);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow)">
+          To get around the current errors on Piped Instances, Please turn on <b>Fetch stream data via Invidious</b> in
+          Settings >
+          Playback. This does not apply to HLS/IOS users.</p>
       </div>
     </section>
 

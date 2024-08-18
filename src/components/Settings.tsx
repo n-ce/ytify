@@ -125,6 +125,30 @@ export default function Settings() {
           <option value="off">Do not Load</option>
         </Selector>
 
+        <ToggleSwitch
+          id="toastsSwitch"
+          name='Toast Notifications'
+          checked={getSaved('toasts') !== 'false'}
+          onClick={() => {
+            getSaved('toasts') ?
+              removeSaved('toasts') :
+              save('toasts', 'false');
+          }}
+        />
+
+        <ToggleSwitch
+          id="fetchInstancesSwitch"
+          name='Fetch Instances'
+          checked={getSaved('fetchAPI') !== 'false'}
+          onClick={() => {
+            getSaved('fetchAPI') ?
+              removeSaved('fetchAPI') :
+              save('fetchAPI', 'false');
+          }}
+        />
+
+
+
       </div>
 
       <div>
@@ -161,6 +185,7 @@ export default function Settings() {
           <i class="ri-play-large-line"></i>
           <p>Playback</p>
         </b>
+
 
         <ToggleSwitch
           id="qualitySwitch"
@@ -209,7 +234,7 @@ export default function Settings() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Proxy Non-Music Streams'
+            name='Proxy non-music streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               getSaved('enforceProxy') ?
@@ -221,13 +246,25 @@ export default function Settings() {
 
           <ToggleSwitch
             id="useInvidiousProxySwitch"
-            name='Proxy Via Invidious'
+            name='Proxy stream via Invidious'
             checked={!getSaved('proxyViaInvidious')}
             onClick={async () => {
               getSaved('proxyViaInvidious') ?
                 removeSaved('proxyViaInvidious') :
                 save('proxyViaInvidious', 'false');
 
+              quickSwitch();
+            }}
+          />
+
+          <ToggleSwitch
+            id="fetchViaIvSwitch"
+            name='Fetch stream data via Invidious'
+            checked={getSaved('fetchViaIV') === 'true'}
+            onClick={async () => {
+              getSaved('fetchViaIV') ?
+                removeSaved('FetchViaIV') :
+                save('fetchViaIV', 'true');
               quickSwitch();
             }}
           />

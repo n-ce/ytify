@@ -5,7 +5,7 @@ import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import player from "./player";
-import { store } from "../store";
+import { getSaved, store } from "../store";
 import fetchList from "../scripts/fetchList";
 
 
@@ -30,7 +30,14 @@ export const numFormatter = (num: number): string => Intl.NumberFormat('en', { n
 export const getPlaylistIdFromArtist = (id: string): Promise<string> =>
   fetch(getApi('hyperpipe') + id)
     .then(res => res.json())
-    .then(data => '/playlists/' + data.playlistId)
+    .then(data => {
+      if (!('playlistId' in data))
+        throw new Error('No Playlist Id found.');
+      store.list.id = data.playlistId;
+      store.list.name = 'Artist - ' + data.title;
+      store.list.thumbnail = data.thumbnails[0].url;
+      return '/playlists/' + data.playlistId;
+    })
     .catch(_ => {
       notify(_);
       return '';
@@ -53,6 +60,7 @@ export async function quickSwitch() {
 }
 
 export function notify(text: string) {
+  if (getSaved('toasts')) return;
   const el = $('p');
   const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
   el.className = 'snackbar';
@@ -146,7 +154,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
 
   const streamItem = (stream: StreamItem) => StreamItem({
     id: stream.videoId || stream.url.substring(9),
-    href: hostResolver(stream.url || 'https://youtu.be/' + stream.videoId),
+    href: hostResolver(stream.url || ('/watch?v=' + stream.videoId)),
     title: stream.title,
     author: (stream.uploaderName || stream.author) + (location.search.endsWith('music_songs') ? ' - Topic' : ''),
     duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
@@ -220,8 +228,10 @@ export function superClick(e: Event) {
       url = url.replace('?list=', 's/');
 
     fetchList(url);
-    store.list.thumbnail = url + eld.thumbnail;
+    store.list.name = eld.title as string;
 
+    store.list.thumbnail = eld.thumbnail?.startsWith('https://') ? eld.thumbnail : url + eld.thumbnail;
+    console.log(store.list)
   }
 }
 

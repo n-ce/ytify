@@ -200,6 +200,16 @@
 }
 
 
+
+/* button hover info */
+[aria-label]:hover::after {
+  position: fixed;
+  content: attr(aria-label);
+  font-size: small;
+}
+
+
+
 /* === range theme and appearance === */
 input[type="range"] {
   font-size: 1.5rem;

@@ -2,18 +2,17 @@
   width: 100%;
 
   #collections {
-    margin: 4vmin;
-    margin-bottom: 0;
-    padding: 2vmin 0;
+    margin: 0 4vmin;
+    padding: 0;
 
 
     a {
-      font-size: large;
       border: var(--border);
       background: var(--onBg);
       border-radius: var(--roundness);
       padding: 2vmin 3vmin;
-      margin: 1vmin 2vmin;
+      margin: 0 2vmin;
+      margin-top: 6vmin;
       padding-right: calc(3vmin + 0.4rem);
       display: inline-flex;
       align-items: center;
@@ -82,16 +81,15 @@ input[type='radio'] {
   &:checked+label {
     background: var(--text);
     color: var(--bg);
+    border: var(--border);
   }
 
   &+label {
+    font-size: small;
     display: inline-block;
     padding: 1vmin 2vmin;
-    margin: 1vmin 2vmin;
+    margin: 1vmin 0;
     border-radius: var(--roundness);
-    border: var(--border);
-    background: var(--onBg);
-
   }
 
 }

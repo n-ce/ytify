@@ -24,14 +24,14 @@ export default function ActionsMenu() {
 
   return (
     <ul on:click={e => e.stopPropagation()}>
-      <li on:click={() => {
+      <li tabindex={0} on:click={() => {
         appendToQueuelist(store.actionsMenu, true);
         close();
       }}>
         <i class="ri-skip-forward-line"></i>Play Next
       </li>
 
-      <li on:click={() => {
+      <li tabindex={1} on:click={() => {
         appendToQueuelist(store.actionsMenu);
         close();
       }}>
@@ -41,14 +41,15 @@ export default function ActionsMenu() {
       <li>
         <i class="ri-play-list-add-line"></i>
         <select
+          tabindex={2}
           id="playlistSelector"
           onchange={(e) => {
             const playlistSelector = e.target;
             let title;
 
             if (!playlistSelector.value) return;
-            if (playlistSelector.value === '+pl') {
-              title = prompt('Playlist Title')?.trim();
+            if (playlistSelector.value === '+cl') {
+              title = prompt('Collection Title')?.trim();
 
               if (title)
                 createPlaylist(title);
@@ -63,20 +64,20 @@ export default function ActionsMenu() {
           }}
         >
           <option>Add To</option>
-          <option value="+pl">Create New Playlist</option>
+          <option value="+cl">Create New Collection</option>
           <option value="favorites">Favorites</option>
           <option value="listenLater">Listen Later</option>
         </select>
       </li>
 
-      <li on:click={async () => {
+      <li tabindex={3} on:click={async () => {
         close();
         fetchList('/playlists/RD' + store.actionsMenu.id, true);
       }}>
         <i class="ri-radio-line"></i>Start Radio
       </li>
 
-      <li on:click={async () => {
+      <li tabindex={4} on:click={async () => {
         close();
         const provider = 'https://api.cobalt.tools/api/json';
         const streamUrl = 'https://youtu.be/' + store.actionsMenu.id;
@@ -103,7 +104,7 @@ export default function ActionsMenu() {
         <i class="ri-download-2-fill"></i>Download
       </li>
 
-      <li on:click={() => {
+      <li tabindex={5} on:click={() => {
         close();
         const smd = store.actionsMenu;
         (document.getElementById('viewOnYTBtn') as HTMLButtonElement).innerHTML = '<i class="ri-external-link-line"></i> ' + smd.author;

@@ -35,7 +35,7 @@ fetch(instanceAPIurl)
       store.api.push(api);
     }
 
-    const savedApi = getSaved('apiList_6');
+    const savedApi = getSaved('api_7');
 
     if (!savedApi) {
       instanceSelector.selectedIndex = 1;
@@ -63,18 +63,25 @@ instanceSelector.addEventListener('change', async () => {
 
     const n = prompt('Enter Name of your instance :');
     const p = prompt('Enter Piped API URL :', current.piped)
+    const i = prompt('Enter Invidious API URL (optional) :', current.invidious);
+    const h = prompt('Enter Hyperpipe API URL (optional) :', current.hyperpipe);
+
 
     if (n)
       current.name = instanceSelector.options[0].textContent = n;
     if (p)
       current.piped = p;
+    if (i)
+      current.invidious = i;
+    if (h)
+      current.hyperpipe = h;
 
-    save('apiList_6', JSON.stringify(current));
+    save('api_7', JSON.stringify(current));
 
   }
   else index === 1 ?
-    removeSaved('apiList_6') :
-    save('apiList_6', JSON.stringify(current));
+    removeSaved('api_7') :
+    save('api_7', JSON.stringify(current));
 
   quickSwitch();
 });

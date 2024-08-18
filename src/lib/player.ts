@@ -3,6 +3,7 @@ import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo } from 
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { params, store, getSaved } from "../store";
+import { fetchWithInvidious } from "../scripts/fetchWithInvidious";
 
 
 subtitleSelector.addEventListener('change', () => {
@@ -110,25 +111,32 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
   const apiIndex = instanceSelector.selectedIndex;
-  const apiUrl = store.api[apiIndex].piped;
-  const data = await fetch(apiUrl + '/streams/' + id)
-    .then(res => res.json())
-    .then(res => {
-      if ('error' in res)
-        throw new Error(res.error)
-      else return res;
-    })
-    .catch(err => {
-      if (apiIndex < instanceSelector.length - 1) {
-        notify(`switched instance from ${apiUrl} to ${getApi('piped', apiIndex + 1)} due to error: ${err.message}`);
-        instanceSelector.selectedIndex++;
-        player(id);
-        return;
-      }
-      notify(err.message);
-      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      instanceSelector.selectedIndex = 1;
-    });
+  const fetchViaIV = getSaved('fetchViaIV');
+  const apiUrl = store.api[apiIndex][fetchViaIV ? 'invidious' : 'piped'];
+  const fetchWithPiped = (id: string) =>
+    fetch(apiUrl + '/streams/' + id)
+      .then(res => res.json())
+      .then(res => {
+        if ('error' in res)
+          throw new Error(res.error)
+        else return res;
+      });
+
+  const data = await (
+    fetchViaIV ?
+      fetchWithInvidious(id, apiUrl) :
+      fetchWithPiped(id)
+  ).catch(err => {
+    if (apiIndex < instanceSelector.length - 1) {
+      notify(`switched instance from ${apiUrl} to ${getApi(fetchViaIV ? 'invidious' : 'piped', apiIndex + 1)} due to error: ${err.message}`);
+      instanceSelector.selectedIndex++;
+      player(id);
+      return;
+    }
+    notify(err.message);
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    instanceSelector.selectedIndex = 1;
+  });
 
   if (!data) return;
 

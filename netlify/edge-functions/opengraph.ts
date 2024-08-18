@@ -12,8 +12,10 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://iv.melmac.space';
+  const instance = 'https://invidious.fdn.fr';
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
+
+  if (!data) return;
 
   // select the lowest bitrate aac stream i.e itag 139
   let audioSrc = data.adaptiveFormats.find((v: { itag: number }) => v.itag == 139).url;

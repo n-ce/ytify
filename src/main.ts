@@ -18,6 +18,22 @@ import { bitrateSelector, instanceSelector, searchFilters, superInput, actionsMe
 import fetchList from './scripts/fetchList';
 
 async function main() {
+  /*
+  instance selector is a vital part which
+  should be available as quickly as possible,
+  - so we render it in html (this is when instances are loaded)
+  - extract it from DOM
+  - fit it into the settings component
+  */
+
+  const settingsContainer = document.getElementById('settings') as HTMLDivElement;
+
+  await import('./components/Settings')
+    .then(mod => render(mod.default, settingsContainer));
+  // render appends Settings after act so we append act after Settings
+  settingsContainer.appendChild(document.getElementById('actionsContainer')!);
+  // insert the instance selector inside the component area
+  document.getElementById('instanceSelectorContainer')!.appendChild(instanceSelector);
 
   // params handling
 
@@ -55,22 +71,6 @@ async function main() {
     });
 
 
-  /*
-  instance selector is a vital part which
-  should be available as quickly as possible,
-  - so we render it in html (this is when instances are loaded)
-  - extract it from DOM
-  - fit it into the settings component
-  */
-
-  const settingsContainer = document.getElementById('settings') as HTMLDivElement;
-
-  await import('./components/Settings')
-    .then(mod => render(mod.default, settingsContainer));
-  // render appends Settings after act so we append act after Settings
-  settingsContainer.appendChild(document.getElementById('actionsContainer')!);
-  // insert the instance selector inside the component area
-  document.getElementById('instanceSelectorContainer')!.appendChild(instanceSelector);
 
 
   // hls
@@ -158,6 +158,9 @@ async function main() {
         .split('=')
         .join('/')
     );
+
+
+
 }
 
 addEventListener('DOMContentLoaded', main);

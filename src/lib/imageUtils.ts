@@ -6,11 +6,13 @@ import { canvas, context, img } from "./dom";
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 // Generates both channel and stream thumbnails
+
+
 export const generateImageUrl = (
   id: string,
   res: string = 'mq'
 ) => 'https://wsrv.nl?url=https://' + (id.startsWith('/') ?
-  `yt3.googleusercontent.com${id}=s176-c-k-c0x00ffffff-no-rj` :
+  `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj&output=webp&w=360` :
   `i.ytimg.com/vi_webp/${id}/${res}default.webp`);
 
 
@@ -38,6 +40,10 @@ export function sqrThumb(src: string): Promise<string> {
 
 
 export function getThumbIdFromLink(url: string) {
+
+  if (url.startsWith('/vi_webp'))
+    url = url.slice(9, 20);
+
   // for featured playlists
   if (url.startsWith('/') || url.length === 11) return url;
   // simplify url 

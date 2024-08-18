@@ -10,7 +10,6 @@ import { store } from '../store';
 function subscribeList(db: Library) {
 
   const l = store.list;
-
   const state = ['Subscribe', 'Subscribed'];
   const dom = subscribeListBtn.innerHTML;
 

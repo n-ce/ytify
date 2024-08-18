@@ -7,13 +7,19 @@ export default async function fetchList(url: string | undefined, mix = false) {
   if (!url)
     return notify('No Channel URL provided');
 
+
   loadingScreen.showModal();
 
+  let useHyperpipe = false;
   if (
     location.search.endsWith('music_artists') ||
     store.actionsMenu.author.endsWith(' - Topic')
   )
+    useHyperpipe = true;
+
+  if (useHyperpipe)
     url = await getPlaylistIdFromArtist(url);
+  if (!url) return loadingScreen.close();
 
   const api = getApi('piped');
 
@@ -89,13 +95,15 @@ export default async function fetchList(url: string | undefined, mix = false) {
 
   openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
 
-  store.list.name = group.name;
-  store.list.url = url;
+
+  if (!useHyperpipe) {
+    store.list.name = group.name;
+    store.list.url = url;
+    store.list.id = url.slice(type === 'playlist' ? 11 : 9);
+    store.list.thumbnail = store.list.thumbnail?.startsWith(url) ? store.list.thumbnail.slice(url.length) :
+      group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
+  }
   store.list.type = type + 's';
-  store.list.id = url.slice(type === 'playlist' ? 11 : 9);
-  store.list.uploader = group.uploader || group.name;
-  store.list.thumbnail = store.list.thumbnail?.startsWith(url) ? store.list.thumbnail.slice(url.length) :
-    group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
 
   const db = Object(getDB());
 
