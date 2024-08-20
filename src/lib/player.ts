@@ -6,6 +6,7 @@ import { params, store, getSaved } from "../store";
 import { fetchWithInvidious } from "../scripts/fetchWithInvidious";
 
 
+
 subtitleSelector.addEventListener('change', () => {
   subtitleTrack.src = subtitleSelector.value;
   if (subtitleSelector.selectedIndex > 0) {
@@ -161,7 +162,7 @@ export default async function player(id: string | null = '') {
       apiIndex === 0
     );
 
-  setSubtitles(data.subtitles);
+  setSubtitles(data.subtitles || '');
 
 
   params.set('s', id);
@@ -196,7 +197,7 @@ export default async function player(id: string | null = '') {
 
     const db = getDB();
     if (!db.hasOwnProperty('discover')) db.discover = {};
-    data.relatedStreams.forEach(
+    data.relatedStreams?.forEach(
       (stream: StreamItem) => {
         if (
           stream.type !== 'stream' ||

@@ -21,7 +21,7 @@ export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementBy
 export const getApi = (
   type: 'piped' | 'invidious' | 'hyperpipe',
   index: number = instanceSelector.selectedIndex || 0) =>
-  store.api[index][type];
+  store.api[index][type].replace(/\s/g, '');
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 

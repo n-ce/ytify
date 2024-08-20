@@ -16,17 +16,12 @@ export default async (request: Request, context: Context) => {
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
 
   if (!data) return;
-
-  // select the lowest bitrate aac stream i.e itag 139
-  let audioSrc = data.adaptiveFormats.find((v: { itag: number }) => v.itag == 139).url;
-
-  // Conditionally only proxy music streams
-  if (data.genre === 'Music')
-    audioSrc = audioSrc.replace(new URL(audioSrc).origin, instance);
+  
   const music = data.author.endsWith(' - Topic') ? '&w=720&h=720&fit=cover' : '';
+  
   if (music)
     data.author = data.author.replace(' - Topic', '');
-
+  
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
     .replace('"ytify"', `"${data.title}"`)
