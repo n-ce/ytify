@@ -144,7 +144,7 @@
     animation-name: fromLeft;
 
     /* button hover info */
-    [aria-label]:hover::before {
+    [aria-label]:hover::after {
       position: fixed;
       content: attr(aria-label);
       font-size: small;

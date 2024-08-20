@@ -182,22 +182,26 @@ export async function superCollectionLoader(name: SuperCollection) {
     return pls.length ? fragment : 'No Collections Found';
   }
 
-  // channels / playlists / artists / albums
-
-  // albums / artist id start with OLAK5uy
-  // artist does not have uploader
+  /*
+  channels / playlists / artists / albums
+  > albums are special playlists, id start with OLAK5uy & start with 'Album - ' naturally.
+  > artists are special channels which have been manually prepended with 'Artist - ' title.
+  */
 
   function loadSubList(type: string) {
     let albums = false;
     let artists = false;
+
     if (type === 'albums') {
       albums = true;
       type = 'playlists';
     }
+
     if (type === 'artists') {
       artists = true;
-      type = 'playlists';
+      type = 'channels';
     }
+
 
     if (!Object(db).hasOwnProperty(type))
       return `No Subscribed ${type} Found`;
@@ -207,19 +211,22 @@ export async function superCollectionLoader(name: SuperCollection) {
 
     for (const pl in pls) {
       let name = pls[pl].name;
-      const id = pls[pl].id;
 
-      if (id.startsWith('OLAK5uy'))
-        // albums + artist
-        if ('uploader' in pls[pl]) {
-          //album
-          if (albums)
-            name = name.substring(8)
-          else continue;
+      if (albums) {
+        if (!name.startsWith('Album'))
+          continue;
+        name = name.slice(8);
+      }
+      else if (name.startsWith('Album'))
+        continue;
 
-        }
-        else if (!artists) continue;
-
+      if (artists) {
+        if (!name.startsWith('Artist'))
+          continue;
+        name = name.slice(8);
+      }
+      else if (name.startsWith('Artist'))
+        continue;
 
 
       array.push(<StreamItem>{
@@ -230,6 +237,7 @@ export async function superCollectionLoader(name: SuperCollection) {
         thumbnail: pls[pl].thumbnail
       });
     }
+
 
     return array.length ?
       itemsLoader(array) :

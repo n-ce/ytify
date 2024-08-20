@@ -3,23 +3,26 @@ import { getDB } from "../lib/libraryUtils";
 import { getApi, getPlaylistIdFromArtist, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../store";
 
-export default async function fetchList(url: string | undefined, mix = false) {
+export default async function fetchList(
+  url: string | undefined,
+  mix = false
+) {
   if (!url)
     return notify('No Channel URL provided');
 
 
   loadingScreen.showModal();
 
-  let useHyperpipe = false;
-  if (
-    location.search.endsWith('music_artists') ||
-    store.actionsMenu.author.endsWith(' - Topic')
-  )
-    useHyperpipe = true;
+  const useHyperpipe = store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist');
 
-  if (useHyperpipe)
-    url = await getPlaylistIdFromArtist(url);
-  if (!url) return loadingScreen.close();
+  if (useHyperpipe) {
+    url = await getPlaylistIdFromArtist(url) || '';
+
+    if (!url) {
+      loadingScreen.close();
+      return;
+    }
+  }
 
   const api = getApi('piped');
 
@@ -100,10 +103,10 @@ export default async function fetchList(url: string | undefined, mix = false) {
     store.list.name = group.name;
     store.list.url = url;
     store.list.id = url.slice(type === 'playlist' ? 11 : 9);
-    store.list.thumbnail = store.list.thumbnail?.startsWith(url) ? store.list.thumbnail.slice(url.length) :
-      group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
+    store.list.thumbnail = store.list.thumbnail || group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
+    store.list.type = type + 's';
   }
-  store.list.type = type + 's';
+
 
   const db = Object(getDB());
 

@@ -246,7 +246,7 @@ export default function Settings() {
 
           <ToggleSwitch
             id="useInvidiousProxySwitch"
-            name='Proxy stream via Invidious'
+            name='Proxy audio via Invidious'
             checked={!getSaved('proxyViaInvidious')}
             onClick={async () => {
               getSaved('proxyViaInvidious') ?

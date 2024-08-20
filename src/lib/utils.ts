@@ -33,9 +33,10 @@ export const getPlaylistIdFromArtist = (id: string): Promise<string> =>
     .then(data => {
       if (!('playlistId' in data))
         throw new Error('No Playlist Id found.');
-      store.list.id = data.playlistId;
-      store.list.name = 'Artist - ' + data.title;
-      store.list.thumbnail = data.thumbnails[0].url;
+      store.list.id = id.slice(9);
+      store.list.type = 'channels';
+
+      store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
       return '/playlists/' + data.playlistId;
     })
     .catch(_ => {
@@ -227,11 +228,17 @@ export function superClick(e: Event) {
     if (!url.startsWith('/channel'))
       url = url.replace('?list=', 's/');
 
-    fetchList(url);
-    store.list.name = eld.title as string;
+    store.list.name = (
+      (location.search.endsWith('music_artists') ||
+        (location.pathname === '/library' && getSaved('defaultSuperCollection') === 'artists')
+      )
+        ? 'Artist - ' : ''
+    ) + eld.title;
+    store.list.uploader = eld.uploader!;
 
-    store.list.thumbnail = eld.thumbnail?.startsWith('https://') ? eld.thumbnail : url + eld.thumbnail;
-    console.log(store.list)
+    store.list.thumbnail = eld.thumbnail ? getThumbIdFromLink(eld.thumbnail) : '';
+
+    fetchList(url);
   }
 }
 

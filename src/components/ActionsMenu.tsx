@@ -107,6 +107,10 @@ export default function ActionsMenu() {
       <li tabindex={5} on:click={() => {
         close();
         const smd = store.actionsMenu;
+        if (smd.author.endsWith('- Topic'))
+          store.list.name = 'Artist - ' + smd.author.replace('- Topic', '');
+
+
         (document.getElementById('viewOnYTBtn') as HTMLButtonElement).innerHTML = '<i class="ri-external-link-line"></i> ' + smd.author;
         fetchList(smd.channelUrl);
       }}>
