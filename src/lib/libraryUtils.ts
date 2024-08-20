@@ -1,5 +1,4 @@
 import { $, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
-import { atpSelector } from "../scripts/superModal";
 import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
@@ -15,15 +14,16 @@ export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElem
 
 
 export function removeFromCollection(collection: string, id: string) {
+  if (!collection) return;
 
   const db = getDB();
   delete db[collection][id];
-  const item = listContainer.querySelector(`[data-id="${id}"]`) as HTMLAnchorElement;
-  item.remove();
+  listContainer.querySelector(`[data-id="${id}"]`)?.remove();
   saveDB(db);
 }
 
 export function toCollection(collection: string, data: CollectionItem | DOMStringMap, db: Library) {
+  if (!collection) return;
   const id = <string>data.id;
   if (db.hasOwnProperty(collection)) {
     if (db[collection].hasOwnProperty(id))// delete old data if already exists
@@ -34,12 +34,17 @@ export function toCollection(collection: string, data: CollectionItem | DOMStrin
 }
 
 export function addToCollection(collection: string, data: CollectionItem | DOMStringMap) {
+
+  if (!collection) return;
+
   const db = getDB();
   toCollection(collection, data, db);
   saveDB(db);
 }
 
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
+
+  if (!collection) return;
 
   if (collection === 'discover')
     db.discover = {};
@@ -52,13 +57,15 @@ export function addListToCollection(collection: string, list: { [index: string]:
 }
 
 export function createPlaylist(title: string) {
+  const playlistSelector = document.getElementById('playlistSelector') as HTMLSelectElement;
+
   reservedCollections
     .concat(
-      [...atpSelector.options].slice(2).map(opt => opt.value)
+      [...playlistSelector.options].slice(2).map(opt => opt.value)
     )
     .includes(title) ?
     notify('This Playlist Already Exists!') :
-    atpSelector.add(new Option(title, title));
+    playlistSelector.add(new Option(title, title));
 }
 
 function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStringMap }, fragment: DocumentFragment) {
@@ -141,7 +148,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 }
 
 
-export async function superCollectionLoader(name: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists') {
+export async function superCollectionLoader(name: SuperCollection) {
   const db = getDB();
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
@@ -175,7 +182,26 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
     return pls.length ? fragment : 'No Collections Found';
   }
 
+  /*
+  channels / playlists / artists / albums
+  > albums are special playlists, id start with OLAK5uy & start with 'Album - ' naturally.
+  > artists are special channels which have been manually prepended with 'Artist - ' title.
+  */
+
   function loadSubList(type: string) {
+    let albums = false;
+    let artists = false;
+
+    if (type === 'albums') {
+      albums = true;
+      type = 'playlists';
+    }
+
+    if (type === 'artists') {
+      artists = true;
+      type = 'channels';
+    }
+
 
     if (!Object(db).hasOwnProperty(type))
       return `No Subscribed ${type} Found`;
@@ -184,15 +210,38 @@ export async function superCollectionLoader(name: 'featured' | 'collections' | '
     const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
 
     for (const pl in pls) {
+      let name = pls[pl].name;
+
+      if (albums) {
+        if (!name.startsWith('Album'))
+          continue;
+        name = name.slice(8);
+      }
+      else if (name.startsWith('Album'))
+        continue;
+
+      if (artists) {
+        if (!name.startsWith('Artist'))
+          continue;
+        name = name.slice(8);
+      }
+      else if (name.startsWith('Artist'))
+        continue;
+
+
       array.push(<StreamItem>{
         type: type.slice(0, -1),
-        name: pls[pl].name,
+        name: name,
         uploaderName: pls[pl].uploader,
         url: `/${type === 'channels' ? type.slice(0, -1) : type}/` + pls[pl].id,
         thumbnail: pls[pl].thumbnail
       });
     }
-    return itemsLoader(array);
+
+
+    return array.length ?
+      itemsLoader(array) :
+      `No Subscribed ${type} Found`;
   }
 
   async function loadFeed() {

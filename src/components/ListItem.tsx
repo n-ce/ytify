@@ -33,8 +33,10 @@ export default function ListItem(
     <a
       class={'listItem ' + (showImage ? 'ravel' : '')}
       href={hostResolver(url)}
+      data-title={title}
       data-url={url}
       data-thumbnail={thumbnail}
+      data-uploader={uploader_data}
     >
       <Show when={showImage}>
         <img

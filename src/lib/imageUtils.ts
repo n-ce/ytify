@@ -1,4 +1,4 @@
-import { canvas, context, img } from "./dom";
+import { img } from "./dom";
 
 
 
@@ -6,38 +6,23 @@ import { canvas, context, img } from "./dom";
 export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 // Generates both channel and stream thumbnails
+
+
 export const generateImageUrl = (
   id: string,
-  res: string = 'mq'
+  res: string,
+  music: string = ''
 ) => 'https://wsrv.nl?url=https://' + (id.startsWith('/') ?
-  `yt3.googleusercontent.com${id}=s176-c-k-c0x00ffffff-no-rj` :
-  `i.ytimg.com/vi_webp/${id}/${res}default.webp`);
+  `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj&output=webp&w=360` :
+  `i.ytimg.com/vi_webp/${id}/${res}default.webp${music}`);
 
-
-// Square Image Generator 
-export function sqrThumb(src: string): Promise<string> {
-
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = async () => {
-      const width = img.width;
-      const height = img.height;
-      const side = Math.min(width, height);
-      canvas.width = side;
-      canvas.height = side;
-      const offsetX = (width - side) / 2;
-      const offsetY = (height - side) / 2;
-      context.drawImage(img, offsetX, offsetY, side, side, 0, 0, side, side);
-      resolve(URL.createObjectURL(new Blob([await canvas.convertToBlob()])));
-    };
-    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-    img.crossOrigin = '';
-    img.src = src;
-  });
-}
 
 
 export function getThumbIdFromLink(url: string) {
+
+  if (url.startsWith('/vi_webp'))
+    url = url.slice(9, 20);
+
   // for featured playlists
   if (url.startsWith('/') || url.length === 11) return url;
   // simplify url 

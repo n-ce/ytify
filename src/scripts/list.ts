@@ -2,7 +2,6 @@ import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAncho
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
 import { addListToCollection, createPlaylist, getDB, reservedCollections, saveDB, toCollection } from '../lib/libraryUtils';
-import { atpSelector } from './superModal';
 import { getThumbIdFromLink } from '../lib/imageUtils';
 import { store } from '../store';
 
@@ -11,7 +10,6 @@ import { store } from '../store';
 function subscribeList(db: Library) {
 
   const l = store.list;
-
   const state = ['Subscribe', 'Subscribed'];
   const dom = subscribeListBtn.innerHTML;
 
@@ -43,7 +41,7 @@ listBtnsContainer.addEventListener('click', e => {
 
   const db = getDB();
   const id = <string>listAnchor.dataset.id;
-  const atpOption = <HTMLOptionElement>atpSelector.querySelector(`[value="${id}"]`);
+  const atpOption = <HTMLOptionElement>document.getElementById('playlistSelector')!.querySelector(`[value="${id}"]`);
 
   if (btn === playAllBtn) {
     clearQ();

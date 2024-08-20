@@ -7,7 +7,6 @@
 @import 'search.css';
 @import 'library.css';
 @import 'list.css';
-@import 'superModal.css';
 @import 'snackbar.css';
 
 :root {
@@ -105,8 +104,8 @@ dialog[open] {
 
 
 dialog::backdrop {
-  background-color: #0007;
   animation: dialogAppear 0.3s ease-in-out forwards;
+  background-color: #0007;
 }
 
 
@@ -163,6 +162,7 @@ a {
   i {
     font-size: xx-large;
   }
+
 }
 
 .ri-loader-3-line {

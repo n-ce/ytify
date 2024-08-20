@@ -47,6 +47,15 @@
 
         #favButton {
           display: none;
+
+          &+label {
+            text-align: right;
+            font-size: x-large;
+          }
+
+          &:checked+label {
+            animation: like 0.4s ease-in-out;
+          }
         }
 
         #loopButton {
@@ -65,9 +74,6 @@
 
       }
     }
-
-
-
 
   }
 
@@ -106,9 +112,6 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
-
-
-
   }
 
   @media(orientation:portrait) {
@@ -139,6 +142,13 @@
     border-radius: var(--rx2);
     padding: 4vmin 8vmin;
     animation-name: fromLeft;
+
+    /* button hover info */
+    [aria-label]:hover::after {
+      position: fixed;
+      content: attr(aria-label);
+      font-size: small;
+    }
 
     #upperLayer {
       display: flex;
@@ -198,6 +208,10 @@
   border-radius: calc(var(--roundness) / 1.4) !important;
   background: var(--bg);
 }
+
+
+
+
 
 
 /* === range theme and appearance === */

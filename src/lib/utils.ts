@@ -1,11 +1,13 @@
-import { audio, img, listAnchor, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subtitleContainer, subtitleTrack, superModal, listBtnsContainer, title, subscribeListBtn, instanceSelector, subtitleSelector } from "./dom";
-import { fetchCollection, getDB, removeFromCollection } from "./libraryUtils";
-import { generateImageUrl, getThumbIdFromLink, sqrThumb } from "./imageUtils";
+import { audio, img, listAnchor, subtitleContainer, subtitleTrack, actionsMenu, title, instanceSelector, subtitleSelector, author } from "./dom";
+import { fetchCollection, removeFromCollection } from "./libraryUtils";
+import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import player from "./player";
-import { params, store } from "../store";
+import { getSaved, store } from "../store";
+import fetchList from "../scripts/fetchList";
+
 
 
 export const $ = document.createElement.bind(document);
@@ -17,13 +19,30 @@ export const removeSaved = localStorage.removeItem.bind(localStorage);
 export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const getApi = (
-  type: 'piped' | 'invidious',
+  type: 'piped' | 'invidious' | 'hyperpipe',
   index: number = instanceSelector.selectedIndex || 0) =>
   store.api[index][type].replace(/\s/g, '');
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
+
+export const getPlaylistIdFromArtist = (id: string): Promise<string> =>
+  fetch(getApi('hyperpipe') + id)
+    .then(res => res.json())
+    .then(data => {
+      if (!('playlistId' in data))
+        throw new Error('No Playlist Id found.');
+      store.list.id = id.slice(9);
+      store.list.type = 'channels';
+
+      store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
+      return '/playlists/' + data.playlistId;
+    })
+    .catch(_ => {
+      notify(_);
+      return '';
+    })
 
 export const hostResolver = (url: string) =>
   store.linkHost + (store.linkHost.includes('ytify') ? url.
@@ -42,6 +61,7 @@ export async function quickSwitch() {
 }
 
 export function notify(text: string) {
+  if (getSaved('toasts')) return;
   const el = $('p');
   const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
   el.className = 'snackbar';
@@ -67,26 +87,32 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-
-
 let more = () => undefined;
 
 document.getElementById('moreBtn')!.addEventListener('click', () => more());
 
+
 export async function setMetaData(
-  id: string,
-  streamName: string,
-  authorName: string,
-  music: boolean = false
+  stream: CollectionItem
 ) {
+
+  // remove ' - Topic' from author name if it exists
+
+  let music = '';
+  let authorText = stream.author;
+  if (stream.author.endsWith(' - Topic')) {
+    music = '&w=720&h=720&fit=cover';
+    authorText = stream.author.slice(0, -8);
+  }
+
   const metadataObj: MediaMetadataInit = {
-    title: streamName,
-    artist: authorName,
+    title: stream.title,
+    artist: authorText,
   };
 
-  const imgx = generateImageUrl(id, 'maxres');
+  const imgX = generateImageUrl(stream.id, 'maxres', music);
   if (store.loadImage !== 'off') {
-    img.src = music ? await sqrThumb(imgx) : imgx;
+    img.src = imgX
     metadataObj.artwork = [
       { src: img.src, sizes: '96x96' },
       { src: img.src, sizes: '128x128' },
@@ -95,29 +121,24 @@ export async function setMetaData(
       { src: img.src, sizes: '384x384' },
       { src: img.src, sizes: '512x512' },
     ]
-    img.alt = streamName;
+    img.alt = stream.title;
   }
 
 
-  title.href = hostResolver(`/watch?v=${id}`);
-  title.textContent = streamName;
+  title.href = hostResolver(`/watch?v=${stream.id}`);
+  title.textContent = stream.title;
+
+  author.textContent = authorText;
 
   more = function() {
-    superModal.showModal();
+    store.actionsMenu = stream;
+    actionsMenu.showModal();
     history.pushState({}, '', '#');
-    const s = superModal.dataset;
-    const a = store.stream;
-    s.id = a.id;
-    s.title = a.title;
-    s.author = a.author;
-    s.duration = a.duration;
-    s.channelUrl = a.channelUrl;
   }
 
-  document.getElementById('author')!.textContent = authorName;
 
   if (location.pathname === '/')
-    document.title = streamName + ' - ytify';
+    document.title = stream.title + ' - ytify';
 
 
   if ('mediaSession' in navigator) {
@@ -128,136 +149,15 @@ export async function setMetaData(
 }
 
 
-
-export async function fetchList(url: string | undefined, mix = false) {
-  if (!url)
-    return notify('No Channel URL provided');
-
-  loadingScreen.showModal();
-  const api = getApi('piped');
-
-  const group = await fetch(api + url)
-    .then(res => res.json())
-    .catch(err => {
-      if (err.message !== 'No Data Found' && instanceSelector.selectedIndex < instanceSelector.length - 1) {
-        instanceSelector.selectedIndex++;
-        fetchList(url, mix);
-        return;
-      }
-      notify(mix ? 'No Mixes Found' : err.message);
-      instanceSelector.selectedIndex = 0;
-    })
-    .finally(() => loadingScreen.close());
-
-  if (!group.relatedStreams.length)
-    return notify('No Data Found');
-
-
-  if (listContainer.classList.contains('reverse'))
-    listContainer.classList.remove('reverse');
-  listContainer.innerHTML = '';
-  listContainer.appendChild(
-    itemsLoader(
-      group.relatedStreams
-    )
-  );
-
-  goTo('/list');
-  listSection.scrollTo(0, 0);
-
-  let token = group.nextpage;
-  function setObserver(callback: () => Promise<string>) {
-    new IntersectionObserver((entries, observer) =>
-      entries.forEach(async e => {
-        if (e.isIntersecting) {
-          token = await callback();
-          observer.disconnect();
-          if (token)
-            setObserver(callback);
-        }
-      }))
-      .observe(listContainer.children[listContainer.childElementCount - 3]);
-  }
-  if (!mix && token)
-    setObserver(async () => {
-      const data = await fetch(
-        api + '/nextpage/' +
-        url.substring(1) + '?nextpage=' + encodeURIComponent(token)
-      )
-        .then(res => res.json())
-        .catch(e => console.log(e));
-      if (!data) return;
-      const existingItems: string[] = [];
-      listContainer.querySelectorAll('.streamItem').forEach((v) => {
-        existingItems.push((v as HTMLElement).dataset.id as string);
-      });
-      listContainer.appendChild(
-        itemsLoader(
-          data.relatedStreams.filter(
-            (item: StreamItem) => !existingItems.includes(
-              item.url.slice(-11))
-          )
-        )
-      );
-      return data.nextpage;
-    });
-
-  const type = url.includes('channel') ? 'channel' : 'playlist';
-
-  listBtnsContainer.className = type;
-
-  openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
-
-  store.list.name = group.name;
-  store.list.url = url;
-  store.list.type = type + 's';
-  store.list.id = url.slice(type === 'playlist' ? 11 : 9);
-  store.list.uploader = group.uploader || group.name;
-  store.list.thumbnail = store.list.thumbnail?.startsWith(url) ? store.list.thumbnail.slice(url.length) :
-    group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
-
-  const db = Object(getDB());
-
-  subscribeListBtn.innerHTML = `<i class="ri-stack-line"></i> Subscribe${db.hasOwnProperty(store.list.type) && db[store.list.type].hasOwnProperty(store.list.id) ? 'd' : ''
-    }`;
-
-  if (mix) playAllBtn.click();
-  else {
-    // replace string for youtube playlist link support
-    store.list.url = url.replace('ts/', 't?list=');
-    document.title = group.name + ' - ytify';
-
-    history.replaceState({}, '',
-      location.origin + location.pathname +
-      '?' + url
-        .split('/')
-        .join('=')
-        .substring(1)
-    );
-
-  }
-
-}
-
-listContainer.addEventListener('click', superClick);
-
-if (params.has('channel') || params.has('playlists'))
-  fetchList('/' +
-    location.search
-      .substring(1)
-      .split('=')
-      .join('/')
-  );
-
 export function itemsLoader(itemsArray: StreamItem[]) {
   if (!itemsArray.length)
     throw new Error('No Data Found');
 
   const streamItem = (stream: StreamItem) => StreamItem({
     id: stream.videoId || stream.url.substring(9),
-    href: hostResolver(stream.url || 'https://youtu.be/' + stream.videoId),
+    href: hostResolver(stream.url || ('/watch?v=' + stream.videoId)),
     title: stream.title,
-    author: stream.uploaderName || stream.author,
+    author: (stream.uploaderName || stream.author) + (location.search.endsWith('music_songs') ? ' - Topic' : ''),
     duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
     uploaded: stream.uploadedDate || stream.publishedText,
     channelUrl: stream.uploaderUrl || stream.authorUrl,
@@ -273,7 +173,7 @@ export function itemsLoader(itemsArray: StreamItem[]) {
     generateImageUrl(
       getThumbIdFromLink(
         item.thumbnail
-      )
+      ), ''
     ),
     item.description || item.uploaderName,
     item.url
@@ -303,22 +203,42 @@ export function superClick(e: Event) {
       : player(eld.id);
 
   else if (elc('ri-more-2-fill')) {
-    superModal.showModal();
+    actionsMenu.showModal();
     history.pushState({}, '', '#');
-    const elp = elem.parentElement?.dataset;
-    for (const x in elp)
-      superModal.dataset[x] = elp[x];
+    const elp = elem.parentElement!.dataset;
+    const sta = store.actionsMenu;
+    sta.id = elp.id as string;
+    sta.title = elp.title as string;
+    sta.author = elp.author as string;
+    sta.channelUrl = elp.channel_url as string;
+    sta.duration = elp.duration as string;
+
   }
 
   else if (elc('ur_pls_item'))
     fetchCollection(elem.textContent as string);
 
   else if (elc('listItem')) {
+
+    // to prevent conflicts
+    store.actionsMenu.author = '';
+
     let url = eld.url as string;
+
     if (!url.startsWith('/channel'))
-      url = url.replace('?list=', 's/')
+      url = url.replace('?list=', 's/');
+
+    store.list.name = (
+      (location.search.endsWith('music_artists') ||
+        (location.pathname === '/library' && getSaved('defaultSuperCollection') === 'artists')
+      )
+        ? 'Artist - ' : ''
+    ) + eld.title;
+    store.list.uploader = eld.uploader!;
+
+    store.list.thumbnail = eld.thumbnail ? getThumbIdFromLink(eld.thumbnail) : '';
+
     fetchList(url);
-    store.list.thumbnail = url + eld.thumbnail;
   }
 }
 

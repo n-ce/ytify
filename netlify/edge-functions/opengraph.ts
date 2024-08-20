@@ -15,11 +15,18 @@ export default async (request: Request, context: Context) => {
   const instance = 'https://invidious.jing.rocks';
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
 
+  if (!data) return;
+  
+  const music = data.author.endsWith(' - Topic') ? '&w=720&h=720&fit=cover' : '';
+  
+  if (music)
+    data.author = data.author.replace(' - Topic', '');
+  
   const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
+    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
     .replace('"ytify"', `"${data.title}"`)
     .replace(<string>context.site.url, `${context.site.url}?s=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', data.videoThumbnails.find((v: { quality: string }) => v.quality === 'medium').url)
+    .replaceAll('/ytify_thumbnail_min.webp', `https://wsrv.nl?url=https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp${music}`);
 
   return new Response(newPage, response);
 };

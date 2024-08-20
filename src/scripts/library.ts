@@ -1,7 +1,7 @@
 import { favButton, favIcon, superCollectionSelector } from "../lib/dom";
-import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, reservedCollections, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
+import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
 import { $, convertSStoHHMMSS, notify, removeSaved, save, superClick } from "../lib/utils";
-import { getSaved, params, store } from "../store";
+import { getSaved, store } from "../store";
 
 
 
@@ -65,37 +65,26 @@ collectionContainer.addEventListener('click', e => {
 });
 
 
-superCollectionSelector.addEventListener('change', () => {
-  const val = superCollectionSelector.value;
-  val === 'featured' ?
-    removeSaved('defaultSuperCollection') :
-    save('defaultSuperCollection', val);
+superCollectionSelector.addEventListener('click', e => {
 
-  superCollectionLoader(val as 'feed');
+  const elm = e.target as HTMLInputElement & { value: SuperCollection };
+  if (!elm.value) return;
+
+
+  elm.value === 'featured' ?
+    removeSaved('defaultSuperCollection') :
+    save('defaultSuperCollection', elm.value);
+
+  superCollectionLoader(elm.value);
 });
 
 
 const sdsc = getSaved('defaultSuperCollection');
 if (sdsc)
-  superCollectionSelector.value = sdsc;
+  document.getElementById('r.' + sdsc)?.toggleAttribute('checked');
 
 
 superCollectionList.addEventListener('click', superClick);
-
-
-// setup initial dom state
-
-addEventListener('DOMContentLoaded', () => {
-
-  const initialKeys = Object.keys(getDB());
-
-  for (const key of initialKeys)
-    if (!reservedCollections.includes(key))
-      createPlaylist(key);
-
-  if (params.has('collection') || params.has('si'))
-    fetchCollection(params.get('collection'), params.get('si'));
-});
 
 
 

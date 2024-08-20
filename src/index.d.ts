@@ -69,6 +69,8 @@ declare global {
     }
   }
 
+  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
+
 }
 
 

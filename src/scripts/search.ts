@@ -1,7 +1,7 @@
 import { instanceSelector, loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getApi, itemsLoader, idFromURL, notify, superClick } from "../lib/utils";
-import { store, params, getSaved } from "../store";
+import { store, getSaved } from "../store";
 import { fetchResultsWithInvidious } from "./search.invidious";
 
 
@@ -23,7 +23,8 @@ function setObserver(callback: () => Promise<string>) {
       if (e.isIntersecting) {
         nextPageToken = await callback();
         observer.disconnect();
-        setObserver(callback);
+        if (nextPageToken !== 'null')
+          setObserver(callback);
       }
     })).observe(searchlist.children[items - (items > 5 ? 5 : 1)]);
 }
@@ -39,17 +40,17 @@ const fetchResultsWithPiped = (query: string) =>
 
       // filter out shorts
       searchlist.appendChild(itemsLoader(
-        items.filter((item: StreamItem) => !item.isShort)
+        items?.filter((item: StreamItem) => !item.isShort)
       ));
       // load more results when 3rd last element is visible
-
-      setObserver(async () => {
-        const data = await loadMoreResults(nextPageToken, query.substring(7));
-        searchlist.appendChild(itemsLoader(
-          data.items.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-        ));
-        return data.nextpage;
-      });
+      if (nextPageToken !== 'null')
+        setObserver(async () => {
+          const data = await loadMoreResults(nextPageToken, query.substring(7));
+          searchlist.appendChild(itemsLoader(
+            data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
+          ));
+          return data.nextpage;
+        });
     })
     .catch(err => {
       if (err.message === 'nextpage error') return;
@@ -71,7 +72,7 @@ function searchLoader() {
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
-  const sortResults = searchFilters.selectedIndex > 7;
+  const sortResults = searchFilters.selectedIndex > 8;
 
   store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
@@ -193,14 +194,4 @@ if (savedSearchFilter)
   searchFilters.value = savedSearchFilter;
 
 
-
-// search param /?q=
-addEventListener('DOMContentLoaded', () => {
-  if (params.has('q')) {
-    superInput.value = params.get('q') || '';
-    if (params.has('f'))
-      searchFilters.value = params.get('f') || '';
-    searchLoader();
-  }
-});
 

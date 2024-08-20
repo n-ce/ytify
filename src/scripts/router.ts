@@ -1,7 +1,8 @@
-import { loadingScreen, searchFilters, superInput, superModal, ytifyIcon } from "../lib/dom";
+import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
-import { fetchList, goTo } from "../lib/utils";
+import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../store";
+import fetchList from "./fetchList";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
 
@@ -129,8 +130,8 @@ ytifyIcon.addEventListener('click', () => {
 // enables back button functionality
 
 onpopstate = () =>
-  superModal.open ?
-    superModal.close() :
+  actionsMenu.open ?
+    actionsMenu.close() :
     showSection(location.pathname);
 
 
