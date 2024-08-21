@@ -8,12 +8,12 @@ import { store } from '../store';
 
 
 function subscribeList(db: Library) {
-
   const l = store.list;
-  const state = ['Subscribe', 'Subscribed'];
-  const dom = subscribeListBtn.innerHTML;
+  const state = [' Subscribe', ' Subscribed'];
+  const dom = (subscribeListBtn.firstElementChild as HTMLParagraphElement);
+  const domState = dom.dataset.state as ' Subscribe' | ' Subscribed';
 
-  if (dom.includes(state[1])) {
+  if (domState === state[1]) {
     delete db[l.type][l.id];
     state.reverse();
   }
@@ -29,7 +29,7 @@ function subscribeList(db: Library) {
 
     toCollection(l.type, dataset, db);
   }
-  subscribeListBtn.innerHTML = dom.replace(state[0], state[1]);
+  dom.dataset.state = state[1];
   saveDB(db);
 }
 
@@ -80,7 +80,7 @@ listBtnsContainer.addEventListener('click', e => {
           'title': sender.title,
           'author': sender.author,
           'duration': sender.duration,
-          'channel_url': sender.channel_url
+          'channelUrl': sender.channel_url
         };
       });
 

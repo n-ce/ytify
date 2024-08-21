@@ -117,10 +117,10 @@ export default async function player(id: string | null = '') {
   const fetchWithPiped = (id: string) =>
     fetch(apiUrl + '/streams/' + id)
       .then(res => res.json())
-      .then(res => {
-        if ('error' in res)
-          throw new Error(res.error)
-        else return res;
+      .then(data => {
+        if ('audioStreams' in data)
+          return data;
+        else throw new Error(data.message);
       });
 
   const data = await (
@@ -162,7 +162,7 @@ export default async function player(id: string | null = '') {
       apiIndex === 0
     );
 
-  setSubtitles(data.subtitles || '');
+  setSubtitles(data.subtitles);
 
 
   params.set('s', id);

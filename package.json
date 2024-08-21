@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,12 +16,12 @@
   },
   "devDependencies": {
     "@netlify/edge-functions": "^2.10.0",
-    "@types/node": "^22.4.1",
+    "@types/node": "^22.4.2",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
     "eruda": "^3.2.3",
     "typescript": "^5.5.4",
-    "vite": "^5.4.1",
+    "vite": "^5.4.2",
     "vite-plugin-pwa": "^0.20.1",
     "vite-plugin-solid": "^2.10.2"
   },

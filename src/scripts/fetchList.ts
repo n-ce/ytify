@@ -96,7 +96,8 @@ export default async function fetchList(
 
   listBtnsContainer.className = type;
 
-  openInYtBtn.innerHTML = '<i class="ri-external-link-line"></i> ' + group.name;
+  (openInYtBtn.firstElementChild as HTMLParagraphElement)
+    .dataset.state = ' ' + group.name;
 
 
   if (!useHyperpipe) {
@@ -107,11 +108,12 @@ export default async function fetchList(
     store.list.type = type + 's';
   }
 
-
   const db = Object(getDB());
 
-  subscribeListBtn.innerHTML = `<i class="ri-stack-line"></i> Subscribe${db.hasOwnProperty(store.list.type) && db[store.list.type].hasOwnProperty(store.list.id) ? 'd' : ''
-    }`;
+
+  (subscribeListBtn.firstElementChild as HTMLParagraphElement)
+    .dataset.state = db.hasOwnProperty(store.list.type) && db[store.list.type].hasOwnProperty(store.list.id) ? ' Subscribed' : ' Subscribe';
+
 
   if (mix) playAllBtn.click();
   else {

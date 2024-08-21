@@ -2,6 +2,11 @@
 export const fetchWithInvidious = (id: string, apiUrl: string) =>
   fetch(`${apiUrl}/api/v1/videos/${id}`)
     .then(res => res.json())
+    .then(data => {
+      if ('adaptiveFormats' in data)
+        return data;
+      else throw new Error(data.error);
+    })
     .then((data: {
       adaptiveFormats: {
         type: string,

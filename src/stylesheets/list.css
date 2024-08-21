@@ -71,3 +71,15 @@
   width: 92%;
   margin: auto;
 }
+
+#viewOnYTBtn,
+#subscribeListBtn {
+  i {
+    pointer-events: none;
+
+    &:after {
+      content: attr(data-state);
+      font-family: 'Noto Sans', sans-serif;
+    }
+  }
+}

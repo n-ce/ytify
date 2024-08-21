@@ -1,4 +1,4 @@
-import { actionsMenu, loadingScreen } from "../lib/dom";
+import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
 import { addToCollection, createPlaylist } from "../lib/libraryUtils";
 import { $, notify } from "../lib/utils";
 import fetchList from "../scripts/fetchList";
@@ -107,11 +107,14 @@ export default function ActionsMenu() {
       <li tabindex={5} on:click={() => {
         close();
         const smd = store.actionsMenu;
-        if (smd.author.endsWith('- Topic'))
-          store.list.name = 'Artist - ' + smd.author.replace('- Topic', '');
+        store.list.name =
+          smd.author.endsWith('- Topic') ?
+            ('Artist - ' + smd.author.replace('- Topic', ''))
+            : '';
 
+        (openInYtBtn.firstElementChild as HTMLParagraphElement)
+          .dataset.state = ' ' + smd.author;
 
-        (document.getElementById('viewOnYTBtn') as HTMLButtonElement).innerHTML = '<i class="ri-external-link-line"></i> ' + smd.author;
         fetchList(smd.channelUrl);
       }}>
         <i class="ri-youtube-line"></i>View Channel

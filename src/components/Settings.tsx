@@ -248,7 +248,7 @@ export default function Settings() {
             id="useInvidiousProxySwitch"
             name='Proxy audio via Invidious'
             checked={!getSaved('proxyViaInvidious')}
-            onClick={async () => {
+            onClick={() => {
               getSaved('proxyViaInvidious') ?
                 removeSaved('proxyViaInvidious') :
                 save('proxyViaInvidious', 'false');
@@ -261,9 +261,9 @@ export default function Settings() {
             id="fetchViaIvSwitch"
             name='Fetch stream data via Invidious'
             checked={getSaved('fetchViaIV') === 'true'}
-            onClick={async () => {
+            onClick={() => {
               getSaved('fetchViaIV') ?
-                removeSaved('FetchViaIV') :
+                removeSaved('fetchViaIV') :
                 save('fetchViaIV', 'true');
               quickSwitch();
             }}
