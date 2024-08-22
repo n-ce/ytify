@@ -18,10 +18,18 @@ function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-const instanceArray: string[] = []; /*await fetch('https://piped-instances.kavin.rocks')
+const instanceArray: string[] = [
+  'https://invidious.perennialte.ch/api/v1/videos/',
+  'https://invidious.jing.rocks/api/v1/videos/',
+  'https://inv.tux.pizza/api/v1/videos/',
+  'https://invidious.nerdvpn.de/api/v1/videos/',
+  'https://invidious.privacyredirect.com/api/v1/videos/',
+  'https://inv.nadeko.net/api/v1/videos/'
+]; 
+/*await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
   .then(data => data.map((i: { api_url: string }) => i.api_url + '/streams/'))
-  .catch(() => ['https://pipedapi.kavin.rocks/streams/']);*/
+  .catch(() => ['https://pipedapi.kavin.rocks/streams/']);
 
 await fetch('https://api.invidious.io/instances.json')
   .then(res => res.json())
@@ -31,7 +39,7 @@ await fetch('https://api.invidious.io/instances.json')
         instanceArray.push(i[1].uri + '/api/v1/videos/')
   })
   .catch(() => instanceArray.push('https://invidious.fdn.fr/api/v1/videos/'));
-
+*/
 
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
