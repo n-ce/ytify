@@ -18,10 +18,10 @@ function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-const instanceArray: string[] = await fetch('https://piped-instances.kavin.rocks')
+const instanceArray: string[] = []; /*await fetch('https://piped-instances.kavin.rocks')
   .then(res => res.json())
   .then(data => data.map((i: { api_url: string }) => i.api_url + '/streams/'))
-  .catch(() => ['https://pipedapi.kavin.rocks/streams/']);
+  .catch(() => ['https://pipedapi.kavin.rocks/streams/']);*/
 
 await fetch('https://api.invidious.io/instances.json')
   .then(res => res.json())
