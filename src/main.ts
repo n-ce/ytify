@@ -15,5 +15,5 @@ addEventListener('DOMContentLoaded', async () => {
 
   import('./scripts/miniPlayer');
 
-  import('./scripts/start');
+  import('./scripts/start').then(mod => mod.default());
 });
