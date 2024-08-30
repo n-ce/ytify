@@ -66,8 +66,7 @@ export default defineConfig(({ command }) => ({
             "icons": [
               {
                 "src": "memories-fill.png",
-                "type": "image/png",
-                "sizes": "24x24",
+                "sizes": "192x192",
               }]
           },
           {
@@ -76,8 +75,7 @@ export default defineConfig(({ command }) => ({
             "icons": [
               {
                 "src": "heart-fill.png",
-                "type": "image/png",
-                "sizes": "24x24",
+                "sizes": "192x192",
               }]
           },
           {
@@ -86,8 +84,7 @@ export default defineConfig(({ command }) => ({
             "icons": [
               {
                 "src": "calendar-schedule-fill.png",
-                "type": "image/png",
-                "sizes": "24x24",
+                "sizes": "192x192",
               }]
           }
         ],
