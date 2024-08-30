@@ -1,5 +1,5 @@
 import { searchlist } from "../lib/dom";
-import { getApi, itemsLoader } from "../lib/utils";
+import { errorHandler, getApi, itemsLoader } from "../lib/utils";
 
 
 function setObserver(callback: () => Promise<void>) {
@@ -38,4 +38,12 @@ export const fetchResultsWithInvidious = (
           )));
       previousQuery = q;
       setObserver(() => fetchResultsWithInvidious(q, sortBy));
-    });
+    })
+    .catch(err => {
+      errorHandler(
+        err.message,
+        () => fetchResultsWithInvidious(q, sortBy),
+        () => '',
+        'invidious'
+      )
+    })

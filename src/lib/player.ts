@@ -1,5 +1,5 @@
-import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, instanceSelector, bitrateSelector } from "./dom";
-import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo } from "./utils";
+import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack, subtitleContainer, listAnchor, bitrateSelector } from "./dom";
+import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo, errorHandler } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { params, store, getSaved } from "../store";
@@ -33,8 +33,7 @@ function setAudioStreams(audioStreams: {
   mimeType: string,
 }[],
   isMusic = false,
-  isLive = false,
-  isCustomInstance = false) {
+  isLive = false) {
 
   const preferedCodec = store.player.codec;
   const noOfBitrates = audioStreams.length;
@@ -51,7 +50,7 @@ function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    const proxyViaPiped = isCustomInstance || (getSaved('proxyViaInvidious') === 'false');
+    const proxyViaPiped = getSaved('custom_instance') || (getSaved('proxyViaInvidious') === 'false');
     const useProxy = isMusic || getSaved('enforceProxy');
 
     // use the default proxy url
@@ -111,9 +110,8 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const apiIndex = instanceSelector.selectedIndex;
   const fetchViaIV = getSaved('fetchViaIV');
-  const apiUrl = store.api[apiIndex][fetchViaIV ? 'invidious' : 'piped'];
+  const apiUrl = getApi(fetchViaIV ? 'invidious' : 'piped');
   const fetchWithPiped = (id: string) =>
     fetch(apiUrl + '/streams/' + id)
       .then(res => res.json())
@@ -128,15 +126,12 @@ export default async function player(id: string | null = '') {
       fetchWithInvidious(id, apiUrl) :
       fetchWithPiped(id)
   ).catch(err => {
-    if (apiIndex < instanceSelector.length - 1) {
-      notify(`switched instance from ${apiUrl} to ${getApi(fetchViaIV ? 'invidious' : 'piped', apiIndex + 1)} due to error: ${err.message}`);
-      instanceSelector.selectedIndex++;
-      player(id);
-      return;
-    }
-    notify(err.message);
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    instanceSelector.selectedIndex = 1;
+    errorHandler(
+      err.message,
+      () => player(id),
+      () => playButton.classList.replace(playButton.className, 'ri-stop-circle-fill'),
+      fetchViaIV ? 'invidious' : 'piped'
+    )
   });
 
   if (!data) return;
@@ -158,8 +153,7 @@ export default async function player(id: string | null = '') {
         (a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate)
       ),
       data.category === 'Music',
-      data.livestream,
-      apiIndex === 0
+      data.livestream
     );
 
   setSubtitles(data.subtitles);

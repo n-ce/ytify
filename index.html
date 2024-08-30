@@ -214,7 +214,6 @@
         box-shadow: var(--shadow);
         border-radius: var(--roundness);
         background-size:cover;
-        margin-bottom:4%;
         color:white;
          " align="center">
           <b style="background-color:#0003;
@@ -227,11 +226,16 @@
               style="text-decoration: underline;" target="_blank">here</a>.
           </b>
         </p>
-        <p
-          style="background: linear-gradient(to bottom right,#f007,#f008);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow)">
+        <p style="background: linear-gradient(to bottom right,#f007,#f008);border-radius:var(--roundness);font-size:large;padding:5vmin;
+          margin:5% 0;
+          box-shadow:var(--shadow)">
           To get around the errors on Piped Instances, Please turn on <b>Fetch stream data via Invidious</b> in
-          Settings >
-          Playback. This does not apply to HLS/IOS users.</p>
+          Settings.</p>
+        <p
+          style="background: linear-gradient(to bottom right,#0777,#0778);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow)">
+          on IOS there might be a duration bug which can only be fixed via enabling <b>HTTP Live Streaming</b> in
+          Settings.
+        </p>
       </div>
     </section>
 
@@ -293,9 +297,6 @@
 
     <section id="settings">
 
-      <select id="instanceSelector">
-        <option>Custom</option>
-      </select>
 
       <div id="actionsContainer">
         <form netlify name="feedback" method="POST">
@@ -321,7 +322,7 @@
 
           <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
 
-          <a href="https://lite--ytify.netlify.app">Open Lite Version</a>
+          <a href="https://ytify.vercel.app">Visit Unofficial Legacy Version</a>
         </form>
 
       </div>

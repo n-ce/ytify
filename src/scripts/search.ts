@@ -1,6 +1,6 @@
-import { instanceSelector, loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
+import { loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getApi, itemsLoader, idFromURL, notify, superClick } from "../lib/utils";
+import { $, getApi, itemsLoader, idFromURL, superClick, errorHandler } from "../lib/utils";
 import { store, getSaved } from "../store";
 import { fetchResultsWithInvidious } from "./search.invidious";
 
@@ -54,15 +54,13 @@ const fetchResultsWithPiped = (query: string) =>
     })
     .catch(err => {
       if (err.message === 'nextpage error') return;
-      const i = instanceSelector.selectedIndex;
-      if (i < instanceSelector.length - 1) {
-        notify(`search error :  switching instance from ${getApi('piped')} to ${getApi('piped', i + 1)} due to error ${err.message}`);
-        instanceSelector.selectedIndex++;
-        searchLoader();
-        return;
-      }
-      notify(err.message);
-      instanceSelector.selectedIndex = 0;
+
+      errorHandler(
+        err.message,
+        searchLoader,
+        () => '',
+        'piped'
+      )
     });
 
 

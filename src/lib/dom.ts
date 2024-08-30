@@ -24,8 +24,6 @@ export const playButton = <HTMLButtonElement>document.getElementById('playButton
 
 export const audio = <HTMLAudioElement>document.querySelector('audio');
 
-export const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement;
-
 export const actionsMenu = <HTMLDialogElement>document.getElementById('actionsMenu');
 
 export const queuelist = <HTMLElement>document.getElementById('queuelist');

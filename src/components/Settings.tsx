@@ -6,6 +6,7 @@ import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
 import { store, getSaved } from '../store';
+import { render } from 'solid-js/web';
 
 
 
@@ -68,9 +69,106 @@ export default function Settings() {
           <p>ytify {Version}</p>
         </b>
 
-        <span id='instanceSelectorContainer'>
-          <label for='instanceSelector'>Instance</label>
-        </span>
+        <Show when={!Boolean(getSaved('custom_instance'))}>
+          <Selector
+            id='instanceSelector'
+            label='Instance'
+            onChange={e => {
+              const selector = e.target;
+              const index = selector.selectedIndex;
+              const current = store.api.list[index];
+              store.api.index = index;
+
+              index === 0 ?
+                removeSaved('api_8') :
+                save('api_8', JSON.stringify(current));
+
+              quickSwitch();
+            }}
+            onMount={target => {
+
+              const hlsOn = getSaved('HLS');
+
+              const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/n-ce/Uma/main/unified_instances.txt';
+
+              fetch(instanceAPIurl)
+                .then(res => hlsOn ? res.json() : res.text())
+                .then(text => {
+
+                  const json = hlsOn ?
+                    text.map((v: Record<'name' | 'locations' | 'api_url' | 'image_proxy_url', string>) => ({
+                      name: `${v.name} ${v.locations}`,
+                      piped: v.api_url,
+                      invidious: 'https://invidious.fdn.fr',
+                      hyperpipe: 'https://hyperpipeapi.onrender.com'
+                    })) :
+                    text.split('\n\n').map((v: string) => {
+                      const [name, flag, pi, iv, hp] = v.split(', ');
+                      return {
+                        name: `${name} ${flag}`,
+                        piped: `https://${pi}.${name}`,
+                        invidious: `https://${iv}.${name}`,
+                        hyperpipe: `https://${hp}.${name}`
+                      }
+                    });
+
+
+                  // add to DOM
+                  for (const api of json) {
+                    target.add(new Option(api.name));
+                    store.api.list.push(api);
+                  }
+
+                  const savedApi = getSaved('api_8');
+
+                  if (!savedApi) return;
+
+                  const api = JSON.parse(savedApi);
+                  const names = json.map((v: { name: string }) => v.name);
+                  const index = names.findIndex((v: { name: string }) => v === api.name);
+
+                  index < 0 ?
+                    removeSaved('api_8') :
+                    target.selectedIndex = index + 1;
+                });
+
+            }}
+          >
+            <option>Official 🌐</option>
+          </Selector>
+        </Show>
+
+        <ToggleSwitch
+          id='customInstanceSwitch'
+          name='Use Custom Instance'
+          checked={Boolean(getSaved('custom_instance'))}
+          onClick={() => {
+            if (getSaved('custom_instance')) {
+              removeSaved('custom_instance');
+              removeSaved('api_8')
+            }
+            else {
+              const current = store.api.list[0];
+              const n = prompt('Enter Name of your instance :', 'Custom');
+              const p = prompt('Enter Piped API URL :', current.piped)
+              const i = prompt('Enter Invidious API URL (optional) :', current.invidious);
+              const h = prompt('Enter Hyperpipe API URL (optional) :', current.hyperpipe);
+
+              if (n)
+                current.name = n;
+              if (p)
+                current.piped = p;
+              if (i)
+                current.invidious = i;
+              if (h)
+                current.hyperpipe = h;
+
+              save('custom_instance', JSON.stringify(current));
+            }
+            location.reload();
+
+          }}
+        />
 
         <Selector
           id='linkHost'
@@ -125,27 +223,31 @@ export default function Settings() {
           <option value="off">Do not Load</option>
         </Selector>
 
-        <ToggleSwitch
-          id="toastsSwitch"
-          name='Toast Notifications'
-          checked={getSaved('toasts') !== 'false'}
-          onClick={() => {
-            getSaved('toasts') ?
-              removeSaved('toasts') :
-              save('toasts', 'false');
+        <Selector
+          id='downloadFormatSelector'
+          label='Download Format'
+          onChange={(e) => {
+            store.downloadFormat = e.target.value as 'opus';
+            store.downloadFormat === 'opus' ?
+              removeSaved('dlFormat') :
+              save('dlFormat', store.downloadFormat);
           }}
-        />
+          onMount={(target) => {
 
-        <ToggleSwitch
-          id="fetchInstancesSwitch"
-          name='Fetch Instances'
-          checked={getSaved('fetchAPI') !== 'false'}
-          onClick={() => {
-            getSaved('fetchAPI') ?
-              removeSaved('fetchAPI') :
-              save('fetchAPI', 'false');
+            const savedDownloadFormat = getSaved('dlFormat');
+            if (savedDownloadFormat)
+              target.value =
+                store.downloadFormat =
+                savedDownloadFormat as 'opus';
+
           }}
-        />
+
+        >
+          <option value='opus'>Opus (Recommended)</option>
+          <option value='mp3'>MP3</option>
+          <option value='wav'>WAV</option>
+          <option value='ogg'>OGG</option>
+        </Selector>
 
 
 
@@ -355,21 +457,22 @@ export default function Settings() {
           id='roundnessChanger'
           onChange={(e) => {
             cssVar('--roundness', e.target.value);
-            e.target.value === '2vmin' ?
+            e.target.value === '0.4rem' ?
               removeSaved('roundness') :
               save('roundness', e.target.value)
           }}
           onMount={(target) => {
             if (getSaved('roundness')) {
-              target.value = getSaved('roundness') || '2vmin';
+              target.value = getSaved('roundness') || '0.4rem';
               cssVar('--roundness', target.value);
             }
           }}
         >
           <option value="none">None</option>
-          <option value="1vmin">Light</option>
-          <option value="2vmin" selected>Medium</option>
-          <option value="4vmin">Heavy</option>
+          <option value="0.2rem">Lighter</option>
+          <option value="0.4rem" selected>Light</option>
+          <option value="0.6rem">Heavy</option>
+          <option value="0.9rem">Heavier</option>
         </Selector>
 
         <Selector
@@ -395,15 +498,6 @@ export default function Settings() {
             <option value="white">White</option>
             <option value="black">Black</option>
           </optgroup>
-          {/*
-          <optgroup label="Community">
-
-            <option value="sepia">Sepia</option>
-            <option value="whatsapp">Whatsapp</option>
-            <option value="sun">Sun</option>
-            <option value="hide_seek">Hide & Seek</option>
-          </optgroup>
-          */}
         </Selector>
 
         <p onClick={
@@ -489,3 +583,12 @@ document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
 document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);
 document.getElementById('importSettingsBtn')!.addEventListener('change', importSettings);
+
+
+const settingsContainer = document.getElementById('settings') as HTMLDivElement;
+
+render(Settings, settingsContainer);
+// render appends Settings after act so we append act after Settings
+settingsContainer.appendChild(document.getElementById('actionsContainer')!);
+
+

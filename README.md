@@ -2,7 +2,7 @@
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
-[![Telegram Members](https://img.shields.io/endpoint?style=flat&url=https://mogyo.ro/quart-apis/tgmembercount?chat_id=ytifytg)](https://t.me/encetg)
+[![Telegram Members](https://img.shields.io/endpoint?style=flat&url=https://mogyo.ro/quart-apis/tgmembercount?chat_id=ytifytg)](https://t.me/ytifytg)
 [![Matrix](https://img.shields.io/matrix/ytify:matrix.org?label=Matrix)](https://matrix.to/#/#ytify:matrix.org)
 
 </div>
@@ -44,7 +44,7 @@ https://ytify.netlify.app is the only official location that the main branch is 
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Telegram Community [@ytifytg](https://t.me/ytifytg)
 - Join our Matrix Community
-[@ytify](https://matrix.to/#/!ytify:matrix.org)
+[@ytify](https://matrix.to/#/#ytify:matrix.org)
 
 
 ## License 📝

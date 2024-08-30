@@ -88,7 +88,7 @@ export default function ActionsMenu() {
           body: JSON.stringify({
             url: streamUrl,
             isAudioOnly: true,
-            aFormat: (await store.player.supportsOpus) ? 'opus' : 'mp3',
+            aFormat: store.downloadFormat,
             filenamePattern: 'basic'
           })
         })

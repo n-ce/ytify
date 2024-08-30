@@ -21,14 +21,18 @@ export const store: {
     highContrast: boolean,
     roundness: 'none' | '2vmin' | '4vmin' | '8vmin'
   },
-  api: Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>[],
+  api: {
+    list: Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>[],
+    index: number
+  },
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
   searchQuery: string,
   upcomingQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
-  list: Record<'name' | 'url' | 'type' | 'id' | 'uploader' | 'thumbnail', string>
+  list: Record<'name' | 'url' | 'type' | 'id' | 'uploader' | 'thumbnail', string>,
+  downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
     playbackState: 'none',
@@ -55,14 +59,19 @@ export const store: {
     highContrast: false,
     roundness: '2vmin'
   },
-  api: [
-    {
-      name: 'Custom',
-      piped: 'https://pipedapi.kavin.rocks',
-      invidious: 'https://invidious.fdn.fr',
-      hyperpipe: 'https://hyperpipeapi.onrender.com'
-    }
-  ],
+  api: {
+    list:
+      [
+        JSON.parse(
+          getSaved('custom_instance') || `{
+          "name": "Official 🌐",
+          "piped": "https://pipedapi.kavin.rocks",
+          "invidious": "https://invidious.fdn.fr",
+          "hyperpipe": "https://hyperpipeapi.onrender.com"
+        }`)
+      ],
+    index: 0
+  },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: getSaved('linkHost') || location.origin,
   searchQuery: '',
@@ -82,6 +91,7 @@ export const store: {
     id: '',
     uploader: '',
     thumbnail: ''
-  }
+  },
+  downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
 }
 
