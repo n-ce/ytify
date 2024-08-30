@@ -69,7 +69,7 @@ export default function Settings() {
           <p>ytify {Version}</p>
         </b>
 
-        <Show when={!Boolean(getSaved('custom_instance'))}>
+        <Show when={!getSaved('custom_instance')}>
           <Selector
             id='instanceSelector'
             label='Instance'
