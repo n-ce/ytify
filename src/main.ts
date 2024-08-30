@@ -1,5 +1,8 @@
 import './stylesheets/global.css';
-
-addEventListener('DOMContentLoaded', async () => {
-  import('./scripts/start').then(mod => mod.default());
-});
+import('eruda')
+  .then(mod => mod.default.init())
+  .then(() => {
+    addEventListener('DOMContentLoaded', async () => {
+      import('./scripts/start').then(mod => mod.default());
+    });
+  });
