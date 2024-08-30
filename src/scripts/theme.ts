@@ -1,6 +1,6 @@
-import { canvas, context } from "../lib/dom";
-import { generateImageUrl } from "../lib/imageUtils";
-import { store, getSaved } from "../store";
+import { canvas, context } from '../lib/dom';
+import { generateImageUrl } from '../lib/imageUtils';
+import { store, getSaved } from '../lib/store';
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);

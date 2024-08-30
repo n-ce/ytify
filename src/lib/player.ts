@@ -2,7 +2,7 @@ import { audio, favButton, favIcon, playButton, subtitleSelector, subtitleTrack,
 import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo, errorHandler } from "./utils";
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
-import { params, store, getSaved } from "../store";
+import { params, store, getSaved } from "./store";
 import { fetchWithInvidious } from "../scripts/fetchWithInvidious";
 
 

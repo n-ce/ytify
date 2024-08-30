@@ -1,7 +1,7 @@
 import { loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
 import { $, getApi, itemsLoader, idFromURL, superClick, errorHandler } from "../lib/utils";
-import { store, getSaved } from "../store";
+import { store, getSaved } from "../lib/store";
 import { fetchResultsWithInvidious } from "./search.invidious";
 
 

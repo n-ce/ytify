@@ -3,7 +3,7 @@ import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver, notify } from '../lib/utils';
 import { addListToCollection, createPlaylist, getDB, reservedCollections, saveDB, toCollection } from '../lib/libraryUtils';
 import { getThumbIdFromLink } from '../lib/imageUtils';
-import { store } from '../store';
+import { store } from '../lib/store';
 
 
 

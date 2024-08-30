@@ -5,7 +5,7 @@ import { getDB, saveDB } from "../lib/libraryUtils";
 import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
-import { store, getSaved } from '../store';
+import { store, getSaved } from '../lib/store';
 import { render } from 'solid-js/web';
 
 

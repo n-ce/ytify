@@ -5,7 +5,7 @@ import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import player from "./player";
-import { getSaved, store } from "../store";
+import { getSaved, store } from "./store";
 import fetchList from "../scripts/fetchList";
 
 

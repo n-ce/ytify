@@ -3,7 +3,7 @@ import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
-import { store, getSaved } from "../store";
+import { store, getSaved } from "../lib/store";
 
 const queueArray = store.queue.array;
 const [

@@ -3,7 +3,7 @@ import { addToCollection, createPlaylist } from "../lib/libraryUtils";
 import { $, notify } from "../lib/utils";
 import fetchList from "../scripts/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
-import { store } from "../store";
+import { store } from "../lib/store";
 import './ActionsMenu.css';
 
 declare module "solid-js" {

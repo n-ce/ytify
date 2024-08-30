@@ -1,16 +1,7 @@
 import type { SortableEvent } from "sortablejs";
-import '../scripts/router';
-import '../scripts/theme';
-import '../scripts/search';
-import '../scripts/queue';
-import '../scripts/list';
-import '../scripts/audioEvents';
-import '../scripts/library';
-import '../scripts/miniPlayer';
-import '../components/Settings';
 import player from '../lib/player';
 import { render } from 'solid-js/web';
-import { getSaved, params, store } from '../store';
+import { getSaved, params, store } from '../lib/store';
 import { errorHandler, getApi, idFromURL } from '../lib/utils';
 import { createPlaylist, fetchCollection, getDB, reservedCollections } from '../lib/libraryUtils';
 import { bitrateSelector, searchFilters, superInput, actionsMenu, audio, playButton, queuelist, loadingScreen, ytifyIcon } from '../lib/dom';

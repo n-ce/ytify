@@ -1,7 +1,7 @@
 import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { goTo } from "../lib/utils";
-import { getSaved, params, store } from "../store";
+import { getSaved, params, store } from "../lib/store";
 import fetchList from "./fetchList";
 import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
@@ -11,7 +11,7 @@ const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorEleme
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
-
+alert('I am the router');
 
 export function upcomingInjector(param: string) {
   loadingScreen.showModal();
