@@ -24,7 +24,7 @@ function resolvePage(q: string) {
   return page;
 }
 
-export const fetchResultsWithInvidious = (
+export const fetchSearchResultsWithInvidious = (
   q: string,
   sortBy: string
 ) =>
@@ -37,12 +37,12 @@ export const fetchResultsWithInvidious = (
             (item: StreamItem) => (item.lengthSeconds > 60) && (item.viewCount > 1000)
           )));
       previousQuery = q;
-      setObserver(() => fetchResultsWithInvidious(q, sortBy));
+      setObserver(() => fetchSearchResultsWithInvidious(q, sortBy));
     })
     .catch(err => {
       errorHandler(
         err.message,
-        () => fetchResultsWithInvidious(q, sortBy),
+        () => fetchSearchResultsWithInvidious(q, sortBy),
         () => '',
         'invidious'
       )

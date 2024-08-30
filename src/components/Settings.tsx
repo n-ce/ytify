@@ -336,7 +336,7 @@ export default function Settings() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Proxy non-music streams'
+            name='Also Proxy non-music streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               getSaved('enforceProxy') ?
@@ -348,7 +348,7 @@ export default function Settings() {
 
           <ToggleSwitch
             id="useInvidiousProxySwitch"
-            name='Proxy audio via Invidious'
+            name='Prefer to Proxy Audio over Invidious instead of Piped'
             checked={!getSaved('proxyViaInvidious')}
             onClick={() => {
               getSaved('proxyViaInvidious') ?

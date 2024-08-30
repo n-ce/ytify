@@ -3,7 +3,7 @@ import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo, errorH
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { params, store, getSaved } from "./store";
-import { fetchWithInvidious } from "../scripts/fetchWithInvidious";
+import { fetchStreamDataWithInvidious } from "../scripts/fetchWithInvidious";
 
 
 
@@ -123,7 +123,7 @@ export default async function player(id: string | null = '') {
 
   const data = await (
     fetchViaIV ?
-      fetchWithInvidious(id, apiUrl) :
+      fetchStreamDataWithInvidious(id, apiUrl) :
       fetchWithPiped(id)
   ).catch(err => {
     errorHandler(

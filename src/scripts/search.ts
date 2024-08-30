@@ -2,7 +2,7 @@ import { loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom
 import player from "../lib/player";
 import { $, getApi, itemsLoader, idFromURL, superClick, errorHandler } from "../lib/utils";
 import { store, getSaved } from "../lib/store";
-import { fetchResultsWithInvidious } from "./search.invidious";
+import { fetchSearchResultsWithInvidious } from "./search.invidious";
 
 
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
@@ -29,7 +29,7 @@ function setObserver(callback: () => Promise<string>) {
     })).observe(searchlist.children[items - (items > 5 ? 5 : 1)]);
 }
 
-const fetchResultsWithPiped = (query: string) =>
+const fetchSearchResultsWithPiped = (query: string) =>
   fetch(getApi('piped') + '/' + query)
     .then(res => res.json())
     .then(async (searchResults) => {
@@ -84,8 +84,8 @@ function searchLoader() {
   loadingScreen.showModal();
 
   (sortResults ?
-    fetchResultsWithInvidious(superInput.value, searchFilters.value) :
-    fetchResultsWithPiped(query)
+    fetchSearchResultsWithInvidious(superInput.value, searchFilters.value) :
+    fetchSearchResultsWithPiped(query)
   ).finally(() => loadingScreen.close());
 
   history.replaceState({}, '', location.origin + location.pathname + store.searchQuery.replace('filter', 'f'));

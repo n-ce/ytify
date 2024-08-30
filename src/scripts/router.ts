@@ -11,7 +11,6 @@ const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorEleme
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
-alert('I am the router');
 
 export function upcomingInjector(param: string) {
   loadingScreen.showModal();

@@ -1,5 +1,5 @@
 
-export const fetchWithInvidious = (id: string, apiUrl: string) =>
+export const fetchStreamDataWithInvidious = (id: string, apiUrl: string) =>
   fetch(`${apiUrl}/api/v1/videos/${id}`)
     .then(res => res.json())
     .then(data => {

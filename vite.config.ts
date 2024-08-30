@@ -32,7 +32,7 @@ export default defineConfig(({ command }) => ({
     Version: JSON.stringify(process.env.npm_package_version),
   },
   plugins: [
-    injectEruda(true),
+    injectEruda(command === 'serve'),
     solidPlugin(),
     VitePWA({
       manifest: {
@@ -62,23 +62,33 @@ export default defineConfig(({ command }) => ({
         "shortcuts": [
           {
             "name": "History",
-            "url": "/list?collection=history"
+            "url": "/list?collection=history",
+            "icons": [
+              {
+                "src": "memories-fill.png",
+                "type": "image/png",
+                "sizes": "24x24",
+              }]
           },
           {
             "name": "Favorites",
-            "url": "/list?collection=favorites"
-          },
-          {
-            "name": "Discover",
-            "url": "/list?collection=discover"
+            "url": "/list?collection=favorites",
+            "icons": [
+              {
+                "src": "heart-fill.png",
+                "type": "image/png",
+                "sizes": "24x24",
+              }]
           },
           {
             "name": "Listen Later",
-            "url": "/list?collection=listenLater"
-          },
-          {
-            "name": "Library",
-            "url": "/library"
+            "url": "/list?collection=listenLater",
+            "icons": [
+              {
+                "src": "calendar-schedule-fill.png",
+                "type": "image/png",
+                "sizes": "24x24",
+              }]
           }
         ],
         "start_url": "/",
@@ -95,7 +105,7 @@ export default defineConfig(({ command }) => ({
           }
         }
       },
-      disable: true,
+      disable: command !== 'build',
       includeAssets: ['*.woff2', 'ytify_banner.webp']
     })
   ],
