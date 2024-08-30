@@ -32,7 +32,7 @@ export default defineConfig(({ command }) => ({
     Version: JSON.stringify(process.env.npm_package_version),
   },
   plugins: [
-    injectEruda(command === 'serve'),
+    injectEruda(true),
     solidPlugin(),
     VitePWA({
       manifest: {
@@ -95,7 +95,7 @@ export default defineConfig(({ command }) => ({
           }
         }
       },
-      disable: command !== 'build',
+      disable: true,
       includeAssets: ['*.woff2', 'ytify_banner.webp']
     })
   ],

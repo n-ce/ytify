@@ -1,4 +1,13 @@
 import type { SortableEvent } from "sortablejs";
+import '../scripts/router';
+import '../scripts/theme';
+import '../scripts/search';
+import '../scripts/queue';
+import '../scripts/list';
+import '../scripts/audioEvents';
+import '../scripts/library';
+import '../scripts/miniPlayer';
+import '../components/Settings';
 import player from '../lib/player';
 import { render } from 'solid-js/web';
 import { getSaved, params, store } from '../store';
