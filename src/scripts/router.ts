@@ -12,7 +12,7 @@ const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivEleme
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
 
-export function upcomingInjector(param: string) {
+function upcomingInjector(param: string) {
   loadingScreen.showModal();
 
   fetch(`${location.origin}/public?id=${param}`)
