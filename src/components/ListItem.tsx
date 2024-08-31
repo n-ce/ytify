@@ -1,5 +1,5 @@
 import { hostResolver } from '../lib/utils';
-import { store } from '../store';
+import { store } from '../lib/store';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
 

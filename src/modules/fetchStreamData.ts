@@ -1,5 +1,23 @@
+export const getData = (
+  id: string,
+  apiUrl: string,
+  useInvidious = false
+) =>
+  useInvidious ?
+    fetchWithInvidious(id, apiUrl) :
+    fetchWithPiped(id, apiUrl)
 
-export const fetchWithInvidious = (id: string, apiUrl: string) =>
+
+const fetchWithPiped = (id: string, apiUrl: string) =>
+  fetch(apiUrl + '/streams/' + id)
+    .then(res => res.json())
+    .then(data => {
+      if ('audioStreams' in data)
+        return data;
+      else throw new Error(data.message);
+    });
+
+const fetchWithInvidious = (id: string, apiUrl: string) =>
   fetch(`${apiUrl}/api/v1/videos/${id}`)
     .then(res => res.json())
     .then(data => {

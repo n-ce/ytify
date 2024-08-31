@@ -1,7 +1,7 @@
-import { instanceSelector, listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
+import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB } from "../lib/libraryUtils";
-import { getApi, getPlaylistIdFromArtist, goTo, itemsLoader, notify, superClick } from "../lib/utils";
-import { store } from "../store";
+import { errorHandler, getApi, getPlaylistIdFromArtist, goTo, itemsLoader, notify, superClick } from "../lib/utils";
+import { store } from "../lib/store";
 
 export default async function fetchList(
   url: string | undefined,
@@ -13,7 +13,8 @@ export default async function fetchList(
 
   loadingScreen.showModal();
 
-  const useHyperpipe = store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist');
+  const useHyperpipe = !mix && store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist');
+
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
@@ -29,13 +30,13 @@ export default async function fetchList(
   const group = await fetch(api + url)
     .then(res => res.json())
     .catch(err => {
-      if (err.message !== 'No Data Found' && instanceSelector.selectedIndex < instanceSelector.length - 1) {
-        instanceSelector.selectedIndex++;
-        fetchList(url, mix);
-        return;
-      }
-      notify(mix ? 'No Mixes Found' : err.message);
-      instanceSelector.selectedIndex = 0;
+
+      errorHandler(
+        mix ? 'No Mixes Found' : err.message,
+        () => fetchList(url, mix),
+        () => '',
+        'piped'
+      )
     })
     .finally(() => loadingScreen.close());
 

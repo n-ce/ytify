@@ -2,7 +2,7 @@ import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
-import { getSaved, params, store } from "../store";
+import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 

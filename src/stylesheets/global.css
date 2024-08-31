@@ -17,7 +17,7 @@
   --border: 0.1vmin solid var(--borderColor);
   --shadowColor: transparent;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
-  --roundness: 2vmin;
+  --roundness: 0.4rem;
   --defaultBg: var(--text);
   --defaultText: var(--bg);
   --pageTransitionEffect: translateX(100%);

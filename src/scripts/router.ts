@@ -1,17 +1,16 @@
 import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { goTo } from "../lib/utils";
-import { getSaved, params, store } from "../store";
-import fetchList from "./fetchList";
-import { miniPlayerRoutingHandler } from "./miniPlayer";
+import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist } from "./queue";
+import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
+import fetchList from "../modules/fetchList";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
-
 
 export function upcomingInjector(param: string) {
   loadingScreen.showModal();

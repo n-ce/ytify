@@ -1,9 +1,9 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
 import { addToCollection, createPlaylist } from "../lib/libraryUtils";
 import { $, notify } from "../lib/utils";
-import fetchList from "../scripts/fetchList";
+import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
-import { store } from "../store";
+import { store } from "../lib/store";
 import './ActionsMenu.css';
 
 declare module "solid-js" {
@@ -88,7 +88,7 @@ export default function ActionsMenu() {
           body: JSON.stringify({
             url: streamUrl,
             isAudioOnly: true,
-            aFormat: (await store.player.supportsOpus) ? 'opus' : 'mp3',
+            aFormat: store.downloadFormat,
             filenamePattern: 'basic'
           })
         })

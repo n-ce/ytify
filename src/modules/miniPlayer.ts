@@ -1,6 +1,6 @@
 import { author, img as imgX, miniPlayer, playButton, title, ytifyIcon } from '../lib/dom';
 import { goTo } from '../lib/utils';
-import { store } from '../store';
+import { store } from '../lib/store';
 
 let img: HTMLImageElement | '' = imgX;
 

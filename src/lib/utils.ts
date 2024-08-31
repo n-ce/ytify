@@ -1,12 +1,12 @@
-import { audio, img, listAnchor, subtitleContainer, subtitleTrack, actionsMenu, title, instanceSelector, subtitleSelector, author } from "./dom";
+import { audio, img, listAnchor, subtitleContainer, subtitleTrack, actionsMenu, title, subtitleSelector, author } from "./dom";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
 import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import player from "./player";
-import { getSaved, store } from "../store";
-import fetchList from "../scripts/fetchList";
+import { getSaved, store } from "./store";
+import fetchList from "../modules/fetchList";
 
 
 
@@ -20,8 +20,8 @@ export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementBy
 
 export const getApi = (
   type: 'piped' | 'invidious' | 'hyperpipe',
-  index: number = instanceSelector.selectedIndex || 0) =>
-  store.api[index][type].replace(/\s/g, '');
+  index: number = store.api.index) =>
+  store.api.list[index][type].replace(/\s/g, '');
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -61,7 +61,6 @@ export async function quickSwitch() {
 }
 
 export function notify(text: string) {
-  if (getSaved('toasts')) return;
   const el = $('p');
   const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
   el.className = 'snackbar';
@@ -84,6 +83,49 @@ export function convertSStoHHMMSS(seconds: number): string {
   if (ss < 10) ssStr = '0' + ssStr;
   return (hh > 0 ?
     hh + ':' : '') + `${mmStr}:${ssStr}`;
+}
+
+
+export async function errorHandler(message: string,
+  redoAction: () => void,
+  finalAction: () => void,
+  instanceType: 'piped' | 'invidious' | 'hyperpipe'
+) {
+
+  // Get Current API
+  // if condition
+  //     > Display Error
+  //     > Redo Action with Next API
+  // final action if all fails
+
+  const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement | null;
+  console.log(store.api);
+  const apiIndex = instanceSelector?.selectedIndex || 0;
+  const apiUrl = getApi(instanceType, apiIndex);
+  const noOfInstances = instanceSelector?.length || 1;
+
+  if (message === 'nextpage error') return;
+
+  if (
+    message !== 'No Data Found' &&
+    apiIndex < noOfInstances - 1
+  ) {
+    const nextApi = getApi(instanceType, apiIndex + 1);
+
+    notify(`switched instance from ${apiUrl} to ${nextApi} due to ${message}.`);
+
+    if (instanceSelector)
+      instanceSelector.selectedIndex++;
+
+    store.api.index = instanceSelector?.selectedIndex || 0;
+
+    redoAction();
+    return;
+  }
+  notify(message);
+  finalAction();
+  if (instanceSelector)
+    instanceSelector.selectedIndex = store.api.index = 0;
 }
 
 

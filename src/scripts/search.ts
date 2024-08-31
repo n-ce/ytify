@@ -1,70 +1,11 @@
-import { instanceSelector, loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
+import { loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, getApi, itemsLoader, idFromURL, notify, superClick } from "../lib/utils";
-import { store, getSaved } from "../store";
-import { fetchResultsWithInvidious } from "./search.invidious";
+import { $, errorHandler, getApi, idFromURL, superClick } from "../lib/utils";
+import { store, getSaved } from "../lib/store";
+import { getSearchResults } from "../modules/fetchSearchResults";
 
 
 const suggestions = <HTMLUListElement>document.getElementById('suggestions');
-let nextPageToken = '';
-
-const loadMoreResults = (token: string, query: string) =>
-  fetch(`${getApi('piped')}/nextpage/search?nextpage=${encodeURIComponent(token)}&${query}`)
-    .then(res => res.json())
-    .catch(x => console.log('e:' + x))
-
-
-function setObserver(callback: () => Promise<string>) {
-
-  const items = searchlist.childElementCount;
-
-  new IntersectionObserver((entries, observer) =>
-    entries.forEach(async e => {
-      if (e.isIntersecting) {
-        nextPageToken = await callback();
-        observer.disconnect();
-        if (nextPageToken !== 'null')
-          setObserver(callback);
-      }
-    })).observe(searchlist.children[items - (items > 5 ? 5 : 1)]);
-}
-
-const fetchResultsWithPiped = (query: string) =>
-  fetch(getApi('piped') + '/' + query)
-    .then(res => res.json())
-    .then(async (searchResults) => {
-      const items = searchResults.items;
-      nextPageToken = searchResults.nextpage;
-      if (!items) throw new Error('Search couldn\'t be resolved on ' + getApi('piped'));
-
-
-      // filter out shorts
-      searchlist.appendChild(itemsLoader(
-        items?.filter((item: StreamItem) => !item.isShort)
-      ));
-      // load more results when 3rd last element is visible
-      if (nextPageToken !== 'null')
-        setObserver(async () => {
-          const data = await loadMoreResults(nextPageToken, query.substring(7));
-          searchlist.appendChild(itemsLoader(
-            data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-          ));
-          return data.nextpage;
-        });
-    })
-    .catch(err => {
-      if (err.message === 'nextpage error') return;
-      const i = instanceSelector.selectedIndex;
-      if (i < instanceSelector.length - 1) {
-        notify(`search error :  switching instance from ${getApi('piped')} to ${getApi('piped', i + 1)} due to error ${err.message}`);
-        instanceSelector.selectedIndex++;
-        searchLoader();
-        return;
-      }
-      notify(err.message);
-      instanceSelector.selectedIndex = 0;
-    });
-
 
 // Get search results of input
 function searchLoader() {
@@ -72,7 +13,7 @@ function searchLoader() {
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
-  const sortResults = searchFilters.selectedIndex > 8;
+  const service = (searchFilters.selectedIndex > 8) ? 'invidious' : 'piped';
 
   store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
@@ -82,13 +23,24 @@ function searchLoader() {
     return
   }
 
-
   loadingScreen.showModal();
 
-  (sortResults ?
-    fetchResultsWithInvidious(superInput.value, searchFilters.value) :
-    fetchResultsWithPiped(query)
-  ).finally(() => loadingScreen.close());
+  getSearchResults(
+    getApi(service),
+    service === 'invidious' ? superInput.value : query,
+    searchFilters.value
+  )
+    .catch(err => {
+      if (err.message === 'nextpage error') return;
+
+      errorHandler(
+        err.message,
+        searchLoader,
+        () => '',
+        service
+      )
+    })
+    .finally(() => loadingScreen.close());
 
   history.replaceState({}, '', location.origin + location.pathname + store.searchQuery.replace('filter', 'f'));
   suggestions.style.display = 'none';

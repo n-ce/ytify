@@ -62,23 +62,30 @@ export default defineConfig(({ command }) => ({
         "shortcuts": [
           {
             "name": "History",
-            "url": "/list?collection=history"
+            "url": "/list?collection=history",
+            "icons": [
+              {
+                "src": "memories-fill.png",
+                "sizes": "192x192",
+              }]
           },
           {
             "name": "Favorites",
-            "url": "/list?collection=favorites"
-          },
-          {
-            "name": "Discover",
-            "url": "/list?collection=discover"
+            "url": "/list?collection=favorites",
+            "icons": [
+              {
+                "src": "heart-fill.png",
+                "sizes": "192x192",
+              }]
           },
           {
             "name": "Listen Later",
-            "url": "/list?collection=listenLater"
-          },
-          {
-            "name": "Library",
-            "url": "/library"
+            "url": "/list?collection=listenLater",
+            "icons": [
+              {
+                "src": "calendar-schedule-fill.png",
+                "sizes": "192x192",
+              }]
           }
         ],
         "start_url": "/",

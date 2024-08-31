@@ -1,7 +1,7 @@
 import { favButton, favIcon, superCollectionSelector } from "../lib/dom";
 import { addListToCollection, addToCollection, createPlaylist, fetchCollection, getDB, removeFromCollection, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
 import { $, convertSStoHHMMSS, notify, removeSaved, save, superClick } from "../lib/utils";
-import { getSaved, store } from "../store";
+import { getSaved, store } from "../lib/store";
 
 
 

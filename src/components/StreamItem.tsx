@@ -1,7 +1,7 @@
 import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { generateImageUrl } from '../lib/imageUtils';
-import { store } from '../store';
+import { store } from '../lib/store';
 
 export default function StreamItem(data: {
   id: string,
