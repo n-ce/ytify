@@ -3,7 +3,7 @@ import { convertSStoHHMMSS, notify, parseTTML, setMetaData, getApi, goTo, errorH
 import { autoQueue } from "../scripts/audioEvents";
 import { getDB, addListToCollection } from "./libraryUtils";
 import { params, store, getSaved } from "./store";
-import { fetchStreamDataWithInvidious } from "../scripts/fetchWithInvidious";
+import { getData } from "../modules/fetchStreamData";
 
 
 
@@ -110,22 +110,10 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const fetchViaIV = getSaved('fetchViaIV');
+  const fetchViaIV = Boolean(!store.player.HLS && getSaved('fetchViaIV'));
   const apiUrl = getApi(fetchViaIV ? 'invidious' : 'piped');
-  const fetchWithPiped = (id: string) =>
-    fetch(apiUrl + '/streams/' + id)
-      .then(res => res.json())
-      .then(data => {
-        if ('audioStreams' in data)
-          return data;
-        else throw new Error(data.message);
-      });
 
-  const data = await (
-    fetchViaIV ?
-      fetchStreamDataWithInvidious(id, apiUrl) :
-      fetchWithPiped(id)
-  ).catch(err => {
+  const data = await getData(id, apiUrl, fetchViaIV).catch(err => {
     errorHandler(
       err.message,
       () => player(id),

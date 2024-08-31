@@ -5,7 +5,7 @@ import { getSaved, params, store } from '../lib/store';
 import { errorHandler, getApi, idFromURL } from '../lib/utils';
 import { createPlaylist, fetchCollection, getDB, reservedCollections } from '../lib/libraryUtils';
 import { bitrateSelector, searchFilters, superInput, actionsMenu, audio, playButton, queuelist, loadingScreen, ytifyIcon } from '../lib/dom';
-import fetchList from '../scripts/fetchList';
+import fetchList from '../modules/fetchList';
 
 export default async function() {
 

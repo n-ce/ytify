@@ -2,9 +2,9 @@ import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
-import fetchList from "./fetchList";
-import { miniPlayerRoutingHandler } from "./miniPlayer";
 import { appendToQueuelist } from "./queue";
+import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
+import fetchList from "../modules/fetchList";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
