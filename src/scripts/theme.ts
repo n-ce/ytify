@@ -28,9 +28,9 @@ const accentLightener = (r: number, g: number, b: number) => {
   return `hsl(
     ${Math.floor(hue)},
     ${Math.floor(saturation)}%,
-    ${80}%)`;
+    80%)`;
 }
-
+// previous algorithm
 // `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
 
 
@@ -85,29 +85,31 @@ const palette: Scheme = {
 
 function colorInjector(colorArray: number[]) {
   const autoDark = systemDark.matches;
-  const theme = getSaved('theme') || 'auto';
+  Promise.resolve()
+    .then(() => getSaved('theme') || 'auto')
+    .then(theme => {
 
-  const scheme = theme === 'auto' ?
-    autoDark ? 'dark' : 'light' :
-    theme === 'auto-hc' ?
-      autoDark ? 'black' : 'white' : theme;
+      const scheme = theme === 'auto' ?
+        autoDark ? 'dark' : 'light' :
+        theme === 'auto-hc' ?
+          autoDark ? 'black' : 'white' : theme;
 
-  const [r, g, b] = colorArray;
+      const [r, g, b] = colorArray;
 
-  cssVar('--bg', palette[scheme].bg(r, g, b));
-  cssVar('--onBg', palette[scheme].onBg);
-  cssVar('--text', palette[scheme].text);
-  cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
-  cssVar('--shadowColor', palette[scheme].shadowColor);
-  tabColor.content = palette[scheme].bg(r, g, b);
+      cssVar('--bg', palette[scheme].bg(r, g, b));
+      cssVar('--onBg', palette[scheme].onBg);
+      cssVar('--text', palette[scheme].text);
+      cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
+      cssVar('--shadowColor', palette[scheme].shadowColor);
+      tabColor.content = palette[scheme].bg(r, g, b);
+    });
 }
 
 
 function themer() {
 
   if (!store.stream.id) {
-    // intentional otherwise too fast to detect localStorage changes from events
-    setTimeout(() => colorInjector([127, 127, 127]));
+    colorInjector([127, 127, 127]);
     return;
   }
 

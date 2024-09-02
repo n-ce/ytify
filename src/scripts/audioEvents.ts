@@ -6,8 +6,6 @@ import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 
 
-const streamHistory: string[] = [];
-
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
@@ -49,21 +47,31 @@ let historyTimeoutId = 0;
 
 audio.addEventListener('playing', () => {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
+
   store.player.playbackState = 'playing';
-  if (!streamHistory.includes(ss.id))
-    streamHistory.push(ss.id);
+
+  if (!store.streamHistory.includes(ss.id))
+    store.streamHistory.push(ss.id);
+
   const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
-  if (getSaved('history') !== 'off' ||
-    firstElementInHistory.dataset.id !== ss.id)
+
+  if (
+    getSaved('history') !== 'off' ||
+    firstElementInHistory.dataset.id !== ss.id
+  )
     historyTimeoutId = window.setTimeout(() => {
       if (historyID === ss.id) {
         addToCollection('history', store.stream);
         // just in case we are already in the history collection 
-        if (listAnchor.classList.contains('view') && params.get('collection') === 'history')
+        if (
+          listAnchor.classList.contains('view') &&
+          params.get('collection') === 'history'
+        )
           goTo('history');
 
       }
     }, 1e4);
+
 });
 
 audio.addEventListener('pause', () => {
@@ -75,7 +83,7 @@ audio.addEventListener('pause', () => {
 
 let isPlayable = false;
 const playableCheckerID = setInterval(() => {
-  if (streamHistory.length || params.has('url') || params.has('text') || !params.has('s')) {
+  if (store.streamHistory.length || params.has('url') || params.has('text') || !params.has('s')) {
     isPlayable = true;
     clearInterval(playableCheckerID);
   }
@@ -165,10 +173,10 @@ loopButton.addEventListener('click', () => {
 
 
 playPrevButton.addEventListener('click', () => {
-  if (streamHistory.length > 1) {
+  if (store.streamHistory.length > 1) {
     appendToQueuelist(store.stream, true);
-    streamHistory.pop();
-    player(streamHistory[streamHistory.length - 1]);
+    store.streamHistory.pop();
+    player(store.streamHistory[store.streamHistory.length - 1]);
   }
 })
 
@@ -244,59 +252,3 @@ if (msn) {
 }
 
 
-// AUTO-QUEUE
-
-const virtualQ = new Map();
-const frequencyQueue: { [index: string]: number } = {};
-
-export function autoQueue(data: StreamItem[]) {
-
-  const init = queuelist.querySelectorAll('div').length === 0;
-  // sometimes users will remove items from queue manually, we need to account for this using the trashHistory array
-  const trashHistory = sessionStorage.getItem('trashHistory');
-
-  const initArray: DOMStringMap[] = [];
-
-  data.forEach(stream => {
-
-    const id = stream.url.slice(9);
-    if ('type' in stream && stream.type !== 'stream')
-      return;
-
-    if (
-      trashHistory?.includes(id) ||
-      streamHistory.includes(id)
-    ) return;
-
-    const streamData: DOMStringMap = {
-      id: id,
-      title: stream.title,
-      author: stream.uploaderName,
-      duration: convertSStoHHMMSS(stream.duration),
-    };
-
-    if (virtualQ.has(id))
-      frequencyQueue[id]++;
-    else {
-      virtualQ.set(id, streamData);
-      frequencyQueue[id] = 1;
-    }
-
-    initArray.push(streamData);
-
-
-  });
-
-  // if queue empty all recommended streams are pushed to queue else they are pushed it to a virtual queue
-  init ?
-    initArray.forEach(s => {
-      appendToQueuelist(s);
-    }) :
-    Object.entries(frequencyQueue)
-      .sort((a, b) => b[1] - a[1])
-      .filter((v, _, a) => v[1] === a[0][1])
-      .forEach(v => {
-        appendToQueuelist(virtualQ.get(v[0]));
-      });
-
-}

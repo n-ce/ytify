@@ -1,10 +1,11 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { addToCollection, createPlaylist } from "../lib/libraryUtils";
+import { addToCollection, createPlaylist, getDB, reservedCollections } from "../lib/libraryUtils";
 import { $, notify } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
 import './ActionsMenu.css';
+import { onMount } from "solid-js";
 
 declare module "solid-js" {
   namespace JSX {
@@ -20,7 +21,17 @@ function close() {
 
 actionsMenu.onclick = close;
 
-export default function ActionsMenu() {
+export default function() {
+
+  let collectionSelector!: HTMLSelectElement;
+
+  onMount(() => {
+    const initialKeys = Object.keys(getDB());
+
+    for (const key of initialKeys)
+      if (!reservedCollections.includes(key))
+        createPlaylist(key);
+  });
 
   return (
     <ul on:click={e => e.stopPropagation()}>
@@ -41,26 +52,27 @@ export default function ActionsMenu() {
       <li>
         <i class="ri-play-list-add-line"></i>
         <select
+          ref={collectionSelector}
           tabindex={2}
-          id="playlistSelector"
+          id="collectionSelector"
           onchange={(e) => {
-            const playlistSelector = e.target;
+            const clxnSlctr = e.target;
             let title;
 
-            if (!playlistSelector.value) return;
-            if (playlistSelector.value === '+cl') {
+            if (!clxnSlctr.value) return;
+            if (clxnSlctr.value === '+cl') {
               title = prompt('Collection Title')?.trim();
 
               if (title)
                 createPlaylist(title);
             }
-            else title = playlistSelector.value;
+            else title = clxnSlctr.value;
 
             if (title)
               addToCollection(title, store.actionsMenu);
 
             close();
-            playlistSelector.selectedIndex = 0;
+            clxnSlctr.selectedIndex = 0;
           }}
         >
           <option>Add To</option>

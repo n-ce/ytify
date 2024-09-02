@@ -6,7 +6,7 @@ import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { pipedPlaylistsImporter } from "../scripts/library";
 import { cssVar, themer } from "../scripts/theme";
 import { store, getSaved } from '../lib/store';
-import { render } from 'solid-js/web';
+
 
 
 
@@ -60,7 +60,7 @@ function Selector(props: {
 }
 
 
-export default function Settings() {
+export default function() {
 
   return (
     <>
@@ -129,7 +129,9 @@ export default function Settings() {
 
                   index < 0 ?
                     removeSaved('api_8') :
-                    target.selectedIndex = index + 1;
+                    target.selectedIndex =
+                    store.api.index =
+                    index + 1;
                 });
 
             }}
@@ -583,12 +585,5 @@ document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
 document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);
 document.getElementById('importSettingsBtn')!.addEventListener('change', importSettings);
-
-
-const settingsContainer = document.getElementById('settings') as HTMLDivElement;
-
-render(Settings, settingsContainer);
-// render appends Settings after act so we append act after Settings
-settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 
 

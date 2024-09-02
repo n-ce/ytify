@@ -1,11 +1,11 @@
-import { audio, img, listAnchor, subtitleContainer, subtitleTrack, actionsMenu, title, subtitleSelector, author } from "./dom";
+import { audio, listAnchor, actionsMenu } from "./dom";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
 import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
+import player from "./player";
+import { getSaved, store } from "./store";
 import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
-import player from "./player";
-import { getSaved, store } from "./store";
 import fetchList from "../modules/fetchList";
 
 
@@ -21,34 +21,17 @@ export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementBy
 export const getApi = (
   type: 'piped' | 'invidious' | 'hyperpipe',
   index: number = store.api.index) =>
-  store.api.list[index][type].replace(/\s/g, '');
+  store.api.list[index][type];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
-
-export const getPlaylistIdFromArtist = (id: string): Promise<string> =>
-  fetch(getApi('hyperpipe') + id)
-    .then(res => res.json())
-    .then(data => {
-      if (!('playlistId' in data))
-        throw new Error('No Playlist Id found.');
-      store.list.id = id.slice(9);
-      store.list.type = 'channels';
-
-      store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
-      return '/playlists/' + data.playlistId;
-    })
-    .catch(_ => {
-      notify(_);
-      return '';
-    })
 
 export const hostResolver = (url: string) =>
   store.linkHost + (store.linkHost.includes('ytify') ? url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
     ('/list?' + url.slice(1).split('/').join('=')) : url);
+
 
 export async function quickSwitch() {
   if (!store.stream.id) return;
@@ -99,7 +82,6 @@ export async function errorHandler(message: string,
   // final action if all fails
 
   const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement | null;
-  console.log(store.api);
   const apiIndex = instanceSelector?.selectedIndex || 0;
   const apiUrl = getApi(instanceType, apiIndex);
   const noOfInstances = instanceSelector?.length || 1;
@@ -129,71 +111,14 @@ export async function errorHandler(message: string,
 }
 
 
-let more = () => undefined;
-
-document.getElementById('moreBtn')!.addEventListener('click', () => more());
 
 
-export async function setMetaData(
-  stream: CollectionItem
-) {
-
-  // remove ' - Topic' from author name if it exists
-
-  let music = '';
-  let authorText = stream.author;
-  if (stream.author.endsWith(' - Topic')) {
-    music = '&w=720&h=720&fit=cover';
-    authorText = stream.author.slice(0, -8);
-  }
-
-  const metadataObj: MediaMetadataInit = {
-    title: stream.title,
-    artist: authorText,
-  };
-
-  const imgX = generateImageUrl(stream.id, 'maxres', music);
-  if (store.loadImage !== 'off') {
-    img.src = imgX
-    metadataObj.artwork = [
-      { src: img.src, sizes: '96x96' },
-      { src: img.src, sizes: '128x128' },
-      { src: img.src, sizes: '192x192' },
-      { src: img.src, sizes: '256x256' },
-      { src: img.src, sizes: '384x384' },
-      { src: img.src, sizes: '512x512' },
-    ]
-    img.alt = stream.title;
-  }
-
-
-  title.href = hostResolver(`/watch?v=${stream.id}`);
-  title.textContent = stream.title;
-
-  author.textContent = authorText;
-
-  more = function() {
-    store.actionsMenu = stream;
-    actionsMenu.showModal();
-    history.pushState({}, '', '#');
-  }
-
-
-  if (location.pathname === '/')
-    document.title = stream.title + ' - ytify';
-
-
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.setPositionState();
-    navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
-  }
-
-}
-
-
-export function itemsLoader(itemsArray: StreamItem[]) {
-  if (!itemsArray.length)
+export function itemsLoader(itemsArray: StreamItem[] | null) {
+  if (!itemsArray?.length)
     throw new Error('No Data Found');
+
+  const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
+
 
   const streamItem = (stream: StreamItem) => StreamItem({
     id: stream.videoId || stream.url.substring(9),
@@ -285,50 +210,3 @@ export function superClick(e: Event) {
 }
 
 
-export async function parseTTML() {
-
-  const imsc = await import('imsc/dist/imsc.all.min.js');
-  const myTrack = audio.textTracks[0];
-  myTrack.mode = "hidden";
-  const d = img.getBoundingClientRect();
-
-
-  subtitleContainer.style.top = Math.floor(d.y) + 'px';
-  subtitleContainer.style.left = Math.floor(d.x) + 'px';
-  subtitleSelector.parentElement!.style.position = 'static';
-  subtitleSelector.style.top = Math.floor(d.y) + 'px';
-  subtitleSelector.style.left = Math.floor(d.x) + 'px';
-
-
-  fetch(subtitleTrack.src)
-    .then(res => res.text())
-    .then(text => {
-
-      const imscDoc = imsc.fromXML(text);
-      const timeEvents = imscDoc.getMediaTimeEvents();
-      const telen = timeEvents.length;
-
-      for (let i = 0; i < telen; i++) {
-        const myCue = new VTTCue(timeEvents[i], (i < telen - 1) ? timeEvents[i + 1] : audio.duration, '');
-
-        myCue.onenter = () => {
-          const subtitleActive = subtitleContainer.firstChild;
-          if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive);
-          imsc.renderHTML(
-            imsc.generateISD(imscDoc, myCue.startTime),
-            subtitleContainer,
-            img,
-            Math.floor(d.height),
-            Math.floor(d.width)
-          );
-        }
-        myCue.onexit = () => {
-          const subtitleActive = subtitleContainer.firstChild;
-          if (subtitleActive)
-            subtitleContainer.removeChild(subtitleActive)
-        }
-        myTrack.addCue(myCue);
-      }
-    });
-}

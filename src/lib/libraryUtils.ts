@@ -1,4 +1,4 @@
-import { $, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
+import { $, errorHandler, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
 import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
@@ -57,15 +57,15 @@ export function addListToCollection(collection: string, list: { [index: string]:
 }
 
 export function createPlaylist(title: string) {
-  const playlistSelector = document.getElementById('playlistSelector') as HTMLSelectElement;
+  const collectionSelector = document.getElementById('collectionSelector') as HTMLSelectElement;
 
   reservedCollections
     .concat(
-      [...playlistSelector.options].slice(2).map(opt => opt.value)
+      [...collectionSelector.options].slice(2).map(opt => opt.value)
     )
     .includes(title) ?
     notify('This Playlist Already Exists!') :
-    playlistSelector.add(new Option(title, title));
+    collectionSelector.add(new Option(title, title));
 }
 
 function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStringMap }, fragment: DocumentFragment) {
@@ -250,16 +250,20 @@ export async function superCollectionLoader(name: SuperCollection) {
 
     loadingScreen.showModal();
 
-    const channels = Object.keys(db.channels);
-    const initApi = getApi('piped');
-    const fetchItems = await fetch(initApi + '/feed/unauthenticated?channels=' + channels.join(','))
+    const channels = Object.keys(db.channels).join(',');
+    const items = await fetch(getApi('piped') + '/feed/unauthenticated?channels=' + channels)
       .then(res => res.json())
-      .catch(() => {
-        notify(`${initApi} was not able to return the subscription feed. Retry with another instance.`);
+      .catch(err => {
+        errorHandler(
+          err.message,
+          loadFeed,
+          () => '',
+          'piped'
+        );
       })
       .finally(() => loadingScreen.close());
 
-    return itemsLoader(fetchItems);
+    return itemsLoader(items);
   }
 
 

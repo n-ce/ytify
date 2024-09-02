@@ -3,33 +3,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 import autoprefixer from 'autoprefixer';
 import solidPlugin from 'vite-plugin-solid';
 
-
-const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
-  name: 'erudaInjector',
-  transformIndexHtml: html => ({
-    html,
-    tags: [
-      {
-        tag: 'script',
-        attrs: {
-          src: '/node_modules/eruda/eruda'
-        },
-        injectTo: 'body-prepend'
-      },
-      {
-        tag: 'script',
-        injectTo: 'body-prepend',
-        children: 'eruda.init()'
-      }
-    ]
-  })
-}) : [];
-
-
-
 export default defineConfig(({ command }) => ({
   define: {
-    Version: JSON.stringify(process.env.npm_package_version),
+    Version: JSON.stringify(
+      ((today = new Date()) => today.getFullYear() + '.' + (today.getMonth() + 1) + '.' + today.getDate())()
+    ),
   },
   plugins: [
     injectEruda(command === 'serve'),
@@ -112,3 +90,28 @@ export default defineConfig(({ command }) => ({
     }
   }
 }));
+
+
+const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
+  name: 'erudaInjector',
+  transformIndexHtml: html => ({
+    html,
+    tags: [
+      {
+        tag: 'script',
+        attrs: {
+          src: '/node_modules/eruda/eruda'
+        },
+        injectTo: 'body-prepend'
+      },
+      {
+        tag: 'script',
+        injectTo: 'body-prepend',
+        children: 'eruda.init()'
+      }
+    ]
+  })
+}) : [];
+
+
+

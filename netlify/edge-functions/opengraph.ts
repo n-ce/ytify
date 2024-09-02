@@ -16,17 +16,21 @@ export default async (request: Request, context: Context) => {
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
 
   if (!data) return;
-  
-  const music = data.author.endsWith(' - Topic') ? '&w=720&h=720&fit=cover' : '';
-  
-  if (music)
+
+  /*
+   wsrv handler square thumbnails
+     'https://wsrv.nl?w=720&h=720&fit=cover&url=';
+     cannot use https://github.com/weserv/images/issues/379
+  */
+
+  if (data.author.endsWith(' - Topic'))
     data.author = data.author.replace(' - Topic', '');
-  
+
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
     .replace('"ytify"', `"${data.title}"`)
     .replace(<string>context.site.url, `${context.site.url}?s=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', `https://wsrv.nl?url=https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp${music}`);
+    .replaceAll('/ytify_thumbnail_min.webp', `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`);
 
   return new Response(newPage, response);
 };

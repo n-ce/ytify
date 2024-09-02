@@ -11,7 +11,7 @@ const [
   shuffleQBtn,
   removeQBtn,
   filterLT10Btn,
-  autoQueueBtn
+  enqueueRelatedStreamsBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
@@ -59,11 +59,16 @@ queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLAnchorElement;
   if (!queueItem.classList.contains('streamItem')) return;
   const id = queueItem.dataset.id || '';
+
+  function addToTrash() {
+    const current = sessionStorage.getItem('trashHistory') || '';
+    if (!current?.includes(id))
+      sessionStorage.setItem('trashHistory', current + id);
+  }
+
   queueItem.classList.contains('delete') ?
-    sessionStorage.setItem(
-      'trashHistory',
-      sessionStorage.getItem('trashHistory') + id
-    ) : player(id);
+    addToTrash() :
+    player(id);
 
   const index = queueArray.indexOf(id);
 
@@ -132,15 +137,15 @@ filterLT10Btn.addEventListener('click', () => {
 });
 
 
-autoQueueBtn.addEventListener('click', () => {
-  autoQueueBtn.classList.contains('checked') ?
-    removeSaved('autoQueue') :
-    save('autoQueue', 'on');
-  autoQueueBtn.classList.toggle('checked');
+enqueueRelatedStreamsBtn.addEventListener('click', () => {
+  enqueueRelatedStreamsBtn.classList.contains('checked') ?
+    removeSaved('enqueueRelatedStreams') :
+    save('enqueueRelatedStreams', 'on');
+  enqueueRelatedStreamsBtn.classList.toggle('checked');
 });
 
-if (getSaved('autoQueue') === 'on')
-  autoQueueBtn.className = 'checked';
+if (getSaved('enqueueRelatedStreams') === 'on')
+  enqueueRelatedStreamsBtn.className = 'checked';
 
 
 function isLongerThan10Min(duration: string) {

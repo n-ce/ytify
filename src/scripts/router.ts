@@ -12,7 +12,7 @@ const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivEleme
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
 
-export function upcomingInjector(param: string) {
+function upcomingInjector(param: string) {
   loadingScreen.showModal();
 
   fetch(`${location.origin}/public?id=${param}`)
@@ -80,9 +80,11 @@ nav.addEventListener('click', (e: Event) => {
 
     const routeName = anchor.lastElementChild?.textContent;
     const homeTitle = store.stream.title || 'Home';
+
     document.title = (
       inHome ? homeTitle : routeName
     ) + ' - ytify';
+
   }
   showSection(anchor.id);
 });
@@ -91,31 +93,42 @@ nav.addEventListener('click', (e: Event) => {
 // load section if name found in address else load library
 let route: string;
 const errorParam = params.get('e');
+
 if (errorParam) {
+
   if (errorParam.includes('?')) {
+
     const _ = errorParam.split('?');
     route = _[0];
     const query = encodeURI(_[1]);
+
     if (route === '/list')
       query.startsWith('si') ?
         fetchCollection('', query.split('=')[1]) :
         fetchList('/' + query.split('=').join('/'));
+
     if (route === '/search') {
       const x = new URLSearchParams(query);
+
       superInput.value = x.get('q') || '';
       searchFilters.value = x.get('f') || 'all';
     }
+
     if (route === '/upcoming')
-      upcomingInjector(query.slice(2))
+      upcomingInjector(query.slice(2));
 
   }
   else route = errorParam;
 }
 else {
+
   route = routes.find(route => location.pathname === route) || '/';
+
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
+
   if (route === '/' && !hasStreamQuery)
     route = getSaved('startupTab') || '/search';
+
 }
 
 // necessary to use a click event 
@@ -128,9 +141,28 @@ ytifyIcon.addEventListener('click', () => {
 
 // enables back button functionality
 
-onpopstate = () =>
-  actionsMenu.open ?
-    actionsMenu.close() :
-    showSection(location.pathname);
+onpopstate = function() {
+
+  if (actionsMenu.open) {
+    actionsMenu.close();
+    return;
+  }
+
+  if (
+    !store.list.id &&
+    location.pathname === '/list'
+  ) {
+    const param = location.search
+      .substring(1)
+      .split('=');
+
+    location.search.includes('collection') ?
+      fetchCollection(param[1]) :
+      fetchList('/' + param.join('/'));
+  }
+
+  showSection(location.pathname);
+
+}
 
 

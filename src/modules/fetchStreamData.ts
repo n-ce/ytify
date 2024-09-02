@@ -59,7 +59,8 @@ const fetchWithInvidious = (id: string, apiUrl: string) =>
         title: v.title,
         uploaderName: v.author,
         duration: v.lengthSeconds,
-        uploaderUrl: v.authorUrl
+        uploaderUrl: v.authorUrl,
+        type: 'stream'
       })),
       audioStreams: data.
         adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({

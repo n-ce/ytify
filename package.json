@@ -1,7 +1,7 @@
 {
   "name": "ytify",
-  "version": "7.2.2",
   "type": "module",
+  "version": "7.2.3",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -12,11 +12,11 @@
     "hls.js": "^1.5.15",
     "imsc": "^1.1.5",
     "solid-js": "^1.8.22",
-    "sortablejs": "^1.15.2"
+    "sortablejs": "^1.15.3"
   },
   "devDependencies": {
     "@netlify/edge-functions": "^2.10.0",
-    "@types/node": "^22.5.1",
+    "@types/node": "^22.5.2",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
     "eruda": "^3.2.3",

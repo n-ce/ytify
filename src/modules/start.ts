@@ -1,26 +1,12 @@
 import type { SortableEvent } from "sortablejs";
 import player from '../lib/player';
-import { render } from 'solid-js/web';
 import { getSaved, params, store } from '../lib/store';
 import { errorHandler, getApi, idFromURL } from '../lib/utils';
-import { createPlaylist, fetchCollection, getDB, reservedCollections } from '../lib/libraryUtils';
-import { bitrateSelector, searchFilters, superInput, actionsMenu, audio, playButton, queuelist, loadingScreen, ytifyIcon } from '../lib/dom';
+import { fetchCollection } from '../lib/libraryUtils';
+import { bitrateSelector, searchFilters, superInput, audio, playButton, queuelist, loadingScreen, ytifyIcon } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 
 export default async function() {
-
-  if (import.meta.env.PROD)
-    await import('virtual:pwa-register').then(pwa => {
-      const handleUpdate = pwa.registerSW({
-        onNeedRefresh() {
-          import('../components/UpdatePrompt').then(mod =>
-            render(() => mod.default(handleUpdate),
-              document.body
-            ));
-        }
-      });
-    });
-
 
 
   // hls
@@ -80,19 +66,8 @@ export default async function() {
     );
 
 
-  // Actions Menu has playlist selector
-
-  await import('../components/ActionsMenu')
-    .then(mod => render(mod.default, actionsMenu));
 
 
-  // playlist selector to create playlist
-
-  const initialKeys = Object.keys(getDB());
-
-  for (const key of initialKeys)
-    if (!reservedCollections.includes(key))
-      createPlaylist(key);
 
 
   // params handling

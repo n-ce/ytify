@@ -1,6 +1,6 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB } from "../lib/libraryUtils";
-import { errorHandler, getApi, getPlaylistIdFromArtist, goTo, itemsLoader, notify, superClick } from "../lib/utils";
+import { errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
 
 export default async function fetchList(
@@ -136,3 +136,18 @@ export default async function fetchList(
 
 listContainer.addEventListener('click', superClick);
 
+const getPlaylistIdFromArtist = (id: string): Promise<string> =>
+  fetch(getApi('hyperpipe') + id)
+    .then(res => res.json())
+    .then(data => {
+      if (!('playlistId' in data))
+        throw new Error('No Playlist Id found.');
+      store.list.id = id.slice(9);
+      store.list.type = 'channels';
+      store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
+      return '/playlists/' + data.playlistId;
+    })
+    .catch(err => {
+      notify(err.message);
+      return '';
+    })

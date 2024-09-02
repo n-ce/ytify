@@ -16,11 +16,7 @@ export const store: {
     array: string[]
   }
   stream: CollectionItem,
-  theme: {
-    scheme: 'auto' | 'light' | 'dark',
-    highContrast: boolean,
-    roundness: 'none' | '2vmin' | '4vmin' | '8vmin'
-  },
+  streamHistory: string[]
   api: {
     list: Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>[],
     index: number
@@ -54,11 +50,7 @@ export const store: {
     duration: '',
     channelUrl: ''
   },
-  theme: {
-    scheme: 'auto',
-    highContrast: false,
-    roundness: '2vmin'
-  },
+  streamHistory: [],
   api: {
     list:
       [
