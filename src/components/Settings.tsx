@@ -112,7 +112,10 @@ export default function() {
                       }
                     });
 
-
+                  if (json.length) {
+                    target[0].remove();
+                    store.api.list.length = 0;
+                  }
                   // add to DOM
                   for (const api of json) {
                     target.add(new Option(api.name));
@@ -121,7 +124,8 @@ export default function() {
 
                   const savedApi = getSaved('api_8');
 
-                  if (!savedApi) return;
+                  if (!savedApi)
+                    return;
 
                   const api = JSON.parse(savedApi);
                   const names = json.map((v: { name: string }) => v.name);
@@ -131,7 +135,7 @@ export default function() {
                     removeSaved('api_8') :
                     target.selectedIndex =
                     store.api.index =
-                    index + 1;
+                    index;
                 });
 
             }}
@@ -147,7 +151,7 @@ export default function() {
           onClick={() => {
             if (getSaved('custom_instance')) {
               removeSaved('custom_instance');
-              removeSaved('api_8')
+              removeSaved('api_8');
             }
             else {
               const current = store.api.list[0];
