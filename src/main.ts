@@ -1,5 +1,8 @@
 import './stylesheets/global.css';
 import './scripts/router';
+import './scripts/audioEvents';
+import './scripts/list';
+import './scripts/search';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
 

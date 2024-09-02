@@ -44,7 +44,7 @@ export function setDiscoveries(
 
   // remove if exists in history
 
-  array = array.filter(e => !db.history.hasOwnProperty(e[0]));
+  array = array.filter(e => !db.history?.hasOwnProperty(e[0]));
 
   // randomly remove items from array when limit crossed
   let len = array.length;

@@ -4,8 +4,6 @@ import { getDB } from "./libraryUtils";
 import { params, store, getSaved } from "./store";
 import { getData } from "../modules/fetchStreamData";
 import { setMetaData } from "../modules/setMetadata";
-import { setAudioStreams } from "../modules/setAudioStreams";
-import { setDiscoveries } from "../modules/setDiscoveries";
 
 
 
@@ -42,13 +40,13 @@ export default async function player(id: string | null = '') {
   const h = store.player.HLS;
   h ?
     h.loadSource(data.hls) :
-    setAudioStreams(
+    import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
       data.audioStreams.sort(
         (a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate)
       ),
       data.category === 'Music',
       data.livestream
-    );
+    ));
 
   if (data.subtitles.length)
     import('../modules/setSubtitles')
@@ -82,6 +80,11 @@ export default async function player(id: string | null = '') {
   // related streams data injection as discovery data after 20 seconds
 
   if (getSaved('discover') !== 'off')
-    setTimeout(() => setDiscoveries(id, data.relatedStreams), 2e4);
+    import('../modules/setDiscoveries')
+      .then(mod => {
+        setTimeout(() => {
+          mod.setDiscoveries(id, data.relatedStreams), 2e4
+        })
+      });
 
 }
