@@ -30,7 +30,7 @@ export default async (request: Request, context: Context) => {
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
     .replace('"ytify"', `"${data.title}"`)
     .replace(<string>context.site.url, `${context.site.url}?s=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', `https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`);
+    .replaceAll('/ytify_thumbnail_min.webp', data.videoThumbnails.find((v: { quality: string }) => v.quality === 'medium').url);
 
   return new Response(newPage, response);
 };
