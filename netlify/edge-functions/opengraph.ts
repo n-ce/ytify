@@ -12,7 +12,7 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://invidious.jing.rocks';
+  const instance = 'https://invidious.fdn.fr';
   const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
 
   if (!data) return;
