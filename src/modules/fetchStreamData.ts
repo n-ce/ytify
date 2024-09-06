@@ -1,15 +1,20 @@
 export const getData = (
   id: string,
   apiUrl: string,
+  signal: AbortSignal,
   useInvidious = false
 ) =>
   useInvidious ?
-    fetchWithInvidious(id, apiUrl) :
-    fetchWithPiped(id, apiUrl)
+    fetchWithInvidious(id, apiUrl, signal) :
+    fetchWithPiped(id, apiUrl, signal)
 
 
-const fetchWithPiped = (id: string, apiUrl: string) =>
-  fetch(apiUrl + '/streams/' + id)
+const fetchWithPiped = (
+  id: string,
+  apiUrl: string,
+  signal: AbortSignal
+) =>
+  fetch(apiUrl + '/streams/' + id, { signal })
     .then(res => res.json())
     .then(data => {
       if ('audioStreams' in data)
@@ -17,8 +22,12 @@ const fetchWithPiped = (id: string, apiUrl: string) =>
       else throw new Error(data.message);
     });
 
-const fetchWithInvidious = (id: string, apiUrl: string) =>
-  fetch(`${apiUrl}/api/v1/videos/${id}`)
+const fetchWithInvidious = (
+  id: string,
+  apiUrl: string,
+  signal: AbortSignal
+) =>
+  fetch(`${apiUrl}/api/v1/videos/${id}`, { signal })
     .then(res => res.json())
     .then(data => {
       if ('adaptiveFormats' in data)

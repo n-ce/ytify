@@ -10,8 +10,11 @@ export function setDiscoveries(
   if (id !== store.stream.id) return;
 
   const db = getDB();
+
   if (!db.hasOwnProperty('discover'))
     db.discover = {};
+
+
   relatedStreams?.forEach(
     stream => {
       if (

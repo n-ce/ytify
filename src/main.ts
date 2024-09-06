@@ -3,6 +3,7 @@ import './scripts/router';
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
+import './scripts/library';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
 
@@ -12,6 +13,7 @@ addEventListener('DOMContentLoaded', async () => {
   await import('./components/Settings')
     .then(mod => render(mod.default, settingsContainer));
   settingsContainer.appendChild(document.getElementById('actionsContainer')!);
+
 
   await import('./modules/start')
     .then(mod => mod.default());

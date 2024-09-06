@@ -71,6 +71,21 @@ declare global {
 
   type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
 
+  type ToggleSwitch = {
+    name: string
+    id: string,
+    checked: boolean,
+    onClick: (e: EventHandler<HTMLInputElement>) => void
+  }
+
+  type Selector = {
+    label: string,
+    id: string,
+    onChange: (e: { target: HTMLSelectElement }) => void,
+    onMount: (target: HTMLSelectElement) => void,
+    children: JSXElement
+  }
+
 }
 
 

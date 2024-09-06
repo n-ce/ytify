@@ -6,7 +6,7 @@ import StreamItem from "../components/StreamItem";
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
-export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{"discover":{}}');
+export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
 export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 
@@ -56,7 +56,7 @@ export function addListToCollection(collection: string, list: { [index: string]:
   saveDB(db);
 }
 
-export function createPlaylist(title: string) {
+export function createCollection(title: string) {
   const collectionSelector = document.getElementById('collectionSelector') as HTMLSelectElement;
 
   reservedCollections
@@ -173,7 +173,7 @@ export async function superCollectionLoader(name: SuperCollection) {
     pls.forEach(v => {
       const a = $('a');
       a.href = '/list?collection=' + v;
-      a.className = 'ur_pls_item';
+      a.className = 'ur_cls_item';
       const i = $('i');
       i.className = 'ri-play-list-2-fill';
       a.append(i, v);
@@ -257,8 +257,7 @@ export async function superCollectionLoader(name: SuperCollection) {
         errorHandler(
           err.message,
           loadFeed,
-          () => '',
-          'piped'
+          () => ''
         );
       })
       .finally(() => loadingScreen.close());

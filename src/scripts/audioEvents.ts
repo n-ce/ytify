@@ -1,9 +1,9 @@
 import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
-import { getCollection, addToCollection } from "../lib/libraryUtils";
 import player from "../lib/player";
 import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
+import { addToCollection, getCollection } from "../lib/libraryUtils";
 
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
@@ -53,12 +53,12 @@ audio.addEventListener('playing', () => {
   if (!store.streamHistory.includes(ss.id))
     store.streamHistory.push(ss.id);
 
-  const firstElementInHistory = <HTMLElement>getCollection('history').firstElementChild;
+  if (getSaved('history') === 'off')
+    return;
 
-  if (
-    getSaved('history') !== 'off' ||
-    firstElementInHistory.dataset.id !== ss.id
-  )
+  const firstElementInHistory = <HTMLElement | null>getCollection('history').firstElementChild;
+
+  if (firstElementInHistory?.dataset.id !== ss.id)
     historyTimeoutId = window.setTimeout(() => {
       if (historyID === ss.id) {
         addToCollection('history', store.stream);
@@ -71,7 +71,6 @@ audio.addEventListener('playing', () => {
 
       }
     }, 1e4);
-
 });
 
 audio.addEventListener('pause', () => {

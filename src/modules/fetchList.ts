@@ -34,14 +34,13 @@ export default async function fetchList(
       errorHandler(
         mix ? 'No Mixes Found' : err.message,
         () => fetchList(url, mix),
-        () => '',
-        'piped'
+        () => ''
       )
     })
     .finally(() => loadingScreen.close());
 
-  if (!group.relatedStreams.length)
-    return notify('No Data Found');
+  if (!group?.relatedStreams?.length)
+    return;
 
 
   if (listContainer.classList.contains('reverse'))

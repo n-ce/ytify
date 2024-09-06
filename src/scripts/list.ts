@@ -1,13 +1,13 @@
 import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, shareCollectionButton, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver, notify } from '../lib/utils';
-import { addListToCollection, createPlaylist, getDB, saveDB, toCollection } from '../lib/libraryUtils';
-import { getThumbIdFromLink } from '../lib/imageUtils';
+import { hostResolver } from '../lib/utils';
 import { store } from '../lib/store';
+import { importList, shareCollection, subscribeList } from '../modules/listUtils';
+import { getDB, saveDB } from '../lib/libraryUtils';
 
 
 
-listBtnsContainer.addEventListener('click', e => {
+listBtnsContainer.addEventListener('click', async e => {
   const btn = e.target as HTMLButtonElement;
   if (!btn.matches('button'))
     return;
@@ -24,27 +24,33 @@ listBtnsContainer.addEventListener('click', e => {
   else if (btn === enqueueBtn)
     listToQ(listContainer);
 
-  else if (btn === subscribeListBtn)
-    subscribeList(db);
-
   else if (btn === openInYtBtn)
     open(['https://youtube.com', location.origin].includes(store.linkHost) ? ('https://youtube.com' + store.list.url) : hostResolver(store.list.url));
 
+  else if (btn === subscribeListBtn)
+    subscribeList(db);
 
   else if (btn === removeFromListBtn) {
     listContainer.querySelectorAll('.streamItem').forEach(e => e.classList.toggle('delete'));
     removeFromListBtn.classList.toggle('delete');
   }
+
   else if (btn === importListBtn)
     importList();
-  else if (btn === deleteCollectionBtn) {
 
+  else if (btn === deleteCollectionBtn) {
+    if (!db) return;
+
+    if (!confirm('Are you sure you want to delete the collection  ' + id + ' ?'))
+      return;
     atcOption.remove();
     delete db[id];
     saveDB(db);
     history.back();
   }
   else if (btn === clearListBtn) {
+    if (!confirm('Are you sure you want to clear ' + id + ' ?'))
+      return;
     delete db[id];
     saveDB(db);
     listContainer.innerHTML = '';
@@ -68,67 +74,4 @@ listBtnsContainer.addEventListener('click', e => {
 });
 
 
-
-function subscribeList(db: Library) {
-  const l = store.list;
-  const state = [' Subscribe', ' Subscribed'];
-  const dom = subscribeListBtn.firstElementChild as HTMLParagraphElement;
-  const domState = dom.dataset.state as ' Subscribe' | ' Subscribed';
-
-  if (domState === state[1]) {
-    delete db[l.type][l.id];
-    state.reverse();
-  }
-  else {
-    const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
-      id: l.id,
-      name: l.name,
-      thumbnail: getThumbIdFromLink(l.thumbnail)
-    };
-
-    if (l.type === 'playlists')
-      dataset.uploader = l.uploader;
-
-    toCollection(l.type, dataset, db);
-  }
-  dom.dataset.state = state[1];
-  saveDB(db);
-}
-
-function importList() {
-
-  const listTitle = prompt('Set Title', store.list.name);
-
-  if (!listTitle) return;
-
-  createPlaylist(listTitle);
-
-  const list: { [index: string]: DOMStringMap } = {};
-  listContainer
-    .querySelectorAll('.streamItem')
-    .forEach(_ => {
-      const sender = (<HTMLElement>_).dataset;
-      const sid = <string>sender.id;
-      list[sid] = {
-        'id': sender.id,
-        'title': sender.title,
-        'author': sender.author,
-        'duration': sender.duration,
-        'channelUrl': sender.channel_url
-      };
-    });
-
-  addListToCollection(listTitle, list);
-  notify(listTitle + ' has been imported to your collections.');
-}
-
-
-function shareCollection(shareId: string) {
-  const text = location.origin + location.pathname + '?si=' + shareId;
-  const type = "text/plain";
-  const blob = new Blob([text], { type });
-  const data = [new ClipboardItem({ [type]: blob })];
-  navigator.clipboard.write(data);
-
-}
 

@@ -37,7 +37,7 @@
   #superCollectionList {
     width: calc(100% - 2rem);
 
-    a.ur_pls_item {
+    a.ur_cls_item {
       background: var(--onBg);
       display: flex;
       align-items: center;
