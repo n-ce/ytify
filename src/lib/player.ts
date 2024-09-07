@@ -52,14 +52,13 @@ export default async function player(id: string | null = '') {
   }
 
 
-  store.stream.id = id;
-  store.stream.title = data.title;
-  store.stream.author = data.uploader;
-  store.stream.duration = convertSStoHHMMSS(data.duration);
-  store.stream.channelUrl = data.uploaderUrl;
-
-
-  setMetaData(store.stream);
+  await setMetaData({
+    id: id,
+    title: data.title,
+    author: data.uploader,
+    duration: convertSStoHHMMSS(data.duration),
+    channelUrl: data.uploaderUrl
+  });
 
   const h = store.player.HLS;
   h ?

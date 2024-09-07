@@ -151,12 +151,14 @@ export function itemsLoader(itemsArray: StreamItem[] | null) {
 
 // TLDR : Stream Item Click Action
 export async function superClick(e: Event) {
-  const elem = e.target as HTMLAnchorElement;
+  const elem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
   if (elem.target === '_blank') return;
   e.preventDefault();
 
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
+
+  store.stream.author = eld.author;
 
   if (elc('streamItem'))
     return elc('delete') ?

@@ -17,7 +17,6 @@ const loopButton = <HTMLButtonElement>document.getElementById('loopButton');
 const volumeChanger = <HTMLInputElement>document.getElementById('volumeChanger');
 const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
-const ss = store.stream;
 
 const msn = 'mediaSession' in navigator;
 function updatePositionState() {
@@ -33,7 +32,7 @@ function updatePositionState() {
 
 
 playButton.addEventListener('click', () => {
-  if (!ss.id) return;
+  if (!store.stream.id) return;
   store.player.playbackState === 'playing' ?
     audio.pause() :
     audio.play();
@@ -50,17 +49,19 @@ audio.addEventListener('playing', () => {
 
   store.player.playbackState = 'playing';
 
-  if (!store.streamHistory.includes(ss.id))
-    store.streamHistory.push(ss.id);
+  const id = store.stream.id;
+
+  if (!store.streamHistory.includes(id))
+    store.streamHistory.push(id);
 
   if (getSaved('history') === 'off')
     return;
 
   const firstElementInHistory = <HTMLElement | null>getCollection('history').firstElementChild;
 
-  if (firstElementInHistory?.dataset.id !== ss.id)
+  if (firstElementInHistory?.dataset.id !== id)
     historyTimeoutId = window.setTimeout(() => {
-      if (historyID === ss.id) {
+      if (historyID === id) {
         addToCollection('history', store.stream);
         // just in case we are already in the history collection 
         if (
@@ -92,7 +93,7 @@ const playableCheckerID = setInterval(() => {
 audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
-  historyID = ss.id;
+  historyID = store.stream.id;
   clearTimeout(historyTimeoutId);
 
   // persist playback speed

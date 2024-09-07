@@ -56,7 +56,7 @@ queuelist.addEventListener('click', e => {
 
   e.preventDefault();
 
-  const queueItem = e.target as HTMLAnchorElement;
+  const queueItem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
   if (!queueItem.classList.contains('streamItem')) return;
   const id = queueItem.dataset.id || '';
 
@@ -65,6 +65,8 @@ queuelist.addEventListener('click', e => {
     if (!current?.includes(id))
       sessionStorage.setItem('trashHistory', current + id);
   }
+
+  store.stream.author = queueItem.dataset.author;
 
   queueItem.classList.contains('delete') ?
     addToTrash() :

@@ -111,9 +111,9 @@ if (errorParam) {
 
     if (route === '/search') {
       const x = new URLSearchParams(query);
-
       superInput.value = x.get('q') || '';
       searchFilters.value = x.get('f') || 'all';
+      superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
     }
 
     if (route === '/upcoming')
