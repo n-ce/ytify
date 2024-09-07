@@ -28,7 +28,11 @@
 - **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
 - **Download** ⬇️ : Download any audio stream using the button on the 3 dot menu.
 
-![ytify_7.0_landscape](https://github.com/n-ce/ytify/assets/69345507/b5a48633-9544-4f6c-b2d0-d11a1fa2efbc)
+![1000012574](https://github.com/user-attachments/assets/450a1eed-0fb6-4fba-8d4a-c18431b935ad)
+![1000012580](https://github.com/user-attachments/assets/4abcd09d-d2ef-4e26-8632-1a50cedfbab8)
+![1000012579](https://github.com/user-attachments/assets/adf1254a-e565-4fb7-ab51-613bbe69e677)
+
+
 
 
 
