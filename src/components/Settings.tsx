@@ -1,60 +1,47 @@
 import './Settings.css';
-import { Show, onMount, JSXElement } from "solid-js";
+import { Show, onMount } from "solid-js";
 import { audio, img } from "../lib/dom";
-import { getDB, saveDB } from "../lib/libraryUtils";
 import { $, quickSwitch, removeSaved, save } from "../lib/utils";
-import { pipedPlaylistsImporter } from "../scripts/library";
-import { cssVar, themer } from "../scripts/theme";
 import { store, getSaved } from '../lib/store';
+import { cssVar, themer } from "../scripts/theme";
+import { getDB, saveDB } from '../lib/libraryUtils';
 
 
 
-
-function ToggleSwitch(props: {
-  name: string
-  id: string,
-  checked: boolean,
-  onClick: (e: Event) => void
-}) {
+function ToggleSwitch(_: ToggleSwitch) {
   let target!: HTMLInputElement;
 
   return (
     <div class='toggleSwitch'>
-      <label for={props.id}>
-        {props.name}
+      <label for={_.id}>
+        {_.name}
       </label>
       <input
         ref={target}
         type='checkbox'
-        id={props.id}
-        checked={props.checked}
-        onClick={props.onClick}
+        id={_.id}
+        checked={_.checked}
+        onClick={_.onClick}
       />
       <span onClick={() => target.click()}></span>
     </div>
   );
 }
 
-function Selector(props: {
-  label: string,
-  id: string,
-  onChange: (e: { target: HTMLSelectElement }) => void,
-  onMount: (target: HTMLSelectElement) => void,
-  children: JSXElement
-}) {
+function Selector(_: Selector) {
   let target!: HTMLSelectElement;
-  onMount(() => props.onMount(target));
+  onMount(() => _.onMount(target));
 
   return (
     <span>
-      <label for={props.id}>
-        {props.label}
+      <label for={_.id}>
+        {_.label}
       </label>
       <select
-        id={props.id}
-        onChange={props.onChange}
+        id={_.id}
+        onChange={_.onChange}
         ref={target}
-      >{props.children}</select>
+      >{_.children}</select>
     </span>
   );
 }
@@ -68,81 +55,6 @@ export default function() {
         <b id="ytifyIconContainer">
           <p>ytify {Version}</p>
         </b>
-
-        <Show when={!getSaved('custom_instance')}>
-          <Selector
-            id='instanceSelector'
-            label='Instance'
-            onChange={e => {
-              const selector = e.target;
-              const index = selector.selectedIndex;
-              const current = store.api.list[index];
-              store.api.index = index;
-
-              index === 0 ?
-                removeSaved('api_8') :
-                save('api_8', JSON.stringify(current));
-
-              quickSwitch();
-            }}
-            onMount={target => {
-
-              const hlsOn = getSaved('HLS');
-
-              const instanceAPIurl = hlsOn ? 'https://piped-instances.kavin.rocks' : 'https://raw.githubusercontent.com/n-ce/Uma/main/unified_instances.txt';
-
-              fetch(instanceAPIurl)
-                .then(res => hlsOn ? res.json() : res.text())
-                .then(text => {
-
-                  const json = hlsOn ?
-                    text.map((v: Record<'name' | 'locations' | 'api_url' | 'image_proxy_url', string>) => ({
-                      name: `${v.name} ${v.locations}`,
-                      piped: v.api_url,
-                      invidious: 'https://invidious.fdn.fr',
-                      hyperpipe: 'https://hyperpipeapi.onrender.com'
-                    })) :
-                    text.split('\n\n').map((v: string) => {
-                      const [name, flag, pi, iv, hp] = v.split(', ');
-                      return {
-                        name: `${name} ${flag}`,
-                        piped: `https://${pi}.${name}`,
-                        invidious: `https://${iv}.${name}`,
-                        hyperpipe: `https://${hp}.${name}`
-                      }
-                    });
-
-                  if (json.length) {
-                    target[0].remove();
-                    store.api.list.length = 0;
-                  }
-                  // add to DOM
-                  for (const api of json) {
-                    target.add(new Option(api.name));
-                    store.api.list.push(api);
-                  }
-
-                  const savedApi = getSaved('api_8');
-
-                  if (!savedApi)
-                    return;
-
-                  const api = JSON.parse(savedApi);
-                  const names = json.map((v: { name: string }) => v.name);
-                  const index = names.findIndex((v: { name: string }) => v === api.name);
-
-                  index < 0 ?
-                    removeSaved('api_8') :
-                    target.selectedIndex =
-                    store.api.index =
-                    index;
-                });
-
-            }}
-          >
-            <option>Official 🌐</option>
-          </Selector>
-        </Show>
 
         <ToggleSwitch
           id='customInstanceSwitch'
@@ -256,8 +168,7 @@ export default function() {
         </Selector>
 
 
-
-      </div>
+      </div >
 
       <div>
         <b>
@@ -399,6 +310,8 @@ export default function() {
           <i class="ri-stack-line"></i>
           <p> Library</p>
         </b>
+
+
         <ToggleSwitch
           id="startupTab"
           name='Set as Default Tab'
@@ -413,9 +326,8 @@ export default function() {
           id='discoverSwitch'
           name='Store Discoveries'
           checked={getSaved('discover') !== 'off'}
-          onClick={(e: Event) => {
-            const discoverSwitch = e.target as HTMLInputElement;
-            if (discoverSwitch.checked)
+          onClick={e => {
+            if (e.target.checked)
               removeSaved('discover');
             else {
               const db = getDB();
@@ -429,13 +341,13 @@ export default function() {
             }
           }}
         />
+
         <ToggleSwitch
           id='historySwitch'
           name='Store History'
           checked={getSaved('history') !== 'off'}
-          onClick={(e) => {
-            const historySwitch = e.target as HTMLInputElement;
-            if (historySwitch.checked)
+          onClick={e => {
+            if (e.target.checked)
               removeSaved('history');
             else {
               const db = getDB();
@@ -448,7 +360,13 @@ export default function() {
 
           }}
         />
-        <p onClick={pipedPlaylistsImporter}>Import Playlists from Piped</p>
+
+        <p onClick={() => {
+          import('../modules/importPipedPlaylists')
+            .then(mod => {
+              mod.pipedPlaylistsImporter()
+            })
+        }}>Import Playlists from Piped</p>
 
       </div>
 

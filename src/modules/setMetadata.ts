@@ -8,25 +8,28 @@ let more = () => undefined;
 document.getElementById('moreBtn')!.addEventListener('click', () => more());
 
 
-export async function setMetaData(
-  stream: CollectionItem
-) {
+export async function setMetaData(data: CollectionItem) {
 
   // remove ' - Topic' from author name if it exists
 
+
+  data.author = data.author === 'Release - Topic' ? store.stream.author : data.author;
+  store.stream = data;
+
+
   let music = '';
-  let authorText = stream.author;
-  if (stream.author.endsWith(' - Topic')) {
+  let authorText = store.stream.author;
+  if (data.author.endsWith(' - Topic')) {
     music = '&w=720&h=720&fit=cover';
-    authorText = stream.author.slice(0, -8);
+    authorText = data.author.slice(0, -8);
   }
 
   const metadataObj: MediaMetadataInit = {
-    title: stream.title,
+    title: data.title,
     artist: authorText,
   };
 
-  const imgX = generateImageUrl(stream.id, 'maxres', music);
+  const imgX = generateImageUrl(data.id, 'maxres', music);
   if (store.loadImage !== 'off') {
     img.src = imgX
     metadataObj.artwork = [
@@ -37,24 +40,24 @@ export async function setMetaData(
       { src: img.src, sizes: '384x384' },
       { src: img.src, sizes: '512x512' },
     ]
-    img.alt = stream.title;
+    img.alt = data.title;
   }
 
 
-  title.href = hostResolver(`/watch?v=${stream.id}`);
-  title.textContent = stream.title;
+  title.href = hostResolver(`/watch?v=${data.id}`);
+  title.textContent = data.title;
 
   author.textContent = authorText;
 
   more = function() {
-    store.actionsMenu = stream;
+    store.actionsMenu = data;
     actionsMenu.showModal();
     history.pushState({}, '', '#');
   }
 
 
   if (location.pathname === '/')
-    document.title = stream.title + ' - ytify';
+    document.title = data.title + ' - ytify';
 
 
   if ('mediaSession' in navigator) {

@@ -54,13 +54,12 @@ export const store: {
   api: {
     list:
       [
-        JSON.parse(
-          getSaved('custom_instance') || `{
+        {
           "name": "Official 🌐",
           "piped": "https://pipedapi.kavin.rocks",
           "invidious": "https://invidious.fdn.fr",
           "hyperpipe": "https://hyperpipeapi.onrender.com"
-        }`)
+        }
       ],
     index: 0
   },

@@ -1,12 +1,13 @@
 import { $, errorHandler, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
-import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
+import { listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
+import { store } from "./store";
 
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
-export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{"discover":{}}');
+export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
 export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 
@@ -56,7 +57,7 @@ export function addListToCollection(collection: string, list: { [index: string]:
   saveDB(db);
 }
 
-export function createPlaylist(title: string) {
+export function createCollection(title: string) {
   const collectionSelector = document.getElementById('collectionSelector') as HTMLSelectElement;
 
   reservedCollections
@@ -90,7 +91,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   if (collection) {
     const db = getDB();
-    const data = db[collection];
+    const data = db[decodeURI(collection)];
 
     if (collection === 'discover')
       for (const i in data)
@@ -105,7 +106,7 @@ export async function fetchCollection(collection: string | null, shareId: string
       alert('No items found');
       return;
     }
-    listAnchor.dataset.id = collection;
+    store.list.id = collection;
 
   } else {
     // this means it does not exist in db and is a public collection
@@ -173,7 +174,7 @@ export async function superCollectionLoader(name: SuperCollection) {
     pls.forEach(v => {
       const a = $('a');
       a.href = '/list?collection=' + v;
-      a.className = 'ur_pls_item';
+      a.className = 'ur_cls_item';
       const i = $('i');
       i.className = 'ri-play-list-2-fill';
       a.append(i, v);
@@ -257,8 +258,7 @@ export async function superCollectionLoader(name: SuperCollection) {
         errorHandler(
           err.message,
           loadFeed,
-          () => '',
-          'piped'
+          () => ''
         );
       })
       .finally(() => loadingScreen.close());

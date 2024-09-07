@@ -6,7 +6,7 @@ import solidPlugin from 'vite-plugin-solid';
 export default defineConfig(({ command }) => ({
   define: {
     Version: JSON.stringify(
-      ((today = new Date()) => today.getFullYear() + '.' + (today.getMonth() + 1) + '.' + today.getDate())()
+      ((today = new Date()) => `${process.env.npm_package_version} (${today.getDate()} ${today.toLocaleString('default', { month: 'short' })} ${today.getFullYear()})`)()
     ),
   },
   plugins: [

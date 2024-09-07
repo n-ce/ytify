@@ -1,11 +1,10 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { addToCollection, createPlaylist, getDB, reservedCollections } from "../lib/libraryUtils";
 import { $, notify } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
 import './ActionsMenu.css';
-import { onMount } from "solid-js";
+import CollectionSelector from "./CollectionSelector";
 
 declare module "solid-js" {
   namespace JSX {
@@ -23,15 +22,6 @@ actionsMenu.onclick = close;
 
 export default function() {
 
-  let collectionSelector!: HTMLSelectElement;
-
-  onMount(() => {
-    const initialKeys = Object.keys(getDB());
-
-    for (const key of initialKeys)
-      if (!reservedCollections.includes(key))
-        createPlaylist(key);
-  });
 
   return (
     <ul on:click={e => e.stopPropagation()}>
@@ -49,38 +39,8 @@ export default function() {
         <i class="ri-list-check-2"></i>Enqueue
       </li>
 
-      <li>
-        <i class="ri-play-list-add-line"></i>
-        <select
-          ref={collectionSelector}
-          tabindex={2}
-          id="collectionSelector"
-          onchange={(e) => {
-            const clxnSlctr = e.target;
-            let title;
+      <CollectionSelector collection={store.actionsMenu} />
 
-            if (!clxnSlctr.value) return;
-            if (clxnSlctr.value === '+cl') {
-              title = prompt('Collection Title')?.trim();
-
-              if (title)
-                createPlaylist(title);
-            }
-            else title = clxnSlctr.value;
-
-            if (title)
-              addToCollection(title, store.actionsMenu);
-
-            close();
-            clxnSlctr.selectedIndex = 0;
-          }}
-        >
-          <option>Add To</option>
-          <option value="+cl">Create New Collection</option>
-          <option value="favorites">Favorites</option>
-          <option value="listenLater">Listen Later</option>
-        </select>
-      </li>
 
       <li tabindex={3} on:click={async () => {
         close();
@@ -129,7 +89,29 @@ export default function() {
 
         fetchList(smd.channelUrl);
       }}>
-        <i class="ri-youtube-line"></i>View Channel
+        <i class="ri-user-line"></i>View Channel
+      </li>
+
+      <li tabindex={7} on:click={() => {
+        open('https://youtu.be/' + store.actionsMenu.id);
+      }}>
+        <i class="ri-youtube-line"></i>Watch on YouTube
+      </li>
+
+      <li tabindex={7} on:click={() => {
+        close();
+        const dialog = $('dialog') as HTMLDialogElement;
+        dialog.className = 'debug';
+        dialog.textContent = JSON.stringify(store, null, 4);
+
+        document.body.appendChild(dialog);
+        dialog.showModal();
+        dialog.onclick = () => {
+          dialog.close();
+          dialog.remove();
+        }
+      }}>
+        <i class="ri-bug-line"></i>Stats For Nerds
       </li>
 
     </ul>

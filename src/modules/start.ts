@@ -1,13 +1,18 @@
-import type { SortableEvent } from "sortablejs";
+import { type SortableEvent } from "sortablejs";
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
 import { errorHandler, getApi, idFromURL } from '../lib/utils';
-import { fetchCollection } from '../lib/libraryUtils';
 import { bitrateSelector, searchFilters, superInput, audio, playButton, queuelist, loadingScreen, ytifyIcon } from '../lib/dom';
 import fetchList from '../modules/fetchList';
+import { fetchCollection } from "../lib/libraryUtils";
 
 export default async function() {
 
+  const custom_instance = getSaved('custom_instance');
+
+  custom_instance ?
+    store.api.list[0] = JSON.parse(custom_instance) :
+    import('../scripts/instances');
 
   // hls
 
@@ -25,16 +30,13 @@ export default async function() {
             h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
           audio.play();
         });
-        h.on(mod.default.Events.ERROR, (e, d) => {
-          console.log(e);
-
+        h.on(mod.default.Events.ERROR, (_, d) => {
           if (d.details !== 'manifestLoadError') return;
           const prevApi = getApi('piped');
           errorHandler(
-            'HLS Manifest Loading Error',
+            'Hi this is Google, We will not let you listen in peace, huahahaha!',
             () => h.loadSource((d.url!).replace(prevApi, getApi('piped'))),
-            () => playButton.classList.replace(playButton.className, 'ri-stop-circle-fill'),
-            'piped'
+            () => playButton.classList.replace(playButton.className, 'ri-stop-circle-fill')
           );
 
         })
@@ -88,8 +90,10 @@ export default async function() {
     superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
   }
 
+
   if (params.has('collection') || params.has('si'))
     fetchCollection(params.get('collection'), params.get('si'));
+
 
   // list loading
 

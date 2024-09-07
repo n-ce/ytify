@@ -169,6 +169,12 @@ a {
   animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
 }
 
+dialog.debug {
+  white-space: pre;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: var(--roundness);
+}
 
 
 #queuetools,

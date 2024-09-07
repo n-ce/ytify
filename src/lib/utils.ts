@@ -1,5 +1,4 @@
-import { audio, listAnchor, actionsMenu } from "./dom";
-import { fetchCollection, removeFromCollection } from "./libraryUtils";
+import { audio, actionsMenu } from "./dom";
 import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
@@ -7,6 +6,7 @@ import { render } from 'solid-js/web';
 import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
+import { fetchCollection, removeFromCollection } from "./libraryUtils";
 
 
 
@@ -71,8 +71,7 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 export async function errorHandler(message: string,
   redoAction: () => void,
-  finalAction: () => void,
-  instanceType: 'piped' | 'invidious' | 'hyperpipe'
+  finalAction: () => void
 ) {
 
   // Get Current API
@@ -83,7 +82,6 @@ export async function errorHandler(message: string,
 
   const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement | null;
   const apiIndex = instanceSelector?.selectedIndex || 0;
-  const apiUrl = getApi(instanceType, apiIndex);
   const noOfInstances = instanceSelector?.length || 1;
 
   if (message === 'nextpage error') return;
@@ -92,10 +90,6 @@ export async function errorHandler(message: string,
     message !== 'No Data Found' &&
     apiIndex < noOfInstances - 1
   ) {
-    const nextApi = getApi(instanceType, apiIndex + 1);
-
-    notify(`switched instance from ${apiUrl} to ${nextApi} due to ${message}.`);
-
     if (instanceSelector)
       instanceSelector.selectedIndex++;
 
@@ -156,18 +150,23 @@ export function itemsLoader(itemsArray: StreamItem[] | null) {
 
 
 // TLDR : Stream Item Click Action
-export function superClick(e: Event) {
-  const elem = e.target as HTMLAnchorElement;
+export async function superClick(e: Event) {
+  const elem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
   if (elem.target === '_blank') return;
   e.preventDefault();
 
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
 
+  store.stream.author = eld.author;
+
   if (elc('streamItem'))
     return elc('delete') ?
-      removeFromCollection(listAnchor.dataset.id as string, eld.id as string)
+      removeFromCollection(store.list.id, eld.id as string)
       : player(eld.id);
+
+  else if (elc('ur_cls_item'))
+    fetchCollection(elem.textContent as string);
 
   else if (elc('ri-more-2-fill')) {
     actionsMenu.showModal();
@@ -182,8 +181,6 @@ export function superClick(e: Event) {
 
   }
 
-  else if (elc('ur_pls_item'))
-    fetchCollection(elem.textContent as string);
 
   else if (elc('listItem')) {
 

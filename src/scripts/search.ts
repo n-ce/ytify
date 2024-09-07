@@ -36,8 +36,7 @@ function searchLoader() {
       errorHandler(
         err.message,
         searchLoader,
-        () => '',
-        service
+        () => ''
       )
     })
     .finally(() => loadingScreen.close());
