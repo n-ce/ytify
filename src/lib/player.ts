@@ -6,8 +6,6 @@ import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 
 
-
-
 export default async function player(id: string | null = '') {
 
   if (!id) return;
@@ -17,33 +15,42 @@ export default async function player(id: string | null = '') {
   const fetchViaIV = Boolean(!store.player.HLS && getSaved('fetchViaIV'));
   const type = fetchViaIV ? 'invidious' : 'piped';
   const controller = new AbortController();
+  const instances = store.api.list;
 
 
-  const data = await Promise.any(
-    store.api.list
-      .map(v => getData(
-        id,
-        v[type],
-        controller.signal,
-        fetchViaIV
-      ).then(async _ => {
-        const streams = _.audioStreams.sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
-        const audio = new Audio();
-        const __: any = await new Promise(res => {
-          audio.addEventListener('loadedmetadata', () => {
-            audio.remove();
-            controller.abort('Resolved');
-            store.api.index = store.api.list.findIndex(i => i[type] === v[type]);
-            res(_);
-          });
-          audio.src = streams[0].url;
+  const concurrent = () => Promise.any(
+    instances.map(v => getData(
+      id,
+      v[type],
+      controller.signal,
+      type
+    ).then(async _ => {
+      const streams = _.audioStreams.sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
+      const audio = new Audio();
+      const __: any = await new Promise(res => {
+        audio.addEventListener('loadedmetadata', () => {
+          audio.remove();
+          controller.abort('Resolved');
+          store.api.index = instances.findIndex(i => i[type] === v[type]);
+          res(_);
         });
+        audio.src = streams[0].url;
+      });
 
-        if ('title' in __)
-          return __;
-      })
-      )
-  ).catch(() => notify('How dare you try to be free from us petty user?, we have blocked all available instances, we are Google Huahahaha!'));
+      if ('title' in __)
+        return __;
+    })
+    )
+  ).catch(() => notify('All Public Instances failed.'));
+
+  const data = await (instances.length < 2 ?
+    getData(
+      id,
+      instances[0][type],
+      controller.signal,
+      type
+    ).catch(e => notify(e)) :
+    concurrent());
 
 
   if (!data) {
