@@ -92,7 +92,7 @@ export default function() {
         <i class="ri-user-line"></i>View Channel
       </li>
 
-      <li tabindex={7} on:click={() => {
+      <li tabindex={6} on:click={() => {
         open('https://youtu.be/' + store.actionsMenu.id);
       }}>
         <i class="ri-youtube-line"></i>Watch on YouTube

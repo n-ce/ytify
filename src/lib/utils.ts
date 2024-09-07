@@ -80,9 +80,8 @@ export async function errorHandler(message: string,
   //     > Redo Action with Next API
   // final action if all fails
 
-  const instanceSelector = document.getElementById('instanceSelector') as HTMLSelectElement | null;
-  const apiIndex = instanceSelector?.selectedIndex || 0;
-  const noOfInstances = instanceSelector?.length || 1;
+  const apiIndex = store.api.index;
+  const noOfInstances = store.api.list.length;
 
   if (message === 'nextpage error') return;
 
@@ -90,18 +89,13 @@ export async function errorHandler(message: string,
     message !== 'No Data Found' &&
     apiIndex < noOfInstances - 1
   ) {
-    if (instanceSelector)
-      instanceSelector.selectedIndex++;
-
-    store.api.index = instanceSelector?.selectedIndex || 0;
-
+    store.api.index++;
     redoAction();
     return;
   }
   notify(message);
   finalAction();
-  if (instanceSelector)
-    instanceSelector.selectedIndex = store.api.index = 0;
+  store.api.index = 0;
 }
 
 
