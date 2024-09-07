@@ -1,4 +1,4 @@
-import { audio, listAnchor, actionsMenu } from "./dom";
+import { audio, actionsMenu } from "./dom";
 import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
@@ -160,7 +160,7 @@ export async function superClick(e: Event) {
 
   if (elc('streamItem'))
     return elc('delete') ?
-      removeFromCollection(listAnchor.dataset.id as string, eld.id as string)
+      removeFromCollection(store.list.id, eld.id as string)
       : player(eld.id);
 
   else if (elc('ur_cls_item'))

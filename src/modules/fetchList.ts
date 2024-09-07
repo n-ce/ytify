@@ -52,7 +52,8 @@ export default async function fetchList(
     )
   );
 
-  goTo('/list');
+  if (location.pathname !== '/list')
+    goTo('/list');
   listSection.scrollTo(0, 0);
 
   let token = group.nextpage;

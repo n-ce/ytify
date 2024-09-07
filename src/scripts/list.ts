@@ -1,4 +1,4 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listAnchor, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, shareCollectionButton, subscribeListBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, shareCollectionButton, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver } from '../lib/utils';
 import { store } from '../lib/store';
@@ -13,7 +13,7 @@ listBtnsContainer.addEventListener('click', async e => {
     return;
 
   const db = getDB();
-  const id = <string>listAnchor.dataset.id;
+  const id = store.list.id;
   const atcOption = <HTMLOptionElement>document.getElementById('collectionSelector')!.querySelector(`[value="${id}"]`);
 
   if (btn === playAllBtn) {

@@ -89,7 +89,29 @@ export default function() {
 
         fetchList(smd.channelUrl);
       }}>
-        <i class="ri-youtube-line"></i>View Channel
+        <i class="ri-user-line"></i>View Channel
+      </li>
+
+      <li tabindex={7} on:click={() => {
+        open('https://youtu.be/' + store.actionsMenu.id);
+      }}>
+        <i class="ri-youtube-line"></i>Watch on YouTube
+      </li>
+
+      <li tabindex={7} on:click={() => {
+        close();
+        const dialog = $('dialog') as HTMLDialogElement;
+        dialog.className = 'debug';
+        dialog.textContent = JSON.stringify(store, null, 4);
+
+        document.body.appendChild(dialog);
+        dialog.showModal();
+        dialog.onclick = () => {
+          dialog.close();
+          dialog.remove();
+        }
+      }}>
+        <i class="ri-bug-line"></i>Stats For Nerds
       </li>
 
     </ul>

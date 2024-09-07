@@ -19,13 +19,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 .ri-search-2-line:before {
   content: "\f0cd";
-}
-
-.ri-stack-line:before {
-  content: "\f181";
 }
 
 .ri-settings-line:before {
@@ -64,10 +59,6 @@
   content: "\f1af";
 }
 
-.ri-filter-2-line:before {
-  content: "\ed23";
-}
-
 .ri-volume-down-fill:before {
   content: "\f29b";
 }
@@ -84,32 +75,12 @@
   content: "\f074";
 }
 
-.ri-play-list-add-line:before {
-  content: "\f00f";
-}
-
-.ri-play-list-2-fill:before {
-  content: "\f00c";
-}
-
-.ri-compass-3-line:before {
-  content: "\ebbe";
-}
-
-.ri-memories-line:before {
-  content: "\f341";
-}
-
 .ri-heart-line:before {
   content: "\ee0f";
 }
 
 .ri-heart-fill:before {
   content: "\ee0e";
-}
-
-.ri-calendar-schedule-line:before {
-  content: "\f3f3";
 }
 
 .ri-import-line:before {
@@ -122,10 +93,6 @@
 
 .ri-delete-bin-2-line:before {
   content: "\ec1e";
-}
-
-.ri-list-check-2:before {
-  content: "\eeb9";
 }
 
 .ri-play-large-line:before {
@@ -144,10 +111,6 @@
   content: "\f2d5";
 }
 
-.ri-external-link-line:before {
-  content: "\ecaf";
-}
-
 .ri-play-circle-fill:before {
   content: "\f008";
 }
@@ -160,38 +123,82 @@
   content: "\f19e";
 }
 
+.ri-list-check-2:before {
+  content: "\eeb9";
+}
+
+.ri-external-link-line:before {
+  content: "\ecaf";
+}
+
+.ri-user-line:before {
+  content: "\f264";
+}
+
+.ri-bug-line:before {
+  content: "\eb07";
+}
+
 .ri-draggable:before {
   content: "\f38f";
 }
 
-.ri-edit-line:before {
-  content: "\ec86";
-}
-
-.ri-t-shirt-2-line:before {
-  content: "\f1d5";
-}
-
-.ri-search-2-fill:before {
-  content: "\f0cc";
-}
-
-.ri-skip-forward-fill:before {
-  content: "\f143";
-}
-
-.ri-stack-fill:before {
-  content: "\f180";
-}
-
-.ri-settings-fill:before {
-  content: "\f0ed";
+.ri-play-list-add-line:before {
+  content: "\f00f";
 }
 
 .ri-more-2-fill:before {
   content: "\ef76";
 }
 
+.ri-stack-line:before {
+  content: "\f181";
+}
+
+.ri-stack-fill:before {
+  content: "\f180";
+}
+
+.ri-search-2-fill:before {
+  content: "\f0cc";
+}
+
+.ri-settings-fill:before {
+  content: "\f0ed";
+}
+
+.ri-skip-forward-fill:before {
+  content: "\f143";
+}
+
+.ri-t-shirt-2-line:before {
+  content: "\f1d5";
+}
+
+.ri-compass-3-line:before {
+  content: "\ebbe";
+}
+
+.ri-memories-line:before {
+  content: "\f341";
+}
+
+.ri-calendar-schedule-line:before {
+  content: "\f3f3";
+}
+
+.ri-filter-2-line:before {
+  content: "\ed23";
+}
+
+.ri-edit-line:before {
+  content: "\ec86";
+}
+
 .ri-link:before {
   content: "\eeb2";
+}
+
+.ri-play-list-2-fill:before {
+  content: "\f00c";
 }

@@ -1,7 +1,8 @@
 import { $, errorHandler, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
-import { listAnchor, listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
+import { listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
+import { store } from "./store";
 
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
@@ -90,7 +91,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   if (collection) {
     const db = getDB();
-    const data = db[collection];
+    const data = db[decodeURI(collection)];
 
     if (collection === 'discover')
       for (const i in data)
@@ -105,7 +106,7 @@ export async function fetchCollection(collection: string | null, shareId: string
       alert('No items found');
       return;
     }
-    listAnchor.dataset.id = collection;
+    store.list.id = collection;
 
   } else {
     // this means it does not exist in db and is a public collection
