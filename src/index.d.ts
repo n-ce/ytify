@@ -1,12 +1,6 @@
 declare global {
 
-  type apiList = {
-    [index: string]: {
-      name: string,
-      url: string,
-      custom: boolean
-    }
-  }
+  type APIList = Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>;
 
 
   type StreamItem = {
@@ -43,15 +37,27 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string,
-    frequency?: number
+    channelUrl: string
+  }
+
+  type List = Record<'id' | 'name' | 'thumbnail', string>
+  type Collection = {
+    [index: string]: CollectionItem | DOMStringMap
   }
 
   type Library = {
-    [index: string]: {
-      [index: string]: CollectionItem | DOMStringMap
-    }
+    history?: Collection,
+    favorites: Collection,
+    listenLater: Collection,
+    discover?: {
+      [index: string]: CollectionItem & { frequency: number }
+    },
+    channels: { [index: string]: List & { uploader: string } },
+    playlists: { [index: string]: List },
+    [index: string]: Collection
   }
+
+
 
   type Codec = {
     urls: string[],

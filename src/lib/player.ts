@@ -12,45 +12,8 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const fetchViaIV = Boolean(!store.player.HLS && getSaved('fetchViaIV'));
-  const type = fetchViaIV ? 'invidious' : 'piped';
-  const controller = new AbortController();
-  const instances = store.api.list;
 
-
-  const concurrent = () => Promise.any(
-    instances.map(v => getData(
-      id,
-      v[type],
-      controller.signal,
-      type
-    ).then(async _ => {
-      const streams = _.audioStreams.sort((a: { bitrate: number }, b: { bitrate: number }) => (a.bitrate - b.bitrate));
-      const audio = new Audio();
-      const __: any = await new Promise(res => {
-        audio.addEventListener('loadedmetadata', () => {
-          audio.remove();
-          controller.abort('Resolved');
-          store.api.index = instances.findIndex(i => i[type] === v[type]);
-          res(_);
-        });
-        audio.src = streams[0].url;
-      });
-
-      if ('title' in __)
-        return __;
-    })
-    )
-  ).catch(() => notify('All Public Instances failed.'));
-
-  const data = await (instances.length < 2 ?
-    getData(
-      id,
-      instances[0][type],
-      controller.signal,
-      type
-    ).catch(e => notify(e)) :
-    concurrent());
+  const data = await getData(id).catch(e => notify(e));
 
 
   if (!data) {

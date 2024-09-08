@@ -80,14 +80,11 @@ export async function errorHandler(message: string,
   //     > Redo Action with Next API
   // final action if all fails
 
-  const apiIndex = store.api.index;
-  const noOfInstances = store.api.list.length;
-
   if (message === 'nextpage error') return;
 
   if (
     message !== 'No Data Found' &&
-    apiIndex < noOfInstances - 1
+    store.api.index < store.api.list.length - 1
   ) {
     store.api.index++;
     redoAction();

@@ -331,7 +331,7 @@ export default function() {
               removeSaved('discover');
             else {
               const db = getDB();
-              if (confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`)) {
+              if (confirm(`This will clear your existing ${Object.keys(db.discover || {}).length || 0} discoveries, continue?`)) {
                 delete db.discover;
                 saveDB(db);
                 save('discover', 'off');
@@ -351,7 +351,7 @@ export default function() {
               removeSaved('history');
             else {
               const db = getDB();
-              if (confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) {
+              if (confirm(`This will clear ${Object.keys(db.history || {}).length || 0} items from your history, continue?`)) {
                 delete db.history;
                 saveDB(db);
                 save('history', 'off')

@@ -1,16 +1,50 @@
-export const getData = (
-  id: string,
-  apiUrl: string,
-  signal: AbortSignal,
-  type: 'invidious' | 'piped'
-) =>
-  fetchVia[type](id, apiUrl, signal);
+import { store } from "../lib/store";
+import { notify } from "../lib/utils";
+
+
+export function getData(id: string) {
+
+  const controller = store.api.list.length > 2 ? new AbortController() : undefined;
+  const type = store.api.type;
+  const list = store.api.list;
+
+  return !controller ?
+    fetchVia[type](id, list[0][type]) :
+    Promise.any(
+      store.api.list.map(v =>
+        fetchVia[type](id, v[type], controller.signal)
+          .then((_: {
+            audioStreams: {
+              bitrate: number,
+              encoding: string,
+              url: string
+            }[]
+          }) => new Promise(res => {
+
+            const audio = new Audio();
+            audio.onloadedmetadata = function() {
+              audio.remove();
+              controller.abort('Resolved');
+              res(_);
+            }
+            audio.src = _.audioStreams
+              .filter(s => s.encoding === 'aac')
+              .sort((a, b) => a.bitrate - b.bitrate)
+            [0].url;
+
+          }))
+          .catch(() => notify('All Public Instances Failed.'))
+      ));
+
+}
+
+
 
 const fetchVia = {
   'piped': (
     id: string,
     apiUrl: string,
-    signal: AbortSignal
+    signal: AbortSignal | undefined = undefined
   ) =>
     fetch(apiUrl + '/streams/' + id, { signal })
       .then(res => res.json())
@@ -23,7 +57,7 @@ const fetchVia = {
   'invidious': (
     id: string,
     apiUrl: string,
-    signal: AbortSignal
+    signal: AbortSignal | undefined = undefined
   ) =>
     fetch(`${apiUrl}/api/v1/videos/${id}`, { signal })
       .then(res => res.json())
@@ -79,3 +113,5 @@ const fetchVia = {
         }))
       }))
 }
+
+

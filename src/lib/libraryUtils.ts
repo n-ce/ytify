@@ -18,6 +18,7 @@ export function removeFromCollection(collection: string, id: string) {
   if (!collection) return;
 
   const db = getDB();
+
   delete db[collection][id];
   listContainer.querySelector(`[data-id="${id}"]`)?.remove();
   saveDB(db);
@@ -69,7 +70,7 @@ export function createCollection(title: string) {
     collectionSelector.add(new Option(title, title));
 }
 
-function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStringMap }, fragment: DocumentFragment) {
+function renderDataIntoFragment(data: Collection, fragment: DocumentFragment) {
 
   for (const item in data) {
     const d = data[item];
@@ -91,12 +92,14 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   if (collection) {
     const db = getDB();
-    const data = db[decodeURI(collection)];
+    const data = db[<'discover'>decodeURI(collection)];
+
+    if (!data) return;
 
     if (collection === 'discover')
       for (const i in data)
         if (data[i].frequency as number < 2)
-          delete db.discover[i];
+          delete db.discover?.[i];
 
     saveDB(db);
 

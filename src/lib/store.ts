@@ -12,14 +12,13 @@ export const store: {
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>
   },
-  queue: {
-    array: string[]
-  }
+  queue: string[]
   stream: CollectionItem,
   streamHistory: string[]
   api: {
-    list: Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>[],
-    index: number
+    list: APIList[],
+    index: number,
+    type: 'piped' | 'invidious'
   },
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
@@ -27,7 +26,7 @@ export const store: {
   upcomingQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
-  list: Record<'name' | 'url' | 'type' | 'id' | 'uploader' | 'thumbnail', string>,
+  list: List & Record<'url' | 'type' | 'uploader', string>,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
@@ -42,7 +41,7 @@ export const store: {
       }
     }).then(res => res.supported)
   },
-  queue: { array: [] },
+  queue: [],
   stream: {
     id: params.get('s') || '',
     title: '',
@@ -61,7 +60,9 @@ export const store: {
           "hyperpipe": "https://hyperpipeapi.onrender.com"
         }
       ],
-    index: 0
+    index: 0,
+    type: (!getSaved('HLS') && getSaved('fetchViaIV'))
+      ? 'invidious' : 'piped'
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: getSaved('linkHost') || location.origin,
