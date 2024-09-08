@@ -1,7 +1,8 @@
+import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
 import { errorHandler, getApi, idFromURL } from '../lib/utils';
-import { bitrateSelector, searchFilters, superInput, audio, playButton, loadingScreen, ytifyIcon } from '../lib/dom';
+import { bitrateSelector, searchFilters, superInput, audio, playButton, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
 
@@ -53,19 +54,19 @@ export default async function() {
 
 
   // queue sorting
-  /*
-    await import('sortablejs')
-      .then(mod =>
-        new mod.default(queuelist, {
-          handle: '.ri-draggable',
-          onUpdate(e: SortableEvent) {
-            if (e.oldIndex == null || e.newIndex == null) return;
-            const queueArray = store.queue;
-            queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
-          }
-        })
-      );
-  */
+
+  await import('sortablejs')
+    .then(mod =>
+      new mod.default(queuelist, {
+        handle: '.ri-draggable',
+        onUpdate(e: SortableEvent) {
+          if (e.oldIndex == null || e.newIndex == null) return;
+          const queueArray = store.queue;
+          queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
+        }
+      })
+    );
+
 
 
 
