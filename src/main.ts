@@ -1,7 +1,7 @@
 import './stylesheets/global.css';
 
-import './scripts/router';
-/*
+// import './scripts/router';
+
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
@@ -38,4 +38,3 @@ addEventListener('DOMContentLoaded', async () => {
 
 })
 
-*/

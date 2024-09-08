@@ -2,7 +2,7 @@ import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist } from "./queue";
-// import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
+import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 
@@ -33,7 +33,7 @@ let prevPageIdx = routes.indexOf(location.pathname);
 
 function showSection(id: string) {
   const routeIdx = routes.indexOf(id);
-  //miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
+  miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
 
   // Enables Reactivity to declare db modifications into UI
   if (id === '/library')
