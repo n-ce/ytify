@@ -1,5 +1,7 @@
 import './stylesheets/global.css';
+
 import './scripts/router';
+/*
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
@@ -12,6 +14,7 @@ addEventListener('DOMContentLoaded', async () => {
 
   await import('./components/Settings')
     .then(mod => render(mod.default, settingsContainer));
+
   settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 
 
@@ -35,3 +38,4 @@ addEventListener('DOMContentLoaded', async () => {
 
 })
 
+*/
