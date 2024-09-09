@@ -1,18 +1,26 @@
 import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { errorHandler, getApi, idFromURL } from '../lib/utils';
-import { bitrateSelector, searchFilters, superInput, audio, playButton, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
+import { idFromURL, notify } from '../lib/utils';
+import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
 
 export default async function() {
 
   const custom_instance = getSaved('custom_instance');
+  const l = store.api.list;
 
   custom_instance ?
-    store.api.list[0] = JSON.parse(custom_instance) :
-    import('../scripts/instances');
+    l.push(custom_instance) :
+    await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/piped_instances.txt')
+      .then(res => res.text())
+      .then(list => list.split('\n'))
+      .then(instances => instances.forEach(i => l.push(i)))
+      .catch(() => l.push('https://pipedapi.kavin.rocks'));
+
+
+
 
   // hls
 
@@ -32,12 +40,7 @@ export default async function() {
         });
         h.on(mod.default.Events.ERROR, (_, d) => {
           if (d.details !== 'manifestLoadError') return;
-          const prevApi = getApi('piped');
-          errorHandler(
-            'Hi this is Google, We will not let you listen in peace, huahahaha!',
-            () => h.loadSource((d.url!).replace(prevApi, getApi('piped'))),
-            () => playButton.classList.replace(playButton.className, 'ri-stop-circle-fill')
-          );
+          notify(d.details);
 
         })
       })

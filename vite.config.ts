@@ -10,7 +10,7 @@ export default defineConfig(({ command }) => ({
     ),
   },
   plugins: [
-    injectEruda(true || command === 'serve'),
+    injectEruda(command === 'serve'),
     solidPlugin(),
     VitePWA({
       manifest: {
@@ -80,7 +80,7 @@ export default defineConfig(({ command }) => ({
           }
         }
       },
-      disable: true || command !== 'build',
+      disable: command !== 'build',
       includeAssets: ['*.woff2', 'ytify_banner.webp']
     })
   ],

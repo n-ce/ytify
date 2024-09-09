@@ -10,9 +10,9 @@ export const progress = <HTMLInputElement>document.getElementById('progress');
 
 export const miniPlayer = <HTMLDivElement>document.getElementById('miniPlayer');
 
-export const canvas = document.createElement('canvas') as HTMLCanvasElement;
+export const canvas = (new OffscreenCanvas(512, 512)) || document.createElement('canvas') as HTMLCanvasElement;
 
-export const context = <CanvasRenderingContext2D>canvas.getContext('2d');
+export const context = <OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D>canvas.getContext('2d', { alpha: false });
 
 export const superInput = <HTMLInputElement>document.getElementById('superInput');
 

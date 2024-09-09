@@ -255,7 +255,7 @@ export async function superCollectionLoader(name: SuperCollection) {
     loadingScreen.showModal();
 
     const channels = Object.keys(db.channels).join(',');
-    const items = await fetch(getApi('piped') + '/feed/unauthenticated?channels=' + channels)
+    const items = await fetch(getApi() + '/feed/unauthenticated?channels=' + channels)
       .then(res => res.json())
       .catch(err => {
         errorHandler(

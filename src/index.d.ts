@@ -92,6 +92,45 @@ declare global {
     children: JSXElement
   }
 
+  type Piped = {
+    title: string,
+    uploader: string,
+    duration: number,
+    uploader: string,
+    uploaderUrl: string,
+    category: string,
+    livestream: boolean,
+    subtitles: [],
+    hls: string
+    relatedStreams: {
+      url: string,
+      title: string,
+      uploaderName: string,
+      duration: number,
+      uploaderUrl: string,
+      type: string
+    }[],
+    audioStreams: Record<'bitrate' | 'codec' | 'contentLength' | 'quality' | 'mimeType' | 'url', string>[]
+  }
+
+  type Invidious = {
+    adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url', string>[],
+    recommendedVideos: {
+      title: string,
+      author: string,
+      lengthSeconds: number,
+      authorUrl: string,
+      videoId: string
+    }[],
+    title: string,
+    author: string,
+    lengthSeconds: number,
+    authorUrl: string,
+    genre: string,
+    liveNow: boolean,
+    hlsUrl: string
+  }
+
 }
 
 

@@ -10,15 +10,15 @@ export const store: {
     HLS: Hls | undefined,
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
-    supportsOpus: Promise<boolean>
+    supportsOpus: Promise<boolean>,
+    dataArray: Piped[]
   },
   queue: string[]
   stream: CollectionItem,
   streamHistory: string[]
   api: {
-    list: APIList[],
+    list: string[],
     index: number,
-    type: 'piped' | 'invidious'
   },
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
@@ -39,7 +39,8 @@ export const store: {
       audio: {
         contentType: 'audio/ogg;codecs=opus'
       }
-    }).then(res => res.supported)
+    }).then(res => res.supported),
+    dataArray: []
   },
   queue: [],
   stream: {
@@ -51,18 +52,8 @@ export const store: {
   },
   streamHistory: [],
   api: {
-    list:
-      [
-        {
-          "name": "Official 🌐",
-          "piped": "https://pipedapi.kavin.rocks",
-          "invidious": "https://invidious.fdn.fr",
-          "hyperpipe": "https://hyperpipeapi.onrender.com"
-        }
-      ],
-    index: 0,
-    type: (!getSaved('HLS') && getSaved('fetchViaIV'))
-      ? 'invidious' : 'piped'
+    list: [],
+    index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: getSaved('linkHost') || location.origin,

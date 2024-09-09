@@ -19,9 +19,9 @@ export const removeSaved = localStorage.removeItem.bind(localStorage);
 export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const getApi = (
-  type: 'piped' | 'invidious' | 'hyperpipe',
-  index: number = store.api.index) =>
-  store.api.list[index][type];
+  index: number = store.api.index
+) =>
+  store.api.list[index];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -73,12 +73,6 @@ export async function errorHandler(message: string,
   redoAction: () => void,
   finalAction: () => void
 ) {
-
-  // Get Current API
-  // if condition
-  //     > Display Error
-  //     > Redo Action with Next API
-  // final action if all fails
 
   if (message === 'nextpage error') return;
 

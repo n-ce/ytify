@@ -37,7 +37,7 @@
 
 		img {
 			height: 19.5vmin;
-			width: 100%;
+			width: auto;
 			border-radius: var(--roundness);
 		}
 

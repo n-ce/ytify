@@ -19,7 +19,7 @@
     "@types/node": "^22.5.4",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
-    "eruda": "^3.2.3",
+    "eruda": "^3.3.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.3",
     "vite-plugin-pwa": "^0.20.5",

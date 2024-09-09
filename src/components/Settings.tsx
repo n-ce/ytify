@@ -61,27 +61,16 @@ export default function() {
           name='Use Custom Instance'
           checked={Boolean(getSaved('custom_instance'))}
           onClick={() => {
-            if (getSaved('custom_instance')) {
+            if (getSaved('custom_instance'))
               removeSaved('custom_instance');
-              removeSaved('api_8');
-            }
             else {
-              const current = store.api.list[0];
-              const n = prompt('Enter Name of your instance :', 'Custom');
-              const p = prompt('Enter Piped API URL :', current.piped)
-              const i = prompt('Enter Invidious API URL (optional) :', current.invidious);
-              const h = prompt('Enter Hyperpipe API URL (optional) :', current.hyperpipe);
+              let current = store.api.list[0];
+              const p = prompt('Enter Piped API URL :', current);
 
-              if (n)
-                current.name = n;
               if (p)
-                current.piped = p;
-              if (i)
-                current.invidious = i;
-              if (h)
-                current.hyperpipe = h;
+                current = p;
 
-              save('custom_instance', JSON.stringify(current));
+              save('custom_instance', current);
             }
             location.reload();
 
@@ -253,7 +242,7 @@ export default function() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Also Proxy non-music streams'
+            name='Proxy non-music streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               getSaved('enforceProxy') ?
@@ -265,25 +254,13 @@ export default function() {
 
           <ToggleSwitch
             id="useInvidiousProxySwitch"
-            name='Prefer to Proxy Audio over Invidious instead of Piped'
+            name='Proxy Audio over Invidious'
             checked={!getSaved('proxyViaInvidious')}
             onClick={() => {
               getSaved('proxyViaInvidious') ?
                 removeSaved('proxyViaInvidious') :
                 save('proxyViaInvidious', 'false');
 
-              quickSwitch();
-            }}
-          />
-
-          <ToggleSwitch
-            id="fetchViaIvSwitch"
-            name='Fetch stream data via Invidious'
-            checked={getSaved('fetchViaIV') === 'true'}
-            onClick={() => {
-              getSaved('fetchViaIV') ?
-                removeSaved('fetchViaIV') :
-                save('fetchViaIV', 'true');
               quickSwitch();
             }}
           />

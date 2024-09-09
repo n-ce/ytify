@@ -118,11 +118,11 @@ function themer() {
 
     const height = canvasImg.height;
     const width = canvasImg.width;
-    const side = Math.min(width, height);
+    const side = Math.floor(Math.min(width, height));
     canvas.width = canvas.height = side;
 
-    const offsetX = (width - side) / 2;
-    const offsetY = (height - side) / 2;
+    const offsetX = Math.floor((width - side) / 2);
+    const offsetY = Math.floor((height - side) / 2);
     context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
 
     const data = context.getImageData(0, 0, side, side).data;
