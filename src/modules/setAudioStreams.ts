@@ -36,7 +36,10 @@ export function setAudioStreams(audioStreams: {
 
     const oldUrl = new URL(url);
 
-    const host = useProxy ? 'https://invidious.fdn.fr' : `https://${oldUrl.searchParams.get('host')}`;
+
+    const host = useProxy ?
+      store.api.invidious[store.api.index] :
+      `https://${oldUrl.searchParams.get('host')}`;
 
     return url.replace(oldUrl.origin, host);
   }
