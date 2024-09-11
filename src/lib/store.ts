@@ -17,7 +17,9 @@ export const store: {
   stream: CollectionItem,
   streamHistory: string[]
   api: {
-    list: string[],
+    piped: string[],
+    invidious: string[],
+    hyperpipe: string,
     index: number,
   },
   loadImage: 'off' | 'lazy' | 'eager',
@@ -52,7 +54,9 @@ export const store: {
   },
   streamHistory: [],
   api: {
-    list: [],
+    piped: [],
+    invidious: [],
+    hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',

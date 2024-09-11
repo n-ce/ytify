@@ -9,16 +9,30 @@ import { fetchCollection } from "../lib/libraryUtils";
 export default async function() {
 
   const custom_instance = getSaved('custom_instance');
-  const l = store.api.list;
+  const a = store.api;
 
-  custom_instance ?
-    l.push(custom_instance) :
-    await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/piped_instances.txt')
-      .then(res => res.text())
-      .then(list => list.split('\n'))
-      .then(instances => instances.forEach(i => l.push(i)))
-      .catch(() => l.push('https://pipedapi.kavin.rocks'));
+  if (custom_instance) {
+    const [pi, iv] = custom_instance.split(',');
+    a.piped.push(pi);
+    a.invidious.push(iv);
 
+  } else {
+    const apiUrl = 'https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json';
+
+    await fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        for (const i in data) {
+          if (Boolean(data[i])) {
+            a.piped.push(i);
+            a.invidious.push(data[i]);
+            delete data[i];
+          }
+        }
+        for (const i in data)
+          a.piped.push(i);
+      })
+  }
 
 
 

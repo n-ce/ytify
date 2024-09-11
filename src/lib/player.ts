@@ -3,6 +3,7 @@ import { convertSStoHHMMSS, notify } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
+import { getData } from "../modules/getStreamData";
 
 export default async function player(id: string | null = '') {
 
@@ -10,28 +11,13 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const f = (i: string) => fetch(i + '/streams/' + id)
-    .then(res => res.json())
-    .then(async data => {
-      if ('audioStreams' in data)
-        return data;
-      else throw new Error(data.message);
-    })
-    .catch(() => '')
 
+  const data = await getData(id)
+    .catch(() => {
+      notify('Could not retrieve data in any known ways.');
+    });
 
-  store.player.dataArray = (await Promise
-    .all(store.api.list.map(f)))
-    .filter(i => i);
-
-
-  if (!store.player.dataArray.length) {
-    notify('No Piped Instances could return data, Retrying...');
-    await player(id);
-    return;
-  }
-
-  const data = store.player.dataArray[0];
+  if (!data) return;
 
   await setMetaData({
     id: id,

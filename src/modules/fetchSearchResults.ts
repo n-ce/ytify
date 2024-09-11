@@ -6,8 +6,8 @@ export const getSearchResults = (
   sortBy: string = ''
 ) =>
   (sortBy === 'date' || sortBy === 'views') ?
-    fetchWithInvidious(query, sortBy) :
-    fetchWithPiped(getApi(), query);
+    fetchWithInvidious(getApi('invidious'), query, sortBy) :
+    fetchWithPiped(getApi('piped'), query);
 
 let nextPageToken = '';
 let previousQuery: string;
@@ -37,10 +37,11 @@ function resolvePage(q: string) {
 }
 
 export const fetchWithInvidious = (
+  API: string,
   q: string,
   sortBy: string
 ) =>
-  fetch(`https://invidious.fdn.fr/api/v1/search?q=${q}&sort=${sortBy}&page=${resolvePage(q)}`)
+  fetch(`${API}/api/v1/search?q=${q}&sort=${sortBy}&page=${resolvePage(q)}`)
     .then(res => res.json())
     .then(items => {
       searchlist.appendChild(
@@ -49,7 +50,7 @@ export const fetchWithInvidious = (
             (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
           )));
       previousQuery = q;
-      setObserver(() => fetchWithInvidious(q, sortBy));
+      setObserver(() => fetchWithInvidious(API, q, sortBy));
     })
 
 

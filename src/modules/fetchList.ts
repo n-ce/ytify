@@ -25,7 +25,7 @@ export default async function fetchList(
     }
   }
 
-  const api = getApi();
+  const api = getApi('piped');
 
   const group = await fetch(api + url)
     .then(res => res.json())
@@ -137,7 +137,7 @@ export default async function fetchList(
 listContainer.addEventListener('click', superClick);
 
 const getPlaylistIdFromArtist = (id: string): Promise<string> =>
-  fetch('https://hyperpipeapi.onrender.com' + id)
+  fetch(store.api.hyperpipe + id)
     .then(res => res.json())
     .then(data => {
       if (!('playlistId' in data))

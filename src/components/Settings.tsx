@@ -64,13 +64,12 @@ export default function() {
             if (getSaved('custom_instance'))
               removeSaved('custom_instance');
             else {
-              let current = store.api.list[0];
-              const p = prompt('Enter Piped API URL :', current);
 
-              if (p)
-                current = p;
+              const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
+              const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
 
-              save('custom_instance', current);
+              if (pi && iv)
+                save('custom_instance', pi + ',' + iv);
             }
             location.reload();
 

@@ -19,9 +19,10 @@ export const removeSaved = localStorage.removeItem.bind(localStorage);
 export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const getApi = (
+  type: 'piped' | 'invidious',
   index: number = store.api.index
 ) =>
-  store.api.list[index];
+  store.api[type][index];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -69,7 +70,8 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-export async function errorHandler(message: string,
+export async function errorHandler(
+  message: string,
   redoAction: () => void,
   finalAction: () => void
 ) {
@@ -78,7 +80,7 @@ export async function errorHandler(message: string,
 
   if (
     message !== 'No Data Found' &&
-    store.api.index < store.api.list.length - 1
+    store.api.index < store.api.invidious.length - 1
   ) {
     store.api.index++;
     redoAction();

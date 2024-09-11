@@ -70,7 +70,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(getApi() + '/suggestions/?query=' + text).then(res => res.json());
+  const data = (await fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text).then(res => res.json()))[1];
 
   if (!data.length) return;
 
