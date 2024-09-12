@@ -1,4 +1,4 @@
-import { favButton, favIcon, playButton } from "./dom";
+import { audio, favButton, favIcon, playButton } from "./dom";
 import { convertSStoHHMMSS, notify } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
@@ -30,17 +30,19 @@ export default async function player(id: string | null = '') {
     channelUrl: data.uploaderUrl
   });
 
-  const h = store.player.HLS;
-  h ?
-    h.loadSource(data.hls) :
-    import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
-      data.audioStreams
-        .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-        ),
-      data.category === 'Music',
-      data.livestream
-    ));
-
+  if ('OffscreenCanvas' in window) {
+    const h = store.player.HLS;
+    h ?
+      h.loadSource(data.hls) :
+      import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
+        data.audioStreams
+          .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+          ),
+        data.category === 'Music',
+        data.livestream
+      ));
+  }
+  else audio.src = data.hls;
 
   if (data.subtitles.length)
     import('../modules/setSubtitles')

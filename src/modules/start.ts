@@ -42,6 +42,9 @@ export default async function() {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
 
+    if (!('OffscreenCanvas' in window))
+      return;
+
     import('hls.js')
       .then(mod => {
         store.player.HLS = new mod.default();
