@@ -57,7 +57,9 @@ export function setDiscoveries(
     len--;
   }
 
-  // convert the new merged+randomized discover back to object and inject it
+  db.discover = {};
+
+  // insert the upgraded collection to discover;
   addListToCollection('discover', Object.fromEntries(array), db);
 
   // just in case we are already in the discover collection 

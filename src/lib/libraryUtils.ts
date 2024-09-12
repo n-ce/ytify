@@ -27,11 +27,15 @@ export function removeFromCollection(collection: string, id: string) {
 export function toCollection(collection: string, data: CollectionItem | DOMStringMap, db: Library) {
   if (!collection) return;
   const id = <string>data.id;
+
   if (db.hasOwnProperty(collection)) {
-    if (db[collection].hasOwnProperty(id))// delete old data if already exists
+    if (db[collection].hasOwnProperty(id))
+      // delete old data if already exists
       delete db[collection][id];
-  } // create if collection does not exists
+  }
+  // create if collection does not exists
   else db[collection] = {};
+
   db[collection][id] = data;
 }
 
@@ -47,9 +51,6 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
 
   if (!collection) return;
-
-  if (collection === 'discover')
-    db.discover = {};
 
   for (const key in list) {
     const data = list[key];
@@ -94,7 +95,10 @@ export async function fetchCollection(collection: string | null, shareId: string
     const db = getDB();
     const data = db[<'discover'>decodeURI(collection)];
 
-    if (!data) return;
+    if (!data) {
+      alert('No items found');
+      return
+    }
 
     if (collection === 'discover')
       for (const i in data)

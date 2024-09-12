@@ -1,6 +1,8 @@
 import { store } from "../lib/store";
 
-export async function getData(id: string) {
+export async function getData(
+  id: string
+) {
   /*
   If HLS
   use full instance list
@@ -29,8 +31,10 @@ export async function getData(id: string) {
   ) => fetch(`${api}/api/v1/videos/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'adaptiveFormats' in data)
+      if (data && 'adaptiveFormats' in data) {
+        store.api.index = store.api.invidious.indexOf(api);
         return data;
+      }
       else throw new Error(data.error);
     })
     .then((data: Invidious) => ({

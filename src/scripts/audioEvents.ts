@@ -4,6 +4,7 @@ import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
+import { getData } from "../modules/getStreamData";
 
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
@@ -165,12 +166,17 @@ audio.onloadedmetadata = function() {
 }
 
 
-audio.oncanplaythrough = function() {
+audio.oncanplaythrough = async function() {
+  const nextItem = store.queue[0];
+  const pf = store.player.prefetch;
   if (audio.duration - audio.currentTime < 30)
-    console.log(true)
+    if (!(nextItem in pf))
+      pf[nextItem] = await getData(nextItem);
 }
 
-
+audio.onerror = function() {
+  player(store.stream.id);
+}
 
 
 loopButton.onclick = function() {

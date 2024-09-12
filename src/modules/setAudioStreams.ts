@@ -36,7 +36,6 @@ export function setAudioStreams(audioStreams: {
 
     const oldUrl = new URL(url);
 
-
     const host = useProxy ?
       store.api.invidious[store.api.index] :
       `https://${oldUrl.searchParams.get('host')}`;

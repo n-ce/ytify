@@ -5,24 +5,15 @@ import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import { getData } from "../modules/getStreamData";
 
-function setAudioStreams(data: Piped) {
-  import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
-    data.audioStreams
-      .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-      ),
-    data.category === 'Music',
-    data.livestream
-  ));
-}
-
 export default async function player(id: string | null = '') {
 
   if (!id) return;
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
+  const prefetched = store.player.prefetch[id];
 
-  const data = await getData(id) as Piped;
+  const data = prefetched ? prefetched : await getData(id) as Piped;
 
   if (!data || !('audioStreams' in data)) {
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
@@ -42,7 +33,13 @@ export default async function player(id: string | null = '') {
   const h = store.player.HLS;
   h ?
     h.loadSource(data.hls) :
-    setAudioStreams(data);
+    import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
+      data.audioStreams
+        .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+        ),
+      data.category === 'Music',
+      data.livestream
+    ));
 
 
   if (data.subtitles.length)

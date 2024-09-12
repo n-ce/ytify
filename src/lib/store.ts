@@ -11,7 +11,7 @@ export const store: {
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
-    dataArray: Piped[]
+    prefetch: { [index: string]: Piped }
   },
   queue: string[]
   stream: CollectionItem,
@@ -42,7 +42,7 @@ export const store: {
         contentType: 'audio/ogg;codecs=opus'
       }
     }).then(res => res.supported),
-    dataArray: []
+    prefetch: {}
   },
   queue: [],
   stream: {
