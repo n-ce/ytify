@@ -97,6 +97,7 @@ export default function() {
           <option value="https://youtube.com">YouTube</option>
           <option value="https://piped.video">Piped</option>
           <option value="https://yewtu.be">Invidious</option>
+          <option value="https://viewtube.io">ViewTube</option>
         </Selector>
 
         <Selector

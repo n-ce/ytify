@@ -27,11 +27,15 @@ export const getApi = (
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 
+const pathModifier = (url: string) => url.includes('=') ?
+  'playlists=' + url.split('=')[1] :
+  url.slice(1).split('/').join('=');
+
 export const hostResolver = (url: string) =>
-  store.linkHost + (store.linkHost.includes('ytify') ? url.
+  store.linkHost + (store.linkHost.includes(location.origin) ? (url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
-    ('/list?' + url.slice(1).split('/').join('=')) : url);
+    ('/list?' + pathModifier(url))) : url);
 
 
 export async function quickSwitch() {

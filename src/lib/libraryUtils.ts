@@ -169,7 +169,7 @@ export async function superCollectionLoader(name: SuperCollection) {
           "type": "playlist",
           "name": data[i + 1],
           "uploaderName": "YouTube Music",
-          "url": '/playlists/' + data[i + 2],
+          "url": '/playlist?list=' + data[i + 2],
           "thumbnail": '/' + data[i + 3]
         });
       return itemsLoader(array);

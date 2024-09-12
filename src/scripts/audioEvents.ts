@@ -174,8 +174,8 @@ audio.oncanplaythrough = async function() {
       pf[nextItem] = await getData(nextItem);
 }
 
-audio.onerror = function() {
-  player(store.stream.id);
+audio.onerror = async function() {
+  await player(store.stream.id);
 }
 
 
