@@ -170,23 +170,6 @@ audio.oncanplaythrough = function() {
     console.log(true)
 }
 
-audio.onerror = function() {
-  const a = store.player.dataArray;
-  if (a.length < 2) return;
-
-  a.shift();
-  const data = a[0];
-  const h = store.player.HLS;
-  h ?
-    h.loadSource(data.hls) :
-    import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
-      data.audioStreams
-        .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-        ),
-      data.category === 'Music',
-      data.livestream
-    ));
-}
 
 
 

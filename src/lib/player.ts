@@ -1,9 +1,19 @@
 import { favButton, favIcon, playButton } from "./dom";
-import { convertSStoHHMMSS, notify } from "./utils";
+import { convertSStoHHMMSS } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import { getData } from "../modules/getStreamData";
+
+function setAudioStreams(data: Piped) {
+  import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
+    data.audioStreams
+      .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+      ),
+    data.category === 'Music',
+    data.livestream
+  ));
+}
 
 export default async function player(id: string | null = '') {
 
@@ -12,12 +22,14 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
 
-  const data = await getData(id)
-    .catch(() => {
-      notify('Could not retrieve data in any known ways.');
-    });
+  const data = await getData(id) as Piped;
 
-  if (!data) return;
+  if (!data || !('audioStreams' in data)) {
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    return;
+  }
+
+
 
   await setMetaData({
     id: id,
@@ -30,13 +42,7 @@ export default async function player(id: string | null = '') {
   const h = store.player.HLS;
   h ?
     h.loadSource(data.hls) :
-    import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
-      data.audioStreams
-        .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-        ),
-      data.category === 'Music',
-      data.livestream
-    ));
+    setAudioStreams(data);
 
 
   if (data.subtitles.length)

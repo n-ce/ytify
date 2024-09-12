@@ -59,17 +59,17 @@ export default function() {
         <ToggleSwitch
           id='customInstanceSwitch'
           name='Use Custom Instance'
-          checked={Boolean(getSaved('custom_instance'))}
+          checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
-            if (getSaved('custom_instance'))
-              removeSaved('custom_instance');
+            if (getSaved('custom_instance_2'))
+              removeSaved('custom_instance_2');
             else {
 
               const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
               const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
 
               if (pi && iv)
-                save('custom_instance', pi + ',' + iv);
+                save('custom_instance_2', pi + ',' + iv);
             }
             location.reload();
 
