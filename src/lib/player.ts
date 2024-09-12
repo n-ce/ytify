@@ -1,5 +1,5 @@
 import { favButton, favIcon, playButton } from "./dom";
-import { convertSStoHHMMSS } from "./utils";
+import { convertSStoHHMMSS, notify } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
@@ -11,16 +11,16 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const prefetched = store.player.prefetch[id];
+  const data = store.player.prefetch[id] || await getData(id) as Piped;
 
-  const data = prefetched ? prefetched : await getData(id) as Piped;
 
   if (!data || !('audioStreams' in data)) {
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    notify('Could not retrieve stream data in any ways.. Trying again..');
+    await player(id);
     return;
   }
-
-
+  else store.player.prefetch[id] = data;
 
   await setMetaData({
     id: id,

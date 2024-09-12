@@ -23,7 +23,7 @@ export default async function() {
       .then(res => res.json())
       .then(data => {
         for (const i in data) {
-          if (Boolean(data[i])) {
+          if (data[i]) {
             a.piped.push(i);
             a.invidious.push(data[i]);
             delete data[i];

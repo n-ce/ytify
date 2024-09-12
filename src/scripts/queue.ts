@@ -65,8 +65,6 @@ queuelist.addEventListener('click', e => {
       sessionStorage.setItem('trashHistory', current + id);
   }
 
-  store.stream.author = queueItem.dataset.author;
-
   queueItem.classList.contains('delete') ?
     addToTrash() :
     player(id);

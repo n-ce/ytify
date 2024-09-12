@@ -175,7 +175,13 @@ audio.oncanplaythrough = async function() {
 }
 
 audio.onerror = async function() {
-  await player(store.stream.id);
+  const ivProxy = new URL(audio.src).origin;
+  const piProxy = new URL(store.player.prefetch[store.stream.id].hls).origin;
+  if (
+    !store.player.HLS &&
+    piProxy !== ivProxy
+  )
+    audio.src = audio.src.replace(ivProxy, piProxy);
 }
 
 

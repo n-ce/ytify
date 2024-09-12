@@ -2,7 +2,7 @@ import { store } from "../lib/store";
 
 export async function getData(
   id: string
-) {
+): Promise<Piped> {
   /*
   If HLS
   use full instance list
@@ -18,7 +18,7 @@ export async function getData(
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data) {
+      if (data && 'audioStreams' in data && !store.player.prefetch[id]) {
         store.api.index = store.api.piped.indexOf(api);
         return data;
       }
@@ -67,6 +67,7 @@ export async function getData(
   const h = store.player.HLS;
   const iv = store.api.invidious;
   const pi = store.api.piped;
+
   const res = await Promise.any(
     pi
       .filter((_, i) => i < (h ? pi : iv).length)
@@ -76,6 +77,7 @@ export async function getData(
       iv.map(fetchDataFromInvidious)
     ));
 
-  return res;
+
+  return res ? res : getData(id);
 }
 

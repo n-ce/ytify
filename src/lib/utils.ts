@@ -149,8 +149,6 @@ export async function superClick(e: Event) {
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
 
-  store.stream.author = eld.author;
-
   if (elc('streamItem'))
     return elc('delete') ?
       removeFromCollection(store.list.id, eld.id as string)
