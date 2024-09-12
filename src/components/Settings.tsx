@@ -67,10 +67,9 @@ export default function() {
 
               const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
               const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
-              const uf = confirm('Click Ok if both the Piped and Invidious Instance are hosted at the same server.') ? ',unified' : '';
 
               if (pi && iv)
-                save('custom_instance_2', pi + ',' + iv + uf);
+                save('custom_instance_2', pi + ',' + iv);
             }
             location.reload();
 

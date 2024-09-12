@@ -53,9 +53,8 @@ export default async function() {
           audio.play();
         });
         h.on(mod.default.Events.ERROR, (_, d) => {
-          if (d.details !== 'manifestLoadError') return;
-          notify(d.details);
-
+          if (d.details === 'manifestLoadError')
+            notify(d.details);
         })
       })
   }
