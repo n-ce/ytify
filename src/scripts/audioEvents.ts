@@ -175,7 +175,7 @@ audio.oncanplaythrough = async function() {
 }
 
 audio.onerror = async function() {
-  if ('offscreenCanvas' in window) {
+  if ('OffscreenCanvas' in window) {
     const ivProxy = new URL(audio.src).origin;
     const data = store.player.prefetch[store.stream.id];
     const adaptiveUrl = (<Piped>data).hls || (<Invidious>data).dashUrl;
