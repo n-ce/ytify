@@ -1,5 +1,6 @@
 import { onMount } from "solid-js";
 import { addToCollection, createCollection, getDB, reservedCollections } from "../lib/libraryUtils";
+import { actionsMenu } from "../lib/dom";
 
 export default function CollectionSelector(props: {
   collection: CollectionItem
@@ -37,7 +38,8 @@ export default function CollectionSelector(props: {
           if (title)
             addToCollection(title, props.collection);
 
-          close();
+          actionsMenu.close();
+          history.back();
           clxnSlctr.selectedIndex = 0;
         }}
       >
