@@ -175,20 +175,24 @@ audio.oncanplaythrough = async function() {
 }
 
 audio.onerror = async function() {
-  const ivProxy = new URL(audio.src).origin;
-  const data = store.player.prefetch[store.stream.id];
-  const adaptiveUrl = (<Piped>data).hls || (<Invidious>data).dashUrl;
-  console.log(ivProxy, adaptiveUrl);
-  const piProxy = new URL(adaptiveUrl).origin;
-  if (ivProxy === 'https://invidious.fdn.fr') {
-    audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
-    return;
-  }
-  if (
-    !store.player.HLS &&
-    piProxy !== ivProxy
-  )
-    audio.src = audio.src.replace(ivProxy, piProxy);
+  if ('offscreenCanvas' in window) {
+    const ivProxy = new URL(audio.src).origin;
+    const data = store.player.prefetch[store.stream.id];
+    const adaptiveUrl = (<Piped>data).hls || (<Invidious>data).dashUrl;
+    console.log(ivProxy, adaptiveUrl);
+    const piProxy = new URL(adaptiveUrl).origin;
+    if (ivProxy === 'https://invidious.fdn.fr') {
+      audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
+      return;
+    }
+    if (
+      !store.player.HLS &&
+      piProxy !== ivProxy
+    )
+      audio.src = audio.src.replace(ivProxy, piProxy);
+
+  } // in the hope that retry will yield more results with a non-blocked url
+  else player(store.stream.id);
 }
 
 
