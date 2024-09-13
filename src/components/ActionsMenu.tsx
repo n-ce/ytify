@@ -43,7 +43,7 @@ export default function() {
 
 
       <li tabindex={3} on:click={async () => {
-        actionsMenu.close();
+        close();
         fetchList('/playlists/RD' + store.actionsMenu.id, true);
       }}>
         <i class="ri-radio-line"></i>Start Radio
