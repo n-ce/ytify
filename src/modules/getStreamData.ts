@@ -1,4 +1,7 @@
+
+import { playButton } from "../lib/dom";
 import { store } from "../lib/store";
+import { notify } from "../lib/utils";
 
 export async function getData(
   id: string
@@ -75,7 +78,12 @@ export async function getData(
   )
     .catch(() => h ? {} : Promise.any(
       iv.map(fetchDataFromInvidious)
-    ));
+    ).catch(() => {
+      // do not update ui for queue prefetch items
+      if (store.stream.id !== id) return;
+      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      notify('Could not retrieve stream data in any ways.. Trying again..');
+    }));
 
 
   return res ? res : getData(id);

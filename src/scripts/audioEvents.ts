@@ -168,15 +168,22 @@ audio.onloadedmetadata = function() {
 
 audio.oncanplaythrough = async function() {
   const nextItem = store.queue[0];
+  if (!nextItem) return;
   const pf = store.player.prefetch;
-  if (audio.duration - audio.currentTime < 30)
-    if (!(nextItem in pf))
-      pf[nextItem] = await getData(nextItem);
+  if (!(nextItem in pf))
+    pf[nextItem] = await getData(nextItem);
 }
 
 audio.onerror = async function() {
   const ivProxy = new URL(audio.src).origin;
-  const piProxy = new URL(store.player.prefetch[store.stream.id].hls).origin;
+  const data = store.player.prefetch[store.stream.id];
+  const adaptiveUrl = (<Piped>data).hls || (<Invidious>data).dashUrl;
+  console.log(ivProxy, adaptiveUrl);
+  const piProxy = new URL(adaptiveUrl).origin;
+  if (ivProxy === 'https://invidious.fdn.fr') {
+    audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
+    return;
+  }
   if (
     !store.player.HLS &&
     piProxy !== ivProxy

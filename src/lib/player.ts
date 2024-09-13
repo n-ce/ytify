@@ -1,5 +1,5 @@
 import { audio, favButton, favIcon, playButton } from "./dom";
-import { convertSStoHHMMSS, notify } from "./utils";
+import { convertSStoHHMMSS } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
@@ -15,8 +15,6 @@ export default async function player(id: string | null = '') {
 
 
   if (!data || !('audioStreams' in data)) {
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    notify('Could not retrieve stream data in any ways.. Trying again..');
     await player(id);
     return;
   }

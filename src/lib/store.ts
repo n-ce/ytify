@@ -11,7 +11,7 @@ export const store: {
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
-    prefetch: { [index: string]: Piped }
+    prefetch: { [index: string]: Piped | Invidious }
   },
   queue: string[]
   stream: CollectionItem,

@@ -128,7 +128,8 @@ declare global {
     authorUrl: string,
     genre: string,
     liveNow: boolean,
-    hlsUrl: string
+    hlsUrl: string,
+    dashUrl: string
   }
 
 }
