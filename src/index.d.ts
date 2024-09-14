@@ -1,8 +1,5 @@
 declare global {
 
-  type APIList = Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>;
-
-
   type StreamItem = {
     url: string,
     type: string,
@@ -56,14 +53,8 @@ declare global {
     playlists: { [index: string]: List },
     [index: string]: Collection
   }
-
-
-
-  type Codec = {
-    urls: string[],
-    bitrates: number[],
-    length?: number
-  }
+  
+  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
 
   type Scheme = {
     [index: string]: {
@@ -74,8 +65,6 @@ declare global {
       text: string
     }
   }
-
-  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
 
   type ToggleSwitch = {
     name: string
