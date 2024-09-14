@@ -12,7 +12,7 @@ export const store: {
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
     prefetch: { [index: string]: Piped },
-    legacy: Boolean
+    legacy: boolean
   },
   queue: string[]
   stream: CollectionItem,

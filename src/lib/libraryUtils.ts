@@ -97,7 +97,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
     if (!data) {
       alert('No items found');
-      return
+      return;
     }
 
     if (collection === 'discover')
