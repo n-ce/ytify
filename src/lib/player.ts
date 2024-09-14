@@ -28,7 +28,9 @@ export default async function player(id: string | null = '') {
     channelUrl: data.uploaderUrl
   });
 
-  if ('OffscreenCanvas' in window) {
+  if (store.player.legacy)
+    audio.src = data.hls;
+  else {
     const h = store.player.HLS;
     h ?
       h.loadSource(data.hls) :
@@ -40,7 +42,6 @@ export default async function player(id: string | null = '') {
         data.livestream
       ));
   }
-  else audio.src = data.hls;
 
   if (data.subtitles.length)
     import('../modules/setSubtitles')

@@ -175,24 +175,30 @@ audio.oncanplaythrough = async function() {
 }
 
 audio.onerror = async function() {
-  if ('OffscreenCanvas' in window) {
-    const ivProxy = new URL(audio.src).origin;
-    const data = store.player.prefetch[store.stream.id];
-    const adaptiveUrl = (<Piped>data).hls || (<Invidious>data).dashUrl;
-    console.log(ivProxy, adaptiveUrl);
-    const piProxy = new URL(adaptiveUrl).origin;
-    if (ivProxy === 'https://invidious.fdn.fr') {
-      audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
-      return;
-    }
-    if (
-      !store.player.HLS &&
-      piProxy !== ivProxy
-    )
-      audio.src = audio.src.replace(ivProxy, piProxy);
+  if (store.player.HLS || store.player.legacy)
+    // in the hope that retry will yield more results with a non-blocked url
+    return player(store.stream.id);
 
-  } // in the hope that retry will yield more results with a non-blocked url
-  else player(store.stream.id);
+  const data = store.player.prefetch[store.stream.id];
+  const adaptiveUrl = data.audioStreams[0].url;
+  const piProxy = new URL(adaptiveUrl).origin;
+  const ivProxy = new URL(audio.src).origin;
+  const defProxy = 'https://invidious.fdn.fr';
+
+
+  // First Proxy Replace 
+  if (ivProxy === defProxy) {
+    audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
+    return;
+  }
+  // 2nd Proxy Replace
+  if (piProxy !== ivProxy)
+    audio.src = audio.src.replace(ivProxy, piProxy);
+  else
+    audio.src = audio.src.replace(ivProxy, defProxy);
+
+
+
 }
 
 

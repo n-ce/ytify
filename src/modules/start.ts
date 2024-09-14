@@ -18,20 +18,12 @@ export default async function() {
 
   } else {
     const apiUrl = 'https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json';
-
     await fetch(apiUrl)
       .then(res => res.json())
       .then(data => {
-        for (const i in data) {
-          if (data[i]) {
-            a.piped.push(i);
-            a.invidious.push(data[i]);
-            delete data[i];
-          }
-        }
-        for (const i in data)
-          a.piped.push(i);
-      })
+        a.piped = data.piped;
+        a.invidious = data.invidious;
+      });
   }
 
 
@@ -42,27 +34,25 @@ export default async function() {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
 
-    if (!('OffscreenCanvas' in window))
-      return;
+    if (!store.player.legacy)
+      import('hls.js')
+        .then(mod => {
+          store.player.HLS = new mod.default();
+          const h = store.player.HLS;
+          h.attachMedia(audio);
+          h.on(mod.default.Events.MANIFEST_PARSED, () => {
+            h.currentLevel = store.player.hq ?
+              h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
+            audio.play();
+          });
+          h.on(mod.default.Events.ERROR, (_, d) => {
+            if (d.details === 'manifestLoadError') {
+              notify(d.details);
+              player(id);
+            }
 
-    import('hls.js')
-      .then(mod => {
-        store.player.HLS = new mod.default();
-        const h = store.player.HLS;
-        h.attachMedia(audio);
-        h.on(mod.default.Events.MANIFEST_PARSED, () => {
-          h.currentLevel = store.player.hq ?
-            h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
-          audio.play();
-        });
-        h.on(mod.default.Events.ERROR, (_, d) => {
-          if (d.details === 'manifestLoadError') {
-            notify(d.details);
-            player(id);
-          }
-
+          })
         })
-      })
   }
   else bitrateSelector.addEventListener('change', () => {
     if (store.player.playbackState === 'playing')
