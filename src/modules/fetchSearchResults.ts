@@ -1,14 +1,13 @@
 import { searchlist } from "../lib/dom";
-import { itemsLoader } from "../lib/utils";
+import { getApi, itemsLoader } from "../lib/utils";
 
 export const getSearchResults = (
-  API: string,
   query: string,
   sortBy: string = ''
 ) =>
   (sortBy === 'date' || sortBy === 'views') ?
-    fetchWithInvidious(API, query, sortBy) :
-    fetchWithPiped(API, query);
+    fetchWithInvidious(getApi('invidious'), query, sortBy) :
+    fetchWithPiped(getApi('piped'), query);
 
 let nextPageToken = '';
 let previousQuery: string;
@@ -48,7 +47,7 @@ export const fetchWithInvidious = (
       searchlist.appendChild(
         itemsLoader(
           items.filter(
-            (item: StreamItem) => (item.lengthSeconds > 60) && (item.viewCount > 1000)
+            (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
           )));
       previousQuery = q;
       setObserver(() => fetchWithInvidious(API, q, sortBy));

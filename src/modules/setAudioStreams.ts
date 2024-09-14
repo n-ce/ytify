@@ -1,13 +1,13 @@
 import { audio, bitrateSelector, playButton } from "../lib/dom";
 import { getSaved, store } from "../lib/store";
-import { getApi, notify } from "../lib/utils";
+import { notify } from "../lib/utils";
 
 export function setAudioStreams(audioStreams: {
   codec: string,
   url: string,
   quality: string,
   bitrate: string,
-  contentLength: number,
+  contentLength: string,
   mimeType: string,
 }[],
   isMusic = false,
@@ -28,15 +28,17 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    const proxyViaPiped = getSaved('custom_instance') || (getSaved('proxyViaInvidious') === 'false');
+    const proxyViaPiped = getSaved('proxyViaInvidious') === 'false';
     const useProxy = isMusic || getSaved('enforceProxy');
 
     // use the default proxy url
     if (proxyViaPiped && useProxy) return url;
 
     const oldUrl = new URL(url);
+    const proxy = getSaved('custom_instance_2') ? store.api.invidious[0] : 'https://invidious.fdn.fr';
 
-    const host = useProxy ? getApi('invidious') : `https://${oldUrl.searchParams.get('host')}`;
+    const host = useProxy ? proxy :
+      `https://${oldUrl.searchParams.get('host')}`;
 
     return url.replace(oldUrl.origin, host);
   }
@@ -44,7 +46,7 @@ export function setAudioStreams(audioStreams: {
   bitrateSelector.innerHTML = '';
   audioStreams.forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
-    const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
+    const size = (parseInt(_.contentLength) / (1024 * 1024)).toFixed(2) + ' MB';
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));

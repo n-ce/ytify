@@ -24,9 +24,9 @@ export function setDiscoveries(
       const rsId = stream.url.slice(9);
 
       // merges previous discover items with current related streams
-      db.discover.hasOwnProperty(rsId) ?
+      db.discover?.hasOwnProperty(rsId) ?
         (<number>db.discover[rsId].frequency)++ :
-        db.discover[rsId] = {
+        db.discover![rsId] = {
           id: rsId,
           title: stream.title,
           author: stream.uploaderName,
@@ -37,7 +37,7 @@ export function setDiscoveries(
     });
 
   // convert to array
-  let array = Object.entries(db.discover);
+  let array = Object.entries(db.discover!);
 
   // Randomize Array
   for (let i = array.length - 1; i > 0; i--) {
@@ -57,7 +57,9 @@ export function setDiscoveries(
     len--;
   }
 
-  // convert the new merged+randomized discover back to object and inject it
+  db.discover = {};
+
+  // insert the upgraded collection to discover;
   addListToCollection('discover', Object.fromEntries(array), db);
 
   // just in case we are already in the discover collection 

@@ -1,9 +1,10 @@
 import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
+import { getData } from "../modules/getStreamData";
 
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
@@ -31,20 +32,20 @@ function updatePositionState() {
 
 
 
-playButton.addEventListener('click', () => {
+playButton.onclick = function() {
   if (!store.stream.id) return;
   store.player.playbackState === 'playing' ?
     audio.pause() :
     audio.play();
 
-});
+}
 
 
 let historyID: string | undefined = '';
 let historyTimeoutId = 0;
 
 
-audio.addEventListener('playing', () => {
+audio.onplaying = function() {
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
 
   store.player.playbackState = 'playing';
@@ -72,13 +73,13 @@ audio.addEventListener('playing', () => {
 
       }
     }, 1e4);
-});
+}
 
-audio.addEventListener('pause', () => {
+audio.onpause = function() {
   playButton.classList.replace('ri-pause-circle-fill', 'ri-play-circle-fill');
   store.player.playbackState = 'paused';
   clearTimeout(historyTimeoutId);
-});
+}
 
 
 let isPlayable = false;
@@ -90,7 +91,7 @@ const playableCheckerID = setInterval(() => {
 }, 500);
 
 
-audio.addEventListener('loadeddata', () => {
+audio.onloadeddata = function() {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
   historyID = store.stream.id;
@@ -100,15 +101,17 @@ audio.addEventListener('loadeddata', () => {
   if (playSpeed.value !== '1.00')
     audio.playbackRate = parseFloat(playSpeed.value);
 
-});
+}
 
 
-audio.addEventListener('waiting', () => {
+audio.onwaiting = function() {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-});
+}
 
 
-playSpeed.addEventListener('change', () => {
+
+
+playSpeed.onchange = function() {
   const speed = parseFloat(playSpeed.value);
 
   if (speed < 0 || speed > 4)
@@ -117,23 +120,23 @@ playSpeed.addEventListener('change', () => {
   audio.playbackRate = speed;
   updatePositionState();
   playSpeed.blur();
-});
+}
 
 
 
-seekFwdButton.addEventListener('click', () => {
+seekFwdButton.onclick = function() {
   audio.currentTime += 15;
   updatePositionState();
-});
+}
 
 
-seekBwdButton.addEventListener('click', () => {
+seekBwdButton.onclick = function() {
   audio.currentTime -= 15;
   updatePositionState();
-});
+}
 
 
-progress.addEventListener('change', () => {
+progress.onchange = function() {
   const value = parseInt(progress.value);
 
   if (value < 0 || value > audio.duration)
@@ -141,9 +144,9 @@ progress.addEventListener('change', () => {
 
   audio.currentTime = value;
   progress.blur();
-});
+}
 
-audio.addEventListener('timeupdate', () => {
+audio.ontimeupdate = function() {
   if (progress === document.activeElement)
     return;
 
@@ -152,33 +155,70 @@ audio.addEventListener('timeupdate', () => {
   progress.value = seconds.toString();
   currentDuration.textContent = convertSStoHHMMSS(seconds);
 
-});
+}
 
 
-audio.addEventListener('loadedmetadata', () => {
+audio.onloadedmetadata = function() {
   progress.value = '0';
   progress.min = '0';
   progress.max = Math.floor(audio.duration).toString();
   fullDuration.textContent = convertSStoHHMMSS(audio.duration);
-});
+}
+
+
+audio.oncanplaythrough = async function() {
+  const nextItem = store.queue[0];
+  if (!nextItem) return;
+  const pf = store.player.prefetch;
+  if (!(nextItem in pf))
+    pf[nextItem] = await getData(nextItem);
+}
+
+audio.onerror = async function() {
+  if (getSaved('custom_instance_2'))
+    return notify('Proxy Failed to decrypt stream');
+
+  if (store.player.HLS || store.player.legacy)
+    // in the hope that retry will yield more results with a non-blocked url
+    return player(store.stream.id);
+
+  const data = store.player.prefetch[store.stream.id];
+  const adaptiveUrl = data.audioStreams[0].url;
+  const piProxy = new URL(adaptiveUrl).origin;
+  const ivProxy = new URL(audio.src).origin;
+  const defProxy = 'https://invidious.fdn.fr';
+
+
+  // First Proxy Replace 
+  if (ivProxy === defProxy) {
+    audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
+    return;
+  }
+  // 2nd Proxy Replace
+  if (piProxy !== ivProxy)
+    audio.src = audio.src.replace(ivProxy, piProxy);
+  else
+    audio.src = audio.src.replace(ivProxy, defProxy);
 
 
 
+}
 
-loopButton.addEventListener('click', () => {
+
+loopButton.onclick = function() {
   loopButton.classList.toggle('on');
   audio.loop = !audio.loop;
-});
+}
 
 
 
-playPrevButton.addEventListener('click', () => {
+playPrevButton.onclick = function() {
   if (store.streamHistory.length > 1) {
     appendToQueuelist(store.stream, true);
     store.streamHistory.pop();
     player(store.streamHistory[store.streamHistory.length - 1]);
   }
-})
+}
 
 
 
@@ -188,12 +228,10 @@ function onEnd() {
     firstItemInQueue().click();
 }
 
-audio.addEventListener('ended', onEnd);
-
-playNextButton.addEventListener('click', onEnd);
+audio.onended = playNextButton.onclick = onEnd;
 
 
-volumeIcon.addEventListener('click', () => {
+volumeIcon.onclick = function() {
   volumeChanger.value = audio.volume ? '0' : '100';
   audio.volume = audio.volume ? 0 : 1;
   volumeIcon.classList.replace(
@@ -201,9 +239,9 @@ volumeIcon.addEventListener('click', () => {
     `ri-volume-${volumeIcon.className.includes('mute') ? 'up' : 'mute'
     }-fill`
   );
-});
+}
 
-volumeChanger.addEventListener('input', () => {
+volumeChanger.oninput = function() {
   audio.volume = parseFloat(volumeChanger.value) / 100;
 
   audio.volume === 1 ?
@@ -216,7 +254,7 @@ volumeChanger.addEventListener('input', () => {
     audio.volume ?
       `ri-volume-${audio.volume > 0.5 ? 'up' : 'down'}-fill` :
       'ri-volume-mute-fill');
-});
+}
 
 const savedVol = getSaved('volume');
 if (savedVol) {

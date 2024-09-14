@@ -59,29 +59,17 @@ export default function() {
         <ToggleSwitch
           id='customInstanceSwitch'
           name='Use Custom Instance'
-          checked={Boolean(getSaved('custom_instance'))}
+          checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
-            if (getSaved('custom_instance')) {
-              removeSaved('custom_instance');
-              removeSaved('api_8');
-            }
+            if (getSaved('custom_instance_2'))
+              removeSaved('custom_instance_2');
             else {
-              const current = store.api.list[0];
-              const n = prompt('Enter Name of your instance :', 'Custom');
-              const p = prompt('Enter Piped API URL :', current.piped)
-              const i = prompt('Enter Invidious API URL (optional) :', current.invidious);
-              const h = prompt('Enter Hyperpipe API URL (optional) :', current.hyperpipe);
 
-              if (n)
-                current.name = n;
-              if (p)
-                current.piped = p;
-              if (i)
-                current.invidious = i;
-              if (h)
-                current.hyperpipe = h;
+              const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
+              const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
 
-              save('custom_instance', JSON.stringify(current));
+              if (pi && iv)
+                save('custom_instance_2', pi + ',' + iv);
             }
             location.reload();
 
@@ -109,6 +97,7 @@ export default function() {
           <option value="https://youtube.com">YouTube</option>
           <option value="https://piped.video">Piped</option>
           <option value="https://yewtu.be">Invidious</option>
+          <option value="https://viewtube.io">ViewTube</option>
         </Selector>
 
         <Selector
@@ -253,7 +242,7 @@ export default function() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Also Proxy non-music streams'
+            name='Proxy non-music streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               getSaved('enforceProxy') ?
@@ -265,25 +254,13 @@ export default function() {
 
           <ToggleSwitch
             id="useInvidiousProxySwitch"
-            name='Prefer to Proxy Audio over Invidious instead of Piped'
+            name='Proxy Audio over Invidious'
             checked={!getSaved('proxyViaInvidious')}
             onClick={() => {
               getSaved('proxyViaInvidious') ?
                 removeSaved('proxyViaInvidious') :
                 save('proxyViaInvidious', 'false');
 
-              quickSwitch();
-            }}
-          />
-
-          <ToggleSwitch
-            id="fetchViaIvSwitch"
-            name='Fetch stream data via Invidious'
-            checked={getSaved('fetchViaIV') === 'true'}
-            onClick={() => {
-              getSaved('fetchViaIV') ?
-                removeSaved('fetchViaIV') :
-                save('fetchViaIV', 'true');
               quickSwitch();
             }}
           />
@@ -331,7 +308,7 @@ export default function() {
               removeSaved('discover');
             else {
               const db = getDB();
-              if (confirm(`This will clear your existing ${Object.keys(db.discover).length || 0} discoveries, continue?`)) {
+              if (confirm(`This will clear your existing ${Object.keys(db.discover || {}).length || 0} discoveries, continue?`)) {
                 delete db.discover;
                 saveDB(db);
                 save('discover', 'off');
@@ -351,7 +328,7 @@ export default function() {
               removeSaved('history');
             else {
               const db = getDB();
-              if (confirm(`This will clear ${Object.keys(db.history).length || 0} items from your history, continue?`)) {
+              if (confirm(`This will clear ${Object.keys(db.history || {}).length || 0} items from your history, continue?`)) {
                 delete db.history;
                 saveDB(db);
                 save('history', 'off')

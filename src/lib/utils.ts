@@ -19,18 +19,23 @@ export const removeSaved = localStorage.removeItem.bind(localStorage);
 export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const getApi = (
-  type: 'piped' | 'invidious' | 'hyperpipe',
-  index: number = store.api.index) =>
-  store.api.list[index][type];
+  type: 'piped' | 'invidious',
+  index: number = store.api.index
+) =>
+  store.api[type][index];
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 
+const pathModifier = (url: string) => url.includes('=') ?
+  'playlists=' + url.split('=')[1] :
+  url.slice(1).split('/').join('=');
+
 export const hostResolver = (url: string) =>
-  store.linkHost + (store.linkHost.includes('ytify') ? url.
+  store.linkHost + (store.linkHost.includes(location.origin) ? (url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
-    ('/list?' + url.slice(1).split('/').join('=')) : url);
+    ('/list?' + pathModifier(url))) : url);
 
 
 export async function quickSwitch() {
@@ -69,25 +74,17 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 
-export async function errorHandler(message: string,
+export async function errorHandler(
+  message: string,
   redoAction: () => void,
   finalAction: () => void
 ) {
-
-  // Get Current API
-  // if condition
-  //     > Display Error
-  //     > Redo Action with Next API
-  // final action if all fails
-
-  const apiIndex = store.api.index;
-  const noOfInstances = store.api.list.length;
 
   if (message === 'nextpage error') return;
 
   if (
     message !== 'No Data Found' &&
-    apiIndex < noOfInstances - 1
+    store.api.index < store.api.invidious.length - 1
   ) {
     store.api.index++;
     redoAction();
@@ -151,8 +148,6 @@ export async function superClick(e: Event) {
 
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
-
-  store.stream.author = eld.author;
 
   if (elc('streamItem'))
     return elc('delete') ?

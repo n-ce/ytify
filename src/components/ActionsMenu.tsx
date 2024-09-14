@@ -100,10 +100,13 @@ export default function() {
 
       <li tabindex={7} on:click={() => {
         close();
+        const hls = store.player.HLS;
+        store.player.HLS = undefined;
+
         const dialog = $('dialog') as HTMLDialogElement;
         dialog.className = 'debug';
         dialog.textContent = JSON.stringify(store, null, 4);
-
+        store.player.HLS = hls;
         document.body.appendChild(dialog);
         dialog.showModal();
         dialog.onclick = () => {

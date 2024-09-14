@@ -15,7 +15,7 @@ export function subscribeList(db: Library) {
     state.reverse();
   }
   else {
-    const dataset: Partial<Record<'name' | 'uploader' | 'thumbnail' | 'id', string | undefined>> = {
+    const dataset: List & { uploader?: string } = {
       id: l.id,
       name: l.name,
       thumbnail: getThumbIdFromLink(l.thumbnail)

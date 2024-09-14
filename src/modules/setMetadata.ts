@@ -13,7 +13,6 @@ export async function setMetaData(data: CollectionItem) {
   // remove ' - Topic' from author name if it exists
 
 
-  data.author = data.author === 'Release - Topic' ? store.stream.author : data.author;
   store.stream = data;
 
 

@@ -5,7 +5,6 @@ import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
 import { store, getSaved } from "../lib/store";
 
-const queueArray = store.queue.array;
 const [
   clearQBtn,
   shuffleQBtn,
@@ -19,7 +18,7 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
 
-  if (queueArray.includes(data.id)) return;
+  if (store.queue.includes(data.id)) return;
 
   if (filterLT10Btn.classList.contains('filter'))
     if (isLongerThan10Min(<string>data.duration))
@@ -31,8 +30,8 @@ export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: 
     removeQBtn.click();
 
   prepend ?
-    queueArray.unshift(data.id) :
-    queueArray.push(data.id);
+    store.queue.unshift(data.id) :
+    store.queue.push(data.id);
 
 
   const fragment = document.createDocumentFragment();
@@ -66,16 +65,14 @@ queuelist.addEventListener('click', e => {
       sessionStorage.setItem('trashHistory', current + id);
   }
 
-  store.stream.author = queueItem.dataset.author;
-
   queueItem.classList.contains('delete') ?
     addToTrash() :
     player(id);
 
-  const index = queueArray.indexOf(id);
+  const index = store.queue.indexOf(id);
 
 
-  queueArray.splice(index, 1);
+  store.queue.splice(index, 1);
 
   queuelist.children[index].remove();
 });
@@ -92,7 +89,7 @@ export function listToQ(container: HTMLDivElement) {
 }
 
 export function clearQ() {
-  queueArray.length = 0;
+  store.queue.length = 0;
   queuelist.innerHTML = '';
 }
 
@@ -103,10 +100,10 @@ shuffleQBtn.addEventListener('click', () => {
   for (let i = queuelist.children.length; i >= 0; i--)
     queuelist.appendChild(queuelist.children[Math.random() * i | 0]);
 
-  queueArray.length = 0;
+  store.queue.length = 0;
 
   for (const item of queuelist.children)
-    queueArray.push((<HTMLElement>item).dataset.id || '');
+    store.queue.push((<HTMLElement>item).dataset.id || '');
 
 });
 
@@ -163,7 +160,7 @@ function isLongerThan10Min(duration: string) {
 new MutationObserver(m => {
   for (const mutation of m) {
     if (mutation.type === "childList") {
-      const query = queueArray.join('');
+      const query = store.queue.join('');
       store.upcomingQuery = query;
 
       if (location.pathname === '/upcoming') {

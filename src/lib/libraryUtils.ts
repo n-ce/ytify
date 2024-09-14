@@ -18,6 +18,7 @@ export function removeFromCollection(collection: string, id: string) {
   if (!collection) return;
 
   const db = getDB();
+
   delete db[collection][id];
   listContainer.querySelector(`[data-id="${id}"]`)?.remove();
   saveDB(db);
@@ -26,11 +27,15 @@ export function removeFromCollection(collection: string, id: string) {
 export function toCollection(collection: string, data: CollectionItem | DOMStringMap, db: Library) {
   if (!collection) return;
   const id = <string>data.id;
+
   if (db.hasOwnProperty(collection)) {
-    if (db[collection].hasOwnProperty(id))// delete old data if already exists
+    if (db[collection].hasOwnProperty(id))
+      // delete old data if already exists
       delete db[collection][id];
-  } // create if collection does not exists
+  }
+  // create if collection does not exists
   else db[collection] = {};
+
   db[collection][id] = data;
 }
 
@@ -46,9 +51,6 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
 export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
 
   if (!collection) return;
-
-  if (collection === 'discover')
-    db.discover = {};
 
   for (const key in list) {
     const data = list[key];
@@ -69,7 +71,7 @@ export function createCollection(title: string) {
     collectionSelector.add(new Option(title, title));
 }
 
-function renderDataIntoFragment(data: { [index: string]: CollectionItem | DOMStringMap }, fragment: DocumentFragment) {
+function renderDataIntoFragment(data: Collection, fragment: DocumentFragment) {
 
   for (const item in data) {
     const d = data[item];
@@ -91,12 +93,17 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   if (collection) {
     const db = getDB();
-    const data = db[decodeURI(collection)];
+    const data = db[<'discover'>decodeURI(collection)];
+
+    if (!data) {
+      alert('No items found');
+      return;
+    }
 
     if (collection === 'discover')
       for (const i in data)
         if (data[i].frequency as number < 2)
-          delete db.discover[i];
+          delete db.discover?.[i];
 
     saveDB(db);
 
@@ -162,7 +169,7 @@ export async function superCollectionLoader(name: SuperCollection) {
           "type": "playlist",
           "name": data[i + 1],
           "uploaderName": "YouTube Music",
-          "url": '/playlists/' + data[i + 2],
+          "url": '/playlist?list=' + data[i + 2],
           "thumbnail": '/' + data[i + 3]
         });
       return itemsLoader(array);

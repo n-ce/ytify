@@ -13,7 +13,7 @@ function searchLoader() {
   const searchQuery = '?q=' + superInput.value;
   const filterQuery = '&filter=' + searchFilters.value;
   const query = 'search' + searchQuery + filterQuery;
-  const service = (searchFilters.selectedIndex > 8) ? 'invidious' : 'piped';
+  const useInvidious = searchFilters.selectedIndex > 8;
 
   store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
   searchlist.innerHTML = '';
@@ -26,12 +26,12 @@ function searchLoader() {
   loadingScreen.showModal();
 
   getSearchResults(
-    getApi(service),
-    service === 'invidious' ? superInput.value : query,
+    useInvidious ?
+      superInput.value : query,
     searchFilters.value
   )
     .catch(err => {
-      if (err.message === 'nextpage error') return;
+      if (useInvidious || err.message === 'nextpage error') return;
 
       errorHandler(
         err.message,
@@ -70,7 +70,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = await fetch(getApi('piped') + '/suggestions/?query=' + text).then(res => res.json());
+  const data = (await fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text).then(res => res.json()))[1];
 
   if (!data.length) return;
 

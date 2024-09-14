@@ -1,14 +1,5 @@
 declare global {
 
-  type apiList = {
-    [index: string]: {
-      name: string,
-      url: string,
-      custom: boolean
-    }
-  }
-
-
   type StreamItem = {
     url: string,
     type: string,
@@ -43,21 +34,27 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string,
-    frequency?: number
+    channelUrl: string
+  }
+
+  type List = Record<'id' | 'name' | 'thumbnail', string>
+  type Collection = {
+    [index: string]: CollectionItem | DOMStringMap
   }
 
   type Library = {
-    [index: string]: {
-      [index: string]: CollectionItem | DOMStringMap
-    }
+    history?: Collection,
+    favorites: Collection,
+    listenLater: Collection,
+    discover?: {
+      [index: string]: CollectionItem & { frequency: number }
+    },
+    channels: { [index: string]: List & { uploader: string } },
+    playlists: { [index: string]: List },
+    [index: string]: Collection
   }
-
-  type Codec = {
-    urls: string[],
-    bitrates: number[],
-    length?: number
-  }
+  
+  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
 
   type Scheme = {
     [index: string]: {
@@ -68,8 +65,6 @@ declare global {
       text: string
     }
   }
-
-  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
 
   type ToggleSwitch = {
     name: string
@@ -84,6 +79,46 @@ declare global {
     onChange: (e: { target: HTMLSelectElement }) => void,
     onMount: (target: HTMLSelectElement) => void,
     children: JSXElement
+  }
+
+  type Piped = {
+    title: string,
+    uploader: string,
+    duration: number,
+    uploader: string,
+    uploaderUrl: string,
+    category: string,
+    livestream: boolean,
+    subtitles: [],
+    hls: string
+    relatedStreams: {
+      url: string,
+      title: string,
+      uploaderName: string,
+      duration: number,
+      uploaderUrl: string,
+      type: string
+    }[],
+    audioStreams: Record<'bitrate' | 'codec' | 'contentLength' | 'quality' | 'mimeType' | 'url', string>[]
+  }
+
+  type Invidious = {
+    adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url', string>[],
+    recommendedVideos: {
+      title: string,
+      author: string,
+      lengthSeconds: number,
+      authorUrl: string,
+      videoId: string
+    }[],
+    title: string,
+    author: string,
+    lengthSeconds: number,
+    authorUrl: string,
+    genre: string,
+    liveNow: boolean,
+    hlsUrl: string,
+    dashUrl: string
   }
 
 }

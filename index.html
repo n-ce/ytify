@@ -39,7 +39,6 @@
 <body>
   <audio>
     <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
-    <source type="audio/mpegurl">
   </audio>
   <header>
     <nav>
@@ -226,15 +225,20 @@
               style="text-decoration: underline;" target="_blank">here</a>.
           </b>
         </p>
-        <p style="background: linear-gradient(to bottom right,#f006,#f009);border-radius:var(--roundness);font-size:large;padding:5vmin;
-          margin:5% 0;
-          box-shadow:var(--shadow)">
-          To get around the errors on Piped Instances, Please turn on <b>Fetch stream data via Invidious</b> in
-          Settings.</p>
         <p
-          style="background: linear-gradient(to bottom right,#0776,#0779);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin-bottom:5%">
-          On IOS there might be a duration bug which can only be fixed via enabling <b>HTTP Live Streaming</b> in
-          Settings.</p>
+          style="background: linear-gradient(to bottom right,#7706,#7709);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin:5% 0">
+          To get stream data at the earliest, it will be requested from all available sources concurrently and may take
+          some time to start playing.
+        </p>
+        <p
+          style="background: linear-gradient(to bottom right,#6626,#6629);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin:5% 0">
+          You can use a <b>Custom Instance</b> to circumvent the start time and turn off <b>Proxy Audio over
+            Invidious</b> if you
+          observe any continuous loading.
+        </p>
+        <p
+          style="background: linear-gradient(to bottom right,#0776,#0779);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin:5% 0">
+          On IOS the stream duration can be incorrect, it can be fixed by enabling <b>HTTP Live Streaming</b>.</p>
       </div>
     </section>
 

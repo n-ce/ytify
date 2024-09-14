@@ -10,16 +10,18 @@ export const store: {
     HLS: Hls | undefined,
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
-    supportsOpus: Promise<boolean>
+    supportsOpus: Promise<boolean>,
+    prefetch: { [index: string]: Piped },
+    legacy: boolean
   },
-  queue: {
-    array: string[]
-  }
+  queue: string[]
   stream: CollectionItem,
   streamHistory: string[]
   api: {
-    list: Record<'name' | 'piped' | 'invidious' | 'hyperpipe', string>[],
-    index: number
+    piped: string[],
+    invidious: string[],
+    hyperpipe: string,
+    index: number,
   },
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
@@ -27,7 +29,7 @@ export const store: {
   upcomingQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
-  list: Record<'name' | 'url' | 'type' | 'id' | 'uploader' | 'thumbnail', string>,
+  list: List & Record<'url' | 'type' | 'uploader', string>,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
@@ -40,9 +42,11 @@ export const store: {
       audio: {
         contentType: 'audio/ogg;codecs=opus'
       }
-    }).then(res => res.supported)
+    }).then(res => res.supported),
+    prefetch: {},
+    legacy: !('OffscreenCanvas' in window)
   },
-  queue: { array: [] },
+  queue: [],
   stream: {
     id: params.get('s') || '',
     title: '',
@@ -52,15 +56,9 @@ export const store: {
   },
   streamHistory: [],
   api: {
-    list:
-      [
-        {
-          "name": "Official 🌐",
-          "piped": "https://pipedapi.kavin.rocks",
-          "invidious": "https://invidious.fdn.fr",
-          "hyperpipe": "https://hyperpipeapi.onrender.com"
-        }
-      ],
+    piped: [],
+    invidious: [],
+    hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
