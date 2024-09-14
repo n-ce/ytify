@@ -35,7 +35,7 @@ export function setAudioStreams(audioStreams: {
     if (proxyViaPiped && useProxy) return url;
 
     const oldUrl = new URL(url);
-    const proxy = 'https://invidious.fdn.fr';
+    const proxy = getSaved('custom_instance_2') ? store.api.invidious[0] : 'https://invidious.fdn.fr';
 
     const host = useProxy ? proxy :
       `https://${oldUrl.searchParams.get('host')}`;

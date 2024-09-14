@@ -1,6 +1,6 @@
 import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
@@ -175,6 +175,9 @@ audio.oncanplaythrough = async function() {
 }
 
 audio.onerror = async function() {
+  if (getSaved('custom_instance_2'))
+    return notify('Proxy Failed to decrypt stream');
+
   if (store.player.HLS || store.player.legacy)
     // in the hope that retry will yield more results with a non-blocked url
     return player(store.stream.id);
