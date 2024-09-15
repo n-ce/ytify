@@ -8,6 +8,8 @@ import './scripts/library';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
 
+import('eruda').then(mod => mod.default.init());
+
 addEventListener('DOMContentLoaded', async () => {
   const settingsContainer = document.getElementById('settings') as HTMLDivElement;
 
