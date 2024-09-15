@@ -90,8 +90,12 @@ const playableCheckerID = setInterval(() => {
   }
 }, 500);
 
+audio.onstalled=function(){
+  alert('loading stalled!');
+}
 
 audio.addEventListener('loadeddata', () => {
+  alert('data loaded');
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
   historyID = store.stream.id;
@@ -105,6 +109,7 @@ audio.addEventListener('loadeddata', () => {
 
 
 audio.onwaiting = function() {
+  alert('started loading but starting waiting');
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 }
 
