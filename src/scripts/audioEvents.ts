@@ -91,7 +91,7 @@ const playableCheckerID = setInterval(() => {
 }, 500);
 
 
-audio.onloadeddata = function() {
+audio.addEventListener('loadeddata', () => {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
   historyID = store.stream.id;
@@ -101,7 +101,7 @@ audio.onloadeddata = function() {
   if (playSpeed.value !== '1.00')
     audio.playbackRate = parseFloat(playSpeed.value);
 
-}
+});
 
 
 audio.onwaiting = function() {

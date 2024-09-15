@@ -31,6 +31,7 @@ export default async function player(id: string | null = '') {
   if (store.player.legacy) {
     alert('playing in legacy mode!')
     audio.src = data.hls;
+    audio.play();
   }
   else {
     alert('playing in modern mode!')
