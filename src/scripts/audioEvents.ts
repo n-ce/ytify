@@ -46,6 +46,7 @@ let historyTimeoutId = 0;
 
 
 audio.onplaying = function() {
+  alert('started playing');
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
 
   store.player.playbackState = 'playing';
@@ -90,11 +91,17 @@ const playableCheckerID = setInterval(() => {
   }
 }, 500);
 
-audio.onstalled=function(){
+audio.onstalled=function(e){
   alert('loading stalled!');
+  console.log(e);
+}
+audio.onsuspend=function(e){
+  alert('loading suspended!');
+  console.log(e);
 }
 
-audio.addEventListener('loadeddata', () => {
+audio.addEventListener('loadeddata', (e) => {
+  console.log(e);
   alert('data loaded');
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
