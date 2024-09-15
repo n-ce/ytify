@@ -39,7 +39,7 @@ export default function() {
         <i class="ri-list-check-2"></i>Enqueue
       </li>
 
-      <CollectionSelector collection={store.actionsMenu} />
+      <CollectionSelector collection={store.actionsMenu} close={close} />
 
 
       <li tabindex={3} on:click={async () => {

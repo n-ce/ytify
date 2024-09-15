@@ -28,9 +28,12 @@ export default async function player(id: string | null = '') {
     channelUrl: data.uploaderUrl
   });
 
-  if (store.player.legacy)
+  if (store.player.legacy) {
+    alert('playing in legacy mode!')
     audio.src = data.hls;
+  }
   else {
+    alert('playing in modern mode!')
     const h = store.player.HLS;
     h ?
       h.loadSource(data.hls) :

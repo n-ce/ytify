@@ -178,6 +178,8 @@ audio.onerror = async function() {
   if (getSaved('custom_instance_2'))
     return notify('Proxy Failed to decrypt stream');
 
+  alert('we just got an error!')
+
   if (store.player.HLS || store.player.legacy)
     // in the hope that retry will yield more results with a non-blocked url
     return player(store.stream.id);
