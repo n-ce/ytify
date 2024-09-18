@@ -14,7 +14,7 @@ export const store: {
     data: Piped | undefined,
     legacy: boolean
   },
-  queue: [undefined] | string[]
+  queue: string[]
   stream: CollectionItem,
   streamHistory: string[]
   api: {

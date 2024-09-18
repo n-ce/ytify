@@ -13,7 +13,7 @@ export default async function fetchList(
 
   loadingScreen.showModal();
 
-  const useHyperpipe = !mix && store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist');
+  const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
 
 
   if (useHyperpipe) {
