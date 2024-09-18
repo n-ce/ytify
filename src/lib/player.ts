@@ -11,14 +11,11 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = store.player.prefetch[id] || await getData(id) as Piped;
+  const data = await getData(id);
 
-
-  if (!data || !('audioStreams' in data)) {
-    await player(id);
-    return;
-  }
-  else store.player.prefetch[id] = data;
+  if (data && 'audioStreams' in data)
+    store.player.data = data;
+  else return player(id);
 
   await setMetaData({
     id: id,
@@ -30,7 +27,6 @@ export default async function player(id: string | null = '') {
 
   if (store.player.legacy) {
     audio.src = data.hls;
-    console.log(audio.src);
     audio.load();
   }
   else {

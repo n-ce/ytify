@@ -46,7 +46,6 @@ let historyTimeoutId = 0;
 
 
 audio.onplaying = function() {
-  alert('started playing');
   playButton.classList.replace(playButton.className, 'ri-pause-circle-fill');
 
   store.player.playbackState = 'playing';
@@ -91,18 +90,8 @@ const playableCheckerID = setInterval(() => {
   }
 }, 500);
 
-audio.onstalled=function(e){
-  alert('loading stalled!');
-  console.log(e);
-}
-audio.onsuspend=function(e){
-  alert('loading suspended!');
-  console.log(e);
-}
 
-audio.addEventListener('loadeddata', (e) => {
-  console.log(e);
-  alert('data loaded');
+audio.onloadeddata = function() {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
   historyID = store.stream.id;
@@ -112,11 +101,10 @@ audio.addEventListener('loadeddata', (e) => {
   if (playSpeed.value !== '1.00')
     audio.playbackRate = parseFloat(playSpeed.value);
 
-});
+}
 
 
 audio.onwaiting = function() {
-  alert('started loading but starting waiting');
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 }
 
@@ -178,43 +166,37 @@ audio.onloadedmetadata = function() {
 }
 
 
-audio.oncanplaythrough = async function() {
+audio.oncanplaythrough = function() {
+  // prefetch beforehand to speed up experience
   const nextItem = store.queue[0];
-  if (!nextItem) return;
-  const pf = store.player.prefetch;
-  if (!(nextItem in pf))
-    pf[nextItem] = await getData(nextItem);
+  if (nextItem)
+    getData(nextItem);
 }
 
 audio.onerror = async function() {
+
+  audio.pause();
+
   if (getSaved('custom_instance_2'))
     return notify('Proxy Failed to decrypt stream');
 
-  alert('we just got an error!')
-
-  if (store.player.HLS || store.player.legacy)
-    // in the hope that retry will yield more results with a non-blocked url
+  if (store.player.HLS)
     return player(store.stream.id);
 
-  const data = store.player.prefetch[store.stream.id];
+  const data = store.player.data as Piped;
   const adaptiveUrl = data.audioStreams[0].url;
   const piProxy = new URL(adaptiveUrl).origin;
   const ivProxy = new URL(audio.src).origin;
   const defProxy = 'https://invidious.fdn.fr';
 
 
-  // First Proxy Replace 
-  if (ivProxy === defProxy) {
-    audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
-    return;
-  }
-  // 2nd Proxy Replace
-  if (piProxy !== ivProxy)
-    audio.src = audio.src.replace(ivProxy, piProxy);
-  else
-    audio.src = audio.src.replace(ivProxy, defProxy);
-
-
+  audio.src = audio.src.replace(
+    ivProxy,
+    ivProxy === defProxy ?
+      store.api.invidious[store.api.index] :
+      ivProxy !== piProxy ?
+        piProxy : defProxy
+  );
 
 }
 

@@ -100,19 +100,21 @@ export default function() {
 
       <li tabindex={7} on:click={() => {
         close();
-        const hls = store.player.HLS;
-        store.player.HLS = undefined;
 
+        const output = location.pathname === '/' ? store.player.data : store.actionsMenu;
         const dialog = $('dialog') as HTMLDialogElement;
+
         dialog.className = 'debug';
-        dialog.textContent = JSON.stringify(store, null, 4);
-        store.player.HLS = hls;
+        dialog.textContent = JSON.stringify(output, null, 4);
+
         document.body.appendChild(dialog);
+
         dialog.showModal();
-        dialog.onclick = () => {
+        dialog.onclick = function() {
           dialog.close();
           dialog.remove();
         }
+
       }}>
         <i class="ri-bug-line"></i>Stats For Nerds
       </li>
