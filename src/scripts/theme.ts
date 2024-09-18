@@ -1,7 +1,11 @@
-import { canvas, context } from '../lib/dom';
 import { generateImageUrl } from '../lib/imageUtils';
+import { $ } from '../lib/utils';
 import { store, getSaved } from '../lib/store';
 
+const canvas = store.player.legacy ?
+  <HTMLCanvasElement>$('canvas') :
+  new OffscreenCanvas(512, 512);
+const context = <OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D>canvas.getContext('2d', { alpha: false });
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
