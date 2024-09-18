@@ -11,7 +11,7 @@ export const store: {
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
-    prefetch: { [index: string]: Piped },
+    data: Piped | undefined,
     legacy: boolean
   },
   queue: string[]
@@ -43,7 +43,7 @@ export const store: {
         contentType: 'audio/ogg;codecs=opus'
       }
     }).then(res => res.supported),
-    prefetch: {},
+    data: undefined,
     legacy: !('OffscreenCanvas' in window)
   },
   queue: [],

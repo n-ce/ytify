@@ -1,4 +1,3 @@
-
 import { playButton } from "../lib/dom";
 import { store } from "../lib/store";
 import { notify } from "../lib/utils";
@@ -21,7 +20,7 @@ export async function getData(
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data && !store.player.prefetch[id]) {
+      if (data && 'audioStreams' in data) {
         store.api.index = store.api.piped.indexOf(api);
         return data;
       }
@@ -80,9 +79,10 @@ export async function getData(
       iv.map(fetchDataFromInvidious)
     ).catch(() => {
       // do not update ui for queue prefetch items
-      if (store.stream.id !== id) return;
-      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      notify('Could not retrieve stream data in any ways.. Trying again..');
+      if (store.stream.id === id) {
+        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+        notify('Could not retrieve stream data in any ways.. Trying again..');
+      }
     }));
 
 

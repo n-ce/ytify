@@ -11,14 +11,11 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  const data = store.player.prefetch[id] || await getData(id) as Piped;
+  const data = await getData(id);
 
-
-  if (!data || !('audioStreams' in data)) {
-    await player(id);
-    return;
-  }
-  else store.player.prefetch[id] = data;
+  if (data && 'audioStreams' in data)
+    store.player.data = data;
+  else return player(id);
 
   await setMetaData({
     id: id,
@@ -28,8 +25,10 @@ export default async function player(id: string | null = '') {
     channelUrl: data.uploaderUrl
   });
 
-  if (store.player.legacy)
+  if (store.player.legacy) {
     audio.src = data.hls;
+    audio.load();
+  }
   else {
     const h = store.player.HLS;
     h ?
@@ -43,9 +42,8 @@ export default async function player(id: string | null = '') {
       ));
   }
 
-  if (data.subtitles.length)
-    import('../modules/setSubtitles')
-      .then(mod => mod.setSubtitles(data.subtitles));
+  import('../modules/setSubtitles')
+    .then(mod => mod.setSubtitles(data.subtitles));
 
 
   params.set('s', id);

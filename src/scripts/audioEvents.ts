@@ -166,41 +166,37 @@ audio.onloadedmetadata = function() {
 }
 
 
-audio.oncanplaythrough = async function() {
+audio.oncanplaythrough = function() {
+  // prefetch beforehand to speed up experience
   const nextItem = store.queue[0];
-  if (!nextItem) return;
-  const pf = store.player.prefetch;
-  if (!(nextItem in pf))
-    pf[nextItem] = await getData(nextItem);
+  if (nextItem)
+    getData(nextItem);
 }
 
 audio.onerror = async function() {
+
+  audio.pause();
+
   if (getSaved('custom_instance_2'))
     return notify('Proxy Failed to decrypt stream');
 
-  if (store.player.HLS || store.player.legacy)
-    // in the hope that retry will yield more results with a non-blocked url
+  if (store.player.HLS)
     return player(store.stream.id);
 
-  const data = store.player.prefetch[store.stream.id];
+  const data = store.player.data as Piped;
   const adaptiveUrl = data.audioStreams[0].url;
   const piProxy = new URL(adaptiveUrl).origin;
   const ivProxy = new URL(audio.src).origin;
   const defProxy = 'https://invidious.fdn.fr';
 
 
-  // First Proxy Replace 
-  if (ivProxy === defProxy) {
-    audio.src = audio.src.replace(ivProxy, store.api.invidious[store.api.index]);
-    return;
-  }
-  // 2nd Proxy Replace
-  if (piProxy !== ivProxy)
-    audio.src = audio.src.replace(ivProxy, piProxy);
-  else
-    audio.src = audio.src.replace(ivProxy, defProxy);
-
-
+  audio.src = audio.src.replace(
+    ivProxy,
+    ivProxy === defProxy ?
+      store.api.invidious[store.api.index] :
+      ivProxy !== piProxy ?
+        piProxy : defProxy
+  );
 
 }
 

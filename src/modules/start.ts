@@ -65,25 +65,6 @@ export default async function() {
 
 
 
-  // queue sorting
-
-  await import('sortablejs')
-    .then(mod =>
-      new mod.default(queuelist, {
-        handle: '.ri-draggable',
-        onUpdate(e: SortableEvent) {
-          if (e.oldIndex == null || e.newIndex == null) return;
-          const queueArray = store.queue;
-          queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
-        }
-      })
-    );
-
-
-
-
-
-
   // params handling
 
   const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
@@ -117,6 +98,21 @@ export default async function() {
         .join('/')
     );
 
+
+
+  // queue sorting
+
+  await import('sortablejs')
+    .then(mod =>
+      new mod.default(queuelist, {
+        handle: '.ri-draggable',
+        onUpdate(e: SortableEvent) {
+          if (e.oldIndex == null || e.newIndex == null) return;
+          const queueArray = store.queue;
+          queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
+        }
+      })
+    );
 
 
 }
