@@ -44,7 +44,7 @@ export async function getData(
       uploader: data.author,
       duration: data.lengthSeconds,
       uploaderUrl: data.authorUrl,
-      category: data.genre,
+      category: data.genre || 'non-music',
       liveStream: data.liveNow,
       subtitles: [],
       relatedStreams: data.recommendedVideos.map(v => ({
@@ -72,7 +72,7 @@ export async function getData(
 
   const res = await Promise.any(
     pi
-      .filter((_, i) => i < (h ? pi : iv).length)
+      .filter((_, i) => i < (h ? pi.length : store.api.unified))
       .map(fetchDataFromPiped)
   )
     .catch(() => h ? {} : Promise.any(

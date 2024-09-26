@@ -173,31 +173,31 @@ audio.oncanplaythrough = function() {
     getData(nextItem);
 }
 
-audio.onerror = async function() {
-
+audio.onerror = function() {
   audio.pause();
 
   if (getSaved('custom_instance_2'))
-    return notify('Proxy Failed to decrypt stream');
+    return notify('Proxy failed to decrypt stream');
 
-  if (store.player.HLS)
-    return player(store.stream.id);
+  if (store.player.HLS || getSaved('proxyViaInvidious') === 'false') {
+    notify('PipedProxy failed to decrypt stream, Retrying...');
+    player(store.stream.id);
+    return;
+  }
+  /*
+  Error Proxies
+  Normal : Unified Invidious Proxied
+  Negative : Non-Unified Invidious Proxied
+  */
 
-  const data = store.player.data as Piped;
-  const adaptiveUrl = data.audioStreams[0].url;
-  const piProxy = new URL(adaptiveUrl).origin;
-  const ivProxy = new URL(audio.src).origin;
+  const ivProxy = (new URL(audio.src)).origin;
   const defProxy = 'https://invidious.fdn.fr';
 
-
-  audio.src = audio.src.replace(
-    ivProxy,
-    ivProxy === defProxy ?
-      store.api.invidious[store.api.index] :
-      ivProxy !== piProxy ?
-        piProxy : defProxy
-  );
-
+  if (ivProxy === defProxy) {
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    notify('Could not play stream in any ways..');
+  }
+  else audio.src = audio.src.replace(ivProxy, defProxy);
 }
 
 

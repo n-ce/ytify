@@ -11,17 +11,17 @@
   "dependencies": {
     "hls.js": "^1.5.15",
     "imsc": "^1.1.5",
-    "solid-js": "^1.8.22",
+    "solid-js": "^1.9.1",
     "sortablejs": "^1.15.3"
   },
   "devDependencies": {
-    "@netlify/edge-functions": "^2.10.0",
-    "@types/node": "^22.5.5",
+    "@netlify/edge-functions": "^2.11.0",
+    "@types/node": "^22.7.2",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
     "eruda": "^3.3.0",
     "typescript": "^5.6.2",
-    "vite": "^5.4.6",
+    "vite": "^5.4.8",
     "vite-plugin-pwa": "^0.20.5",
     "vite-plugin-solid": "^2.10.2"
   },

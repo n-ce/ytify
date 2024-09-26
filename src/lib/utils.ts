@@ -84,7 +84,7 @@ export async function errorHandler(
 
   if (
     message !== 'No Data Found' &&
-    store.api.index < store.api.invidious.length - 1
+    store.api.index < store.api.unified - 1
   ) {
     store.api.index++;
     redoAction();
