@@ -191,7 +191,7 @@ audio.onerror = function() {
   */
 
   const ivProxy = (new URL(audio.src)).origin;
-  const piProxy = (new URL(store.player.data?.audioStreams[0].url)).origin;
+  const piProxy = (new URL(store.player.data!.audioStreams[0].url)).origin;
   const defProxy = 'https://invidious.fdn.fr';
   
   if(ivProxy === piProxy) {
