@@ -191,13 +191,14 @@ audio.onerror = function() {
   */
 
   const ivProxy = (new URL(audio.src)).origin;
+  const piProxy = (new URL(store.player.data!.hls)).origin;
   const defProxy = 'https://invidious.fdn.fr';
-
-  if (ivProxy === defProxy) {
+  
+  if(ivProxy === piProxy) {
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     notify('Could not play stream in any ways..');
   }
-  else audio.src = audio.src.replace(ivProxy, defProxy);
+  else audio.src = audio.src.replace(ivProxy, (ivProxy === defProxy) ? piProxy : defProxy);
 }
 
 
