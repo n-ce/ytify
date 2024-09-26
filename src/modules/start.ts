@@ -23,6 +23,7 @@ export default async function() {
       .then(data => {
         a.piped = data.piped;
         a.invidious = data.invidious;
+        a.unified = data.unified;
       });
   }
 
@@ -46,9 +47,21 @@ export default async function() {
             audio.play();
           });
           h.on(mod.default.Events.ERROR, (_, d) => {
+
             if (d.details === 'manifestLoadError') {
-              notify(d.details);
-              player(id);
+              const hlsUrl = store.player.data!.hls;
+              const piProxy = (new URL(hlsUrl)).origin;
+              const defProxy = 'https://invidious.fdn.fr';
+              if (piProxy === defProxy) {
+                notify(d.details);
+                return;
+              }
+              const newUrl = hlsUrl.replace(piProxy, defProxy);
+              h.loadSource(newUrl);
+            }
+            else {
+              notify('load error, retrying...')
+              player(store.stream.id);
             }
 
           })
