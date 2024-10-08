@@ -148,6 +148,7 @@
       position: fixed;
       content: attr(aria-label);
       font-size: small;
+      font-family: 'Noto Sans', sans-serif !important;
     }
 
     #upperLayer {
