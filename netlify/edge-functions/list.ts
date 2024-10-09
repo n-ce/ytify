@@ -11,7 +11,7 @@ export default async (request: Request, context: Context) => {
   const id = req.searchParams.get('playlists');
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://invidious.privacyredirect.com';
+  const instance = 'https://invidious.catspeed.cc';
   const data = await fetch(instance + '/api/v1/playlists/' + id).then(res => res.json());
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
