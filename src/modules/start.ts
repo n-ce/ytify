@@ -80,11 +80,22 @@ export default async function() {
 
   // params handling
 
-  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+  const isPWA = idFromURL(params.get('url') || params.get('text'));
+  const id = params.get('s') || isPWA;
+  let shareAction = getSaved('shareAction');
+  if (shareAction === 'ask')
+    shareAction = confirm('Click ok to Play, click cancel to Download') ?
+      '' : 'dl';
+
+
 
   if (id) {
     loadingScreen.showModal();
-    await player(id);
+    if (isPWA && shareAction) {
+      store.actionsMenu.id = id;
+      document.getElementById('downloadBtn')?.click();
+    }
+    else await player(id);
     loadingScreen.close();
   }
   else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);

@@ -157,7 +157,30 @@ export default function() {
         </Selector>
 
 
-      </div >
+        <Selector
+          id='shareAction'
+          label='PWA Share Action'
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === 'play')
+              removeSaved('shareAction');
+            else {
+              save('shareAction', val);
+            }
+          }}
+          onMount={(target) => {
+            const val = getSaved('shareAction');
+            if (val)
+              target.value = val;
+          }}
+        >
+          <option value='play'>Play</option>
+          <option value='dl'>Download</option>
+          <option value='ask'>Always Ask</option>
+        </Selector>
+
+
+      </div>
 
       <div>
         <b>

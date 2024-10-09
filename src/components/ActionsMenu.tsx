@@ -80,7 +80,7 @@ export default function() {
           })
           .catch(_ => notify(_))
           .finally(() => loadingScreen.close());
-      }}>
+      }} id='downloadBtn'>
         <i class="ri-download-2-fill"></i>Download
       </li>
 
