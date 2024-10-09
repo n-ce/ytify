@@ -116,7 +116,7 @@ export default function() {
         }
 
       }}>
-        <i class="ri-bug-line"></i>Stats For Nerds
+        <i class="ri-bug-line"></i> Debug Information
       </li>
 
     </ul>
