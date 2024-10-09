@@ -376,6 +376,27 @@ export default function() {
           <option value="0.9rem">Heavier</option>
         </Selector>
 
+
+        <ToggleSwitch
+          id="custom_theme"
+          name='Use Custom Color'
+          checked={getSaved('custom_theme') !== null}
+          onClick={() => {
+            const colorString = getSaved('custom_theme');
+            if (colorString) {
+              removeSaved('custom_theme');
+            }
+            else {
+              const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
+              if (str)
+                save('custom_theme', str);
+            }
+            themer();
+          }}
+
+        />
+
+
         <Selector
           label='Theming Scheme'
           id='themeSelector'

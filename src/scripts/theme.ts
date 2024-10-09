@@ -1,11 +1,6 @@
 import { generateImageUrl } from '../lib/imageUtils';
-import { $ } from '../lib/utils';
 import { store, getSaved } from '../lib/store';
 
-const canvas = store.player.legacy ?
-  <HTMLCanvasElement>$('canvas') :
-  new OffscreenCanvas(512, 512);
-const context = <OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D>canvas.getContext('2d', { alpha: false });
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
@@ -110,47 +105,36 @@ function colorInjector(colorArray: number[]) {
 }
 
 
+
+
 function themer() {
+  const custom = getSaved('custom_theme');
 
-  if (!store.stream.id) {
-    colorInjector([127, 127, 127]);
-    return;
-  }
+  store.stream.id && !custom ?
 
-  const canvasImg = new Image();
-  canvasImg.onload = () => {
+    import('extract-colors').then(mod => mod.extractColorsFromSrc(
+      generateImageUrl(store.stream.id, 'mq'),
+      {
+        crossOrigin: 'anonymous',
+        distance: 0
+      }
+    )
+      .then(array => array
+        .filter(c => c.saturation > 0.2 && c.saturation < 0.8)
+        .sort((a, b) => b.area - a.area)[0]
+      )
+      .then(_ => colorInjector([
+        _.red,
+        _.green,
+        _.blue
+      ]))
+      .catch(console.error)) :
 
-    const height = canvasImg.height;
-    const width = canvasImg.width;
-    const side = Math.floor(Math.min(width, height));
-    canvas.width = canvas.height = side;
-
-    const offsetX = Math.floor((width - side) / 2);
-    const offsetY = Math.floor((height - side) / 2);
-    context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
-
-    const data = context.getImageData(0, 0, side, side).data;
-    const len = data.length;
-    let r = 0, g = 0, b = 0;
-
-    for (let i = 0; i < len; i += 4) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-    }
-    const amount = len / 4;
-    r = Math.floor(r / amount),
-      g = Math.floor(g / amount),
-      b = Math.floor(b / amount);
-
-    colorInjector([r, g, b]);
-
-  }
-  canvasImg.crossOrigin = '';
-  const temp = generateImageUrl(store.stream.id, 'mq');
-  if (canvasImg.src !== temp) canvasImg.src = temp;
-
-
+    colorInjector(
+      (custom || '127,127,127')
+        .split(',')
+        .map(s => parseInt(s))
+    );
 }
 
 
