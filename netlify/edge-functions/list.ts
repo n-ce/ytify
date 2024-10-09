@@ -11,7 +11,7 @@ export default async (request: Request, context: Context) => {
   const id = req.searchParams.get('playlists');
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://inv.qilk.de';
+  const instance = 'https://invidious.privacyredirect.com';
   const data = await fetch(instance + '/api/v1/playlists/' + id).then(res => res.json());
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
@@ -23,5 +23,5 @@ export default async (request: Request, context: Context) => {
 }
 
 export const config: Config = {
-  path: '/list/*',
+  path: '/*',
 };
