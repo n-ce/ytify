@@ -11,13 +11,12 @@ export default async (request: Request, context: Context) => {
   const id = req.searchParams.get('playlists');
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://invidious.catspeed.cc';
-  const data = await fetch(instance + '/api/v1/playlists/' + id).then(res => res.json());
+  const data = await fetch('https://pipedapi.kavin.rocks/playlists/' + id).then(res => res.json());
   const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author)
-    .replace('"ytify"', `"${data.title}"`)
+    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.uploader)
+    .replace('"ytify"', `"${data.name}"`)
     .replace(<string>context.site.url, `${context.site.url}/list?playlists=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', data.videos[0].videoThumbnails[0].url);
+    .replaceAll('/ytify_thumbnail_min.webp', data.relatedStreams[0].thumbnail);
 
   return new Response(newPage, response);
 }
