@@ -1,7 +1,7 @@
 // handles upcoming query & public collection requests to restore stream lists from any state
 
 import { Config } from '@netlify/edge-functions';
-import { convertSStoHHMMSS, instanceArray } from '../commons';
+import { convertSStoHHMMSS, instanceArray } from '../../src/neltifyCommons';
 
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
