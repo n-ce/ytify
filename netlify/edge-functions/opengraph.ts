@@ -7,12 +7,12 @@ export default async (request: Request, context: Context) => {
 
   const id = req.searchParams.get('s') || req.searchParams.get('playlists') || '';
 
-  if (id.length < 11) return;
+  if (id.length !== 11) return;
 
   const response = await context.next();
   const page = await response.text();
 
-  const newPage = await (id.length === 11 ? streamHandler(page, id) : playlistHandler(page, id));
+  const newPage = await streamHandler(page, id)
 
   return new Response(newPage, response);
 };
@@ -34,15 +34,4 @@ async function streamHandler(page: string, id: string) {
     .replaceAll('/ytify_thumbnail_min.webp', thumbnail);
 }
 
-
-async function playlistHandler(page: string, id: string) {
-
-  const data = await fetch('https://pipedapi.kavin.rocks/playlists/' + id).then(res => res.json());
-  return page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.uploader)
-    .replace('"ytify"', `"${data.name}"`)
-    .replace('ytify.netlify.app', `ytify.netlify.app/list?playlists=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', data.relatedStreams[0].thumbnail);
-
-}
 
