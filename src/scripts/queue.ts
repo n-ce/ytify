@@ -18,8 +18,6 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
 
-  if (store.queue.includes(data.id)) return;
-
   if (filterLT10Btn.classList.contains('filter'))
     if (isLongerThan10Min(<string>data.duration))
       return;
