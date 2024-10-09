@@ -5,6 +5,7 @@ import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
+import { createSignal } from "solid-js";
 
 declare module "solid-js" {
   namespace JSX {
@@ -21,6 +22,13 @@ function close() {
 actionsMenu.onclick = close;
 
 export default function() {
+
+  const [isMusic, setMusic] = createSignal(false);
+
+  new IntersectionObserver(() => {
+    if (actionsMenu.checkVisibility())
+      setMusic(store.actionsMenu.author.endsWith('- Topic'));
+  }).observe(actionsMenu);
 
 
   return (
@@ -89,7 +97,7 @@ export default function() {
 
         fetchList(smd.channelUrl);
       }}>
-        <i class="ri-user-line"></i>View Channel
+        <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
       </li>
 
       <li tabindex={6} on:click={() => {

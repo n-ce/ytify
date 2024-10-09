@@ -381,15 +381,15 @@ export default function() {
           id="custom_theme"
           name='Use Custom Color'
           checked={getSaved('custom_theme') !== null}
-          onClick={() => {
+          onClick={e => {
             const colorString = getSaved('custom_theme');
-            if (colorString) {
+            if (colorString)
               removeSaved('custom_theme');
-            }
             else {
               const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
-              if (str)
-                save('custom_theme', str);
+              str ?
+                save('custom_theme', str) :
+                e.preventDefault();
             }
             themer();
           }}
