@@ -83,7 +83,7 @@ export default async function() {
   const isPWA = idFromURL(params.get('url') || params.get('text'));
   const id = params.get('s') || isPWA;
   let shareAction = getSaved('shareAction');
-  if (shareAction === 'ask')
+  if (isPWA && shareAction === 'ask')
     shareAction = confirm('Click ok to Play, click cancel to Download') ?
       '' : 'dl';
 
