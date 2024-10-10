@@ -1,5 +1,5 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, notify } from "../lib/utils";
+import { $, downloader } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
@@ -59,28 +59,10 @@ export default function() {
 
       <li tabindex={4} on:click={async () => {
         close();
-        const provider = 'https://api.cobalt.tools/api/json';
-        const streamUrl = 'https://youtu.be/' + store.actionsMenu.id;
         loadingScreen.showModal();
-        fetch(provider, {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            url: streamUrl,
-            isAudioOnly: true,
-            aFormat: store.downloadFormat,
-            filenamePattern: 'basic'
-          })
-        })
-          .then(_ => _.json())
-          .then(_ => {
-            const a = $('a');
-            a.href = _.url;
-            a.click();
-          })
-          .catch(_ => notify(_))
-          .finally(() => loadingScreen.close());
-      }} id='downloadBtn'>
+        await downloader(store.actionsMenu.id);
+        loadingScreen.close();
+      }}>
         <i class="ri-download-2-fill"></i>Download
       </li>
 

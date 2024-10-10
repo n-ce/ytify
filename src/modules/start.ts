@@ -1,7 +1,7 @@
 import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { idFromURL, notify } from '../lib/utils';
+import { downloader, idFromURL, notify } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
@@ -91,11 +91,11 @@ export default async function() {
 
   if (id) {
     loadingScreen.showModal();
-    if (isPWA && shareAction) {
-      store.actionsMenu.id = id;
-      document.getElementById('downloadBtn')?.click();
-    }
-    else await player(id);
+    await (
+      (isPWA && shareAction) ?
+        downloader(id) :
+        player(id)
+    );
     loadingScreen.close();
   }
   else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);

@@ -73,6 +73,27 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
+export async function downloader(id: string) {
+  const provider = 'https://api.cobalt.tools/api/json';
+  const streamUrl = 'https://youtu.be/' + id;
+  await fetch(provider, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url: streamUrl,
+      isAudioOnly: true,
+      aFormat: store.downloadFormat,
+      filenamePattern: 'basic'
+    })
+  })
+    .then(_ => _.json())
+    .then(_ => {
+      const a = $('a');
+      a.href = _.url;
+      a.click();
+    })
+    .catch(_ => notify(_))
+}
 
 export async function errorHandler(
   message: string,
