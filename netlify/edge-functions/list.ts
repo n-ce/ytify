@@ -5,16 +5,17 @@ export default async (request: Request, context: Context) => {
 
   const req = new URL(request.url);
 
-  const id = req.searchParams.get('s') || req.searchParams.get('playlists') || '';
+  const id = req.searchParams.get('playlists');
+  if (!id) return;
 
 
   const response = await context.next();
 
   async function playlistHandler(id: string) {
 
-    const data = await fetch('https://pipedapi.kavin.rocks/playlists/' + id).then(res => res.json());
+    const data = await fetch('https://pipedapi.reallyaweso.me/playlists/' + id).then(res => res.json());
     return html
-      .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.uploader)
+      .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.uploader || '')
       .replace('"ytify"', `"${data.name}"`)
       .replace('ytify.netlify.app', `ytify.netlify.app/list?playlists=${id}`)
       .replaceAll('/ytify_thumbnail_min.webp', data.relatedStreams[0].thumbnail);
