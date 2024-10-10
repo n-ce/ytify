@@ -91,11 +91,12 @@ export default async function() {
 
   if (id) {
     loadingScreen.showModal();
-    await (
-      (isPWA && shareAction) ?
-        downloader(id) :
-        player(id)
-    );
+    if (isPWA && shareAction) {
+      await downloader(id);
+      close();
+    }
+    else await player(id)
+
     loadingScreen.close();
   }
   else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
