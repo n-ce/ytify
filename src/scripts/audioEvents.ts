@@ -193,10 +193,29 @@ audio.onerror = function() {
   const ivProxy = (new URL(audio.src)).origin;
   const piProxy = (new URL(store.player.data!.audioStreams[0].url)).origin;
   const defProxy = 'https://invidious.fdn.fr';
-  
-  if(ivProxy === piProxy) {
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    notify('Could not play stream in any ways..');
+
+  if (ivProxy === piProxy) {
+    notify('Trying to play using Cobalt...');
+    fetch('https://api.cobalt.tools/api/json', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: 'https://youtu.be/' + store.stream.id,
+        isAudioOnly: true,
+        aFormat: store.downloadFormat
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.url)
+          audio.src = data.url;
+        else throw new Error();
+      })
+      .catch(() => {
+        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+        notify('Could not play stream in any ways..')
+      });
+
   }
   else audio.src = audio.src.replace(ivProxy, (ivProxy === defProxy) ? piProxy : defProxy);
 }

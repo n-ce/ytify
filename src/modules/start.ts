@@ -93,7 +93,6 @@ export default async function() {
     loadingScreen.showModal();
     if (isPWA && shareAction) {
       await downloader(id);
-      close();
     }
     else await player(id)
 

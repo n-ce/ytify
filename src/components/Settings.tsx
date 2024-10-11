@@ -209,7 +209,18 @@ export default function() {
             location.reload();
           }}
         />
+        <ToggleSwitch
+          id="frequentSearches"
+          name='Show Frequent Searches'
+          checked={getSaved('frequentSearches') !== null}
+          onClick={() => {
+            getSaved('frequentSearches') === null ?
+              save('frequentSearches', '') :
+              removeSaved('frequentSearches');
+          }}
+        />
       </div>
+
 
       <div>
         <b>
