@@ -202,7 +202,7 @@ audio.onerror = function() {
       body: JSON.stringify({
         url: 'https://youtu.be/' + store.stream.id,
         isAudioOnly: true,
-        aFormat: store.downloadFormat
+        aFormat: 'mp3'
       })
     })
       .then(res => res.json())

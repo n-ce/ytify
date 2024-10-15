@@ -9,7 +9,7 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "extract-colors": "^4.0.8",
+    "extract-colors": "^4.1.0",
     "hls.js": "^1.5.16",
     "imsc": "^1.1.5",
     "solid-js": "^1.9.2",
@@ -22,7 +22,7 @@
     "autoprefixer": "^10.4.20",
     "eruda": "^3.4.0",
     "typescript": "^5.6.3",
-    "vite": "^5.4.8",
+    "vite": "^5.4.9",
     "vite-plugin-pwa": "^0.20.5",
     "vite-plugin-solid": "^2.10.2"
   },

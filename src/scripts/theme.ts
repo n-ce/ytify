@@ -1,3 +1,4 @@
+import type { FinalColor } from 'extract-colors/lib/types/Color';
 import { generateImageUrl } from '../lib/imageUtils';
 import { store, getSaved } from '../lib/store';
 
@@ -108,18 +109,19 @@ function colorInjector(colorArray: number[]) {
 
 
 function themer() {
-  const custom = getSaved('custom_theme');
+  const initColor = '127,127,127';
+  const custom = getSaved('custom_theme') || (store.player.legacy ? initColor : '');
 
   store.stream.id && !custom ?
 
-    import('extract-colors').then(mod => mod.extractColorsFromSrc(
+    import('extract-colors/lib/worker-wrapper').then(mod => mod.extractColors(
       generateImageUrl(store.stream.id, 'mq'),
       {
         crossOrigin: 'anonymous',
         distance: 0
       }
     )
-      .then(array => array
+      .then(array => (array as FinalColor[])
         .filter(c => c.saturation > 0.2 && c.saturation < 0.8)
         .sort((a, b) => b.area - a.area)[0]
       )
@@ -131,7 +133,7 @@ function themer() {
       .catch(console.error)) :
 
     colorInjector(
-      (custom || '127,127,127')
+      (custom || initColor)
         .split(',')
         .map(s => parseInt(s))
     );
