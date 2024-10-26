@@ -9,32 +9,7 @@ const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
-const accentLightener = (r: number, g: number, b: number) => {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const l = Math.max(r, g, b);
-  const s = l - Math.min(r, g, b);
-  const h = s
-    ? l === r
-      ? (g - b) / s
-      : l === g
-        ? 2 + (b - r) / s
-        : 4 + (r - g) / s
-    : 0;
-
-  const hue = 60 * h < 0 ? 60 * h + 360 : 60 * h;
-  const saturation = 100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
-  return `hsl(
-    ${Math.floor(hue)},
-    ${Math.floor(saturation)}%,
-    80%)`;
-}
-// previous algorithm
-// `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
-
-
-
+const accentLightener = (r: number, g: number, b: number) => `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
 
 function accentDarkener(r: number, g: number, b: number) {
 
@@ -47,7 +22,6 @@ function accentDarkener(r: number, g: number, b: number) {
     min = Math.floor(min / 3);
   }
   return `rgb(${r - min}, ${g - min},${b - min})`;
-
 
 }
 
@@ -104,7 +78,6 @@ function colorInjector(colorArray: number[]) {
       tabColor.content = palette[scheme].bg(r, g, b);
     });
 }
-
 
 
 

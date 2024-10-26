@@ -35,5 +35,12 @@ addEventListener('DOMContentLoaded', async () => {
       });
     });
 
+  alert('loading test');
+  await fetch(`${location.origin}/streams?id=${'YRoZ-MXZtMA'}`)
+    .then(res => res.json())
+    .then(JSON.stringify)
+    .then(alert)
+    .catch(alert);
+
 })
 

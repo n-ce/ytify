@@ -1,4 +1,5 @@
 import { Context, Config } from '@netlify/edge-functions';
+import { getData } from './public';
 
 
 export default async (request: Request, context: Context) => {
@@ -10,10 +11,9 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const instance = 'https://invidious.catspeed.cc';
-  const data = await fetch(instance + '/api/v1/videos/' + id).then(res => res.json());
+  const data = await getData(id).catch(() => getData(id));
   const music = data.author.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
-  const thumbnail = music + data.videoThumbnails.find((v: { quality: string }) => v.quality === 'medium').url;
+  const thumbnail = music + data.videoThumbnails.find(v => v.quality === 'medium')?.url;
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
