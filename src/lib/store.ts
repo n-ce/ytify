@@ -31,6 +31,7 @@ export const store: {
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
+  downloadAPI: string,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
@@ -83,6 +84,7 @@ export const store: {
     uploader: '',
     thumbnail: ''
   },
+  downloadAPI: 'https://cobalt-api.kwiatekmiki.com',
   downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
 }
 

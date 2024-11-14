@@ -51,7 +51,8 @@ export default async function() {
             if (d.details === 'manifestLoadError') {
               const hlsUrl = store.player.data!.hls;
               const piProxy = (new URL(hlsUrl)).origin;
-              const defProxy = 'https://invidious.fdn.fr';
+              const defProxy = 'https://invidious.jing.rocks';
+
               if (piProxy === defProxy) {
                 notify(d.details);
                 return;
@@ -107,9 +108,7 @@ export default async function() {
     superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
   }
 
-
-  if (params.has('collection') || params.has('si'))
-    fetchCollection(params.get('collection'), params.get('si'));
+  fetchCollection(params.get('collection'));
 
 
   // list loading

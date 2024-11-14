@@ -72,7 +72,7 @@ export async function getData(
 
   const res = await Promise.any(
     pi
-      //.filter((_, i) => i < (h ? pi.length : store.api.unified))
+      .filter((_, i) => i < (h ? pi.length : store.api.unified))
       .map(fetchDataFromPiped)
   )
     .catch(() => h ? {} : Promise.any(

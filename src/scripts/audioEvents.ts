@@ -192,17 +192,17 @@ audio.onerror = function() {
 
   const ivProxy = (new URL(audio.src)).origin;
   const piProxy = (new URL(store.player.data!.audioStreams[0].url)).origin;
-  const defProxy = 'https://invidious.fdn.fr';
+  const defProxy = 'https://invidious.jing.rocks';
 
   if (ivProxy === piProxy) {
-    notify('Trying to play using Cobalt...');
-    fetch('https://api.cobalt.tools/api/json', {
+    fetch(store.downloadAPI, {
       method: 'POST',
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({
         url: 'https://youtu.be/' + store.stream.id,
-        isAudioOnly: true,
-        aFormat: 'mp3'
+        downloadMode: 'audio',
+        audioFormat: store.downloadFormat,
+        disableMetadata: true
       })
     })
       .then(res => res.json())

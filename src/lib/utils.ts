@@ -61,6 +61,7 @@ export function notify(text: string) {
 
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
+  if (seconds === Infinity) return 'Emergency Mode';
   const hh = Math.floor(seconds / 3600);
   seconds %= 3600;
   const mm = Math.floor(seconds / 60);
@@ -74,9 +75,8 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 export async function downloader(id: string) {
-  const provider = 'https://cobalt-api.kwiatekmiki.com/';
   const streamUrl = 'https://youtu.be/' + id;
-  await fetch(provider, {
+  await fetch(store.downloadAPI, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
