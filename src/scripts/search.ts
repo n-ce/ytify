@@ -130,9 +130,11 @@ superInput.addEventListener('keydown', _ => {
 
 });
 
+/*
 function injectFrequentSearches() {
 
 }
+*/
 
 superInput.addEventListener('blur', () => {
   if (suggestions.style.display === 'block')

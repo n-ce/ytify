@@ -74,16 +74,16 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 export async function downloader(id: string) {
-  const provider = 'https://api.cobalt.tools/api/json';
+  const provider = 'https://cobalt-api.kwiatekmiki.com/';
   const streamUrl = 'https://youtu.be/' + id;
   await fetch(provider, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
       url: streamUrl,
-      isAudioOnly: true,
-      aFormat: store.downloadFormat,
-      filenamePattern: 'basic'
+      downloadMode: 'audio',
+      audioFormat: store.downloadFormat,
+      filenameStyle: 'basic'
     })
   })
     .then(_ => _.json())

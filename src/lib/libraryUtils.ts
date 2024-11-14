@@ -87,49 +87,34 @@ function renderDataIntoFragment(data: Collection, fragment: DocumentFragment) {
   }
 }
 
-export async function fetchCollection(collection: string | null, shareId: string | null = '') {
+export async function fetchCollection(collection: string | null) {
+
+  if (!collection) return;
 
   const fragment = document.createDocumentFragment();
 
-  if (collection) {
-    const db = getDB();
-    const data = db[<'discover'>decodeURI(collection)];
+  const db = getDB();
+  const data = db[<'discover'>decodeURI(collection)];
 
-    if (!data) {
-      alert('No items found');
-      return;
-    }
-
-    if (collection === 'discover')
-      for (const i in data)
-        if (data[i].frequency as number < 2)
-          delete db.discover?.[i];
-
-    saveDB(db);
-
-    renderDataIntoFragment(data, fragment);
-
-    if (!fragment.childElementCount) {
-      alert('No items found');
-      return;
-    }
-    store.list.id = collection;
-
-  } else {
-    // this means it does not exist in db and is a public collection
-
-    listBtnsContainer.className = 'publicPlaylist';
-    loadingScreen.showModal();
-    await fetch(`${location.origin}/public?id=${shareId}`)
-      .then(res => res.json())
-      .then(data => {
-        renderDataIntoFragment(data, fragment);
-      })
-      .catch(() => notify('Failed to load the shared list, it may consist of a corrupted stream'))
-      .finally(() => loadingScreen.close());
-
+  if (!data) {
+    alert('No items found');
+    return;
   }
 
+  if (collection === 'discover')
+    for (const i in data)
+      if (data[i].frequency as number < 2)
+        delete db.discover?.[i];
+
+  saveDB(db);
+
+  renderDataIntoFragment(data, fragment);
+
+  if (!fragment.childElementCount) {
+    alert('No items found');
+    return;
+  }
+  store.list.id = collection;
 
   listContainer.innerHTML = '';
   listContainer.appendChild(fragment);
@@ -150,8 +135,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
-    location.origin + location.pathname +
-    (collection ? ('?collection=' + collection) : ('?si=' + shareId)));
+    location.origin + location.pathname + '?collection=' + collection);
   document.title = (collection || 'Shared Playlist') + ' - ytify';
 }
 
