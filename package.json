@@ -1,7 +1,7 @@
 {
   "name": "ytify",
   "type": "module",
-  "version": "7.5 Dev",
+  "version": "7.4 Dev",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
