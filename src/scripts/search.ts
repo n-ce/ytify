@@ -95,6 +95,9 @@ superInput.addEventListener('input', async () => {
 let index = 0;
 
 superInput.addEventListener('keydown', _ => {
+
+  console.log(true);
+
   if (_.key === 'Enter') {
     searchLoader();
     _.preventDefault();
@@ -126,6 +129,18 @@ superInput.addEventListener('keydown', _ => {
   }
 
 });
+
+/*
+function injectFrequentSearches() {
+
+}
+*/
+
+superInput.addEventListener('blur', () => {
+  if (suggestions.style.display === 'block')
+    suggestions.style.display = 'none';
+})
+
 
 // CTRL + K focus search bar
 document.addEventListener('keydown', (event) => {

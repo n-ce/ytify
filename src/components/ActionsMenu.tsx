@@ -1,10 +1,11 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, notify } from "../lib/utils";
+import { $, downloader } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
+import { createSignal } from "solid-js";
 
 declare module "solid-js" {
   namespace JSX {
@@ -21,6 +22,13 @@ function close() {
 actionsMenu.onclick = close;
 
 export default function() {
+
+  const [isMusic, setMusic] = createSignal(false);
+
+  new IntersectionObserver(() => {
+    if (actionsMenu.checkVisibility())
+      setMusic(store.actionsMenu.author.endsWith('- Topic'));
+  }).observe(actionsMenu);
 
 
   return (
@@ -51,27 +59,9 @@ export default function() {
 
       <li tabindex={4} on:click={async () => {
         close();
-        const provider = 'https://api.cobalt.tools/api/json';
-        const streamUrl = 'https://youtu.be/' + store.actionsMenu.id;
         loadingScreen.showModal();
-        fetch(provider, {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            url: streamUrl,
-            isAudioOnly: true,
-            aFormat: store.downloadFormat,
-            filenamePattern: 'basic'
-          })
-        })
-          .then(_ => _.json())
-          .then(_ => {
-            const a = $('a');
-            a.href = _.url;
-            a.click();
-          })
-          .catch(_ => notify(_))
-          .finally(() => loadingScreen.close());
+        await downloader(store.actionsMenu.id);
+        loadingScreen.close();
       }}>
         <i class="ri-download-2-fill"></i>Download
       </li>
@@ -89,7 +79,7 @@ export default function() {
 
         fetchList(smd.channelUrl);
       }}>
-        <i class="ri-user-line"></i>View Channel
+        <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
       </li>
 
       <li tabindex={6} on:click={() => {
@@ -116,7 +106,7 @@ export default function() {
         }
 
       }}>
-        <i class="ri-bug-line"></i>Stats For Nerds
+        <i class="ri-bug-line"></i> Debug Information
       </li>
 
     </ul>

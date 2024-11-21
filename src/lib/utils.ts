@@ -61,6 +61,7 @@ export function notify(text: string) {
 
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
+  if (seconds === Infinity) return 'Emergency Mode';
   const hh = Math.floor(seconds / 3600);
   seconds %= 3600;
   const mm = Math.floor(seconds / 60);
@@ -73,6 +74,26 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
+export async function downloader(id: string) {
+  const streamUrl = 'https://youtu.be/' + id;
+  await fetch(store.downloadAPI, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url: streamUrl,
+      downloadMode: 'audio',
+      audioFormat: store.downloadFormat,
+      filenameStyle: 'basic'
+    })
+  })
+    .then(_ => _.json())
+    .then(_ => {
+      const a = $('a');
+      a.href = _.url;
+      a.click();
+    })
+    .catch(_ => notify(_))
+}
 
 export async function errorHandler(
   message: string,
@@ -147,6 +168,7 @@ export async function superClick(e: Event) {
   e.preventDefault();
 
   const eld = elem.dataset;
+  store.actionsMenu = eld;
   const elc = elem.classList.contains.bind(elem.classList);
 
   if (elc('streamItem'))

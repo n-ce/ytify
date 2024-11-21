@@ -184,21 +184,15 @@ audio.onerror = function() {
     player(store.stream.id);
     return;
   }
-  /*
-  Error Proxies
-  Normal : Unified Invidious Proxied
-  Negative : Non-Unified Invidious Proxied
-  */
 
-  const ivProxy = (new URL(audio.src)).origin;
-  const piProxy = (new URL(store.player.data!.audioStreams[0].url)).origin;
-  const defProxy = 'https://invidious.fdn.fr';
-  
-  if(ivProxy === piProxy) {
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    notify('Could not play stream in any ways..');
-  }
-  else audio.src = audio.src.replace(ivProxy, (ivProxy === defProxy) ? piProxy : defProxy);
+  const ivProxies = store.api.invidious;
+  const host = new URL(audio.src).origin;
+  const idx = ivProxies.indexOf(host) + 1;
+
+  audio.src = audio.src.replace(
+    host, ivProxies[idx]
+  );
+
 }
 
 

@@ -1,7 +1,7 @@
 import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { idFromURL, notify } from '../lib/utils';
+import { downloader, idFromURL, notify } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
@@ -51,7 +51,8 @@ export default async function() {
             if (d.details === 'manifestLoadError') {
               const hlsUrl = store.player.data!.hls;
               const piProxy = (new URL(hlsUrl)).origin;
-              const defProxy = 'https://invidious.fdn.fr';
+              const defProxy = 'https://invidious.jing.rocks';
+
               if (piProxy === defProxy) {
                 notify(d.details);
                 return;
@@ -80,11 +81,22 @@ export default async function() {
 
   // params handling
 
-  const id = params.get('s') || idFromURL(params.get('url') || params.get('text'));
+  const isPWA = idFromURL(params.get('url') || params.get('text'));
+  const id = params.get('s') || isPWA;
+  let shareAction = getSaved('shareAction');
+  if (isPWA && shareAction === 'ask')
+    shareAction = confirm('Click ok to Play, click cancel to Download') ?
+      '' : 'dl';
+
+
 
   if (id) {
     loadingScreen.showModal();
-    await player(id);
+    if (isPWA && shareAction) {
+      await downloader(id);
+    }
+    else await player(id)
+
     loadingScreen.close();
   }
   else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
@@ -96,9 +108,7 @@ export default async function() {
     superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
   }
 
-
-  if (params.has('collection') || params.has('si'))
-    fetchCollection(params.get('collection'), params.get('si'));
+  fetchCollection(params.get('collection'));
 
 
   // list loading

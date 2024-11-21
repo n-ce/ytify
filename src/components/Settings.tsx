@@ -55,7 +55,7 @@ export default function() {
         <b id="ytifyIconContainer">
           <p>ytify {Version}</p>
         </b>
-
+        {/*
         <ToggleSwitch
           id='customInstanceSwitch'
           name='Use Custom Instance'
@@ -75,7 +75,7 @@ export default function() {
 
           }}
         />
-
+*/}
         <Selector
           id='linkHost'
           label='Links Host'
@@ -157,7 +157,30 @@ export default function() {
         </Selector>
 
 
-      </div >
+        <Selector
+          id='shareAction'
+          label='PWA Share Action'
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === 'play')
+              removeSaved('shareAction');
+            else {
+              save('shareAction', val);
+            }
+          }}
+          onMount={(target) => {
+            const val = getSaved('shareAction');
+            if (val)
+              target.value = val;
+          }}
+        >
+          <option value='play'>Play</option>
+          <option value='dl'>Download</option>
+          <option value='ask'>Always Ask</option>
+        </Selector>
+
+
+      </div>
 
       <div>
         <b>
@@ -186,9 +209,22 @@ export default function() {
             location.reload();
           }}
         />
+        {/*
+        <ToggleSwitch
+          id="frequentSearches"
+          name='Show Frequent Searches'
+          checked={getSaved('frequentSearches') !== null}
+          onClick={() => {
+            getSaved('frequentSearches') === null ?
+              save('frequentSearches', '') :
+              removeSaved('frequentSearches');
+          }}
+        />
+        */}
       </div>
 
-      <div>
+
+      <div class="hide">
         <b>
           <i class="ri-play-large-line"></i>
           <p>Playback</p>
@@ -375,6 +411,27 @@ export default function() {
           <option value="0.6rem">Heavy</option>
           <option value="0.9rem">Heavier</option>
         </Selector>
+
+
+        <ToggleSwitch
+          id="custom_theme"
+          name='Use Custom Color'
+          checked={getSaved('custom_theme') !== null}
+          onClick={e => {
+            const colorString = getSaved('custom_theme');
+            if (colorString)
+              removeSaved('custom_theme');
+            else {
+              const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
+              str ?
+                save('custom_theme', str) :
+                e.preventDefault();
+            }
+            themer();
+          }}
+
+        />
+
 
         <Selector
           label='Theming Scheme'

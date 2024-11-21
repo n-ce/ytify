@@ -53,7 +53,7 @@ declare global {
     playlists: { [index: string]: List },
     [index: string]: Collection
   }
-  
+
   type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
 
   type Scheme = {
@@ -118,7 +118,8 @@ declare global {
     genre: string,
     liveNow: boolean,
     hlsUrl: string,
-    dashUrl: string
+    dashUrl: string,
+    videoThumbnails: Record<'url' | 'quality', string>[]
   }
 
 }

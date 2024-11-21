@@ -1,11 +1,7 @@
+import type { FinalColor } from 'extract-colors/lib/types/Color';
 import { generateImageUrl } from '../lib/imageUtils';
-import { $ } from '../lib/utils';
 import { store, getSaved } from '../lib/store';
 
-const canvas = store.player.legacy ?
-  <HTMLCanvasElement>$('canvas') :
-  new OffscreenCanvas(512, 512);
-const context = <OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D>canvas.getContext('2d', { alpha: false });
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
@@ -13,32 +9,7 @@ const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
 const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
 
-const accentLightener = (r: number, g: number, b: number) => {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const l = Math.max(r, g, b);
-  const s = l - Math.min(r, g, b);
-  const h = s
-    ? l === r
-      ? (g - b) / s
-      : l === g
-        ? 2 + (b - r) / s
-        : 4 + (r - g) / s
-    : 0;
-
-  const hue = 60 * h < 0 ? 60 * h + 360 : 60 * h;
-  const saturation = 100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
-  return `hsl(
-    ${Math.floor(hue)},
-    ${Math.floor(saturation)}%,
-    80%)`;
-}
-// previous algorithm
-// `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
-
-
-
+const accentLightener = (r: number, g: number, b: number) => `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
 
 function accentDarkener(r: number, g: number, b: number) {
 
@@ -51,7 +22,6 @@ function accentDarkener(r: number, g: number, b: number) {
     min = Math.floor(min / 3);
   }
   return `rgb(${r - min}, ${g - min},${b - min})`;
-
 
 }
 
@@ -110,47 +80,36 @@ function colorInjector(colorArray: number[]) {
 }
 
 
+
 function themer() {
+  const initColor = '127,127,127';
+  const custom = getSaved('custom_theme') || (store.player.legacy ? initColor : '');
 
-  if (!store.stream.id) {
-    colorInjector([127, 127, 127]);
-    return;
-  }
+  store.stream.id && !custom ?
 
-  const canvasImg = new Image();
-  canvasImg.onload = () => {
+    import('extract-colors/lib/worker-wrapper').then(mod => mod.extractColors(
+      generateImageUrl(store.stream.id, 'mq'),
+      {
+        crossOrigin: 'anonymous',
+        distance: 0
+      }
+    )
+      .then(array => (array as FinalColor[])
+        .filter(c => c.saturation > 0.2 && c.saturation < 0.8)
+        .sort((a, b) => b.area - a.area)[0]
+      )
+      .then(_ => colorInjector([
+        _.red,
+        _.green,
+        _.blue
+      ]))
+      .catch(console.error)) :
 
-    const height = canvasImg.height;
-    const width = canvasImg.width;
-    const side = Math.floor(Math.min(width, height));
-    canvas.width = canvas.height = side;
-
-    const offsetX = Math.floor((width - side) / 2);
-    const offsetY = Math.floor((height - side) / 2);
-    context.drawImage(canvasImg, offsetX, offsetY, side, side, 0, 0, side, side);
-
-    const data = context.getImageData(0, 0, side, side).data;
-    const len = data.length;
-    let r = 0, g = 0, b = 0;
-
-    for (let i = 0; i < len; i += 4) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
-    }
-    const amount = len / 4;
-    r = Math.floor(r / amount),
-      g = Math.floor(g / amount),
-      b = Math.floor(b / amount);
-
-    colorInjector([r, g, b]);
-
-  }
-  canvasImg.crossOrigin = '';
-  const temp = generateImageUrl(store.stream.id, 'mq');
-  if (canvasImg.src !== temp) canvasImg.src = temp;
-
-
+    colorInjector(
+      (custom || initColor)
+        .split(',')
+        .map(s => parseInt(s))
+    );
 }
 
 
