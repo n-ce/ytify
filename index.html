@@ -142,7 +142,7 @@
           <option value="3.50">3.50x</option>
           <option value="4.00">4.00x</option>
         </select>
-        <select id="bitrateSelector">
+        <select id="bitrateSelector" class="hide">
           <option>Bitrate</option>
         </select>
         <svg id="ytifyIcon" xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 4172 4172" width="1.5rem"
@@ -226,14 +226,11 @@
           </b>
         </p>
         <p
-          style="background: linear-gradient(to bottom right,#6626,#6629);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin:5% 0">
-          You can use a <b>Custom Instance</b> to circumvent the start time and turn off <b>Proxy Audio over
-            Invidious</b> if you
-          observe any continuous loading.
+          style="background: linear-gradient(to bottom right,#fa06,#fa09);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin:5% 0">
+          We are in the endgame now, playback capabilities have been stripped off because of API failures. But our
+          mission must not stop, low fidelity audio-only content access for everyone.
+          It is recommended to restore settings config to avoid breaking stuff.
         </p>
-        <p
-          style="background: linear-gradient(to bottom right,#0776,#0779);border-radius:var(--roundness);font-size:large;padding:5vmin;box-shadow:var(--shadow);margin:5% 0">
-          On IOS the stream duration can be incorrect, it can be fixed by enabling <b>HTTP Live Streaming</b>.</p>
       </div>
     </section>
 
@@ -313,10 +310,6 @@
           </button>
 
           <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
-
-          <a
-            href="javascript:(function () { var script = document.createElement('script'); script.src='/node_modules/eruda/eruda.js'; document.body.append(script); script.onload = function () { eruda.init(); } })();">Debug</a>
-
 
           <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
 

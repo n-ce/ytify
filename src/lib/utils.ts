@@ -168,6 +168,7 @@ export async function superClick(e: Event) {
   e.preventDefault();
 
   const eld = elem.dataset;
+  store.actionsMenu = eld;
   const elc = elem.classList.contains.bind(elem.classList);
 
   if (elc('streamItem'))

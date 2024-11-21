@@ -38,7 +38,7 @@ export function setAudioStreams(audioStreams: {
     const isIvUrl = store.api.invidious.includes(oldUrl.origin);
     if (isIvUrl && useProxy) return url;
 
-    const proxy = 'https://invidious.jing.rocks';
+    const proxy = store.api.invidious[0];
     const host = useProxy ? proxy :
       `https://${oldUrl.searchParams.get('host')}`;
 

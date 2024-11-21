@@ -55,7 +55,7 @@ export default function() {
         <b id="ytifyIconContainer">
           <p>ytify {Version}</p>
         </b>
-
+        {/*
         <ToggleSwitch
           id='customInstanceSwitch'
           name='Use Custom Instance'
@@ -75,7 +75,7 @@ export default function() {
 
           }}
         />
-
+*/}
         <Selector
           id='linkHost'
           label='Links Host'
@@ -209,6 +209,7 @@ export default function() {
             location.reload();
           }}
         />
+        {/*
         <ToggleSwitch
           id="frequentSearches"
           name='Show Frequent Searches'
@@ -219,10 +220,11 @@ export default function() {
               removeSaved('frequentSearches');
           }}
         />
+        */}
       </div>
 
 
-      <div>
+      <div class="hide">
         <b>
           <i class="ri-play-large-line"></i>
           <p>Playback</p>

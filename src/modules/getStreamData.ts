@@ -77,13 +77,14 @@ export async function getData(
   )
     .catch(() => h ? {} : Promise.any(
       iv.map(fetchDataFromInvidious)
-    ).catch(() => {
-      // do not update ui for queue prefetch items
-      if (store.stream.id === id) {
-        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-        notify('Could not retrieve stream data in any ways.. Trying again..');
-      }
-    }));
+    )
+      .catch(() => {
+        // do not update ui for queue prefetch items
+        if (store.stream.id === id) {
+          playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+          notify('Could not retrieve stream data in any ways.. Trying again..');
+        }
+      }));
 
 
   return res ? res : getData(id);

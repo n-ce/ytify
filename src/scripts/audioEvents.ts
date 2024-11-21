@@ -184,40 +184,15 @@ audio.onerror = function() {
     player(store.stream.id);
     return;
   }
-  /*
-  Error Proxies
-  Normal : Unified Invidious Proxied
-  Negative : Non-Unified Invidious Proxied
-  */
 
-  const ivProxy = (new URL(audio.src)).origin;
-  const piProxy = (new URL(store.player.data!.audioStreams[0].url)).origin;
-  const defProxy = 'https://invidious.jing.rocks';
+  const ivProxies = store.api.invidious;
+  const host = new URL(audio.src).origin;
+  const idx = ivProxies.indexOf(host) + 1;
 
-  if (ivProxy === piProxy) {
-    fetch(store.downloadAPI, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: 'https://youtu.be/' + store.stream.id,
-        downloadMode: 'audio',
-        audioFormat: store.downloadFormat,
-        disableMetadata: true
-      })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.url)
-          audio.src = data.url;
-        else throw new Error();
-      })
-      .catch(() => {
-        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-        notify('Could not play stream in any ways..')
-      });
+  audio.src = audio.src.replace(
+    host, ivProxies[idx]
+  );
 
-  }
-  else audio.src = audio.src.replace(ivProxy, (ivProxy === defProxy) ? piProxy : defProxy);
 }
 
 
