@@ -1,7 +1,7 @@
 {
   "name": "ytify",
   "type": "module",
-  "version": "7.4 Dev",
+  "version": "7.4",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -9,6 +9,7 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
+    "color2k": "^2.0.3",
     "extract-colors": "^4.1.0",
     "hls.js": "^1.5.17",
     "imsc": "^1.1.5",

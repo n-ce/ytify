@@ -1,7 +1,7 @@
 import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { downloader, idFromURL, notify } from '../lib/utils';
+import { $, getDownloadLink, idFromURL, notify } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
@@ -24,6 +24,7 @@ export default async function() {
         a.piped = data.piped;
         a.invidious = data.invidious;
         a.unified = data.unified;
+        store.downloadAPI = data.cobalt;
       });
   }
 
@@ -93,7 +94,9 @@ export default async function() {
   if (id) {
     loadingScreen.showModal();
     if (isPWA && shareAction) {
-      await downloader(id);
+      const a = $('a');
+      a.href = await getDownloadLink(store.actionsMenu.id);
+      a.click();
     }
     else await player(id)
 

@@ -1,6 +1,6 @@
 import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
@@ -175,23 +175,18 @@ audio.oncanplaythrough = function() {
 
 audio.onerror = function() {
   audio.pause();
+  const id = store.stream.id;
 
   if (getSaved('custom_instance_2'))
     return notify('Proxy failed to decrypt stream');
 
-  if (store.player.HLS || getSaved('proxyViaInvidious') === 'false') {
+  if (store.player.HLS) {
     notify('PipedProxy failed to decrypt stream, Retrying...');
-    player(store.stream.id);
+    player(id);
     return;
   }
 
-  const ivProxies = store.api.invidious;
-  const host = new URL(audio.src).origin;
-  const idx = ivProxies.indexOf(host) + 1;
-
-  audio.src = audio.src.replace(
-    host, ivProxies[idx]
-  );
+  getDownloadLink(id).then(_ => audio.src = _);
 
 }
 

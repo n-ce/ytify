@@ -71,9 +71,7 @@ export async function getData(
   const pi = store.api.piped;
 
   const res = await Promise.any(
-    pi
-      .filter((_, i) => i < (h ? pi.length : store.api.unified))
-      .map(fetchDataFromPiped)
+    pi.map(fetchDataFromPiped)
   )
     .catch(() => h ? {} : Promise.any(
       iv.map(fetchDataFromInvidious)
@@ -87,6 +85,7 @@ export async function getData(
       }));
 
 
-  return res ? res : getData(id);
+  return res ? res : (h ? getData(id) : fetchDataFromPiped('https://video-api-transform.vercel.app/api'));
+
 }
 

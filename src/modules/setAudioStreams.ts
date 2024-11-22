@@ -28,21 +28,11 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    const proxyViaPiped = getSaved('proxyViaInvidious') === 'false';
     const useProxy = isMusic || getSaved('enforceProxy');
 
-    // use the default proxy url
-    if (proxyViaPiped && useProxy) return url;
-
     const oldUrl = new URL(url);
-    const isIvUrl = store.api.invidious.includes(oldUrl.origin);
-    if (isIvUrl && useProxy) return url;
 
-    const proxy = store.api.invidious[0];
-    const host = useProxy ? proxy :
-      `https://${oldUrl.searchParams.get('host')}`;
-
-    return url.replace(oldUrl.origin, host);
+    return useProxy ? url : url.replace(new URL(url).origin, `https://${oldUrl.searchParams.get('host')}`);
   }
 
   bitrateSelector.innerHTML = '';

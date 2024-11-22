@@ -74,9 +74,9 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
-export async function downloader(id: string) {
+export async function getDownloadLink(id: string): Promise<string> {
   const streamUrl = 'https://youtu.be/' + id;
-  await fetch(store.downloadAPI, {
+  const dl = await fetch(store.downloadAPI, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -87,12 +87,10 @@ export async function downloader(id: string) {
     })
   })
     .then(_ => _.json())
-    .then(_ => {
-      const a = $('a');
-      a.href = _.url;
-      a.click();
-    })
-    .catch(_ => notify(_))
+    .then(_ => _.url)
+    .catch(_ => notify(_));
+
+  return dl;
 }
 
 export async function errorHandler(
@@ -168,7 +166,6 @@ export async function superClick(e: Event) {
   e.preventDefault();
 
   const eld = elem.dataset;
-  store.actionsMenu = eld;
   const elc = elem.classList.contains.bind(elem.classList);
 
   if (elc('streamItem'))

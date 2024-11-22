@@ -84,7 +84,7 @@ export const store: {
     uploader: '',
     thumbnail: ''
   },
-  downloadAPI: 'https://cobalt-api.kwiatekmiki.com',
+  downloadAPI: '',
   downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
 }
 
