@@ -67,10 +67,11 @@ superInput.addEventListener('input', async () => {
 
   if (text.length < 3) return;
 
+  suggestions.style.display = 'block';
+
   const data = (await fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text).then(res => res.json()).catch(() => { store.api.index++; return ['', ''] }))[1];
 
   if (!data.length) return;
-  suggestions.style.display = 'block';
 
   const fragment = document.createDocumentFragment();
 
