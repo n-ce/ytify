@@ -99,7 +99,15 @@ declare global {
       uploaderUrl: string,
       type: string
     }[],
-    audioStreams: Record<'bitrate' | 'codec' | 'contentLength' | 'quality' | 'mimeType' | 'url', string>[]
+    audioStreams: {
+      codec: string,
+      url: string,
+      quality: string,
+      bitrate: string,
+      contentLength: string,
+      mimeType: string,
+      size: number
+    }[]
   }
 
   type Invidious = {
