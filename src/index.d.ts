@@ -104,9 +104,8 @@ declare global {
       url: string,
       quality: string,
       bitrate: string,
-      contentLength: string,
-      mimeType: string,
-      size: number
+      contentLength: number,
+      mimeType: string
     }[]
   }
 

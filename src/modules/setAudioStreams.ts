@@ -7,9 +7,8 @@ export function setAudioStreams(audioStreams: {
   url: string,
   quality: string,
   bitrate: string,
-  contentLength: string,
-  mimeType: string,
-  size: number
+  contentLength: number,
+  mimeType: string
 }[],
   isMusic = false,
   isLive = false) {
@@ -44,7 +43,7 @@ export function setAudioStreams(audioStreams: {
   bitrateSelector.innerHTML = '';
   audioStreams.forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
-    const size = ((_.size || parseInt(_.contentLength)) / (1024 * 1024)).toFixed(2) + ' MB';
+    const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));
