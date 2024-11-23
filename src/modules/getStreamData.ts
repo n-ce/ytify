@@ -73,11 +73,7 @@ export async function getData(
     .catch(() => h ? {} : Promise.any(
       iv.map(fetchDataFromInvidious)
     )
-      .catch(() => {
-        // do not update ui for queue prefetch items
-        if (store.stream.id === id)
-          return fetchDataFromPiped('https://video-api-transform.vercel.app/api');
-      })
+      .catch(() => fetchDataFromPiped('https://video-api-transform.vercel.app/api'))
     )
     ;
 

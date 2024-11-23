@@ -12,7 +12,8 @@ export const store: {
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
-    legacy: boolean
+    legacy: boolean,
+    proxy: string
   },
   queue: string[]
   stream: CollectionItem,
@@ -46,7 +47,8 @@ export const store: {
       }
     }).then(res => res.supported),
     data: undefined,
-    legacy: !('OffscreenCanvas' in window)
+    legacy: !('OffscreenCanvas' in window),
+    proxy: ''
   },
   queue: [],
   stream: {

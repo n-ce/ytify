@@ -29,17 +29,15 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    const useProxy = isMusic || getSaved('enforceProxy');
+    const useProxy = url.startsWith('https://ymd') || isMusic || getSaved('enforceProxy');
 
     const oldUrl = new URL(url);
+    const origin = oldUrl.origin;
 
     if (url.startsWith('https://redirector'))
-      return url.replace(oldUrl.origin, 'invidious.jing.rocks');
+      return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
-    if (url.startsWith('https://ymd'))
-      return url;
-
-    return useProxy ? url : url.replace(oldUrl.origin, `https://${oldUrl.searchParams.get('host')}`);
+    return useProxy ? url : url.replace(origin, `https://${oldUrl.searchParams.get('host')}`);
 
   }
 
