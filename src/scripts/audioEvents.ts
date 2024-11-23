@@ -185,8 +185,8 @@ audio.onerror = function() {
     player(id);
     return;
   }
-
-  getDownloadLink(id).then(_ => audio.src = _);
+  if (!audio.src.startsWith(store.downloadAPI))
+    getDownloadLink(id).then(_ => audio.src = _);
 
 }
 
