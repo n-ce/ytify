@@ -1,5 +1,5 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, downloader } from "../lib/utils";
+import { $, getDownloadLink } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
@@ -60,7 +60,9 @@ export default function() {
       <li tabindex={4} on:click={async () => {
         close();
         loadingScreen.showModal();
-        await downloader(store.actionsMenu.id);
+        const a = $('a');
+        a.href = await getDownloadLink(store.actionsMenu.id);
+        a.click();
         loadingScreen.close();
       }}>
         <i class="ri-download-2-fill"></i>Download

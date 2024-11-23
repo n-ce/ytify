@@ -9,6 +9,7 @@ export function setAudioStreams(audioStreams: {
   bitrate: string,
   contentLength: string,
   mimeType: string,
+  size: number
 }[],
   isMusic = false,
   isLive = false) {
@@ -28,27 +29,22 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    const proxyViaPiped = getSaved('proxyViaInvidious') === 'false';
-    const useProxy = isMusic || getSaved('enforceProxy');
-
-    // use the default proxy url
-    if (proxyViaPiped && useProxy) return url;
+    const useProxy = url.startsWith('https://ymd') || isMusic || getSaved('enforceProxy');
 
     const oldUrl = new URL(url);
-    const isIvUrl = store.api.invidious.includes(oldUrl.origin);
-    if (isIvUrl && useProxy) return url;
+    const origin = oldUrl.origin;
 
-    const proxy = store.api.invidious[0];
-    const host = useProxy ? proxy :
-      `https://${oldUrl.searchParams.get('host')}`;
+    if (url.startsWith('https://redirector'))
+      return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
-    return url.replace(oldUrl.origin, host);
+    return useProxy ? url : url.replace(origin, `https://${oldUrl.searchParams.get('host')}`);
+
   }
 
   bitrateSelector.innerHTML = '';
   audioStreams.forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
-    const size = (parseInt(_.contentLength) / (1024 * 1024)).toFixed(2) + ' MB';
+    const size = ((_.size || parseInt(_.contentLength)) / (1024 * 1024)).toFixed(2) + ' MB';
 
     // add to DOM
     bitrateSelector.add(new Option(`${_.quality} ${codec} - ${size}`, proxyHandler(_.url)));
@@ -60,7 +56,6 @@ export function setAudioStreams(audioStreams: {
     if (codecPref && index < hqPref) index = i;
   });
 
-
-  bitrateSelector.selectedIndex = index;
+  bitrateSelector.selectedIndex = index !== -1 ? index : 1;
   audio.src = bitrateSelector.value;
 }

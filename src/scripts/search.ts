@@ -52,7 +52,6 @@ function searchLoader() {
 let prevID: string | undefined;
 
 superInput.addEventListener('input', async () => {
-
   const text = superInput.value;
 
   const id = idFromURL(text);
@@ -70,7 +69,7 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = (await fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text).then(res => res.json()))[1];
+  const data = (await fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text).then(res => res.json()).catch(() => { store.api.index++; return ['', ''] }))[1];
 
   if (!data.length) return;
 
@@ -94,9 +93,8 @@ superInput.addEventListener('input', async () => {
 
 let index = 0;
 
-superInput.addEventListener('keydown', _ => {
 
-  console.log(true);
+superInput.addEventListener('keydown', _ => {
 
   if (_.key === 'Enter') {
     searchLoader();
@@ -130,15 +128,14 @@ superInput.addEventListener('keydown', _ => {
 
 });
 
-/*
-function injectFrequentSearches() {
 
-}
-*/
 
 superInput.addEventListener('blur', () => {
-  if (suggestions.style.display === 'block')
-    suggestions.style.display = 'none';
+  setTimeout(() => {
+    if (suggestions.style.display === 'block')
+      suggestions.style.display = 'none';
+    suggestions.innerHTML = '';
+  }, 500);
 })
 
 
