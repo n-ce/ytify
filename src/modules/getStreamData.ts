@@ -3,7 +3,7 @@ import { store } from "../lib/store";
 export async function getData(
   id: string,
   prefetch: boolean = false
-): Promise<Piped | void> {
+): Promise<Piped> {
   /*
   If HLS
   loop piped instance list
@@ -76,12 +76,9 @@ export async function getData(
     )
       .catch(() => {
         if (!prefetch)
-          fetchDataFromPiped('https://video-api-transform.vercel.app/api');
+          return fetchDataFromPiped('https://video-api-transform.vercel.app/api');
       })
     );
-
-  if (prefetch)
-    return undefined;
 
   return res ? res : getData(id);
 
