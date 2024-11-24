@@ -80,7 +80,7 @@ export async function getData(
       })
     );
 
-  return res ? res : getData(id);
+  return res ? res : getData(id, prefetch);
 
 }
 
