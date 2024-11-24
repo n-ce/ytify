@@ -1,8 +1,9 @@
 import { store } from "../lib/store";
 
 export async function getData(
-  id: string
-): Promise<Piped> {
+  id: string,
+  prefetch: boolean = false
+): Promise<Piped | void> {
   /*
   If HLS
   loop piped instance list
@@ -74,12 +75,13 @@ export async function getData(
       iv.map(fetchDataFromInvidious)
     )
       .catch(() => {
-        if (store.stream.id === id)
-          fetchDataFromPiped('https://video-api-transform.vercel.app/api')
-        // else is for Prefetch
+        if (!prefetch)
+          fetchDataFromPiped('https://video-api-transform.vercel.app/api');
       })
     );
 
+  if (prefetch)
+    return undefined;
 
   return res ? res : getData(id);
 
