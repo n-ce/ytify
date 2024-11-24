@@ -170,7 +170,7 @@ audio.oncanplaythrough = function() {
   // prefetch beforehand to speed up experience
   const nextItem = store.queue[0];
   if (nextItem)
-    getData(nextItem);
+    getData(nextItem, true);
 }
 
 audio.onerror = function() {

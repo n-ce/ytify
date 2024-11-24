@@ -1,7 +1,8 @@
 import { store } from "../lib/store";
 
 export async function getData(
-  id: string
+  id: string,
+  prefetch: boolean = false
 ): Promise<Piped> {
   /*
   If HLS
@@ -55,7 +56,7 @@ export async function getData(
       audioStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({
         bitrate: parseInt(v.bitrate),
         codec: v.encoding,
-        contentLength: v.clen,
+        contentLength: parseInt(v.clen),
         quality: Math.floor(parseInt(v.bitrate) / 1024) + ' kbps',
         mimeType: v.type,
         url: v.url.replace(new URL(v.url).origin, api)
@@ -73,12 +74,13 @@ export async function getData(
     .catch(() => h ? {} : Promise.any(
       iv.map(fetchDataFromInvidious)
     )
-      .catch(() => fetchDataFromPiped('https://video-api-transform.vercel.app/api'))
-    )
-    ;
+      .catch(() => {
+        if (!prefetch)
+          return fetchDataFromPiped('https://video-api-transform.vercel.app/api');
+      })
+    );
 
-
-  return res ? res : getData(id);
+  return res ? res : getData(id, prefetch);
 
 }
 
