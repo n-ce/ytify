@@ -55,6 +55,6 @@ export function setAudioStreams(audioStreams: {
     if (codecPref && index < hqPref) index = i;
   });
 
-  bitrateSelector.selectedIndex = index !== -1 ? index : 1;
+  bitrateSelector.selectedIndex = index;
   audio.src = bitrateSelector.value;
 }

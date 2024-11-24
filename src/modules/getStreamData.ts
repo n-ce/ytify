@@ -78,8 +78,7 @@ export async function getData(
           fetchDataFromPiped('https://video-api-transform.vercel.app/api')
         // else is for Prefetch
       })
-    )
-    ;
+    );
 
 
   return res ? res : getData(id);
