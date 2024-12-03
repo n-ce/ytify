@@ -32,7 +32,7 @@ export async function getData(
     .then(res => res.json())
     .then(data => {
       if (data && 'adaptiveFormats' in data) {
-        store.api.index = store.api.invidious.indexOf(api);
+        store.api.index = store.api.unified + 1;
         return data;
       }
       else throw new Error(data.error);
@@ -79,7 +79,7 @@ export async function getData(
       .catch(() => {
         if (!prefetch && store.player.fallback)
           return fetchDataFromPiped(store.player.fallback)
-            .catch(() => getData(id))
+            .catch(() => Promise.any(pi.filter((_, i) => i >= store.api.unified).map(fetchDataFromPiped)).catch(()=>getData(id)))
       })
     );
 
