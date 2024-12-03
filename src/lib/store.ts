@@ -13,6 +13,7 @@ export const store: {
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
+    fallback: string,
     proxy: string
   },
   queue: string[]
@@ -48,6 +49,7 @@ export const store: {
     }).then(res => res.supported),
     data: undefined,
     legacy: !('OffscreenCanvas' in window),
+    fallback: '',
     proxy: ''
   },
   queue: [],

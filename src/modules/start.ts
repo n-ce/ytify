@@ -17,8 +17,13 @@ export default async function() {
     a.invidious.push(iv);
 
   } else {
-    const apiUrl = 'https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json';
-    await fetch(apiUrl)
+    const ytifyApi =
+      (window as Window & typeof globalThis & { ytifyApi: string }
+      ).ytifyApi;
+
+    if (!ytifyApi) return;
+
+    await fetch(ytifyApi)
       .then(res => res.json())
       .then(data => {
         a.piped = data.piped;
@@ -26,6 +31,7 @@ export default async function() {
         a.unified = data.unified;
         store.downloadAPI = data.cobalt;
         store.player.proxy = data.proxy;
+        store.player.fallback = data.fallback;
       });
   }
 

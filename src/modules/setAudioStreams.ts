@@ -28,15 +28,21 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    const useProxy = url.startsWith('https://ymd') || isMusic || getSaved('enforceProxy');
+    const useProxy = isMusic || getSaved('enforceProxy');
 
     const oldUrl = new URL(url);
     const origin = oldUrl.origin;
 
+    if (url.startsWith('https://ymd'))
+      return url;
+
     if (url.startsWith('https://redirector'))
       return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
-    return useProxy ? url : url.replace(origin, `https://${oldUrl.searchParams.get('host')}`);
+    return url.replace(origin,
+      useProxy ?
+        store.api.invidious[store.api.index] : `https://${oldUrl.searchParams.get('host')}`
+    );
 
   }
 
