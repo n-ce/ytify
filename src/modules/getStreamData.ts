@@ -79,7 +79,7 @@ export async function getData(
       .catch(() => {
         if (!prefetch && store.player.fallback)
           return fetchDataFromPiped(store.player.fallback)
-            .catch(() => getData(id))
+            .catch(() => Promise.any(pi.filter((_, i) => i >= store.api.unified).map(fetchDataFromPiped)))
       })
     );
 
