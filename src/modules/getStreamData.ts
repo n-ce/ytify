@@ -32,7 +32,7 @@ export async function getData(
     .then(res => res.json())
     .then(data => {
       if (data && 'adaptiveFormats' in data) {
-        store.api.index = store.api.invidious.indexOf(api);
+        store.api.index = store.api.unified + 1;
         return data;
       }
       else throw new Error(data.error);
