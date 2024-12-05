@@ -33,10 +33,7 @@ export function setAudioStreams(audioStreams: {
     const oldUrl = new URL(url);
     const origin = oldUrl.origin;
 
-    if (url.startsWith('https://ymd'))
-      return url;
-
-    if (url.startsWith('https://redirector'))
+    if (url.startsWith('https://rr'))
       return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
     return url.replace(origin,
