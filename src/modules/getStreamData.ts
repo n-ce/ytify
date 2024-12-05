@@ -18,7 +18,7 @@ export async function getData(
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data) {
+      if (data && 'audioStreams' in data && data.audioStreams.length) {
         store.api.index = store.api.piped.indexOf(api);
         return data;
       }
