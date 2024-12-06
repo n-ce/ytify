@@ -29,11 +29,13 @@ export function setAudioStreams(audioStreams: {
 
   function proxyHandler(url: string) {
     const useProxy = isMusic || getSaved('enforceProxy');
-
     const oldUrl = new URL(url);
     const origin = oldUrl.origin;
-
-    if (url.startsWith('https://rr'))
+    
+    if (url.startsWith('https://ymd'))
+      return url;
+    
+    if (url.startsWith('https://r'))
       return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
     return url.replace(origin,
