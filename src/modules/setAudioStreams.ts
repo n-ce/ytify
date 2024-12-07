@@ -40,7 +40,7 @@ export function setAudioStreams(audioStreams: {
 
     return url.replace(origin,
       useProxy ?
-        (store.api.index < store.api.unified ? store.api.invidious[store.api.index] : origin ) : `https://${oldUrl.searchParams.get('host')}`
+        (store.api.index < store.api.unified ? store.api.invidious[store.api.index] : origin ) : 'https://redirector.googlevideo.com'
     );
 
   }
