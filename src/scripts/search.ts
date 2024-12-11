@@ -69,7 +69,17 @@ superInput.addEventListener('input', async () => {
 
   suggestions.style.display = 'block';
 
-  const data = (await fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text).then(res => res.json()).catch(() => { store.api.index++; return ['', ''] }))[1];
+  const fetchSuggestions = async () => fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text)
+    .then(res => res.json())
+    .catch(() =>
+      errorHandler(
+        '',
+        fetchSuggestions,
+        () => ''
+      )
+    );
+
+  const data = (await fetchSuggestions())[1];
 
   if (!data.length) return;
 

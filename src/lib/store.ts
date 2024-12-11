@@ -25,8 +25,7 @@ export const store: {
     invidious: string[],
     hyperpipe: string,
     cobalt: string
-    index: number,
-    unified: number
+    index: number
   },
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
@@ -64,12 +63,11 @@ export const store: {
   },
   streamHistory: [],
   api: {
-    piped: [],
-    invidious: [],
+    piped: ['https://pipedapi.kavin.rocks'],
+    invidious: ['https://invidious.nerdvpn.de'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
     cobalt: '',
-    index: 0,
-    unified: 0
+    index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: getSaved('linkHost') || location.origin,

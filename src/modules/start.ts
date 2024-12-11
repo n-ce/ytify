@@ -21,18 +21,16 @@ export default async function() {
       (window as Window & typeof globalThis & { ytifyApi: string }
       ).ytifyApi;
 
-    if (!ytifyApi) return;
-
-    await fetch(ytifyApi)
-      .then(res => res.json())
-      .then(data => {
-        a.piped = data.piped;
-        a.invidious = data.invidious;
-        a.unified = data.unified;
-        a.cobalt = data.cobalt;
-        store.player.proxy = data.proxy;
-        store.player.fallback = data.fallback;
-      });
+    if (ytifyApi)
+      await fetch(ytifyApi)
+        .then(res => res.json())
+        .then(data => {
+          a.piped = data.piped;
+          a.invidious = data.invidious;
+          a.cobalt = data.cobalt;
+          store.player.proxy = data.proxy;
+          store.player.fallback = data.fallback;
+        });
   }
 
 
