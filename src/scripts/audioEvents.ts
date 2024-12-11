@@ -192,9 +192,9 @@ audio.onerror = function() {
 
   if (audio.src.startsWith('https://r'))
     audio.src = audio.src.replace(
-      new URL(audio.src).origin
+      origin
       , store.player.proxy
-    );
+    ) + '&host=' + origin.slice(8);
   else if (audio.src.startsWith(store.player.proxy) && store.player.ogProxy) {
     audio.src = audio.src.replace(origin,
       store.player.ogProxy
