@@ -29,7 +29,7 @@ export default async function() {
         a.piped = data.piped;
         a.invidious = data.invidious;
         a.unified = data.unified;
-        store.downloadAPI = data.cobalt;
+        a.cobalt = data.cobalt;
         store.player.proxy = data.proxy;
         store.player.fallback = data.fallback;
       });

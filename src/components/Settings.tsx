@@ -267,7 +267,7 @@ export default function() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Proxy non-music streams'
+            name='Always Proxy Streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               getSaved('enforceProxy') ?

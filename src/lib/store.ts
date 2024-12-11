@@ -14,7 +14,8 @@ export const store: {
     data: Piped | undefined,
     legacy: boolean,
     fallback: string,
-    proxy: string
+    proxy: string,
+    ogProxy: string
   },
   queue: string[]
   stream: CollectionItem,
@@ -23,6 +24,7 @@ export const store: {
     piped: string[],
     invidious: string[],
     hyperpipe: string,
+    cobalt: string
     index: number,
     unified: number
   },
@@ -33,7 +35,6 @@ export const store: {
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
-  downloadAPI: string,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
@@ -50,7 +51,8 @@ export const store: {
     data: undefined,
     legacy: !('OffscreenCanvas' in window),
     fallback: '',
-    proxy: ''
+    proxy: '',
+    ogProxy: ''
   },
   queue: [],
   stream: {
@@ -65,6 +67,7 @@ export const store: {
     piped: [],
     invidious: [],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
+    cobalt: '',
     index: 0,
     unified: 0
   },
@@ -88,7 +91,6 @@ export const store: {
     uploader: '',
     thumbnail: ''
   },
-  downloadAPI: '',
   downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
 }
 

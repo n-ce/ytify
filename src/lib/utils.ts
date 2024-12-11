@@ -76,7 +76,7 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 export async function getDownloadLink(id: string): Promise<string> {
   const streamUrl = 'https://youtu.be/' + id;
-  const dl = await fetch(store.downloadAPI, {
+  const dl = await fetch(store.api.cobalt, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({

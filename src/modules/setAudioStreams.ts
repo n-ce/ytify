@@ -10,7 +10,6 @@ export function setAudioStreams(audioStreams: {
   contentLength: number,
   mimeType: string
 }[],
-  isMusic = false,
   isLive = false) {
 
   const preferedCodec = store.player.codec;
@@ -28,22 +27,15 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
-    
-    if (url.startsWith('https://ymd.dlod.link/?u='))
-      url = url.slice(25);
-    
-    const useProxy = isMusic || getSaved('enforceProxy');
+    const useProxy = getSaved('enforceProxy');
     const oldUrl = new URL(url);
-    const origin = oldUrl.origin;
-    const isInvidiousResponse = store.api.invidious.includes(origin);
-    const proxy = isInvidiousResponse ? origin : store.player.proxy;
-      
-    if (url.startsWith('https://r'))
-      return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
-    return url.replace(origin, useProxy ? proxy :
-        'https://redirector.googlevideo.com'
-    );
+    if (useProxy || url.startsWith('https://ymd.dlod.link/?u=') || url.startsWith('https://r'))
+      return url;
+
+    store.player.ogProxy = oldUrl.origin;
+
+    return url.replace(oldUrl.origin, 'https://redirector.googlevideo.com');
 
   }
 

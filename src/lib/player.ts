@@ -37,7 +37,6 @@ export default async function player(id: string | null = '') {
         data.audioStreams
           .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
           ),
-        data.category === 'Music',
         data.livestream
       ));
   }
