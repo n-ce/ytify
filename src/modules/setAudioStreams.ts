@@ -28,19 +28,21 @@ export function setAudioStreams(audioStreams: {
   }
 
   function proxyHandler(url: string) {
+    
+    if (url.startsWith('https://ymd.dlod.link/?u='))
+      url = url.slice(25);
+    
     const useProxy = isMusic || getSaved('enforceProxy');
     const oldUrl = new URL(url);
     const origin = oldUrl.origin;
-    
-    if (url.startsWith('https://ymd'))
-      return url;
-    
+    const isInvidiousResponse = store.api.invidious.includes(origin);
+    const proxy = isInvidiousResponse ? origin : store.player.proxy;
+      
     if (url.startsWith('https://r'))
       return url.replace(origin, store.player.proxy) + '&host=' + origin.slice(8);
 
-    return url.replace(origin,
-      useProxy ?
-        (store.api.index < store.api.unified ? store.api.invidious[store.api.index] : origin ) : 'https://redirector.googlevideo.com'
+    return url.replace(origin, useProxy ? proxy :
+        'https://redirector.googlevideo.com'
     );
 
   }

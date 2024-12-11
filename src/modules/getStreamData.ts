@@ -5,12 +5,11 @@ export async function getData(
   prefetch: boolean = false
 ): Promise<Piped> {
   /*
-  If HLS
-  loop piped instance list
+  If HLS try with piped
   else 
-  try piped instance list
-  try invidious instance list
-  use emergency instance
+   try with piped
+    try with invidious
+     try with fallback
   */
 
   const fetchDataFromPiped = (
@@ -18,10 +17,8 @@ export async function getData(
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data && data.audioStreams.length) {
-        store.api.index = store.api.piped.indexOf(api);
+      if (data && 'audioStreams' in data && data.audioStreams.length)
         return data;
-      }
       else throw new Error(data.message);
     });
 
@@ -31,10 +28,8 @@ export async function getData(
   ) => fetch(`${api}/api/v1/videos/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'adaptiveFormats' in data) {
-        store.api.index = store.api.unified + 1;
+      if (data && 'adaptiveFormats' in data)
         return data;
-      }
       else throw new Error(data.error);
     })
     .then((data: Invidious) => ({
@@ -69,9 +64,7 @@ export async function getData(
   const pi = store.api.piped;
 
   const res = await Promise.any(
-    pi
-      .filter((_, i) => i < (h ? pi.length : store.api.unified))
-      .map(fetchDataFromPiped)
+    pi.map(fetchDataFromPiped)
   )
     .catch(() => h ? {} : Promise.any(
       iv.map(fetchDataFromInvidious)
@@ -79,7 +72,7 @@ export async function getData(
       .catch(() => {
         if (!prefetch && store.player.fallback)
           return fetchDataFromPiped(store.player.fallback)
-            .catch(() => Promise.any(pi.filter((_, i) => i >= store.api.unified).map(fetchDataFromPiped)).catch(()=>getData(id)))
+            .catch(() => getData(id))
       })
     );
 
