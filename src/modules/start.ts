@@ -9,31 +9,15 @@ import { fetchCollection } from "../lib/libraryUtils";
 export default async function() {
 
   const custom_instance = getSaved('custom_instance_2');
-  const a = store.api;
 
   if (custom_instance) {
+
     const [pi, iv] = custom_instance.split(',');
-    a.piped.push(pi);
-    a.invidious.push(iv);
+    store.api.piped[0] = pi;
+    store.api.invidious[0] =
+      store.player.proxy = iv;
 
-  } else {
-    const ytifyApi =
-      (window as Window & typeof globalThis & { ytifyApi: string }
-      ).ytifyApi;
-
-    if (ytifyApi)
-      await fetch(ytifyApi)
-        .then(res => res.json())
-        .then(data => {
-          a.piped = data.piped;
-          a.invidious = data.invidious;
-          a.cobalt = data.cobalt;
-          store.player.proxy = data.proxy;
-          store.player.fallback = data.fallback;
-        });
-  }
-
-
+  } else window.inject_ytify_services(store);
 
   // hls
 
