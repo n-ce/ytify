@@ -201,6 +201,10 @@ audio.onerror = function() {
     );
     store.player.ogProxy = '';
   }
+  else {
+    notify('This audiostream could not be loaded.');
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+  }
 
 }
 
