@@ -16,24 +16,7 @@ export default async function() {
     a.piped.push(pi);
     a.invidious.push(iv);
 
-  } else {
-    const ytifyApi =
-      (window as Window & typeof globalThis & { ytifyApi: string }
-      ).ytifyApi;
-
-    if (ytifyApi)
-      await fetch(ytifyApi)
-        .then(res => res.json())
-        .then(data => {
-          a.piped = data.piped;
-          a.invidious = data.invidious;
-          a.cobalt = data.cobalt;
-          store.player.proxy = data.proxy;
-          store.player.fallback = data.fallback;
-        });
-  }
-
-
+  } else window.inject_ytify_services(store);
 
   // hls
 

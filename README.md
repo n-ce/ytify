@@ -44,7 +44,7 @@
 
 
 ## Usage 👆
-https://ytify.netlify.app is the only official location that the main branch is directly connected to.
+https://ytify.us.kg is the only official location that the main branch is directly connected to.
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Telegram Community [@ytifytg](https://t.me/ytifytg)
 - Join our Matrix Community

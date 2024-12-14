@@ -13,7 +13,7 @@ export const generateImageUrl = (
   res: string,
   music: string = ''
 ) => 'https://wsrv.nl?url=https://' + (id.startsWith('/') ?
-  `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj&output=webp&w=360` :
+  `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj&output=webp&w=${res === 'mq' ? '180' : '360'}` :
   `i.ytimg.com/vi_webp/${id}/${res}default.webp${music}`);
 
 
