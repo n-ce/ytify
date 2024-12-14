@@ -10,13 +10,13 @@ export default async (_: Request, context: Context) => {
 
   const fetcher = (): Promise<{}> => fetch(url, {
     headers: {
-      'X-RapidAPI-Key': RAPID_API_KEYS[Math.floor(Math.random() * RAPID_API_KEYS.length)],
+      'X-RapidAPI-Key': <string>RAPID_API_KEYS.shift(),
       'X-RapidAPI-Host': host
     }
   })
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data && data.audioStreams.length)
+      if (data && 'adaptiveFormats' in data && data.adaptiveFormats.length)
         return data;
       else throw new Error(data.message);
     })
