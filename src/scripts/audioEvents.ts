@@ -1,6 +1,6 @@
 import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
@@ -201,8 +201,6 @@ audio.onerror = function() {
     );
     store.player.ogProxy = '';
   }
-  else if (!audio.src.startsWith(store.api.cobalt))
-    getDownloadLink(id).then(_ => audio.src = _);
 
 }
 
