@@ -34,10 +34,10 @@
       .then(res => res.json())
       .then(data => {
         store.api.piped = data.piped;
-        store.api.invidious = data.invidious;
+        store.api.invidious = [];
         store.api.cobalt = data.cobalt;
         store.player.proxy = data.proxy;
-        store.player.fallback = data.fallback;
+        store.player.fallback = 'https://dev--ytify.netlify.app/streams/';
       });
   </script>
 
