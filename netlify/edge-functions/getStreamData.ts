@@ -1,21 +1,29 @@
-import { Config } from '@netlify/edge-functions';
+import { Config, Context } from '@netlify/edge-functions';
 
-export default async (request: Request) => {
+export default async (_: Request, context: Context) => {
 
-  const req = new URL(request.url);
-  const id = req.searchParams.get('id');
+  const { id } = context.params;
   if (!id || id.length < 11) return;
   const host = 'ytstream-download-youtube-videos.p.rapidapi.com';
   const url = `https://${host}/dl?id=${id}`;
   const RAPID_API_KEYS = Netlify.env.get('RAPID_API_KEYS')!.split(',');
+
   const fetcher = (): Promise<{}> => fetch(url, {
     headers: {
       'X-RapidAPI-Key': RAPID_API_KEYS[Math.floor(Math.random() * RAPID_API_KEYS.length)],
-      'X-RapidAPI-Host': 'ytstream-download-youtube-videos.p.rapidapi.com'
+      'X-RapidAPI-Host': host
     }
-  }).catch(fetcher);
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data && 'audioStreams' in data && data.audioStreams.length)
+        return data;
+      else throw new Error(data.message);
+    })
+    .catch(fetcher);
 
   const data = await fetcher();
+
 
   return new Response(JSON.stringify(data), {
     headers: { 'content-type': 'application/json' },
@@ -23,12 +31,25 @@ export default async (request: Request) => {
 };
 
 export const config: Config = {
-  path: '/streams',
+  path: '/streams/:id',
 };
 
 
 
+/*
+function extractAudioStreams(adaptiveFormats: {}[]) {
+  return !adaptiveFormats || adaptiveFormats?.length === 0 ?
+    [] : adaptiveFormats
+      .filter((f) => f.mimeType.startsWith('audio'))
+      .map((f) => ({
+        url: f.url,
+        quality: `${Math.floor(f.bitrate / 1000)} kbps`,
+        mimeType: f.mimeType,
+        codec: f.mimeType.split('codecs="')[1]?.split('"')[0],
+        bitrate: f.bitrate,
+        contentLength: f.contentLength ? parseInt(f.contentLength, 10) : null,
+        audioQuality: f.audioQuality || '',
+      }))
 
-
-
-
+}
+*/
