@@ -1,4 +1,4 @@
-import { audio, actionsMenu } from "./dom";
+import { audio, actionsMenu, title } from "./dom";
 import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
@@ -7,7 +7,6 @@ import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-
 
 
 export const $ = document.createElement.bind(document);
@@ -37,6 +36,21 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
+export async function proxyHandler(url: string) {
+  const useProxy = getSaved('enforceProxy');
+  const link = new URL(url);
+
+  store.api.index = 0;
+  title.textContent = 'Injecting optimal audio source into player';
+
+  return url.includes('host=') ?
+    url.replace(link.origin,
+      useProxy ?
+        store.api.invidious[0] :
+        'https://' + link.searchParams.get('host')
+    ) :
+    url + '&host=' + link.origin.slice(8);
+}
 
 export async function quickSwitch() {
   if (!store.stream.id) return;

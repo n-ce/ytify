@@ -1,7 +1,7 @@
 import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { $, getDownloadLink, idFromURL, notify } from '../lib/utils';
+import { $, getDownloadLink, idFromURL, notify, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
@@ -57,11 +57,11 @@ export default async function() {
           })
         })
   }
-  else bitrateSelector.addEventListener('change', () => {
+  else bitrateSelector.addEventListener('change', async () => {
     if (store.player.playbackState === 'playing')
       audio.pause();
     const timeOfSwitch = audio.currentTime;
-    audio.src = bitrateSelector.value;
+    audio.src = await proxyHandler(bitrateSelector.value);
     audio.currentTime = timeOfSwitch;
     audio.play();
   });

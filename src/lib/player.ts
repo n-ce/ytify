@@ -1,4 +1,4 @@
-import { audio, favButton, favIcon, playButton } from "./dom";
+import { audio, favButton, favIcon, playButton, title } from "./dom";
 import { convertSStoHHMMSS } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
@@ -10,6 +10,8 @@ export default async function player(id: string | null = '') {
   if (!id) return;
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+
+  title.textContent = 'Fetching Data...';
 
   const data = await getData(id);
 

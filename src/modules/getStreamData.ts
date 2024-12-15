@@ -54,7 +54,7 @@ export async function getData(
         contentLength: parseInt(v.clen),
         quality: Math.floor(parseInt(v.bitrate) / 1024) + ' kbps',
         mimeType: v.type,
-        url: v.url.replace(new URL(v.url).origin, api)
+        url: v.url
       }))
     }));
 

@@ -14,8 +14,7 @@ export const store: {
     data: Piped | undefined,
     legacy: boolean,
     fallback: string,
-    proxy: string,
-    ogProxy: string
+    proxy: string
   },
   queue: string[]
   stream: CollectionItem,
@@ -50,8 +49,7 @@ export const store: {
     data: undefined,
     legacy: !('OffscreenCanvas' in window),
     fallback: 'https://pipedapi.reallyaweso.me',
-    proxy: 'https://invidious.jing.rocks',
-    ogProxy: ''
+    proxy: 'https://invidious.jing.rocks'
   },
   queue: [],
   stream: {

@@ -1,4 +1,4 @@
-import { audio, listAnchor, playButton, progress, queuelist } from "../lib/dom";
+import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
@@ -159,6 +159,7 @@ audio.ontimeupdate = function() {
 
 
 audio.onloadedmetadata = function() {
+  title.textContent = store.stream.title;
   progress.value = '0';
   progress.min = '0';
   progress.max = Math.floor(audio.duration).toString();
@@ -186,22 +187,32 @@ audio.onerror = function() {
     return;
   }
 
-  console.log(audio.src);
 
-  const origin = new URL(audio.src).origin
+  const origin = new URL(audio.src).origin;
 
-  if (audio.src.startsWith('https://r'))
-    audio.src = audio.src.replace(
-      origin
-      , store.player.proxy
-    ) + '&host=' + origin.slice(8);
-  else if (audio.src.startsWith(store.player.proxy) && store.player.ogProxy) {
-    audio.src = audio.src.replace(origin,
-      store.player.ogProxy
-    );
-    store.player.ogProxy = '';
+  title.textContent = 'Error 403, handling Error...';
+
+  if (store.api.index < store.api.invidious.length) {
+    const proxy = store.api.invidious[store.api.index];
+    audio.src = audio.src.replace(origin, proxy);
+    title.textContent = 'trying to load via Proxy ' + store.api.index;
+    store.api.index++;
   }
   else {
+    store.api.index = 0;
+    if (store.player.fallback) {
+      title.textContent = 'Fetching data via ytify services...';
+      return fetch(store.player.fallback + '/streams/' + store.stream.id)
+        .then(res => res.json())
+        .then(data => {
+          import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
+            data.audioStreams
+              .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+              ),
+            data.livestream
+          ));
+        });
+    }
     notify('This audiostream could not be loaded.');
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   }
