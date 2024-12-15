@@ -8,6 +8,9 @@ export default async (_: Request, context: Context) => {
   const url = `https://${host}/dl?id=${id}`;
   const RAPID_API_KEYS = Netlify.env.get('RAPID_API_KEYS')!.split(',');
 
+  if (Math.floor(Math.random() * 2))
+    RAPID_API_KEYS.reverse();
+
   const fetcher = (): Promise<{
     title: string,
     channelTitle: string,
