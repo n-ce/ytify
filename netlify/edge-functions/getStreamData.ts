@@ -60,10 +60,7 @@ export default async (_: Request, context: Context) => {
         contentLength: _.contentLength
       })),
     relatedStreams: [],
-    subtitles: streamData.captions.captionTracks.map(_ => ({
-      url: _.baseUrl,
-      name: _.name
-    })),
+    subtitles: [],
     livestream: streamData.isLiveContent
   };
 
