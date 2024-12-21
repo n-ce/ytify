@@ -200,20 +200,8 @@ audio.onerror = function() {
   }
   else {
     store.api.index = 0;
-    if (store.player.fallback) {
-      title.textContent = 'Fetching data via ytify services...';
-      return fetch(store.player.fallback + '/streams/' + store.stream.id)
-        .then(res => res.json())
-        .then(data => {
-          import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
-            data.audioStreams
-              .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-              ),
-            data.livestream
-          ));
-        });
-    }
-    notify('This audiostream could not be loaded.');
+    notify('Failed to Play');
+    title.textContent = store.stream.title;
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   }
 

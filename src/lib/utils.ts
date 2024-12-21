@@ -88,7 +88,7 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
-export async function getDownloadLink(id: string): Promise<string> {
+export async function getDownloadLink(id: string): Promise<string | null> {
   const streamUrl = 'https://youtu.be/' + id;
   const dl = await fetch(store.api.cobalt, {
     method: 'POST',
@@ -101,10 +101,14 @@ export async function getDownloadLink(id: string): Promise<string> {
     })
   })
     .then(_ => _.json())
-    .then(_ => _.url)
-    .catch(_ => notify(_));
+    .then(_ => {
+      if ('url' in _)
+        return _.url;
+      else throw new Error(_.error.code);
+    })
+    .catch(notify);
 
-  return dl;
+  return dl || '';
 }
 
 export async function errorHandler(
