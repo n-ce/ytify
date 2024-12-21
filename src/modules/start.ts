@@ -17,7 +17,7 @@ export default async function() {
     store.api.invidious[0] =
       store.player.proxy = iv;
 
-  } else window.inject_ytify_services(store);
+  } else if ('inject_ytify_services' in window) window.inject_ytify_services(store);
 
   // hls
 
@@ -83,8 +83,11 @@ export default async function() {
     loadingScreen.showModal();
     if (isPWA && shareAction) {
       const a = $('a');
-      a.href = await getDownloadLink(store.actionsMenu.id);
-      a.click();
+      const l = await getDownloadLink(store.actionsMenu.id);
+      if (l) {
+        a.href = l;
+        a.click();
+      }
     }
     else await player(id)
 

@@ -64,7 +64,7 @@ export const store: {
     piped: ['https://pipedapi.kavin.rocks'],
     invidious: ['https://invidious.jing.rocks'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
-    cobalt: 'https://api.cobalt.tools',
+    cobalt: 'https://cobalt-api.kwiatekmiki.com',
     index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',

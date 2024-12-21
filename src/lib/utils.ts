@@ -37,7 +37,6 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 export async function proxyHandler(url: string) {
-  const useProxy = getSaved('enforceProxy');
   const link = new URL(url);
 
   store.api.index = 0;
@@ -45,7 +44,7 @@ export async function proxyHandler(url: string) {
 
   return url.includes('host=') ?
     url.replace(link.origin,
-      useProxy ?
+      getSaved('enforceProxy') ?
         store.api.invidious[0] :
         'https://' + link.searchParams.get('host')
     ) :
@@ -88,7 +87,7 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
-export async function getDownloadLink(id: string): Promise<string> {
+export async function getDownloadLink(id: string): Promise<string | null> {
   const streamUrl = 'https://youtu.be/' + id;
   const dl = await fetch(store.api.cobalt, {
     method: 'POST',
@@ -101,10 +100,14 @@ export async function getDownloadLink(id: string): Promise<string> {
     })
   })
     .then(_ => _.json())
-    .then(_ => _.url)
-    .catch(_ => notify(_));
+    .then(_ => {
+      if ('url' in _)
+        return _.url;
+      else throw new Error(_.error.code);
+    })
+    .catch(notify);
 
-  return dl;
+  return dl || '';
 }
 
 export async function errorHandler(

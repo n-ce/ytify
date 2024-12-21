@@ -61,8 +61,11 @@ export default function() {
         close();
         loadingScreen.showModal();
         const a = $('a');
-        a.href = await getDownloadLink(store.actionsMenu.id);
-        a.click();
+        const l = await getDownloadLink(store.actionsMenu.id);
+        if (l) {
+          a.href = l;
+          a.click();
+        }
         loadingScreen.close();
       }}>
         <i class="ri-download-2-fill"></i>Download
