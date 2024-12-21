@@ -1,6 +1,6 @@
 import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
@@ -202,7 +202,17 @@ audio.onerror = function() {
     store.api.index = 0;
     notify('Error 403 unauthenticated stream.');
     title.textContent = store.stream.title;
-    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+
+    getDownloadLink(store.actionsMenu.id)
+      .then(_ => {
+        if (_)
+          audio.src = _;
+        else throw new Error();
+      })
+      .catch(() => {
+        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      })
+
   }
 
 }
