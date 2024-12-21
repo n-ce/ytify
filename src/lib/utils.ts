@@ -37,7 +37,6 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 export async function proxyHandler(url: string) {
-  const useProxy = getSaved('enforceProxy');
   const link = new URL(url);
 
   store.api.index = 0;
@@ -45,7 +44,7 @@ export async function proxyHandler(url: string) {
 
   return url.includes('host=') ?
     url.replace(link.origin,
-      useProxy ?
+      getSaved('enforceProxy') ?
         store.api.invidious[0] :
         'https://' + link.searchParams.get('host')
     ) :

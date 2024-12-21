@@ -200,7 +200,7 @@ audio.onerror = function() {
   }
   else {
     store.api.index = 0;
-    notify('Failed to Play');
+    notify('Error 403 unauthenticated stream.');
     title.textContent = store.stream.title;
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   }
