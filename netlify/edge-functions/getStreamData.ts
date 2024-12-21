@@ -70,7 +70,7 @@ export const config: Config = {
 
 
 function shuffle(array: string[]) {
-  let currentIndex = array.length;
+  const currentIndex = array.length;
 
   while (currentIndex != 0) {
 
