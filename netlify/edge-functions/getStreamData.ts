@@ -3,9 +3,10 @@ import { Config, Context } from '@netlify/edge-functions';
 export default async (_: Request, context: Context) => {
 
   const { id } = context.params;
+  const region = context.geo?.country?.code || 'IN';
   if (!id || id.length < 11) return;
   const host = 'ytstream-download-youtube-videos.p.rapidapi.com';
-  const url = `https://${host}/dl?id=${id}`;
+  const url = `https://${host}/dl?id=${id}&cgeo=${region}`;
   const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
 
   shuffle(keys);
