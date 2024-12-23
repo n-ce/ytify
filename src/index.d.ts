@@ -12,7 +12,6 @@ declare global {
     title: string,
     videos: number,
     duration: number,
-    category: string,
     isShort?: boolean,
     thumbnail: string,
     subscribers: number,
@@ -91,7 +90,6 @@ declare global {
     duration: number,
     uploader: string,
     uploaderUrl: string,
-    category: string,
     livestream: boolean,
     subtitles: [],
     hls: string
@@ -126,7 +124,6 @@ declare global {
     author: string,
     lengthSeconds: number,
     authorUrl: string,
-    genre: string,
     liveNow: boolean,
     hlsUrl: string,
     dashUrl: string,

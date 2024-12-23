@@ -13,8 +13,7 @@ export const store: {
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
-    fallback: string,
-    proxy: string
+    fallback: string
   },
   queue: string[]
   stream: CollectionItem,
@@ -48,8 +47,7 @@ export const store: {
     }).then(res => res.supported),
     data: undefined,
     legacy: !('OffscreenCanvas' in window),
-    fallback: 'https://pipedapi.reallyaweso.me',
-    proxy: 'https://invidious.jing.rocks'
+    fallback: 'https://pipedapi.reallyaweso.me'
   },
   queue: [],
   stream: {

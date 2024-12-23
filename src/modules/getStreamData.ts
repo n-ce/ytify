@@ -37,7 +37,6 @@ export async function getData(
       uploader: data.author,
       duration: data.lengthSeconds,
       uploaderUrl: data.authorUrl,
-      category: data.genre || 'non-music',
       liveStream: data.liveNow,
       subtitles: [],
       relatedStreams: data.recommendedVideos.map(v => ({
