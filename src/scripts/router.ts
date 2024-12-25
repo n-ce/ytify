@@ -6,13 +6,11 @@ import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 
+
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
-const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 const queueParam = params.get('a');
-
-
 
 function upcomingInjector(param: string) {
   loadingScreen.showModal();
@@ -29,10 +27,10 @@ function upcomingInjector(param: string) {
 if (queueParam)
   upcomingInjector(queueParam);
 
-let prevPageIdx = routes.indexOf(location.pathname);
+let prevPageIdx = store.routes.indexOf(location.pathname);
 
 function showSection(id: string) {
-  const routeIdx = routes.indexOf(id);
+  const routeIdx = store.routes.indexOf(id);
   miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
 
   // Enables Reactivity to declare db modifications into UI
@@ -57,7 +55,6 @@ function showSection(id: string) {
   }
   prevPageIdx = routeIdx;
 }
-
 
 nav.addEventListener('click', (e: Event) => {
   e.preventDefault();
@@ -91,7 +88,6 @@ nav.addEventListener('click', (e: Event) => {
   showSection(anchor.id);
 });
 
-
 // load section if name found in address else load library
 let route: string;
 const errorParam = params.get('e');
@@ -122,7 +118,7 @@ if (errorParam) {
 }
 else {
 
-  route = routes.find(route => location.pathname === route) || '/';
+  route = store.routes.find(route => location.pathname === route) || '/';
 
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
 
@@ -164,7 +160,4 @@ onpopstate = function() {
 
   showSection(location.pathname);
 
-
 }
-
-
