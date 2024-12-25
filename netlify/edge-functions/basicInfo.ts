@@ -25,7 +25,7 @@ export const config: Config = {
   path: "/basic/:id",
 };
 
-export function convertSStoHHMMSS(seconds) {
+export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return "";
   if (seconds === Infinity) return "Emergency Mode";
   const hh = Math.floor(seconds / 3600);
