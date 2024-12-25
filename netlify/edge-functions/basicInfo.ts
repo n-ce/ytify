@@ -1,5 +1,5 @@
 import { Config, Context } from "@netlify/edge-functions";
-import { Innertube } from "https://deno.land/x/youtubei";
+import { Innertube } from "https://deno.land/x/youtubei/deno.ts";
 
 export default async (_: Request, context: Context) => {
   const { id } = context.params;
