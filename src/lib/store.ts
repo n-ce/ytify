@@ -32,7 +32,8 @@ export const store: {
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
-  downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
+  downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg',
+  routes: string[]
 } = {
   player: {
     playbackState: 'none',
@@ -85,6 +86,6 @@ export const store: {
     uploader: '',
     thumbnail: ''
   },
-  downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
+  downloadFormat: getSaved('dlFormat') as 'opus' || 'opus',
+  routes: ['/', '/upcoming', '/search', '/library', '/settings', '/list']
 }
-
