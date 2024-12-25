@@ -9,14 +9,12 @@ if (store.loadImage === 'off') {
   img = '';
 }
 
-
 miniPlayer.addEventListener('click', (e) => {
   e.preventDefault();
   if (!(<HTMLElement>e.target).matches('button'))
     goTo('/');
 });
 const mptext = document.getElementById('mptext') as HTMLDivElement;
-
 
 export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) {
   if (inHome) {
@@ -35,7 +33,7 @@ export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) 
     miniPlayer.lastElementChild!.append(mptext, playButton);
     document.getElementById('ytifyIconContainer')!.prepend(ytifyIcon);
     // Update document title when not in MiniPlayer
-    const activeRoute = routes.find(route => location.pathname === route);
+    const activeRoute = store.routes.find(route => location.pathname === route);
     const routeName = activeRoute ? document.querySelector(`nav a[href="${activeRoute}"]`)?.textContent : '';
     document.title = (routeName || 'ytify') + ' - ytify';
   }
