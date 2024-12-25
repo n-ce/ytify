@@ -11,7 +11,7 @@ export default async (_: Request, context: Context) => {
       id: _.basic_info.id,
       title: _.basic_info.title,
       author: _.basic_info.author,
-      duration: convertSStoHHMMSS(_.basic_info.duration),
+      duration: convertSStoHHMMSS(_.basic_info.duration as number),
       channelUrl: "/channel/" + _.basic_info.channel_id,
     }))
   );
