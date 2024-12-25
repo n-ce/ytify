@@ -1,13 +1,16 @@
 import { Config, Context } from "@netlify/edge-functions";
 import { Innertube } from "youtubei.js";
 
+const tube = Innertube.create();
+
 export default async (_: Request, context: Context) => {
   const { id } = context.params;
 
   if (!id || id.length < 11) return;
 
-  const info = await Innertube.create().then((_) =>
-    _.getBasicInfo("gLqnLfi8uy8").then((_) => ({
+  const info = await tube
+    .then(_ => _.getBasicInfo(id)
+    .then(_ => ({
       id: _.basic_info.id,
       title: _.basic_info.title,
       author: _.basic_info.author,
