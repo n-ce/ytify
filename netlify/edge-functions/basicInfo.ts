@@ -1,5 +1,5 @@
 import { Config, Context } from "@netlify/edge-functions";
-import { Innertube } from "https://esm.sh/youtubei.js@12.2.0";
+import { Innertube } from "youtubei.js";
 
 export default async (_: Request, context: Context) => {
   const { id } = context.params;
