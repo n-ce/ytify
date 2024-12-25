@@ -23,7 +23,8 @@
     "typescript": "^5.7.2",
     "vite": "^6.0.5",
     "vite-plugin-pwa": "^0.21.1",
-    "vite-plugin-solid": "^2.11.0"
+    "vite-plugin-solid": "^2.11.0",
+    "youtubei.js": "^12.2.0"
   },
   "browserslist": [
     "defaults"
