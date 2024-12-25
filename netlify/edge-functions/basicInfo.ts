@@ -6,7 +6,7 @@ export default async (_: Request, context: Context) => {
 
   if (!id || id.length < 11) return;
 
-  const info = await Innertube.create()
+  const info = await Innertube.create({ fetch: fetch })
     .then(_ => _.getBasicInfo(id))
     .then(_ => _.basic_info)
     .then(_ => ({
