@@ -9,7 +9,8 @@ export default async (_: Request, context: Context) => {
   if (!id || id.length < 11) return;
 
   const info = await tube
-    .then(_ => (_.getBasicInfo(id)).basic_info)
+    .then(_ => _.getBasicInfo(id))
+    .then(_ => _.basic_info)
     .then(_ => ({
       id: _.id,
       title: _.title,
