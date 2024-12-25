@@ -19,13 +19,14 @@ const mptext = document.getElementById('mptext') as HTMLDivElement;
 
 
 export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) {
-
   if (inHome) {
     header.add('hide');
     document.getElementById('upperLayer')!.prepend(img);
     document.getElementById('meta')!.prepend(title, author);
     document.getElementById('playerControls')!.insertBefore(playButton, document.getElementById('seekFwdButton'));
     document.getElementById('selectors')!.appendChild(ytifyIcon);
+    // Update document title when in MiniPlayer (Home)
+    document.title = (store.stream.title || 'Home') + ' - ytify';
   }
   else if (header.contains('hide')) {
     header.remove('hide');
@@ -33,6 +34,9 @@ export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) 
     mptext.append(title, author);
     miniPlayer.lastElementChild!.append(mptext, playButton);
     document.getElementById('ytifyIconContainer')!.prepend(ytifyIcon);
+    // Update document title when not in MiniPlayer
+    const activeRoute = routes.find(route => location.pathname === route);
+    const routeName = activeRoute ? document.querySelector(`nav a[href="${activeRoute}"]`)?.textContent : '';
+    document.title = (routeName || 'ytify') + ' - ytify';
   }
-
 }
