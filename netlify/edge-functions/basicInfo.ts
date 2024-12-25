@@ -9,13 +9,14 @@ export default async (_: Request, context: Context) => {
   if (!id || id.length < 11) return;
 
   const info = await tube
-    .then(_ => _.getBasicInfo(id)
+    .then(_ => _.getBasicInfo(id))
+    .then(_ => _.basic_info)
     .then(_ => ({
-      id: _.basic_info.id,
-      title: _.basic_info.title,
-      author: _.basic_info.author,
-      duration: convertSStoHHMMSS(_.basic_info.duration as number),
-      channelUrl: "/channel/" + _.basic_info.channel_id,
+      id: _.id,
+      title: _.title,
+      author: _.author,
+      duration: convertSStoHHMMSS(_.duration as number),
+      channelUrl: "/channel/" + _.channel_id
     }))
   );
 
