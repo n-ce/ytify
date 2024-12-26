@@ -1,3 +1,5 @@
+if (typeof global === undefined) globalThis.global = globalThis;
+
 import { Config, Context } from "@netlify/edge-functions";
 import { Innertube } from "youtubei.js";
 
