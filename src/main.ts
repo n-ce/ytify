@@ -1,3 +1,5 @@
+if (typeof global === undefined) globalThis.global = globalThis;
+
 import './stylesheets/global.css';
 import './scripts/router';
 import './scripts/audioEvents';
