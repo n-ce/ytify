@@ -120,7 +120,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
     listBtnsContainer.className = 'publicPlaylist';
     loadingScreen.showModal();
-    await fetch(`${location.origin}/public?id=${shareId}`)
+    await fetch(`${location.origin}/collection/${shareId}`)
       .then(res => res.json())
       .then(data => {
         renderDataIntoFragment(data, fragment);
