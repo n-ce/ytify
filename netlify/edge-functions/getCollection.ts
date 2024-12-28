@@ -1,9 +1,13 @@
 import { Config, Context } from '@netlify/edge-functions';
 
-
 export default async (_: Request, context: Context) => {
 
   const { uid } = context.params;
+  const instanceArray: string[] = await fetch(
+    'https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json'
+  )
+    .then(res => res.json())
+    .then(di => di.invidious);
   const array = [];
 
   if (!uid) return;
@@ -22,14 +26,9 @@ export const config: Config = {
   path: '/collection/:uid'
 };
 
-const instanceArray: string[] = [
-  'https://inv.clovius.club/api/v1/videos/',
-  'https://iv.ggtyler.dev/api/v1/videos/',
-  'https://invidious.nikkosphere.com/api/v1/videos/'
-]; 
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
-const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
+const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + '/api/v1/videos/' + id)
     .then(res => res.json())
     .then(res => {
       if ('error' in res)
