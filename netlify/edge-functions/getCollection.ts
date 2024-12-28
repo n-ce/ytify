@@ -26,7 +26,7 @@ const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
 export default async (request: Request) => {
 
-  const uid = new URL(request.url).searchParams.get('id');
+  const { uid } = context.params;
   const array = [];
 
   if (!uid) return;
@@ -58,5 +58,5 @@ export default async (request: Request) => {
 };
 
 export const config: Config = {
-  path: '/collection/:id',
+  path: '/collection/:uid',
 };
