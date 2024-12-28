@@ -1,4 +1,4 @@
-import { Config } from '@netlify/edge-functions';
+import { Config, Context } from '@netlify/edge-functions';
 
 function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
@@ -24,7 +24,7 @@ const instanceArray: string[] = [
 const getIndex = () => Math.floor(Math.random() * instanceArray.length);
 
 
-export default async (request: Request) => {
+export default async (_: Request, context: Context) => {
 
   const { uid } = context.params;
   const array = [];
