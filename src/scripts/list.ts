@@ -65,7 +65,7 @@ listBtnsContainer.addEventListener('click', async e => {
     delete db[id];
     saveDB(db);
   }
-  else if (btn === shareCollectionButton)
+  else if (btn === shareCollectionBtn)
     shareCollection(
       Object
         .keys(db[id])
