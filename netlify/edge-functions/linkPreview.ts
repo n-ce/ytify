@@ -12,7 +12,7 @@ export default async (request: Request, context: Context) => {
   const api = 'https://iv.ggtyler.dev/api/v1/videos/';
   const data = await fetch(api + id).then(res => res.json());
   const music = data.author.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
-  const thumbnail = music + 'https://i.ytimg.com/vi_webp/'+id+'/mqdefault.webp';
+  const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
@@ -23,5 +23,5 @@ export default async (request: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: '/*',
+  path: '/*'
 };
