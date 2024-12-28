@@ -11,21 +11,7 @@ export default async (_: Request, context: Context) => {
   
   if (!uid) return;
   
-  const array = Array.from({ length: Math.ceil(uid.length / 11) }, (_, i) => uid.slice(i * 11, i * 11 + 11));
-  const response = await Promise.all(array.map(getData));
-
-  return new Response(JSON.stringify(response), {
-    headers: { 'content-type': 'application/json' },
-  });
-};
-
-export const config: Config = {
-  path: '/collection/:uid'
-};
-
-const getIndex = () => Math.floor(Math.random() * instanceArray.length);
-
-const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + '/api/v1/videos/' + id)
+  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + '/api/v1/videos/' + id)
     .then(res => res.json())
     .then(res => {
       if ('error' in res)
@@ -40,6 +26,21 @@ const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channe
       'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
     }))
     .catch(() => getData(id));
+
+  const array = Array.from({ length: Math.ceil(uid.length / 11) }, (_, i) => uid.slice(i * 11, i * 11 + 11));
+  const response = await Promise.all(array.map(getData));
+
+  return new Response(JSON.stringify(response), {
+    headers: { 'content-type': 'application/json' },
+  });
+};
+
+export const config: Config = {
+  path: '/collection/:uid'
+};
+
+const getIndex = () => Math.floor(Math.random() * instanceArray.length);
+
 
 function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
