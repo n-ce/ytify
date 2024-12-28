@@ -1,5 +1,50 @@
 import { Config, Context } from '@netlify/edge-functions';
 
+
+export default async (_: Request, context: Context) => {
+
+  const { uid } = context.params;
+  const array = [];
+
+  if (!uid) return;
+
+  for (let i = 0; i < uid.length; i += 11)
+    array.push(uid.slice(i, i + 11));
+
+  const response = await Promise.all(array.map(getData));
+
+  return new Response(JSON.stringify(response), {
+    headers: { 'content-type': 'application/json' },
+  });
+};
+
+export const config: Config = {
+  path: '/collection/:uid'
+};
+
+const instanceArray: string[] = [
+  'https://inv.clovius.club/api/v1/videos/',
+  'https://iv.ggtyler.dev/api/v1/videos/',
+  'https://invidious.nikkosphere.com/api/v1/videos/'
+]; 
+const getIndex = () => Math.floor(Math.random() * instanceArray.length);
+
+const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
+    .then(res => res.json())
+    .then(res => {
+      if ('error' in res)
+        throw new Error(res.error)
+      else return res;
+    })
+    .then(json => ({
+      'id': id,
+      'title': json.title,
+      'author': (json.uploader || json.author),
+      'channelUrl': json.authorUrl || json.uploaderUrl,
+      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
+    }))
+    .catch(() => getData(id));
+
 function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
   const hh = Math.floor(seconds / 3600);
@@ -14,49 +59,3 @@ function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
-
-const instanceArray: string[] = [
-  'https://inv.clovius.club/api/v1/videos/',
-  'https://iv.ggtyler.dev/api/v1/videos/',
-  'https://invidious.nikkosphere.com/api/v1/videos/'
-]; 
-
-const getIndex = () => Math.floor(Math.random() * instanceArray.length);
-
-
-export default async (_: Request, context: Context) => {
-
-  const { uid } = context.params;
-  const array = [];
-
-  if (!uid) return;
-
-  for (let i = 0; i < uid.length; i += 11)
-    array.push(uid.slice(i, i + 11));
-
-  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + id)
-    .then(res => res.json())
-    .then(res => {
-      if ('error' in res)
-        throw new Error(res.error)
-      else return res;
-    })
-    .then(json => ({
-      'id': id,
-      'title': json.title,
-      'author': (json.uploader || json.author),
-      'channelUrl': json.authorUrl || json.uploaderUrl,
-      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
-    }))
-    .catch(() => getData(id))
-
-  const response = await Promise.all(array.map(getData));
-
-  return new Response(JSON.stringify(response), {
-    headers: { 'content-type': 'application/json' },
-  });
-};
-
-export const config: Config = {
-  path: '/collection/:uid',
-};
