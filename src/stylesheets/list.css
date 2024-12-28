@@ -4,6 +4,7 @@
 
     #clearListBtn,
     #removeFromListBtn,
+    #shareCollectionBtn,
     #renameCollectionBtn,
     #deleteCollectionBtn {
       display: none
