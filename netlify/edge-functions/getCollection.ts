@@ -8,13 +8,10 @@ export default async (_: Request, context: Context) => {
   )
     .then(res => res.json())
     .then(di => di.invidious);
-  const array = [];
-
+  
   if (!uid) return;
-
-  for (let i = 0; i < uid.length; i += 11)
-    array.push(uid.slice(i, i + 11));
-
+  
+  const array = Array.from({ length: Math.ceil(uid.length / 11) }, (_, i) => uid.slice(i * 11, i * 11 + 11));
   const response = await Promise.all(array.map(getData));
 
   return new Response(JSON.stringify(response), {
