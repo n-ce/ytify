@@ -11,6 +11,7 @@ export default async (_: Request, context: Context) => {
   
   if (!uid) return;
   
+  const getIndex = () => Math.floor(Math.random() * instanceArray.length);
   const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + '/api/v1/videos/' + id)
     .then(res => res.json())
     .then(res => {
@@ -38,9 +39,6 @@ export default async (_: Request, context: Context) => {
 export const config: Config = {
   path: '/collection/:uid'
 };
-
-const getIndex = () => Math.floor(Math.random() * instanceArray.length);
-
 
 function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
