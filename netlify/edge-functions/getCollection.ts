@@ -44,7 +44,7 @@ export default async (_: Request, context: Context) => {
     .then(json => ({
       'id': id,
       'title': json.title,
-      'author': (json.uploader || json.author).replace(' - Topic', ''),
+      'author': (json.uploader || json.author),
       'channelUrl': json.authorUrl || json.uploaderUrl,
       'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
     }))
