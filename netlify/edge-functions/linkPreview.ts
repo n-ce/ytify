@@ -9,10 +9,25 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const api = 'https://iv.ggtyler.dev/api/v1/videos/';
-  const data = await fetch(api + id).then(res => res.json());
+  const apis = await fetch(
+    'https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json'
+  )
+    .then(res => res.json())
+    .then(di => di.invidious);
+
+  const fetcher = (): Promise<Invidious> =>
+    fetch(apis.shift() + id)
+      .then(res => res.json())
+      .catch(async () => {
+        return apis.length ?
+          await fetcher() : '';
+      });
+
+
+  const data = await fetcher();
+  if (!data) return;
   const music = data.author.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
-  const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
+  const thumbnail = music + data.videoThumbnails.find((v: Record<'quality' | 'url', string>) => v.quality === 'medium')?.url;
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
