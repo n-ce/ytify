@@ -16,7 +16,7 @@ export default async function() {
     store.api.piped[0] = pi;
     store.api.invidious[0] = iv;
 
-  } else if ('inject_ytify_services' in window) window.inject_ytify_services(store);
+  } else if ('inject_ytify_services' in window) await window.inject_ytify_services(store);
 
   // hls
 
