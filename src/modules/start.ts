@@ -101,7 +101,10 @@ export default async function() {
     superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
   }
 
-  fetchCollection(params.get('collection'));
+  const collection = params.get('collection');
+  const shared = params.get('si');
+
+  fetchCollection(collection || shared, Boolean(shared));
 
 
   // list loading

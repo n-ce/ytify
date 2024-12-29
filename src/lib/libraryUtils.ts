@@ -87,11 +87,13 @@ function renderDataIntoFragment(data: Collection, fragment: DocumentFragment) {
   }
 }
 
-export async function fetchCollection(collection: string | null, shareId: string | null = '') {
+export async function fetchCollection(collection: string | null, shared: boolean = false) {
+
+  if (!collection) return;
 
   const fragment = document.createDocumentFragment();
 
-  if (collection) {
+  if (!shared) {
     const db = getDB();
     const data = db[<'discover'>decodeURI(collection)];
 
@@ -116,11 +118,10 @@ export async function fetchCollection(collection: string | null, shareId: string
     store.list.id = collection;
 
   } else {
-    // this means it does not exist in db and is a public collection
 
-    listBtnsContainer.className = 'publicPlaylist';
+    listBtnsContainer.className = 'sharedClxn';
     loadingScreen.showModal();
-    await fetch(`${location.origin}/collection/${shareId}`)
+    await fetch(`${location.origin}/collection/${collection}`)
       .then(res => res.json())
       .then(data => {
         renderDataIntoFragment(data, fragment);
@@ -136,7 +137,7 @@ export async function fetchCollection(collection: string | null, shareId: string
 
   const isReversed = listContainer.classList.contains('reverse');
 
-  if (collection && reservedCollections.includes(collection)) {
+  if (!shared && reservedCollections.includes(collection)) {
     if (!isReversed)
       listContainer.classList.add('reverse');
   }
@@ -144,15 +145,17 @@ export async function fetchCollection(collection: string | null, shareId: string
     listContainer.classList.remove('reverse');
 
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (collection ? 'collection' : 'publicCollection');
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'sharedCollection' : 'collection');
 
-  if (location.pathname !== '/list') goTo('/list');
+  if (location.pathname !== '/list')
+    goTo('/list');
 
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    (collection ? ('?collection=' + collection) : ('?si=' + shareId)));
-  document.title = (collection || 'Shared Playlist') + ' - ytify';
+    (shared ? '?si=' : '?collection=') + collection
+  );
+  document.title = (collection || 'Shared Collection') + ' - ytify';
 }
 
 

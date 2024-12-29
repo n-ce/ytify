@@ -17,7 +17,7 @@ const queueParam = params.get('a');
 function upcomingInjector(param: string) {
   loadingScreen.showModal();
 
-  fetch(`${location.origin}/public?id=${param}`)
+  fetch(`${location.origin}/collection?id=${param}`)
     .then(res => res.json())
     .then(data => {
       for (const stream of data)
@@ -106,7 +106,7 @@ if (errorParam) {
 
     if (route === '/list')
       query.startsWith('si') ?
-        fetchCollection('', query.split('=')[1]) :
+        fetchCollection(query.split('=')[1], true) :
         fetchList('/' + query.split('=').join('/'));
 
 

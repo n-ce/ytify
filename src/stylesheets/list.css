@@ -45,7 +45,7 @@
 
   }
 
-  &.publicCollection {
+  &.sharedClxn {
     button {
       display: none;
     }
