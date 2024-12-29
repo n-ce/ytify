@@ -4,6 +4,7 @@
 
     #clearListBtn,
     #removeFromListBtn,
+    #shareCollectionBtn,
     #renameCollectionBtn,
     #deleteCollectionBtn {
       display: none
@@ -44,7 +45,7 @@
 
   }
 
-  &.publicCollection {
+  &.sharedClxn {
     button {
       display: none;
     }

@@ -1,8 +1,8 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
 import { hostResolver } from '../lib/utils';
 import { store } from '../lib/store';
-import { importList, subscribeList } from '../modules/listUtils';
+import { importList, subscribeList, shareCollection } from '../modules/listUtils';
 import { getDB, saveDB } from '../lib/libraryUtils';
 
 
@@ -65,6 +65,12 @@ listBtnsContainer.addEventListener('click', async e => {
     delete db[id];
     saveDB(db);
   }
+  else if (btn === shareCollectionBtn)
+    shareCollection(
+      Object
+        .keys(db[id])
+        .join('')
+    );
 });
 
 

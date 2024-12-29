@@ -21,7 +21,7 @@
     "autoprefixer": "^10.4.20",
     "eruda": "^3.4.1",
     "typescript": "^5.7.2",
-    "vite": "^6.0.5",
+    "vite": "^6.0.6",
     "vite-plugin-pwa": "^0.21.1",
     "vite-plugin-solid": "^2.11.0"
   },
