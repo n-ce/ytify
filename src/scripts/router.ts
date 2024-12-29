@@ -105,7 +105,10 @@ if (errorParam) {
     const query = encodeURI(_[1]);
 
     if (route === '/list')
-      fetchList('/' + query.split('=').join('/'));
+      query.startsWith('si') ?
+        fetchCollection('', query.split('=')[1]) :
+        fetchList('/' + query.split('=').join('/'));
+
 
     if (route === '/search') {
       const x = new URLSearchParams(query);

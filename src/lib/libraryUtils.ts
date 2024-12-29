@@ -5,7 +5,7 @@ import StreamItem from "../components/StreamItem";
 import { store } from "./store";
 
 
-export const reservedCollections: string[] = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
+export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
