@@ -20,7 +20,7 @@ export default async (request: Request, context: Context) => {
       .then(res => res.json())
       .catch(async () =>
         apis.length ?
-          await fetcher() : '';
+          (await fetcher()) : '';
       );
 
 
