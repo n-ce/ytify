@@ -450,10 +450,11 @@ export default function() {
 
 
 
-function clearCache(reload : Boolean = true) {
+function clearCache(_: Event | undefined = undefined) {
   self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
   navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-  if (reload) location.reload();
+
+  if (_?.type === 'click') location.reload();
 }
 
 function restoreSettings() {
@@ -507,7 +508,7 @@ async function importSettings(e: Event) {
 // emergency use
 if (location.search === '?reset') {
   history.replaceState({}, '', location.pathname);
-  clearCache(false);
+  clearCache();
   restoreSettings();
 }
 
