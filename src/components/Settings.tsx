@@ -503,9 +503,9 @@ async function importSettings(e: Event) {
 
 // emergency use
 if (location.search === '?reset') {
-  history.replaceState({}, '', location.pathname);
   clearCache();
   restoreSettings();
+  history.replaceState({}, '', location.pathname);
 }
 
 
