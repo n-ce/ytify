@@ -41,8 +41,9 @@ function Selector(_: Selector) {
         id={_.id}
         onChange={_.onChange}
         ref={target}
+        multiple={_.multiple}
       >{_.children}</select>
-    </span>
+    </span >
   );
 }
 
@@ -444,6 +445,65 @@ export default function() {
         }>Toggle Fullscreen</p>
       </div>
 
+      <div>
+        <b>
+          <i class="ri-parent-line"></i>
+          <p>Parental Controls</p>
+        </b>
+
+        <ToggleSwitch
+          id="kidsSwitch"
+          name='Set Up'
+          checked={Boolean(getSaved('kidsMode'))}
+          onClick={e => {
+            const savedPin = getSaved('kidsMode');
+            if (savedPin) {
+              if (prompt('Enter PIN to disable') === savedPin) {
+                removeSaved('kidsMode');
+                location.reload();
+              } else {
+                alert('Incorrect PIN!');
+                e.preventDefault();
+              }
+              return;
+            }
+
+            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the blocking functionalities.');
+            if (pin) {
+              save('kidsMode', pin);
+              location.reload();
+            }
+            else e.preventDefault();
+          }}
+
+        />
+
+        <Show when={getSaved('kidsMode')}>
+
+          <Selector
+            label="Toggle Parts"
+            id="partsSelector"
+            multiple={true}
+            onChange={e => {
+              import('../modules/partsManager')
+                .then(mod => mod.default(e.target.value));
+            }}
+            onMount={e => {
+              console.log(e.value);
+            }}
+          >
+            <option></option>
+            <option value="/settings">Settings</option>
+            <option value="/search">Search</option>
+            <option value="/library">Library</option>
+            <option value="collections">Reserved Collections</option>
+            <option value="viewOnYTBtn" >Open Playlist in YouTube Button</option>
+            <option value="actionsMenu3" >Start Radio Button</option>
+            <option value="actionsMenu5" >View Channel Button</option>
+            <option value="actionsMenu6" >Watch on YouTube Button</option>
+          </Selector >
+        </Show>
+      </div>
     </>
   );
 }
@@ -462,7 +522,7 @@ function restoreSettings(_: Event | undefined = undefined) {
   localStorage.clear();
 
   if (temp) save('library', temp);
-  
+
   if (_?.type === 'click') location.reload();
 }
 

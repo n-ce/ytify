@@ -81,7 +81,8 @@ declare global {
     id: string,
     onChange: (e: { target: HTMLSelectElement }) => void,
     onMount: (target: HTMLSelectElement) => void,
-    children: JSXElement
+    children: JSXElement,
+    multiple?: boolean | undefined
   }
 
   type Piped = {
