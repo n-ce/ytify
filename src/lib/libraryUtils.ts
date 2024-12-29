@@ -123,10 +123,8 @@ export async function fetchCollection(collection: string | null, shared: boolean
     loadingScreen.showModal();
     await fetch(`${location.origin}/collection/${collection}`)
       .then(res => res.json())
-      .then(data => {
-        renderDataIntoFragment(data, fragment);
-      })
-      .catch(() => notify('Failed to load the shared list, it may consist of a corrupted stream'))
+      .then(data => renderDataIntoFragment(data, fragment))
+      .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
       .finally(() => loadingScreen.close());
 
   }
@@ -145,7 +143,7 @@ export async function fetchCollection(collection: string | null, shared: boolean
     listContainer.classList.remove('reverse');
 
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'sharedCollection' : 'collection');
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'sharedClxn' : 'collection');
 
   if (location.pathname !== '/list')
     goTo('/list');
