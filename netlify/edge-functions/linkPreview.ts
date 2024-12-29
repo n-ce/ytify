@@ -27,7 +27,7 @@ export default async (request: Request, context: Context) => {
   const data = await fetcher();
   if (!data) return;
   const music = data.author.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
-  const thumbnail = music + (data.videoThumbnails.find((v: Record<'quality' | 'url', string>) => v.quality === 'medium')?.url || `https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`);
+  const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.author.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
