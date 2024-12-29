@@ -16,7 +16,7 @@ export default async (request: Request, context: Context) => {
     .then(di => di.invidious);
 
   const fetcher = (): Promise<Invidious> =>
-    fetch(apis.shift() + id)
+    fetch(apis.shift() +'/api/v1/videos/' + id)
       .then(res => res.json())
       .catch(async () => {
         return apis.length ?
