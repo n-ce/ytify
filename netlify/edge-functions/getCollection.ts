@@ -1,18 +1,13 @@
 import { Config, Context } from '@netlify/edge-functions';
 
-export default async (_: Request, context: Context) => {
+export default async (request: Request, context: Context) => {
 
   const { uid } = context.params;
-  const instanceArray: string[] = await fetch(
-    'https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json'
-  )
-    .then(res => res.json())
-    .then(di => di.invidious);
+  const url = new URL(request.url);
   
   if (!uid) return;
   
-  const getIndex = () => Math.floor(Math.random() * instanceArray.length);
-  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(instanceArray[getIndex()] + '/api/v1/videos/' + id)
+  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(url.origin + '/streams/' + id)
     .then(res => res.json())
     .then(res => {
       if ('error' in res)

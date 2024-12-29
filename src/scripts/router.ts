@@ -129,7 +129,7 @@ else {
 
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
 
-  if (route === '/' && !hasStreamQuery)
+  if (route === '/' && !hasStreamQuery && location.search !== '?reset')
     route = getSaved('startupTab') || '/search';
 
 }

@@ -450,20 +450,20 @@ export default function() {
 
 
 
-function clearCache() {
-  self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-  navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
-  location.reload();
+async function clearCache(_: Event | undefined = undefined) {
+  await self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
+  await navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
+
+  if (_?.type === 'click') location.reload();
 }
 
-function restoreSettings() {
+function restoreSettings(_: Event | undefined = undefined) {
   const temp = getSaved('library');
   localStorage.clear();
 
-  if (temp)
-    save('library', temp);
-
-  location.reload();
+  if (temp) save('library', temp);
+  
+  if (_?.type === 'click') location.reload();
 }
 
 function extractSettings() {
@@ -475,7 +475,6 @@ function extractSettings() {
     keys[key] = getSaved(key) as string;
   }
   return keys;
-
 }
 
 function exportSettings() {
@@ -499,24 +498,18 @@ async function importSettings(e: Event) {
 
     location.reload();
   }
-
 }
-
 
 
 // emergency use
 if (location.search === '?reset') {
-  history.replaceState({}, '', location.pathname);
   clearCache();
   restoreSettings();
+  history.replaceState({}, '', location.pathname);
 }
-
-
 
 
 document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
 document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);
 document.getElementById('importSettingsBtn')!.addEventListener('change', importSettings);
-
-
