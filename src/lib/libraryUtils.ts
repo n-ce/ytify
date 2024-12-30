@@ -167,11 +167,11 @@ export async function superCollectionLoader(name: SuperCollection) {
       const array = [];
       for (let i = 0; i < data.length; i += 4)
         array.push(<StreamItem>{
-          "type": "playlist",
-          "name": data[i + 1],
-          "uploaderName": "YouTube Music",
-          "url": '/playlist?list=' + data[i + 2],
-          "thumbnail": '/' + data[i + 3]
+          'type': 'playlist',
+          'name': data[i + 1],
+          'uploaderName': '',
+          'url': '/playlist?list=' + data[i + 2],
+          'thumbnail': '/' + data[i + 3]
         });
       return itemsLoader(array);
     });
