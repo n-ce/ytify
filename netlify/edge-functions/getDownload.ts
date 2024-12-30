@@ -3,7 +3,7 @@ import { Config, Context } from '@netlify/edge-functions';
 export default async (request: Request, context: Context) => {
 
   const { id } = context.params;
-  const url = new URL(request);
+  const url = new URL(request.url);
   const format = url.searchParams.get('f');
   const streamUrl = 'https://youtu.be/' + id;
   const cobalt = 'https://cobalt.api.timelessnesses.me';
