@@ -88,7 +88,7 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 export async function getDownloadLink(id: string): Promise<string | null> {
-  const api = store.player.fallback;
+  const api = store.player.fallback || '';
   if (!api) return;
   const dl = await fetch(`${api}/download/${id}?f=${store.downloadFormat}`)
     .then(_ => _.json())
