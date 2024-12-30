@@ -88,17 +88,9 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 export async function getDownloadLink(id: string): Promise<string | null> {
-  const streamUrl = 'https://youtu.be/' + id;
-  const dl = await fetch(store.api.cobalt, {
-    method: 'POST',
-    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url: streamUrl,
-      downloadMode: 'audio',
-      audioFormat: store.downloadFormat,
-      filenameStyle: 'basic'
-    })
-  })
+  const api = store.player.fallback;
+  if (!api) return;
+  const dl = await fetch(`${api}/download/${id}?f=${store.downloadFormat}`)
     .then(_ => _.json())
     .then(_ => {
       if ('url' in _)
