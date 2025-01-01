@@ -37,18 +37,9 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 export async function proxyHandler(url: string) {
-  const link = new URL(url);
-
   store.api.index = 0;
-  title.textContent = 'Injecting optimal audio source into player';
-
-  return url.includes('host=') ?
-    url.replace(link.origin,
-      getSaved('enforceProxy') ?
-        store.api.invidious[0] :
-        'https://' + link.searchParams.get('host')
-    ) :
-    url + '&host=' + link.origin.slice(8);
+  title.textContent = 'Inserting optimal audio source into player...';
+  return url + (url.includes('host=') ? '' : `&host=${new URL(url).origin.slice(8)}`);
 }
 
 export async function quickSwitch() {
