@@ -157,13 +157,13 @@ export async function fetchCollection(collection: string | null, shared: boolean
 }
 
 
-export async function fetchSuperMix(favorites: Collection) {
+export async function fetchSuperMix(query: string) {
 
   store.list.id = 'supermix';
   listBtnsContainer.className = 'supermix';
   loadingScreen.showModal();
 
-  const fragment = await fetch(`${store.api.supermix}/${Object.keys(favorites).join('')}`)
+  const fragment = await fetch(`${store.api.supermix}/${query}`)
     .then(res => res.json())
     .then(mixes => {
       const fragment = document.createDocumentFragment();
@@ -191,7 +191,7 @@ export async function fetchSuperMix(favorites: Collection) {
 
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
-    location.origin + location.pathname + '?supermix'
+    location.origin + location.pathname + '?supermix=' + query
   );
   document.title = 'SuperMix - ytify';
   removeSaved('defaultSuperCollection');
@@ -206,9 +206,8 @@ export async function superCollectionLoader(name: SuperCollection) {
 
   if (name === 'supermix')
     if ('favorites' in db)
-      fetchSuperMix(db.favorites)
+      fetchSuperMix(Object.keys(db.favorites).join(''))
     else return 'No Favorites Found';
-
 
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
