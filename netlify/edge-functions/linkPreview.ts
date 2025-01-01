@@ -1,4 +1,5 @@
 import { Context, Config } from '@netlify/edge-functions';
+import { fetcher, shuffle } from '../commons';
 
 export default async (request: Request, context: Context) => {
 
@@ -9,13 +10,18 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const data = await fetch(url.origin + '/streams/' + id).then(res => res.json())
-  
+  const cgeo = context.geo.country?.code || 'IN';
+  const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
+
+  shuffle(keys);
+
+  const data = await fetcher(cgeo, keys, id);
+
   if (!data) return;
-  const music = data.uploader.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
+  const music = data.channelTitle.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
   const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
   const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.uploader.replace(' - Topic', ''))
+    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.channelTitle.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
     .replace('ytify.us.kg', `ytify.us.kg?s=${id}`)
     .replaceAll('/ytify_thumbnail_min.webp', thumbnail);

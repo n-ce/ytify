@@ -1,27 +1,27 @@
 import { Config, Context } from '@netlify/edge-functions';
+import { fetcher, convertSStoHHMMSS, shuffle } from '../commons';
 
-export default async (request: Request, context: Context) => {
+export default async (_: Request, context: Context) => {
 
   const { uid } = context.params;
-  const url = new URL(request.url);
-  
+  const cgeo = context.geo.country?.code || 'IN';
+
+  const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
+
+  shuffle(keys);
+
   if (!uid) return;
-  
-  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> => fetch(url.origin + '/streams/' + id)
-    .then(res => res.json())
-    .then(res => {
-      if ('error' in res)
-        throw new Error(res.error)
-      else return res;
-    })
-    .then(json => ({
-      'id': id,
-      'title': json.title,
-      'author': (json.uploader || json.author),
-      'channelUrl': json.authorUrl || json.uploaderUrl,
-      'duration': convertSStoHHMMSS(json.duration || json.lengthSeconds)
-    }))
-    .catch(() => getData(id));
+
+  const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> =>
+    fetcher(cgeo, keys, id)
+      .then(json => ({
+        'id': id,
+        'title': json.title,
+        'author': json.channelTitle,
+        'channelUrl': '/channel/' + json.channelId,
+        'duration': convertSStoHHMMSS(json.lengthSeconds)
+      }))
+      .catch(() => getData(id));
 
   const array = Array.from({ length: Math.ceil(uid.length / 11) }, (_, i) => uid.slice(i * 11, i * 11 + 11));
   const response = await Promise.all(array.map(getData));
@@ -34,18 +34,4 @@ export default async (request: Request, context: Context) => {
 export const config: Config = {
   path: '/collection/:uid'
 };
-
-function convertSStoHHMMSS(seconds: number): string {
-  if (seconds < 0) return '';
-  const hh = Math.floor(seconds / 3600);
-  seconds %= 3600;
-  const mm = Math.floor(seconds / 60);
-  const ss = Math.floor(seconds % 60);
-  let mmStr = String(mm);
-  let ssStr = String(ss);
-  if (mm < 10) mmStr = '0' + mmStr;
-  if (ss < 10) ssStr = '0' + ssStr;
-  return (hh > 0 ?
-    hh + ':' : '') + `${mmStr}:${ssStr}`;
-}
 
