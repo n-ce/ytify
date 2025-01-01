@@ -1,7 +1,7 @@
 {
   "name": "ytify",
   "type": "module",
-  "version": "7.4",
+  "version": "7.5",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@netlify/edge-functions": "^2.11.1",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.3",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
     "eruda": "^3.4.1",

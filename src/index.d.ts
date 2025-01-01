@@ -57,7 +57,7 @@ declare global {
     [index: string]: Collection
   }
 
-  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists';
+  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists' | 'supermix';
 
   type Scheme = {
     [index: string]: {
