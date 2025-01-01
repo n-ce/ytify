@@ -1,4 +1,4 @@
-import { $, errorHandler, getApi, goTo, hostResolver, itemsLoader, notify, save } from "./utils";
+import { $, errorHandler, getApi, goTo, hostResolver, itemsLoader, notify, removeSaved, save } from "./utils";
 import { listBtnsContainer, listContainer, listSection, loadingScreen } from "./dom";
 import { render } from "solid-js/web";
 import StreamItem from "../components/StreamItem";
@@ -157,8 +157,58 @@ export async function fetchCollection(collection: string | null, shared: boolean
 }
 
 
+export async function fetchSuperMix(query: string) {
+
+  store.list.id = 'supermix';
+  listBtnsContainer.className = 'supermix';
+  loadingScreen.showModal();
+
+  const fragment = await fetch(`${store.api.supermix}/${query}`)
+    .then(res => res.json())
+    .then(mixes => {
+      const fragment = document.createDocumentFragment();
+      renderDataIntoFragment(mixes, fragment);
+      return fragment;
+    })
+    .catch(() => { notify('Error Fetching Mixes.') })
+    .finally(() => loadingScreen.close());
+
+  if (!fragment) return;
+
+  listContainer.innerHTML = '';
+  listContainer.appendChild(fragment);
+
+  const isReversed = listContainer.classList.contains('reverse');
+
+  if (isReversed)
+    listContainer.classList.remove('reverse');
+
+
+  listBtnsContainer.className = 'supermix';
+
+  if (location.pathname !== '/list')
+    goTo('/list');
+
+  listSection.scrollTo(0, 0);
+  history.replaceState({}, '',
+    location.origin + location.pathname + '?supermix=' + query
+  );
+  document.title = 'SuperMix - ytify';
+  removeSaved('defaultSuperCollection');
+}
+
+
+
+
+
 export async function superCollectionLoader(name: SuperCollection) {
   const db = getDB();
+
+  if (name === 'supermix')
+    if ('favorites' in db)
+      fetchSuperMix(Object.keys(db.favorites).join(''))
+    else return 'No Favorites Found';
+
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
     .then(res => res.text())

@@ -9,13 +9,18 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const data = await fetch(url.origin + '/streams/' + id).then(res => res.json())
-  
+  const cgeo = context.geo.country?.code || 'IN';
+  const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
+
+  shuffle(keys);
+
+  const data = await fetcher(cgeo, keys, id);
+
   if (!data) return;
-  const music = data.uploader.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
+  const music = data.channelTitle.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
   const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
   const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.uploader.replace(' - Topic', ''))
+    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.channelTitle.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
     .replace('ytify.us.kg', `ytify.us.kg?s=${id}`)
     .replaceAll('/ytify_thumbnail_min.webp', thumbnail);
@@ -26,3 +31,45 @@ export default async (request: Request, context: Context) => {
 export const config: Config = {
   path: '/*'
 };
+
+const host = 'ytstream-download-youtube-videos.p.rapidapi.com';
+export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
+  title: string,
+  channelTitle: string,
+  channelId: string,
+  lengthSeconds: number,
+  isLiveContent: boolean,
+  adaptiveFormats: {
+    mimeType: string,
+    url: string,
+    bitrate: number,
+    contentLength: string
+  }[]
+}> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
+  headers: {
+    'X-RapidAPI-Key': <string>keys.shift(),
+    'X-RapidAPI-Host': host
+  }
+})
+  .then(res => res.json())
+  .then(data => {
+    if (data && 'adaptiveFormats' in data && data.adaptiveFormats.length)
+      return data;
+    else throw new Error(data.message);
+  })
+  .catch(() => fetcher(cgeo, keys, id));
+
+
+
+export function shuffle(array: string[]) {
+  let currentIndex = array.length;
+
+  while (currentIndex != 0) {
+
+    const randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+}

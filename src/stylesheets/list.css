@@ -45,6 +45,7 @@
 
   }
 
+  &.supermix,
   &.sharedClxn {
     button {
       display: none;

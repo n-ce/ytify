@@ -4,7 +4,7 @@ import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist } from "./queue";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
-import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
+import { fetchCollection, fetchSuperMix, superCollectionLoader } from "../lib/libraryUtils";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
@@ -107,7 +107,9 @@ if (errorParam) {
     if (route === '/list')
       query.startsWith('si') ?
         fetchCollection(query.split('=')[1], true) :
-        fetchList('/' + query.split('=').join('/'));
+        query.startsWith('supermix') ?
+          fetchSuperMix(query.split('=')[1]) :
+          fetchList('/' + query.split('=').join('/'));
 
 
     if (route === '/search') {

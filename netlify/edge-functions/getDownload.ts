@@ -13,7 +13,7 @@ export default async (request: Request, context: Context) => {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Api-Key '+ key
+      'Authorization': 'Api-Key ' + key
     },
     body: JSON.stringify({
       url: streamUrl,
@@ -26,9 +26,9 @@ export default async (request: Request, context: Context) => {
     .then(_ => {
       if ('url' in _)
         return _;
-      else throw new Error(_.error.code);
+      else throw new Error(_);
     })
-  .catch(_=>_);
+    .catch(_ => _);
 
   return new Response(JSON.stringify(dl), {
     headers: { 'content-type': 'application/json' },
