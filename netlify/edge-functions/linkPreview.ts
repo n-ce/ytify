@@ -1,5 +1,5 @@
 import { Context, Config } from '@netlify/edge-functions';
-import { fetcher, shuffle } from '../commons';
+import { fetcher, shuffle } from './commons';
 
 export default async (request: Request, context: Context) => {
 
