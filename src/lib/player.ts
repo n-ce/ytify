@@ -17,8 +17,8 @@ export default async function player(id: string | null = '') {
   if (data && 'audioStreams' in data)
     store.player.data = data;
   else {
-    playButton.classList.replace(playButton.className, 'ri-stop-line');
-    title.textContent = 'Fetching Data Failed';
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    title.textContent = data.message || data.error || 'Fetching Data Failed';
     return;
   }
 
