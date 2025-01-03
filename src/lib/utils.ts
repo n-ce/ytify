@@ -39,7 +39,13 @@ export const hostResolver = (url: string) =>
 export async function proxyHandler(url: string) {
   store.api.index = 0;
   title.textContent = 'Inserting optimal audio source into player...';
-  return url + (url.includes('host=') ? '' : `&host=${new URL(url).origin.slice(8)}`);
+  const link = new URL(url);
+  const origin = link.origin.slice(8);
+  const host = link.searchParams.get('host');
+  
+  return getSaved('enforceProxy') ?  
+    (url + (host ? '' : `&host=${origin}`)) :
+    host ? url.replace(origin, host) : url;
 }
 
 export async function quickSwitch() {

@@ -10,14 +10,17 @@ export default async function player(id: string | null = '') {
   if (!id) return;
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-
   title.textContent = 'Fetching Data...';
 
   const data = await getData(id);
 
   if (data && 'audioStreams' in data)
     store.player.data = data;
-  else return player(id);
+  else {
+    playButton.classList.replace(playButton.className, 'ri-stop-line');
+    title.textContent = 'Fetching Data Failed';
+    return;
+  }
 
   await setMetaData({
     id: id,
