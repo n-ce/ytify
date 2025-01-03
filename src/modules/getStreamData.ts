@@ -62,7 +62,7 @@ export async function getData(
   const iv = store.api.invidious;
   const pi = store.api.piped;
 
-  const res = await Promise.any(
+  return Promise.any(
     pi.map(fetchDataFromPiped)
   )
     .catch(() => h ? {} : Promise.any(
@@ -74,8 +74,6 @@ export async function getData(
             .catch(() => getData(id))
       })
     );
-
-  return res ? res : getData(id, prefetch);
-
+  
 }
 
