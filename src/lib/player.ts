@@ -18,7 +18,7 @@ export default async function player(id: string | null = '') {
     store.player.data = data;
   else {
     playButton.classList.replace(playButton.className, 'ri-stop-line');
-    title.textContent = 'Fetching Data Failed';
+    title.textContent = data.message || data.error || 'Fetching Data Failed';
     return;
   }
 
