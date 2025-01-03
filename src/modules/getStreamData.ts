@@ -3,7 +3,7 @@ import { store } from "../lib/store";
 export async function getData(
   id: string,
   prefetch: boolean = false
-): Promise<Piped> {
+): Promise<Piped|Error> {
   /*
   If HLS try with piped
   else 
