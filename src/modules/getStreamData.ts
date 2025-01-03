@@ -65,13 +65,13 @@ export async function getData(
   return Promise.any(
     pi.map(fetchDataFromPiped)
   )
-    .catch(e => h ? e : Promise.any(
+    .catch(e => h ? e.errors[0] : Promise.any(
       iv.map(fetchDataFromInvidious)
     )
       .catch(e => {
         if (!prefetch && store.player.fallback)
           return fetchDataFromPiped(store.player.fallback)
-            .catch(() => e)
+            .catch(() => e.errors[0])
       })
     );
   
