@@ -87,28 +87,38 @@ export default function() {
         <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
       </li>
 
-      <li tabindex={6} on:click={() => {
-        open('https://youtu.be/' + store.actionsMenu.id);
-      }}>
-        <i class="ri-youtube-line"></i>Watch on YouTube
-      </li>
+      {isMusic() ?
+        (<li tabindex={6} on:click={
+          () => {
+            loadingScreen.showModal();
+            fetch(`https://lrclib.net/api/get?
+            track_name=${store.actionsMenu.title}&
+            artist_name=${store.actionsMenu.author.slice(0, -8)}`)
+              .then(res => res.json())
+              .then(data => {
+                displayer(data.plainLyrics);
+              })
+              .catch(() => 'Failed to Retrieve Lyrics.')
+              .finally(() => loadingScreen.close());
+
+          }
+        }>
+          <i class="ri-music-2-line"></i>View Lyrics
+        </li>) :
+
+        (<li tabindex={6} on:click={() => {
+          open('https://youtu.be/' + store.actionsMenu.id);
+        }}>
+          <i class="ri-youtube-line"></i>Watch on YouTube
+        </li>)
+
+      }
 
       <li tabindex={7} on:click={() => {
         close();
 
         const output = location.pathname === '/' ? store.player.data : store.actionsMenu;
-        const dialog = $('dialog') as HTMLDialogElement;
-
-        dialog.className = 'debug';
-        dialog.textContent = JSON.stringify(output, null, 4);
-
-        document.body.appendChild(dialog);
-
-        dialog.showModal();
-        dialog.onclick = function() {
-          dialog.close();
-          dialog.remove();
-        }
+        displayer(JSON.stringify(output, null, 4));
 
       }}>
         <i class="ri-bug-line"></i> Debug Information
@@ -117,3 +127,21 @@ export default function() {
     </ul>
   )
 }
+
+
+function displayer(text: string) {
+
+  const dialog = $('dialog') as HTMLDialogElement;
+
+  dialog.className = 'displayer';
+  dialog.textContent = text;
+
+  document.body.appendChild(dialog);
+
+  dialog.showModal();
+  dialog.onclick = function() {
+    dialog.close();
+    dialog.remove();
+  }
+}
+
