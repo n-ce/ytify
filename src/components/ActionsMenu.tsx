@@ -91,9 +91,7 @@ export default function() {
         (<li tabindex={6} on:click={
           () => {
             loadingScreen.showModal();
-            fetch(`https://lrclib.net/api/get?
-            track_name=${store.actionsMenu.title}&
-            artist_name=${store.actionsMenu.author.slice(0, -8)}`)
+            fetch(`https://lrclib.net/api/get?track_name=${store.actionsMenu.title}&artist_name=${store.actionsMenu.author.slice(0, -8)}`)
               .then(res => res.json())
               .then(data => {
                 displayer(data.plainLyrics);
