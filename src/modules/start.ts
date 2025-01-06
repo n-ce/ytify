@@ -49,7 +49,8 @@ export default async function() {
               h.loadSource(newUrl);
             }
             else {
-              notify('load error, retrying...')
+              notify('load error, retrying...');
+              store.api.piped.splice(store.api.index, 1);
               player(store.stream.id);
             }
 
