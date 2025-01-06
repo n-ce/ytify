@@ -1,5 +1,5 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, getDownloadLink } from "../lib/utils";
+import { $, getDownloadLink, notify } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { store } from "../lib/store";
@@ -145,5 +145,9 @@ const getLyrics = () => fetch(
     }
   })
   .then(res => res.json())
-  .then(data => displayer(data.plainLyrics))
-  .catch(e => displayer(e.message));
+  .then(data => {
+    const lrc = data.plainLyrics;
+    lrc ?
+      displayer(lrc) :
+      notify(data.message);
+  });
