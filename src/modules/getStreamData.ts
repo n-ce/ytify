@@ -62,12 +62,13 @@ export async function getData(
   const iv = store.api.invidious;
   const pi = store.api.piped;
 
-  return Promise.any(
-    pi.map(fetchDataFromPiped)
-  )
-    .catch(e => h ? e.errors[0] : Promise.any(
-      iv.map(fetchDataFromInvidious)
+  return h ? (
+    Promise.any(pi.map(fetchDataFromPiped)) :
+    fetchDataFromPiped(pi[0])
     )
+    .catch(e => h ? 
+      e.errors[0] :
+      Promise.any(iv.map(fetchDataFromInvidious))
       .catch(e => {
         if (!prefetch && store.player.fallback)
           return fetchDataFromPiped(store.player.fallback)
