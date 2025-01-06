@@ -35,6 +35,7 @@ export default function(mod: typeof Hls) {
       else {
         playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
         title.textContent = 'All Instances Failed, Reload the page to retry.';
+
       }
 
     }

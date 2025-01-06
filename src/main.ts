@@ -8,16 +8,17 @@ import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
+
   const settingsContainer = document.getElementById('settings') as HTMLDivElement;
   const stngs = await import('./components/Settings');
-  const start = await import('./modules/start')
-  const amenu = await import('./components/ActionsMenu');
-
-  start.default();
-  render(amenu.default, actionsMenu);
   render(stngs.default, settingsContainer);
-
   settingsContainer.appendChild(document.getElementById('actionsContainer')!);
+
+  const start = await import('./modules/start')
+  start.default();
+
+  const amenu = await import('./components/ActionsMenu');
+  render(amenu.default, actionsMenu);
 
   if (import.meta.env.PROD)
     await import('virtual:pwa-register').then(pwa => {
