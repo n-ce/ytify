@@ -49,9 +49,11 @@ export default async function() {
               h.loadSource(newUrl);
             }
             else {
-              notify('load error, retrying...');
-              store.api.piped.splice(store.api.index, 1);
-              player(store.stream.id);
+              const index = store.api.piped.indexOf(piProxy);
+              store.api.piped.splice(index, 1);
+              store.api.piped.length ?
+                player(store.stream.id) :
+                notify('Loading Error.');
             }
 
           })
