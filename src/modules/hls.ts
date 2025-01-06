@@ -1,8 +1,7 @@
 import { store } from "../lib/store";
 import { notify } from "../lib/utils";
-import { audio } from '../lib/dom';
+import { audio, playButton, title } from '../lib/dom';
 import player from '../lib/player';
-
 import Hls from "hls.js";
 
 export default function(mod: typeof Hls) {
@@ -30,13 +29,13 @@ export default function(mod: typeof Hls) {
 
     }
     else {
-      const url = store.player.data!.audioStreams[0].url;
-      const pi = (new URL(url)).origin;
-      const index = store.api.piped.indexOf(pi);
-      store.api.piped.splice(index, 1);
-      store.api.piped.length ?
-        player(store.stream.id) :
-        notify('All Instances Failed, Reload the page to retry.');
+      store.api.piped.splice(store.api.index, 1);
+      if (store.api.piped.length)
+        player(store.stream.id)
+      else {
+        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+        title.textContent = 'All Instances Failed, Reload the page to retry.';
+      }
 
     }
 

@@ -4,21 +4,21 @@ export async function getData(
   id: string,
   prefetch: boolean = false
 ): Promise<Piped | Error & { error: string }> {
-  /*
-  If HLS try with piped
-  else 
-   try with piped
-    try with invidious
-     try with fallback
-  */
+
+  const hls = store.player.HLS;
+  const inv = store.api.invidious;
+  const pip = store.api.piped;
 
   const fetchDataFromPiped = (
     api: string
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data && data.audioStreams.length)
+      if (data && 'audioStreams' in data && data.audioStreams.length) {
+        if (hls)
+          store.api.index = pip.indexOf(api);
         return data;
+      }
       else throw new Error(data.message);
     });
 
@@ -57,25 +57,21 @@ export async function getData(
       }))
     }));
 
+  const emergency = (e: AggregateError) =>
+    (!prefetch && store.player.fallback) ?
+      fetchDataFromPiped(store.player.fallback)
+        .catch(() => e.errors[0]) :
+      e.errors[0];
 
-  const h = store.player.HLS;
-  const iv = store.api.invidious;
-  const pi = store.api.piped;
+  const useInvidious = (e: AggregateError) => hls ?
+    e.errors[0] :
+    Promise.any(inv.map(fetchDataFromInvidious))
+      .catch(emergency);
 
-  return (h ?
-    Promise.any(pi.map(fetchDataFromPiped)) :
-    fetchDataFromPiped(pi[0])
-  )
-    .catch(e => h ?
-      e.errors[0] :
-      Promise.any(iv.map(fetchDataFromInvidious))
-        .catch(x => {
-          if (!prefetch && store.player.fallback)
-            return fetchDataFromPiped(store.player.fallback)
-              .catch(() => x.errors[0])
-          else return x.errors[0];
-        })
-    );
+  const usePiped = hls ?
+    Promise.any(pip.map(fetchDataFromPiped)) :
+    fetchDataFromPiped(pip[0]);
 
+  return usePiped.catch(useInvidious);
 }
 
