@@ -85,6 +85,7 @@ declare global {
   }
 
   type Piped = {
+    instance: string,
     title: string,
     uploader: string,
     duration: number,

@@ -1,7 +1,7 @@
 import { type SortableEvent } from 'sortablejs';
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { $, getDownloadLink, idFromURL, notify, proxyHandler } from '../lib/utils';
+import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, queuelist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection, fetchSuperMix } from "../lib/libraryUtils";
@@ -18,43 +18,16 @@ export default async function() {
 
   } else if ('inject_ytify_services' in window) await window.inject_ytify_services(store);
 
-  // hls
 
   if (getSaved('HLS')) {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
 
-    if (!store.player.legacy)
-      import('hls.js')
-        .then(mod => {
-          store.player.HLS = new mod.default();
-          const h = store.player.HLS;
-          h.attachMedia(audio);
-          h.on(mod.default.Events.MANIFEST_PARSED, () => {
-            h.currentLevel = store.player.hq ?
-              h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
-            audio.play();
-          });
-          h.on(mod.default.Events.ERROR, (_, d) => {
-
-            if (d.details === 'manifestLoadError') {
-              const hlsUrl = store.player.data!.hls;
-              const piProxy = (new URL(hlsUrl)).origin;
-
-              if (piProxy === store.api.invidious[0]) {
-                notify(d.details);
-                return;
-              }
-              const newUrl = hlsUrl.replace(piProxy, store.api.invidious[0]);
-              h.loadSource(newUrl);
-            }
-            else {
-              notify('load error, retrying...')
-              player(store.stream.id);
-            }
-
-          })
-        })
+    if (!store.player.legacy) {
+      const lib = await import('hls.js');
+      const fun = await import('./hls');
+      fun.default(lib.default);
+    }
   }
   else bitrateSelector.addEventListener('change', async () => {
     if (store.player.playbackState === 'playing')

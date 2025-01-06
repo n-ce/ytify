@@ -3,14 +3,11 @@ import { store } from "../lib/store";
 export async function getData(
   id: string,
   prefetch: boolean = false
-): Promise<Piped|Error & { error: string }> {
-  /*
-  If HLS try with piped
-  else 
-   try with piped
-    try with invidious
-     try with fallback
-  */
+): Promise<Piped | Error & { error: string }> {
+
+  const hls = store.player.HLS;
+  const inv = store.api.invidious;
+  const pip = store.api.piped;
 
   const fetchDataFromPiped = (
     api: string
@@ -57,23 +54,34 @@ export async function getData(
       }))
     }));
 
+  const emergency = (e: AggregateError) =>
+    (!prefetch && store.player.fallback) ?
+      fetchDataFromPiped(store.player.fallback)
+        .catch(() => e.errors[0]) :
+      e.errors[0];
 
-  const h = store.player.HLS;
-  const iv = store.api.invidious;
-  const pi = store.api.piped;
+  const useInvidious = (e: AggregateError) => hls ?
+    e.errors[0] :
+    Promise.any(inv.map(fetchDataFromInvidious))
+      .catch(emergency);
 
-  return Promise.any(
-    pi.map(fetchDataFromPiped)
-  )
-    .catch(e => h ? e.errors[0] : Promise.any(
-      iv.map(fetchDataFromInvidious)
-    )
-      .catch(e => {
-        if (!prefetch && store.player.fallback)
-          return fetchDataFromPiped(store.player.fallback)
-            .catch(() => e.errors[0])
-      })
-    );
-  
+  const usePiped = hls ?
+    Promise
+      .allSettled(pip.map(fetchDataFromPiped))
+      .then(res => {
+        const ff = res.filter(r => r.status === 'fulfilled');
+        store.player.hlsCache.length = 0;
+
+        ff.forEach(r => {
+          if (r.value.hls) {
+            store.player.hlsCache.push(r.value.hls);
+          }
+        });
+
+        return ff[0].value || { message: 'No HLS sources are available.' };
+      }) :
+    fetchDataFromPiped(pip[0]);
+
+  return usePiped.catch(useInvidious);
 }
 

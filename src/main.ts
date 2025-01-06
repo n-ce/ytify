@@ -4,24 +4,21 @@ import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
 import './scripts/library';
-
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
+
   const settingsContainer = document.getElementById('settings') as HTMLDivElement;
-
-  await import('./components/Settings')
-    .then(mod => render(mod.default, settingsContainer));
-
+  const stngs = await import('./components/Settings');
+  render(stngs.default, settingsContainer);
   settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 
+  const start = await import('./modules/start')
+  start.default();
 
-  await import('./modules/start')
-    .then(mod => mod.default());
-
-  await import('./components/ActionsMenu')
-    .then(mod => render(mod.default, actionsMenu));
+  const amenu = await import('./components/ActionsMenu');
+  render(amenu.default, actionsMenu);
 
   if (import.meta.env.PROD)
     await import('virtual:pwa-register').then(pwa => {
