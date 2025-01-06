@@ -29,7 +29,8 @@ export default function(mod: typeof Hls) {
 
     }
     else {
-      store.api.piped.splice(store.api.index, 1);
+      const index = store.api.piped.indexOf(store.player.data!.instance);
+      store.api.piped.splice(index, 1);
       if (store.api.piped.length)
         player(store.stream.id)
       else {

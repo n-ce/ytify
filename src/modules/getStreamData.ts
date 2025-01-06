@@ -15,8 +15,7 @@ export async function getData(
     .then(res => res.json())
     .then(data => {
       if (data && 'audioStreams' in data && data.audioStreams.length) {
-        if (hls)
-          store.api.index = pip.indexOf(api);
+        data['instance'] = api;
         return data;
       }
       else throw new Error(data.message);
