@@ -16,10 +16,10 @@ export default function(mod: typeof Hls) {
   });
   h.on(mod.Events.ERROR, (_, d) => {
 
-    const hlsUrl = store.player.data!.hls;
-    const piProxy = (new URL(hlsUrl)).origin;
 
     if (d.details === 'manifestLoadError') {
+      const hlsUrl = store.player.data!.hls;
+      const piProxy = (new URL(hlsUrl)).origin;
 
       if (piProxy === store.api.invidious[0]) {
         notify(d.details);
@@ -30,8 +30,9 @@ export default function(mod: typeof Hls) {
 
     }
     else {
-
-      const index = store.api.piped.indexOf(piProxy);
+      const url = store.player.data!.audioStreams[0].url;
+      const pi = (new URL(url)).origin;
+      const index = store.api.piped.indexOf(pi);
       store.api.piped.splice(index, 1);
       store.api.piped.length ?
         player(store.stream.id) :
