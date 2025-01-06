@@ -163,7 +163,7 @@ export async function fetchSuperMix(query: string) {
   listBtnsContainer.className = 'supermix';
   loadingScreen.showModal();
 
-  const fragment = await fetch(`${store.api.supermix}/${query}`)
+  const fragment = await fetch(`${store.api.supermix}/supermix/${query}`)
     .then(res => res.json())
     .then(mixes => {
       const fragment = document.createDocumentFragment();

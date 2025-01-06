@@ -3,7 +3,7 @@ import { store } from "../lib/store";
 export async function getData(
   id: string,
   prefetch: boolean = false
-): Promise<Piped|Error & { error: string }> {
+): Promise<Piped | Error & { error: string }> {
   /*
   If HLS try with piped
   else 
@@ -62,19 +62,19 @@ export async function getData(
   const iv = store.api.invidious;
   const pi = store.api.piped;
 
-  return h ? (
+  return (h ?
     Promise.any(pi.map(fetchDataFromPiped)) :
     fetchDataFromPiped(pi[0])
-    )
-    .catch(e => h ? 
+  )
+    .catch(e => h ?
       e.errors[0] :
       Promise.any(iv.map(fetchDataFromInvidious))
-      .catch(e => {
-        if (!prefetch && store.player.fallback)
-          return fetchDataFromPiped(store.player.fallback)
-            .catch(() => e.errors[0])
-      })
+        .catch(e => {
+          if (!prefetch && store.player.fallback)
+            return fetchDataFromPiped(store.player.fallback)
+              .catch(() => e.errors[0])
+        })
     );
-  
+
 }
 
