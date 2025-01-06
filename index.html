@@ -30,6 +30,15 @@
   <link rel="apple-touch-icon" href="/logo192.png">
   <link rel="icon" type="image/svg+xml" href="/ytify_lite.svg">
 
+  <script>
+    window.inject_ytify_services = store => fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
+      .then(res => res.json())
+      .then(data => {
+        store.api.piped = data.piped;
+        store.api.invidious = data.invidious;
+        store.api.supermix = data.supermix; store.player.fallback = location.origin;
+      });
+  </script>
 
   <title>ytify</title>
 </head>

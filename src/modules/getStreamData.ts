@@ -14,10 +14,8 @@ export async function getData(
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data && data.audioStreams.length) {
-        data['instance'] = api;
+      if (data && 'audioStreams' in data && data.audioStreams.length)
         return data;
-      }
       else throw new Error(data.message);
     });
 
@@ -68,7 +66,20 @@ export async function getData(
       .catch(emergency);
 
   const usePiped = hls ?
-    Promise.any(pip.map(fetchDataFromPiped)) :
+    Promise
+      .allSettled(pip.map(fetchDataFromPiped))
+      .then(res => {
+        const ff = res.filter(r => r.status === 'fulfilled');
+        store.player.hlsCache.length = 0;
+
+        ff.forEach(r => {
+          if (r.value.hls) {
+            store.player.hlsCache.push(r.value.hls);
+          }
+        });
+
+        return ff[0].value || { message: 'No HLS sources are available.' };
+      }) :
     fetchDataFromPiped(pip[0]);
 
   return usePiped.catch(useInvidious);

@@ -12,6 +12,7 @@ export const store: {
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
+    hlsCache: string[],
     legacy: boolean,
     fallback: string
   },
@@ -46,6 +47,7 @@ export const store: {
       }
     }).then(res => res.supported),
     data: undefined,
+    hlsCache: [],
     legacy: !('OffscreenCanvas' in window),
     fallback: ''
   },

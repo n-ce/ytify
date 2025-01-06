@@ -1,7 +1,6 @@
 import { store } from "../lib/store";
 import { notify } from "../lib/utils";
-import { audio, playButton, title } from '../lib/dom';
-import player from '../lib/player';
+import { audio, playButton } from '../lib/dom';
 import Hls from "hls.js";
 
 export default function(mod: typeof Hls) {
@@ -29,16 +28,15 @@ export default function(mod: typeof Hls) {
 
     }
     else {
-      const index = store.api.piped.indexOf(store.player.data!.instance);
-      store.api.piped.splice(index, 1);
-      if (store.api.piped.length)
-        player(store.stream.id)
+      const hlsUrl = store.player.hlsCache.shift();
+      if (hlsUrl) {
+        h.stopLoad();
+        h.loadSource(hlsUrl);
+      }
       else {
         playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-        title.textContent = 'All Instances Failed, Reload the page to retry.';
-
+        notify(d.details);
       }
-
     }
 
   });

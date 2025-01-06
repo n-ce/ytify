@@ -13,6 +13,7 @@ export default async function player(id: string | null = '') {
   title.textContent = 'Fetching Data...';
 
   const data = await getData(id);
+  const h = store.player.HLS;
 
   if (data && 'audioStreams' in data)
     store.player.data = data;
@@ -35,10 +36,14 @@ export default async function player(id: string | null = '') {
     audio.load();
   }
   else {
-    const h = store.player.HLS;
-    h ?
-      h.loadSource(data.hls) :
-      import('../modules/setAudioStreams').then(mod => mod.setAudioStreams(
+    if (h) {
+      const hlsUrl = store.player.hlsCache.shift();
+      if (hlsUrl)
+        h.loadSource(hlsUrl);
+
+    }
+    else import('../modules/setAudioStreams')
+      .then(mod => mod.setAudioStreams(
         data.audioStreams
           .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
           ),
