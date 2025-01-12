@@ -1,5 +1,5 @@
 import './Settings.css';
-import { Show, onMount } from "solid-js";
+import { For, Show, createSignal, onMount } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { store, getSaved, params } from '../lib/store';
@@ -48,6 +48,18 @@ function Selector(_: Selector) {
 
 
 export default function() {
+
+  // kids mode signal
+
+  const [getParts, setParts] = createSignal([] as {
+    name: string,
+    callback: (arg0: Event) => void
+  }[]);
+  if (getSaved('kidsMode'))
+    import('../modules/partsManager')
+      .then(mod => mod.partsManager())
+      .then(setParts);
+
 
   return (
     <>
@@ -443,6 +455,58 @@ export default function() {
           }
         }>Toggle Fullscreen</p>
       </div>
+
+
+
+      <div>
+        <b>
+          <i class="ri-parent-line"></i>
+          <p>Parental Controls</p>
+        </b>
+
+        <ToggleSwitch
+          id="kidsSwitch"
+          name='Set Up'
+          checked={Boolean(getSaved('kidsMode'))}
+          onClick={e => {
+            const savedPin = getSaved('kidsMode');
+            if (savedPin) {
+              if (prompt('Enter PIN to disable') === savedPin) {
+                removeSaved('kidsMode');
+                location.reload();
+              } else {
+                alert('Incorrect PIN!');
+                e.preventDefault();
+              }
+              return;
+            }
+
+            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the blocking functionalities.');
+            if (pin) {
+              save('kidsMode', pin);
+              location.reload();
+            }
+            else e.preventDefault();
+          }}
+
+        />
+
+        <For each={getParts()}>
+          {item => (
+            <ToggleSwitch
+              id={'kidsMode_' + item.name}
+              name={item.name}
+              checked={!Boolean(getSaved('kidsMode_' + item.name))}
+              onClick={item.callback}
+
+            />
+          )}
+        </For>
+
+
+      </div>
+
+
 
     </>
   );

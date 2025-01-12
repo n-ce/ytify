@@ -98,7 +98,7 @@ export default function() {
           <i class="ri-music-2-line"></i>View Lyrics
         </li>) :
 
-        (<li tabindex={6} on:click={() => {
+        (<li id='woytBtn' tabindex={6} on:click={() => {
           open('https://youtu.be/' + store.actionsMenu.id);
         }}>
           <i class="ri-youtube-line"></i>Watch on YouTube
