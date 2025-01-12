@@ -177,12 +177,13 @@ audio.oncanplaythrough = function() {
 audio.onerror = function() {
   audio.pause();
   const id = store.stream.id;
+  const message = 'Error 403 : Unauthenticated Stream';
 
   if (getSaved('custom_instance_2'))
-    return notify('Proxy failed to decrypt stream');
+    return notify(message);
 
   if (store.player.HLS) {
-    notify('PipedProxy failed to decrypt stream, Retrying...');
+    notify(message);
     player(id);
     return;
   }
@@ -190,20 +191,18 @@ audio.onerror = function() {
 
   const origin = new URL(audio.src).origin;
 
-  title.textContent = 'Error 403, handling Error...';
-
   if (store.api.index < store.api.invidious.length) {
     const proxy = store.api.invidious[store.api.index];
+    title.textContent = `Switching proxy to ${proxy.slice(8)}`;
     audio.src = audio.src.replace(origin, proxy);
-    title.textContent = 'trying to load via Proxy ' + store.api.index;
     store.api.index++;
   }
   else {
     store.api.index = 0;
-    notify('Error 403 unauthenticated stream.');
+    notify(message);
     title.textContent = store.stream.title;
 
-    getDownloadLink(store.actionsMenu.id)
+    getDownloadLink(store.stream.id)
       .then(_ => {
         if (_)
           audio.src = _;

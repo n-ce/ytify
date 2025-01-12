@@ -2,7 +2,7 @@ import './Settings.css';
 import { Show, onMount } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { $, quickSwitch, removeSaved, save } from "../lib/utils";
-import { store, getSaved } from '../lib/store';
+import { store, getSaved, params } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
 import { getDB, saveDB } from '../lib/libraryUtils';
 
@@ -462,7 +462,7 @@ function restoreSettings(_: Event | undefined = undefined) {
   localStorage.clear();
 
   if (temp) save('library', temp);
-  
+
   if (_?.type === 'click') location.reload();
 }
 
@@ -502,7 +502,7 @@ async function importSettings(e: Event) {
 
 
 // emergency use
-if (location.search === '?reset') {
+if (params.has('reset')) {
   clearCache();
   restoreSettings();
   history.replaceState({}, '', location.pathname);

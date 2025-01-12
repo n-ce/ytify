@@ -38,14 +38,14 @@ export const hostResolver = (url: string) =>
 
 export async function proxyHandler(url: string) {
   store.api.index = 0;
-  title.textContent = 'Inserting optimal audio source into player...';
+  title.textContent = 'Inserting audio source into player...';
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
-  
-  return getSaved('enforceProxy') ?  
+
+  return getSaved('enforceProxy') ?
     (url + (host ? '' : `&host=${origin}`)) :
-    host ? url.replace(origin, host) : url;
+    (host && !getSaved('custom_instance_2')) ? url.replace(origin, host) : url;
 }
 
 export async function quickSwitch() {
@@ -121,6 +121,26 @@ export async function errorHandler(
 
 
 
+export function renderDataIntoFragment(
+  data: Collection,
+  fragment: DocumentFragment,
+  draggable = false
+) {
+
+  for (const item in data) {
+    const d = data[item] as CollectionItem;
+    if (d.id)
+      render(() => StreamItem({
+        id: d.id,
+        href: hostResolver(`/watch?v=${d.id}`),
+        title: d.title,
+        author: d.author,
+        duration: d.duration,
+        channelUrl: d.channelUrl,
+        draggable: draggable
+      }), fragment);
+  }
+}
 
 export function itemsLoader(itemsArray: StreamItem[] | null) {
   if (!itemsArray?.length)

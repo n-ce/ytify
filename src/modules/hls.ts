@@ -3,16 +3,19 @@ import { notify } from "../lib/utils";
 import { audio, playButton } from '../lib/dom';
 import Hls from "hls.js";
 
-export default function(mod: typeof Hls) {
-  store.player.HLS = new mod();
-  const h = store.player.HLS as Hls;
+export default function() {
+  store.player.HLS = new Hls();
+  const h = store.player.HLS;
+
   h.attachMedia(audio);
-  h.on(mod.Events.MANIFEST_PARSED, () => {
+
+  h.on(Hls.Events.MANIFEST_PARSED, () => {
     h.currentLevel = store.player.hq ?
       h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
     audio.play();
   });
-  h.on(mod.Events.ERROR, (_, d) => {
+
+  h.on(Hls.Events.ERROR, (_, d) => {
 
 
     if (d.details === 'manifestLoadError') {

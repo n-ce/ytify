@@ -4,6 +4,7 @@ import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render } from "solid-js/web";
 import { store, getSaved } from "../lib/store";
+import Sortable, { type SortableEvent } from 'sortablejs';
 
 const [
   clearQBtn,
@@ -172,3 +173,13 @@ new MutationObserver(m => {
     }
   }
 }).observe(queuelist, { childList: true });
+
+
+new Sortable(queuelist, {
+  handle: '.ri-draggable',
+  onUpdate(e: SortableEvent) {
+    if (e.oldIndex == null || e.newIndex == null) return;
+    const queueArray = store.queue;
+    queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
+  }
+});
