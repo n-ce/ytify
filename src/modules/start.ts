@@ -35,7 +35,7 @@ export default async function() {
     if (store.player.playbackState === 'playing')
       audio.pause();
     const timeOfSwitch = audio.currentTime;
-    audio.src = await proxyHandler(bitrateSelector.value);
+    audio.src = proxyHandler(bitrateSelector.value);
     audio.currentTime = timeOfSwitch;
     audio.play();
   });

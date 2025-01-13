@@ -176,6 +176,20 @@ dialog.displayer {
   background: var(--bg);
   color: var(--text);
   border-radius: var(--roundness);
+
+}
+
+dialog.watcher {
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: var(--roundness);
+
+  video {
+    width: 100%;
+    border-radius: var(--roundness);
+  }
 }
 
 

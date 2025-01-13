@@ -28,7 +28,7 @@ function ToggleSwitch(_: ToggleSwitch) {
   );
 }
 
-function Selector(_: Selector) {
+export function Selector(_: Selector) {
   let target!: HTMLSelectElement;
   onMount(() => _.onMount(target));
 
@@ -191,6 +191,17 @@ export default function() {
           <option value='ask'>Always Ask</option>
         </Selector>
 
+        <ToggleSwitch
+          id='woytifySwitch'
+          name='Watch on ytify'
+          checked={Boolean(getSaved('watchOnYtify'))}
+          onClick={() => {
+            const _ = 'watchOnYtify';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'true');
+          }}
+        />
 
       </div>
 

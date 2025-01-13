@@ -111,10 +111,6 @@ function toggle(part: string, e: Event | undefined = undefined) {
   elm?.classList.toggle('hide');
 }
 
-function button(part: string, e: Event | undefined = undefined) {
-
-}
-
 
 /*
           < option value = "viewOnYTBtn" > Open Playlist in YouTube Button </option>

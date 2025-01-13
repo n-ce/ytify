@@ -36,7 +36,7 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
-export async function proxyHandler(url: string) {
+export function proxyHandler(url: string) {
   store.api.index = 0;
   title.textContent = 'Inserting audio source into player...';
   const link = new URL(url);

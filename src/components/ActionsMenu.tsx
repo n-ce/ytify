@@ -2,10 +2,11 @@ import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
 import { $, getDownloadLink, notify } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
-import { store } from "../lib/store";
+import { getSaved, store } from "../lib/store";
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { createSignal } from "solid-js";
+import { render } from "solid-js/web";
 
 declare module "solid-js" {
   namespace JSX {
@@ -99,9 +100,13 @@ export default function() {
         </li>) :
 
         (<li id='woytBtn' tabindex={6} on:click={() => {
-          open('https://youtu.be/' + store.actionsMenu.id);
+          close();
+          getSaved('watchOnYtify') ?
+            import('./watchOnYtify')
+              .then(mod => render(mod.default, document.body)) :
+            open('https://youtu.be/' + store.actionsMenu.id);
         }}>
-          <i class="ri-youtube-line"></i>Watch on YouTube
+          <i class="ri-youtube-line"></i>Watch on {getSaved('watchOnYtify') ? 'ytify' : 'YouTube'}
         </li>)
 
       }

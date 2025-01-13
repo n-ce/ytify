@@ -5,7 +5,7 @@ export default function UpdatePrompt(handleUpdate: () => void) {
 
   const [list, setList] = createSignal([<li>Loading Update</li>]);
   const [fullList, setFullList] = createSignal(['']);
-
+  let dialog!: HTMLDialogElement;
 
   fetch('https://api.github.com/repos/n-ce/ytify/commits/main')
     .then(res => res.json())
@@ -13,12 +13,6 @@ export default function UpdatePrompt(handleUpdate: () => void) {
     .then(list => list.map((text: string) => (<li>{text}</li>)))
     .then(e => setList(e))
 
-
-  function handleLater(e: Event) {
-    const dialog = ((e.target as HTMLElement).parentElement as HTMLUListElement).parentElement as HTMLDialogElement;
-    dialog.close();
-    dialog.remove();
-  }
 
   const handleFullList = () =>
     fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
@@ -28,7 +22,11 @@ export default function UpdatePrompt(handleUpdate: () => void) {
 
 
   return (
-    <dialog id="changelog" open>
+    <dialog
+      id="changelog"
+      ref={dialog}
+      open
+    >
       <ul>
         {list()}
         <hr />
@@ -40,7 +38,10 @@ export default function UpdatePrompt(handleUpdate: () => void) {
       </ul>
       <span>
         <button onclick={handleUpdate} autofocus> Update</button>
-        <button onclick={handleLater}>Later</button>
+        <button onclick={() => {
+          dialog.close();
+          dialog.remove();
+        }}>Later</button>
       </span>
     </dialog>
   );

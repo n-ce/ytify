@@ -46,6 +46,5 @@ export function setAudioStreams(audioStreams: {
 
   bitrateSelector.selectedIndex = index;
 
-  proxyHandler(bitrateSelector.value)
-    .then(url => audio.src = url);
+  audio.src = proxyHandler(bitrateSelector.value);
 }

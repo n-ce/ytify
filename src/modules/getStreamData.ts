@@ -3,7 +3,7 @@ import { store } from "../lib/store";
 export async function getData(
   id: string,
   prefetch: boolean = false
-): Promise<Piped | Error & { error: string }> {
+): Promise<Piped | Record<'error' | 'message', string>> {
 
   const hls = store.player.HLS;
   const inv = store.api.invidious.slice(1);
@@ -44,6 +44,7 @@ export async function getData(
         uploaderUrl: v.authorUrl,
         type: 'stream'
       })),
+      videoStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('video')),
       audioStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({
         bitrate: parseInt(v.bitrate),
         codec: v.encoding,
