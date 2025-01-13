@@ -3,7 +3,7 @@ import { Config } from '@netlify/edge-functions';
 export default async (request: Request) => {
 
   const url = new URL(request.url);
-  const [type, id] = url.search.split('=');
+  const [type, id] = url.search.substring(1).split('=');
   return new Response(`     
 <!doctype html>
 <html lang="en">
