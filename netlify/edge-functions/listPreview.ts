@@ -23,7 +23,7 @@ export default async (request: Request) => {
 
   <title>${type} | ${id} | ytify</title>
 </head>
-<script>location.replace('/?e=' + encodeURI('list'+'${url.search}'))</script>
+<script>location.replace('/?e=' + encodeURI('/list'+'${url.search}'))</script>
 </html>
     `, {
     headers: { 'content-type': 'text/html' },

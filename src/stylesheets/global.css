@@ -178,6 +178,7 @@ dialog.displayer {
   border-radius: var(--roundness);
 
   p {
+    white-space: normal;
     margin-bottom: 1rem;
     transition: all 0.5s;
     font-size: small;
