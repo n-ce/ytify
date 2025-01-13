@@ -55,11 +55,12 @@ export default function() {
     name: string,
     callback: (arg0: Event) => void
   }[]);
-  if (getSaved('kidsMode'))
-    import('../modules/partsManager')
-      .then(mod => mod.partsManager())
-      .then(setParts);
 
+  onMount(async () => {
+    if (!getSaved('kidsMode')) return;
+    const pm = await import('../modules/partsManager');
+    setParts(pm.partsManager);
+  });
 
   return (
     <>

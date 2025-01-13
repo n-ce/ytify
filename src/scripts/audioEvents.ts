@@ -151,7 +151,7 @@ audio.ontimeupdate = function() {
     return;
 
   const seconds = Math.floor(audio.currentTime);
-
+  store.lrcSync(seconds);
   progress.value = seconds.toString();
   currentDuration.textContent = convertSStoHHMMSS(seconds);
 

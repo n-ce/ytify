@@ -16,6 +16,7 @@ export const store: {
     legacy: boolean,
     fallback: string
   },
+  lrcSync: (arg0: number) => {} | void,
   queue: string[],
   stream: CollectionItem,
   streamHistory: string[]
@@ -49,6 +50,7 @@ export const store: {
     legacy: !('OffscreenCanvas' in window),
     fallback: ''
   },
+  lrcSync: () => '',
   queue: [],
   stream: {
     id: params.get('s') || '',

@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import './UpdatePrompt.css';
 
 export default function UpdatePrompt(handleUpdate: () => void) {
@@ -7,12 +7,12 @@ export default function UpdatePrompt(handleUpdate: () => void) {
   const [fullList, setFullList] = createSignal(['']);
   let dialog!: HTMLDialogElement;
 
-  fetch('https://api.github.com/repos/n-ce/ytify/commits/main')
-    .then(res => res.json())
-    .then(data => data.commit.message.split('-'))
-    .then(list => list.map((text: string) => (<li>{text}</li>)))
-    .then(e => setList(e))
-
+  onMount(async () => {
+    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(res => res.json());
+    const list = data.commit.message.split('-');
+    const e = list.map((text: string) => (<li>{text}</li>))
+    setList(e);
+  });
 
   const handleFullList = () =>
     fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
