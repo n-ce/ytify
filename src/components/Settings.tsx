@@ -73,15 +73,16 @@ export default function() {
           name='Use Custom Instance'
           checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
-            if (getSaved('custom_instance_2'))
-              removeSaved('custom_instance_2');
+            const _ = 'custom_instance_2';
+            if (getSaved(_))
+              removeSaved(_);
             else {
 
               const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
               const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
 
               if (pi && iv)
-                save('custom_instance_2', pi + ',' + iv);
+                save(_, pi + ',' + iv);
             }
             location.reload();
 
@@ -200,6 +201,8 @@ export default function() {
             getSaved(_) ?
               removeSaved(_) :
               save(_, 'true');
+
+            location.reload();
           }}
         />
 
@@ -215,9 +218,10 @@ export default function() {
           name='Set Songs as Default Filter'
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
-            getSaved('searchFilter') ?
-              removeSaved('searchFilter') :
-              save('searchFilter', 'music_songs');
+            const _ = 'searchFilter';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'music_songs');
             location.assign('/search');
           }}
         />
@@ -226,9 +230,10 @@ export default function() {
           name='Display Suggestions'
           checked={getSaved('searchSuggestions') !== 'off'}
           onClick={() => {
-            getSaved('searchSuggestions') ?
-              removeSaved('searchSuggestions') :
-              save('searchSuggestions', 'off');
+            const _ = 'searchSuggestions';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'off');
             location.reload();
           }}
         />
@@ -293,9 +298,10 @@ export default function() {
             name='Always Proxy Streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
-              getSaved('enforceProxy') ?
-                removeSaved('enforceProxy') :
-                save('enforceProxy', 'true');
+              const _ = 'enforceProxy';
+              getSaved(_) ?
+                removeSaved(_) :
+                save(_, 'true');
               quickSwitch();
             }}
           />
@@ -330,9 +336,10 @@ export default function() {
           name='Set as Default Tab'
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
-            getSaved('startupTab') ?
-              removeSaved('startupTab') :
-              save('startupTab', '/library')
+            const _ = 'startupTab';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, '/library')
           }}
         />
         <ToggleSwitch
@@ -418,13 +425,14 @@ export default function() {
           name='Use Custom Color'
           checked={getSaved('custom_theme') !== null}
           onClick={e => {
-            const colorString = getSaved('custom_theme');
+            const _ = 'custom_theme';
+            const colorString = getSaved(_);
             if (colorString)
-              removeSaved('custom_theme');
+              removeSaved(_);
             else {
               const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
               str ?
-                save('custom_theme', str) :
+                save(_, str) :
                 e.preventDefault();
             }
             themer();
