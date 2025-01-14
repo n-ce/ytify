@@ -22,23 +22,19 @@ function close() {
 
 actionsMenu.onclick = close;
 
-
 const WatchOnYtify = lazy(() => import('./WatchOnYtify'));
 const Lyrics = lazy(() => import('./Lyrics.tsx'));
-
-
-
 
 export default function() {
 
   const [isMusic, setMusic] = createSignal(false);
-  const [isWO_ytify, setWO_ytify] = createSignal('' as string | null);
+  const [isWatchOnYtify, setWatchOnYtify] = createSignal('' as string | null);
 
   onMount(() => {
     new IntersectionObserver(() => {
       if (actionsMenu.checkVisibility()) {
         setMusic(store.actionsMenu.author.endsWith('- Topic'));
-        setWO_ytify(getSaved('watchOnYtify'));
+        setWatchOnYtify(getSaved('watchOnYtify'));
       }
     }).observe(actionsMenu);
   });
@@ -115,7 +111,7 @@ export default function() {
 
         <Show when={!getSaved('kidsMode_Watch On Button')}>
           {
-            isWO_ytify() ?
+            isWatchOnYtify() ?
               <li tabindex={6} on:click={() => {
                 close();
                 render(WatchOnYtify, document.body);
