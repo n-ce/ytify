@@ -57,9 +57,10 @@ export default function() {
   }[]);
 
   onMount(async () => {
-    if (!getSaved('kidsMode')) return;
-    const pm = await import('../modules/partsManager');
-    setParts(pm.partsManager);
+    if (getSaved('kidsMode')) {
+      const pm = await import('../modules/partsManager');
+      setParts(pm.partsManager);
+    }
   });
 
   return (
@@ -194,7 +195,7 @@ export default function() {
         </Selector>
 
         <ToggleSwitch
-          id=''
+          id='woswitch'
           name='Watch on ytify'
           checked={Boolean(getSaved('watchOnYtify'))}
           onClick={() => {
@@ -489,8 +490,13 @@ export default function() {
           onClick={e => {
             const savedPin = getSaved('kidsMode');
             if (savedPin) {
-              if (prompt('Enter PIN to disable') === savedPin) {
-                removeSaved('kidsMode');
+              if (prompt('Enter PIN to disable parental controls :') === savedPin) {
+                const len = localStorage.length;
+                for (let i = 0; i <= len; i++) {
+                  const key = localStorage.key(i);
+                  if (key && key.startsWith('kidsMode'))
+                    removeSaved(key);
+                }
                 location.reload();
               } else {
                 alert('Incorrect PIN!');
@@ -499,7 +505,7 @@ export default function() {
               return;
             }
 
-            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the blocking functionalities.');
+            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the parts manager.');
             if (pin) {
               save('kidsMode', pin);
               location.reload();
