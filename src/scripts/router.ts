@@ -163,7 +163,7 @@ onpopstate = function() {
       .substring(1)
       .split('=');
 
-    params.has('collection') ?
+    param[0] === 'collection' ?
       fetchCollection(param[1]) :
       fetchList('/' + param.join('/'));
   }
