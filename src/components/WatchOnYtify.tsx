@@ -79,7 +79,7 @@ export default function WatchOnYtify() {
         <Selector
 
           id='videoCodecSelector'
-          label=''
+          label=' Video : '
           onChange={_ => {
             video.src = proxyHandler(_.target.value);
           }}
@@ -96,7 +96,7 @@ export default function WatchOnYtify() {
 
         <Selector
           id='audioCodecSelector'
-          label=''
+          label=' Audio : '
           onChange={_ => {
             audio.src = proxyHandler(_.target.value)
           }}
