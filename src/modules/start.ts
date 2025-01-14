@@ -52,13 +52,11 @@ export default async function() {
     shareAction = confirm('Click ok to Play, click cancel to Download') ?
       '' : 'dl';
 
-
-
   if (id) {
     loadingScreen.showModal();
     if (isPWA && shareAction) {
       const a = $('a');
-      const l = await getDownloadLink(store.stream.id);
+      const l = await getDownloadLink(store.actionsMenu.id);
       if (l) {
         a.href = l;
         a.click();
@@ -83,7 +81,7 @@ export default async function() {
 
   fetchCollection(collection || shared, Boolean(shared));
   if (supermix)
-    import('./supermix').then(mod => mod.default(supermix.split(' ')));
+    import('./supermix').then(mod => mod.default(supermix.split('+')));
 
   // list loading
 
