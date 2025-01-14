@@ -194,7 +194,7 @@ export default function() {
         </Selector>
 
         <ToggleSwitch
-          id='woytifySwitch'
+          id=''
           name='Watch on ytify'
           checked={Boolean(getSaved('watchOnYtify'))}
           onClick={() => {
@@ -202,8 +202,6 @@ export default function() {
             getSaved(_) ?
               removeSaved(_) :
               save(_, 'true');
-
-            location.reload();
           }}
         />
 
@@ -516,7 +514,7 @@ export default function() {
             <ToggleSwitch
               id={'kidsMode_' + item.name}
               name={item.name}
-              checked={!Boolean(getSaved('kidsMode_' + item.name))}
+              checked={!getSaved('kidsMode_' + item.name)}
               onClick={item.callback}
 
             />

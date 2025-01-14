@@ -1,9 +1,5 @@
 declare global {
 
-  interface Window {
-    inject_ytify_services: (arg0: {}) => Promise<void>
-  }
-
   type StreamItem = {
     url: string,
     type: string,
@@ -129,6 +125,10 @@ declare global {
     hlsUrl: string,
     dashUrl: string,
     videoThumbnails: Record<'url' | 'quality', string>[]
+  }
+
+  interface EventTarget {
+    id: string
   }
 
 }

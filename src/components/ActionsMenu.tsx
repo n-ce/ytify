@@ -5,7 +5,7 @@ import { appendToQueuelist } from "../scripts/queue";
 import { getSaved, store } from "../lib/store";
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, lazy, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 declare module "solid-js" {
@@ -22,14 +22,24 @@ function close() {
 
 actionsMenu.onclick = close;
 
+
+const WatchOnYtify = lazy(() => import('./WatchOnYtify'));
+const Lyrics = lazy(() => import('./Lyrics.tsx'));
+
+
+
+
 export default function() {
 
   const [isMusic, setMusic] = createSignal(false);
+  const [isWO_ytify, setWO_ytify] = createSignal('' as string | null);
 
   onMount(() => {
     new IntersectionObserver(() => {
-      if (actionsMenu.checkVisibility())
+      if (actionsMenu.checkVisibility()) {
         setMusic(store.actionsMenu.author.endsWith('- Topic'));
+        setWO_ytify(getSaved('watchOnYtify'));
+      }
     }).observe(actionsMenu);
   });
 
@@ -52,12 +62,14 @@ export default function() {
       <CollectionSelector collection={store.actionsMenu} close={close} />
 
 
-      <li tabindex={3} on:click={async () => {
-        close();
-        fetchList('/playlists/RD' + store.actionsMenu.id, true);
-      }}>
-        <i class="ri-radio-line"></i>Start Radio
-      </li>
+      <Show when={!getSaved('kidsMode_Start Radio Button')}>
+        <li tabindex={3} on:click={async () => {
+          close();
+          fetchList('/playlists/RD' + store.actionsMenu.id, true);
+        }}>
+          <i class="ri-radio-line"></i>Start Radio
+        </li>
+      </Show>
 
       <li tabindex={4} on:click={async () => {
         close();
@@ -73,42 +85,52 @@ export default function() {
         <i class="ri-download-2-fill"></i>Download
       </li>
 
-      <li tabindex={5} on:click={() => {
-        close();
-        const smd = store.actionsMenu;
-        store.list.name =
-          smd.author.endsWith('- Topic') ?
-            ('Artist - ' + smd.author.replace('- Topic', ''))
-            : '';
+      <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
+        <li tabindex={5} on:click={() => {
+          close();
+          const smd = store.actionsMenu;
+          store.list.name =
+            smd.author.endsWith('- Topic') ?
+              ('Artist - ' + smd.author.replace('- Topic', ''))
+              : '';
 
-        (openInYtBtn.firstElementChild as HTMLParagraphElement)
-          .dataset.state = ' ' + smd.author;
+          (openInYtBtn.firstElementChild as HTMLParagraphElement)
+            .dataset.state = ' ' + smd.author;
 
-        fetchList(smd.channelUrl);
-      }}>
-        <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
-      </li>
+          fetchList(smd.channelUrl);
+        }}>
+          <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
+        </li>
+      </Show>
 
       {isMusic() ?
-        (<li tabindex={6} on:click={
+        <li tabindex={6} on:click={
           () => {
             close();
-            import('./Lyrics.tsx')
-              .then(mod => render(mod.default, document.body));
+            render(Lyrics, document.body);
           }
         }>
           <i class="ri-music-2-line"></i>View Lyrics
-        </li>) :
+        </li> :
 
-        (<li id='woytBtn' tabindex={6} on:click={() => {
-          close();
-          getSaved('watchOnYtify') ?
-            import('./watchOnYtify')
-              .then(mod => render(mod.default, document.body)) :
-            open('https://youtu.be/' + store.actionsMenu.id);
-        }}>
-          <i class="ri-youtube-line"></i>Watch on {getSaved('watchOnYtify') ? 'ytify' : 'YouTube'}
-        </li>)
+        <Show when={!getSaved('kidsMode_Watch On Button')}>
+          {
+            isWO_ytify() ?
+              <li tabindex={6} on:click={() => {
+                close();
+                render(WatchOnYtify, document.body);
+              }}>
+                <i class="ri-youtube-line"></i>Watch on  ytify
+              </li>
+              :
+              <li tabindex={6} on:click={() => {
+                close();
+                open('https://youtu.be/' + store.actionsMenu.id);
+              }}>
+                <i class="ri-youtube-line"></i>Watch on YouTube
+              </li>
+          }
+        </Show>
 
       }
 

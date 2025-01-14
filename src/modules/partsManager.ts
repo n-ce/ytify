@@ -6,11 +6,11 @@ export const partsManager = (): {
   name: string,
   callback: (arg0: Event) => void
 }[] => {
-  if (getSaved('kidsMode_Settings'))
+  if (getSaved('kidsMode_Navigation Settings'))
     toggle('/settings');
-  if (getSaved('kidsMode_Search'))
+  if (getSaved('kidsMode_Navigation Search'))
     toggle('/search');
-  if (getSaved('kidsMode_Library'))
+  if (getSaved('kidsMode_Navigation Library'))
     toggle('/library');
   if (getSaved('kidsMode_Reserved Collections'))
     toggle('collections');
@@ -30,8 +30,9 @@ export const partsManager = (): {
     toggle('r.playlists');
   if (getSaved('kidsMode_Collections'))
     toggle('r.collections');
-  if (getSaved('kidsMode_Watch On YouTube Button'))
-    toggle('woytBtn');
+
+
+
 
   return [
     {
@@ -83,16 +84,30 @@ export const partsManager = (): {
       callback: e => toggle('r.collections', e)
     },
     {
-      name: 'Watch On YouTube Button',
-      callback: e => toggle('woytBtn', e)
+      name: 'Watch On Button',
+      callback: e => lsHandler(e.target?.id)
+    },
+    {
+      name: 'View Channel/Artist Button',
+      callback: e => lsHandler(e.target?.id)
+    },
+    {
+      name: 'Start Radio Button',
+      callback: e => lsHandler(e.target?.id)
     }
-
-
   ];
 }
 
+
+
+const lsHandler = (id: string | undefined) => id ?
+  getSaved(id) ?
+    removeSaved(id) :
+    save(id, 'hidden')
+  : undefined;
+
 function toggle(part: string, e: Event | undefined = undefined) {
-  // @ts-ignore
+
   const id = e?.target?.id;
   if (id) {
     const askpin = prompt('Enter PIN');
@@ -101,9 +116,7 @@ function toggle(part: string, e: Event | undefined = undefined) {
       e?.preventDefault();
       return alert('Incorrect PIN entered.')
     }
-    getSaved(id) ?
-      removeSaved(id) :
-      save(id, 'hidden');
+    lsHandler(id);
   }
   const elem = document.getElementById(part)!;
   const elm = part.includes('r.') ? elem.nextElementSibling : elem;
@@ -112,9 +125,3 @@ function toggle(part: string, e: Event | undefined = undefined) {
 }
 
 
-/*
-          < option value = "viewOnYTBtn" > Open Playlist in YouTube Button </option>
-            < option value = "actionsMenu3" > Start Radio Button </option>
-              < option value = "actionsMenu5" > View Channel Button </option>
-                < option value = "actionsMenu6" > Watch on YouTube Button </option>
-*/
