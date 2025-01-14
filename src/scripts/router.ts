@@ -4,7 +4,7 @@ import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist } from "./queue";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
-import { fetchCollection, fetchSuperMix, superCollectionLoader } from "../lib/libraryUtils";
+import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
@@ -108,7 +108,8 @@ if (errorParam) {
       query.startsWith('si') ?
         fetchCollection(query.split('=')[1], true) :
         query.startsWith('supermix') ?
-          fetchSuperMix(query.split('=')[1]) :
+
+          import('../modules/supermix').then(mod => mod.default(query.split('=')[1].split('+'))) :
           fetchList('/' + query.split('=').join('/'));
 
 
@@ -131,7 +132,7 @@ else {
 
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
 
-  if (route === '/' && !hasStreamQuery && location.search !== '?reset')
+  if (route === '/' && !hasStreamQuery && !params.has('reset'))
     route = getSaved('startupTab') || '/search';
 
 }
@@ -162,7 +163,7 @@ onpopstate = function() {
       .substring(1)
       .split('=');
 
-    location.search.includes('collection') ?
+    params.has('collection') ?
       fetchCollection(param[1]) :
       fetchList('/' + param.join('/'));
   }

@@ -1,11 +1,28 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver } from '../lib/utils';
+import { hostResolver, renderDataIntoFragment } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
 import { getDB, saveDB } from '../lib/libraryUtils';
+import Sortable, { type SortableEvent } from 'sortablejs';
 
 
+new Sortable(listContainer, {
+  handle: '.ri-draggable',
+  onUpdate(e: SortableEvent) {
+    if (e.oldIndex == null || e.newIndex == null) return;
+    const collection = store.list.id;
+    const db = getDB();
+    const dataArray = Object.entries(db[collection]);
+    const [oldKey, oldItem] = dataArray.splice(e.oldIndex, 1)[0];
+    dataArray.splice(
+      e.newIndex, 0,
+      [oldKey, oldItem]
+    );
+    db[collection] = Object.fromEntries(dataArray);
+    saveDB(db);
+  }
+});
 
 listBtnsContainer.addEventListener('click', async e => {
   const btn = e.target as HTMLButtonElement;
@@ -71,6 +88,20 @@ listBtnsContainer.addEventListener('click', async e => {
         .keys(db[id])
         .join('')
     );
+  else if (btn === radioCollectionBtn)
+    import('../modules/supermix').then(mod => mod.default(Object.keys(db[id])))
+  else if (btn === sortCollectionBtn) {
+
+    listContainer.innerHTML = '';
+    sortCollectionBtn.classList.toggle('checked');
+
+    const fragment = document.createDocumentFragment();
+
+    renderDataIntoFragment(db[id], fragment, sortCollectionBtn.classList.contains('checked'));
+
+    listContainer.appendChild(fragment);
+
+  }
 });
 
 

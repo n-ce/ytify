@@ -171,11 +171,43 @@ a {
 }
 
 
+
 dialog.displayer {
   white-space: pre;
   background: var(--bg);
   color: var(--text);
   border-radius: var(--roundness);
+
+  section {
+    white-space: normal;
+    overflow: scroll;
+
+    p {
+      margin-bottom: 1rem;
+      transition: all 0.5s;
+      font-size: small;
+    }
+
+    p.active {
+      font-size: large;
+      font-weight: bold;
+    }
+  }
+
+
+}
+
+dialog.watcher {
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  border-radius: var(--roundness);
+
+  video {
+    width: 100%;
+    border-radius: var(--roundness);
+  }
 }
 
 

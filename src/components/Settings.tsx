@@ -1,8 +1,8 @@
 import './Settings.css';
-import { Show, onMount } from "solid-js";
+import { For, Show, createSignal, onMount } from "solid-js";
 import { audio, img } from "../lib/dom";
 import { $, quickSwitch, removeSaved, save } from "../lib/utils";
-import { store, getSaved } from '../lib/store';
+import { store, getSaved, params } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
 import { getDB, saveDB } from '../lib/libraryUtils';
 
@@ -28,7 +28,7 @@ function ToggleSwitch(_: ToggleSwitch) {
   );
 }
 
-function Selector(_: Selector) {
+export function Selector(_: Selector) {
   let target!: HTMLSelectElement;
   onMount(() => _.onMount(target));
 
@@ -49,6 +49,20 @@ function Selector(_: Selector) {
 
 export default function() {
 
+  // kids mode signal
+
+  const [getParts, setParts] = createSignal([] as {
+    name: string,
+    callback: (arg0: Event) => void
+  }[]);
+
+  onMount(async () => {
+    if (getSaved('kidsMode')) {
+      const pm = await import('../modules/partsManager');
+      setParts(pm.partsManager);
+    }
+  });
+
   return (
     <>
       <div>
@@ -61,15 +75,16 @@ export default function() {
           name='Use Custom Instance'
           checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
-            if (getSaved('custom_instance_2'))
-              removeSaved('custom_instance_2');
+            const _ = 'custom_instance_2';
+            if (getSaved(_))
+              removeSaved(_);
             else {
 
               const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
               const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
 
               if (pi && iv)
-                save('custom_instance_2', pi + ',' + iv);
+                save(_, pi + ',' + iv);
             }
             location.reload();
 
@@ -179,6 +194,17 @@ export default function() {
           <option value='ask'>Always Ask</option>
         </Selector>
 
+        <ToggleSwitch
+          id='woswitch'
+          name='Watch on ytify'
+          checked={Boolean(getSaved('watchOnYtify'))}
+          onClick={() => {
+            const _ = 'watchOnYtify';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'true');
+          }}
+        />
 
       </div>
 
@@ -192,9 +218,10 @@ export default function() {
           name='Set Songs as Default Filter'
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
-            getSaved('searchFilter') ?
-              removeSaved('searchFilter') :
-              save('searchFilter', 'music_songs');
+            const _ = 'searchFilter';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'music_songs');
             location.assign('/search');
           }}
         />
@@ -203,9 +230,10 @@ export default function() {
           name='Display Suggestions'
           checked={getSaved('searchSuggestions') !== 'off'}
           onClick={() => {
-            getSaved('searchSuggestions') ?
-              removeSaved('searchSuggestions') :
-              save('searchSuggestions', 'off');
+            const _ = 'searchSuggestions';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'off');
             location.reload();
           }}
         />
@@ -270,9 +298,10 @@ export default function() {
             name='Always Proxy Streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
-              getSaved('enforceProxy') ?
-                removeSaved('enforceProxy') :
-                save('enforceProxy', 'true');
+              const _ = 'enforceProxy';
+              getSaved(_) ?
+                removeSaved(_) :
+                save(_, 'true');
               quickSwitch();
             }}
           />
@@ -307,9 +336,10 @@ export default function() {
           name='Set as Default Tab'
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
-            getSaved('startupTab') ?
-              removeSaved('startupTab') :
-              save('startupTab', '/library')
+            const _ = 'startupTab';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, '/library')
           }}
         />
         <ToggleSwitch
@@ -395,13 +425,14 @@ export default function() {
           name='Use Custom Color'
           checked={getSaved('custom_theme') !== null}
           onClick={e => {
-            const colorString = getSaved('custom_theme');
+            const _ = 'custom_theme';
+            const colorString = getSaved(_);
             if (colorString)
-              removeSaved('custom_theme');
+              removeSaved(_);
             else {
               const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
               str ?
-                save('custom_theme', str) :
+                save(_, str) :
                 e.preventDefault();
             }
             themer();
@@ -444,6 +475,63 @@ export default function() {
         }>Toggle Fullscreen</p>
       </div>
 
+
+
+      <div>
+        <b>
+          <i class="ri-parent-line"></i>
+          <p>Parental Controls</p>
+        </b>
+
+        <ToggleSwitch
+          id="kidsSwitch"
+          name='Set Up'
+          checked={Boolean(getSaved('kidsMode'))}
+          onClick={e => {
+            const savedPin = getSaved('kidsMode');
+            if (savedPin) {
+              if (prompt('Enter PIN to disable parental controls :') === savedPin) {
+                const len = localStorage.length;
+                for (let i = 0; i <= len; i++) {
+                  const key = localStorage.key(i);
+                  if (key && key.startsWith('kidsMode'))
+                    removeSaved(key);
+                }
+                location.reload();
+              } else {
+                alert('Incorrect PIN!');
+                e.preventDefault();
+              }
+              return;
+            }
+
+            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the parts manager.');
+            if (pin) {
+              save('kidsMode', pin);
+              location.reload();
+            }
+            else e.preventDefault();
+          }}
+
+        />
+
+        <For each={getParts()}>
+          {item => (
+            <ToggleSwitch
+              id={'kidsMode_' + item.name}
+              name={item.name}
+              checked={!getSaved('kidsMode_' + item.name)}
+              onClick={item.callback}
+
+            />
+          )}
+        </For>
+
+
+      </div>
+
+
+
     </>
   );
 }
@@ -462,7 +550,7 @@ function restoreSettings(_: Event | undefined = undefined) {
   localStorage.clear();
 
   if (temp) save('library', temp);
-  
+
   if (_?.type === 'click') location.reload();
 }
 
@@ -502,7 +590,7 @@ async function importSettings(e: Event) {
 
 
 // emergency use
-if (location.search === '?reset') {
+if (params.has('reset')) {
   clearCache();
   restoreSettings();
   history.replaceState({}, '', location.pathname);

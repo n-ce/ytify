@@ -16,14 +16,14 @@ export const store: {
     legacy: boolean,
     fallback: string
   },
-  queue: string[]
+  lrcSync: (arg0: number) => {} | void,
+  queue: string[],
   stream: CollectionItem,
   streamHistory: string[]
   api: {
     piped: string[],
     invidious: string[],
     hyperpipe: string,
-    supermix: string,
     index: number
   },
   loadImage: 'off' | 'lazy' | 'eager',
@@ -51,6 +51,7 @@ export const store: {
     legacy: !('OffscreenCanvas' in window),
     fallback: ''
   },
+  lrcSync: () => '',
   queue: [],
   stream: {
     id: params.get('s') || '',
@@ -64,7 +65,6 @@ export const store: {
     piped: ['https://pipedapi.kavin.rocks'],
     invidious: ['https://invidious.jing.rocks'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
-    supermix: '',
     index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',

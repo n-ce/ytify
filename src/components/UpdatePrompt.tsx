@@ -1,24 +1,18 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import './UpdatePrompt.css';
 
 export default function UpdatePrompt(handleUpdate: () => void) {
 
   const [list, setList] = createSignal([<li>Loading Update</li>]);
   const [fullList, setFullList] = createSignal(['']);
+  let dialog!: HTMLDialogElement;
 
-
-  fetch('https://api.github.com/repos/n-ce/ytify/commits/main')
-    .then(res => res.json())
-    .then(data => data.commit.message.split('-'))
-    .then(list => list.map((text: string) => (<li>{text}</li>)))
-    .then(e => setList(e))
-
-
-  function handleLater(e: Event) {
-    const dialog = ((e.target as HTMLElement).parentElement as HTMLUListElement).parentElement as HTMLDialogElement;
-    dialog.close();
-    dialog.remove();
-  }
+  onMount(async () => {
+    const data = await fetch('https://api.github.com/repos/n-ce/ytify/commits/main').then(res => res.json());
+    const list = data.commit.message.split('-');
+    const e = list.map((text: string) => (<li>{text}</li>))
+    setList(e);
+  });
 
   const handleFullList = () =>
     fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/Changelog.md')
@@ -28,7 +22,11 @@ export default function UpdatePrompt(handleUpdate: () => void) {
 
 
   return (
-    <dialog id="changelog" open>
+    <dialog
+      id="changelog"
+      ref={dialog}
+      open
+    >
       <ul>
         {list()}
         <hr />
@@ -40,7 +38,10 @@ export default function UpdatePrompt(handleUpdate: () => void) {
       </ul>
       <span>
         <button onclick={handleUpdate} autofocus> Update</button>
-        <button onclick={handleLater}>Later</button>
+        <button onclick={() => {
+          dialog.close();
+          dialog.remove();
+        }}>Later</button>
       </span>
     </dialog>
   );

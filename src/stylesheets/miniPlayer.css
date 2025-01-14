@@ -37,7 +37,6 @@
       margin-left: 2%;
       padding: 0;
       font-size: 2rem;
-      z-index: 1;
 
       &:active {
         transform: scale(0.8);

@@ -1,11 +1,12 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, getDownloadLink, notify } from "../lib/utils";
+import { $, getDownloadLink } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
-import { store } from "../lib/store";
+import { getSaved, store } from "../lib/store";
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
-import { createSignal } from "solid-js";
+import { createSignal, lazy, onMount, Show } from "solid-js";
+import { render } from "solid-js/web";
 
 declare module "solid-js" {
   namespace JSX {
@@ -21,15 +22,22 @@ function close() {
 
 actionsMenu.onclick = close;
 
+const WatchOnYtify = lazy(() => import('./WatchOnYtify'));
+const Lyrics = lazy(() => import('./Lyrics.tsx'));
+
 export default function() {
 
   const [isMusic, setMusic] = createSignal(false);
+  const [isWatchOnYtify, setWatchOnYtify] = createSignal('' as string | null);
 
-  new IntersectionObserver(() => {
-    if (actionsMenu.checkVisibility())
-      setMusic(store.actionsMenu.author.endsWith('- Topic'));
-  }).observe(actionsMenu);
-
+  onMount(() => {
+    new IntersectionObserver(() => {
+      if (actionsMenu.checkVisibility()) {
+        setMusic(store.actionsMenu.author.endsWith('- Topic'));
+        setWatchOnYtify(getSaved('watchOnYtify'));
+      }
+    }).observe(actionsMenu);
+  });
 
   return (
     <ul on:click={e => e.stopPropagation()}>
@@ -50,12 +58,14 @@ export default function() {
       <CollectionSelector collection={store.actionsMenu} close={close} />
 
 
-      <li tabindex={3} on:click={async () => {
-        close();
-        fetchList('/playlists/RD' + store.actionsMenu.id, true);
-      }}>
-        <i class="ri-radio-line"></i>Start Radio
-      </li>
+      <Show when={!getSaved('kidsMode_Start Radio Button')}>
+        <li tabindex={3} on:click={async () => {
+          close();
+          fetchList('/playlists/RD' + store.actionsMenu.id, true);
+        }}>
+          <i class="ri-radio-line"></i>Start Radio
+        </li>
+      </Show>
 
       <li tabindex={4} on:click={async () => {
         close();
@@ -71,38 +81,52 @@ export default function() {
         <i class="ri-download-2-fill"></i>Download
       </li>
 
-      <li tabindex={5} on:click={() => {
-        close();
-        const smd = store.actionsMenu;
-        store.list.name =
-          smd.author.endsWith('- Topic') ?
-            ('Artist - ' + smd.author.replace('- Topic', ''))
-            : '';
+      <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
+        <li tabindex={5} on:click={() => {
+          close();
+          const smd = store.actionsMenu;
+          store.list.name =
+            smd.author.endsWith('- Topic') ?
+              ('Artist - ' + smd.author.replace('- Topic', ''))
+              : '';
 
-        (openInYtBtn.firstElementChild as HTMLParagraphElement)
-          .dataset.state = ' ' + smd.author;
+          (openInYtBtn.firstElementChild as HTMLParagraphElement)
+            .dataset.state = ' ' + smd.author;
 
-        fetchList(smd.channelUrl);
-      }}>
-        <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
-      </li>
+          fetchList(smd.channelUrl);
+        }}>
+          <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
+        </li>
+      </Show>
 
       {isMusic() ?
-        (<li tabindex={6} on:click={
+        <li tabindex={6} on:click={
           () => {
             close();
-            loadingScreen.showModal();
-            getLyrics().finally(() => loadingScreen.close());
+            render(Lyrics, document.body);
           }
         }>
           <i class="ri-music-2-line"></i>View Lyrics
-        </li>) :
+        </li> :
 
-        (<li tabindex={6} on:click={() => {
-          open('https://youtu.be/' + store.actionsMenu.id);
-        }}>
-          <i class="ri-youtube-line"></i>Watch on YouTube
-        </li>)
+        <Show when={!getSaved('kidsMode_Watch On Button')}>
+          {
+            isWatchOnYtify() ?
+              <li tabindex={6} on:click={() => {
+                close();
+                render(WatchOnYtify, document.body);
+              }}>
+                <i class="ri-youtube-line"></i>Watch on  ytify
+              </li>
+              :
+              <li tabindex={6} on:click={() => {
+                close();
+                open('https://youtu.be/' + store.actionsMenu.id);
+              }}>
+                <i class="ri-youtube-line"></i>Watch on YouTube
+              </li>
+          }
+        </Show>
 
       }
 
@@ -110,44 +134,27 @@ export default function() {
         close();
 
         const output = location.pathname === '/' ? store.player.data : store.actionsMenu;
-        displayer(JSON.stringify(output, null, 4));
+
+        render(() => {
+          let dialog!: HTMLDialogElement;
+          onMount(() => dialog.showModal());
+          return <dialog
+            ref={dialog}
+            class="displayer"
+            onclick={() => {
+              dialog.close();
+              dialog.remove();
+            }}
+          >
+            {JSON.stringify(output, null, 4)}
+          </dialog>
+        }, document.body);
 
       }}>
         <i class="ri-bug-line"></i> Debug Information
       </li>
 
-    </ul >
+    </ul>
   )
 }
 
-
-function displayer(text: string) {
-
-  const dialog = $('dialog') as HTMLDialogElement;
-
-  dialog.className = 'displayer';
-  dialog.textContent = text;
-
-  document.body.appendChild(dialog);
-
-  dialog.showModal();
-  dialog.onclick = function() {
-    dialog.close();
-    dialog.remove();
-  }
-}
-
-const getLyrics = () => fetch(
-  `https://lrclib.net/api/get?track_name=${store.actionsMenu.title}&artist_name=${store.actionsMenu.author.slice(0, -8)}`,
-  {
-    headers: {
-      'Lrclib-Client': `ytify ${Version.substring(0, 3)} (https://github.com/n-ce/ytify)`
-    }
-  })
-  .then(res => res.json())
-  .then(data => {
-    const lrc = data.plainLyrics;
-    lrc ?
-      displayer(lrc) :
-      notify(data.message);
-  });
