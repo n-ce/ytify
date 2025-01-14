@@ -20,6 +20,7 @@ export default async function() {
     .then(data => {
       store.api.piped = data.piped;
       store.api.invidious = data.invidious;
+      store.api.hyperpipe = data.hyperpipe;
       store.player.fallback = location.origin;
     });
 

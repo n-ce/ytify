@@ -23,6 +23,7 @@ export const store: {
   api: {
     piped: string[],
     invidious: string[],
+    hyperpipe: string,
     index: number
   },
   loadImage: 'off' | 'lazy' | 'eager',
@@ -63,6 +64,7 @@ export const store: {
   api: {
     piped: ['https://pipedapi.kavin.rocks'],
     invidious: ['https://invidious.jing.rocks'],
+    hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',

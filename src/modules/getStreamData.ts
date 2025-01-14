@@ -6,7 +6,7 @@ export async function getData(
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
   const hls = store.player.HLS;
-  const inv = store.api.invidious.slice(1);
+  const inv = store.api.invidious;
   const pip = store.api.piped;
 
   const fetchDataFromPiped = (

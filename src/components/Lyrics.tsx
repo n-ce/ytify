@@ -66,13 +66,15 @@ export default function Lyrics() {
         dialog.remove();
       }}
     >
-      <For each={lrcMap()}>
-        {(v: string, i) =>
-          <p
-            class={(active() === i() ? 'active' : '')}
-          >{v}</p>
-        }
-      </For>
+      <section>
+        <For each={lrcMap()}>
+          {(v: string, i) =>
+            <p
+              class={(active() === i() ? 'active' : '')}
+            >{v}</p>
+          }
+        </For>
+      </section>
     </dialog>
   );
 }
