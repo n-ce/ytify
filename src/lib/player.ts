@@ -51,6 +51,7 @@ export default async function player(id: string | null = '') {
       ));
   }
 
+  if (data.subtitles?.length)
   import('../modules/setSubtitles')
     .then(mod => mod.setSubtitles(data.subtitles));
 

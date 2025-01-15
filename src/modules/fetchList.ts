@@ -1,5 +1,5 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
-import { getDB } from "../lib/libraryUtils";
+import { getDB, saveDB } from "../lib/libraryUtils";
 import { errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
 
@@ -29,9 +29,19 @@ export default async function fetchList(
 
   const group = await fetch(api + url)
     .then(res => res.json())
+    .then(data => {
+      if ('error' in data)
+        throw data;
+      else return data;
+    })
     .catch(err => {
-
-      errorHandler(
+      if (err.message === 'Got error: "The playlist does not exist."') {
+        notify(err.message);
+        const db = getDB();
+        delete db.playlists[url.slice(11)];
+        saveDB(db);
+      }
+      else errorHandler(
         mix ? 'No Mixes Found' : err.message,
         () => fetchList(url, mix),
         () => ''
