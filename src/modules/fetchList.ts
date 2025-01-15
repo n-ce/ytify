@@ -30,7 +30,7 @@ export default async function fetchList(
   const group = await fetch(api + url)
     .then(res => res.json())
     .catch(err => {
-      if (err.message === 'Got error: "The playlist does not exist."') {
+      if (err.message === 'Got error: \"The playlist does not exist.\"') {
         notify(err.message);
         const db = getDB();
         delete db.playlists[url.slice(11)];
