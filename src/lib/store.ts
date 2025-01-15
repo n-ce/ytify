@@ -43,7 +43,7 @@ export const store: {
     supportsOpus: navigator.mediaCapabilities.decodingInfo({
       type: 'file',
       audio: {
-        contentType: 'audio/ogg;codecs=opus'
+        contentType: 'audio/webm;codecs=opus'
       }
     }).then(res => res.supported),
     data: undefined,
