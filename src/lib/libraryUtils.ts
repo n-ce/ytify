@@ -1,4 +1,4 @@
-import { $, errorHandler, getApi, goTo, itemsLoader, notify, removeSaved, renderDataIntoFragment, save } from "./utils";
+import { $, errorHandler, getApi, goTo, itemsLoader, notify, renderDataIntoFragment, save } from "./utils";
 import { listBtnsContainer, listContainer, listSection, loadingScreen, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 
@@ -146,14 +146,17 @@ export async function fetchCollection(collection: string | null, shared: boolean
 export async function superCollectionLoader(name: SuperCollection) {
   const db = getDB();
 
-  if (name === 'for_you')
+  function loadForYou() {
     if ('favorites' in db) {
-      import('../modules/supermix').then(mod => mod.default(Object.keys(db.favorites)));
-
-      removeSaved('defaultSuperCollection');
+      const ids = Object
+        .keys(db.favorites)
+        .filter(id => id.length === 11);
+      import('../modules/supermix')
+        .then(mod => mod.default(ids));
+      return '';
     }
-    else return 'No Favorites Found';
-
+    else return 'No favorites in library';
+  }
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
     .then(res => res.text())
@@ -278,6 +281,8 @@ export async function superCollectionLoader(name: SuperCollection) {
         loadUrPls() :
         name === 'feed' ?
           await loadFeed() :
-          loadSubList(name)
+          name === 'for_you' ?
+            loadForYou() :
+            loadSubList(name)
   );
 }

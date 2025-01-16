@@ -109,7 +109,7 @@ if (errorParam) {
         fetchCollection(query.split('=')[1], true) :
         query.startsWith('supermix') ?
 
-          import('../modules/supermix').then(mod => mod.default(query.split('=')[1].split('+'))) :
+          import('../modules/supermix').then(mod => mod.default(query.split('=')[1].split(' '))) :
           fetchList('/' + query.split('=').join('/'));
 
 

@@ -70,11 +70,11 @@ superCollectionSelector.addEventListener('click', e => {
   const elm = e.target as HTMLInputElement & { value: SuperCollection };
   if (!elm.value) return;
 
-
-  elm.value === 'featured' ?
-    removeSaved('defaultSuperCollection') :
-    save('defaultSuperCollection', elm.value);
-
+  if (elm.value !== 'for_you') {
+    elm.value === 'featured' ?
+      removeSaved('defaultSuperCollection') :
+      save('defaultSuperCollection', elm.value);
+  }
   superCollectionLoader(elm.value);
 });
 

@@ -81,7 +81,7 @@ export default async function() {
 
   fetchCollection(collection || shared, Boolean(shared));
   if (supermix)
-    import('./supermix').then(mod => mod.default(supermix.split('+')));
+    import('./supermix').then(mod => mod.default(supermix.split(' ')));
 
   // list loading
 
