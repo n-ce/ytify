@@ -77,6 +77,7 @@ export async function fetchCollection(collection: string | null, shared: boolean
   const fragment = document.createDocumentFragment();
   const isReserved = reservedCollections.includes(collection);
   const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
+  
   let data;
   let items: [string, CollectionItem | DOMStringMap][];
   let itemsToShow: number;
@@ -86,8 +87,9 @@ export async function fetchCollection(collection: string | null, shared: boolean
     data = db[decodeURI(collection)];
     items = Object.entries(data);
     itemsToShow = items.length;
+    
     if (collection === 'history')
-      data = Object.fromEntries(items.slice(itemsToShow - 20, itemsToShow));
+      data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
 
     if (!data || !items.length) {
       notify('No items found');
@@ -137,8 +139,8 @@ export async function fetchCollection(collection: string | null, shared: boolean
         .observe(listContainer.children[3]);
     }
     setObserver(() => {
-      itemsToShow -= 20;
-      const part = Object.fromEntries(items.slice(itemsToShow - 20, itemsToShow));
+      itemsToShow -= 1;
+      const part = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
       renderDataIntoFragment(part, fragment);
       listContainer.prepend(fragment);
     });
