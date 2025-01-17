@@ -4,10 +4,8 @@
 # Changelog
 - https://github.com/n-ce/ytify/wiki/changelog
 
-# Development / Todo / Maydo
-- Dash Support using Shaka Player
-- Native TTML Renderer
-- Caching audio using Cache API
+# Development
+- Please take a look at [issues](https://github.com/n-ce/ytify/issues)
 
 # Notable Versions
 - [One](https://deploy-preview-8--ytify.netlify.app/)

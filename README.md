@@ -81,10 +81,12 @@ npm run dev -- --open
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
  
 ## Acknowledgements 🙏
+- [Uma](https://github.com/n-ce/Uma) - Instances Manager
 - [Piped](https://github.com/teampiped/piped) - YouTube Data API & Adaptive Streaming Proxy
 - [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Proxy
 - [Hyperpipe](https://codeberg.org/Hyperpipe/hyperpipe-backend) - YT Music Artist Data API
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
+- [LRCLIB](https://lrclib.net) - Synced Lyrics Provider
 - [wsrv](https://wsrv.nl) - Image Proxy Provider
 - [Solid](https://github.com/solidjs/solid) - Delightful JSX Library
 - [HLS.js](https://github.com/video-dev/hls.js) - HLS Support Library

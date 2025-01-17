@@ -1,7 +1,7 @@
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
 import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
-import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon } from '../lib/dom';
+import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
 
@@ -67,13 +67,17 @@ export default async function() {
     loadingScreen.close();
   }
   else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
-
   if (params.has('q')) {
     superInput.value = params.get('q') || '';
     if (params.has('f'))
       searchFilters.value = params.get('f') || '';
     superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
   }
+  else fetch(location.origin + '/landing')
+    .then(_ => _.text())
+    .then(_ => searchlist.innerHTML = _.startsWith('<!') ? '' : _);
+
+
 
   const collection = params.get('collection');
   const shared = params.get('si');
