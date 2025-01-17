@@ -1,4 +1,6 @@
+// @ts-ignore
 import React from "https://esm.sh/react";
+// @ts-ignore
 import { renderToReadableStream } from "https://esm.sh/react-dom/server";
 import type { Config, Context } from "@netlify/edge-functions";
 
