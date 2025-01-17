@@ -61,10 +61,14 @@ export async function getData(
         .catch(() => e.errors[0]) :
       e.errors[0];
 
-  const useInvidious = (e: AggregateError) => hls ?
+  const useInvidious = (e: AggregateError, index = 0): Piped => hls ?
     e.errors[0] :
-    Promise.any(inv.map(fetchDataFromInvidious))
-      .catch(emergency);
+    fetchDataFromInvidious(inv[index])
+      .catch(() => {
+        if (index + 1 === inv.length)
+          return emergency(e);
+        else return useInvidious(e, index + 1);
+      })
 
   const usePiped = hls ?
     Promise
