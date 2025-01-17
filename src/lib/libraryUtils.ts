@@ -1,5 +1,5 @@
 import { $, errorHandler, getApi, goTo, itemsLoader, notify, renderDataIntoFragment, save } from "./utils";
-import { listBtnsContainer, listContainer, listSection, loadingScreen, sortCollectionBtn } from "./dom";
+import { listBtnsContainer, listContainer, listSection, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 
 
@@ -76,77 +76,10 @@ export async function fetchCollection(collection: string | null, shared: boolean
 
   const fragment = document.createDocumentFragment();
   const isReserved = reservedCollections.includes(collection);
-  const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
-  
-  let data;
-  let items: [string, CollectionItem | DOMStringMap][];
-  let itemsToShow: number;
 
-  if (!shared) {
-    const db = getDB();
-    data = db[decodeURI(collection)];
-    items = Object.entries(data);
-    itemsToShow = items.length;
-    
-    if (collection === 'history')
-      data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
-
-    if (!data || !items.length) {
-      notify('No items found');
-      return;
-    }
-
-    if (collection === 'discover') {
-      for (const i in data)
-        if ((data[i] as CollectionItem & { frequency: number }).frequency < 2)
-          delete db.discover?.[i];
-      saveDB(db);
-    }
-
-
-    renderDataIntoFragment(data, fragment, sort);
-
-    store.list.id = collection;
-
-  } else {
-
-    listBtnsContainer.className = 'sharedClxn';
-    loadingScreen.showModal();
-    await fetch(`${location.origin}/collection/${collection}`)
-      .then(res => res.json())
-      .then(data => renderDataIntoFragment(data, fragment))
-      .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
-      .finally(() => loadingScreen.close());
-
-  }
-
-
-  listContainer.innerHTML = '';
-  listContainer.appendChild(fragment);
-
-  if (collection === 'history') {
-
-    function setObserver(callback: () => void) {
-      new IntersectionObserver((entries, observer) =>
-        entries.forEach(async e => {
-          if (e.isIntersecting) {
-            callback();
-            observer.disconnect();
-            if (itemsToShow)
-              setObserver(callback);
-          }
-        }))
-        .observe(listContainer.children[3]);
-    }
-    setObserver(() => {
-      itemsToShow -= 1;
-      const part = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
-      renderDataIntoFragment(part, fragment);
-      listContainer.prepend(fragment);
-    });
-  }
-
-
+  shared ?
+    await getSharedCollection(collection, fragment) :
+    getLocalCollection(collection, fragment, isReserved);
 
   const isReversed = listContainer.classList.contains('reverse');
 
@@ -156,7 +89,6 @@ export async function fetchCollection(collection: string | null, shared: boolean
   }
   else if (isReversed)
     listContainer.classList.remove('reverse');
-
 
   listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'sharedClxn' : 'collection');
 
@@ -172,6 +104,76 @@ export async function fetchCollection(collection: string | null, shared: boolean
 
 }
 
+function setObserver(callback: () => number) {
+  new IntersectionObserver((entries, observer) =>
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const itemsLeft = callback();
+        observer.disconnect();
+        if (itemsLeft)
+          setObserver(callback);
+      }
+    }))
+    .observe(listContainer.children[0]);
+}
+
+
+function getLocalCollection(collection: string, fragment: DocumentFragment, isReserved: Boolean) {
+  const db = getDB();
+  const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
+  let data = db[decodeURI(collection)];
+
+  if (!data) {
+    notify('No items found');
+    return;
+  }
+
+  const items = Object.entries(data);
+  let itemsToShow = items.length;
+  const usePagination = collection === 'history' && itemsToShow > 20;
+
+  if (usePagination)
+    data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
+
+  if (collection === 'discover') {
+    for (const i in data)
+      if ((data[i] as CollectionItem & { frequency: number }).frequency < 2)
+        delete db.discover?.[i];
+    saveDB(db);
+  }
+
+  renderDataIntoFragment(data, fragment, sort);
+  listContainer.innerHTML = '';
+  listContainer.appendChild(fragment);
+
+  if (usePagination)
+    setObserver(() => {
+      itemsToShow -= 1;
+      const part = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
+      renderDataIntoFragment(part, fragment);
+      if (removeFromListBtn.classList.contains('delete'))
+        fragment.childNodes.forEach(v => {
+          (v as HTMLElement).classList.add('delete');
+        })
+      listContainer.prepend(fragment);
+      return itemsToShow;
+    });
+
+  store.list.id = collection;
+}
+
+async function getSharedCollection(si: string, fragment: DocumentFragment) {
+
+  loadingScreen.showModal();
+  await fetch(`${location.origin}/collection/${si}`)
+    .then(res => res.json())
+    .then(data => renderDataIntoFragment(data, fragment))
+    .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
+    .finally(() => loadingScreen.close());
+
+  listContainer.innerHTML = '';
+  listContainer.appendChild(fragment);
+}
 
 
 
