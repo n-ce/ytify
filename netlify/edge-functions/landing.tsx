@@ -1,17 +1,10 @@
-// @ts-ignore
-import React from "https://esm.sh/react";
-// @ts-ignore
-import { renderToReadableStream } from "https://esm.sh/react-dom/server";
 import type { Config, Context } from "@netlify/edge-functions";
 
 
 export default async function handler(_: Request, context: Context) {
 
   const cgeo = context.geo.country?.code || 'IN';
-
-
-  const stream = await renderToReadableStream(
-    <>
+  const html = `
       <p style="
         background:url('/ytify_banner.webp') center;
         box-shadow: var(--shadow);
@@ -40,18 +33,17 @@ export default async function handler(_: Request, context: Context) {
         be imported again.
         <br />
         <br />
-        {cgeo === 'IN' ?
-          <a href="upi://pay?pa=animesh.5383@waicici&cu=INR" target="_blank" style="font-size:smaller;margin-top:1rem">
+        ${cgeo === 'IN' ?
+      `<a href="upi://pay?pa=animesh.5383@waicici&cu=INR" target="_blank" style="font-size:smaller;margin-top:1rem">
             <img width="100"
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/UPI_logo.svg/374px-UPI_logo.svg.png" />
             Support development
-          </a> : ''
-        }
+          </a>` : ''
+    }
       </p>
-    </>
-  );
+    `;
 
-  return new Response(stream, {
+  return new Response(html, {
     status: 200,
     headers: { "Content-Type": "text/html" },
   });
