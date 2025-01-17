@@ -1,4 +1,4 @@
-import { $, errorHandler, getApi, goTo, itemsLoader, notify, removeSaved, renderDataIntoFragment, save } from "./utils";
+import { $, errorHandler, getApi, goTo, itemsLoader, notify, renderDataIntoFragment, save } from "./utils";
 import { listBtnsContainer, listContainer, listSection, loadingScreen, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 
@@ -75,29 +75,35 @@ export async function fetchCollection(collection: string | null, shared: boolean
   if (!collection) return;
 
   const fragment = document.createDocumentFragment();
+  const isReserved = reservedCollections.includes(collection);
+  const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
+  let data;
+  let items: [string, CollectionItem | DOMStringMap][];
+  let itemsToShow: number;
 
   if (!shared) {
     const db = getDB();
-    const data = db[<'discover'>decodeURI(collection)];
+    data = db[decodeURI(collection)];
+    items = Object.entries(data);
+    itemsToShow = items.length;
+    if (collection === 'history')
+      data = Object.fromEntries(items.slice(itemsToShow - 20, itemsToShow));
 
-    if (!data) {
-      alert('No items found');
+    if (!data || !items.length) {
+      notify('No items found');
       return;
     }
 
-    if (collection === 'discover')
+    if (collection === 'discover') {
       for (const i in data)
-        if (data[i].frequency as number < 2)
+        if ((data[i] as CollectionItem & { frequency: number }).frequency < 2)
           delete db.discover?.[i];
-
-    saveDB(db);
-
-    renderDataIntoFragment(data, fragment, sortCollectionBtn.classList.contains('checked'));
-
-    if (!fragment.childElementCount) {
-      alert('No items found');
-      return;
+      saveDB(db);
     }
+
+
+    renderDataIntoFragment(data, fragment, sort);
+
     store.list.id = collection;
 
   } else {
@@ -116,9 +122,33 @@ export async function fetchCollection(collection: string | null, shared: boolean
   listContainer.innerHTML = '';
   listContainer.appendChild(fragment);
 
+  if (collection === 'history') {
+
+    function setObserver(callback: () => void) {
+      new IntersectionObserver((entries, observer) =>
+        entries.forEach(async e => {
+          if (e.isIntersecting) {
+            callback();
+            observer.disconnect();
+            if (itemsToShow)
+              setObserver(callback);
+          }
+        }))
+        .observe(listContainer.children[3]);
+    }
+    setObserver(() => {
+      itemsToShow -= 20;
+      const part = Object.fromEntries(items.slice(itemsToShow - 20, itemsToShow));
+      renderDataIntoFragment(part, fragment);
+      listContainer.prepend(fragment);
+    });
+  }
+
+
+
   const isReversed = listContainer.classList.contains('reverse');
 
-  if (!shared && reservedCollections.includes(collection)) {
+  if (!shared && isReserved) {
     if (!isReversed)
       listContainer.classList.add('reverse');
   }
@@ -146,14 +176,17 @@ export async function fetchCollection(collection: string | null, shared: boolean
 export async function superCollectionLoader(name: SuperCollection) {
   const db = getDB();
 
-  if (name === 'for_you')
+  function loadForYou() {
     if ('favorites' in db) {
-      import('../modules/supermix').then(mod => mod.default(Object.keys(db.favorites)));
-
-      removeSaved('defaultSuperCollection');
+      const ids = Object
+        .keys(db.favorites)
+        .filter(id => id.length === 11);
+      import('../modules/supermix')
+        .then(mod => mod.default(ids));
+      return '';
     }
-    else return 'No Favorites Found';
-
+    else return 'No favorites in library';
+  }
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
     .then(res => res.text())
@@ -278,6 +311,8 @@ export async function superCollectionLoader(name: SuperCollection) {
         loadUrPls() :
         name === 'feed' ?
           await loadFeed() :
-          loadSubList(name)
+          name === 'for_you' ?
+            loadForYou() :
+            loadSubList(name)
   );
 }

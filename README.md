@@ -8,7 +8,8 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is a simple WebApp, built with vanilla TypeScript for maximum efficiency, that streams only audio from YouTube. Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
+> [**ytify**](https://ytify.netlify.app) is the fastest (50KB to load) and the lightest (7K LOC only) audio streaming web application built with a unprecedented hybrid [Vanilla Typescript + SolidJS] approach for maximum efficiency.
+>  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 > As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
 
@@ -26,7 +27,10 @@
 - **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
 - **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
-- **Download** ⬇️ : Download any audio stream using the button on the 3 dot menu.
+- **Download** ⬇️ : Download any audio stream using the button on the action menu.
+- **Lyrics** 🎼 : Immersive Synced Lyrics using the button on the action menu.
+- **For You** 🎻 : Get audio tailored specifically for you based on your Favorites, generated on device without any violation of privacy.
+- **Parental Controls** 👨‍👦 : Disable Parts of the application according to your needs.
 
 ![1000012574](https://github.com/user-attachments/assets/450a1eed-0fb6-4fba-8d4a-c18431b935ad)
 ![1000012580](https://github.com/user-attachments/assets/4abcd09d-d2ef-4e26-8632-1a50cedfbab8)
@@ -44,7 +48,8 @@
 
 
 ## Usage 👆
-https://ytify.us.kg is the only official location that the main branch is directly connected to.
+- Official Instance : https://ytify.us.kg
+- Secondary Instance : https://ytify.netlify.app
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Telegram Community [@ytifytg](https://t.me/ytifytg)
 - Join our Matrix Community
@@ -81,10 +86,12 @@ npm run dev -- --open
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
  
 ## Acknowledgements 🙏
+- [Uma](https://github.com/n-ce/Uma) - Instances Manager
 - [Piped](https://github.com/teampiped/piped) - YouTube Data API & Adaptive Streaming Proxy
 - [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Proxy
 - [Hyperpipe](https://codeberg.org/Hyperpipe/hyperpipe-backend) - YT Music Artist Data API
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
+- [LRCLIB](https://lrclib.net) - Synced Lyrics Provider
 - [wsrv](https://wsrv.nl) - Image Proxy Provider
 - [Solid](https://github.com/solidjs/solid) - Delightful JSX Library
 - [HLS.js](https://github.com/video-dev/hls.js) - HLS Support Library

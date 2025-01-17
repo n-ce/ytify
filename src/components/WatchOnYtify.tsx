@@ -4,6 +4,7 @@ import { store } from "../lib/store";
 import { getData } from "../modules/getStreamData";
 import { Selector } from "./Settings";
 import { proxyHandler } from "../lib/utils";
+import { loadingScreen } from "../lib/dom";
 
 export default function WatchOnYtify() {
 
@@ -15,9 +16,11 @@ export default function WatchOnYtify() {
   let video!: HTMLVideoElement;
 
   onMount(async () => {
+    loadingScreen.showModal();
     const data = await getData(store.actionsMenu.id) as unknown as Piped & {
       videoStreams: Record<'url' | 'type' | 'resolution', string>[]
     };
+    loadingScreen.close();
 
     setVF(data.videoStreams
       .map(f => {
@@ -49,12 +52,36 @@ export default function WatchOnYtify() {
         crossorigin="anonymous"
         poster={generateImageUrl(store.actionsMenu.id, 'mq')}
         onplay={() => {
-          video.currentTime = audio.currentTime;
           audio.play();
+          audio.currentTime = video.currentTime;
         }}
         onpause={() => {
-          video.currentTime = audio.currentTime;
           audio.pause();
+          audio.currentTime = video.currentTime;
+        }}
+        onwaiting={() => {
+          if (!audio.paused)
+            audio.pause();
+        }}
+        ontimeupdate={() => {
+          const diff = audio.currentTime - video.currentTime;
+          if (Math.abs(diff) > 0.1) {
+            console.log(diff);
+            audio.currentTime = video.currentTime - diff;
+          }
+        }}
+        onloadstart={() => {
+          audio.pause();
+        }}
+        onplaying={() => {
+          if (audio.paused)
+            audio.play();
+        }}
+        onseeked={() => {
+          audio.currentTime = video.currentTime;
+        }}
+        onratechange={() => {
+          audio.playbackRate = video.playbackRate;
         }}
         onerror={() => {
           const origin = new URL(video.src).origin;
@@ -68,20 +95,21 @@ export default function WatchOnYtify() {
 
       ></video>
 
-      <span>
+      <div>
 
         <button onclick={() => {
           dialog.close();
           dialog.remove();
 
-        }}>Close </button>
+        }}>Close</button>
 
         <Selector
 
           id='videoCodecSelector'
-          label=' Video : '
+          label=''
           onChange={_ => {
             video.src = proxyHandler(_.target.value);
+            video.currentTime = audio.currentTime;
           }}
           onMount={() => undefined}
         >
@@ -96,9 +124,10 @@ export default function WatchOnYtify() {
 
         <Selector
           id='audioCodecSelector'
-          label=' Audio : '
+          label=''
           onChange={_ => {
-            audio.src = proxyHandler(_.target.value)
+            audio.src = proxyHandler(_.target.value);
+            audio.currentTime = video.currentTime;
           }}
           onMount={() => undefined}
         >
@@ -111,7 +140,7 @@ export default function WatchOnYtify() {
           </For>
         </Selector>
 
-      </span>
+      </div>
     </dialog >
 
   );

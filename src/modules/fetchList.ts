@@ -35,7 +35,9 @@ export default async function fetchList(
       else return data;
     })
     .catch(err => {
-      if (err.message === 'Got error: "The playlist does not exist."') {
+      if (err.message === 'Could not get playlistData')
+        notify(err.message);
+      else if (err.message === 'Got error: "The playlist does not exist."') {
         notify(err.message);
         const db = getDB();
         delete db.playlists[url.slice(11)];
