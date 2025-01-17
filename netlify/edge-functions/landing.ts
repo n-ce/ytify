@@ -5,14 +5,13 @@ export default async function handler(_: Request, context: Context) {
 
   const cgeo = context.geo.country?.code || 'IN';
   const html = `
-      <p style="
+      <p align="center" style="
         background:url('/ytify_banner.webp') center;
         box-shadow: var(--shadow);
         border-radius: var(--roundness);
         background-size:cover;
         color:white;
         overflow:hidden;
-        text-align:center;
          ">
         <i style="
           background-color: #0003;
@@ -26,7 +25,10 @@ export default async function handler(_: Request, context: Context) {
             style="text-decoration: underline;" target="_blank">here</a>.
         </i>
       </p>
-      <p style="padding: 5vmin;color:var(--text);text-align:center">
+      <p align="center" style="
+      padding: 5vmin;
+      color:var(--text);
+      ">
         Attention! ytify.us.kg is now our primary domain.
         PWA users can reinstall from ytify.us.kg.
         You can easily migrate your data by importing your settings and library export files, piped playlists need not
