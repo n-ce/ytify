@@ -194,14 +194,15 @@ dialog.displayer {
     }
   }
 
-
 }
 
 dialog.watcher {
   height: 100dvh;
   width: 100dvw;
   background: var(--bg);
-
+  button {
+    color: var(--text);
+  }
   video {
     width: 100%;
     max-width: 100vmin;
