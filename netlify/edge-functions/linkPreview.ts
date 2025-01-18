@@ -9,12 +9,11 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const cgeo = context.geo.country?.code || 'IN';
   const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
 
   shuffle(keys);
 
-  const data = await fetcher(cgeo, keys, id);
+  const data = await fetcher(keys, id);
 
   if (!data) return;
   const music = data.channelTitle.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
@@ -33,7 +32,7 @@ export const config: Config = {
 };
 
 const host = 'ytstream-download-youtube-videos.p.rapidapi.com';
-export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
+export const fetcher = (keys: string[], id: string): Promise<{
   title: string,
   channelTitle: string,
   channelId: string,
@@ -45,7 +44,7 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     bitrate: number,
     contentLength: string
   }[]
-}> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
+}> => fetch(`https://${host}/dl?id=${id}`, {
   headers: {
     'X-RapidAPI-Key': <string>keys.shift(),
     'X-RapidAPI-Host': host
