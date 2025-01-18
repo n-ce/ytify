@@ -56,7 +56,7 @@ export const fetcher = (keys: string[], id: string): Promise<{
       return data;
     else throw new Error(data.message);
   })
-  .catch(() => fetcher(cgeo, keys, id));
+  .catch(() => fetcher(keys, id));
 
 
 
