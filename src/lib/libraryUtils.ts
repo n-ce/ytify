@@ -118,7 +118,7 @@ function setObserver(callback: () => number) {
 }
 
 
-function getLocalCollection(collection: string, fragment: DocumentFragment, isReserved: Boolean) {
+function getLocalCollection(collection: string, fragment: DocumentFragment, isReserved: boolean) {
   const db = getDB();
   const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
   let data = db[decodeURI(collection)];
