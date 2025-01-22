@@ -31,7 +31,7 @@ export function setAudioStreams(audioStreams: {
   bitrateSelector.innerHTML = '';
 
   const isDRC = (url: string) => url.includes('xtags=drc%3D1');
-  const useDRC = getSaved('stableVolume') && 'url' in audioStreams.find(a => isDRC(a.url));
+  const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
   
   audioStreams
     .filter(a => useDRC === isDRC(a.url))
