@@ -4,7 +4,7 @@ body {
 }
 
 body {
-  background: var(--bg);
+  background-image: linear-gradient(var(--bg), var(--text));
   color: var(--text);
   display: flex;
   align-items: center;
