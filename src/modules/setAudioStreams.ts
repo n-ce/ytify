@@ -30,11 +30,11 @@ export function setAudioStreams(audioStreams: {
 
   bitrateSelector.innerHTML = '';
 
-  const isDRC = s => s.url.includes('xtags=drc%3D1');
+  const isDRC = (s: string) => s.includes('xtags=drc%3D1');
   const useDRC = getSaved('stableVolume') && audioStreams.find(s);
   
   audioStreams
-    .filter(a => useDRC ? isDRC(a) : !isDRC(a))
+    .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
     .forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
     const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
