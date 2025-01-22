@@ -1,5 +1,5 @@
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
-import { store } from "../lib/store";
+import { store, getSaved } from "../lib/store";
 import { notify, proxyHandler } from "../lib/utils";
 
 export function setAudioStreams(audioStreams: {
