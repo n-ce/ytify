@@ -4,7 +4,7 @@ body {
 }
 
 body {
-  background-image: linear-gradient(var(--bg), var(--onBg));
+  background-color: var(--bg);
   color: var(--text);
   display: flex;
   align-items: center;
@@ -13,6 +13,7 @@ body {
   -webkit-font-smoothing: antialiased;
 
   main {
+    background-image: linear-gradient(var(--bg), var(--onBg));
     display: flex;
     flex-direction: column;
     isolation: isolate;
