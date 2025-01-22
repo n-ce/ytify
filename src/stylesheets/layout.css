@@ -13,7 +13,6 @@ body {
   -webkit-font-smoothing: antialiased;
 
   main {
-    background-image: linear-gradient(var(--bg), var(--onBg));
     display: flex;
     flex-direction: column;
     isolation: isolate;
