@@ -28,9 +28,13 @@ export function setAudioStreams(audioStreams: {
     return;
   }
 
-
   bitrateSelector.innerHTML = '';
-  audioStreams.forEach(async (_, i: number) => {
+  
+  const hasDRC = getSaved('stableVolume') ? audioStreams.find(a => a.url.includes('xtags=drc%3D1')) : false;
+  
+  audioStreams
+    .filter(a => hasDRC ? a.url.includes('xtags=drc%3D1') : a)
+    .forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
     const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
 
