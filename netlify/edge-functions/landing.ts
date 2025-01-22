@@ -38,7 +38,7 @@ export default async function handler(_: Request, context: Context) {
         ${cgeo === 'IN' ?
       `<a href="upi://pay?pa=animesh.5383@waicici&cu=INR" target="_blank" style="font-size:smaller;margin-top:1rem">
             <img width="100"
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/UPI_logo.svg/374px-UPI_logo.svg.png" />
+              src="https://upload.wikimedia.org/wikipedia/commons/6/6f/UPI_logo.svg" />
             Support development
           </a>` : ''
     }

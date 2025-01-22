@@ -76,12 +76,11 @@ export async function fetchCollection(collection: string | null, shared: boolean
 
   const fragment = document.createDocumentFragment();
   const isReserved = reservedCollections.includes(collection);
+  const isReversed = listContainer.classList.contains('reverse');
 
   shared ?
     await getSharedCollection(collection, fragment) :
     getLocalCollection(collection, fragment, isReserved);
-
-  const isReversed = listContainer.classList.contains('reverse');
 
   if (!shared && isReserved) {
     if (!isReversed)
@@ -123,17 +122,12 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
   const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
   let data = db[decodeURI(collection)];
 
-  if (!data) {
+  if (!data)
     notify('No items found');
-    return;
-  }
 
   const items = Object.entries(data);
   let itemsToShow = items.length;
-  const usePagination = collection === 'history' && itemsToShow > 20;
-
-  if (usePagination)
-    data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
+  const usePagination = isReserved && itemsToShow > 20;
 
   if (collection === 'discover') {
     for (const i in data)
@@ -141,7 +135,10 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
         delete db.discover?.[i];
     saveDB(db);
   }
-
+  
+  if (usePagination)
+    data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
+  
   renderDataIntoFragment(data, fragment, sort);
   listContainer.innerHTML = '';
   listContainer.appendChild(fragment);
