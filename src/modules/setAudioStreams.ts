@@ -34,7 +34,7 @@ export function setAudioStreams(audioStreams: {
   const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
   
   audioStreams
-    .filter(a => useDRC === isDRC(a.url))
+    .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
     .forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
     const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
