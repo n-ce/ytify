@@ -77,7 +77,6 @@ export const messages = {
     settings_export_settings: "Export Settings",
     settings_import_settings: "Import Settings",
     settings_changelog: "Changelog",
-
     settings_custom_instance: "Use Custom Instance",
     settings_links_hosts: "Links Host",
     settings_image_loading: "Image Loading",
@@ -112,5 +111,8 @@ export const messages = {
     settings_parental_controls: "Parental controls",
     settings_toggle: "Set Up",
     settings_pin: "PIN is required to setup parental controls, after which the app will reload to integrate the parts manager.",
-    feedback_placeholder: "Anonymously enter your feedback (bugs, feature requests) here:"
+    feedback_placeholder: "Anonymously enter your feedback (bugs, feature requests) here:",
+    now_playing: "Now Playing",
+    channel: "Channel",
+    settings_language: "Language"
 }

@@ -67,8 +67,8 @@
       <div id="mp">
 
         <div id="mptext">
-          <a id="title" href="" target="_blank"></a>
-          <p id="author"></p>
+          <a data-translation="now_playing" id="title" href="" target="_blank">Now Playing</a>
+          <p data-translation="channel" id="author">Channel</p>
         </div>
 
         <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
@@ -279,11 +279,6 @@
         <form netlify name="feedback" method="POST">
           <textarea data-translation-placeholder="feedback_placeholder" name="->" id="netlifyForm"
             placeholder="Anonymously enter your feedback (bugs, feature requests) here:" required></textarea>
-          <label for="language"></label>
-          <select name="language" id="language">
-            <option value="en">English</option>
-            <option value="pl">Polski</option>
-          </select>
           <button data-translation="settings_submit_feedback" type="submit">Submit Feedback</button>
 
           <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>

@@ -9,11 +9,7 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "@lingui/cli": "^5.1.2",
     "@lingui/core": "^5.1.2",
-    "@lingui/loader": "^5.1.2",
-    "@lingui/macro": "^5.1.2",
-    "@lingui/react": "^5.1.2",
     "hls.js": "^1.5.19",
     "imsc": "^1.1.5",
     "solid-js": "^1.9.4",

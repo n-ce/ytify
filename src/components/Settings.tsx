@@ -1,13 +1,12 @@
 import './Settings.css';
-import { For, Show, createSignal, onMount } from "solid-js";
-import { audio, img } from "../lib/dom";
-import { $, quickSwitch, removeSaved, save } from "../lib/utils";
-import { store, getSaved, params } from '../lib/store';
-import { cssVar, themer } from "../scripts/theme";
-import { getDB, saveDB } from '../lib/libraryUtils';
+import {createSignal, For, onMount, Show} from "solid-js";
+import {audio, img} from "../lib/dom";
+import {$, quickSwitch, removeSaved, save} from "../lib/utils";
+import {getSaved, params, store} from '../lib/store';
+import {cssVar, themer} from "../scripts/theme";
+import {getDB, saveDB} from '../lib/libraryUtils';
 import {changeLanguage} from "../scripts/translateHTML.ts";
 import {i18n} from "../scripts/i18n.ts";
-
 
 
 function ToggleSwitch(_: ToggleSwitch) {
@@ -93,10 +92,23 @@ export default function() {
           }}
         />
 
-        <Selector
-          id='linkHost'
-          label={i18n._('settings_links_hosts')}
-          onChange={(e) => {
+
+      <Selector
+          label={i18n._('settings_language')}
+          id='languageSelector'
+          onChange={(e) => {changeLanguage(e.target.value)}}
+            onMount={(target) => {
+                (target as HTMLSelectElement).value = localStorage.getItem("language") || "en";
+            }}
+      >
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
+      </Selector>
+
+      <Selector
+              id='linkHost'
+              label={i18n._('settings_links_hosts')}
+              onChange={(e) => {
             e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
               save('linkHost', e.target.value);
@@ -213,7 +225,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-search-2-line"></i>
-          <p data-translation="settings_search">Search</p>
+          <p data-translation="settings_search">{i18n._('settings_search')}</p>
         </b>
         <ToggleSwitch
           id="defaultFilterSongs"
@@ -246,7 +258,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-play-large-line"></i>
-          <p data-translation="settings_playback">Playback</p>
+          <p data-translation="settings_playback">{i18n._('settings_playback')}</p>
         </b>
 
 
@@ -329,7 +341,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-stack-line"></i>
-          <p data-translation="settings_library"> Library</p>
+          <p data-translation="settings_library">{i18n._('settings_library')}</p>
         </b>
 
 
@@ -395,7 +407,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-t-shirt-2-line"></i>
-          <p data-translation="settings_interface">Interface</p>
+          <p data-translation="settings_interface">{i18n._('settings_interface')}</p>
         </b>
 
         <Selector
@@ -482,7 +494,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-parent-line"></i>
-          <p data-translation="settings_parental_controls">Parental Controls</p>
+          <p data-translation="settings_parental_controls">{i18n._('settings_parental_controls')}</p>
         </b>
 
         <ToggleSwitch
@@ -603,7 +615,7 @@ if (params.has('reset')) {
   history.replaceState({}, '', location.pathname);
 }
 
-document.getElementById('language')!.addEventListener('change', callChangeLanguage)
+
 document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
 document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);

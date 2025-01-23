@@ -77,7 +77,6 @@ export const messages = {
     settings_export_settings: "Eksportuj ustawienia",
     settings_import_settings: "Importuj ustawienia",
     settings_changelog: "Dziennik zmian",
-
     settings_custom_instance: "Użyj niestandardowej wersji",
     settings_links_hosts: "Baza hosta",
     settings_image_loading: "Sposób ładowania miniatur",
@@ -112,5 +111,8 @@ export const messages = {
     settings_parental_controls: "Kontrola Rodzicielska",
     settings_toggle: "Włącz",
     settings_pin: "Kod PIN jest wymagany do skonfigurowania kontroli rodzicielskiej, po czym aplikacja przeładuje się, aby zintegrować menedżera części.",
-    feedback_placeholder: "Prześlij anonimowo swoją opinię (błędy, prośby o funkcje) tutaj:"
+    feedback_placeholder: "Prześlij anonimowo swoją opinię (błędy, prośby o funkcje) tutaj:",
+    now_playing: "Odtwarzane",
+    channel: "Kanał",
+    settings_language: "Language"
 }

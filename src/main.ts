@@ -13,7 +13,7 @@ import {callChangeLanguage} from "./components/Settings.tsx";
 addEventListener('DOMContentLoaded', async () => {
 
   const savedLanguage = localStorage.getItem("language") || "en";
-  const languageSelector = document.getElementById("language") as HTMLSelectElement;
+  const languageSelector = document.getElementById("languageSelector") as HTMLSelectElement;
 
   i18n.activate(savedLanguage);
 
