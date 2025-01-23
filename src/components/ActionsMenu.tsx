@@ -7,6 +7,7 @@ import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { createSignal, lazy, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
+import {i18n} from "../scripts/i18n.ts";
 
 declare module "solid-js" {
   namespace JSX {
@@ -45,14 +46,14 @@ export default function() {
         appendToQueuelist(store.actionsMenu, true);
         close();
       }}>
-        <i class="ri-skip-forward-line"></i><span data-translation="actions_menu_play_next">Play Next</span>
+        <i class="ri-skip-forward-line"></i><span>{i18n._('actions_menu_play_next')}</span>
       </li>
 
       <li tabindex={1} on:click={() => {
         appendToQueuelist(store.actionsMenu);
         close();
       }}>
-        <i class="ri-list-check-2"></i><span data-translation="actions_menu_enqueue">Enqueue</span>
+        <i class="ri-list-check-2"></i><span>{i18n._('actions_menu_enqueue')}</span>
       </li>
 
       <CollectionSelector collection={store.actionsMenu} close={close} />
@@ -63,7 +64,7 @@ export default function() {
           close();
           fetchList('/playlists/RD' + store.actionsMenu.id, true);
         }}>
-            <i class="ri-radio-line"></i><span data-translation="actions_menu_start_radio">Start Radio</span>
+            <i class="ri-radio-line"></i><span>{i18n._('actions_menu_start_radio')}</span>
         </li>
       </Show>
 
@@ -78,7 +79,7 @@ export default function() {
         }
         loadingScreen.close();
       }}>
-        <i class="ri-download-2-fill"></i><span data-translation="actions_menu_download">Download</span>
+        <i class="ri-download-2-fill"></i><span>{i18n._('actions_menu_download')}</span>
       </li>
 
       <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
@@ -98,9 +99,9 @@ export default function() {
 
           <i class="ri-user-line"></i>
             {isMusic() ?
-                <span data-translation="actions_menu_view_artist">View Artist</span>
+                <span>{i18n._('actions_menu_view_artist')}</span>
                 :
-                <span data-translation="actions_menu_view_channel">View Channel</span>
+                <span>{i18n._('actions_menu_view_channel')}</span>
             }
         </li>
       </Show>
@@ -122,14 +123,14 @@ export default function() {
                 close();
                 render(WatchOnYtify, document.body);
               }}>
-                <i class="ri-youtube-line"></i><span data-translation="actions_menu_watch_ytify">Watch on  ytify</span>
+                <i class="ri-youtube-line"></i><span>{i18n._('actions_menu_watch_ytify')}</span>
               </li>
               :
               <li tabindex={6} on:click={() => {
                 close();
                 open('https://youtu.be/' + store.actionsMenu.id);
               }}>
-                <i class="ri-youtube-line"></i><span data-translation="actions_menu_watch_youtube">Watch on YouTube</span>
+                <i class="ri-youtube-line"></i><span>{i18n._('actions_menu_watch_youtube')}</span>
               </li>
           }
         </Show>
@@ -157,7 +158,7 @@ export default function() {
         }, document.body);
 
       }}>
-        <i class="ri-bug-line"></i> <span data-translation="actions_menu_debug_info">Debug Information</span>
+        <i class="ri-bug-line"></i> <span>{i18n._('actions_menu_debug_info')}</span>
       </li>
 
     </ul>

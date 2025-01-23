@@ -63,7 +63,7 @@ export const messages = {
     actions_menu_start_radio: "Start radio",
     actions_menu_download: "Download",
     actions_menu_watch_ytify: "Watch ytify",
-    actions_menu_watch_youtube: "Watch youtube",
+    actions_menu_watch_youtube: "Watch Youtube",
     actions_menu_view_artist: "View artist",
     actions_menu_view_channel: "View channel",
     actions_menu_debug_info: "Debug information",

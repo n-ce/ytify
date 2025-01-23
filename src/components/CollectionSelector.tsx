@@ -1,5 +1,6 @@
 import { onMount } from "solid-js";
 import { addToCollection, createCollection, getDB, reservedCollections } from "../lib/libraryUtils";
+import {i18n} from "../scripts/i18n.ts";
 
 export default function CollectionSelector(_: {
   collection: CollectionItem,
@@ -42,10 +43,10 @@ export default function CollectionSelector(_: {
           clxnSlctr.selectedIndex = 0;
         }}
       >
-          <option data-translation="collection_selector_add_to">Add To</option>
-          <option data-translation="collection_selector_create_new" value="+cl">Create New Collection</option>
-          <option data-translation="collection_selector_favorites" value="favorites">Favorites</option>
-          <option data-translation="collection_selector_listen_later" value="listenLater">Listen Later</option>
+          <option>{i18n._('collection_selector_add_to')}</option>
+          <option value="+cl">{i18n._('collection_selector_create_new')}</option>
+          <option value="favorites">{i18n._('collection_selector_favorites')}</option>
+          <option value="listenLater">{i18n._('collection_selector_listen_later')}</option>
       </select>
     </li>
   );
