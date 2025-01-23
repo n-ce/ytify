@@ -45,14 +45,14 @@ export default function() {
         appendToQueuelist(store.actionsMenu, true);
         close();
       }}>
-        <i class="ri-skip-forward-line"></i>Play Next
+        <i class="ri-skip-forward-line"></i><span data-translation="actions_menu_play_next">Play Next</span>
       </li>
 
       <li tabindex={1} on:click={() => {
         appendToQueuelist(store.actionsMenu);
         close();
       }}>
-        <i class="ri-list-check-2"></i>Enqueue
+        <i class="ri-list-check-2"></i><span data-translation="actions_menu_enqueue">Enqueue</span>
       </li>
 
       <CollectionSelector collection={store.actionsMenu} close={close} />
@@ -63,7 +63,7 @@ export default function() {
           close();
           fetchList('/playlists/RD' + store.actionsMenu.id, true);
         }}>
-          <i class="ri-radio-line"></i>Start Radio
+            <i class="ri-radio-line"></i><span data-translation="actions_menu_start_radio">Start Radio</span>
         </li>
       </Show>
 
@@ -78,7 +78,7 @@ export default function() {
         }
         loadingScreen.close();
       }}>
-        <i class="ri-download-2-fill"></i>Download
+        <i class="ri-download-2-fill"></i><span data-translation="actions_menu_download">Download</span>
       </li>
 
       <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
@@ -95,7 +95,13 @@ export default function() {
 
           fetchList(smd.channelUrl);
         }}>
-          <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
+
+          <i class="ri-user-line"></i>
+            {isMusic() ?
+                <span data-translation="actions_menu_view_artist">View Artist</span>
+                :
+                <span data-translation="actions_menu_view_channel">View Channel</span>
+            }
         </li>
       </Show>
 
@@ -116,14 +122,14 @@ export default function() {
                 close();
                 render(WatchOnYtify, document.body);
               }}>
-                <i class="ri-youtube-line"></i>Watch on  ytify
+                <i class="ri-youtube-line"></i><span data-translation="actions_menu_watch_ytify">Watch on  ytify</span>
               </li>
               :
               <li tabindex={6} on:click={() => {
                 close();
                 open('https://youtu.be/' + store.actionsMenu.id);
               }}>
-                <i class="ri-youtube-line"></i>Watch on YouTube
+                <i class="ri-youtube-line"></i><span data-translation="actions_menu_watch_youtube">Watch on YouTube</span>
               </li>
           }
         </Show>
@@ -151,7 +157,7 @@ export default function() {
         }, document.body);
 
       }}>
-        <i class="ri-bug-line"></i> Debug Information
+        <i class="ri-bug-line"></i> <span data-translation="actions_menu_debug_info">Debug Information</span>
       </li>
 
     </ul>

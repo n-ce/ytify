@@ -5,6 +5,8 @@ import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { store, getSaved, params } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
 import { getDB, saveDB } from '../lib/libraryUtils';
+import {changeLanguage} from "../scripts/translateHTML.ts";
+import {i18n} from "../scripts/i18n.ts";
 
 
 
@@ -72,7 +74,7 @@ export default function() {
 
         <ToggleSwitch
           id='customInstanceSwitch'
-          name='Use Custom Instance'
+          name={i18n._('settings_custom_instance')}
           checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
             const _ = 'custom_instance_2';
@@ -93,7 +95,7 @@ export default function() {
 
         <Selector
           id='linkHost'
-          label='Links Host'
+          label={i18n._('settings_links_hosts')}
           onChange={(e) => {
             e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
@@ -116,7 +118,7 @@ export default function() {
         </Selector>
 
         <Selector
-          label='Image Loading'
+          label={i18n._('settings_image_loading')}
           id='imgLoad'
           onChange={(e) => {
             const val = e.target.value;
@@ -147,7 +149,7 @@ export default function() {
 
         <Selector
           id='downloadFormatSelector'
-          label='Download Format'
+          label={i18n._('settings_download_format')}
           onChange={(e) => {
             store.downloadFormat = e.target.value as 'opus';
             store.downloadFormat === 'opus' ?
@@ -174,7 +176,7 @@ export default function() {
 
         <Selector
           id='shareAction'
-          label='PWA Share Action'
+          label={i18n._('settings_pwa_share_action')}
           onChange={(e) => {
             const val = e.target.value;
             if (val === 'play')
@@ -196,7 +198,7 @@ export default function() {
 
         <ToggleSwitch
           id='woswitch'
-          name='Watch on ytify'
+          name={i18n._('settings_watch_ytify')}
           checked={Boolean(getSaved('watchOnYtify'))}
           onClick={() => {
             const _ = 'watchOnYtify';
@@ -211,11 +213,11 @@ export default function() {
       <div>
         <b>
           <i class="ri-search-2-line"></i>
-          <p>Search</p>
+          <p data-translation="settings_search">Search</p>
         </b>
         <ToggleSwitch
           id="defaultFilterSongs"
-          name='Set Songs as Default Filter'
+          name={i18n._('settings_set_song_as_default_filter')}
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             const _ = 'searchFilter';
@@ -227,7 +229,7 @@ export default function() {
         />
         <ToggleSwitch
           id="suggestionsSwitch"
-          name='Display Suggestions'
+          name={i18n._('settings_display_suggestions')}
           checked={getSaved('searchSuggestions') !== 'off'}
           onClick={() => {
             const _ = 'searchSuggestions';
@@ -244,13 +246,13 @@ export default function() {
       <div>
         <b>
           <i class="ri-play-large-line"></i>
-          <p>Playback</p>
+          <p data-translation="settings_playback">Playback</p>
         </b>
 
 
         <ToggleSwitch
           id="qualitySwitch"
-          name='Highest Quality Audio'
+          name={i18n._('settings_hq_audio')}
           checked={getSaved('hq') === 'true'}
           onClick={async () => {
             getSaved('hq') ?
@@ -266,7 +268,7 @@ export default function() {
         <Show when={!getSaved('HLS')}>
 
           <Selector
-            label='Codec Preference'
+            label={i18n._('settings_codec_preference')}
             id='codecPreference'
             onChange={async (e) => {
 
@@ -295,7 +297,7 @@ export default function() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Always Proxy Streams'
+            name={i18n._('settings_always_proxy_streams')}
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               const _ = 'enforceProxy';
@@ -311,7 +313,7 @@ export default function() {
 
         <ToggleSwitch
           id="HLS_Switch"
-          name='HTTP Live Streaming'
+          name={i18n._('settings_http_live_streaming')}
           checked={getSaved('HLS') === 'true'}
           onClick={() => {
             getSaved('HLS') ?
@@ -327,13 +329,13 @@ export default function() {
       <div>
         <b>
           <i class="ri-stack-line"></i>
-          <p> Library</p>
+          <p data-translation="settings_library"> Library</p>
         </b>
 
 
         <ToggleSwitch
           id="startupTab"
-          name='Set as Default Tab'
+          name={i18n._('settings_set_as_default')}
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
             const _ = 'startupTab';
@@ -344,7 +346,7 @@ export default function() {
         />
         <ToggleSwitch
           id='discoverSwitch'
-          name='Store Discoveries'
+          name={i18n._('settings_store_discoveries')}
           checked={getSaved('discover') !== 'off'}
           onClick={e => {
             if (e.target.checked)
@@ -364,7 +366,7 @@ export default function() {
 
         <ToggleSwitch
           id='historySwitch'
-          name='Store History'
+          name={i18n._('settings_store_history')}
           checked={getSaved('history') !== 'off'}
           onClick={e => {
             if (e.target.checked)
@@ -386,18 +388,18 @@ export default function() {
             .then(mod => {
               mod.pipedPlaylistsImporter()
             })
-        }}>Import Playlists from Piped</p>
+        }}>{i18n._('settings_import_from_piped')}</p>
 
       </div>
 
       <div>
         <b>
           <i class="ri-t-shirt-2-line"></i>
-          <p>Interface</p>
+          <p data-translation="settings_interface">Interface</p>
         </b>
 
         <Selector
-          label='Roundness'
+          label={i18n._('settings_roundness')}
           id='roundnessChanger'
           onChange={(e) => {
             cssVar('--roundness', e.target.value);
@@ -422,7 +424,7 @@ export default function() {
 
         <ToggleSwitch
           id="custom_theme"
-          name='Use Custom Color'
+          name={i18n._('settings_use_custom_color')}
           checked={getSaved('custom_theme') !== null}
           onClick={e => {
             const _ = 'custom_theme';
@@ -442,7 +444,7 @@ export default function() {
 
 
         <Selector
-          label='Theming Scheme'
+          label={i18n._('settings_theming_scheme')}
           id='themeSelector'
           onChange={(e) => {
             themer();
@@ -454,15 +456,15 @@ export default function() {
             target.value = (getSaved('theme') as 'light' | 'dark') || 'auto';
           }}
         >
-          <optgroup label="Dynamic">
-            <option value="auto" selected>System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
+          <optgroup label={i18n._('settings_theming_scheme_dynamic')}>
+            <option value="auto" selected>{i18n._('settings_theming_scheme_system')}</option>
+            <option value="light">{i18n._('settings_theming_scheme_light')}</option>
+            <option value="dark">{i18n._('settings_theming_scheme_dark')}</option>
           </optgroup>
-          <optgroup label="High Contrast">
-            <option value="auto-hc">System</option>
-            <option value="white">White</option>
-            <option value="black">Black</option>
+          <optgroup label={i18n._('settings_theming_scheme_hc')}>
+            <option value="auto-hc">{i18n._('settings_theming_scheme_hc_system')}</option>
+            <option value="white">{i18n._('settings_theming_scheme_white')}</option>
+            <option value="black">{i18n._('settings_theming_scheme_black')}</option>
           </optgroup>
         </Selector>
 
@@ -480,12 +482,12 @@ export default function() {
       <div>
         <b>
           <i class="ri-parent-line"></i>
-          <p>Parental Controls</p>
+          <p data-translation="settings_parental_controls">Parental Controls</p>
         </b>
 
         <ToggleSwitch
           id="kidsSwitch"
-          name='Set Up'
+          name={i18n._('settings_toggle')}
           checked={Boolean(getSaved('kidsMode'))}
           onClick={e => {
             const savedPin = getSaved('kidsMode');
@@ -504,8 +506,8 @@ export default function() {
               }
               return;
             }
-
-            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the parts manager.');
+            let pinMessage: string = i18n._('settings_pin')
+            const pin = prompt(pinMessage);
             if (pin) {
               save('kidsMode', pin);
               location.reload();
@@ -588,6 +590,11 @@ async function importSettings(e: Event) {
   }
 }
 
+export function callChangeLanguage(e: Event) {
+    const selectElement = e.target as HTMLSelectElement;
+    const selectedLanguage = selectElement.value;
+    changeLanguage(selectedLanguage);
+}
 
 // emergency use
 if (params.has('reset')) {
@@ -596,7 +603,7 @@ if (params.has('reset')) {
   history.replaceState({}, '', location.pathname);
 }
 
-
+document.getElementById('language')!.addEventListener('change', callChangeLanguage)
 document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
 document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);

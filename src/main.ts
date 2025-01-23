@@ -6,8 +6,24 @@ import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
+import {translateHTML} from "./scripts/translateHTML.ts";
+import {i18n} from "@lingui/core";
+import {callChangeLanguage} from "./components/Settings.tsx";
 
 addEventListener('DOMContentLoaded', async () => {
+
+  const savedLanguage = localStorage.getItem("language") || "en";
+  const languageSelector = document.getElementById("language") as HTMLSelectElement;
+
+  i18n.activate(savedLanguage);
+
+  translateHTML();
+
+  if (languageSelector) {
+    languageSelector.value = savedLanguage;
+  }
+
+  languageSelector?.addEventListener("change", callChangeLanguage);
 
   const settingsContainer = document.getElementById('settings') as HTMLDivElement;
   const stngs = await import('./components/Settings');

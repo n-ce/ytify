@@ -22,6 +22,8 @@ export function miniPlayerRoutingHandler(inHome: boolean, header: DOMTokenList) 
 
   if (inHome) {
     header.add('hide');
+    playButton.setAttribute("data-translation-aria-label", "player_controls_play_button");
+    playButton.setAttribute("aria-label", "Play");
     document.getElementById('upperLayer')!.prepend(img);
     document.getElementById('meta')!.prepend(title, author);
     document.getElementById('playerControls')!.insertBefore(playButton, document.getElementById('seekFwdButton'));

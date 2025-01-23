@@ -42,10 +42,10 @@ export default function CollectionSelector(_: {
           clxnSlctr.selectedIndex = 0;
         }}
       >
-        <option>Add To</option>
-        <option value="+cl">Create New Collection</option>
-        <option value="favorites">Favorites</option>
-        <option value="listenLater">Listen Later</option>
+          <option data-translation="collection_selector_add_to">Add To</option>
+          <option data-translation="collection_selector_create_new" value="+cl">Create New Collection</option>
+          <option data-translation="collection_selector_favorites" value="favorites">Favorites</option>
+          <option data-translation="collection_selector_listen_later" value="listenLater">Listen Later</option>
       </select>
     </li>
   );
