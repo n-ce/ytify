@@ -506,7 +506,7 @@ export default function() {
               }
               return;
             }
-            let pinMessage: string = i18n._('settings_pin')
+            const pinMessage = i18n._('settings_pin');
             const pin = prompt(pinMessage);
             if (pin) {
               save('kidsMode', pin);
