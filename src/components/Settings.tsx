@@ -5,8 +5,7 @@ import {$, quickSwitch, removeSaved, save} from "../lib/utils";
 import {getSaved, params, store} from '../lib/store';
 import {cssVar, themer} from "../scripts/theme";
 import {getDB, saveDB} from '../lib/libraryUtils';
-import {changeLanguage} from "../scripts/translateHTML.ts";
-import {i18n} from "../scripts/i18n.ts";
+import {changeLanguage, i18n} from "../scripts/i18n.ts";
 
 
 function ToggleSwitch(_: ToggleSwitch) {

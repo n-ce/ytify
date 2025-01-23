@@ -6,9 +6,9 @@ import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
-import {translateHTML} from "./scripts/translateHTML.ts";
-import {i18n} from "@lingui/core";
-import {callChangeLanguage} from "./components/Settings.tsx";
+import { i18n } from "@lingui/core";
+import { callChangeLanguage } from "./components/Settings.tsx";
+import { translateHTML } from "./scripts/i18n.ts";
 
 addEventListener('DOMContentLoaded', async () => {
 
