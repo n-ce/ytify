@@ -307,6 +307,19 @@ export default function() {
           </Selector>
 
           <ToggleSwitch
+            id="stableVolumeSwitch"
+            name='Prefer Stable Volume'
+            checked={getSaved('stableVolume') === 'true'}
+            onClick={() => {
+              const _ = 'stableVolume';
+              getSaved(_) ?
+                removeSaved(_) :
+                save(_, 'true');
+              quickSwitch();
+            }}
+          />
+
+          <ToggleSwitch
             id="enforceProxySwitch"
             name={i18n._('settings_always_proxy_streams')}
             checked={getSaved('enforceProxy') === 'true'}
@@ -318,7 +331,6 @@ export default function() {
               quickSwitch();
             }}
           />
-
 
         </Show>
 

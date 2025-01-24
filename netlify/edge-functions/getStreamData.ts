@@ -41,7 +41,7 @@ export const config: Config = {
   path: '/streams/:id',
 };
 
-const host = 'ytstream-download-youtube-videos.p.rapidapi.com';
+const host = 'yt-api.p.rapidapi.com';
 export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
   title: string,
   channelTitle: string,
