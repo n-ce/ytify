@@ -1,9 +1,6 @@
-
-// piped import playlists into ytify collections
-
+import { i18n } from "@lingui/core";
 import { addListToCollection, createCollection, superCollectionLoader } from "../lib/libraryUtils";
 import { convertSStoHHMMSS, notify } from "../lib/utils";
-import {i18n} from "../scripts/i18n.ts";
 
 export async function pipedPlaylistsImporter() {
 
@@ -37,7 +34,7 @@ export async function pipedPlaylistsImporter() {
       Authorization: authId.token
     }
   }).then(res => res.json())
-    .catch(e => notify( i18n._("piped_failed_find", { e })));
+    .catch(e => notify(i18n._("piped_failed_find", { e })));
   if (playlists.length)
     notify(i18n._("piped_success_fetched"))
   else return;
@@ -84,8 +81,8 @@ export async function pipedPlaylistsImporter() {
     }
   }).then(res => {
     notify(res.ok ?
-        i18n._('piped_success_auth') :
-        i18n._('piped_failed_auth')
+      i18n._('piped_success_auth') :
+      i18n._('piped_failed_auth')
     );
   });
 }

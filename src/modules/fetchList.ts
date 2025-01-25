@@ -2,7 +2,7 @@ import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtB
 import { getDB, saveDB } from "../lib/libraryUtils";
 import { errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
-import {i18n} from "../scripts/i18n.ts";
+import { i18n } from "@lingui/core";
 
 export default async function fetchList(
   url: string | undefined,

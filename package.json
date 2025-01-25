@@ -10,23 +10,38 @@
   },
   "dependencies": {
     "@lingui/core": "^5.1.2",
-    "hls.js": "^1.5.19",
+    "hls.js": "^1.5.20",
     "imsc": "^1.1.5",
     "solid-js": "^1.9.4",
     "sortablejs": "^1.15.6"
   },
   "devDependencies": {
     "@netlify/edge-functions": "^2.11.1",
-    "@types/node": "^22.10.7",
+    "@types/node": "^22.10.10",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.20",
     "eruda": "^3.4.1",
-    "open-props": "^1.7.7",
+    "open-props": "^1.7.10",
     "postcss-jit-props": "^1.0.15",
     "typescript": "^5.7.3",
     "vite": "^6.0.11",
     "vite-plugin-pwa": "^0.21.1",
     "vite-plugin-solid": "^2.11.0"
+  },
+  "lingui": {
+    "locales": [
+      "en",
+      "pl"
+    ],
+    "sourceLocale": "en",
+    "catalogs": [
+      {
+        "path": "src/locales/{locale}",
+        "include": [
+          "src"
+        ]
+      }
+    ]
   },
   "browserslist": [
     "defaults"

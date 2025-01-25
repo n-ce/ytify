@@ -4,7 +4,7 @@ import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
-import {i18n} from "../scripts/i18n.ts";
+import { i18n } from '@lingui/core';
 
 export default async function() {
 

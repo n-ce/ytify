@@ -26,7 +26,7 @@ export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
 export const listSection = <HTMLDivElement>document.getElementById('list');
 
-export const listContainer = <HTMLDivElement>document.getElementById('playlist');
+export const listContainer = <HTMLDivElement>document.getElementById('listContainer');
 
 export const listAnchor = <HTMLAnchorElement>document.getElementById('/list');
 

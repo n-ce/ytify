@@ -7,7 +7,7 @@ import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { createSignal, lazy, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
-import {i18n} from "../scripts/i18n.ts";
+import { i18n } from "@lingui/core";
 
 declare module "solid-js" {
   namespace JSX {
@@ -64,7 +64,7 @@ export default function() {
           close();
           fetchList('/playlists/RD' + store.actionsMenu.id, true);
         }}>
-            <i class="ri-radio-line"></i>{i18n._('actions_menu_start_radio')}
+          <i class="ri-radio-line"></i>{i18n._('actions_menu_start_radio')}
         </li>
       </Show>
 
@@ -98,11 +98,11 @@ export default function() {
         }}>
 
           <i class="ri-user-line"></i>
-            {isMusic() ?
-                i18n._('actions_menu_view_artist')
-                :
-                i18n._('actions_menu_view_channel')
-            }
+          {isMusic() ?
+            i18n._('actions_menu_view_artist')
+            :
+            i18n._('actions_menu_view_channel')
+          }
         </li>
       </Show>
 

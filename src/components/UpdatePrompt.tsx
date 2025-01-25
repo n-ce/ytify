@@ -1,6 +1,6 @@
 import { createSignal, onMount } from "solid-js";
 import './UpdatePrompt.css';
-import {i18n} from "../scripts/i18n.ts";
+import { i18n } from "@lingui/core";
 
 export default function UpdatePrompt(handleUpdate: () => void) {
 

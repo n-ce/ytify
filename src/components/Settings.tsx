@@ -1,11 +1,11 @@
 import './Settings.css';
-import {createSignal, For, onMount, Show} from "solid-js";
-import {audio, img} from "../lib/dom";
-import {$, quickSwitch, removeSaved, save} from "../lib/utils";
-import {getSaved, params, store} from '../lib/store';
-import {cssVar, themer} from "../scripts/theme";
-import {getDB, saveDB} from '../lib/libraryUtils';
-import {changeLanguage, i18n} from "../scripts/i18n.ts";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { audio, img } from "../lib/dom";
+import { $, quickSwitch, removeSaved, save } from "../lib/utils";
+import { getSaved, params, store } from '../lib/store';
+import { cssVar, themer } from "../scripts/theme";
+import { getDB, saveDB } from '../lib/libraryUtils';
+import { i18n } from '@lingui/core';
 
 
 function ToggleSwitch(_: ToggleSwitch) {
@@ -91,22 +91,27 @@ export default function() {
         />
 
 
-      <Selector
+        <Selector
           label={i18n._('settings_language')}
           id='languageSelector'
-          onChange={(e) => {changeLanguage(e.target.value)}}
-            onMount={(target) => {
-                (target as HTMLSelectElement).value = localStorage.getItem("language") || "en";
-            }}
-      >
+          onChange={(e) => {
+            const lang = e.target.value;
+            i18n.activate(lang);
+            save("language", lang);
+            location.reload();
+          }}
+          onMount={(target) => {
+            (target as HTMLSelectElement).value = localStorage.getItem("language") || "en";
+          }}
+        >
           <option value="en">English</option>
           <option value="pl">Polski</option>
-      </Selector>
+        </Selector>
 
-      <Selector
-              id='linkHost'
-              label={i18n._('settings_links_hosts')}
-              onChange={(e) => {
+        <Selector
+          id='linkHost'
+          label={i18n._('settings_links_hosts')}
+          onChange={(e) => {
             e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
               save('linkHost', e.target.value);
@@ -375,7 +380,7 @@ export default function() {
               removeSaved('discover');
             else {
               const db = getDB();
-                if (confirm(i18n._("settings_clear_discoveries", { count: Object.keys(db.discover || {}).length || 0 }))) {
+              if (confirm(i18n._("settings_clear_discoveries", { count: Object.keys(db.discover || {}).length || 0 }))) {
                 delete db.discover;
                 saveDB(db);
                 save('discover', 'off');
@@ -454,7 +459,7 @@ export default function() {
             if (colorString)
               removeSaved(_);
             else {
-                const rgbText = i18n._('settings_enter_rgb');
+              const rgbText = i18n._('settings_enter_rgb');
               const str = prompt(rgbText, '174,174,174');
               str ?
                 save(_, str) :
@@ -612,11 +617,6 @@ async function importSettings(e: Event) {
   }
 }
 
-export function callChangeLanguage(e: Event) {
-    const selectElement = e.target as HTMLSelectElement;
-    const selectedLanguage = selectElement.value;
-    changeLanguage(selectedLanguage);
-}
 
 // emergency use
 if (params.has('reset')) {

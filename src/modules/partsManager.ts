@@ -1,6 +1,6 @@
+import { i18n } from "@lingui/core";
 import { getSaved } from "../lib/store";
 import { removeSaved, save } from "../lib/utils";
-import {i18n} from "../scripts/i18n.ts";
 
 
 export const partsManager = (): {
