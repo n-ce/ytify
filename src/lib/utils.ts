@@ -85,9 +85,17 @@ export function convertSStoHHMMSS(seconds: number): string {
 }
 
 export async function getDownloadLink(id: string): Promise<string | null> {
-  const api = store.player.fallback;
-  if (!api) return '';
-  const dl = await fetch(`${api}/download/${id}?f=${store.downloadFormat}`)
+  const streamUrl = 'https://youtu.be/' + id;
+  const dl = await fetch('https://cobalt-api.kwiatekmiki.com', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url: streamUrl,
+      downloadMode: 'audio',
+      audioFormat: store.downloadFormat,
+      filenameStyle: 'basic'
+    })
+  })
     .then(_ => _.json())
     .then(_ => {
       if ('url' in _)

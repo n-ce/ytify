@@ -1,5 +1,5 @@
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
-import { store } from "../lib/store";
+import { store, getSaved } from "../lib/store";
 import { notify, proxyHandler } from "../lib/utils";
 import {i18n} from "../scripts/i18n.ts";
 
@@ -30,9 +30,14 @@ export function setAudioStreams(audioStreams: {
     return;
   }
 
-
   bitrateSelector.innerHTML = '';
-  audioStreams.forEach(async (_, i: number) => {
+
+  const isDRC = (url: string) => url.includes('xtags=drc%3D1');
+  const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
+  
+  audioStreams
+    .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
+    .forEach((_, i: number) => {
     const codec = _.codec === 'opus' ? 'opus' : 'aac';
     const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
 
