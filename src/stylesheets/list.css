@@ -1,5 +1,11 @@
 #listTools {
 
+  button {
+    &::after {
+      content: attr(aria-label);
+    }
+  }
+
   &.playlist {
 
     #clearListBtn,
@@ -60,7 +66,7 @@
   }
 }
 
-#playlist {
+#listContainer {
   width: 100%;
 
   &.reverse {

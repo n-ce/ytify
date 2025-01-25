@@ -8,7 +8,7 @@ const attributes = [
   '-aria-label',
   '-placeholder'
 ];
-import(`../locales/${lang}`)
+import(`../locales/${lang}.ts`)
   .then(({ messages }) => {
 
     i18n.load(lang, messages);

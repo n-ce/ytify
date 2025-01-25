@@ -17,6 +17,10 @@
       display: inline-flex;
       align-items: center;
 
+      &::after {
+        content: attr(aria-label);
+      }
+
       i {
         font-weight: initial;
         pointer-events: none;

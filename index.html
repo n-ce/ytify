@@ -186,8 +186,7 @@
 
     <section id="search">
       <form id="superInputContainer">
-        <input data-translation-placeholder="search_placeholder" type="search" id="superInput" autocomplete="off"
-          placeholder='Search or enter YT URL             CTRL+K' />
+        <input data-translation-placeholder="search_placeholder" type="search" id="superInput" autocomplete="off" />
         <select id="searchFilters">
           <optgroup label="YouTube">
             <option data-translation="search_filter_all" value="all">All</option>
@@ -217,26 +216,24 @@
 
       <div id="collections">
 
-        <a class="collectionItem" id="discover" href="/list?collection=discover">
+        <a class="collectionItem" id="discover" href="/list?collection=discover"
+          data-translation-aria-label="library_discover">
           <i class="ri-compass-3-line"></i>
-          <p data-translation="library_discover">Discover</p>
         </a>
 
-        <a class="collectionItem" id="history" href="/list?collection=history">
+        <a class="collectionItem" id="history" href="/list?collection=history"
+          data-translation-aria-label="library_history">
           <i class="ri-memories-line"></i>
-          <p data-translation="library_history">History</p>
-
         </a>
 
-        <a class="collectionItem" id="favorites" href="/list?collection=favorites">
+        <a class="collectionItem" id="favorites" href="/list?collection=favorites"
+          data-translation-aria-label="library_favorites">
           <i class="ri-heart-fill"></i>
-          <p data-translation="library_favorites">Favorites</p>
-
         </a>
 
-        <a class="collectionItem" id="listenLater" href="/list?collection=listenLater">
+        <a class="collectionItem" id="listenLater" href="/list?collection=listenLater"
+          data-translation-aria-label="library_listen_later">
           <i class="ri-calendar-schedule-line"></i>
-          <p data-translation="library_listen_later">Listen Later</p>
         </a>
       </div>
 
@@ -286,16 +283,15 @@
       <div id="actionsContainer">
         <form netlify name="feedback" method="POST">
           <textarea data-translation-placeholder="settings_feedback_placeholder" name="->" id="netlifyForm"
-            placeholder="Anonymously enter your feedback (bugs, feature requests) here:" required></textarea>
+            required></textarea>
+
           <button data-translation="settings_feedback_submit" type="submit">Submit Feedback</button>
 
           <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
 
-          <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore
-            Settings</button>
+          <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore Settings</button>
 
-          <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export
-            Settings</button>
+          <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export Settings</button>
           <button type="button">
             <label data-translation="settings_import" for="importSettingsBtn">Import Settings</label>
             <input type="file" id="importSettingsBtn" class="hide">
@@ -317,14 +313,14 @@
 
     <section id="list">
       <span id="listTools">
-        <button id="playAllBtn">
-          <i class="ri-play-large-line"></i> <span data-translation="list_play">Play</span>
+        <button id="playAllBtn" data-translation-aria-label="list_play">
+          <i class="ri-play-large-line"></i>
         </button>
-        <button id="enqueueAllBtn">
-          <i class="ri-list-check-2"></i> <span data-translation="list_enqueue">Enqueue</span>
+        <button id="enqueueAllBtn" data-translation-aria-label="list_enqueue">
+          <i class="ri-list-check-2"></i>
         </button>
-        <button id="importListBtn">
-          <i class="ri-import-line"></i> <span data-translation="list_import">Import</span>
+        <button id="importListBtn" data-translation-aria-label="list_import">
+          <i class="ri-import-line"></i>
         </button>
         <button id="subscribeListBtn">
           <i class="ri-stack-line" data-state="Subscribe"></i>
@@ -332,26 +328,26 @@
         <button id="viewOnYTBtn">
           <i class="ri-external-link-line" data-state=" View on YouTube"></i>
         </button>
-        <button id="clearListBtn">
-          <i class="ri-close-line"></i> <span data-translation="list_clear_all">Clear All</span>
+        <button id="clearListBtn" data-translation-aria-label="list_clear_all">
+          <i class="ri-close-line"></i>
         </button>
-        <button id="removeFromListBtn">
-          <i class="ri-subtract-line"></i> <span data-translation="list_remove">Remove</span>
+        <button id="removeFromListBtn" data-translation-aria-label="list_remove">
+          <i class="ri-subtract-line"></i>
         </button>
-        <button id="deleteCollectionBtn">
-          <i class="ri-delete-bin-2-line"></i> <span data-translation="list_delete">Delete</span>
+        <button id="deleteCollectionBtn" data-translation-aria-label="list_delete">
+          <i class="ri-delete-bin-2-line"></i>
         </button>
-        <button id="renameCollectionBtn">
-          <i class="ri-edit-line"></i> <span data-translation="list_rename">Rename</span>
+        <button id="renameCollectionBtn" data-translation-aria-label="list_rename">
+          <i class="ri-edit-line"></i>
         </button>
-        <button id="shareCollectionBtn">
-          <i class="ri-link"></i> <span data-translation="list_share">Share</span>
+        <button id="shareCollectionBtn" data-translation-aria-label="list_share">
+          <i class="ri-link"></i>
         </button>
-        <button id="radioCollectionBtn">
-          <i class="ri-radio-line"></i> <span data-translation="list_radio">Radio</span>
+        <button id="radioCollectionBtn" data-translation-aria-label="list_radio">
+          <i class="ri-radio-line"></i>
         </button>
-        <button id="sortCollectionBtn">
-          <i class="ri-draggable"></i> <span data-translation="list_sort">Sort</span>
+        <button id="sortCollectionBtn" data-translation-aria-label="list_sort">
+          <i class="ri-draggable"></i>
         </button>
 
 
