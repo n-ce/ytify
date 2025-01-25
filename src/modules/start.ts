@@ -4,6 +4,7 @@ import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
+import {i18n} from "../scripts/i18n.ts";
 
 export default async function() {
 
@@ -49,7 +50,7 @@ export default async function() {
   const id = params.get('s') || isPWA;
   let shareAction = getSaved('shareAction');
   if (isPWA && shareAction === 'ask')
-    shareAction = confirm('Click ok to Play, click cancel to Download') ?
+    shareAction = confirm(i18n._('pwa_ctp_ctd')) ?
       '' : 'dl';
 
   if (id) {

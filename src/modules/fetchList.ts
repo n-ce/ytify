@@ -2,13 +2,14 @@ import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtB
 import { getDB, saveDB } from "../lib/libraryUtils";
 import { errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
+import {i18n} from "../scripts/i18n.ts";
 
 export default async function fetchList(
   url: string | undefined,
   mix = false
 ) {
   if (!url)
-    return notify('No Channel URL provided');
+    return notify(i18n._('fetch_no_url_provided'));
 
 
   loadingScreen.showModal();
@@ -36,9 +37,9 @@ export default async function fetchList(
     })
     .catch(err => {
       if (err.message === 'Could not get playlistData')
-        notify(err.message);
+        notify(i18n._('fetch_not_get_pd'));
       else if (err.message === 'Got error: "The playlist does not exist."') {
-        notify(err.message);
+        notify(i18n._('fetch_pl_not_exist'));
         const db = getDB();
         delete db.playlists[url.slice(11)];
         saveDB(db);

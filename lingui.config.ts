@@ -5,7 +5,7 @@ const config: LinguiConfig = {
     sourceLocale: "en",
     catalogs: [
         {
-            path: "src/locales/{locale}/messages",
+            path: "src/locales/{locale}",
             include: ["src"],
         },
     ],
