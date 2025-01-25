@@ -31,7 +31,10 @@ function searchLoader() {
     searchFilters.value
   )
     .catch(err => {
-      if (useInvidious || err.message === 'nextpage error') return;
+      if (useInvidious && store.api.index >= store.api.invidious.length)
+        store.api.index = -1;
+
+      if (err.message === 'nextpage error') return;
 
       errorHandler(
         err.message,
