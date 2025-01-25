@@ -1,4 +1,4 @@
-export const messages = {
+export const messages: TranslationKeys = {
 
   nav_search: "Search",
   nav_library: "Library",
@@ -6,7 +6,7 @@ export const messages = {
   nav_upcoming: "Upcoming",
 
   player_setup_audiostreams: "Setting up  AudioStreams...",
-  player_notify_hls: "Turn on HLS to listen to LiveStreams!",
+  player_livestreams_hls: "Turn on HLS to listen to LiveStreams!",
   player_audiostreams_null: "No Audio Streams Found.",
   player_now_playing: "Now Playing",
   player_channel: "Channel",
@@ -26,7 +26,7 @@ export const messages = {
   upcoming_enqueue_related: "Enqueue Related Streams",
   upcoming_info: "Upcoming streams show here",
 
-  fetchlist_channel_null: "No Channel URL provided",
+  fetchlist_url_null: "No Channel URL provided",
   fetchlist_error: "Could not get playlistData",
   fetchlist_nonexistent: "Got error: \"The playlist does not exist.\"",
 
@@ -63,7 +63,7 @@ export const messages = {
   list_play: "Play",
   list_enqueue: "Enqueue",
   list_import: "Import",
-  list_imported: "has been imported to your collections.",
+  list_imported: "{listTitle} has been imported to your collections.",
   list_set_title: "Set Title",
   list_clear_all: "Clear all",
   list_remove: "Remove",
@@ -102,9 +102,12 @@ export const messages = {
   settings_image_loading: "Image Loading",
   settings_image_eager: "Eager",
   settings_image_lazy: "Lazy",
-  settings_image_do_not_load: "Do not load",
+  settings_image_off: "off",
   settings_download_format: "Download Format",
   settings_pwa_share_action: "PWA Share Action",
+  settings_pwa_play: "Play",
+  settings_pwa_download: "Download",
+  settings_pwa_always_ask: "Always ask",
   settings_watch_ytify: "Watch on ytify",
   settings_search: "Search",
   settings_set_songs_as_default_filter: "Set Songs as Default Filter",
@@ -113,6 +116,7 @@ export const messages = {
   settings_hq_audio: "Highest Quality Audio",
   settings_codec_preference: "Codec Preference",
   settings_always_proxy_streams: "Always Proxy Streams",
+  settings_stable_volume: "Prefer Stable Volume",
   settings_hls: "HTTP Live Streaming",
   settings_library: "Library",
   settings_set_as_default_tab: "Set as Default Tab",
@@ -143,9 +147,6 @@ export const messages = {
   settings_enter_piped_api: "Enter Piped API URL :",
   settings_enter_invidious_api: "Enter Invidious API URL :",
   settings_opus_recommended: "Opus (Recommended)",
-  settings_pwa_play: "Play",
-  settings_pwa_download: "Download",
-  settings_pwa_always_ask: "Always ask",
   settings_clear_discoveries: "This will clear your existing {count} discoveries, continue?",
   settings_clear_history: "This will clear {count} items from your history, continue?",
   settings_roundness_none: "None",

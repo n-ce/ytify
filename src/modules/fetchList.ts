@@ -9,7 +9,7 @@ export default async function fetchList(
   mix = false
 ) {
   if (!url)
-    return notify(i18n._('fetch_no_url_provided'));
+    return notify(i18n._('fetchlist_url_null'));
 
 
   loadingScreen.showModal();
@@ -37,9 +37,9 @@ export default async function fetchList(
     })
     .catch(err => {
       if (err.message === 'Could not get playlistData')
-        notify(i18n._('fetch_not_get_pd'));
+        notify(i18n._('fetchlist_error'));
       else if (err.message === 'Got error: "The playlist does not exist."') {
-        notify(i18n._('fetch_pl_not_exist'));
+        notify(i18n._('fetch_nonexistent'));
         const db = getDB();
         delete db.playlists[url.slice(11)];
         saveDB(db);

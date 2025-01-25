@@ -111,11 +111,11 @@ function toggle(part: string, e: Event | undefined = undefined) {
 
   const id = e?.target?.id;
   if (id) {
-    const askpin = prompt(i18n._('settings_enter_pin'));
+    const askpin = prompt(i18n._('settings_pin_prompt'));
     if (!askpin) return e?.preventDefault();
     if (getSaved('kidsMode') !== askpin) {
       e?.preventDefault();
-      return alert(i18n._('settings_incorrect_pin'))
+      return alert(i18n._('settings_pin_incorrect'))
     }
     lsHandler(id);
   }

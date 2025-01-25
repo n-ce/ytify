@@ -36,7 +36,7 @@ export async function pipedPlaylistsImporter() {
   }).then(res => res.json())
     .catch(e => notify(i18n._("piped_failed_find", { e })));
   if (playlists.length)
-    notify(i18n._("piped_success_fetched"))
+    notify(i18n._("piped_success_fetched"));
   else return;
 
 
@@ -80,10 +80,11 @@ export async function pipedPlaylistsImporter() {
       Authorization: authId.token
     }
   }).then(res => {
-    notify(res.ok ?
-      i18n._('piped_success_auth') :
-      i18n._('piped_failed_auth')
-    );
+    notify(i18n._(
+      res.ok ?
+        'piped_success_auth' :
+        'piped_failed_auth'
+    ));
   });
 }
 

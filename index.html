@@ -34,7 +34,7 @@
 </head>
 
 <body>
-  <audio type="audio/webm">
+  <audio>
     <track src="subtitles.ttml" kind="subtitles" label="Expanded TTML Sample" />
   </audio>
   <header>
@@ -67,8 +67,8 @@
       <div id="mp">
 
         <div id="mptext">
-          <a data-translation="now_playing" id="title" href="" target="_blank">Now Playing</a>
-          <p data-translation="channel" id="author">Channel</p>
+          <a data-translation="player_now_playing" id="title" href="" target="_blank">Now Playing</a>
+          <p data-translation="player_channel" id="author">Channel</p>
         </div>
 
         <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
@@ -93,16 +93,14 @@
 
           <div id="upperButtonLayer">
             <span id="volumeContainer">
-              <label data-translation-aria-label="player_controls_volume" for="volumeChanger" aria-label="volume"
+              <label data-translation-aria-label="player_volume" for="volumeChanger" aria-label="volume"
                 class="ri-volume-up-fill"></label>
               <input type="range" min="0" max="100" value="100" id="volumeChanger">
             </span>
-            <i data-translation-aria-label="player_controls_loop" class="ri-repeat-line" id="loopButton"
-              aria-label="loop"></i>
+            <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton" aria-label="loop"></i>
             <input type="checkbox" id="favButton" />
             <label for="favButton" class="ri-heart-line" aria-label="Like"></label>
-            <i data-translation-aria-label="player_controls_more" class="ri-more-2-fill" id="moreBtn"
-              aria-label="more"></i>
+            <i data-translation-aria-label="player_more" class="ri-more-2-fill" id="moreBtn" aria-label="more"></i>
           </div>
         </div>
       </div>
@@ -116,16 +114,16 @@
       </span>
 
       <div id="playerControls">
-        <button data-translation-aria-label="player_controls_play_previous" class="ri-skip-back-line"
-          id="playPrevButton" aria-label="play previous"></button>
-        <button data-translation-aria-label="player_controls_seek_backward" class="ri-replay-15-line" id="seekBwdButton"
+        <button data-translation-aria-label="player_play_previous" class="ri-skip-back-line" id="playPrevButton"
+          aria-label="play previous"></button>
+        <button data-translation-aria-label="player_seek_backward" class="ri-replay-15-line" id="seekBwdButton"
           aria-label="seek backward"></button>
 
         <!-- play button -->
 
-        <button data-translation-aria-label="player_controls_seek_forward" class="ri-forward-15-line" id="seekFwdButton"
+        <button data-translation-aria-label="player_seek_forward" class="ri-forward-15-line" id="seekFwdButton"
           aria-label="seek forward"></button>
-        <button data-translation-aria-label="player_controls_play_next" class="ri-skip-forward-line" id="playNextButton"
+        <button data-translation-aria-label="player_play_next" class="ri-skip-forward-line" id="playNextButton"
           aria-label="play next"></button>
 
       </div>
@@ -181,14 +179,14 @@
       </span>
       <br>
       <div id="queuelist">
-        <h1 data-translation="queue_list_info">Upcoming streams show here</h1>
+        <h1 data-translation="upcoming_info">Upcoming streams show here</h1>
       </div>
     </section>
 
 
     <section id="search">
       <form id="superInputContainer">
-        <input data-translation-placeholder="search_placeholder_info" type="search" id="superInput" autocomplete="off"
+        <input data-translation-placeholder="search_placeholder" type="search" id="superInput" autocomplete="off"
           placeholder='Search or enter YT URL             CTRL+K' />
         <select id="searchFilters">
           <optgroup label="YouTube">
@@ -287,19 +285,19 @@
 
       <div id="actionsContainer">
         <form netlify name="feedback" method="POST">
-          <textarea data-translation-placeholder="feedback_placeholder" name="->" id="netlifyForm"
+          <textarea data-translation-placeholder="settings_feedback_placeholder" name="->" id="netlifyForm"
             placeholder="Anonymously enter your feedback (bugs, feature requests) here:" required></textarea>
-          <button data-translation="settings_submit_feedback" type="submit">Submit Feedback</button>
+          <button data-translation="settings_feedback_submit" type="submit">Submit Feedback</button>
 
           <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
 
-          <button data-translation="settings_restore_settings" id="restoreSettingsBtn" type="button">Restore
+          <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore
             Settings</button>
 
-          <button data-translation="settings_export_settings" id="exportSettingsBtn" type="button">Export
+          <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export
             Settings</button>
           <button type="button">
-            <label data-translation="settings_import_settings" for="importSettingsBtn">Import Settings</label>
+            <label data-translation="settings_import" for="importSettingsBtn">Import Settings</label>
             <input type="file" id="importSettingsBtn" class="hide">
           </button>
 

@@ -33,7 +33,7 @@ export function subscribeList(db: Library) {
 
 export function importList() {
 
-  const listTitle = prompt(i18n._('set_title'), store.list.name);
+  const listTitle = prompt(i18n._('list_set_title'), store.list.name);
 
   if (!listTitle) return;
 
@@ -55,7 +55,7 @@ export function importList() {
     });
 
   addListToCollection(listTitle, list);
-  notify(i18n._('imported_to_collections', { listTitle }));
+  notify(i18n._('list_imported', { listTitle }));
 }
 
 export function shareCollection(shareId: string) {

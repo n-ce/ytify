@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
 import { store, getSaved } from "../lib/store";
-import { notify, proxyHandler } from "../lib/utils";
+import { proxyHandler } from "../lib/utils";
 
 export function setAudioStreams(audioStreams: {
   codec: string,
@@ -13,19 +13,18 @@ export function setAudioStreams(audioStreams: {
 }[],
   isLive = false) {
 
-  title.textContent = i18n._('as_setting_up');
+  title.textContent = i18n._('player_setup_audiostreams');
 
   const preferedCodec = store.player.codec;
   const noOfBitrates = audioStreams.length;
   let index = -1;
 
   if (!noOfBitrates) {
-    notify(
+    title.textContent = i18n._(
       isLive ?
-        i18n._('as_turn_hls') :
-        i18n._('as_no_found')
+        'player_livestreams_hls' :
+        'player_audiostreams_null'
     );
-    i18n._('as_turn_hls')
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }

@@ -34,11 +34,11 @@ export default function UpdatePrompt(handleUpdate: () => void) {
         {fullList().length > 2 ?
           fullList().map((text: string) => (<li>{text}</li>))
           :
-          <li onclick={handleFullList}>{i18n._('settings_up_read_all_prev')}</li>
+          <li onclick={handleFullList}>{i18n._('updater_changelog_full')}</li>
         }
       </ul>
       <span>
-        <button onclick={handleUpdate} autofocus>{i18n._('settings_update')}</button>
+        <button onclick={handleUpdate} autofocus>{i18n._('updater_button')}</button>
         <button onclick={() => {
           dialog.close();
           dialog.remove();

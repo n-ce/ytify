@@ -80,7 +80,7 @@ export default function() {
               removeSaved(_);
             else {
               const pi = prompt(i18n._('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
-              const iv = prompt(i18n._('settings_enter_invidious_api'), 'https://invidious.fdn.fr');
+              const iv = prompt(i18n._('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
 
               if (pi && iv)
                 save(_, pi + ',' + iv);
@@ -96,21 +96,23 @@ export default function() {
           id='languageSelector'
           onChange={(e) => {
             const lang = e.target.value;
-            i18n.activate(lang);
-            save("language", lang);
+            lang === 'en' ?
+              removeSaved('language') :
+              save('language', lang);
             location.reload();
           }}
           onMount={(target) => {
-            (target as HTMLSelectElement).value = localStorage.getItem("language") || "en";
+            target.value = getSaved("language") || "en";
           }}
         >
           <option value="en">English</option>
           <option value="pl">Polski</option>
+          <option value="hi">Hindi</option>
         </Selector>
 
         <Selector
           id='linkHost'
-          label={i18n._('settings_links_hosts')}
+          label={i18n._('settings_links_host')}
           onChange={(e) => {
             e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
@@ -157,9 +159,9 @@ export default function() {
             else audio.addEventListener('loadstart', themer);
           }}
         >
-          <option value="eager">{i18n._('settings_eager_loading')}</option>
-          <option value="lazy">{i18n._('settings_lazy_loading')}</option>
-          <option value="off">{i18n._('settings_no_not_load')}</option>
+          <option value="eager">{i18n._('settings_image_eager')}</option>
+          <option value="lazy">{i18n._('settings_image_lazy')}</option>
+          <option value="off">{i18n._('settings_image_off')}</option>
         </Selector>
 
         <Selector
@@ -206,9 +208,9 @@ export default function() {
               target.value = val;
           }}
         >
-          <option value='play'>{i18n._('settings_share_play')}</option>
-          <option value='dl'>{i18n._('settings_share_download')}</option>
-          <option value='ask'>{i18n._('settings_share_always_ask')}</option>
+          <option value='play'>{i18n._('settings_pwa_play')}</option>
+          <option value='dl'>{i18n._('settings_pwa_download')}</option>
+          <option value='ask'>{i18n._('settings_pwa_always_ask')}</option>
         </Selector>
 
         <ToggleSwitch
@@ -228,11 +230,11 @@ export default function() {
       <div>
         <b>
           <i class="ri-search-2-line"></i>
-          <p data-translation="settings_search">{i18n._('settings_search')}</p>
+          <p>{i18n._('settings_search')}</p>
         </b>
         <ToggleSwitch
           id="defaultFilterSongs"
-          name={i18n._('settings_set_song_as_default_filter')}
+          name={i18n._('settings_set_songs_as_default_filter')}
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             const _ = 'searchFilter';
@@ -261,7 +263,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-play-large-line"></i>
-          <p data-translation="settings_playback">{i18n._('settings_playback')}</p>
+          <p>{i18n._('settings_playback')}</p>
         </b>
 
 
@@ -312,7 +314,7 @@ export default function() {
 
           <ToggleSwitch
             id="stableVolumeSwitch"
-            name='Prefer Stable Volume'
+            name={i18n._('settings_stable_volume')}
             checked={getSaved('stableVolume') === 'true'}
             onClick={() => {
               const _ = 'stableVolume';
@@ -340,7 +342,7 @@ export default function() {
 
         <ToggleSwitch
           id="HLS_Switch"
-          name={i18n._('settings_http_live_streaming')}
+          name={i18n._('settings_hls')}
           checked={getSaved('HLS') === 'true'}
           onClick={() => {
             getSaved('HLS') ?
@@ -356,13 +358,13 @@ export default function() {
       <div>
         <b>
           <i class="ri-stack-line"></i>
-          <p data-translation="settings_library">{i18n._('settings_library')}</p>
+          <p>{i18n._('settings_library')}</p>
         </b>
 
 
         <ToggleSwitch
           id="startupTab"
-          name={i18n._('settings_set_as_default')}
+          name={i18n._('settings_set_as_default_tab')}
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
             const _ = 'startupTab';
@@ -422,7 +424,7 @@ export default function() {
       <div>
         <b>
           <i class="ri-t-shirt-2-line"></i>
-          <p data-translation="settings_interface">{i18n._('settings_interface')}</p>
+          <p>{i18n._('settings_interface')}</p>
         </b>
 
         <Selector
@@ -459,7 +461,7 @@ export default function() {
             if (colorString)
               removeSaved(_);
             else {
-              const rgbText = i18n._('settings_enter_rgb');
+              const rgbText = i18n._('settings_custom_color_prompt');
               const str = prompt(rgbText, '174,174,174');
               str ?
                 save(_, str) :
@@ -502,7 +504,7 @@ export default function() {
               document.exitFullscreen() :
               document.documentElement.requestFullscreen();
           }
-        }>{i18n._('settings_theming_toggle_fs')}</p>
+        }>{i18n._('settings_fullscreen')}</p>
       </div>
 
 
@@ -510,12 +512,12 @@ export default function() {
       <div>
         <b>
           <i class="ri-parent-line"></i>
-          <p data-translation="settings_parental_controls">{i18n._('settings_parental_controls')}</p>
+          <p>{i18n._('settings_parental_controls')}</p>
         </b>
 
         <ToggleSwitch
           id="kidsSwitch"
-          name={i18n._('settings_toggle')}
+          name={i18n._('settings_pin_toggle')}
           checked={Boolean(getSaved('kidsMode'))}
           onClick={e => {
             const savedPin = getSaved('kidsMode');
@@ -529,12 +531,12 @@ export default function() {
                 }
                 location.reload();
               } else {
-                alert(i18n._('settings_incorrect_pin'));
+                alert(i18n._('settings_pin_incorrect'));
                 e.preventDefault();
               }
               return;
             }
-            const pin = prompt(i18n._('settings_pin'));
+            const pin = prompt(i18n._('settings_pin_message'));
             if (pin) {
               save('kidsMode', pin);
               location.reload();

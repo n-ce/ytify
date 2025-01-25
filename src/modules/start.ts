@@ -50,7 +50,7 @@ export default async function() {
   const id = params.get('s') || isPWA;
   let shareAction = getSaved('shareAction');
   if (isPWA && shareAction === 'ask')
-    shareAction = confirm(i18n._('pwa_ctp_ctd')) ?
+    shareAction = confirm(i18n._('pwa_share_prompt')) ?
       '' : 'dl';
 
   if (id) {
