@@ -121,14 +121,14 @@ export default function() {
                 close();
                 open(hostResolver('/watch?v=' + store.actionsMenu.id));
               }}>
-                <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_youtube')}
+                <i class="ri-video-line"></i>{i18n._('actions_menu_watch_youtube')}
               </li> :
 
               <li tabindex={6} on:click={() => {
                 close();
                 render(WatchOnYtify, document.body);
               }}>
-                <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_ytify')}
+                <i class="ri-video-line"></i>{i18n._('actions_menu_watch_ytify')}
               </li>
           }
         </Show>

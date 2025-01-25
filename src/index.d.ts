@@ -156,6 +156,7 @@ declare global {
     | 'upcoming_remove'
     | 'upcoming_filter'
     | 'upcoming_enqueue_related'
+    | 'upcoming_allow_duplicates'
     | 'upcoming_info'
     | 'fetchlist_url_null'
     | 'fetchlist_error'

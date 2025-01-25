@@ -1,9 +1,7 @@
 #listTools {
 
-  button {
-    &::after {
-      content: attr(aria-label);
-    }
+  button::after {
+    content: attr(aria-label);
   }
 
   &.playlist {

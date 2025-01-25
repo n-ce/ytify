@@ -24,6 +24,7 @@ export const messages: TranslationKeys = {
   upcoming_remove: "Remove",
   upcoming_filter: "Filter < 10:00",
   upcoming_enqueue_related: "Enqueue Related Streams",
+  upcoming_allow_duplicates: "Allow Duplicates",
   upcoming_info: "Upcoming streams show here",
 
   fetchlist_url_null: "No Channel URL provided",
@@ -105,7 +106,6 @@ export const messages: TranslationKeys = {
   settings_pwa_play: "Play",
   settings_pwa_download: "Download",
   settings_pwa_always_ask: "Always ask",
-
 
   settings_search: "Search",
   settings_set_songs_as_default_filter: "Set Songs as Default Filter",

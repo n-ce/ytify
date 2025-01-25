@@ -39,7 +39,7 @@ export default async function handler(_: Request, context: Context) {
       `<a href="upi://pay?pa=animesh.5383@waicici&cu=INR" target="_blank" style="font-size:smaller;margin-top:1rem">
             <img width="100"
               src="https://upload.wikimedia.org/wikipedia/commons/6/6f/UPI_logo.svg" />
-            Support development
+              Donate today and support development. Even 10rs can help.
           </a>` : ''
     }
       </p>
