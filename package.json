@@ -9,6 +9,7 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
+    "@lingui/core": "^5.1.2",
     "hls.js": "^1.5.19",
     "imsc": "^1.1.5",
     "solid-js": "^1.9.4",
@@ -23,7 +24,7 @@
     "open-props": "^1.7.7",
     "postcss-jit-props": "^1.0.15",
     "typescript": "^5.7.3",
-    "vite": "^6.0.7",
+    "vite": "^6.0.11",
     "vite-plugin-pwa": "^0.21.1",
     "vite-plugin-solid": "^2.11.0"
   },

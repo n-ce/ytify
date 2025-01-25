@@ -44,19 +44,19 @@
       </a>
       <a href="/upcoming" id="/upcoming">
         <i class="ri-skip-forward-line"></i>
-        <p>Upcoming</p>
+        <p data-translation="nav_upcoming">Upcoming</p>
       </a>
       <a href="/search" id="/search">
         <i class="ri-search-2-line"></i>
-        <p>Search</p>
+        <p data-translation="nav_search">Search</p>
       </a>
       <a href="/library" id="/library">
         <i class="ri-stack-line"></i>
-        <p>Library</p>
+        <p data-translation="nav_library">Library</p>
       </a>
       <a href="/settings" id="/settings">
         <i class="ri-settings-line"></i>
-        <p>Settings</p>
+        <p data-translation="nav_settings">Settings</p>
       </a>
       <a href="/list" id="/list" class="hide">
         <p>list</p>
@@ -67,8 +67,8 @@
       <div id="mp">
 
         <div id="mptext">
-          <a id="title" href="" target="_blank">Now Playing</a>
-          <p id="author">Channel</p>
+          <a data-translation="now_playing" id="title" href="" target="_blank">Now Playing</a>
+          <p data-translation="channel" id="author">Channel</p>
         </div>
 
         <button class="ri-stop-circle-fill" id="playButton" aria-label="play" data-playbackState="none"></button>
@@ -93,13 +93,13 @@
 
           <div id="upperButtonLayer">
             <span id="volumeContainer">
-              <label for="volumeChanger" aria-label="volume" class="ri-volume-up-fill"></label>
+              <label data-translation-aria-label="player_controls_volume" for="volumeChanger" aria-label="volume" class="ri-volume-up-fill"></label>
               <input type="range" min="0" max="100" value="100" id="volumeChanger">
             </span>
-            <i class="ri-repeat-line" id="loopButton" aria-label="loop"></i>
+            <i data-translation-aria-label="player_controls_loop" class="ri-repeat-line" id="loopButton" aria-label="loop"></i>
             <input type="checkbox" id="favButton" />
-            <label for="favButton" class="ri-heart-line" aria-label="like"></label>
-            <i class="ri-more-2-fill" id="moreBtn" aria-label="more"></i>
+            <label for="favButton" class="ri-heart-line" aria-label="Like"></label>
+            <i data-translation-aria-label="player_controls_more" class="ri-more-2-fill" id="moreBtn" aria-label="more"></i>
           </div>
         </div>
       </div>
@@ -113,13 +113,13 @@
       </span>
 
       <div id="playerControls">
-        <button class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
-        <button class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
+        <button data-translation-aria-label="player_controls_play_previous" class="ri-skip-back-line" id="playPrevButton" aria-label="play previous"></button>
+        <button data-translation-aria-label="player_controls_seek_backward" class="ri-replay-15-line" id="seekBwdButton" aria-label="seek backward"></button>
 
         <!-- play button -->
 
-        <button class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
-        <button class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
+        <button data-translation-aria-label="player_controls_seek_forward" class="ri-forward-15-line" id="seekFwdButton" aria-label="seek forward"></button>
+        <button data-translation-aria-label="player_controls_play_next" class="ri-skip-forward-line" id="playNextButton" aria-label="play next"></button>
 
       </div>
 
@@ -156,49 +156,49 @@
     <section id="upcoming">
       <span id="queuetools">
         <button>
-          <i class="ri-close-line"></i> Clear
+          <i class="ri-close-line"></i> <span data-translation="upcoming_clear">Clear</span>
         </button>
         <button>
-          <i class="ri-shuffle-line"></i> Shuffle
+          <i class="ri-shuffle-line"></i> <span data-translation="upcoming_shuffle">Shuffle</span>
         </button>
         <button>
-          <i class="ri-subtract-line"></i> Remove
+          <i class="ri-subtract-line"></i> <span data-translation="upcoming_remove">Remove</span>
         </button>
         <button>
-          <i class="ri-filter-2-line"></i> Filter &lt;10:00
+          <i class="ri-filter-2-line"></i> <span data-translation="upcoming_filter">Filter &lt;10:00</span>
         </button>
         <button>
-          <i class="ri-list-check-2"></i> Enqueue Related Streams
+          <i class="ri-list-check-2"></i> <span data-translation="upcoming_enqueue_related">Enqueue Related Streams</span>
         </button>
       </span>
       <br>
       <div id="queuelist">
-        <h1>upcoming streams show here</h1>
+        <h1 data-translation="queue_list_info" >Upcoming streams show here</h1>
       </div>
     </section>
 
 
     <section id="search">
       <form id="superInputContainer">
-        <input type="search" id="superInput" autocomplete="off"
+        <input data-translation-placeholder="search_placeholder_info" type="search" id="superInput" autocomplete="off"
           placeholder='Search or enter YT URL             CTRL+K' />
         <select id="searchFilters">
           <optgroup label="YouTube">
-            <option value="all">All</option>
-            <option value="videos">Videos</option>
-            <option value="channels">Channels</option>
-            <option value="playlists">Playlists</option>
+            <option data-translation="search_filter_all" value="all">All</option>
+            <option data-translation="search_filter_videos" value="videos">Videos</option>
+            <option data-translation="search_filter_channels" value="channels">Channels</option>
+            <option data-translation="search_filter_playlists" value="playlists">Playlists</option>
           </optgroup>
           <optgroup label="YouTube Music">
-            <option value="music_songs">Songs</option>
-            <option value="music_artists">Artists</option>
-            <option value="music_videos">Videos</option>
-            <option value="music_albums">Albums</option>
-            <option value="music_playlists">Playlists</option>
+            <option data-translation="search_filter_music_songs" value="music_songs">Songs</option>
+            <option data-translation="search_filter_music_artists" value="music_artists">Artists</option>
+            <option data-translation="search_filter_music_videos" value="music_videos">Videos</option>
+            <option data-translation="search_filter_music_albums" value="music_albums">Albums</option>
+            <option data-translation="search_filter_music_playlists" value="music_playlists">Playlists</option>
           </optgroup>
-          <optgroup label="Sort By">
-            <option value="date">Time</option>
-            <option value="views">Views</option>
+          <optgroup data-translation-label="search_filter_sort_by" label="Sort By">
+            <option data-translation="search_filter_date" value="date">Time</option>
+            <option data-translation="search_filter_views" value="views">Views</option>
           </optgroup>
         </select>
       </form>
@@ -213,53 +213,59 @@
       <div id="collections">
 
         <a class="collectionItem" id="discover" href="/list?collection=discover">
-          <i class="ri-compass-3-line"></i>Discover
+          <i class="ri-compass-3-line"></i>
+          <p data-translation="library_discover">Discover</p>
         </a>
 
         <a class="collectionItem" id="history" href="/list?collection=history">
-          <i class="ri-memories-line"></i>History
+          <i class="ri-memories-line"></i>
+          <p data-translation="library_history">History</p>
+
         </a>
 
         <a class="collectionItem" id="favorites" href="/list?collection=favorites">
-          <i class="ri-heart-fill"></i>Favorites
+          <i class="ri-heart-fill"></i>
+          <p data-translation="library_favorites">Favorites</p>
+
         </a>
 
         <a class="collectionItem" id="listenLater" href="/list?collection=listenLater">
-          <i class="ri-calendar-schedule-line"></i>Listen Later
+          <i class="ri-calendar-schedule-line"></i>
+          <p data-translation="library_listen_later">Listen Later</p>
         </a>
       </div>
 
       <div id="superCollectionSelector">
         <input type="radio" id="r.featured" name="superCollectionChips" value="featured" checked>
-        <label for="r.featured">Featured</label>
+        <label data-translation="library_featured" for="r.featured">Featured</label>
         <input type="radio" id="r.collections" name="superCollectionChips" value="collections">
-        <label for="r.collections">Collections</label>
+        <label data-translation="library_collections" for="r.collections">Collections</label>
         <input type="radio" id="r.playlists" name="superCollectionChips" value="playlists">
-        <label for="r.playlists">Playlists</label>
+        <label data-translation="library_playlists" for="r.playlists">Playlists</label>
         <input type="radio" id="r.albums" name="superCollectionChips" value="albums">
-        <label for="r.albums">Albums</label>
+        <label data-translation="library_albums" for="r.albums">Albums</label>
         <input type="radio" id="r.artists" name="superCollectionChips" value="artists">
-        <label for="r.artists">Artists</label>
+        <label data-translation="library_artists" for="r.artists">Artists</label>
         <input type="radio" id="r.channels" name="superCollectionChips" value="channels">
-        <label for="r.channels">Channels</label>
+        <label data-translation="library_channels" for="r.channels">Channels</label>
 
         <input type="radio" id="r.feed" name="superCollectionChips" value="feed">
-        <label for="r.feed">Subscription Feed</label>
+        <label data-translation="library_feed" for="r.feed">Subscription Feed</label>
 
         <input type="radio" id="r.for_you" name="superCollectionChips" value="for_you">
-        <label for="r.for_you">For You</label>
+        <label data-translation="library_for_you" for="r.for_you">For You</label>
 
       </div>
 
       <div id="superCollectionList"></div>
 
       <div id="libraryActions">
-        <label id="importBtn" for="upload">
+        <label data-translation="import" id="importBtn" for="upload">
           <i class="ri-import-line"></i> Import</label>
         <input type="file" id="upload" class="hide">
-        <label id="exportBtn">
+        <label data-translation="export" id="exportBtn">
           <i class="ri-export-line"></i> Export</label>
-        <label id="cleanLibraryBtn">
+        <label data-translation="clean" id="cleanLibraryBtn">
           <i class="ri-delete-bin-2-line"></i> Clean</label>
       </div>
 
@@ -271,21 +277,21 @@
 
       <div id="actionsContainer">
         <form netlify name="feedback" method="POST">
-          <textarea name="->" id="netlifyForm"
+          <textarea data-translation-placeholder="feedback_placeholder" name="->" id="netlifyForm"
             placeholder="Anonymously enter your feedback (bugs, feature requests) here:" required></textarea>
-          <button type="submit">Submit Feedback</button>
+          <button data-translation="settings_submit_feedback" type="submit">Submit Feedback</button>
 
-          <button id="clearCacheBtn" type="button">Clear Caches</button>
+          <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
 
-          <button id="restoreSettingsBtn" type="button">Restore Settings</button>
+          <button data-translation="settings_restore_settings" id="restoreSettingsBtn" type="button">Restore Settings</button>
 
-          <button id="exportSettingsBtn" type="button">Export Settings</button>
+          <button data-translation="settings_export_settings" id="exportSettingsBtn" type="button">Export Settings</button>
           <button type="button">
-            <label for="importSettingsBtn">Import Settings</label>
+            <label data-translation="settings_import_settings" for="importSettingsBtn">Import Settings</label>
             <input type="file" id="importSettingsBtn" class="hide">
           </button>
 
-          <a href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
+          <a data-translation="settings_changelog" href="https://github.com/n-ce/ytify/wiki/changelog" target="_blank">Changelog</a>
 
           <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
 
@@ -301,47 +307,47 @@
     <section id="list">
       <span id="listTools">
         <button id="playAllBtn">
-          <i class="ri-play-large-line"></i> Play
+          <i class="ri-play-large-line"></i> <span data-translation="list_play">Play</span>
         </button>
         <button id="enqueueAllBtn">
-          <i class="ri-list-check-2"></i> Enqueue
+          <i class="ri-list-check-2"></i> <span data-translation="list_enqueue">Enqueue</span>
         </button>
         <button id="importListBtn">
-          <i class="ri-import-line"></i> Import
+          <i class="ri-import-line"></i> <span data-translation="list_import">Import</span>
         </button>
         <button id="subscribeListBtn">
-          <i class="ri-stack-line" data-state=" Subscribe"></i>
+          <i class="ri-stack-line" data-state="Subscribe"></i>
         </button>
         <button id="viewOnYTBtn">
           <i class="ri-external-link-line" data-state=" View on YouTube"></i>
         </button>
         <button id="clearListBtn">
-          <i class="ri-close-line"></i> Clear All
+          <i class="ri-close-line"></i> <span data-translation="list_clear_all">Clear All</span>
         </button>
         <button id="removeFromListBtn">
-          <i class="ri-subtract-line"></i> Remove
+          <i class="ri-subtract-line"></i> <span data-translation="list_remove">Remove</span>
         </button>
         <button id="deleteCollectionBtn">
-          <i class="ri-delete-bin-2-line"></i> Delete
+          <i class="ri-delete-bin-2-line"></i> <span data-translation="list_delete">Delete</span>
         </button>
         <button id="renameCollectionBtn">
-          <i class="ri-edit-line"></i> Rename
+          <i class="ri-edit-line"></i> <span data-translation="list_rename">Rename</span>
         </button>
         <button id="shareCollectionBtn">
-          <i class="ri-link"></i> Share
+          <i class="ri-link"></i> <span data-translation="list_share">Share</span>
         </button>
         <button id="radioCollectionBtn">
-          <i class="ri-radio-line"></i> Radio
+          <i class="ri-radio-line"></i> <span data-translation="list_radio">Radio</span>
         </button>
         <button id="sortCollectionBtn">
-          <i class="ri-draggable"></i> Sort
+          <i class="ri-draggable"></i> <span data-translation="list_sort">Sort</span>
         </button>
 
 
       </span>
       <br>
       <div id="playlist">
-        <h1>playlist, channel or your collection items show here</h1>
+        <h1 data-translation="playlist_info">Playlist, channel or your collection items show here</h1>
       </div>
     </section>
 

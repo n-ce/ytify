@@ -7,6 +7,7 @@ import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { createSignal, lazy, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
+import {i18n} from "../scripts/i18n.ts";
 
 declare module "solid-js" {
   namespace JSX {
@@ -45,14 +46,14 @@ export default function() {
         appendToQueuelist(store.actionsMenu, true);
         close();
       }}>
-        <i class="ri-skip-forward-line"></i>Play Next
+        <i class="ri-skip-forward-line"></i>{i18n._('actions_menu_play_next')}
       </li>
 
       <li tabindex={1} on:click={() => {
         appendToQueuelist(store.actionsMenu);
         close();
       }}>
-        <i class="ri-list-check-2"></i>Enqueue
+        <i class="ri-list-check-2"></i>{i18n._('actions_menu_enqueue')}
       </li>
 
       <CollectionSelector collection={store.actionsMenu} close={close} />
@@ -63,7 +64,7 @@ export default function() {
           close();
           fetchList('/playlists/RD' + store.actionsMenu.id, true);
         }}>
-          <i class="ri-radio-line"></i>Start Radio
+            <i class="ri-radio-line"></i>{i18n._('actions_menu_start_radio')}
         </li>
       </Show>
 
@@ -78,7 +79,7 @@ export default function() {
         }
         loadingScreen.close();
       }}>
-        <i class="ri-download-2-fill"></i>Download
+        <i class="ri-download-2-fill"></i>{i18n._('actions_menu_download')}
       </li>
 
       <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
@@ -95,7 +96,13 @@ export default function() {
 
           fetchList(smd.channelUrl);
         }}>
-          <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
+
+          <i class="ri-user-line"></i>
+            {isMusic() ?
+                i18n._('actions_menu_view_artist')
+                :
+                i18n._('actions_menu_view_channel')
+            }
         </li>
       </Show>
 
@@ -106,7 +113,7 @@ export default function() {
             render(Lyrics, document.body);
           }
         }>
-          <i class="ri-music-2-line"></i>View Lyrics
+          <i class="ri-music-2-line"></i>{i18n._('actions_menu_view_lyrics')}
         </li> :
 
         <Show when={!getSaved('kidsMode_Watch On Button')}>
@@ -116,14 +123,14 @@ export default function() {
                 close();
                 render(WatchOnYtify, document.body);
               }}>
-                <i class="ri-youtube-line"></i>Watch on  ytify
+                <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_ytify')}
               </li>
               :
               <li tabindex={6} on:click={() => {
                 close();
                 open('https://youtu.be/' + store.actionsMenu.id);
               }}>
-                <i class="ri-youtube-line"></i>Watch on YouTube
+                <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_youtube')}
               </li>
           }
         </Show>
@@ -151,7 +158,7 @@ export default function() {
         }, document.body);
 
       }}>
-        <i class="ri-bug-line"></i> Debug Information
+        <i class="ri-bug-line"></i>{i18n._('actions_menu_debug_info')}
       </li>
 
     </ul>

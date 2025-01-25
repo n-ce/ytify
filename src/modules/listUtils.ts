@@ -3,6 +3,7 @@ import { getThumbIdFromLink } from "../lib/imageUtils";
 import { addListToCollection, createCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { store } from "../lib/store";
 import { notify } from "../lib/utils";
+import {i18n} from "../scripts/i18n.ts";
 
 export function subscribeList(db: Library) {
   const l = store.list;
@@ -32,7 +33,7 @@ export function subscribeList(db: Library) {
 
 export function importList() {
 
-  const listTitle = prompt('Set Title', store.list.name);
+  const listTitle = prompt(i18n._('set_title'), store.list.name);
 
   if (!listTitle) return;
 
@@ -54,7 +55,7 @@ export function importList() {
     });
 
   addListToCollection(listTitle, list);
-  notify(listTitle + ' has been imported to your collections.');
+  notify(i18n._('imported_to_collections', {listTitle}));
 }
 
 export function shareCollection(shareId: string) {

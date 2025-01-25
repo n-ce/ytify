@@ -1,6 +1,7 @@
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
 import { store, getSaved } from "../lib/store";
 import { notify, proxyHandler } from "../lib/utils";
+import {i18n} from "../scripts/i18n.ts";
 
 export function setAudioStreams(audioStreams: {
   codec: string,
@@ -12,7 +13,7 @@ export function setAudioStreams(audioStreams: {
 }[],
   isLive = false) {
 
-  title.textContent = 'Setting up  AudioStreams...';
+  title.textContent = i18n._('as_setting_up');
 
   const preferedCodec = store.player.codec;
   const noOfBitrates = audioStreams.length;
@@ -21,9 +22,10 @@ export function setAudioStreams(audioStreams: {
   if (!noOfBitrates) {
     notify(
       isLive ?
-        'Turn on HLS to listen to LiveStreams!' :
-        'No Audio Streams Found.'
+          i18n._('as_turn_hls') :
+          i18n._('as_no_found')
     );
+    i18n._('as_turn_hls')
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
