@@ -213,18 +213,6 @@ export default function() {
           <option value='ask'>{i18n._('settings_pwa_always_ask')}</option>
         </Selector>
 
-        <ToggleSwitch
-          id='woswitch'
-          name={i18n._('settings_watch_ytify')}
-          checked={Boolean(getSaved('watchOnYtify'))}
-          onClick={() => {
-            const _ = 'watchOnYtify';
-            getSaved(_) ?
-              removeSaved(_) :
-              save(_, 'true');
-          }}
-        />
-
       </div>
 
       <div>

@@ -78,14 +78,14 @@ export const messages: TranslationKeys = {
   actions_menu_enqueue: "Enqueue",
   actions_menu_start_radio: "Start radio",
   actions_menu_download: "Download",
-  actions_menu_watch_ytify: "Watch ytify",
-  actions_menu_watch_youtube: "Watch Youtube",
-  actions_menu_view_artist: "View artist",
+  actions_menu_watch_ytify: "Watch on ytify",
+  actions_menu_watch_youtube: "Watch on Youtube",
+  actions_menu_view_artist: "View Artist",
   actions_menu_view_lyrics: "View Lyrics",
-  actions_menu_view_channel: "View channel",
+  actions_menu_view_channel: "View Channel",
   actions_menu_debug_info: "Debug information",
 
-  collection_selector__add_to: "Add to",
+  collection_selector_add_to: "Add to",
   collection_selector_create_new: "Create New Collection",
   collection_selector_favorites: "Favorites",
   collection_selector_listen_later: "Listen later",
@@ -105,7 +105,6 @@ export const messages: TranslationKeys = {
   settings_pwa_play: "Play",
   settings_pwa_download: "Download",
   settings_pwa_always_ask: "Always ask",
-  settings_watch_ytify: "Watch on ytify",
 
 
   settings_search: "Search",

@@ -1,5 +1,5 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, getDownloadLink } from "../lib/utils";
+import { $, getDownloadLink, hostResolver } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { getSaved, store } from "../lib/store";
@@ -29,14 +29,11 @@ const Lyrics = lazy(() => import('./Lyrics.tsx'));
 export default function() {
 
   const [isMusic, setMusic] = createSignal(false);
-  const [isWatchOnYtify, setWatchOnYtify] = createSignal('' as string | null);
 
   onMount(() => {
     new IntersectionObserver(() => {
-      if (actionsMenu.checkVisibility()) {
+      if (actionsMenu.checkVisibility())
         setMusic(store.actionsMenu.author.endsWith('- Topic'));
-        setWatchOnYtify(getSaved('watchOnYtify'));
-      }
     }).observe(actionsMenu);
   });
 
@@ -118,19 +115,20 @@ export default function() {
 
         <Show when={!getSaved('kidsMode_Watch On Button')}>
           {
-            isWatchOnYtify() ?
+            getSaved('linkHost') ?
+
+              <li tabindex={6} on:click={() => {
+                close();
+                open(hostResolver('/watch?v=' + store.actionsMenu.id));
+              }}>
+                <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_youtube')}
+              </li> :
+
               <li tabindex={6} on:click={() => {
                 close();
                 render(WatchOnYtify, document.body);
               }}>
                 <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_ytify')}
-              </li>
-              :
-              <li tabindex={6} on:click={() => {
-                close();
-                open('https://youtu.be/' + store.actionsMenu.id);
-              }}>
-                <i class="ri-youtube-line"></i>{i18n._('actions_menu_watch_youtube')}
               </li>
           }
         </Show>
