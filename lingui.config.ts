@@ -9,7 +9,6 @@ const config: LinguiConfig = {
             include: ["src"],
         },
     ],
-    format: "po",
 };
 
 export default config;

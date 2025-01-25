@@ -79,9 +79,8 @@ export default function() {
             if (getSaved(_))
               removeSaved(_);
             else {
-
-              const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
-              const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
+              const pi = prompt(i18n._('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
+              const iv = prompt(i18n._('settings_enter_invidious_api'), 'https://invidious.fdn.fr');
 
               if (pi && iv)
                 save(_, pi + ',' + iv);
@@ -153,9 +152,9 @@ export default function() {
             else audio.addEventListener('loadstart', themer);
           }}
         >
-          <option value="eager">Eager</option>
-          <option value="lazy">Lazy</option>
-          <option value="off">Do not Load</option>
+          <option value="eager">{i18n._('settings_eager_loading')}</option>
+          <option value="lazy">{i18n._('settings_lazy_loading')}</option>
+          <option value="off">{i18n._('settings_no_not_load')}</option>
         </Selector>
 
         <Selector
@@ -178,7 +177,7 @@ export default function() {
           }}
 
         >
-          <option value='opus'>Opus (Recommended)</option>
+          <option value='opus'>{i18n._('settings_opus_recommended')}</option>
           <option value='mp3'>MP3</option>
           <option value='wav'>WAV</option>
           <option value='ogg'>OGG</option>
@@ -202,9 +201,9 @@ export default function() {
               target.value = val;
           }}
         >
-          <option value='play'>Play</option>
-          <option value='dl'>Download</option>
-          <option value='ask'>Always Ask</option>
+          <option value='play'>{i18n._('settings_share_play')}</option>
+          <option value='dl'>{i18n._('settings_share_download')}</option>
+          <option value='ask'>{i18n._('settings_share_always_ask')}</option>
         </Selector>
 
         <ToggleSwitch
@@ -364,7 +363,7 @@ export default function() {
               removeSaved('discover');
             else {
               const db = getDB();
-              if (confirm(`This will clear your existing ${Object.keys(db.discover || {}).length || 0} discoveries, continue?`)) {
+                if (confirm(i18n._("settings_clear_discoveries", { count: Object.keys(db.discover || {}).length || 0 }))) {
                 delete db.discover;
                 saveDB(db);
                 save('discover', 'off');
@@ -384,7 +383,7 @@ export default function() {
               removeSaved('history');
             else {
               const db = getDB();
-              if (confirm(`This will clear ${Object.keys(db.history || {}).length || 0} items from your history, continue?`)) {
+              if (confirm(i18n._("settings_clear_history", { count: Object.keys(db.discover || {}).length || 0 }))) {
                 delete db.history;
                 saveDB(db);
                 save('history', 'off')
@@ -425,11 +424,11 @@ export default function() {
             }
           }}
         >
-          <option value="none">None</option>
-          <option value="0.2rem">Lighter</option>
-          <option value="0.4rem" selected>Light</option>
-          <option value="0.6rem">Heavy</option>
-          <option value="0.9rem">Heavier</option>
+          <option value="none">{i18n._('settings_roundness_none')}</option>
+          <option value="0.2rem">{i18n._('settings_roundness_lighter')}</option>
+          <option value="0.4rem" selected>{i18n._('settings_roundness_light')}</option>
+          <option value="0.6rem">{i18n._('settings_roundness_heavy')}</option>
+          <option value="0.9rem">{i18n._('settings_roundness_heavier')}</option>
         </Selector>
 
 
@@ -443,7 +442,8 @@ export default function() {
             if (colorString)
               removeSaved(_);
             else {
-              const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
+                const rgbText = i18n._('settings_enter_rgb');
+              const str = prompt(rgbText, '174,174,174');
               str ?
                 save(_, str) :
                 e.preventDefault();
@@ -485,7 +485,7 @@ export default function() {
               document.exitFullscreen() :
               document.documentElement.requestFullscreen();
           }
-        }>Toggle Fullscreen</p>
+        }>{i18n._('settings_theming_toggle_fs')}</p>
       </div>
 
 
@@ -512,13 +512,12 @@ export default function() {
                 }
                 location.reload();
               } else {
-                alert('Incorrect PIN!');
+                alert(i18n._('settings_incorrect_pin'));
                 e.preventDefault();
               }
               return;
             }
-            const pinMessage = i18n._('settings_pin');
-            const pin = prompt(pinMessage);
+            const pin = prompt(i18n._('settings_pin'));
             if (pin) {
               save('kidsMode', pin);
               location.reload();
