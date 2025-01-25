@@ -3,16 +3,15 @@ import { Config, Context } from '@netlify/edge-functions';
 export default async (_: Request, context: Context) => {
 
   const { uid } = context.params;
-  const cgeo = context.geo.country?.code || 'IN';
 
-  const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
+  const keys = Netlify.env.get('rkeys')!.split(',');
 
   shuffle(keys);
 
   if (!uid) return;
 
   const getData = (id: string): Promise<Record<'id' | 'title' | 'author' | 'channelUrl' | 'duration', string>> =>
-    fetcher(cgeo, keys, id)
+    fetcher(keys, id)
       .then(json => ({
         'id': id,
         'title': json.title,
@@ -49,8 +48,8 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
-const host = 'ytstream-download-youtube-videos.p.rapidapi.com';
-export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
+const host = 'yt-api.p.rapidapi.com';
+export const fetcher = (keys: string[], id: string): Promise<{
   title: string,
   channelTitle: string,
   channelId: string,
@@ -62,7 +61,7 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     bitrate: number,
     contentLength: string
   }[]
-}> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
+}> => fetch(`https://${host}/dl?id=${id}`, {
   headers: {
     'X-RapidAPI-Key': <string>keys.shift(),
     'X-RapidAPI-Host': host
@@ -74,7 +73,7 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
       return data;
     else throw new Error(data.message);
   })
-  .catch(() => fetcher(cgeo, keys, id));
+  .catch(() => fetcher(keys, id));
 
 
 

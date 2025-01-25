@@ -9,7 +9,7 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
+  const keys = Netlify.env.get('rkeys')!.split(',');
 
   shuffle(keys);
 
