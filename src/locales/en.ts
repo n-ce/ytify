@@ -5,7 +5,8 @@ export const messages: TranslationKeys = {
   nav_settings: "Settings",
   nav_upcoming: "Upcoming",
 
-  player_setup_audiostreams: "Setting up  AudioStreams...",
+  player_audiostreams_setup: "Setting up  AudioStreams...",
+  player_audiostreams_insert: "Inserting audio source into player...",
   player_livestreams_hls: "Turn on HLS to listen to LiveStreams!",
   player_audiostreams_null: "No Audio Streams Found.",
   player_now_playing: "Now Playing",
