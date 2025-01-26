@@ -1,18 +1,17 @@
 import { i18n } from "@lingui/core";
 import { getSaved } from "../lib/store";
 
-const lang = getSaved('language') || 'en';
+const locale = getSaved('language') || 'en';
 const attributes = [
   '',
   '-label',
   '-aria-label',
   '-placeholder'
 ];
-import(`../locales/${lang}.ts`)
+import(`../locales/${locale}.ts`)
   .then(({ messages }) => {
 
-    i18n.load(lang, messages);
-    i18n.activate(lang);
+    i18n.loadAndActivate({ locale, messages });
 
 
     attributes.forEach(attr => {

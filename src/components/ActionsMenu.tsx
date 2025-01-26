@@ -25,6 +25,7 @@ actionsMenu.onclick = close;
 
 const WatchOnYtify = lazy(() => import('./WatchOnYtify'));
 const Lyrics = lazy(() => import('./Lyrics.tsx'));
+const host = store.linkHost.substring(8);
 
 export default function() {
 
@@ -114,23 +115,16 @@ export default function() {
         </li> :
 
         <Show when={!getSaved('kidsMode_Watch On Button')}>
-          {
+
+          <li tabindex={6} on:click={() => {
+            close();
             getSaved('linkHost') ?
+              open(hostResolver('/watch?v=' + store.actionsMenu.id)) :
+              render(WatchOnYtify, document.body);
+          }}>
+            <i class="ri-video-line"></i>{i18n._('actions_menu_watch_on', { host })}
+          </li>
 
-              <li tabindex={6} on:click={() => {
-                close();
-                open(hostResolver('/watch?v=' + store.actionsMenu.id));
-              }}>
-                <i class="ri-video-line"></i>{i18n._('actions_menu_watch_youtube')}
-              </li> :
-
-              <li tabindex={6} on:click={() => {
-                close();
-                render(WatchOnYtify, document.body);
-              }}>
-                <i class="ri-video-line"></i>{i18n._('actions_menu_watch_ytify')}
-              </li>
-          }
         </Show>
 
       }
