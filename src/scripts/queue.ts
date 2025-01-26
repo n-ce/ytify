@@ -11,8 +11,8 @@ const [
   shuffleQBtn,
   removeQBtn,
   filterLT10Btn,
-  enqueueRelatedStreamsBtn,
-  allowDuplicatesBtn
+  allowDuplicatesBtn,
+  enqueueRelatedStreamsBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
 export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
