@@ -113,6 +113,7 @@ export default function WatchOnYtify() {
           }}
           onMount={() => undefined}
         >
+          <option>Video</option>
           <For each={vFormats()}>
             {(f) =>
               <option value={f[1]}>
@@ -131,10 +132,11 @@ export default function WatchOnYtify() {
           }}
           onMount={() => undefined}
         >
+          <option>Audio</option>
           <For each={aFormats()}>
             {(f) =>
               <option value={f[1]}>
-                {f[0]}
+                {f[0] + (f[1].includes('xtags=drc') ? ' DRC' : '')}
               </option>
             }
           </For>

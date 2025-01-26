@@ -219,6 +219,11 @@ dialog.watcher {
     max-width: 100vmin;
     border-radius: var(--roundness);
   }
+
+  select {
+    width: 7ch;
+    margin-left: 1ch;
+  }
 }
 
 
