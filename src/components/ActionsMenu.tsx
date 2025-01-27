@@ -96,10 +96,9 @@ export default function() {
         }}>
 
           <i class="ri-user-line"></i>
-          {isMusic() ?
-            i18n._('actions_menu_view_artist')
-            :
-            i18n._('actions_menu_view_channel')
+          {i18n._(isMusic() ?
+            'actions_menu_view_artist' :
+            'actions_menu_view_channel')
           }
         </li>
       </Show>

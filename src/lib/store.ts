@@ -63,7 +63,7 @@ export const store: {
   streamHistory: [],
   api: {
     piped: ['https://pipedapi.kavin.rocks'],
-    invidious: ['https://invidious.jing.rocks'],
+    invidious: ['https://iv.ggtyler.dev'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },

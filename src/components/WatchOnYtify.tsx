@@ -10,10 +10,10 @@ export default function WatchOnYtify() {
 
   const [vFormats, setVF] = createSignal([] as string[][]);
   const [aFormats, setAF] = createSignal([] as string[][]);
-  const audio = new Audio();
 
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
+  let audio!: HTMLAudioElement;
 
   onMount(async () => {
     loadingScreen.showModal();
@@ -46,6 +46,10 @@ export default function WatchOnYtify() {
       class='watcher'
       ref={dialog}
     >
+      <audio
+        ref={audio}
+        crossorigin="anonymous"
+      ></audio>
       <video
         ref={video}
         controls
