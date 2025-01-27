@@ -13,7 +13,7 @@ export default function WatchOnYtify() {
 
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
-  let audio!: HTMLAudioElement;
+  const audio = new Audio();
 
   onMount(async () => {
     loadingScreen.showModal();
@@ -46,10 +46,6 @@ export default function WatchOnYtify() {
       class='watcher'
       ref={dialog}
     >
-      <audio
-        ref={audio}
-        crossorigin="anonymous"
-      ></audio>
       <video
         ref={video}
         controls
@@ -69,13 +65,15 @@ export default function WatchOnYtify() {
         }}
         ontimeupdate={() => {
           const diff = audio.currentTime - video.currentTime;
-          if (Math.abs(diff) > 0.1) {
-            console.log(diff);
-            audio.currentTime = video.currentTime - diff;
-          }
+          const vpr = video.playbackRate;
+          audio.playbackRate = vpr - diff;
+          // sync factor
+          // console.log(audio.playbackRate - diff);
+
         }}
         onloadstart={() => {
-          audio.pause();
+          if (!audio.paused)
+            audio.pause();
         }}
         onplaying={() => {
           if (audio.paused)
@@ -93,6 +91,8 @@ export default function WatchOnYtify() {
           if (store.api.index < store.api.invidious.length) {
             const proxy = store.api.invidious[store.api.index];
             video.src = video.src.replace(origin, proxy);
+            audio.src = audio.src.replace(origin, proxy);
+
             store.api.index++;
           }
         }}
