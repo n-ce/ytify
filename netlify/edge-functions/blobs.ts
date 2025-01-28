@@ -15,7 +15,7 @@ export default async (req: Request, context: Context) => {
   }
   else {
 
-    const data = await req.text();
+    const data = await req.arrayBuffer();
     const id = Date.now().toString();
     const link = context.site.url + location.pathname + '?blob=' + id;
 
@@ -28,5 +28,6 @@ export default async (req: Request, context: Context) => {
 
 
 export const config: Config = {
-  path: "/blob/:uid",
+  method: 'POST',
+  path: '/blob/:uid',
 };
