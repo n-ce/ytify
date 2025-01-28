@@ -9,16 +9,7 @@ const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
-const queueParam = params.get('a');
 
-
-
-function upcomingInjector(param: string) {
-  alert('Upcoming Queries have been removed. id: ' + param);
-}
-
-if (queueParam)
-  upcomingInjector(queueParam);
 
 let prevPageIdx = routes.indexOf(location.pathname);
 
@@ -62,8 +53,7 @@ nav.addEventListener('click', (e: Event) => {
   if (anchor.id !== location.pathname) {
     const sParamInHome = params.has('s') && inHome;
     const sParam = '?s=' + params.get('s');
-    const aParam = store.upcomingQuery ? '?a=' + store.upcomingQuery : '';
-    const otherQuery = anchor.id === '/search' ? store.searchQuery : anchor.id === '/upcoming' ? aParam : '';
+    const otherQuery = anchor.id === '/search' ? store.searchQuery : '';
 
     history.pushState({}, '',
       anchor.id + (
@@ -110,9 +100,6 @@ if (errorParam) {
       searchFilters.value = x.get('f') || 'all';
       superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
     }
-
-    if (route === '/upcoming')
-      upcomingInjector(query.slice(2));
 
   }
   else route = errorParam;

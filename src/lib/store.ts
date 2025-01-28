@@ -29,7 +29,6 @@ export const store: {
   loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
   searchQuery: string,
-  upcomingQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
@@ -70,7 +69,6 @@ export const store: {
   loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: getSaved('linkHost') || location.origin,
   searchQuery: '',
-  upcomingQuery: '',
   superCollectionType: 'featured',
   actionsMenu: {
     id: '',

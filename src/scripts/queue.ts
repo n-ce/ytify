@@ -172,27 +172,6 @@ function isLongerThan10Min(duration: string) {
   );
 }
 
-// queuelist mutation observer
-
-new MutationObserver(m => {
-  for (const mutation of m) {
-    if (mutation.type === "childList") {
-      const query = store.queue.join('');
-      store.upcomingQuery = query;
-
-      if (location.pathname === '/upcoming') {
-        history.replaceState({}, '',
-          location.pathname + (
-            query ?
-              `?a=${query}` : ''
-          )
-        );
-      }
-    }
-  }
-}).observe(queuelist, { childList: true });
-
-
 new Sortable(queuelist, {
   handle: '.ri-draggable',
   onUpdate(e: SortableEvent) {
