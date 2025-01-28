@@ -67,7 +67,7 @@ export function shareCollection(data: Collection) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ data }),
+    body: JSON.stringify(data),
   })
     .then(res => res.text())
     .then(_ => {

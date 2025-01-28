@@ -4,7 +4,8 @@ import type { Config, Context } from "@netlify/edge-functions";
 
 export default async (req: Request, context: Context) => {
   const { uid } = context.params;
-  const collection = getStore("clxn");
+  const collection = getStore('clxn');
+
 
   if (uid) {
 
@@ -14,11 +15,11 @@ export default async (req: Request, context: Context) => {
   }
   else {
 
-    const { data } = await req.json();
+    const data = await req.text();
     const id = Date.now().toString();
-    await collection.set(id, data);
-
     const link = context.site.url + location.pathname + '?blob=' + id;
+
+    await collection.set(id, data);
     return new Response(link);
 
   }
