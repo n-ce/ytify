@@ -162,10 +162,7 @@ async function getSharedCollection(id: string, fragment: DocumentFragment) {
   loadingScreen.showModal();
   await fetch(`${location.origin}/blob/${id}`)
     .then(res => res.json())
-    .then(data => {
-      console.log(data);
-      renderDataIntoFragment(data, fragment);
-    })
+    .then(data => renderDataIntoFragment(data, fragment))
     .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
     .finally(() => loadingScreen.close());
 

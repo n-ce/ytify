@@ -20,7 +20,7 @@ export default async (req: Request, context: Context) => {
     const id = Date.now().toString();
     const link = context.site.url + '/list?blob=' + id;
 
-    await collection.set(id, data);
+    await collection.setJSON(id, data);
 
     return new Response(link, {
       headers: { 'content-type': 'text/plain' }

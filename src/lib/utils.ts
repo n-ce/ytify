@@ -136,6 +136,10 @@ export function renderDataIntoFragment(
   draggable = false
 ) {
 
+  setTimeout(() => {
+    console.log(data)
+  }, 5000);
+
   for (const item in data) {
     const d = data[item] as CollectionItem;
     if (d.id)
