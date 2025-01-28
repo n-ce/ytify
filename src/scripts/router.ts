@@ -1,7 +1,6 @@
-import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from "../lib/dom";
+import { actionsMenu, searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
-import { appendToQueuelist } from "./queue";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
@@ -15,15 +14,7 @@ const queueParam = params.get('a');
 
 
 function upcomingInjector(param: string) {
-  loadingScreen.showModal();
-
-  fetch(`${location.origin}/collection?id=${param}`)
-    .then(res => res.json())
-    .then(data => {
-      for (const stream of data)
-        appendToQueuelist(stream)
-    })
-    .finally(() => loadingScreen.close());
+  alert('Upcoming Queries have been removed. id: ' + param);
 }
 
 if (queueParam)
