@@ -70,17 +70,17 @@ export function createCollection(title: string) {
 }
 
 
-export async function fetchCollection(collection: string | null, shared: boolean = false) {
+export async function fetchCollection(id: string | null, shared: boolean = false) {
 
-  if (!collection) return;
+  if (!id) return;
 
   const fragment = document.createDocumentFragment();
-  const isReserved = reservedCollections.includes(collection);
+  const isReserved = reservedCollections.includes(id);
   const isReversed = listContainer.classList.contains('reverse');
 
   shared ?
-    await getSharedCollection(collection, fragment) :
-    getLocalCollection(collection, fragment, isReserved);
+    await getSharedCollection(id, fragment) :
+    getLocalCollection(id, fragment, isReserved);
 
   if (!shared && isReserved) {
     if (!isReversed)
@@ -97,9 +97,9 @@ export async function fetchCollection(collection: string | null, shared: boolean
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    (shared ? '?si=' : '?collection=') + collection
+    (shared ? '?blob=' : '?collection=') + id
   );
-  document.title = (collection || 'Shared Collection') + ' - ytify';
+  document.title = (shared ? 'Shared Collection' : id) + ' - ytify';
 
 }
 
@@ -135,10 +135,10 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
         delete db.discover?.[i];
     saveDB(db);
   }
-  
+
   if (usePagination)
     data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
-  
+
   renderDataIntoFragment(data, fragment, sort);
   listContainer.innerHTML = '';
   listContainer.appendChild(fragment);
@@ -159,10 +159,10 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
   store.list.id = collection;
 }
 
-async function getSharedCollection(si: string, fragment: DocumentFragment) {
+async function getSharedCollection(id: string, fragment: DocumentFragment) {
 
   loadingScreen.showModal();
-  await fetch(`${location.origin}/collection/${si}`)
+  await fetch(`${location.origin}/blob/${id}`)
     .then(res => res.json())
     .then(data => renderDataIntoFragment(data, fragment))
     .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
