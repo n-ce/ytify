@@ -141,9 +141,12 @@ onpopstate = function() {
       .substring(1)
       .split('=');
 
-    param[0] === 'collection' ?
-      fetchCollection(param[1]) :
+    if (param[0] === 'collection')
+      fetchCollection(param[1]);
+
+    if (param[0] === 'list')
       fetchList('/' + param.join('/'));
+
   }
 
   showSection(location.pathname);

@@ -12,7 +12,10 @@ export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
 
-export function removeFromCollection(collection: string, id: string) {
+export function removeFromCollection(
+  collection: string,
+  id: string
+) {
   if (!collection) return;
 
   const db = getDB();
@@ -22,7 +25,11 @@ export function removeFromCollection(collection: string, id: string) {
   saveDB(db);
 }
 
-export function toCollection(collection: string, data: CollectionItem | DOMStringMap, db: Library) {
+export function toCollection(
+  collection: string,
+  data: CollectionItem | DOMStringMap,
+  db: Library
+) {
   if (!collection) return;
   const id = <string>data.id;
 
@@ -37,7 +44,10 @@ export function toCollection(collection: string, data: CollectionItem | DOMStrin
   db[collection][id] = data;
 }
 
-export function addToCollection(collection: string, data: CollectionItem | DOMStringMap) {
+export function addToCollection(
+  collection: string,
+  data: CollectionItem | DOMStringMap
+) {
 
   if (!collection) return;
 
@@ -46,7 +56,11 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
   saveDB(db);
 }
 
-export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
+export function addListToCollection(
+  collection: string,
+  list: { [index: string]: CollectionItem | DOMStringMap },
+  db = getDB()
+) {
 
   if (!collection) return;
 
@@ -70,13 +84,17 @@ export function createCollection(title: string) {
 }
 
 
-export async function fetchCollection(id: string | null, shared: boolean = false) {
+export async function fetchCollection(
+  id: string | null,
+  shared: boolean = false
+) {
 
   if (!id) return;
 
   const fragment = document.createDocumentFragment();
   const isReserved = reservedCollections.includes(id);
   const isReversed = listContainer.classList.contains('reverse');
+
 
   shared ?
     await getSharedCollection(id, fragment) :
@@ -89,7 +107,7 @@ export async function fetchCollection(id: string | null, shared: boolean = false
   else if (isReversed)
     listContainer.classList.remove('reverse');
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'sharedClxn' : 'collection');
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'shared' : 'collection');
 
   if (location.pathname !== '/list')
     goTo('/list');
@@ -117,7 +135,11 @@ function setObserver(callback: () => number) {
 }
 
 
-function getLocalCollection(collection: string, fragment: DocumentFragment, isReserved: boolean) {
+function getLocalCollection(
+  collection: string,
+  fragment: DocumentFragment,
+  isReserved: boolean
+) {
   const db = getDB();
   const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
   let data = db[decodeURI(collection)];
@@ -158,11 +180,16 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
   store.list.id = collection;
 }
 
-async function getSharedCollection(id: string, fragment: DocumentFragment) {
+async function getSharedCollection(
+  id: string,
+  fragment: DocumentFragment
+) {
 
   loadingScreen.showModal();
+
   const data = await fetch(`${location.origin}/blob/${id}`)
-    .then(res => res.json());
+    .then(res => res.json())
+    .catch(() => '');
 
   if (data) {
     renderDataIntoFragment(data, fragment)
@@ -170,7 +197,7 @@ async function getSharedCollection(id: string, fragment: DocumentFragment) {
     listContainer.appendChild(fragment);
   }
   else
-    listContainer.innerHTML = 'Failed to load the shared collection, id : ' + id;
+    listContainer.innerHTML = 'Collection does not exist';
 
   loadingScreen.close();
 }
