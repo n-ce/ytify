@@ -6,7 +6,7 @@ export default async (req: Request, context: Context) => {
   const collection = getStore('clxn');
   const data = await req.text();
   const id = Date.now().toString();
-  const link = context.site.url + '/' + location.pathname + '?blob=' + id;
+  const link = context.site.url + '/list?blob=' + id;
 
   await collection.set(id, data);
   return new Response(link, {
