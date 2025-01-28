@@ -266,7 +266,6 @@ declare global {
     | 'settings_language'
     | 'settings_enter_piped_api'
     | 'settings_enter_invidious_api'
-    | 'settings_opus_recommended'
     | 'settings_pwa_play'
     | 'settings_pwa_download'
     | 'settings_pwa_always_ask'

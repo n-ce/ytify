@@ -184,7 +184,7 @@ export default function() {
           }}
 
         >
-          <option value='opus'>{i18n._('settings_opus_recommended')}</option>
+          <option value='opus'>Opus</option>
           <option value='mp3'>MP3</option>
           <option value='wav'>WAV</option>
           <option value='ogg'>OGG</option>

@@ -101,7 +101,6 @@ export const messages: TranslationKeys = {
   settings_image_lazy: "Lazy",
   settings_image_off: "Off",
   settings_download_format: "Download Format",
-  settings_opus_recommended: "Opus (Recommended)",
   settings_pwa_share_action: "PWA Share Action",
   settings_pwa_play: "Play",
   settings_pwa_download: "Download",
