@@ -16,7 +16,7 @@ export default async (req: Request, context: Context) => {
 
   } else {
 
-    const data = await req.text();
+    const data = await req.json();
     const id = Date.now().toString();
     const link = context.site.url + '/list?blob=' + id;
 
