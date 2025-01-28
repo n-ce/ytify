@@ -159,15 +159,20 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
 }
 
 async function getSharedCollection(id: string, fragment: DocumentFragment) {
-  loadingScreen.showModal();
-  await fetch(`${location.origin}/blob/${id}`)
-    .then(res => res.json())
-    .then(data => renderDataIntoFragment(data, fragment))
-    .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
-    .finally(() => loadingScreen.close());
 
-  listContainer.innerHTML = '';
-  listContainer.appendChild(fragment);
+  loadingScreen.showModal();
+  const data = await fetch(`${location.origin}/blob/${id}`)
+    .then(res => res.json());
+
+  if (data) {
+    renderDataIntoFragment(data, fragment)
+    listContainer.innerHTML = '';
+    listContainer.appendChild(fragment);
+  }
+  else
+    listContainer.innerHTML = 'Failed to load the shared collection, id : ' + id;
+
+  loadingScreen.close();
 }
 
 

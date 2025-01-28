@@ -10,7 +10,7 @@ export default async (req: Request, context: Context) => {
   if (uid) {
 
     const data = await collection.get(uid);
-    return new Response(JSON.stringify(data), {
+    return new Response(data, {
       headers: { 'content-type': 'application/json' }
     });
 
@@ -18,7 +18,7 @@ export default async (req: Request, context: Context) => {
 
     const data = await req.json();
     const id = Date.now().toString();
-    const link = context.site.url + '/list?blob=' + id;
+    const link = context.url + '/list?blob=' + id;
 
     await collection.setJSON(id, data);
 
