@@ -1,6 +1,6 @@
 import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
@@ -21,20 +21,19 @@ const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 const msn = 'mediaSession' in navigator;
 function updatePositionState() {
-  if (msn)
-    if ('setPositionState' in navigator.mediaSession)
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: audio.currentTime,
-      });
+  if (msn && 'setPositionState' in navigator.mediaSession)
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: audio.currentTime,
+    });
 }
 
 
 
 playButton.onclick = function() {
-  if (!store.stream.id) return;
-  store.player.playbackState === 'playing' ?
+  store.stream.id &&
+    store.player.playbackState === 'playing' ?
     audio.pause() :
     audio.play();
 
@@ -174,43 +173,41 @@ audio.oncanplaythrough = function() {
     getData(nextItem, true);
 }
 
-audio.onerror = function() {
+audio.onerror = async function() {
   audio.pause();
-  const id = store.stream.id;
   const message = 'Error 403 : Unauthenticated Stream';
+  const _ = store.api;
 
-  if (getSaved('custom_instance_2'))
+  if (getSaved('custom_instance_2') || store.player.hls.on)
     return notify(message);
 
-  if (store.player.HLS) {
-    notify(message);
-    player(id);
-    return;
-  }
+  if (_.piped[0] === location.origin) return;
 
 
   const origin = new URL(audio.src).origin;
 
-  if (store.api.index < store.api.invidious.length) {
-    const proxy = store.api.invidious[store.api.index];
+  if (_.index < _.invidious.length) {
+    const proxy = _.invidious[store.api.index];
     title.textContent = `Switching proxy to ${proxy.slice(8)}`;
     audio.src = audio.src.replace(origin, proxy);
-    store.api.index++;
+    _.index++;
   }
   else {
-    store.api.index = 0;
+    _.index = 0;
     notify(message);
     title.textContent = store.stream.title;
-
-    getDownloadLink(store.stream.id)
-      .then(_ => {
-        if (_)
-          audio.src = _;
-        else throw new Error();
-      })
-      .catch(() => {
-        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      })
+    _.piped.unshift(location.origin);
+    const data = await getData(store.stream.id) as Piped;
+    if (data.audioStreams)
+      import('../modules/setAudioStreams')
+        .then(mod => mod.setAudioStreams(
+          data.audioStreams
+            .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+            ),
+          data.livestream
+        ));
+    else
+      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
 
   }
 
@@ -223,8 +220,7 @@ loopButton.onclick = function() {
 }
 
 
-
-playPrevButton.onclick = function() {
+function prev() {
   if (store.streamHistory.length > 1) {
     appendToQueuelist(store.stream, true);
     store.streamHistory.pop();
@@ -232,6 +228,7 @@ playPrevButton.onclick = function() {
   }
 }
 
+playPrevButton.onclick = prev;
 
 
 function onEnd() {
@@ -297,6 +294,10 @@ if (msn) {
   });
   navigator.mediaSession.setActionHandler("nexttrack", () => {
     onEnd();
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler("previoustrack", () => {
+    prev();
     updatePositionState();
   });
 }

@@ -1,5 +1,3 @@
-import type Hls from "hls.js";
-
 export const params = (new URL(location.href)).searchParams;
 
 export const getSaved = localStorage.getItem.bind(localStorage);
@@ -7,12 +5,16 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 export const store: {
   player: {
     playbackState: 'none' | 'playing' | 'paused',
-    HLS: Hls | undefined,
+    hls: {
+      on: boolean,
+      src: (arg0: string) => void,
+      api: string[],
+      manifests: string[]
+    }
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
-    hlsCache: string[],
     legacy: boolean,
     fallback: string
   },
@@ -36,7 +38,12 @@ export const store: {
 } = {
   player: {
     playbackState: 'none',
-    HLS: undefined,
+    hls: {
+      on: Boolean(getSaved('HLS')),
+      src: () => '',
+      manifests: [],
+      api: ['https://pipedapi.kavin.rocks']
+    },
     hq: Boolean(getSaved('hq')),
     codec: 'opus',
     supportsOpus: navigator.mediaCapabilities.decodingInfo({
@@ -46,7 +53,6 @@ export const store: {
       }
     }).then(res => res.supported),
     data: undefined,
-    hlsCache: [],
     legacy: !('OffscreenCanvas' in window),
     fallback: ''
   },

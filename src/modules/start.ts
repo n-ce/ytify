@@ -15,18 +15,20 @@ export default async function() {
     const [pi, iv] = custom_instance.split(',');
     store.api.piped[0] = pi;
     store.api.invidious[0] = iv;
+    store.player.hls.api[0] = pi;
 
   } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
     .then(res => res.json())
     .then(data => {
       store.api.piped = data.piped;
+      store.player.hls.api = data.hls;
       store.api.invidious = data.invidious;
       store.api.hyperpipe = data.hyperpipe;
       store.player.fallback = location.origin;
     });
 
 
-  if (getSaved('HLS')) {
+  if (store.player.hls.on) {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
     if (store.player.legacy) return;

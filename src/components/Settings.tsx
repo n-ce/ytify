@@ -270,7 +270,7 @@ export default function() {
           }}
         />
 
-        <Show when={!getSaved('HLS')}>
+        <Show when={!store.player.hls.on}>
 
           <Selector
             label={i18n._('settings_codec_preference')}

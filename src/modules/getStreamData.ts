@@ -5,17 +5,18 @@ export async function getData(
   prefetch: boolean = false
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const hls = store.player.HLS;
   const inv = store.api.invidious;
   const pip = store.api.piped;
+  const hls = store.player.hls;
 
   const fetchDataFromPiped = (
     api: string
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (data && 'audioStreams' in data && data.audioStreams.length)
+      if (hls.on ? data.hls : data.audioStreams.length) {
         return data;
+      }
       else throw new Error(data.message);
     });
 
@@ -61,7 +62,7 @@ export async function getData(
         .catch(() => e.errors[0]) :
       e.errors[0];
 
-  const useInvidious = (e: AggregateError, index = 0): Piped => hls ?
+  const useInvidious = (e: AggregateError, index = 0): Piped => hls.on ?
     e.errors[0] :
     fetchDataFromInvidious(inv[index])
       .catch(() => {
@@ -70,16 +71,16 @@ export async function getData(
         else return useInvidious(e, index + 1);
       })
 
-  const usePiped = hls ?
+  const usePiped = hls.on ?
     Promise
-      .allSettled(pip.map(fetchDataFromPiped))
+      .allSettled(hls.api.map(fetchDataFromPiped))
       .then(res => {
         const ff = res.filter(r => r.status === 'fulfilled');
-        store.player.hlsCache.length = 0;
+        hls.manifests.length = 0;
 
         ff.forEach(r => {
           if (r.value.hls) {
-            store.player.hlsCache.push(r.value.hls);
+            hls.manifests.push(r.value.hls);
           }
         });
 
