@@ -1,7 +1,6 @@
-import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from "../lib/dom";
+import { actionsMenu, searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
-import { appendToQueuelist } from "./queue";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
@@ -10,24 +9,7 @@ const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
-const queueParam = params.get('a');
 
-
-
-function upcomingInjector(param: string) {
-  loadingScreen.showModal();
-
-  fetch(`${location.origin}/collection?id=${param}`)
-    .then(res => res.json())
-    .then(data => {
-      for (const stream of data)
-        appendToQueuelist(stream)
-    })
-    .finally(() => loadingScreen.close());
-}
-
-if (queueParam)
-  upcomingInjector(queueParam);
 
 let prevPageIdx = routes.indexOf(location.pathname);
 
@@ -71,8 +53,7 @@ nav.addEventListener('click', (e: Event) => {
   if (anchor.id !== location.pathname) {
     const sParamInHome = params.has('s') && inHome;
     const sParam = '?s=' + params.get('s');
-    const aParam = store.upcomingQuery ? '?a=' + store.upcomingQuery : '';
-    const otherQuery = anchor.id === '/search' ? store.searchQuery : anchor.id === '/upcoming' ? aParam : '';
+    const otherQuery = anchor.id === '/search' ? store.searchQuery : '';
 
     history.pushState({}, '',
       anchor.id + (
@@ -105,7 +86,7 @@ if (errorParam) {
     const query = encodeURI(_[1]);
 
     if (route === '/list')
-      query.startsWith('si') ?
+      query.startsWith('blob') ?
         fetchCollection(query.split('=')[1], true) :
         query.startsWith('supermix') ?
 
@@ -119,9 +100,6 @@ if (errorParam) {
       searchFilters.value = x.get('f') || 'all';
       superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
     }
-
-    if (route === '/upcoming')
-      upcomingInjector(query.slice(2));
 
   }
   else route = errorParam;
@@ -163,9 +141,12 @@ onpopstate = function() {
       .substring(1)
       .split('=');
 
-    param[0] === 'collection' ?
-      fetchCollection(param[1]) :
+    if (param[0] === 'collection')
+      fetchCollection(param[1]);
+
+    if (param[0] === 'list')
       fetchList('/' + param.join('/'));
+
   }
 
   showSection(location.pathname);

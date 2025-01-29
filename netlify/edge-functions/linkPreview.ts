@@ -28,7 +28,8 @@ export default async (request: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: '/*'
+  path: '/*',
+  excludedPath: '/list'
 };
 
 const host = 'yt-api.p.rapidapi.com';

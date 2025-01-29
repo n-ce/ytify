@@ -13,7 +13,10 @@ export const saveDB = (data: Library) => save('library', JSON.stringify(data));
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
 
-export function removeFromCollection(collection: string, id: string) {
+export function removeFromCollection(
+  collection: string,
+  id: string
+) {
   if (!collection) return;
 
   const db = getDB();
@@ -23,7 +26,11 @@ export function removeFromCollection(collection: string, id: string) {
   saveDB(db);
 }
 
-export function toCollection(collection: string, data: CollectionItem | DOMStringMap, db: Library) {
+export function toCollection(
+  collection: string,
+  data: CollectionItem | DOMStringMap,
+  db: Library
+) {
   if (!collection) return;
   const id = <string>data.id;
 
@@ -38,7 +45,10 @@ export function toCollection(collection: string, data: CollectionItem | DOMStrin
   db[collection][id] = data;
 }
 
-export function addToCollection(collection: string, data: CollectionItem | DOMStringMap) {
+export function addToCollection(
+  collection: string,
+  data: CollectionItem | DOMStringMap
+) {
 
   if (!collection) return;
 
@@ -47,7 +57,11 @@ export function addToCollection(collection: string, data: CollectionItem | DOMSt
   saveDB(db);
 }
 
-export function addListToCollection(collection: string, list: { [index: string]: CollectionItem | DOMStringMap }, db = getDB()) {
+export function addListToCollection(
+  collection: string,
+  list: { [index: string]: CollectionItem | DOMStringMap },
+  db = getDB()
+) {
 
   if (!collection) return;
 
@@ -71,17 +85,21 @@ export function createCollection(title: string) {
 }
 
 
-export async function fetchCollection(collection: string | null, shared: boolean = false) {
+export async function fetchCollection(
+  id: string | null,
+  shared: boolean = false
+) {
 
-  if (!collection) return;
+  if (!id) return;
 
   const fragment = document.createDocumentFragment();
-  const isReserved = reservedCollections.includes(collection);
+  const isReserved = reservedCollections.includes(id);
   const isReversed = listContainer.classList.contains('reverse');
 
+
   shared ?
-    await getSharedCollection(collection, fragment) :
-    getLocalCollection(collection, fragment, isReserved);
+    await getSharedCollection(id, fragment) :
+    getLocalCollection(id, fragment, isReserved);
 
   if (!shared && isReserved) {
     if (!isReversed)
@@ -90,7 +108,7 @@ export async function fetchCollection(collection: string | null, shared: boolean
   else if (isReversed)
     listContainer.classList.remove('reverse');
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'sharedClxn' : 'collection');
+  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'shared' : 'collection');
 
   if (location.pathname !== '/list')
     goTo('/list');
@@ -98,9 +116,9 @@ export async function fetchCollection(collection: string | null, shared: boolean
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    (shared ? '?si=' : '?collection=') + collection
+    (shared ? '?blob=' : '?collection=') + id
   );
-  document.title = (collection || 'Shared Collection') + ' - ytify';
+  document.title = (shared ? 'Shared Collection' : id) + ' - ytify';
 
 }
 
@@ -118,7 +136,11 @@ function setObserver(callback: () => number) {
 }
 
 
-function getLocalCollection(collection: string, fragment: DocumentFragment, isReserved: boolean) {
+function getLocalCollection(
+  collection: string,
+  fragment: DocumentFragment,
+  isReserved: boolean
+) {
   const db = getDB();
   const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
   let data = db[decodeURI(collection)];
@@ -136,10 +158,9 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
         delete db.discover?.[i];
     saveDB(db);
   }
-  
+
   if (usePagination)
     data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
-  
   renderDataIntoFragment(data, fragment, sort);
   listContainer.innerHTML = '';
   listContainer.appendChild(fragment);
@@ -160,17 +181,26 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
   store.list.id = collection;
 }
 
-async function getSharedCollection(si: string, fragment: DocumentFragment) {
+async function getSharedCollection(
+  id: string,
+  fragment: DocumentFragment
+) {
 
   loadingScreen.showModal();
-  await fetch(`${location.origin}/collection/${si}`)
-    .then(res => res.json())
-    .then(data => renderDataIntoFragment(data, fragment))
-    .catch(() => notify('Failed to load the shared collection, it may consist of a corrupted stream.'))
-    .finally(() => loadingScreen.close());
 
-  listContainer.innerHTML = '';
-  listContainer.appendChild(fragment);
+  const data = await fetch(`${location.origin}/blob/${id}`)
+    .then(res => res.json())
+    .catch(() => '');
+
+  if (data) {
+    renderDataIntoFragment(data, fragment)
+    listContainer.innerHTML = '';
+    listContainer.appendChild(fragment);
+  }
+  else
+    listContainer.innerHTML = 'Collection does not exist';
+
+  loadingScreen.close();
 }
 
 

@@ -27,7 +27,6 @@ export default async (_: Request, context: Context) => {
         contentLength: _.contentLength
       })),
     relatedStreams: [],
-    subtitles: [],
     livestream: streamData.isLiveContent
   };
 

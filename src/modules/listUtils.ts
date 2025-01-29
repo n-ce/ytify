@@ -1,4 +1,4 @@
-import { listContainer, subscribeListBtn } from "../lib/dom";
+import {listContainer, loadingScreen, subscribeListBtn} from "../lib/dom";
 import { getThumbIdFromLink } from "../lib/imageUtils";
 import { addListToCollection, createCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { store } from "../lib/store";
@@ -58,12 +58,29 @@ export function importList() {
   notify(i18next.t('list_imported', { listTitle }));
 }
 
-export function shareCollection(shareId: string) {
-  const text = location.origin + location.pathname + '?si=' + shareId;
-  const type = "text/plain";
-  const blob = new Blob([text], { type });
-  const data = [new ClipboardItem({ [type]: blob })];
-  navigator.clipboard.write(data);
+export function shareCollection(data: Collection) {
+
+  loadingScreen.showModal();
+
+  fetch(location.origin + '/blob', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+    .then(res => res.text())
+    .then(_ => {
+      const type = "text/plain";
+      const blob = new Blob([_], { type });
+      const link = [new ClipboardItem({ [type]: blob })];
+      navigator.clipboard.write(link);
+    })
+    .catch(() => {
+      alert('failed');
+    })
+    .finally(() => loadingScreen.close());
+
 }
 
 

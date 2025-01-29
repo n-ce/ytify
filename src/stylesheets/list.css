@@ -52,7 +52,7 @@
   }
 
   &.supermix,
-  &.sharedClxn {
+  &.shared {
     button {
       display: none;
     }

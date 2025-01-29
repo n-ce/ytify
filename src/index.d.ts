@@ -88,7 +88,6 @@ declare global {
     uploader: string,
     uploaderUrl: string,
     livestream: boolean,
-    subtitles: [],
     hls: string
     relatedStreams: {
       url: string,
@@ -108,6 +107,8 @@ declare global {
     }[]
   }
 
+  type Captions = Record<'label' | 'url', string>;
+
   type Invidious = {
     adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url', string>[],
     recommendedVideos: {
@@ -117,6 +118,7 @@ declare global {
       authorUrl: string,
       videoId: string
     }[],
+    captions: Captions[],
     title: string,
     author: string,
     lengthSeconds: number,

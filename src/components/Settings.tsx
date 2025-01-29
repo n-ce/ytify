@@ -184,7 +184,7 @@ export default function() {
           }}
 
         >
-          <option value='opus'>{i18next.t('settings_opus_recommended')}</option>
+          <option value='opus'>Opus</option>
           <option value='mp3'>MP3</option>
           <option value='wav'>WAV</option>
           <option value='ogg'>OGG</option>
@@ -270,7 +270,7 @@ export default function() {
           }}
         />
 
-        <Show when={!getSaved('HLS')}>
+        <Show when={!store.player.hls.on}>
 
           <Selector
             label={i18next.t('settings_codec_preference')}
