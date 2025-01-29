@@ -31,11 +31,13 @@ export default function WatchOnYtify() {
       }));
 
     setAF(
-      data.audioStreams.map(f => {
-        const codec =
-          f.mimeType.includes('opus') ? 'opus' : 'M4A';
-        return [`${f.quality} ${codec}`, f.url];
-      })
+      data.audioStreams
+        .filter(a => !a.url.includes('acont%3Ddubbed'))
+        .map(f => {
+          const codec =
+            f.mimeType.includes('opus') ? 'opus' : 'M4A';
+          return [`${f.quality} ${codec}`, f.url];
+        })
     );
 
   });
@@ -66,9 +68,11 @@ export default function WatchOnYtify() {
         ontimeupdate={() => {
           const diff = audio.currentTime - video.currentTime;
           const vpr = video.playbackRate;
-          audio.playbackRate = vpr - diff;
-          // sync factor
-          // console.log(audio.playbackRate - diff);
+          const npr = vpr - diff;
+          if (npr < 0) return;
+          const rpr = Math.round(npr * 100) / 100;
+          if (rpr !== audio.playbackRate)
+            audio.playbackRate = rpr;
 
         }}
         onloadstart={() => {

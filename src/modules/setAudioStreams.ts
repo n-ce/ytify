@@ -31,11 +31,13 @@ export function setAudioStreams(audioStreams: {
 
   bitrateSelector.innerHTML = '';
 
-  const isDRC = (url: string) => url.includes('xtags=drc%3D1');
+  const isDRC = (url: string) => url.includes('drc%3D1');
   const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
+  const isOriginal = (a: { url: string }) => !a.url.includes('acont%3Ddubbed');
 
   audioStreams
     .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
+    .filter(isOriginal)
     .forEach((_, i: number) => {
       const codec = _.codec === 'opus' ? 'opus' : 'aac';
       const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';
