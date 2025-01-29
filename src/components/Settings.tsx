@@ -5,7 +5,7 @@ import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
 import { getDB, saveDB } from '../lib/libraryUtils';
-import { i18n } from '@lingui/core';
+import i18next from "i18next";
 
 
 function ToggleSwitch(_: ToggleSwitch) {
@@ -72,15 +72,15 @@ export default function() {
 
         <ToggleSwitch
           id='customInstanceSwitch'
-          name={i18n._('settings_custom_instance')}
+          name={i18next.t('settings_custom_instance')}
           checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
             const _ = 'custom_instance_2';
             if (getSaved(_))
               removeSaved(_);
             else {
-              const pi = prompt(i18n._('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
-              const iv = prompt(i18n._('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
+              const pi = prompt(i18next.t('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
+              const iv = prompt(i18next.t('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
 
               if (pi && iv)
                 save(_, pi + ',' + iv);
@@ -92,7 +92,7 @@ export default function() {
 
 
         <Selector
-          label={i18n._('settings_language')}
+          label={i18next.t('settings_language')}
           id='languageSelector'
           onChange={(e) => {
             const lang = e.target.value;
@@ -112,7 +112,7 @@ export default function() {
 
         <Selector
           id='linkHost'
-          label={i18n._('settings_links_host')}
+          label={i18next.t('settings_links_host')}
           onChange={(e) => {
             e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
@@ -135,7 +135,7 @@ export default function() {
         </Selector>
 
         <Selector
-          label={i18n._('settings_image_loading')}
+          label={i18next.t('settings_image_loading')}
           id='imgLoad'
           onChange={(e) => {
             const val = e.target.value;
@@ -159,14 +159,14 @@ export default function() {
             else audio.addEventListener('loadstart', themer);
           }}
         >
-          <option value="eager">{i18n._('settings_image_eager')}</option>
-          <option value="lazy">{i18n._('settings_image_lazy')}</option>
-          <option value="off">{i18n._('settings_image_off')}</option>
+          <option value="eager">{i18next.t('settings_image_eager')}</option>
+          <option value="lazy">{i18next.t('settings_image_lazy')}</option>
+          <option value="off">{i18next.t('settings_image_off')}</option>
         </Selector>
 
         <Selector
           id='downloadFormatSelector'
-          label={i18n._('settings_download_format')}
+          label={i18next.t('settings_download_format')}
           onChange={(e) => {
             store.downloadFormat = e.target.value as 'opus';
             store.downloadFormat === 'opus' ?
@@ -184,7 +184,7 @@ export default function() {
           }}
 
         >
-          <option value='opus'>{i18n._('settings_opus_recommended')}</option>
+          <option value='opus'>{i18next.t('settings_opus_recommended')}</option>
           <option value='mp3'>MP3</option>
           <option value='wav'>WAV</option>
           <option value='ogg'>OGG</option>
@@ -193,7 +193,7 @@ export default function() {
 
         <Selector
           id='shareAction'
-          label={i18n._('settings_pwa_share_action')}
+          label={i18next.t('settings_pwa_share_action')}
           onChange={(e) => {
             const val = e.target.value;
             if (val === 'play')
@@ -208,9 +208,9 @@ export default function() {
               target.value = val;
           }}
         >
-          <option value='play'>{i18n._('settings_pwa_play')}</option>
-          <option value='dl'>{i18n._('settings_pwa_download')}</option>
-          <option value='ask'>{i18n._('settings_pwa_always_ask')}</option>
+          <option value='play'>{i18next.t('settings_pwa_play')}</option>
+          <option value='dl'>{i18next.t('settings_pwa_download')}</option>
+          <option value='ask'>{i18next.t('settings_pwa_always_ask')}</option>
         </Selector>
 
       </div>
@@ -218,11 +218,11 @@ export default function() {
       <div>
         <b>
           <i class="ri-search-2-line"></i>
-          <p>{i18n._('settings_search')}</p>
+          <p>{i18next.t('settings_search')}</p>
         </b>
         <ToggleSwitch
           id="defaultFilterSongs"
-          name={i18n._('settings_set_songs_as_default_filter')}
+          name={i18next.t('settings_set_songs_as_default_filter')}
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             const _ = 'searchFilter';
@@ -234,7 +234,7 @@ export default function() {
         />
         <ToggleSwitch
           id="suggestionsSwitch"
-          name={i18n._('settings_display_suggestions')}
+          name={i18next.t('settings_display_suggestions')}
           checked={getSaved('searchSuggestions') !== 'off'}
           onClick={() => {
             const _ = 'searchSuggestions';
@@ -251,13 +251,13 @@ export default function() {
       <div>
         <b>
           <i class="ri-play-large-line"></i>
-          <p>{i18n._('settings_playback')}</p>
+          <p>{i18next.t('settings_playback')}</p>
         </b>
 
 
         <ToggleSwitch
           id="qualitySwitch"
-          name={i18n._('settings_hq_audio')}
+          name={i18next.t('settings_hq_audio')}
           checked={getSaved('hq') === 'true'}
           onClick={async () => {
             getSaved('hq') ?
@@ -273,7 +273,7 @@ export default function() {
         <Show when={!getSaved('HLS')}>
 
           <Selector
-            label={i18n._('settings_codec_preference')}
+            label={i18next.t('settings_codec_preference')}
             id='codecPreference'
             onChange={async (e) => {
 
@@ -302,7 +302,7 @@ export default function() {
 
           <ToggleSwitch
             id="stableVolumeSwitch"
-            name={i18n._('settings_stable_volume')}
+            name={i18next.t('settings_stable_volume')}
             checked={getSaved('stableVolume') === 'true'}
             onClick={() => {
               const _ = 'stableVolume';
@@ -315,7 +315,7 @@ export default function() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name={i18n._('settings_always_proxy_streams')}
+            name={i18next.t('settings_always_proxy_streams')}
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               const _ = 'enforceProxy';
@@ -330,7 +330,7 @@ export default function() {
 
         <ToggleSwitch
           id="HLS_Switch"
-          name={i18n._('settings_hls')}
+          name={i18next.t('settings_hls')}
           checked={getSaved('HLS') === 'true'}
           onClick={() => {
             getSaved('HLS') ?
@@ -346,13 +346,13 @@ export default function() {
       <div>
         <b>
           <i class="ri-stack-line"></i>
-          <p>{i18n._('settings_library')}</p>
+          <p>{i18next.t('settings_library')}</p>
         </b>
 
 
         <ToggleSwitch
           id="startupTab"
-          name={i18n._('settings_set_as_default_tab')}
+          name={i18next.t('settings_set_as_default_tab')}
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
             const _ = 'startupTab';
@@ -363,14 +363,14 @@ export default function() {
         />
         <ToggleSwitch
           id='discoverSwitch'
-          name={i18n._('settings_store_discoveries')}
+          name={i18next.t('settings_store_discoveries')}
           checked={getSaved('discover') !== 'off'}
           onClick={e => {
             if (e.target.checked)
               removeSaved('discover');
             else {
               const db = getDB();
-              if (confirm(i18n._("settings_clear_discoveries", { count: Object.keys(db.discover || {}).length || 0 }))) {
+              if (confirm(i18next.t("settings_clear_discoveries", { count: Object.keys(db.discover || {}).length || 0 }))) {
                 delete db.discover;
                 saveDB(db);
                 save('discover', 'off');
@@ -383,14 +383,14 @@ export default function() {
 
         <ToggleSwitch
           id='historySwitch'
-          name={i18n._('settings_store_history')}
+          name={i18next.t('settings_store_history')}
           checked={getSaved('history') !== 'off'}
           onClick={e => {
             if (e.target.checked)
               removeSaved('history');
             else {
               const db = getDB();
-              if (confirm(i18n._("settings_clear_history", { count: Object.keys(db.discover || {}).length || 0 }))) {
+              if (confirm(i18next.t("settings_clear_history", { count: Object.keys(db.discover || {}).length || 0 }))) {
                 delete db.history;
                 saveDB(db);
                 save('history', 'off')
@@ -405,18 +405,18 @@ export default function() {
             .then(mod => {
               mod.pipedPlaylistsImporter()
             })
-        }}>{i18n._('settings_import_from_piped')}</p>
+        }}>{i18next.t('settings_import_from_piped')}</p>
 
       </div>
 
       <div>
         <b>
           <i class="ri-t-shirt-2-line"></i>
-          <p>{i18n._('settings_interface')}</p>
+          <p>{i18next.t('settings_interface')}</p>
         </b>
 
         <Selector
-          label={i18n._('settings_roundness')}
+          label={i18next.t('settings_roundness')}
           id='roundnessChanger'
           onChange={(e) => {
             cssVar('--roundness', e.target.value);
@@ -431,17 +431,17 @@ export default function() {
             }
           }}
         >
-          <option value="none">{i18n._('settings_roundness_none')}</option>
-          <option value="0.2rem">{i18n._('settings_roundness_lighter')}</option>
-          <option value="0.4rem" selected>{i18n._('settings_roundness_light')}</option>
-          <option value="0.6rem">{i18n._('settings_roundness_heavy')}</option>
-          <option value="0.9rem">{i18n._('settings_roundness_heavier')}</option>
+          <option value="none">{i18next.t('settings_roundness_none')}</option>
+          <option value="0.2rem">{i18next.t('settings_roundness_lighter')}</option>
+          <option value="0.4rem" selected>{i18next.t('settings_roundness_light')}</option>
+          <option value="0.6rem">{i18next.t('settings_roundness_heavy')}</option>
+          <option value="0.9rem">{i18next.t('settings_roundness_heavier')}</option>
         </Selector>
 
 
         <ToggleSwitch
           id="custom_theme"
-          name={i18n._('settings_use_custom_color')}
+          name={i18next.t('settings_use_custom_color')}
           checked={getSaved('custom_theme') !== null}
           onClick={e => {
             const _ = 'custom_theme';
@@ -449,7 +449,7 @@ export default function() {
             if (colorString)
               removeSaved(_);
             else {
-              const rgbText = i18n._('settings_custom_color_prompt');
+              const rgbText = i18next.t('settings_custom_color_prompt');
               const str = prompt(rgbText, '174,174,174');
               str ?
                 save(_, str) :
@@ -462,7 +462,7 @@ export default function() {
 
 
         <Selector
-          label={i18n._('settings_theming_scheme')}
+          label={i18next.t('settings_theming_scheme')}
           id='themeSelector'
           onChange={(e) => {
             themer();
@@ -474,15 +474,15 @@ export default function() {
             target.value = (getSaved('theme') as 'light' | 'dark') || 'auto';
           }}
         >
-          <optgroup label={i18n._('settings_theming_scheme_dynamic')}>
-            <option value="auto" selected>{i18n._('settings_theming_scheme_system')}</option>
-            <option value="light">{i18n._('settings_theming_scheme_light')}</option>
-            <option value="dark">{i18n._('settings_theming_scheme_dark')}</option>
+          <optgroup label={i18next.t('settings_theming_scheme_dynamic')}>
+            <option value="auto" selected>{i18next.t('settings_theming_scheme_system')}</option>
+            <option value="light">{i18next.t('settings_theming_scheme_light')}</option>
+            <option value="dark">{i18next.t('settings_theming_scheme_dark')}</option>
           </optgroup>
-          <optgroup label={i18n._('settings_theming_scheme_hc')}>
-            <option value="auto-hc">{i18n._('settings_theming_scheme_hc_system')}</option>
-            <option value="white">{i18n._('settings_theming_scheme_white')}</option>
-            <option value="black">{i18n._('settings_theming_scheme_black')}</option>
+          <optgroup label={i18next.t('settings_theming_scheme_hc')}>
+            <option value="auto-hc">{i18next.t('settings_theming_scheme_hc_system')}</option>
+            <option value="white">{i18next.t('settings_theming_scheme_white')}</option>
+            <option value="black">{i18next.t('settings_theming_scheme_black')}</option>
           </optgroup>
         </Selector>
 
@@ -492,7 +492,7 @@ export default function() {
               document.exitFullscreen() :
               document.documentElement.requestFullscreen();
           }
-        }>{i18n._('settings_fullscreen')}</p>
+        }>{i18next.t('settings_fullscreen')}</p>
       </div>
 
 
@@ -500,12 +500,12 @@ export default function() {
       <div>
         <b>
           <i class="ri-parent-line"></i>
-          <p>{i18n._('settings_parental_controls')}</p>
+          <p>{i18next.t('settings_parental_controls')}</p>
         </b>
 
         <ToggleSwitch
           id="kidsSwitch"
-          name={i18n._('settings_pin_toggle')}
+          name={i18next.t('settings_pin_toggle')}
           checked={Boolean(getSaved('kidsMode'))}
           onClick={e => {
             const savedPin = getSaved('kidsMode');
@@ -519,12 +519,12 @@ export default function() {
                 }
                 location.reload();
               } else {
-                alert(i18n._('settings_pin_incorrect'));
+                alert(i18next.t('settings_pin_incorrect'));
                 e.preventDefault();
               }
               return;
             }
-            const pin = prompt(i18n._('settings_pin_message'));
+            const pin = prompt(i18next.t('settings_pin_message'));
             if (pin) {
               save('kidsMode', pin);
               location.reload();

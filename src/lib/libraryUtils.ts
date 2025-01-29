@@ -1,6 +1,7 @@
 import { $, errorHandler, getApi, goTo, itemsLoader, notify, renderDataIntoFragment, save } from "./utils";
 import { listBtnsContainer, listContainer, listSection, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
+import i18next from "i18next";
 
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
@@ -123,7 +124,7 @@ function getLocalCollection(collection: string, fragment: DocumentFragment, isRe
   let data = db[decodeURI(collection)];
 
   if (!data)
-    notify('No items found');
+    notify(i18next.t("library_utils_not_found_items"));
 
   const items = Object.entries(data);
   let itemsToShow = items.length;
@@ -186,7 +187,7 @@ export async function superCollectionLoader(name: SuperCollection) {
         .then(mod => mod.default(ids));
       return '';
     }
-    else return 'No favorites in library';
+    else return i18next.t("library_utils_not_found_fav");
   }
 
   const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
@@ -217,7 +218,7 @@ export async function superCollectionLoader(name: SuperCollection) {
       a.append(i, v);
       fragment.appendChild(a);
     });
-    return pls.length ? fragment : 'No Collections Found';
+    return pls.length ? fragment : i18next.t("library_utils_not_found_collections");
   }
 
   /*
@@ -232,17 +233,17 @@ export async function superCollectionLoader(name: SuperCollection) {
 
     if (type === 'albums') {
       albums = true;
-      type = 'playlists';
+      type = i18next.t("library_utils_not_found_playlists_type");
     }
 
     if (type === 'artists') {
       artists = true;
-      type = 'channels';
+      type = i18next.t("library_utils_not_found_channels_type");
     }
 
 
     if (!Object(db).hasOwnProperty(type))
-      return `No Subscribed ${type} Found`;
+      return  i18next.t("library_utils_not_found", {type})
 
     const array = [];
     const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
@@ -279,12 +280,12 @@ export async function superCollectionLoader(name: SuperCollection) {
 
     return array.length ?
       itemsLoader(array) :
-      `No Subscribed ${type} Found`;
+        i18next.t("library_utils_not_found", {type})
   }
 
   async function loadFeed() {
     if (!Object(db).hasOwnProperty('channels'))
-      return 'You have not subscribed to any channels';
+      return i18next.t("library_utils_not_found_sub");
 
     loadingScreen.showModal();
 

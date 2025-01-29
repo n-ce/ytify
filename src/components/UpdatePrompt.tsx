@@ -1,6 +1,6 @@
 import { createSignal, onMount } from "solid-js";
 import './UpdatePrompt.css';
-import { i18n } from "@lingui/core";
+import i18next from "i18next";
 
 export default function UpdatePrompt(handleUpdate: () => void) {
 
@@ -34,11 +34,11 @@ export default function UpdatePrompt(handleUpdate: () => void) {
         {fullList().length > 2 ?
           fullList().map((text: string) => (<li>{text}</li>))
           :
-          <li onclick={handleFullList}>{i18n._('updater_changelog_full')}</li>
+          <li onclick={handleFullList}>{i18next.t('updater_changelog_full')}</li>
         }
       </ul>
       <span>
-        <button onclick={handleUpdate} autofocus>{i18n._('updater_button')}</button>
+        <button onclick={handleUpdate} autofocus>{i18next.t('updater_button')}</button>
         <button onclick={() => {
           dialog.close();
           dialog.remove();

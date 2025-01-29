@@ -4,6 +4,7 @@ import solidPlugin from 'vite-plugin-solid';
 import autoprefixer from 'autoprefixer';
 import postcssJitProps from 'postcss-jit-props';
 import OpenProps from 'open-props';
+import copy from "rollup-plugin-copy";
 
 export default defineConfig(({ command }) => ({
   define: {
@@ -84,6 +85,12 @@ export default defineConfig(({ command }) => ({
       },
       disable: command !== 'build',
       includeAssets: ['*.woff2', 'ytify_banner.webp']
+    }),
+    copy({
+      targets: [
+        { src: 'locales', dest: 'dist' }
+      ],
+      hook: 'buildEnd'
     })
   ],
   css: {

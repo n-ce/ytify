@@ -1,7 +1,7 @@
-import { i18n } from "@lingui/core";
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
 import { store, getSaved } from "../lib/store";
 import { proxyHandler } from "../lib/utils";
+import i18next from "i18next";
 
 export function setAudioStreams(audioStreams: {
   codec: string,
@@ -13,14 +13,14 @@ export function setAudioStreams(audioStreams: {
 }[],
   isLive = false) {
 
-  title.textContent = i18n._('player_setup_audiostreams');
+  title.textContent = i18next.t('player_setup_audiostreams');
 
   const preferedCodec = store.player.codec;
   const noOfBitrates = audioStreams.length;
   let index = -1;
 
   if (!noOfBitrates) {
-    title.textContent = i18n._(
+    title.textContent = i18next.t(
       isLive ?
         'player_livestreams_hls' :
         'player_audiostreams_null'

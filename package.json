@@ -9,8 +9,10 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "@lingui/core": "^5.1.2",
     "hls.js": "^1.5.20",
+    "i18next": "^24.2.2",
+    "i18next-browser-languagedetector": "^8.0.2",
+    "i18next-http-backend": "^3.0.2",
     "imsc": "^1.1.5",
     "solid-js": "^1.9.4",
     "sortablejs": "^1.15.6"
@@ -26,22 +28,8 @@
     "typescript": "^5.7.3",
     "vite": "^6.0.11",
     "vite-plugin-pwa": "^0.21.1",
-    "vite-plugin-solid": "^2.11.0"
-  },
-  "lingui": {
-    "locales": [
-      "en",
-      "pl"
-    ],
-    "sourceLocale": "en",
-    "catalogs": [
-      {
-        "path": "src/locales/{locale}",
-        "include": [
-          "src"
-        ]
-      }
-    ]
+    "vite-plugin-solid": "^2.11.0",
+    "rollup-plugin-copy": "^3.5.0"
   },
   "browserslist": [
     "defaults"

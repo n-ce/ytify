@@ -7,9 +7,10 @@ import './scripts/library';
 import './scripts/i18n.ts';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
+import i18next from "i18next";
 
 addEventListener('DOMContentLoaded', async () => {
-
+  await i18next.loadNamespaces(['translation']);
   const settingsContainer = document.getElementById('settings') as HTMLDivElement;
   const stngs = await import('./components/Settings');
   render(stngs.default, settingsContainer);

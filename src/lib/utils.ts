@@ -7,7 +7,7 @@ import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { i18n } from "@lingui/core";
+import i18next from "i18next";
 
 
 export const $ = document.createElement.bind(document);
@@ -39,7 +39,7 @@ export const hostResolver = (url: string) =>
 
 export function proxyHandler(url: string) {
   store.api.index = 0;
-  title.textContent = i18n._('player_audiostreams_insert');
+  title.textContent = i18next.t('player_audiostreams_insert');
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');

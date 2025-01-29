@@ -4,7 +4,7 @@ import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
-import { i18n } from '@lingui/core';
+import i18next from "i18next";
 
 export default async function() {
 
@@ -50,7 +50,7 @@ export default async function() {
   const id = params.get('s') || isPWA;
   let shareAction = getSaved('shareAction');
   if (isPWA && shareAction === 'ask')
-    shareAction = confirm(i18n._('pwa_share_prompt')) ?
+    shareAction = confirm(i18next.t('pwa_share_prompt')) ?
       '' : 'dl';
 
   if (id) {
