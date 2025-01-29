@@ -1,6 +1,7 @@
 import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solidPlugin from 'vite-plugin-solid';
+import { lingui } from '@lingui/vite-plugin';
 import autoprefixer from 'autoprefixer';
 import postcssJitProps from 'postcss-jit-props';
 import OpenProps from 'open-props';
@@ -14,6 +15,7 @@ export default defineConfig(({ command }) => ({
   plugins: [
     injectEruda(command === 'serve'),
     solidPlugin(),
+    lingui(),
     VitePWA({
       manifest: {
         "short_name": "Ytify",

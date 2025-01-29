@@ -196,8 +196,15 @@ audio.onerror = async function() {
     _.index = 0;
     notify(message);
     title.textContent = store.stream.title;
-    _.piped.unshift(location.origin);
+    // Emergency Handling
+    const f = store.player.fallback;
+
+    if (!f) return;
+
+    _.piped.unshift(f);
+
     const data = await getData(store.stream.id) as Piped;
+
     if (data.audioStreams)
       import('../modules/setAudioStreams')
         .then(mod => mod.setAudioStreams(

@@ -1,4 +1,4 @@
-import { createSignal, For, onMount } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { generateImageUrl } from "../lib/imageUtils";
 import { store } from "../lib/store";
 import { getData } from "../modules/getStreamData";
@@ -8,8 +8,11 @@ import { loadingScreen } from "../lib/dom";
 
 export default function WatchOnYtify() {
 
-  const [vFormats, setVF] = createSignal([] as string[][]);
-  const [aFormats, setAF] = createSignal([] as string[][]);
+  const [data, setData] = createSignal({
+    video: [] as string[][],
+    audio: [] as string[][],
+    captions: [] as Captions[]
+  });
 
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
@@ -18,29 +21,30 @@ export default function WatchOnYtify() {
   onMount(async () => {
     loadingScreen.showModal();
     const data = await getData(store.actionsMenu.id) as unknown as Piped & {
+      captions: Captions[],
       videoStreams: Record<'url' | 'type' | 'resolution', string>[]
     };
     loadingScreen.close();
 
-    setVF(data.videoStreams
-      .map(f => {
-        const codec =
-          f.type.includes('avc1') ? 'AVC' :
-            f.type.includes('av01') ? 'AV1' : 'VP9';
-        return [`${f.resolution} ${codec}`, f.url];
-      }));
-
-    setAF(
-      data.audioStreams
+    setData({
+      video: data.videoStreams
+        .map(f => {
+          const codec =
+            f.type.includes('avc1') ? 'AVC' :
+              f.type.includes('av01') ? 'AV1' : 'VP9';
+          return [`${f.resolution} ${codec}`, f.url];
+        }),
+      audio: data.audioStreams
         .filter(a => !a.url.includes('acont%3Ddubbed'))
         .map(f => {
           const codec =
             f.mimeType.includes('opus') ? 'opus' : 'M4A';
           return [`${f.quality} ${codec}`, f.url];
-        })
-    );
-
+        }),
+      captions: data.captions
+    });
   });
+
 
   return (
     <dialog
@@ -101,7 +105,21 @@ export default function WatchOnYtify() {
           }
         }}
 
-      ></video>
+      >
+        <Show when={data().captions.length}>
+          <option>Captions</option>
+          <For each={data().captions}>
+            {(v) =>
+              <track
+                src={store.api.invidious[0] + v.url}
+                srclang={v.label}
+              >
+              </track>
+            }
+          </For>
+        </Show>
+
+      </video>
 
       <div>
 
@@ -122,7 +140,7 @@ export default function WatchOnYtify() {
           onMount={() => undefined}
         >
           <option>Video</option>
-          <For each={vFormats()}>
+          <For each={data().video}>
             {(f) =>
               <option value={f[1]}>
                 {f[0]}
@@ -141,7 +159,7 @@ export default function WatchOnYtify() {
           onMount={() => undefined}
         >
           <option>Audio</option>
-          <For each={aFormats()}>
+          <For each={data().audio}>
             {(f) =>
               <option value={f[1]}>
                 {f[0] + (f[1].includes('xtags=drc') ? ' DRC' : '')}
@@ -149,6 +167,7 @@ export default function WatchOnYtify() {
             }
           </For>
         </Selector>
+
 
       </div>
     </dialog >

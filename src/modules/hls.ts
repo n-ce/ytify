@@ -30,7 +30,8 @@ export default function() {
 
     }
     else {
-      if (d.details === 'levelLoadError') return;
+      if (d.details === 'levelLoadError')
+        return;
       const hlsUrl = store.player.hls.manifests.shift();
       if (hlsUrl) {
         h.stopLoad();

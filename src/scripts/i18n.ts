@@ -9,6 +9,8 @@ const attributes = [
   '-placeholder'
 ];
 
+
+
 function attributeHandler(attr: string) {
 
   const query = 'data-translation' + attr;
@@ -30,6 +32,7 @@ function attributeHandler(attr: string) {
   });
 }
 
+
 import(`../locales/${locale}.ts`)
   .then(({ messages }) => {
 
@@ -37,3 +40,4 @@ import(`../locales/${locale}.ts`)
     attributes.forEach(attributeHandler);
 
   });
+
