@@ -152,7 +152,7 @@
   "piped_failed_token": "No Auth Token Found! Aborted Login Process.",
   "piped_success_logged": "Successfully logged in to account.",
   "updater_changelog_full": "Read all previous changes",
-  "updater_button": "Update",
+  "updater_update": "Update",
   "updater_later": "Later",
   "pwa_share_prompt": "Click ok to Play, click cancel to Download"
 }
