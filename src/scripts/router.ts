@@ -85,7 +85,7 @@ if (errorParam) {
     const query = encodeURI(_[1]);
 
     if (route === '/list')
-      query.startsWith('blob') ?
+      query.startsWith('si') ?
         fetchCollection(query.split('=')[1], true) :
         query.startsWith('supermix') ?
 

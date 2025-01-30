@@ -86,35 +86,33 @@ npm run dev -- --open
 
 ```bash
 vite v6.0.11 building for production...
-✓ 76 modules transformed.
+✓ 56 modules transformed.
 dist/manifest.webmanifest                          1.00 kB
-dist/index.html                                   16.20 kB │ gzip:   4.19 kB
+dist/index.html                                   15.98 kB │ gzip:   4.12 kB
 dist/assets/UpdatePrompt-BVWVWGFX.css              0.72 kB │ gzip:   0.40 kB
 dist/assets/ActionsMenu-CZvdWJ42.css               0.91 kB │ gzip:   0.45 kB
 dist/assets/Settings-tEADDnJ_.css                  2.25 kB │ gzip:   0.73 kB
-dist/assets/index-DiVk3L30.css                    21.04 kB │ gzip:   5.08 kB
-dist/assets/enqueueRelatedStreams-z6NfhrGD.js      0.35 kB │ gzip:   0.27 kB
-dist/assets/extractColorFromImage-gfkQnX2T.js      0.62 kB │ gzip:   0.42 kB
-dist/assets/setAudioStreams-JxcPd0s1.js            0.80 kB │ gzip:   0.55 kB
-dist/assets/setDiscoveries-CH2qE0_Z.js             0.93 kB │ gzip:   0.55 kB
-dist/assets/virtual_pwa-register-D-NEVoiB.js       0.96 kB │ gzip:   0.55 kB
-dist/assets/UpdatePrompt-CzPR-rCA.js               1.07 kB │ gzip:   0.63 kB
-dist/assets/supermix-C5RtO9r4.js                   1.11 kB │ gzip:   0.69 kB
-dist/assets/Lyrics-CW9KpzDm.js                     1.24 kB │ gzip:   0.80 kB
-dist/assets/importPipedPlaylists-D75eGkCH.js       1.27 kB │ gzip:   0.60 kB
-dist/assets/setSubtitles-RKJOGi0a.js               1.32 kB │ gzip:   0.69 kB
-dist/assets/start-Ceh-xdKG.js                      1.90 kB │ gzip:   1.05 kB
-dist/assets/partsManager-nJsZoRo2.js               1.96 kB │ gzip:   0.68 kB
-dist/assets/WatchOnYtify-BIBaXm9q.js               2.32 kB │ gzip:   1.03 kB
-dist/assets/ActionsMenu-BxRuM54s.js                4.14 kB │ gzip:   1.74 kB
+dist/assets/index--EX9VXLN.css                    20.68 kB │ gzip:   5.01 kB
+dist/assets/enqueueRelatedStreams-DdHTYd6g.js      0.35 kB │ gzip:   0.27 kB
+dist/assets/extractColorFromImage-Cxdm9n2W.js      0.62 kB │ gzip:   0.42 kB
+dist/assets/setAudioStreams-BVS_1Ljb.js            0.84 kB │ gzip:   0.56 kB
+dist/assets/setDiscoveries-TaEtEbHx.js             0.93 kB │ gzip:   0.54 kB
+dist/assets/virtual_pwa-register-CvOwgYno.js       0.96 kB │ gzip:   0.55 kB
+dist/assets/UpdatePrompt-D5n4sX3r.js               1.09 kB │ gzip:   0.62 kB
+dist/assets/supermix-BtwNGR11.js                   1.11 kB │ gzip:   0.68 kB
+dist/assets/importPipedPlaylists-B2u7XIyS.js       1.24 kB │ gzip:   0.60 kB
+dist/assets/Lyrics-zDQNW8E2.js                     1.24 kB │ gzip:   0.80 kB
+dist/assets/start-BQEMUpCE.js                      1.95 kB │ gzip:   1.06 kB
+dist/assets/partsManager-DmWC75D0.js               1.96 kB │ gzip:   0.67 kB
+dist/assets/WatchOnYtify-LiGdckDA.js               2.84 kB │ gzip:   1.22 kB
+dist/assets/ActionsMenu-BzqUfV6s.js                4.06 kB │ gzip:   1.72 kB
 dist/assets/workbox-window.prod.es5-DL_hIMXg.js    5.72 kB │ gzip:   2.36 kB
-dist/assets/en-NVVrF0VL.js                         6.37 kB │ gzip:   2.21 kB
-dist/assets/pl-CKf9Bsc3.js                         6.90 kB │ gzip:   2.77 kB
-dist/assets/Settings-Cyski7DB.js                  14.09 kB │ gzip:   4.47 kB
-dist/assets/index-DTQvjAvY.js                     97.26 kB │ gzip:  35.00 kB
-dist/assets/imsc.all.min-43NCT61c.js             153.95 kB │ gzip:  44.61 kB
-dist/assets/hls-Dp1mexXk.js                      399.79 kB │ gzip: 123.77 kB
-✓ built in 11.57s
+dist/assets/en-D06fOH0-.js                        11.19 kB │ gzip:   3.67 kB
+dist/assets/pl-D1p_NQ5j.js                        11.99 kB │ gzip:   4.26 kB
+dist/assets/Settings-CBM8jAms.js                  13.25 kB │ gzip:   4.38 kB
+dist/assets/index-pbIhJqLG.js                     89.34 kB │ gzip:  32.19 kB
+dist/assets/hls-CySapf1N.js                      399.85 kB │ gzip: 123.78 kB
+✓ built in 9.51s
 ```
 
 
