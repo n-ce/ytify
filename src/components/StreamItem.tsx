@@ -17,7 +17,6 @@ export default function StreamItem(data: {
 }) {
 
   const [getImage, setImage] = createSignal('');
-  const showImage = (store.loadImage === 'off') ? undefined : store.loadImage;
 
   let parent!: HTMLAnchorElement;
 
@@ -53,12 +52,12 @@ export default function StreamItem(data: {
 
 
 
-  if (showImage)
+  if (store.loadImage)
     setImage(generateImageUrl(data.img || data.id, 'mq'));
 
   return (
     <a
-      class={'streamItem ' + (showImage ? 'ravel' : '')}
+      class={'streamItem ' + (store.loadImage ? 'ravel' : '')}
       href={data.href}
       ref={parent}
       data-id={data.id}
@@ -69,9 +68,8 @@ export default function StreamItem(data: {
       data-thumbnail={getImage()}
     >
       <span>
-        <Show when={showImage} fallback={data.duration}>
+        <Show when={store.loadImage} fallback={data.duration}>
           <img
-            loading={showImage}
             crossorigin='anonymous'
             onerror={handleThumbnailError}
             onload={handleThumbnailLoad}

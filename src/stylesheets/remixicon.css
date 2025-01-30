@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url('/remixicon.woff2');
+  src: url("/remixicon.woff2") format("woff2");
   font-display: swap;
 }
 
@@ -18,7 +18,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 .ri-search-2-line:before {
   content: "\f0cd";
@@ -140,10 +139,6 @@
   content: "\ebbe";
 }
 
-.ri-youtube-line:before {
-  content: "\f2d5";
-}
-
 .ri-heart-line:before {
   content: "\ee0f";
 }
@@ -210,4 +205,12 @@
 
 .ri-music-2-line:before {
   content: "\ef83";
+}
+
+.ri-file-copy-line:before {
+  content: "\ecd5";
+}
+
+.ri-video-line:before {
+  content: "\f282";
 }

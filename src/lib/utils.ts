@@ -7,7 +7,7 @@ import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-
+import { json } from "../scripts/i18n";
 
 export const $ = document.createElement.bind(document);
 
@@ -17,14 +17,15 @@ export const removeSaved = localStorage.removeItem.bind(localStorage);
 
 export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
 
+export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
 export const getApi = (
   type: 'piped' | 'invidious',
   index: number = store.api.index
 ) =>
-  store.api[type][index];
-
-export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
-
+  type === 'piped' ?
+    store.api.piped.concat(store.player.hls.api)[index] :
+    store.api.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -36,9 +37,16 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
+export const i18n = (
+  key: TranslationKeys,
+  value: string = ''
+) => value ?
+    (json?.[key] || key).replace('$', value) :
+    json?.[key] || key;
+
 export function proxyHandler(url: string) {
   store.api.index = 0;
-  title.textContent = 'Inserting audio source into player...';
+  title.textContent = i18n('player_audiostreams_insert');
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
@@ -110,7 +118,6 @@ export async function getDownloadLink(id: string): Promise<string | null> {
 export async function errorHandler(
   message: string = '',
   redoAction: () => void,
-  finalAction: () => void
 ) {
 
   if (message === 'nextpage error') return;
@@ -123,7 +130,6 @@ export async function errorHandler(
     return redoAction();
   }
   notify(message);
-  finalAction();
   store.api.index = 0;
 }
 
@@ -246,5 +252,4 @@ export async function superClick(e: Event) {
     fetchList(url);
   }
 }
-
 

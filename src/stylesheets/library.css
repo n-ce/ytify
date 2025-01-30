@@ -17,6 +17,10 @@
       display: inline-flex;
       align-items: center;
 
+      &::after {
+        content: attr(aria-label);
+      }
+
       i {
         font-weight: initial;
         pointer-events: none;
@@ -61,6 +65,10 @@
 
     label {
       transition: transform 0.4s;
+
+      &::after {
+        content: attr(aria-label);
+      }
 
       &:hover {
         transform: scale(1.1);

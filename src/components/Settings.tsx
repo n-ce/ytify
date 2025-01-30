@@ -1,11 +1,9 @@
 import './Settings.css';
-import { For, Show, createSignal, onMount } from "solid-js";
-import { audio, img } from "../lib/dom";
-import { $, quickSwitch, removeSaved, save } from "../lib/utils";
-import { store, getSaved, params } from '../lib/store';
+import { createSignal, For, onMount, Show } from "solid-js";
+import { $, i18n, quickSwitch, removeSaved, save } from "../lib/utils";
+import { getSaved, params, store } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
 import { getDB, saveDB } from '../lib/libraryUtils';
-
 
 
 function ToggleSwitch(_: ToggleSwitch) {
@@ -14,7 +12,7 @@ function ToggleSwitch(_: ToggleSwitch) {
   return (
     <div class='toggleSwitch'>
       <label for={_.id}>
-        {_.name}
+        {i18n(_.name as TranslationKeys)}
       </label>
       <input
         ref={target}
@@ -35,7 +33,7 @@ export function Selector(_: Selector) {
   return (
     <span>
       <label for={_.id}>
-        {_.label}
+        {i18n(_.label as TranslationKeys)}
       </label>
       <select
         id={_.id}
@@ -72,16 +70,15 @@ export default function() {
 
         <ToggleSwitch
           id='customInstanceSwitch'
-          name='Use Custom Instance'
+          name='settings_custom_instance'
           checked={Boolean(getSaved('custom_instance_2'))}
           onClick={() => {
             const _ = 'custom_instance_2';
             if (getSaved(_))
               removeSaved(_);
             else {
-
-              const pi = prompt('Enter Piped API URL :', 'https://pipedapi.kavin.rocks');
-              const iv = prompt('Enter Invidious API URL :', 'https://invidious.fdn.fr');
+              const pi = prompt(i18n('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
+              const iv = prompt(i18n('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
 
               if (pi && iv)
                 save(_, pi + ',' + iv);
@@ -91,9 +88,31 @@ export default function() {
           }}
         />
 
+
+        <Selector
+          label='settings_language'
+          id='languageSelector'
+          onChange={(e) => {
+            const lang = e.target.value;
+            if (lang === 'en')
+              removeSaved('language');
+            else
+              save('language', lang);
+            location.reload();
+          }}
+          onMount={(target) => {
+            target.value = document.documentElement.lang;
+          }}
+        >
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
+          <option value="hi">Hindi</option>
+          <option value="sa">Sanskrit</option>
+        </Selector>
+
         <Selector
           id='linkHost'
-          label='Links Host'
+          label='settings_links_host'
           onChange={(e) => {
             e.target.selectedIndex === 0 ?
               removeSaved('linkHost') :
@@ -115,39 +134,10 @@ export default function() {
           <option value="https://viewtube.io">ViewTube</option>
         </Selector>
 
-        <Selector
-          label='Image Loading'
-          id='imgLoad'
-          onChange={(e) => {
-            const val = e.target.value;
-            val === 'eager' ?
-              removeSaved('imgLoad') :
-              save('imgLoad', val);
-            location.reload();
-          }}
-          onMount={(target) => {
-            if (location.pathname !== '/')
-              themer();
-
-            const savedImgLoad = getSaved('imgLoad');
-            if (savedImgLoad)
-              target.value = savedImgLoad;
-
-            if (target.value === 'off') {
-              img.remove();
-              themer();
-            }
-            else audio.addEventListener('loadstart', themer);
-          }}
-        >
-          <option value="eager">Eager</option>
-          <option value="lazy">Lazy</option>
-          <option value="off">Do not Load</option>
-        </Selector>
 
         <Selector
           id='downloadFormatSelector'
-          label='Download Format'
+          label='settings_download_format'
           onChange={(e) => {
             store.downloadFormat = e.target.value as 'opus';
             store.downloadFormat === 'opus' ?
@@ -165,7 +155,7 @@ export default function() {
           }}
 
         >
-          <option value='opus'>Opus (Recommended)</option>
+          <option value='opus'>Opus</option>
           <option value='mp3'>MP3</option>
           <option value='wav'>WAV</option>
           <option value='ogg'>OGG</option>
@@ -174,7 +164,7 @@ export default function() {
 
         <Selector
           id='shareAction'
-          label='PWA Share Action'
+          label='settings_pwa_share_action'
           onChange={(e) => {
             const val = e.target.value;
             if (val === 'play')
@@ -189,33 +179,23 @@ export default function() {
               target.value = val;
           }}
         >
-          <option value='play'>Play</option>
-          <option value='dl'>Download</option>
-          <option value='ask'>Always Ask</option>
+          <option value='play'>{i18n('settings_pwa_play')}</option>
+          <option value='dl'>{i18n('settings_pwa_download')}</option>
+          <option value='ask'>{i18n('settings_pwa_always_ask')}</option>
         </Selector>
-
-        <ToggleSwitch
-          id='woswitch'
-          name='Watch on ytify'
-          checked={Boolean(getSaved('watchOnYtify'))}
-          onClick={() => {
-            const _ = 'watchOnYtify';
-            getSaved(_) ?
-              removeSaved(_) :
-              save(_, 'true');
-          }}
-        />
 
       </div>
 
       <div>
+
         <b>
           <i class="ri-search-2-line"></i>
-          <p>Search</p>
+          <p>{i18n('settings_search')}</p>
         </b>
+
         <ToggleSwitch
           id="defaultFilterSongs"
-          name='Set Songs as Default Filter'
+          name='settings_set_songs_as_default_filter'
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             const _ = 'searchFilter';
@@ -225,9 +205,10 @@ export default function() {
             location.assign('/search');
           }}
         />
+
         <ToggleSwitch
           id="suggestionsSwitch"
-          name='Display Suggestions'
+          name='settings_display_suggestions'
           checked={getSaved('searchSuggestions') !== 'off'}
           onClick={() => {
             const _ = 'searchSuggestions';
@@ -242,15 +223,15 @@ export default function() {
 
 
       <div>
+
         <b>
           <i class="ri-play-large-line"></i>
-          <p>Playback</p>
+          <p>{i18n('settings_playback')}</p>
         </b>
-
 
         <ToggleSwitch
           id="qualitySwitch"
-          name='Highest Quality Audio'
+          name='settings_hq_audio'
           checked={getSaved('hq') === 'true'}
           onClick={async () => {
             getSaved('hq') ?
@@ -263,10 +244,10 @@ export default function() {
           }}
         />
 
-        <Show when={!getSaved('HLS')}>
+        <Show when={!store.player.hls.on}>
 
           <Selector
-            label='Codec Preference'
+            label='settings_codec_preference'
             id='codecPreference'
             onChange={async (e) => {
 
@@ -295,7 +276,7 @@ export default function() {
 
           <ToggleSwitch
             id="stableVolumeSwitch"
-            name='Prefer Stable Volume'
+            name='settings_stable_volume'
             checked={getSaved('stableVolume') === 'true'}
             onClick={() => {
               const _ = 'stableVolume';
@@ -308,7 +289,7 @@ export default function() {
 
           <ToggleSwitch
             id="enforceProxySwitch"
-            name='Always Proxy Streams'
+            name='settings_always_proxy_streams'
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               const _ = 'enforceProxy';
@@ -323,7 +304,7 @@ export default function() {
 
         <ToggleSwitch
           id="HLS_Switch"
-          name='HTTP Live Streaming'
+          name='settings_hls'
           checked={getSaved('HLS') === 'true'}
           onClick={() => {
             getSaved('HLS') ?
@@ -331,21 +312,20 @@ export default function() {
               save('HLS', 'true');
             location.reload();
           }}
-
         />
 
       </div>
 
       <div>
+
         <b>
           <i class="ri-stack-line"></i>
-          <p> Library</p>
+          <p>{i18n('settings_library')}</p>
         </b>
-
 
         <ToggleSwitch
           id="startupTab"
-          name='Set as Default Tab'
+          name='settings_set_as_default_tab'
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
             const _ = 'startupTab';
@@ -354,16 +334,18 @@ export default function() {
               save(_, '/library')
           }}
         />
+
         <ToggleSwitch
           id='discoverSwitch'
-          name='Store Discoveries'
+          name='settings_store_discoveries'
           checked={getSaved('discover') !== 'off'}
           onClick={e => {
             if (e.target.checked)
               removeSaved('discover');
             else {
               const db = getDB();
-              if (confirm(`This will clear your existing ${Object.keys(db.discover || {}).length || 0} discoveries, continue?`)) {
+              const count = Object.keys(db.discover || {}).length || 0;
+              if (confirm(i18n("settings_clear_discoveries", count.toString()))) {
                 delete db.discover;
                 saveDB(db);
                 save('discover', 'off');
@@ -376,20 +358,20 @@ export default function() {
 
         <ToggleSwitch
           id='historySwitch'
-          name='Store History'
+          name='settings_store_history'
           checked={getSaved('history') !== 'off'}
           onClick={e => {
             if (e.target.checked)
               removeSaved('history');
             else {
               const db = getDB();
-              if (confirm(`This will clear ${Object.keys(db.history || {}).length || 0} items from your history, continue?`)) {
+              const count = Object.keys(db.discover || {}).length || 0;
+              if (confirm(i18n("settings_clear_history", count.toString()))) {
                 delete db.history;
                 saveDB(db);
                 save('history', 'off')
               } else e.preventDefault();
             }
-
           }}
         />
 
@@ -398,18 +380,33 @@ export default function() {
             .then(mod => {
               mod.pipedPlaylistsImporter()
             })
-        }}>Import Playlists from Piped</p>
+        }}>{i18n('settings_import_from_piped')}</p>
+
 
       </div>
 
       <div>
+
         <b>
           <i class="ri-t-shirt-2-line"></i>
-          <p>Interface</p>
+          <p>{i18n('settings_interface')}</p>
         </b>
 
+        <ToggleSwitch
+          id='imgLoadSwitch'
+          name='settings_load_images'
+          checked={store.loadImage}
+          onClick={() => {
+            const _ = 'imgLoad';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'off');
+            location.reload();
+          }}
+        />
+
         <Selector
-          label='Roundness'
+          label='settings_roundness'
           id='roundnessChanger'
           onChange={(e) => {
             cssVar('--roundness', e.target.value);
@@ -424,37 +421,35 @@ export default function() {
             }
           }}
         >
-          <option value="none">None</option>
-          <option value="0.2rem">Lighter</option>
-          <option value="0.4rem" selected>Light</option>
-          <option value="0.6rem">Heavy</option>
-          <option value="0.9rem">Heavier</option>
+          <option value="none">{i18n('settings_roundness_none')}</option>
+          <option value="0.2rem">{i18n('settings_roundness_lighter')}</option>
+          <option value="0.4rem" selected>{i18n('settings_roundness_light')}</option>
+          <option value="0.6rem">{i18n('settings_roundness_heavy')}</option>
+          <option value="0.9rem">{i18n('settings_roundness_heavier')}</option>
         </Selector>
-
 
         <ToggleSwitch
           id="custom_theme"
-          name='Use Custom Color'
+          name='settings_use_custom_color'
           checked={getSaved('custom_theme') !== null}
           onClick={e => {
             const _ = 'custom_theme';
             const colorString = getSaved(_);
-            if (colorString)
-              removeSaved(_);
+
+            if (colorString) removeSaved(_);
             else {
-              const str = prompt('Enter rgb in the format r,g,b', '174,174,174');
+              const rgbText = i18n('settings_custom_color_prompt');
+              const str = prompt(rgbText, '174,174,174');
               str ?
                 save(_, str) :
                 e.preventDefault();
             }
             themer();
           }}
-
         />
 
-
         <Selector
-          label='Theming Scheme'
+          label='settings_theming_scheme'
           id='themeSelector'
           onChange={(e) => {
             themer();
@@ -466,15 +461,15 @@ export default function() {
             target.value = (getSaved('theme') as 'light' | 'dark') || 'auto';
           }}
         >
-          <optgroup label="Dynamic">
-            <option value="auto" selected>System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
+          <optgroup label={i18n('settings_theming_scheme_dynamic')}>
+            <option value="auto" selected>{i18n('settings_theming_scheme_system')}</option>
+            <option value="light">{i18n('settings_theming_scheme_light')}</option>
+            <option value="dark">{i18n('settings_theming_scheme_dark')}</option>
           </optgroup>
-          <optgroup label="High Contrast">
-            <option value="auto-hc">System</option>
-            <option value="white">White</option>
-            <option value="black">Black</option>
+          <optgroup label={i18n('settings_theming_scheme_hc')}>
+            <option value="auto-hc">{i18n('settings_theming_scheme_hc_system')}</option>
+            <option value="white">{i18n('settings_theming_scheme_white')}</option>
+            <option value="black">{i18n('settings_theming_scheme_black')}</option>
           </optgroup>
         </Selector>
 
@@ -484,20 +479,21 @@ export default function() {
               document.exitFullscreen() :
               document.documentElement.requestFullscreen();
           }
-        }>Toggle Fullscreen</p>
+        }>{i18n('settings_fullscreen')}</p>
+
       </div>
 
 
-
       <div>
+
         <b>
           <i class="ri-parent-line"></i>
-          <p>Parental Controls</p>
+          <p>{i18n('settings_parental_controls')}</p>
         </b>
 
         <ToggleSwitch
           id="kidsSwitch"
-          name='Set Up'
+          name='settings_pin_toggle'
           checked={Boolean(getSaved('kidsMode'))}
           onClick={e => {
             const savedPin = getSaved('kidsMode');
@@ -511,27 +507,25 @@ export default function() {
                 }
                 location.reload();
               } else {
-                alert('Incorrect PIN!');
+                alert(i18n('settings_pin_incorrect'));
                 e.preventDefault();
               }
               return;
             }
-
-            const pin = prompt('PIN is required to setup parental controls, after which the app will reload to integrate the parts manager.');
+            const pin = prompt(i18n('settings_pin_message'));
             if (pin) {
               save('kidsMode', pin);
               location.reload();
             }
             else e.preventDefault();
           }}
-
         />
 
         <For each={getParts()}>
           {item => (
             <ToggleSwitch
               id={'kidsMode_' + item.name}
-              name={item.name}
+              name={item.name as TranslationKeys}
               checked={!getSaved('kidsMode_' + item.name)}
               onClick={item.callback}
 
@@ -539,10 +533,7 @@ export default function() {
           )}
         </For>
 
-
       </div>
-
-
 
     </>
   );

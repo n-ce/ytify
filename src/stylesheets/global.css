@@ -139,6 +139,13 @@ a {
   --defaultText: #faf;
 }
 
+.redup {
+  --defaultBg: #550;
+  --defaultText: #ffa;
+}
+
+
+
 #queuetools,
 #listTools,
 #settings,
@@ -202,13 +209,20 @@ dialog.watcher {
   height: 100dvh;
   width: 100dvw;
   background: var(--bg);
+
   button {
     color: var(--text);
   }
+
   video {
     width: 100%;
     max-width: 100vmin;
     border-radius: var(--roundness);
+  }
+
+  select {
+    width: 7ch;
+    margin-left: 1ch;
   }
 }
 
@@ -232,6 +246,10 @@ dialog.watcher {
 
   #queuetools {
     width: calc(92% + 3vmin);
+
+    button::after {
+      content: attr(aria-label);
+    }
   }
 }
 

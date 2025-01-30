@@ -108,7 +108,7 @@
     }
   }
 
-  #selectors {
+  #playerSelectors {
     display: flex;
     width: 100%;
     justify-content: space-between;
@@ -184,33 +184,6 @@
   }
 
 }
-
-
-#subtitleContainer {
-  position: absolute;
-  pointer-events: none;
-
-  span {
-    font-size: medium !important;
-    font-family: 'Noto Sans';
-  }
-
-  div div div div {
-    border-radius: var(--roundness);
-    overflow: hidden;
-  }
-}
-
-#subtitleSelector {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0.2rem;
-  border-radius: calc(var(--roundness) / 1.4) !important;
-  background: var(--bg);
-}
-
-
 
 
 
