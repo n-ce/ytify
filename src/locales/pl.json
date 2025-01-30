@@ -92,9 +92,9 @@
   "settings_download_format": "Format pobierania",
   "settings_pwa_share_action": "Akcja udostępniania PWA",
   "settings_pwa_play": "Odtwórz",
-  "settings_image_loading": "Ładowanie obrazów",
   "settings_pwa_download": "Pobierz",
   "settings_pwa_always_ask": "Zawsze pytaj",
+  "settings_search": "Szukaj",
   "settings_set_songs_as_default_filter": "Ustaw utwory jako domyślny filtr",
   "settings_display_suggestions": "Wyświetlaj sugestie",
   "settings_playback": "Odtwarzanie",
@@ -155,6 +155,7 @@
   "piped_failed_token": "Nie znaleziono tokena uwierzytelniającego! Proces logowania przerwany.",
   "piped_success_logged": "Pomyślnie zalogowano na konto.",
   "updater_changelog_full": "Przeczytaj wszystkie poprzednie zmiany",
-  "updater_button": "Aktualizuj",
+  "updater_update": "Aktualizuj",
+  "updater_later": "Później"
   "pwa_share_prompt": "Kliknij OK, aby odtworzyć, kliknij Anuluj, aby pobrać"
 }
