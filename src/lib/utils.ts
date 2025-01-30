@@ -23,7 +23,9 @@ export const getApi = (
   type: 'piped' | 'invidious',
   index: number = store.api.index
 ) =>
-  store.api[type][index];
+  type === 'piped' ?
+    store.api.piped.concat(store.player.hls.api)[index] :
+    store.api.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -116,7 +118,6 @@ export async function getDownloadLink(id: string): Promise<string | null> {
 export async function errorHandler(
   message: string = '',
   redoAction: () => void,
-  finalAction: () => void
 ) {
 
   if (message === 'nextpage error') return;
@@ -129,7 +130,6 @@ export async function errorHandler(
     return redoAction();
   }
   notify(message);
-  finalAction();
   store.api.index = 0;
 }
 

@@ -64,7 +64,14 @@ export async function getData(
       if (index + 1 === inv.length)
         return emergency(e);
       else return useInvidious(index + 1);
-    })
+    });
+
+  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(store.api.piped[index])
+    .catch(() => {
+      if (index + 1 === inv.length)
+        return useInvidious();
+      else return usePiped(index + 1);
+    });
 
   const useHls = () => Promise
     .allSettled(hls.api.map(fetchDataFromPiped))
@@ -82,7 +89,7 @@ export async function getData(
     });
 
 
-  return hls.on ? useHls() : useInvidious();
+  return hls.on ? useHls() : store.player.usePiped ? usePiped() : useInvidious();
 
 }
 

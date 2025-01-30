@@ -320,16 +320,26 @@ export async function superCollectionLoader(name: SuperCollection) {
     const channels = Object.keys(db.channels).join(',');
     const items = await fetch(getApi('piped') + '/feed/unauthenticated?channels=' + channels)
       .then(res => res.json())
-      .catch(err => {
-        errorHandler(
+      .then(data => {
+        const current = Date.now();
+        const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+        data = data
+          .filter((i: StreamItem) => !i.isShort)
+          .filter((i: { uploaded: number }) => (current - i.uploaded) < oneWeekInMilliseconds);
+
+        if (data.length > 10)
+          return data;
+        else throw new Error('No Weekly Updates Found!');
+      })
+      .catch(async err => {
+        await errorHandler(
           err.message,
-          loadFeed,
-          () => ''
+          () => superCollectionLoader(name)
         );
       })
       .finally(() => loadingScreen.close());
 
-    return itemsLoader(items);
+    return items.length ? itemsLoader(items) : 'No Items Found'
   }
 
 

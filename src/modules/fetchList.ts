@@ -45,8 +45,7 @@ export default async function fetchList(
       }
       else errorHandler(
         mix ? 'No Mixes Found' : err.message,
-        () => fetchList(url, mix),
-        () => ''
+        () => fetchList(url, mix)
       )
     })
     .finally(() => loadingScreen.close());
