@@ -2,8 +2,7 @@ import { getSaved } from '../lib/store';
 
 const locales = ['en', 'pl', 'hi', 'sa'];
 const nl = navigator.language.slice(0, 2);
-const sl = getSaved('language');
-const locale = sl ? sl : (locales.includes(nl) ? nl : 'en');
+const locale = getSaved('language') || (locales.includes(nl) ? nl : 'en');
 document.documentElement.lang = locale;
 
 const attributes = [
