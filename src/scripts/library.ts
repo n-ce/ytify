@@ -1,6 +1,6 @@
 import { favButton, favIcon, superCollectionSelector } from "../lib/dom";
 import { addToCollection, fetchCollection, getDB, removeFromCollection, saveDB, superCollectionLoader, toCollection } from "../lib/libraryUtils";
-import { $, removeSaved, save, superClick } from "../lib/utils";
+import { $, i18n, removeSaved, save, superClick } from "../lib/utils";
 import { getSaved, store } from "../lib/store";
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
@@ -12,13 +12,12 @@ const superCollectionList = document.getElementById('superCollectionList')!;
 importBtn.addEventListener('change', async () => {
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
   const oldDB = getDB();
-  if (!confirm('This will merge your current library with the imported library, continue?')) return;
+  if (!confirm(i18n('library_import_prompt'))) return;
   for (const collection in newDB) for (const item in newDB[collection])
     toCollection(collection, newDB[collection][item], oldDB)
   saveDB(oldDB);
   location.reload();
 });
-
 
 exportBtn.addEventListener('click', () => {
   const link = $('a');
@@ -28,31 +27,25 @@ exportBtn.addEventListener('click', () => {
 });
 
 cleanBtn.addEventListener('click', () => {
-
-  if (confirm(`Are you sure you want to clear ${Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0)} items from the library?`)) {
+  const count = Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0);
+  if (confirm(i18n('library_clean_prompt', count.toString()))) {
     removeSaved('library');
     location.reload();
   }
 });
 
-
-
-
-
 // favorites button & data
 
 favButton.addEventListener('click', () => {
   if (!store.stream.id) return;
-  favButton.checked ?
-    addToCollection('favorites', store.stream) :
+
+  if (favButton.checked)
+    addToCollection('favorites', store.stream)
+  else
     removeFromCollection('favorites', store.stream.id);
 
   favIcon.classList.toggle('ri-heart-fill');
 });
-
-
-
-
 
 
 collectionContainer.addEventListener('click', e => {
@@ -81,8 +74,6 @@ const sdsc = getSaved('defaultSuperCollection');
 if (sdsc)
   document.getElementById('r.' + sdsc)?.toggleAttribute('checked');
 
-
 superCollectionList.addEventListener('click', superClick);
-
 
 

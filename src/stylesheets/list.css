@@ -1,7 +1,13 @@
 #listTools {
 
-  button::after {
-    content: attr(aria-label);
+  button {
+    i {
+      pointer-events: none;
+    }
+
+    &::after {
+      content: attr(aria-label);
+    }
   }
 
   &.playlist {

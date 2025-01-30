@@ -77,8 +77,8 @@ export default function() {
             if (getSaved(_))
               removeSaved(_);
             else {
-              const pi = prompt('settings_enter_piped_api', 'https://pipedapi.kavin.rocks');
-              const iv = prompt('settings_enter_invidious_api', 'https://iv.ggtyler.dev');
+              const pi = prompt(i18n('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
+              const iv = prompt(i18n('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
 
               if (pi && iv)
                 save(_, pi + ',' + iv);
@@ -187,10 +187,12 @@ export default function() {
       </div>
 
       <div>
+
         <b>
           <i class="ri-search-2-line"></i>
           <p>{i18n('settings_search')}</p>
         </b>
+
         <ToggleSwitch
           id="defaultFilterSongs"
           name='settings_set_songs_as_default_filter'
@@ -203,6 +205,7 @@ export default function() {
             location.assign('/search');
           }}
         />
+
         <ToggleSwitch
           id="suggestionsSwitch"
           name='settings_display_suggestions'
@@ -220,11 +223,11 @@ export default function() {
 
 
       <div>
+
         <b>
           <i class="ri-play-large-line"></i>
           <p>{i18n('settings_playback')}</p>
         </b>
-
 
         <ToggleSwitch
           id="qualitySwitch"
@@ -309,17 +312,16 @@ export default function() {
               save('HLS', 'true');
             location.reload();
           }}
-
         />
 
       </div>
 
       <div>
+
         <b>
           <i class="ri-stack-line"></i>
           <p>{i18n('settings_library')}</p>
         </b>
-
 
         <ToggleSwitch
           id="startupTab"
@@ -332,6 +334,7 @@ export default function() {
               save(_, '/library')
           }}
         />
+
         <ToggleSwitch
           id='discoverSwitch'
           name='settings_store_discoveries'
@@ -369,7 +372,6 @@ export default function() {
                 save('history', 'off')
               } else e.preventDefault();
             }
-
           }}
         />
 
@@ -384,6 +386,7 @@ export default function() {
       </div>
 
       <div>
+
         <b>
           <i class="ri-t-shirt-2-line"></i>
           <p>{i18n('settings_interface')}</p>
@@ -399,7 +402,6 @@ export default function() {
               removeSaved(_) :
               save(_, 'off');
             location.reload();
-
           }}
         />
 
@@ -426,7 +428,6 @@ export default function() {
           <option value="0.9rem">{i18n('settings_roundness_heavier')}</option>
         </Selector>
 
-
         <ToggleSwitch
           id="custom_theme"
           name='settings_use_custom_color'
@@ -434,11 +435,10 @@ export default function() {
           onClick={e => {
             const _ = 'custom_theme';
             const colorString = getSaved(_);
-            if (colorString)
-              removeSaved(_);
+
+            if (colorString) removeSaved(_);
             else {
               const rgbText = i18n('settings_custom_color_prompt');
-
               const str = prompt(rgbText, '174,174,174');
               str ?
                 save(_, str) :
@@ -446,9 +446,7 @@ export default function() {
             }
             themer();
           }}
-
         />
-
 
         <Selector
           label='settings_theming_scheme'
@@ -482,10 +480,12 @@ export default function() {
               document.documentElement.requestFullscreen();
           }
         }>{i18n('settings_fullscreen')}</p>
+
       </div>
 
 
       <div>
+
         <b>
           <i class="ri-parent-line"></i>
           <p>{i18n('settings_parental_controls')}</p>
@@ -519,7 +519,6 @@ export default function() {
             }
             else e.preventDefault();
           }}
-
         />
 
         <For each={getParts()}>
@@ -534,10 +533,7 @@ export default function() {
           )}
         </For>
 
-
       </div>
-
-
 
     </>
   );
