@@ -17,8 +17,9 @@ function showSection(id: string) {
   miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
 
   // Enables Reactivity to declare db modifications into UI
-  if (id === '/library')
-    superCollectionLoader(getSaved('defaultSuperCollection') as 'feed' || 'featured');
+  const dsc = getSaved('defaultSuperCollection') as 'feed' || 'featured';
+  if (id === '/library' && dsc !== 'feed')
+    superCollectionLoader(dsc);
 
   sections[routeIdx].classList.add('view');
   const a = anchors[routeIdx];

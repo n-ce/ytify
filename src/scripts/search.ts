@@ -36,11 +36,7 @@ function searchLoader() {
 
       if (err.message === 'nextpage error') return;
 
-      errorHandler(
-        err.message,
-        searchLoader,
-        () => ''
-      )
+      errorHandler(err.message, searchLoader);
     })
     .finally(() => loadingScreen.close());
 
@@ -74,13 +70,7 @@ superInput.addEventListener('input', async () => {
 
   const fetchSuggestions = async () => fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text)
     .then(res => res.json())
-    .catch(() =>
-      errorHandler(
-        '',
-        fetchSuggestions,
-        () => ''
-      )
-    );
+    .catch(e => errorHandler(e.message, fetchSuggestions));
 
   const data = (await fetchSuggestions())[1];
 

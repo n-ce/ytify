@@ -61,7 +61,7 @@ superCollectionSelector.addEventListener('click', e => {
   const elm = e.target as HTMLInputElement & { value: SuperCollection };
   if (!elm.value) return;
 
-  if (elm.value !== 'for_you') {
+  if (elm.value !== 'for_you' && elm.value !== 'feed') {
     elm.value === 'featured' ?
       removeSaved('defaultSuperCollection') :
       save('defaultSuperCollection', elm.value);
