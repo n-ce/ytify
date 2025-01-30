@@ -111,13 +111,12 @@ function themer() {
   const initColor = '127,127,127';
   const custom = getSaved('custom_theme') || (store.player.legacy ? initColor : '');
 
-  store.loadImage && store.stream.id && !custom ?
-
+  if (store.loadImage && store.stream.id && !custom)
     import('../modules/extractColorFromImage')
       .then(mod => mod.extractColorFromImage)
       .then(e => e(generateImageUrl(store.stream.id, 'mq'), !store.player.legacy))
-      .then(colorInjector) :
-
+      .then(colorInjector);
+  else
     colorInjector(
       (custom || initColor)
         .split(',')

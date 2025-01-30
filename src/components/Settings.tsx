@@ -94,8 +94,9 @@ export default function() {
           id='languageSelector'
           onChange={(e) => {
             const lang = e.target.value;
-            lang === 'en' ?
-              removeSaved('language') :
+            if (lang === 'en')
+              removeSaved('language');
+            else
               save('language', lang);
             location.reload();
           }}

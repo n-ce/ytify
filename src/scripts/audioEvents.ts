@@ -29,13 +29,14 @@ function updatePositionState() {
 }
 
 
-
 playButton.onclick = function() {
-  store.stream.id &&
-    store.player.playbackState === 'playing' ?
-    audio.pause() :
+  if (
+    store.stream.id &&
+    store.player.playbackState === 'playing'
+  )
+    audio.pause();
+  else
     audio.play();
-
 }
 
 

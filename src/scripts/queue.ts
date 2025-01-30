@@ -153,8 +153,9 @@ if (getSaved('enqueueRelatedStreams') === 'on')
 
 
 allowDuplicatesBtn.addEventListener('click', () => {
-  allowDuplicatesBtn.classList.contains('redup') ?
-    removeSaved('allowDuplicates') :
+  if (allowDuplicatesBtn.classList.contains('redup'))
+    removeSaved('allowDuplicates')
+  else
     save('allowDuplicates', 'true');
   allowDuplicatesBtn.classList.toggle('redup');
 });

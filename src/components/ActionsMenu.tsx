@@ -115,8 +115,9 @@ export default function() {
 
           <li tabindex={6} on:click={() => {
             close();
-            getSaved('linkHost') ?
-              open(hostResolver('/watch?v=' + store.actionsMenu.id)) :
+            if (getSaved('linkHost'))
+              open(hostResolver('/watch?v=' + store.actionsMenu.id));
+            else
               render(WatchOnYtify, document.body);
           }}>
             <i class="ri-video-line"></i>{i18n('actions_menu_watch_on', store.linkHost.slice(8))}
