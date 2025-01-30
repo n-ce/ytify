@@ -28,7 +28,7 @@ export const store: {
     hyperpipe: string,
     index: number
   },
-  loadImage: 'off' | 'lazy' | 'eager',
+  loadImage: boolean,
   linkHost: string,
   searchQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
@@ -72,7 +72,7 @@ export const store: {
     hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },
-  loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
+  loadImage: getSaved('imgLoad') !== 'off',
   linkHost: getSaved('linkHost') || location.origin,
   searchQuery: '',
   superCollectionType: 'featured',

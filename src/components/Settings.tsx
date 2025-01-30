@@ -1,6 +1,5 @@
 import './Settings.css';
 import { createSignal, For, onMount, Show } from "solid-js";
-import { audio, img } from "../lib/dom";
 import { $, i18n, quickSwitch, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
@@ -133,35 +132,6 @@ export default function() {
           <option value="https://viewtube.io">ViewTube</option>
         </Selector>
 
-        <Selector
-          label='settings_image_loading'
-          id='imgLoad'
-          onChange={(e) => {
-            const val = e.target.value;
-            val === 'eager' ?
-              removeSaved('imgLoad') :
-              save('imgLoad', val);
-            location.reload();
-          }}
-          onMount={(target) => {
-            if (location.pathname !== '/')
-              themer();
-
-            const savedImgLoad = getSaved('imgLoad');
-            if (savedImgLoad)
-              target.value = savedImgLoad;
-
-            if (target.value === 'off') {
-              img.remove();
-              themer();
-            }
-            else audio.addEventListener('loadstart', themer);
-          }}
-        >
-          <option value="eager">{i18n('settings_image_eager')}</option>
-          <option value="lazy">{i18n('settings_image_lazy')}</option>
-          <option value="off">{i18n('settings_image_off')}</option>
-        </Selector>
 
         <Selector
           id='downloadFormatSelector'
@@ -416,6 +386,20 @@ export default function() {
           <i class="ri-t-shirt-2-line"></i>
           <p>{i18n('settings_interface')}</p>
         </b>
+
+        <ToggleSwitch
+          id='imgLoadSwitch'
+          name='settings_load_images'
+          checked={store.loadImage}
+          onClick={() => {
+            const _ = 'imgLoad';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, 'off');
+            location.reload();
+
+          }}
+        />
 
         <Selector
           label='settings_roundness'

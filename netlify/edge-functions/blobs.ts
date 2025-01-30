@@ -32,7 +32,7 @@ export default async (req: Request, context: Context) => {
     });
 
     const id = now.toString();
-    const link = context.url.origin + '/list?blob=' + id;
+    const link = context.url.origin + '/list?si=' + id;
 
     await _.setJSON(id, data);
 

@@ -82,7 +82,7 @@ export default async function() {
 
 
   const collection = params.get('collection');
-  const shared = params.get('blob');
+  const shared = params.get('si');
   const supermix = params.get('supermix');
 
   fetchCollection(collection || shared, Boolean(shared));

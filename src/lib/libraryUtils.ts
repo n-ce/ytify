@@ -114,7 +114,7 @@ export async function fetchCollection(
   listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
-    (shared ? '?blob=' : '?collection=') + id
+    (shared ? '?si=' : '?collection=') + id
   );
   document.title = (shared ? 'Shared Collection' : id) + ' - ytify';
 
