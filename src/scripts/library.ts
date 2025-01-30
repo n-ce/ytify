@@ -3,8 +3,6 @@ import { addToCollection, fetchCollection, getDB, removeFromCollection, saveDB, 
 import { $, removeSaved, save, superClick } from "../lib/utils";
 import { getSaved, store } from "../lib/store";
 
-
-
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;

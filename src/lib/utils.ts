@@ -7,8 +7,7 @@ import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { i18n } from "@lingui/core";
-
+import { json } from "../scripts/i18n";
 
 export const $ = document.createElement.bind(document);
 
@@ -17,6 +16,13 @@ export const save = localStorage.setItem.bind(localStorage);
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
 export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
+
+export const i18n = (key: TranslationKeys, value: string = '') => {
+  return json ? (value ?
+    json[key].replace('$', value)
+    : json[key] || key)
+    : key;
+}
 
 export const getApi = (
   type: 'piped' | 'invidious',
@@ -39,7 +45,7 @@ export const hostResolver = (url: string) =>
 
 export function proxyHandler(url: string) {
   store.api.index = 0;
-  title.textContent = i18n._('player_audiostreams_insert');
+  title.textContent = i18n('player_audiostreams_insert');
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
@@ -247,5 +253,4 @@ export async function superClick(e: Event) {
     fetchList(url);
   }
 }
-
 

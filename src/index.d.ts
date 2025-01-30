@@ -66,14 +66,14 @@ declare global {
   }
 
   type ToggleSwitch = {
-    name: string
+    name: TranslationKeys | string,
     id: string,
     checked: boolean,
     onClick: (e: EventHandler<HTMLInputElement>) => void
   }
 
   type Selector = {
-    label: string,
+    label: TranslationKeys | string,
     id: string,
     onChange: (e: { target: HTMLSelectElement }) => void,
     onMount: (target: HTMLSelectElement) => void,
@@ -135,7 +135,7 @@ declare global {
 
 
 
-  type TranslationKeys = Record<
+  type TranslationKeys =
     | 'nav_search'
     | 'nav_library'
     | 'nav_settings'
@@ -292,9 +292,9 @@ declare global {
     | 'piped_failed_token'
     | 'piped_success_logged'
     | 'updater_changelog_full'
-    | 'updater_button'
-    | 'pwa_share_prompt'
-    , string>;
+    | 'updater_update'
+    | 'updater_later'
+    | 'pwa_share_prompt';
 
 
 }

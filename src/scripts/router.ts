@@ -10,7 +10,6 @@ const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorEleme
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 
-
 let prevPageIdx = routes.indexOf(location.pathname);
 
 function showSection(id: string) {

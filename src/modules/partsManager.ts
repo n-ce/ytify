@@ -1,6 +1,5 @@
-import { i18n } from "@lingui/core";
 import { getSaved } from "../lib/store";
-import { removeSaved, save } from "../lib/utils";
+import { i18n, removeSaved, save } from "../lib/utils";
 
 
 export const partsManager = (): {
@@ -111,11 +110,11 @@ function toggle(part: string, e: Event | undefined = undefined) {
 
   const id = e?.target?.id;
   if (id) {
-    const askpin = prompt(i18n._('settings_pin_prompt'));
+    const askpin = prompt(i18n('settings_pin_prompt'));
     if (!askpin) return e?.preventDefault();
     if (getSaved('kidsMode') !== askpin) {
       e?.preventDefault();
-      return alert(i18n._('settings_pin_incorrect'))
+      return alert(i18n('settings_pin_incorrect'))
     }
     lsHandler(id);
   }

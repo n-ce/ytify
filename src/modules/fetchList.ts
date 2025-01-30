@@ -1,15 +1,14 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
+import { i18n, errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
-import { i18n } from "@lingui/core";
 
 export default async function fetchList(
   url: string | undefined,
   mix = false
 ) {
   if (!url)
-    return notify(i18n._('fetchlist_url_null'));
+    return notify(i18n('fetchlist_url_null'));
 
 
   loadingScreen.showModal();
@@ -37,9 +36,9 @@ export default async function fetchList(
     })
     .catch(err => {
       if (err.message === 'Could not get playlistData')
-        notify(i18n._('fetchlist_error'));
+        notify(i18n('fetchlist_error'));
       else if (err.message === 'Got error: "The playlist does not exist."') {
-        notify(i18n._('fetch_nonexistent'));
+        notify(i18n('fetchlist_nonexistent'));
         const db = getDB();
         delete db.playlists[url.slice(11)];
         saveDB(db);

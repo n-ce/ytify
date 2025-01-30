@@ -1,5 +1,5 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, getDownloadLink, hostResolver } from "../lib/utils";
+import { $, i18n, getDownloadLink, hostResolver } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { getSaved, store } from "../lib/store";
@@ -7,7 +7,6 @@ import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { createSignal, lazy, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
-import { i18n } from "@lingui/core";
 
 declare module "solid-js" {
   namespace JSX {
@@ -25,7 +24,6 @@ actionsMenu.onclick = close;
 
 const WatchOnYtify = lazy(() => import('./WatchOnYtify'));
 const Lyrics = lazy(() => import('./Lyrics.tsx'));
-const host = store.linkHost.substring(8);
 
 export default function() {
 
@@ -44,14 +42,14 @@ export default function() {
         appendToQueuelist(store.actionsMenu, true);
         close();
       }}>
-        <i class="ri-skip-forward-line"></i>{i18n._('actions_menu_play_next')}
+        <i class="ri-skip-forward-line"></i>{i18n('actions_menu_play_next')}
       </li>
 
       <li tabindex={1} on:click={() => {
         appendToQueuelist(store.actionsMenu);
         close();
       }}>
-        <i class="ri-list-check-2"></i>{i18n._('actions_menu_enqueue')}
+        <i class="ri-list-check-2"></i>{i18n('actions_menu_enqueue')}
       </li>
 
       <CollectionSelector collection={store.actionsMenu} close={close} />
@@ -62,7 +60,7 @@ export default function() {
           close();
           fetchList('/playlists/RD' + store.actionsMenu.id, true);
         }}>
-          <i class="ri-radio-line"></i>{i18n._('actions_menu_start_radio')}
+          <i class="ri-radio-line"></i>{i18n('actions_menu_start_radio')}
         </li>
       </Show>
 
@@ -77,7 +75,7 @@ export default function() {
         }
         loadingScreen.close();
       }}>
-        <i class="ri-download-2-fill"></i>{i18n._('actions_menu_download')}
+        <i class="ri-download-2-fill"></i>{i18n('actions_menu_download')}
       </li>
 
       <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
@@ -96,7 +94,7 @@ export default function() {
         }}>
 
           <i class="ri-user-line"></i>
-          {i18n._(isMusic() ?
+          {i18n(isMusic() ?
             'actions_menu_view_artist' :
             'actions_menu_view_channel')
           }
@@ -110,7 +108,7 @@ export default function() {
             render(Lyrics, document.body);
           }
         }>
-          <i class="ri-music-2-line"></i>{i18n._('actions_menu_view_lyrics')}
+          <i class="ri-music-2-line"></i>{i18n('actions_menu_view_lyrics')}
         </li> :
 
         <Show when={!getSaved('kidsMode_Watch On Button')}>
@@ -121,7 +119,7 @@ export default function() {
               open(hostResolver('/watch?v=' + store.actionsMenu.id)) :
               render(WatchOnYtify, document.body);
           }}>
-            <i class="ri-video-line"></i>{i18n._('actions_menu_watch_on', { host })}
+            <i class="ri-video-line"></i>{i18n('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>
 
         </Show>
@@ -149,7 +147,7 @@ export default function() {
         }, document.body);
 
       }}>
-        <i class="ri-bug-line"></i>{i18n._('actions_menu_debug_info')}
+        <i class="ri-bug-line"></i>{i18n('actions_menu_debug_info')}
       </li>
 
     </ul>

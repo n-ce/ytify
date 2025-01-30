@@ -1,10 +1,9 @@
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
+import { $, getDownloadLink, i18n, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
-import { i18n } from '@lingui/core';
 
 export default async function() {
 
@@ -52,7 +51,7 @@ export default async function() {
   const id = params.get('s') || isPWA;
   let shareAction = getSaved('shareAction');
   if (isPWA && shareAction === 'ask')
-    shareAction = confirm(i18n._('pwa_share_prompt')) ?
+    shareAction = confirm(i18n('pwa_share_prompt')) ?
       '' : 'dl';
 
   if (id) {

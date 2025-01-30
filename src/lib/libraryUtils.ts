@@ -2,7 +2,6 @@ import { $, errorHandler, getApi, goTo, itemsLoader, notify, renderDataIntoFragm
 import { listBtnsContainer, listContainer, listSection, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 
-
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');

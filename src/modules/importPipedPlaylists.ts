@@ -1,16 +1,15 @@
-import { i18n } from "@lingui/core";
 import { addListToCollection, createCollection, superCollectionLoader } from "../lib/libraryUtils";
-import { convertSStoHHMMSS, notify } from "../lib/utils";
+import { i18n, convertSStoHHMMSS, notify } from "../lib/utils";
 
 export async function pipedPlaylistsImporter() {
 
-  const instance = prompt(i18n._('piped_enter_auth'), 'https://pipedapi.kavin.rocks');
+  const instance = prompt(i18n('piped_enter_auth'), 'https://pipedapi.kavin.rocks');
   if (!instance) return;
 
-  const username = prompt(i18n._('piped_enter_username'));
+  const username = prompt(i18n('piped_enter_username'));
   if (!username) return;
 
-  const password = prompt(i18n._('piped_enter_password'));
+  const password = prompt(i18n('piped_enter_password'));
   if (!password) return;
 
   // login 
@@ -19,14 +18,14 @@ export async function pipedPlaylistsImporter() {
     body: JSON.stringify({ username, password })
   })
     .then(res => res.json())
-    .catch(e => notify(i18n._("piped_failed_login", { e })));
+    .catch(e => notify(i18n("piped_failed_login", e)));
 
   if (!authId) {
-    notify(i18n._("piped_failed_token"));
+    notify(i18n("piped_failed_token"));
     return;
   }
 
-  notify(i18n._("piped_success_logged"));
+  notify(i18n("piped_success_logged"));
 
   // fetch
   const playlists = await fetch(instance + '/user/playlists', {
@@ -34,9 +33,9 @@ export async function pipedPlaylistsImporter() {
       Authorization: authId.token
     }
   }).then(res => res.json())
-    .catch(e => notify(i18n._("piped_failed_find", { e })));
+    .catch(e => notify(i18n("piped_failed_find", e)));
   if (playlists.length)
-    notify(i18n._("piped_success_fetched"));
+    notify(i18n("piped_success_fetched"));
   else return;
 
 
@@ -64,10 +63,10 @@ export async function pipedPlaylistsImporter() {
         addListToCollection(listTitle, list);
       })
   )).then(() => {
-    notify(i18n._('piped_success_imported'));
+    notify(i18n('piped_success_imported'));
   })
     .catch(e => {
-      notify(i18n._("piped_failed_imported", { e }));
+      notify(i18n("piped_failed_imported", e));
     });
 
   superCollectionLoader('collections');
@@ -80,7 +79,7 @@ export async function pipedPlaylistsImporter() {
       Authorization: authId.token
     }
   }).then(res => {
-    notify(i18n._(
+    notify(i18n(
       res.ok ?
         'piped_success_auth' :
         'piped_failed_auth'

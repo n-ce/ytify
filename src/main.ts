@@ -1,10 +1,10 @@
 import './stylesheets/global.css';
+import './scripts/i18n';
 import './scripts/router';
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
 import './scripts/library';
-import './scripts/i18n.ts';
 import { render } from 'solid-js/web';
 import { actionsMenu } from './lib/dom';
 
@@ -34,4 +34,3 @@ addEventListener('DOMContentLoaded', async () => {
     });
 
 })
-

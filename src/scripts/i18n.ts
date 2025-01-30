@@ -1,7 +1,11 @@
-import { i18n } from "@lingui/core";
-import { getSaved } from "../lib/store";
+import { getSaved } from '../lib/store';
 
-const locale = getSaved('language') || 'en';
+const locales = ['en', 'pl'];
+const nl = navigator.language.slice(0, 2);
+const sl = getSaved('language');
+const locale = sl ? sl : locales.includes(nl) ? nl : 'en';
+document.documentElement.lang = locale;
+
 const attributes = [
   '',
   '-label',
@@ -9,35 +13,34 @@ const attributes = [
   '-placeholder'
 ];
 
+let json: Record<TranslationKeys, string> | undefined;;
 
+import(`../locales/${locale}.json`)
+  .then(_ => {
+    json = _.default;
+    attributes.forEach(attributeHandler);
+  });
 
 function attributeHandler(attr: string) {
 
   const query = 'data-translation' + attr;
 
   document.querySelectorAll(`[${query}]`).forEach(el => {
+    const translationKey = el.getAttribute(query) as TranslationKeys;
 
-    const translationKey = el.getAttribute(query);
+    if (!translationKey || !json) return;
 
-    if (translationKey)
-      if (attr) {
-        el.removeAttribute(query);
-        el.setAttribute(
-          attr.substring(1),
-          i18n._(translationKey)
-        );
-      }
-      else el.textContent = i18n._(translationKey);
+    const translationVal = json[translationKey] || translationKey;
 
+    if (attr) {
+      el.removeAttribute(query);
+      el.setAttribute(
+        attr.substring(1),
+        translationVal
+      );
+    }
+    else el.textContent = translationVal;
   });
 }
 
-
-import(`../locales/${locale}.ts`)
-  .then(({ messages }) => {
-
-    i18n.loadAndActivate({ locale, messages });
-    attributes.forEach(attributeHandler);
-
-  });
-
+export { json };

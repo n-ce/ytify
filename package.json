@@ -9,13 +9,11 @@
     "update": "npx npm-check-updates -u"
   },
   "dependencies": {
-    "@lingui/core": "^5.1.2",
     "hls.js": "^1.5.20",
     "solid-js": "^1.9.4",
     "sortablejs": "^1.15.6"
   },
   "devDependencies": {
-    "@lingui/vite-plugin": "^5.1.2",
     "@netlify/blobs": "^8.1.0",
     "@netlify/edge-functions": "^2.11.1",
     "@types/node": "^22.12.0",
@@ -28,21 +26,6 @@
     "vite": "^6.0.11",
     "vite-plugin-pwa": "^0.21.1",
     "vite-plugin-solid": "^2.11.0"
-  },
-  "lingui": {
-    "locales": [
-      "en",
-      "pl"
-    ],
-    "sourceLocale": "en",
-    "catalogs": [
-      {
-        "path": "src/locales/{locale}",
-        "include": [
-          "src"
-        ]
-      }
-    ]
   },
   "browserslist": [
     "defaults"

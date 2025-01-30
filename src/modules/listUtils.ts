@@ -1,9 +1,8 @@
-import { i18n } from "@lingui/core";
 import { listContainer, loadingScreen, subscribeListBtn } from "../lib/dom";
 import { getThumbIdFromLink } from "../lib/imageUtils";
 import { addListToCollection, createCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { store } from "../lib/store";
-import { notify } from "../lib/utils";
+import { i18n, notify } from "../lib/utils";
 
 export function subscribeList(db: Library) {
   const l = store.list;
@@ -33,7 +32,7 @@ export function subscribeList(db: Library) {
 
 export function importList() {
 
-  const listTitle = prompt(i18n._('list_set_title'), store.list.name);
+  const listTitle = prompt(i18n('list_set_title'), store.list.name);
 
   if (!listTitle) return;
 
@@ -55,7 +54,7 @@ export function importList() {
     });
 
   addListToCollection(listTitle, list);
-  notify(i18n._('list_imported', { listTitle }));
+  notify(i18n('list_imported', listTitle));
 }
 
 export function shareCollection(data: Collection) {
