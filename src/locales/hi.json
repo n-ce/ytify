@@ -10,6 +10,7 @@
   "player_now_playing": "अभी चल रहा है",
   "player_channel": "चैनल",
   "player_volume": "आवाज़",
+  "player_like": "अच्छा लगा"
   "player_loop": "दोहराएं",
   "player_more": "और",
   "player_play_button": "चलाएं",
@@ -55,6 +56,8 @@
   "library_import": "आयात करें",
   "library_export": "निर्यात करें",
   "library_clean": "साफ करें",
+  "library_clean_prompt": "क्या आप वाकई लाइब्रेरी से $ आइटम साफ़ करना चाहते हैं?",
+  "library_import_prompt": "यह आपकी वर्तमान लाइब्रेरी को आयातित लाइब्रेरी के साथ मिला देगा, जारी रखें?"
   "list_play": "चलाएं",
   "list_enqueue": "कतार में जोड़ें",
   "list_import": "आयात करें",
