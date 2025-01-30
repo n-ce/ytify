@@ -106,6 +106,7 @@ export default function() {
           <option value="en">English</option>
           <option value="pl">Polski</option>
           <option value="hi">Hindi</option>
+          <option value="sa">Sanskrit</option>
         </Selector>
 
         <Selector
