@@ -93,26 +93,26 @@ dist/assets/UpdatePrompt-BVWVWGFX.css              0.72 kB │ gzip:   0.40 kB
 dist/assets/ActionsMenu-CZvdWJ42.css               0.91 kB │ gzip:   0.45 kB
 dist/assets/Settings-tEADDnJ_.css                  2.25 kB │ gzip:   0.73 kB
 dist/assets/index--EX9VXLN.css                    20.68 kB │ gzip:   5.01 kB
-dist/assets/enqueueRelatedStreams-DS0_4z7V.js      0.35 kB │ gzip:   0.27 kB
-dist/assets/extractColorFromImage-D8FZNvse.js      0.62 kB │ gzip:   0.42 kB
-dist/assets/setAudioStreams-DZ1YBCps.js            0.84 kB │ gzip:   0.57 kB
-dist/assets/setDiscoveries-CNw60DXZ.js             0.93 kB │ gzip:   0.55 kB
-dist/assets/virtual_pwa-register-Boq_uO0b.js       0.96 kB │ gzip:   0.55 kB
-dist/assets/UpdatePrompt-eYz8QjKP.js               1.09 kB │ gzip:   0.63 kB
-dist/assets/supermix-CNWj1vYs.js                   1.11 kB │ gzip:   0.69 kB
-dist/assets/importPipedPlaylists-RGb3cGBv.js       1.24 kB │ gzip:   0.60 kB
-dist/assets/Lyrics-DvHKHrFb.js                     1.24 kB │ gzip:   0.80 kB
-dist/assets/start-Dg_GxosS.js                      1.95 kB │ gzip:   1.06 kB
-dist/assets/partsManager-BiwwKQIJ.js               1.96 kB │ gzip:   0.67 kB
-dist/assets/WatchOnYtify-DTI_O1dT.js               2.84 kB │ gzip:   1.22 kB
-dist/assets/ActionsMenu-DGjHWFL4.js                4.06 kB │ gzip:   1.72 kB
+dist/assets/enqueueRelatedStreams-DdHTYd6g.js      0.35 kB │ gzip:   0.27 kB
+dist/assets/extractColorFromImage-Cxdm9n2W.js      0.62 kB │ gzip:   0.42 kB
+dist/assets/setAudioStreams-BVS_1Ljb.js            0.84 kB │ gzip:   0.56 kB
+dist/assets/setDiscoveries-TaEtEbHx.js             0.93 kB │ gzip:   0.54 kB
+dist/assets/virtual_pwa-register-CvOwgYno.js       0.96 kB │ gzip:   0.55 kB
+dist/assets/UpdatePrompt-D5n4sX3r.js               1.09 kB │ gzip:   0.62 kB
+dist/assets/supermix-BtwNGR11.js                   1.11 kB │ gzip:   0.68 kB
+dist/assets/importPipedPlaylists-B2u7XIyS.js       1.24 kB │ gzip:   0.60 kB
+dist/assets/Lyrics-zDQNW8E2.js                     1.24 kB │ gzip:   0.80 kB
+dist/assets/start-BQEMUpCE.js                      1.95 kB │ gzip:   1.06 kB
+dist/assets/partsManager-DmWC75D0.js               1.96 kB │ gzip:   0.67 kB
+dist/assets/WatchOnYtify-LiGdckDA.js               2.84 kB │ gzip:   1.22 kB
+dist/assets/ActionsMenu-BzqUfV6s.js                4.06 kB │ gzip:   1.72 kB
 dist/assets/workbox-window.prod.es5-DL_hIMXg.js    5.72 kB │ gzip:   2.36 kB
-dist/assets/en-dfDkdZDM.js                        11.38 kB │ gzip:   3.72 kB
+dist/assets/en-D06fOH0-.js                        11.19 kB │ gzip:   3.67 kB
 dist/assets/pl-D1p_NQ5j.js                        11.99 kB │ gzip:   4.26 kB
-dist/assets/Settings-W2kRASXw.js                  13.58 kB │ gzip:   4.44 kB
-dist/assets/index-B7PLkXEw.js                     89.41 kB │ gzip:  32.21 kB
-dist/assets/hls-CSn0glv3.js                      399.85 kB │ gzip: 123.78 kB
-✓ built in 9.89s
+dist/assets/Settings-CBM8jAms.js                  13.25 kB │ gzip:   4.38 kB
+dist/assets/index-pbIhJqLG.js                     89.34 kB │ gzip:  32.19 kB
+dist/assets/hls-CySapf1N.js                      399.85 kB │ gzip: 123.78 kB
+✓ built in 9.51s
 ```
 
 
