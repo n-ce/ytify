@@ -3,6 +3,7 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
 [![Telegram Members](https://img.shields.io/endpoint?style=flat&url=https://mogyo.ro/quart-apis/tgmembercount?chat_id=ytifytg)](https://t.me/ytifytg)
+[![Telegram Online](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fytifytg)](https://t.me/ytifytg)
 [![Matrix](https://img.shields.io/matrix/ytify:matrix.org?label=Matrix)](https://matrix.to/#/#ytify:matrix.org)
 
 </div>
@@ -115,7 +116,9 @@ dist/assets/hls-CySapf1N.js                      399.85 kB │ gzip: 123.78 kB
 ✓ built in 9.51s
 ```
 
-
+## Translations 🗺️
+[![Translation status](https://hosted.weblate.org/widget/ytify/multi-auto.svg)](https://hosted.weblate.org/engage/ytify/)
+Gracefully powered by [Weblate](https://hosted.weblate.org/projects/ytify/web) Libre Hosting.
  
 ## Acknowledgements 🙏
 - [Uma](https://github.com/n-ce/Uma) - Instances Manager
