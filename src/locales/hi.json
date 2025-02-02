@@ -143,7 +143,7 @@
     "settings_export": "सेटिंग्स निर्यात करें",
     "settings_import": "सेटिंग्स आयात करें",
     "piped_enter_auth": "Piped प्रमाणीकरण इंस्टेंस API URL दर्ज करें :",
-    "piped_enter_username": "उपयोगकर्ता नाम दर्ज करें: ",
+    "piped_enter_username": "उपयोगकर्ता नाम दर्ज करें:",
     "piped_enter_password": "पासवर्ड",
     "piped_success_auth": "आपके piped खाते से सफलतापूर्वक लॉग आउट हो गया।",
     "piped_failed_auth": "लॉगआउट सफल नहीं हो सका",
