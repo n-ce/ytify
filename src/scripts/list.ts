@@ -1,6 +1,6 @@
 import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver, renderDataIntoFragment } from '../lib/utils';
+import { hostResolver, i18n, renderDataIntoFragment } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
 import { getDB, saveDB } from '../lib/libraryUtils';
@@ -58,7 +58,7 @@ listBtnsContainer.addEventListener('click', async e => {
   else if (btn === deleteCollectionBtn) {
     if (!db) return;
 
-    if (!confirm('Are you sure you want to delete the collection ' + id + ' ?'))
+    if (!confirm(i18n('list_prompt_delete', id)))
       return;
     atcOption.remove();
     delete db[id];
@@ -66,7 +66,7 @@ listBtnsContainer.addEventListener('click', async e => {
     history.back();
   }
   else if (btn === clearListBtn) {
-    if (!confirm('Are you sure you want to clear ' + id + ' ?'))
+    if (!confirm(i18n('list_prompt_clear', id)))
       return;
     delete db[id];
     saveDB(db);
@@ -74,7 +74,7 @@ listBtnsContainer.addEventListener('click', async e => {
   }
   else if (btn === renameCollectionBtn) {
 
-    const newTitle = prompt('Enter the new title', id)?.trim();
+    const newTitle = prompt(i18n('list_prompt_rename'), id)?.trim();
     if (!newTitle) return;
     atcOption.text = newTitle;
     atcOption.value = newTitle;

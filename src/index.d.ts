@@ -1,4 +1,9 @@
+import type en from './locales/en.json';
+
 declare global {
+
+  type TranslationKeys = keyof typeof en;
+
 
   type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
 
