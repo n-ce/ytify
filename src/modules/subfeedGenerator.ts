@@ -4,7 +4,6 @@ import { store } from "../lib/store";
 export default async function(channels: string[]) {
 
   loadingScreen.showModal();
-  store.api.index = 0;
 
   const apis = store.api.piped.concat(store.player.hls.api);
   const current = Date.now();

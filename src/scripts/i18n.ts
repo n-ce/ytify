@@ -1,6 +1,5 @@
 import { getSaved } from '../lib/store';
 
-
 const nl = navigator.language.slice(0, 2);
 const locale = getSaved('language') || (Locales.includes(nl) ? nl : 'en');
 document.documentElement.lang = locale;
