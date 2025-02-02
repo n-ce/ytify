@@ -58,7 +58,7 @@ listBtnsContainer.addEventListener('click', async e => {
   else if (btn === deleteCollectionBtn) {
     if (!db) return;
 
-    if (!confirm('Are you sure you want to delete the collection  ' + id + ' ?'))
+    if (!confirm('Are you sure you want to delete the collection ' + id + ' ?'))
       return;
     atcOption.remove();
     delete db[id];

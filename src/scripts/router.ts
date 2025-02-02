@@ -3,7 +3,7 @@ import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
-import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
+import { fetchCollection } from "../lib/libraryUtils";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
@@ -15,11 +15,6 @@ let prevPageIdx = routes.indexOf(location.pathname);
 function showSection(id: string) {
   const routeIdx = routes.indexOf(id);
   miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
-
-  // Enables Reactivity to declare db modifications into UI
-  const dsc = getSaved('defaultSuperCollection') as 'feed' || 'featured';
-  if (id === '/library' && dsc !== 'feed')
-    superCollectionLoader(dsc);
 
   sections[routeIdx].classList.add('view');
   const a = anchors[routeIdx];
@@ -74,7 +69,7 @@ nav.addEventListener('click', (e: Event) => {
 
 
 // load section if name found in address else load library
-let route: string;
+let route: Routes | string;
 const errorParam = params.get('e');
 
 if (errorParam) {
@@ -82,7 +77,7 @@ if (errorParam) {
   if (errorParam.includes('?')) {
 
     const _ = errorParam.split('?');
-    route = _[0];
+    route = _[0] as Routes;
     const query = encodeURI(_[1]);
 
     if (route === '/list')
@@ -117,10 +112,10 @@ else {
 
 // necessary to use a click event 
 
-goTo(route);
+goTo(route as Routes);
 
 ytifyIcon.addEventListener('click', () => {
-  goTo(getSaved('startupTab') || '/search');
+  goTo(getSaved('startupTab') as '/' || '/search');
 });
 
 // enables back button functionality

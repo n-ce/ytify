@@ -1,5 +1,7 @@
 declare global {
 
+  type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
+
   type StreamItem = {
     url: string,
     type: string,
@@ -7,6 +9,7 @@ declare global {
     views: number,
     title: string,
     videos: number,
+    uploaded: number,
     duration: number,
     isShort?: boolean,
     thumbnail: string,
@@ -53,7 +56,8 @@ declare global {
     [index: string]: Collection
   }
 
-  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists' | 'for_you';
+  type APAC = 'albums' | 'playlists' | 'artists' | 'channels';
+  type SuperCollection = 'featured' | 'collections' | APAC | 'feed' | 'for_you';
 
   type Scheme = {
     [index: string]: {
@@ -131,6 +135,9 @@ declare global {
 
   interface EventTarget {
     id: string
+  }
+  interface WindowEventMap {
+    'dbchange': CustomEvent<Library>;
   }
 
 }

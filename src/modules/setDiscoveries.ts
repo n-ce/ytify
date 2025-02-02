@@ -3,7 +3,7 @@ import { addListToCollection, getDB } from "../lib/libraryUtils";
 import { params, store } from "../lib/store";
 import { convertSStoHHMMSS, goTo } from "../lib/utils";
 
-export function setDiscoveries(
+export default function(
   id: string,
   relatedStreams: StreamItem[]
 ) {

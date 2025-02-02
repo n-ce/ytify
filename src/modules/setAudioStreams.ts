@@ -2,7 +2,7 @@ import { audio, bitrateSelector, playButton, title } from "../lib/dom";
 import { store, getSaved } from "../lib/store";
 import { i18n, proxyHandler } from "../lib/utils";
 
-export function setAudioStreams(audioStreams: {
+export default function(audioStreams: {
   codec: string,
   url: string,
   quality: string,

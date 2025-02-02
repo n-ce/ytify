@@ -1,7 +1,7 @@
-import { addListToCollection, createCollection, superCollectionLoader } from "../lib/libraryUtils";
-import { i18n, convertSStoHHMMSS, notify } from "../lib/utils";
+import { addListToCollection, createCollection } from "../lib/libraryUtils";
+import { i18n, convertSStoHHMMSS, notify, goTo } from "../lib/utils";
 
-export async function pipedPlaylistsImporter() {
+export default async function() {
 
   const instance = prompt(i18n('piped_enter_auth'), 'https://pipedapi.kavin.rocks');
   if (!instance) return;
@@ -64,12 +64,12 @@ export async function pipedPlaylistsImporter() {
       })
   )).then(() => {
     notify(i18n('piped_success_imported'));
+    document.getElementById('r.collections')?.click();
+    goTo('/library');
   })
     .catch(e => {
       notify(i18n("piped_failed_imported", e));
     });
-
-  superCollectionLoader('collections');
 
   // logout
 

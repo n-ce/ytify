@@ -2,10 +2,10 @@ import { getSaved } from "../lib/store";
 import { i18n, removeSaved, save } from "../lib/utils";
 
 
-export const partsManager = (): {
+export default function(): {
   name: string,
   callback: (arg0: Event) => void
-}[] => {
+}[] {
   if (getSaved('kidsMode_Navigation Settings'))
     toggle('/settings');
   if (getSaved('kidsMode_Navigation Search'))

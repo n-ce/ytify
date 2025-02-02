@@ -167,8 +167,8 @@ export default function WatchOnYtify() {
             }
           </For>
         </Selector>
-
-
+        <br /><br />
+        <i>Because video streaming consumes a lot of energy, contributing to carbon emissions, please try to watch only what's necessary. When you do stream, select the lowest resolution / bitrate that meets your needs.</i>
       </div>
     </dialog >
 

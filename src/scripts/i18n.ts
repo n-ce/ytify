@@ -1,6 +1,6 @@
 import { getSaved } from '../lib/store';
 
-const locales = ['en', 'pl', 'hi', 'sa'];
+const locales = ['en', 'pl', 'hi', 'sa', 'bn', 'ro'];
 const nl = navigator.language.slice(0, 2);
 const locale = getSaved('language') || (locales.includes(nl) ? nl : 'en');
 document.documentElement.lang = locale;
@@ -12,7 +12,7 @@ const attributes = [
   '-placeholder'
 ];
 
-let json: Record<TranslationKeys, string> | undefined;;
+let json: Record<TranslationKeys, string> | undefined;
 
 import(`../locales/${locale}.json`)
   .then(_ => {

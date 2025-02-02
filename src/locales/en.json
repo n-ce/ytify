@@ -71,6 +71,8 @@
   "list_radio": "Radio",
   "list_sort": "Sort",
   "list_info": "Playlist, channel or your collection items show here",
+  "list_prompt_delete": "",
+  "list_prompt_clear": "",
   "actions_menu_play_next": "Play next",
   "actions_menu_enqueue": "Enqueue",
   "actions_menu_start_radio": "Start radio",

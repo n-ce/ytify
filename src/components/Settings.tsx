@@ -57,7 +57,7 @@ export default function() {
   onMount(async () => {
     if (getSaved('kidsMode')) {
       const pm = await import('../modules/partsManager');
-      setParts(pm.partsManager);
+      setParts(pm.default);
     }
   });
 
@@ -377,9 +377,7 @@ export default function() {
 
         <p onClick={() => {
           import('../modules/importPipedPlaylists')
-            .then(mod => {
-              mod.pipedPlaylistsImporter()
-            })
+            .then(mod => mod.default())
         }}>{i18n('settings_import_from_piped')}</p>
 
 

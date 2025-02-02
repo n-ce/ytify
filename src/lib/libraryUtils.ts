@@ -1,4 +1,4 @@
-import { $, errorHandler, getApi, goTo, itemsLoader, notify, renderDataIntoFragment, save } from "./utils";
+import { goTo, notify, renderDataIntoFragment } from "./utils";
 import { listBtnsContainer, listContainer, listSection, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 
@@ -6,7 +6,10 @@ export const reservedCollections = ['discover', 'history', 'favorites', 'listenL
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
-export const saveDB = (data: Library) => save('library', JSON.stringify(data));
+export function saveDB(data: Library) {
+  localStorage.setItem('library', JSON.stringify(data));
+  dispatchEvent(new CustomEvent('dbchange', { detail: data }));
+}
 
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
 
@@ -203,156 +206,3 @@ async function getSharedCollection(
 
 
 
-export async function superCollectionLoader(name: SuperCollection) {
-  const db = getDB();
-
-  function loadForYou() {
-    if ('favorites' in db) {
-      const ids = Object
-        .keys(db.favorites)
-        .filter(id => id.length === 11);
-      import('../modules/supermix')
-        .then(mod => mod.default(ids));
-      return '';
-    }
-    else return 'No favorites in library';
-  }
-
-  const loadFeaturedPls = () => fetch('https://raw.githubusercontent.com/wiki/n-ce/ytify/ytm_pls.md')
-    .then(res => res.text())
-    .then(text => text.split('\n'))
-    .then(data => {
-      const array = [];
-      for (let i = 0; i < data.length; i += 4)
-        array.push(<StreamItem>{
-          'type': 'playlist',
-          'name': data[i + 1],
-          'uploaderName': '',
-          'url': '/playlist?list=' + data[i + 2],
-          'thumbnail': '/' + data[i + 3]
-        });
-      return itemsLoader(array);
-    });
-
-  function loadUrPls() {
-    const fragment = document.createDocumentFragment();
-    const pls = Object.keys(db).filter(v => !reservedCollections.includes(v));
-    pls.forEach(v => {
-      const a = $('a');
-      a.href = '/list?collection=' + v;
-      a.className = 'ur_cls_item';
-      const i = $('i');
-      i.className = 'ri-play-list-2-fill';
-      a.append(i, v);
-      fragment.appendChild(a);
-    });
-    return pls.length ? fragment : 'No Collections Found';
-  }
-
-  /*
-  channels / playlists / artists / albums
-  > albums are special playlists, id start with OLAK5uy & start with 'Album - ' naturally.
-  > artists are special channels which have been manually prepended with 'Artist - ' title.
-  */
-
-  function loadSubList(type: string) {
-    let albums = false;
-    let artists = false;
-
-    if (type === 'albums') {
-      albums = true;
-      type = 'playlists';
-    }
-
-    if (type === 'artists') {
-      artists = true;
-      type = 'channels';
-    }
-
-
-    if (!Object(db).hasOwnProperty(type))
-      return `No Subscribed ${type} Found`;
-
-    const array = [];
-    const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
-
-    for (const pl in pls) {
-      let name = pls[pl].name;
-
-      if (albums) {
-        if (!name.startsWith('Album'))
-          continue;
-        name = name.slice(8);
-      }
-      else if (name.startsWith('Album'))
-        continue;
-
-      if (artists) {
-        if (!name.startsWith('Artist'))
-          continue;
-        name = name.slice(8);
-      }
-      else if (name.startsWith('Artist'))
-        continue;
-
-
-      array.push(<StreamItem>{
-        type: type.slice(0, -1),
-        name: name,
-        uploaderName: pls[pl].uploader,
-        url: `/${type === 'channels' ? type.slice(0, -1) : type}/` + pls[pl].id,
-        thumbnail: pls[pl].thumbnail
-      });
-    }
-
-
-    return array.length ?
-      itemsLoader(array) :
-      `No Subscribed ${type} Found`;
-  }
-
-  async function loadFeed() {
-    if (!Object(db).hasOwnProperty('channels'))
-      return 'You have not subscribed to any channels';
-
-    loadingScreen.showModal();
-
-    const channels = Object.keys(db.channels).join(',');
-    const items = await fetch(getApi('piped') + '/feed/unauthenticated?channels=' + channels)
-      .then(res => res.json())
-      .then(data => {
-        const current = Date.now();
-        const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
-        data = data
-          .filter((i: StreamItem) => !i.isShort)
-          .filter((i: { uploaded: number }) => (current - i.uploaded) < oneWeekInMilliseconds);
-
-        if (data.length > 10)
-          return data;
-        else throw new Error('No Weekly Updates Found!');
-      })
-      .catch(async err => {
-        await errorHandler(
-          err.message,
-          () => superCollectionLoader(name)
-        );
-      })
-      .finally(() => loadingScreen.close());
-
-    return items.length ? itemsLoader(items) : 'No Items Found'
-  }
-
-
-  const container = document.getElementById('superCollectionList') as HTMLDivElement;
-  container.replaceChildren(
-    name === 'featured' ?
-      await loadFeaturedPls() :
-      name === 'collections' ?
-        loadUrPls() :
-        name === 'feed' ?
-          await loadFeed() :
-          name === 'for_you' ?
-            loadForYou() :
-            loadSubList(name)
-  );
-}

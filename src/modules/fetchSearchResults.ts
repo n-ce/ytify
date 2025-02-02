@@ -44,11 +44,10 @@ export const fetchWithInvidious = (
   fetch(`${API}/api/v1/search?q=${q}&sort=${sortBy}&page=${resolvePage(q)}`)
     .then(res => res.json())
     .then(items => {
-      searchlist.appendChild(
-        itemsLoader(
-          items.filter(
-            (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
-          )));
+      itemsLoader(
+        items.filter(
+          (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
+        ), searchlist);
       previousQuery = q;
       setObserver(() => fetchWithInvidious(API, q, sortBy));
     })
@@ -75,16 +74,18 @@ const fetchWithPiped = (
     if (!items) throw new Error("No Items Found");
 
     // filter out shorts
-    searchlist.appendChild(itemsLoader(
+    itemsLoader(
       items?.filter((item: StreamItem) => !item.isShort)
-    ));
+      , searchlist
+    );
     // load more results when 3rd last element is visible
     if (nextPageToken !== 'null')
       setObserver(async () => {
         const data = await loadMoreResults(API, nextPageToken, query.substring(7));
-        searchlist.appendChild(itemsLoader(
+        itemsLoader(
           data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-        ));
+          , searchlist
+        );
         return data.nextpage;
       });
   })

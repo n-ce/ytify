@@ -118,7 +118,7 @@ dist/assets/hls-CySapf1N.js                      399.85 kB │ gzip: 123.78 kB
 
 ## Translations 🗺️
 [![Translation status](https://hosted.weblate.org/widget/ytify/multi-auto.svg)](https://hosted.weblate.org/engage/ytify/)
-Gracefully powered by [Weblate](https://hosted.weblate.org/projects/ytify/web) Libre Hosting.
+ytify is being translated into multiple languages using [Weblate](https://hosted.weblate.org/projects/ytify/web).
  
 ## Acknowledgements 🙏
 - [Uma](https://github.com/n-ce/Uma) - Instances Manager

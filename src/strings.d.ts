@@ -73,6 +73,8 @@ declare global {
     | 'list_radio'
     | 'list_sort'
     | 'list_info'
+    | 'list_prompt_delete'
+    | 'list_prompt_clear'
     | 'actions_menu_play_next'
     | 'actions_menu_enqueue'
     | 'actions_menu_start_radio'

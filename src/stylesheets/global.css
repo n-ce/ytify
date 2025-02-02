@@ -209,9 +209,10 @@ dialog.watcher {
   height: 100dvh;
   width: 100dvw;
   background: var(--bg);
+  color: var(--text);
 
   button {
-    color: var(--text);
+    color: inherit;
   }
 
   video {
