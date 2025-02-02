@@ -143,7 +143,7 @@
     "settings_export": "Eksportuj ustawienia",
     "settings_import": "Importuj ustawienia",
     "piped_enter_auth": "Wprowadź adres URL API instancji uwierzytelniającej Piped:",
-    "piped_enter_username": "Wprowadź nazwę użytkownika: ",
+    "piped_enter_username": "Wprowadź nazwę użytkownika:",
     "piped_enter_password": "Hasło",
     "piped_success_auth": "Pomyślnie wylogowano z konta Piped.",
     "piped_failed_auth": "Nie udało się wylogować",
