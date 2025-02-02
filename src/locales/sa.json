@@ -143,7 +143,7 @@
     "settings_export": "व्यवस्थाः निर्यातय",
     "settings_import": "व्यवस्थाः आयातय",
     "piped_enter_auth": "Piped प्रमाणीकरणस्य API URL प्रविश्यताम् :",
-    "piped_enter_username": "उपयोक्तृनाम प्रविश्यताम्: ",
+    "piped_enter_username": "उपयोक्तृनाम प्रविश्यताम्:",
     "piped_enter_password": "कूटशब्दः",
     "piped_success_auth": "भवतः piped खातात् सफलतया निर्गतः",
     "piped_failed_auth": "सफलतया निर्गन्तुं न शक्तः",
