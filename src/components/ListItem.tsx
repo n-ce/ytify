@@ -4,15 +4,15 @@ import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
 
 
-export default function ListItem(
+export default function ListItem(data: {
   title: string,
   stats: string,
   thumbnail: string,
   uploader_data: string,
   url: string,
-) {
+}) {
 
-  const [getThumbnail, setThumbnail] = createSignal(thumbnail);
+  const [getThumbnail, setThumbnail] = createSignal(data.thumbnail);
   let img!: HTMLImageElement;
 
   function unravel() {
@@ -26,11 +26,11 @@ export default function ListItem(
   return (
     <a
       class={'listItem ' + (store.loadImage ? 'ravel' : '')}
-      href={hostResolver(url)}
-      data-title={title}
-      data-url={url}
-      data-thumbnail={thumbnail}
-      data-uploader={uploader_data}
+      href={hostResolver(data.url)}
+      data-title={data.title}
+      data-url={data.url}
+      data-thumbnail={data.thumbnail}
+      data-uploader={data.uploader_data}
     >
       <Show when={store.loadImage}>
         <img
@@ -41,9 +41,9 @@ export default function ListItem(
         />
       </Show>
       <div>
-        <p class="title">{title}</p>
-        <p class="uData">{uploader_data}</p>
-        <p class="stats">{stats}</p>
+        <p class="title">{data.title}</p>
+        <p class="uData">{data.uploader_data}</p>
+        <p class="stats">{data.stats}</p>
       </div>
     </a>
   );

@@ -57,11 +57,11 @@ export default async function fetchList(
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
   listContainer.innerHTML = '';
-  listContainer.appendChild(
-    itemsLoader(
-      group.relatedStreams
-    )
-  );
+
+  itemsLoader(
+    group.relatedStreams, listContainer
+  )
+
 
   if (location.pathname !== '/list')
     goTo('/list');
@@ -93,13 +93,12 @@ export default async function fetchList(
       listContainer.querySelectorAll('.streamItem').forEach((v) => {
         existingItems.push((v as HTMLElement).dataset.id as string);
       });
-      listContainer.appendChild(
-        itemsLoader(
-          data.relatedStreams.filter(
-            (item: StreamItem) => !existingItems.includes(
-              item.url.slice(-11))
-          )
+      itemsLoader(
+        data.relatedStreams.filter(
+          (item: StreamItem) => !existingItems.includes(
+            item.url.slice(-11))
         )
+        , listContainer
       );
       return data.nextpage;
     });

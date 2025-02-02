@@ -6,7 +6,7 @@ import './scripts/list';
 import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
-import { actionsMenu } from './lib/dom';
+import { actionsMenu, superCollectionList } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
 
@@ -20,6 +20,9 @@ addEventListener('DOMContentLoaded', async () => {
 
   const amenu = await import('./components/ActionsMenu');
   render(amenu.default, actionsMenu);
+
+  const sclist = await import('./components/SuperCollectionList.tsx');
+  render(sclist.default, superCollectionList);
 
   if (import.meta.env.PROD)
     await import('virtual:pwa-register').then(pwa => {

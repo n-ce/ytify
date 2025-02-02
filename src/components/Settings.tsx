@@ -57,7 +57,7 @@ export default function() {
   onMount(async () => {
     if (getSaved('kidsMode')) {
       const pm = await import('../modules/partsManager');
-      setParts(pm.partsManager);
+      setParts(pm.default);
     }
   });
 
@@ -104,10 +104,11 @@ export default function() {
             target.value = document.documentElement.lang;
           }}
         >
-          <option value="en">English</option>
-          <option value="pl">Polski</option>
-          <option value="hi">Hindi</option>
-          <option value="sa">Sanskrit</option>
+          <For each={Locales}>
+            {(item) =>
+              <option value={item}>{new Intl.DisplayNames(document.documentElement.lang, { type: 'language' }).of(item)}</option>
+            }
+          </For>
         </Selector>
 
         <Selector
@@ -377,9 +378,7 @@ export default function() {
 
         <p onClick={() => {
           import('../modules/importPipedPlaylists')
-            .then(mod => {
-              mod.pipedPlaylistsImporter()
-            })
+            .then(mod => mod.default())
         }}>{i18n('settings_import_from_piped')}</p>
 
 

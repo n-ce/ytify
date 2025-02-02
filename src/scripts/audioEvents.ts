@@ -207,7 +207,7 @@ audio.onerror = async function() {
 
     if (data.audioStreams)
       import('../modules/setAudioStreams')
-        .then(mod => mod.setAudioStreams(
+        .then(mod => mod.default(
           data.audioStreams
             .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
             ),

@@ -44,3 +44,5 @@ loadingScreen.addEventListener('click', () => loadingScreen.close());
 export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
 
 export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLDivElement;
+
+export const superCollectionList = document.getElementById('superCollectionList') as HTMLDivElement;

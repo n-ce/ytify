@@ -6,6 +6,7 @@ export async function getData(
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
   const inv = store.api.invidious;
+  const pip = store.api.piped;
   const hls = store.player.hls;
   const fbk = store.player.fallback;
 
@@ -66,7 +67,7 @@ export async function getData(
       else return useInvidious(index + 1);
     });
 
-  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(store.api.piped[index])
+  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(pip[index])
     .catch(() => {
       if (index + 1 === inv.length)
         return useInvidious();
@@ -74,7 +75,7 @@ export async function getData(
     });
 
   const useHls = () => Promise
-    .allSettled(hls.api.map(fetchDataFromPiped))
+    .allSettled((hls.api.length ? hls.api : pip).map(fetchDataFromPiped))
     .then(res => {
       const ff = res.filter(r => r.status === 'fulfilled');
       hls.manifests.length = 0;

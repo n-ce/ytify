@@ -7,7 +7,7 @@ import { appendToQueuelist } from "../scripts/queue";
 >Check if stream exists in stream history or trash history or queue, if not enqueue it
 */
 
-export function enqueueRelatedStreams(data: StreamItem[]) {
+export default function(data: StreamItem[]) {
 
   // sometimes users will remove items from queue manually,
   // we need to account for this using the trashHistory array

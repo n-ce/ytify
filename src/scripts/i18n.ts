@@ -1,8 +1,8 @@
 import { getSaved } from '../lib/store';
 
-const locales = ['en', 'pl', 'hi', 'sa'];
+
 const nl = navigator.language.slice(0, 2);
-const locale = getSaved('language') || (locales.includes(nl) ? nl : 'en');
+const locale = getSaved('language') || (Locales.includes(nl) ? nl : 'en');
 document.documentElement.lang = locale;
 
 const attributes = [
@@ -12,7 +12,7 @@ const attributes = [
   '-placeholder'
 ];
 
-let json: Record<TranslationKeys, string> | undefined;;
+let json: Record<TranslationKeys, string> | undefined;
 
 import(`../locales/${locale}.json`)
   .then(_ => {
@@ -43,3 +43,4 @@ function attributeHandler(attr: string) {
 }
 
 export { json };
+

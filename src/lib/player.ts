@@ -41,7 +41,7 @@ export default async function player(id: string | null = '') {
       if (hlsUrl) h.src(hlsUrl);
     }
     else import('../modules/setAudioStreams')
-      .then(mod => mod.setAudioStreams(
+      .then(mod => mod.default(
         data.audioStreams
           .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
           ),
@@ -59,7 +59,7 @@ export default async function player(id: string | null = '') {
 
   if (getSaved('enqueueRelatedStreams') === 'on')
     import('../modules/enqueueRelatedStreams')
-      .then(mod => mod.enqueueRelatedStreams(data.relatedStreams as StreamItem[]));
+      .then(mod => mod.default(data.relatedStreams as StreamItem[]));
 
 
   // favbutton reset
@@ -82,7 +82,7 @@ export default async function player(id: string | null = '') {
     import('../modules/setDiscoveries')
       .then(mod => {
         setTimeout(() => {
-          mod.setDiscoveries(id, data.relatedStreams as StreamItem[]);
+          mod.default(id, data.relatedStreams as StreamItem[]);
         }, 1e5);
       });
 
