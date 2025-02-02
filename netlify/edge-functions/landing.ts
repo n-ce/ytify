@@ -23,8 +23,9 @@ export default async function handler(_: Request, context: Context) {
           again.
           <br><br>
         ${cgeo === 'IN' ?
-      `<a href="https://pay.upilink.in/pay/animesh.5383@waicici" target="_blank" style="font-size:smaller;margin-top:1rem">
-            <img width="100"
+      `<a href="upi://pay?pa=abrocks1120@okhdfcbank&cu=INR" target="_blank" style="font-size:smaller;margin-top:1rem">
+            <img style="pointer-events:none"
+             width="100"
               src="https://upload.wikimedia.org/wikipedia/commons/6/6f/UPI_logo.svg" />
               Please donate now and support development, even 1re can help.
           </a>` : "<a style='background:var(--text);color:var(--bg);border-radius:var(--roundness);' href='https://en.m.wikipedia.org/wiki/Individual_action_on_climate_change' target='_blank'> Keeping our consumptions low is the only way to retain our planet's ability to host mankind.</a>"
