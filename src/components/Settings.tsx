@@ -104,10 +104,11 @@ export default function() {
             target.value = document.documentElement.lang;
           }}
         >
-          <option value="en">English</option>
-          <option value="pl">Polski</option>
-          <option value="hi">Hindi</option>
-          <option value="sa">Sanskrit</option>
+          <For each={Locales}>
+            {(item) =>
+              <option value={item}>{new Intl.DisplayNames(document.documentElement.lang, { type: 'language' }).of(item)}</option>
+            }
+          </For>
         </Selector>
 
         <Selector
