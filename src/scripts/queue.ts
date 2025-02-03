@@ -1,4 +1,4 @@
-import { goTo, removeSaved, save } from "../lib/utils";
+import { goTo, i18n, notify, removeSaved, save } from "../lib/utils";
 import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
@@ -75,9 +75,7 @@ queuelist.addEventListener('click', e => {
 
   const index = store.queue.indexOf(id);
 
-
   store.queue.splice(index, 1);
-
   queuelist.children[index].remove();
 });
 
@@ -118,12 +116,36 @@ removeQBtn.addEventListener('click', () => {
   removeQBtn.classList.toggle('delete');
 });
 
+const actions: [HTMLButtonElement, string, string][] = [
+  [filterLT10Btn, 'filterLT10', 'filter'],
+  [enqueueRelatedStreamsBtn, 'enqueueRelatedStreams', 'checked'],
+  [allowDuplicatesBtn, 'allowDuplicates', 'redup']
+];
+
+actions.forEach(_ => {
+  const [btn, ls, clss] = _;
+
+  btn.addEventListener('click', () => {
+
+    if (btn.classList.contains(clss))
+      removeSaved(ls);
+    else
+      save(ls, 'on');
+
+    btn.classList.toggle(clss);
+
+    if (ls === 'filterLT10')
+      filterLT10();
+    else
+      notify(i18n('upcoming_change'));
+  });
+
+  if (getSaved(ls) === 'on')
+    btn.className = clss;
+});
 
 
-
-filterLT10Btn.addEventListener('click', () => {
-
-  filterLT10Btn.classList.toggle('filter');
+function filterLT10() {
   // Prevent Queue Conflicts
   if (removeQBtn.classList.contains('delete'))
     removeQBtn.click();
@@ -137,31 +159,10 @@ filterLT10Btn.addEventListener('click', () => {
     el.click()
 
   });
-});
-
-
-enqueueRelatedStreamsBtn.addEventListener('click', () => {
-  enqueueRelatedStreamsBtn.classList.contains('checked') ?
-    removeSaved('enqueueRelatedStreams') :
-    save('enqueueRelatedStreams', 'on');
-  enqueueRelatedStreamsBtn.classList.toggle('checked');
-});
-
-if (getSaved('enqueueRelatedStreams') === 'on')
-  enqueueRelatedStreamsBtn.className = 'checked';
+}
 
 
 
-allowDuplicatesBtn.addEventListener('click', () => {
-  if (allowDuplicatesBtn.classList.contains('redup'))
-    removeSaved('allowDuplicates')
-  else
-    save('allowDuplicates', 'true');
-  allowDuplicatesBtn.classList.toggle('redup');
-});
-
-if (getSaved('allowDuplicates') === 'true')
-  allowDuplicatesBtn.className = 'redup';
 
 
 

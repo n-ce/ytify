@@ -69,7 +69,7 @@ export async function getData(
 
   const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(pip[index])
     .catch(() => {
-      if (index + 1 === inv.length)
+      if (index + 1 === pip.length)
         return useInvidious();
       else return usePiped(index + 1);
     });

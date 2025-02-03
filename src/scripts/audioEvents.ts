@@ -1,6 +1,6 @@
 import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
@@ -177,12 +177,12 @@ audio.onerror = async function() {
   audio.pause();
   const message = 'Error 403 : Unauthenticated Stream';
   const _ = store.api;
+  const id = store.stream.id;
 
   if (getSaved('custom_instance_2') || store.player.hls.on)
     return notify(message);
 
   if (_.piped[0] === location.origin) return;
-
 
   const origin = new URL(audio.src).origin;
 
@@ -196,25 +196,30 @@ audio.onerror = async function() {
     _.index = 0;
     notify(message);
     title.textContent = store.stream.title;
+
     // Emergency Handling
-    const f = store.player.fallback;
-
-    if (!f) return;
-
-    _.piped.unshift(f);
-
-    const data = await getData(store.stream.id) as Piped;
-
-    if (data.audioStreams)
-      import('../modules/setAudioStreams')
-        .then(mod => mod.default(
-          data.audioStreams
-            .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-            ),
-          data.livestream
-        ));
+    const fbk = store.player.fallback;
+    if (!fbk) useCobalt();
     else
-      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      fetch(+ '/streams/' + id)
+        .then(res => res.json())
+        .then(data => {
+          import('../modules/setAudioStreams.ts')
+            .then(mod => mod.default(data.audioStreams));
+        })
+        .catch(useCobalt);
+
+    function useCobalt() {
+      getDownloadLink(id)
+        .then(_ => {
+          if (_)
+            audio.src = _;
+          else throw new Error();
+        })
+        .catch(() => {
+          playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+        })
+    }
 
   }
 
