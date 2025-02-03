@@ -1,4 +1,4 @@
-import { goTo, removeSaved, save } from "../lib/utils";
+import { goTo, i18n, notify, removeSaved, save } from "../lib/utils";
 import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
@@ -11,6 +11,7 @@ const [
   shuffleQBtn,
   removeQBtn,
   filterLT10Btn,
+  allowDuplicatesBtn,
   enqueueRelatedStreamsBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
@@ -18,6 +19,10 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
+
+  if (!allowDuplicatesBtn.classList.contains('redup'))
+    if (store.queue.includes(data.id))
+      return;
 
   if (filterLT10Btn.classList.contains('filter'))
     if (isLongerThan10Min(<string>data.duration))
@@ -70,9 +75,7 @@ queuelist.addEventListener('click', e => {
 
   const index = store.queue.indexOf(id);
 
-
   store.queue.splice(index, 1);
-
   queuelist.children[index].remove();
 });
 
@@ -113,12 +116,36 @@ removeQBtn.addEventListener('click', () => {
   removeQBtn.classList.toggle('delete');
 });
 
+const actions: [HTMLButtonElement, string, string][] = [
+  [filterLT10Btn, 'filterLT10', 'filter'],
+  [enqueueRelatedStreamsBtn, 'enqueueRelatedStreams', 'checked'],
+  [allowDuplicatesBtn, 'allowDuplicates', 'redup']
+];
+
+actions.forEach(_ => {
+  const [btn, ls, clss] = _;
+
+  btn.addEventListener('click', () => {
+
+    if (btn.classList.contains(clss))
+      removeSaved(ls);
+    else
+      save(ls, 'on');
+
+    btn.classList.toggle(clss);
+
+    if (ls === 'filterLT10')
+      filterLT10();
+    else
+      notify(i18n('upcoming_change'));
+  });
+
+  if (getSaved(ls) === 'on')
+    btn.className = clss;
+});
 
 
-
-filterLT10Btn.addEventListener('click', () => {
-
-  filterLT10Btn.classList.toggle('filter');
+function filterLT10() {
   // Prevent Queue Conflicts
   if (removeQBtn.classList.contains('delete'))
     removeQBtn.click();
@@ -132,18 +159,11 @@ filterLT10Btn.addEventListener('click', () => {
     el.click()
 
   });
-});
+}
 
 
-enqueueRelatedStreamsBtn.addEventListener('click', () => {
-  enqueueRelatedStreamsBtn.classList.contains('checked') ?
-    removeSaved('enqueueRelatedStreams') :
-    save('enqueueRelatedStreams', 'on');
-  enqueueRelatedStreamsBtn.classList.toggle('checked');
-});
 
-if (getSaved('enqueueRelatedStreams') === 'on')
-  enqueueRelatedStreamsBtn.className = 'checked';
+
 
 
 function isLongerThan10Min(duration: string) {
@@ -153,27 +173,6 @@ function isLongerThan10Min(duration: string) {
     parseInt(hhmmss[0]) < 10
   );
 }
-
-// queuelist mutation observer
-
-new MutationObserver(m => {
-  for (const mutation of m) {
-    if (mutation.type === "childList") {
-      const query = store.queue.join('');
-      store.upcomingQuery = query;
-
-      if (location.pathname === '/upcoming') {
-        history.replaceState({}, '',
-          location.pathname + (
-            query ?
-              `?a=${query}` : ''
-          )
-        );
-      }
-    }
-  }
-}).observe(queuelist, { childList: true });
-
 
 new Sortable(queuelist, {
   handle: '.ri-draggable',

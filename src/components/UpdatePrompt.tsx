@@ -1,5 +1,6 @@
 import { createSignal, onMount } from "solid-js";
 import './UpdatePrompt.css';
+import { i18n } from "../lib/utils";
 
 export default function UpdatePrompt(handleUpdate: () => void) {
 
@@ -33,15 +34,15 @@ export default function UpdatePrompt(handleUpdate: () => void) {
         {fullList().length > 2 ?
           fullList().map((text: string) => (<li>{text}</li>))
           :
-          <li onclick={handleFullList}>Read all previous changes</li>
+          <li onclick={handleFullList}>{i18n('updater_changelog_full')}</li>
         }
       </ul>
       <span>
-        <button onclick={handleUpdate} autofocus> Update</button>
+        <button onclick={handleUpdate} autofocus>{i18n('updater_update')}</button>
         <button onclick={() => {
           dialog.close();
           dialog.remove();
-        }}>Later</button>
+        }}>{i18n('updater_later')}</button>
       </span>
     </dialog>
   );

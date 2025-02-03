@@ -1,4 +1,11 @@
+import type en from './locales/en.json';
+
 declare global {
+
+  type TranslationKeys = keyof typeof en;
+
+
+  type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
 
   type StreamItem = {
     url: string,
@@ -7,6 +14,7 @@ declare global {
     views: number,
     title: string,
     videos: number,
+    uploaded: number,
     duration: number,
     isShort?: boolean,
     thumbnail: string,
@@ -53,7 +61,8 @@ declare global {
     [index: string]: Collection
   }
 
-  type SuperCollection = 'featured' | 'collections' | 'channels' | 'feed' | 'playlists' | 'for_you';
+  type APAC = 'albums' | 'playlists' | 'artists' | 'channels';
+  type SuperCollection = 'featured' | 'collections' | APAC | 'feed' | 'for_you';
 
   type Scheme = {
     [index: string]: {
@@ -66,14 +75,14 @@ declare global {
   }
 
   type ToggleSwitch = {
-    name: string
+    name: TranslationKeys | string,
     id: string,
     checked: boolean,
     onClick: (e: EventHandler<HTMLInputElement>) => void
   }
 
   type Selector = {
-    label: string,
+    label: TranslationKeys | string,
     id: string,
     onChange: (e: { target: HTMLSelectElement }) => void,
     onMount: (target: HTMLSelectElement) => void,
@@ -88,7 +97,6 @@ declare global {
     uploader: string,
     uploaderUrl: string,
     livestream: boolean,
-    subtitles: [],
     hls: string
     relatedStreams: {
       url: string,
@@ -108,6 +116,8 @@ declare global {
     }[]
   }
 
+  type Captions = Record<'label' | 'url', string>;
+
   type Invidious = {
     adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url', string>[],
     recommendedVideos: {
@@ -117,6 +127,7 @@ declare global {
       authorUrl: string,
       videoId: string
     }[],
+    captions: Captions[],
     title: string,
     author: string,
     lengthSeconds: number,
@@ -129,6 +140,9 @@ declare global {
 
   interface EventTarget {
     id: string
+  }
+  interface WindowEventMap {
+    'dbchange': CustomEvent<Library>;
   }
 
 }

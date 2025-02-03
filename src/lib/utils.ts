@@ -1,13 +1,13 @@
 import { audio, actionsMenu, title } from "./dom";
-import { generateImageUrl, getThumbIdFromLink } from "./imageUtils";
+import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
 import { render } from 'solid-js/web';
-import ListItem from "../components/ListItem";
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-
+import { json } from "../scripts/i18n";
+import ItemsLoader from "../components/ItemsLoader";
 
 export const $ = document.createElement.bind(document);
 
@@ -15,16 +15,17 @@ export const save = localStorage.setItem.bind(localStorage);
 
 export const removeSaved = localStorage.removeItem.bind(localStorage);
 
-export const goTo = (route: string) => (<HTMLAnchorElement>document.getElementById(route)).click();
+export const goTo = (route: Routes | 'history' | 'discover') => (<HTMLAnchorElement>document.getElementById(route)).click();
+
+export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
 export const getApi = (
   type: 'piped' | 'invidious',
   index: number = store.api.index
 ) =>
-  store.api[type][index];
-
-export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
-
+  type === 'piped' ?
+    store.api.piped.concat(store.player.hls.api)[index] :
+    store.api.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -36,9 +37,16 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
+export const i18n = (
+  key: TranslationKeys,
+  value: string = ''
+) => value ?
+    (json?.[key] || key).replace('$', value) :
+    json?.[key] || key;
+
 export function proxyHandler(url: string) {
   store.api.index = 0;
-  title.textContent = 'Inserting audio source into player...';
+  title.textContent = i18n('player_audiostreams_insert');
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
@@ -110,7 +118,6 @@ export async function getDownloadLink(id: string): Promise<string | null> {
 export async function errorHandler(
   message: string = '',
   redoAction: () => void,
-  finalAction: () => void
 ) {
 
   if (message === 'nextpage error') return;
@@ -123,7 +130,6 @@ export async function errorHandler(
     return redoAction();
   }
   notify(message);
-  finalAction();
   store.api.index = 0;
 }
 
@@ -150,45 +156,8 @@ export function renderDataIntoFragment(
   }
 }
 
-export function itemsLoader(itemsArray: StreamItem[] | null) {
-  if (!itemsArray?.length)
-    throw new Error('No Data Found');
-
-  const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
-
-
-  const streamItem = (stream: StreamItem) => StreamItem({
-    id: stream.videoId || stream.url.substring(9),
-    href: hostResolver(stream.url || ('/watch?v=' + stream.videoId)),
-    title: stream.title,
-    author: (stream.uploaderName || stream.author) + (location.search.endsWith('music_songs') ? ' - Topic' : ''),
-    duration: (stream.duration || stream.lengthSeconds) > 0 ? convertSStoHHMMSS(stream.duration || stream.lengthSeconds) : 'LIVE',
-    uploaded: stream.uploadedDate || stream.publishedText,
-    channelUrl: stream.uploaderUrl || stream.authorUrl,
-    views: stream.viewCountText || (stream.views > 0 ? numFormatter(stream.views) + ' views' : ''),
-    img: getThumbIdFromLink(stream.thumbnail || 'https://i.ytimg.com/vi_webp/' + stream.videoId + '/mqdefault.webp?host=i.ytimg.com')
-  })
-
-  const listItem = (item: StreamItem) => ListItem(
-    item.name,
-    item.subscribers > 0 ?
-      (numFormatter(item.subscribers) + ' subscribers') :
-      (item.videos > 0 ? item.videos + ' streams' : ''),
-    generateImageUrl(
-      getThumbIdFromLink(
-        item.thumbnail
-      ), ''
-    ),
-    item.description || item.uploaderName,
-    item.url
-  )
-
-  const fragment = document.createDocumentFragment();
-  for (const item of itemsArray)
-    render(() => (item.type === 'stream' || item.type === 'video') ? streamItem(item) : listItem(item), fragment);
-
-
-  return fragment;
+export function itemsLoader(itemsArray: StreamItem[], container: HTMLElement) {
+  return render(() => ItemsLoader({ itemsArray }), container);
 }
 
 
@@ -206,7 +175,7 @@ export async function superClick(e: Event) {
       removeFromCollection(store.list.id, eld.id as string)
       : player(eld.id);
 
-  else if (elc('ur_cls_item'))
+  else if (elc('clxn_item'))
     fetchCollection(elem.textContent as string);
 
   else if (elc('ri-more-2-fill')) {
@@ -246,5 +215,4 @@ export async function superClick(e: Event) {
     fetchList(url);
   }
 }
-
 

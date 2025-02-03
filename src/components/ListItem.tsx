@@ -4,52 +4,46 @@ import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
 
 
-export default function ListItem(
+export default function ListItem(data: {
   title: string,
   stats: string,
   thumbnail: string,
   uploader_data: string,
   url: string,
-) {
-  const [getThumbnail, setThumbnail] = createSignal(thumbnail);
-  const showImage = (store.loadImage === 'off') ? undefined : store.loadImage;
+}) {
 
-  function handleError(e: Event) {
-    const img = e.target as HTMLImageElement;
+  const [getThumbnail, setThumbnail] = createSignal(data.thumbnail);
+  let img!: HTMLImageElement;
+
+  function unravel() {
     img.parentElement!.classList.remove('ravel');
+  }
+  function handleError() {
+    unravel();
     setThumbnail('/logo192.png');
   }
 
-
-
-
-  function handleLoad(e: Event) {
-    const img = e.target as HTMLImageElement;
-    img.parentElement!.classList.remove('ravel');
-  }
-
-
   return (
     <a
-      class={'listItem ' + (showImage ? 'ravel' : '')}
-      href={hostResolver(url)}
-      data-title={title}
-      data-url={url}
-      data-thumbnail={thumbnail}
-      data-uploader={uploader_data}
+      class={'listItem ' + (store.loadImage ? 'ravel' : '')}
+      href={hostResolver(data.url)}
+      data-title={data.title}
+      data-url={data.url}
+      data-thumbnail={data.thumbnail}
+      data-uploader={data.uploader_data}
     >
-      <Show when={showImage}>
+      <Show when={store.loadImage}>
         <img
-          loading={showImage as 'lazy' | 'eager' | undefined}
+          ref={img}
           src={getThumbnail()}
           onError={handleError}
-          onLoad={handleLoad}
+          onLoad={unravel}
         />
       </Show>
       <div>
-        <p class="title">{title}</p>
-        <p class="uData">{uploader_data}</p>
-        <p class="stats">{stats}</p>
+        <p class="title">{data.title}</p>
+        <p class="uData">{data.uploader_data}</p>
+        <p class="stats">{data.stats}</p>
       </div>
     </a>
   );

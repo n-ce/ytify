@@ -1,43 +1,20 @@
-import { actionsMenu, loadingScreen, searchFilters, superInput, ytifyIcon } from "../lib/dom";
+import { actionsMenu, searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
-import { appendToQueuelist } from "./queue";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
-import { fetchCollection, superCollectionLoader } from "../lib/libraryUtils";
+import { fetchCollection } from "../lib/libraryUtils";
 
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
-const queueParam = params.get('a');
-
-
-
-function upcomingInjector(param: string) {
-  loadingScreen.showModal();
-
-  fetch(`${location.origin}/collection?id=${param}`)
-    .then(res => res.json())
-    .then(data => {
-      for (const stream of data)
-        appendToQueuelist(stream)
-    })
-    .finally(() => loadingScreen.close());
-}
-
-if (queueParam)
-  upcomingInjector(queueParam);
 
 let prevPageIdx = routes.indexOf(location.pathname);
 
 function showSection(id: string) {
   const routeIdx = routes.indexOf(id);
   miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
-
-  // Enables Reactivity to declare db modifications into UI
-  if (id === '/library')
-    superCollectionLoader(getSaved('defaultSuperCollection') as 'feed' || 'featured');
 
   sections[routeIdx].classList.add('view');
   const a = anchors[routeIdx];
@@ -71,8 +48,7 @@ nav.addEventListener('click', (e: Event) => {
   if (anchor.id !== location.pathname) {
     const sParamInHome = params.has('s') && inHome;
     const sParam = '?s=' + params.get('s');
-    const aParam = store.upcomingQuery ? '?a=' + store.upcomingQuery : '';
-    const otherQuery = anchor.id === '/search' ? store.searchQuery : anchor.id === '/upcoming' ? aParam : '';
+    const otherQuery = anchor.id === '/search' ? store.searchQuery : '';
 
     history.pushState({}, '',
       anchor.id + (
@@ -93,7 +69,7 @@ nav.addEventListener('click', (e: Event) => {
 
 
 // load section if name found in address else load library
-let route: string;
+let route: Routes | string;
 const errorParam = params.get('e');
 
 if (errorParam) {
@@ -101,7 +77,7 @@ if (errorParam) {
   if (errorParam.includes('?')) {
 
     const _ = errorParam.split('?');
-    route = _[0];
+    route = _[0] as Routes;
     const query = encodeURI(_[1]);
 
     if (route === '/list')
@@ -120,9 +96,6 @@ if (errorParam) {
       superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
     }
 
-    if (route === '/upcoming')
-      upcomingInjector(query.slice(2));
-
   }
   else route = errorParam;
 }
@@ -139,10 +112,10 @@ else {
 
 // necessary to use a click event 
 
-goTo(route);
+goTo(route as Routes);
 
 ytifyIcon.addEventListener('click', () => {
-  goTo(getSaved('startupTab') || '/search');
+  goTo(getSaved('startupTab') as '/' || '/search');
 });
 
 // enables back button functionality
@@ -163,9 +136,12 @@ onpopstate = function() {
       .substring(1)
       .split('=');
 
-    param[0] === 'collection' ?
-      fetchCollection(param[1]) :
+    if (param[0] === 'collection')
+      fetchCollection(param[1]);
+
+    if (param[0] === 'list')
       fetchList('/' + param.join('/'));
+
   }
 
   showSection(location.pathname);

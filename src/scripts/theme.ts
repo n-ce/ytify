@@ -1,3 +1,4 @@
+import { img, audio } from '../lib/dom';
 import { generateImageUrl } from '../lib/imageUtils';
 import { store, getSaved } from '../lib/store';
 
@@ -107,17 +108,15 @@ function colorInjector(colorArray: number[]) {
 
 
 function themer() {
-
   const initColor = '127,127,127';
   const custom = getSaved('custom_theme') || (store.player.legacy ? initColor : '');
 
-  store.stream.id && !custom ?
-
+  if (store.loadImage && store.stream.id && !custom)
     import('../modules/extractColorFromImage')
       .then(mod => mod.extractColorFromImage)
       .then(e => e(generateImageUrl(store.stream.id, 'mq'), !store.player.legacy))
-      .then(colorInjector) :
-
+      .then(colorInjector);
+  else
     colorInjector(
       (custom || initColor)
         .split(',')
@@ -127,6 +126,16 @@ function themer() {
 }
 
 
+
+if (store.loadImage) {
+  if (location.pathname !== '/')
+    themer();
+  audio.addEventListener('loadeddata', themer);
+}
+else {
+  img.remove();
+  themer(); // one time only
+}
 
 systemDark.addEventListener('change', themer);
 

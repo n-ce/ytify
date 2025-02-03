@@ -6,7 +6,6 @@ import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
 import { getData } from "../modules/getStreamData";
 
-
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
 const seekFwdButton = <HTMLButtonElement>document.getElementById('seekFwdButton');
@@ -21,23 +20,23 @@ const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 const msn = 'mediaSession' in navigator;
 function updatePositionState() {
-  if (msn)
-    if ('setPositionState' in navigator.mediaSession)
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration,
-        playbackRate: audio.playbackRate,
-        position: audio.currentTime,
-      });
+  if (msn && 'setPositionState' in navigator.mediaSession)
+    navigator.mediaSession.setPositionState({
+      duration: audio.duration,
+      playbackRate: audio.playbackRate,
+      position: audio.currentTime,
+    });
 }
 
 
-
 playButton.onclick = function() {
-  if (!store.stream.id) return;
-  store.player.playbackState === 'playing' ?
-    audio.pause() :
+  if (
+    store.stream.id &&
+    store.player.playbackState === 'playing'
+  )
+    audio.pause();
+  else
     audio.play();
-
 }
 
 
@@ -91,7 +90,7 @@ const playableCheckerID = setInterval(() => {
 }, 500);
 
 
-audio.onloadeddata = function() {
+audio.onloadstart = function() {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
   historyID = store.stream.id;
@@ -174,43 +173,53 @@ audio.oncanplaythrough = function() {
     getData(nextItem, true);
 }
 
-audio.onerror = function() {
+audio.onerror = async function() {
   audio.pause();
-  const id = store.stream.id;
   const message = 'Error 403 : Unauthenticated Stream';
+  const _ = store.api;
+  const id = store.stream.id;
 
-  if (getSaved('custom_instance_2'))
+  if (getSaved('custom_instance_2') || store.player.hls.on)
     return notify(message);
 
-  if (store.player.HLS) {
-    notify(message);
-    player(id);
-    return;
-  }
-
+  if (_.piped[0] === location.origin) return;
 
   const origin = new URL(audio.src).origin;
 
-  if (store.api.index < store.api.invidious.length) {
-    const proxy = store.api.invidious[store.api.index];
+  if (_.index < _.invidious.length) {
+    const proxy = _.invidious[store.api.index];
     title.textContent = `Switching proxy to ${proxy.slice(8)}`;
     audio.src = audio.src.replace(origin, proxy);
-    store.api.index++;
+    _.index++;
   }
   else {
-    store.api.index = 0;
+    _.index = 0;
     notify(message);
     title.textContent = store.stream.title;
 
-    getDownloadLink(store.stream.id)
-      .then(_ => {
-        if (_)
-          audio.src = _;
-        else throw new Error();
-      })
-      .catch(() => {
-        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-      })
+    // Emergency Handling
+    const fbk = store.player.fallback;
+    if (!fbk) useCobalt();
+    else
+      fetch(+ '/streams/' + id)
+        .then(res => res.json())
+        .then(data => {
+          import('../modules/setAudioStreams.ts')
+            .then(mod => mod.default(data.audioStreams));
+        })
+        .catch(useCobalt);
+
+    function useCobalt() {
+      getDownloadLink(id)
+        .then(_ => {
+          if (_)
+            audio.src = _;
+          else throw new Error();
+        })
+        .catch(() => {
+          playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+        })
+    }
 
   }
 
@@ -223,8 +232,7 @@ loopButton.onclick = function() {
 }
 
 
-
-playPrevButton.onclick = function() {
+function prev() {
   if (store.streamHistory.length > 1) {
     appendToQueuelist(store.stream, true);
     store.streamHistory.pop();
@@ -232,6 +240,7 @@ playPrevButton.onclick = function() {
   }
 }
 
+playPrevButton.onclick = prev;
 
 
 function onEnd() {
@@ -297,6 +306,10 @@ if (msn) {
   });
   navigator.mediaSession.setActionHandler("nexttrack", () => {
     onEnd();
+    updatePositionState();
+  });
+  navigator.mediaSession.setActionHandler("previoustrack", () => {
+    prev();
     updatePositionState();
   });
 }
