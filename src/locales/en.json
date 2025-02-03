@@ -146,7 +146,7 @@
     "settings_export": "Export Settings",
     "settings_import": "Import Settings",
     "piped_enter_auth": "Enter the Piped Authentication Instance API URL :",
-    "piped_enter_username": "Enter username: ",
+    "piped_enter_username": "Enter username:",
     "piped_enter_password": "Password",
     "piped_success_auth": "Successfully logged out of your piped account.",
     "piped_failed_auth": "Couldn't logout successfully",
@@ -160,5 +160,6 @@
     "updater_changelog_full": "Read all previous changes",
     "updater_update": "Update",
     "updater_later": "Later",
-    "pwa_share_prompt": "Click ok to Play, click cancel to Download"
+    "pwa_share_prompt": "Click ok to Play, click cancel to Download",
+    "upcoming_change": "Changes will take place from next stream"
 }
