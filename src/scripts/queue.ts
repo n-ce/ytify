@@ -11,7 +11,6 @@ const [
   shuffleQBtn,
   removeQBtn,
   filterLT10Btn,
-  allowDuplicatesBtn,
   enqueueRelatedStreamsBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
 
@@ -19,10 +18,6 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
-
-  if (!allowDuplicatesBtn.classList.contains('redup'))
-    if (store.queue.includes(data.id))
-      return;
 
   if (filterLT10Btn.classList.contains('filter'))
     if (isLongerThan10Min(<string>data.duration))
@@ -151,20 +146,6 @@ if (getSaved('enqueueRelatedStreams') === 'on')
   enqueueRelatedStreamsBtn.className = 'checked';
 
 
-
-allowDuplicatesBtn.addEventListener('click', () => {
-  if (allowDuplicatesBtn.classList.contains('redup'))
-    removeSaved('allowDuplicates')
-  else
-    save('allowDuplicates', 'true');
-  allowDuplicatesBtn.classList.toggle('redup');
-});
-
-if (getSaved('allowDuplicates') === 'true')
-  allowDuplicatesBtn.className = 'redup';
-
-
-
 function isLongerThan10Min(duration: string) {
   const hhmmss = duration.split(':');
   return !(
@@ -172,6 +153,27 @@ function isLongerThan10Min(duration: string) {
     parseInt(hhmmss[0]) < 10
   );
 }
+
+// queuelist mutation observer
+
+new MutationObserver(m => {
+  for (const mutation of m) {
+    if (mutation.type === "childList") {
+      const query = store.queue.join('');
+      store.upcomingQuery = query;
+
+      if (location.pathname === '/upcoming') {
+        history.replaceState({}, '',
+          location.pathname + (
+            query ?
+              `?a=${query}` : ''
+          )
+        );
+      }
+    }
+  }
+}).observe(queuelist, { childList: true });
+
 
 new Sortable(queuelist, {
   handle: '.ri-draggable',

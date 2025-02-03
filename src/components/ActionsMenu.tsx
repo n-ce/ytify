@@ -1,5 +1,5 @@
 import { actionsMenu, loadingScreen, openInYtBtn } from "../lib/dom";
-import { $, i18n, getDownloadLink, hostResolver } from "../lib/utils";
+import { $, getDownloadLink } from "../lib/utils";
 import fetchList from "../modules/fetchList";
 import { appendToQueuelist } from "../scripts/queue";
 import { getSaved, store } from "../lib/store";
@@ -28,11 +28,14 @@ const Lyrics = lazy(() => import('./Lyrics.tsx'));
 export default function() {
 
   const [isMusic, setMusic] = createSignal(false);
+  const [isWatchOnYtify, setWatchOnYtify] = createSignal('' as string | null);
 
   onMount(() => {
     new IntersectionObserver(() => {
-      if (actionsMenu.checkVisibility())
+      if (actionsMenu.checkVisibility()) {
         setMusic(store.actionsMenu.author.endsWith('- Topic'));
+        setWatchOnYtify(getSaved('watchOnYtify'));
+      }
     }).observe(actionsMenu);
   });
 
@@ -42,14 +45,14 @@ export default function() {
         appendToQueuelist(store.actionsMenu, true);
         close();
       }}>
-        <i class="ri-skip-forward-line"></i>{i18n('actions_menu_play_next')}
+        <i class="ri-skip-forward-line"></i>Play Next
       </li>
 
       <li tabindex={1} on:click={() => {
         appendToQueuelist(store.actionsMenu);
         close();
       }}>
-        <i class="ri-list-check-2"></i>{i18n('actions_menu_enqueue')}
+        <i class="ri-list-check-2"></i>Enqueue
       </li>
 
       <CollectionSelector collection={store.actionsMenu} close={close} />
@@ -60,7 +63,7 @@ export default function() {
           close();
           fetchList('/playlists/RD' + store.actionsMenu.id, true);
         }}>
-          <i class="ri-radio-line"></i>{i18n('actions_menu_start_radio')}
+          <i class="ri-radio-line"></i>Start Radio
         </li>
       </Show>
 
@@ -75,7 +78,7 @@ export default function() {
         }
         loadingScreen.close();
       }}>
-        <i class="ri-download-2-fill"></i>{i18n('actions_menu_download')}
+        <i class="ri-download-2-fill"></i>Download
       </li>
 
       <Show when={!getSaved('kidsMode_View Channel/Artist Button')}>
@@ -92,12 +95,7 @@ export default function() {
 
           fetchList(smd.channelUrl);
         }}>
-
-          <i class="ri-user-line"></i>
-          {i18n(isMusic() ?
-            'actions_menu_view_artist' :
-            'actions_menu_view_channel')
-          }
+          <i class="ri-user-line"></i>View {isMusic() ? 'Artist' : 'Channel'}
         </li>
       </Show>
 
@@ -108,21 +106,26 @@ export default function() {
             render(Lyrics, document.body);
           }
         }>
-          <i class="ri-music-2-line"></i>{i18n('actions_menu_view_lyrics')}
+          <i class="ri-music-2-line"></i>View Lyrics
         </li> :
 
         <Show when={!getSaved('kidsMode_Watch On Button')}>
-
-          <li tabindex={6} on:click={() => {
-            close();
-            if (getSaved('linkHost'))
-              open(hostResolver('/watch?v=' + store.actionsMenu.id));
-            else
-              render(WatchOnYtify, document.body);
-          }}>
-            <i class="ri-video-line"></i>{i18n('actions_menu_watch_on', store.linkHost.slice(8))}
-          </li>
-
+          {
+            isWatchOnYtify() ?
+              <li tabindex={6} on:click={() => {
+                close();
+                render(WatchOnYtify, document.body);
+              }}>
+                <i class="ri-youtube-line"></i>Watch on  ytify
+              </li>
+              :
+              <li tabindex={6} on:click={() => {
+                close();
+                open('https://youtu.be/' + store.actionsMenu.id);
+              }}>
+                <i class="ri-youtube-line"></i>Watch on YouTube
+              </li>
+          }
         </Show>
 
       }
@@ -148,7 +151,7 @@ export default function() {
         }, document.body);
 
       }}>
-        <i class="ri-bug-line"></i>{i18n('actions_menu_debug_info')}
+        <i class="ri-bug-line"></i> Debug Information
       </li>
 
     </ul>

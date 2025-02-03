@@ -5,8 +5,8 @@ import { convertSStoHHMMSS, goTo, renderDataIntoFragment } from "../lib/utils";
 export default async function(ids: string[]) {
 
   let index = 0;
-  const pi = store.api.piped.concat(store.player.hls.api);
   function instance() {
+    const pi = store.api.piped;
     if (index < pi.length - 1)
       index++;
     else index = 0;

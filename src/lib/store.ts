@@ -1,3 +1,5 @@
+import type Hls from "hls.js";
+
 export const params = (new URL(location.href)).searchParams;
 
 export const getSaved = localStorage.getItem.bind(localStorage);
@@ -5,19 +7,14 @@ export const getSaved = localStorage.getItem.bind(localStorage);
 export const store: {
   player: {
     playbackState: 'none' | 'playing' | 'paused',
-    hls: {
-      on: boolean,
-      src: (arg0: string) => void,
-      api: string[],
-      manifests: string[]
-    }
+    HLS: Hls | undefined,
     hq: boolean,
     codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
+    hlsCache: string[],
     legacy: boolean,
-    fallback: string,
-    usePiped: boolean
+    fallback: string
   },
   lrcSync: (arg0: number) => {} | void,
   queue: string[],
@@ -29,9 +26,10 @@ export const store: {
     hyperpipe: string,
     index: number
   },
-  loadImage: boolean,
+  loadImage: 'off' | 'lazy' | 'eager',
   linkHost: string,
   searchQuery: string,
+  upcomingQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
@@ -39,12 +37,7 @@ export const store: {
 } = {
   player: {
     playbackState: 'none',
-    hls: {
-      on: Boolean(getSaved('HLS')),
-      src: () => '',
-      manifests: [],
-      api: ['https://pipedapi.kavin.rocks']
-    },
+    HLS: undefined,
     hq: Boolean(getSaved('hq')),
     codec: 'opus',
     supportsOpus: navigator.mediaCapabilities.decodingInfo({
@@ -54,9 +47,9 @@ export const store: {
       }
     }).then(res => res.supported),
     data: undefined,
+    hlsCache: [],
     legacy: !('OffscreenCanvas' in window),
-    fallback: '',
-    usePiped: true
+    fallback: ''
   },
   lrcSync: () => '',
   queue: [],
@@ -70,13 +63,14 @@ export const store: {
   streamHistory: [],
   api: {
     piped: ['https://pipedapi.kavin.rocks'],
-    invidious: ['https://iv.ggtyler.dev'],
+    invidious: ['https://invidious.jing.rocks'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },
-  loadImage: getSaved('imgLoad') !== 'off',
+  loadImage: getSaved('imgLoad') as 'off' | 'lazy' || 'eager',
   linkHost: getSaved('linkHost') || location.origin,
   searchQuery: '',
+  upcomingQuery: '',
   superCollectionType: 'featured',
   actionsMenu: {
     id: '',

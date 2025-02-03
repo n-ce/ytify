@@ -83,7 +83,11 @@ listBtnsContainer.addEventListener('click', async e => {
     saveDB(db);
   }
   else if (btn === shareCollectionBtn)
-    shareCollection(db[id]);
+    shareCollection(
+      Object
+        .keys(db[id])
+        .join('')
+    );
   else if (btn === radioCollectionBtn)
     import('../modules/supermix').then(mod => mod.default(Object.keys(db[id])))
   else if (btn === sortCollectionBtn) {

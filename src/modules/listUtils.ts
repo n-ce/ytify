@@ -1,8 +1,8 @@
-import { listContainer, loadingScreen, subscribeListBtn } from "../lib/dom";
+import { listContainer, subscribeListBtn } from "../lib/dom";
 import { getThumbIdFromLink } from "../lib/imageUtils";
 import { addListToCollection, createCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { store } from "../lib/store";
-import { i18n, notify } from "../lib/utils";
+import { notify } from "../lib/utils";
 
 export function subscribeList(db: Library) {
   const l = store.list;
@@ -32,7 +32,7 @@ export function subscribeList(db: Library) {
 
 export function importList() {
 
-  const listTitle = prompt(i18n('list_set_title'), store.list.name);
+  const listTitle = prompt('Set Title', store.list.name);
 
   if (!listTitle) return;
 
@@ -54,32 +54,15 @@ export function importList() {
     });
 
   addListToCollection(listTitle, list);
-  notify(i18n('list_imported', listTitle));
+  notify(listTitle + ' has been imported to your collections.');
 }
 
-export function shareCollection(data: Collection) {
-
-  loadingScreen.showModal();
-
-  fetch(location.origin + '/blob', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-    .then(res => res.text())
-    .then(_ => {
-      const type = "text/plain";
-      const blob = new Blob([_], { type });
-      const link = [new ClipboardItem({ [type]: blob })];
-      navigator.clipboard.write(link);
-    })
-    .catch(() => {
-      alert('failed');
-    })
-    .finally(() => loadingScreen.close());
-
+export function shareCollection(shareId: string) {
+  const text = location.origin + location.pathname + '?si=' + shareId;
+  const type = "text/plain";
+  const blob = new Blob([text], { type });
+  const data = [new ClipboardItem({ [type]: blob })];
+  navigator.clipboard.write(data);
 }
 
 

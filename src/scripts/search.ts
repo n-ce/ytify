@@ -31,12 +31,13 @@ function searchLoader() {
     searchFilters.value
   )
     .catch(err => {
-      if (useInvidious && store.api.index >= store.api.invidious.length)
-        store.api.index = -1;
+      if (useInvidious || err.message === 'nextpage error') return;
 
-      if (err.message === 'nextpage error') return;
-
-      errorHandler(err.message, searchLoader);
+      errorHandler(
+        err.message,
+        searchLoader,
+        () => ''
+      )
     })
     .finally(() => loadingScreen.close());
 
@@ -70,7 +71,13 @@ superInput.addEventListener('input', async () => {
 
   const fetchSuggestions = async () => fetch(getApi('piped') + '/opensearch/suggestions/?query=' + text)
     .then(res => res.json())
-    .catch(e => errorHandler(e.message, fetchSuggestions));
+    .catch(() =>
+      errorHandler(
+        '',
+        fetchSuggestions,
+        () => ''
+      )
+    );
 
   const data = (await fetchSuggestions())[1];
 

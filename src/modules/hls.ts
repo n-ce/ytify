@@ -4,10 +4,11 @@ import { audio, playButton } from '../lib/dom';
 import Hls from "hls.js";
 
 export default function() {
-  const h = new Hls();
+  store.player.HLS = new Hls();
+  const h = store.player.HLS;
 
   h.attachMedia(audio);
-  store.player.hls.src = h.loadSource.bind(h);
+
   h.on(Hls.Events.MANIFEST_PARSED, () => {
     h.currentLevel = store.player.hq ?
       h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
@@ -30,9 +31,7 @@ export default function() {
 
     }
     else {
-      if (d.details === 'levelLoadError')
-        return;
-      const hlsUrl = store.player.hls.manifests.shift();
+      const hlsUrl = store.player.hlsCache.shift();
       if (hlsUrl) {
         h.stopLoad();
         h.loadSource(hlsUrl);

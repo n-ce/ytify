@@ -9,7 +9,7 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  const keys = Netlify.env.get('rkeys')!.split(',');
+  const keys = Netlify.env.get('RAPID_API_KEYS')!.split(',');
 
   shuffle(keys);
 
@@ -28,8 +28,7 @@ export default async (request: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: '/*',
-  excludedPath: '/list'
+  path: '/*'
 };
 
 const host = 'yt-api.p.rapidapi.com';
