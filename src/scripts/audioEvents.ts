@@ -1,10 +1,11 @@
 import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
 import { getData } from "../modules/getStreamData";
+
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
@@ -20,23 +21,23 @@ const volumeIcon = <HTMLLabelElement>volumeChanger.previousElementSibling;
 
 const msn = 'mediaSession' in navigator;
 function updatePositionState() {
-  if (msn && 'setPositionState' in navigator.mediaSession)
-    navigator.mediaSession.setPositionState({
-      duration: audio.duration,
-      playbackRate: audio.playbackRate,
-      position: audio.currentTime,
-    });
+  if (msn)
+    if ('setPositionState' in navigator.mediaSession)
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime,
+      });
 }
 
 
+
 playButton.onclick = function() {
-  if (
-    store.stream.id &&
-    store.player.playbackState === 'playing'
-  )
-    audio.pause();
-  else
+  if (!store.stream.id) return;
+  store.player.playbackState === 'playing' ?
+    audio.pause() :
     audio.play();
+
 }
 
 
@@ -90,7 +91,7 @@ const playableCheckerID = setInterval(() => {
 }, 500);
 
 
-audio.onloadstart = function() {
+audio.onloadeddata = function() {
   playButton.classList.replace('ri-loader-3-line', 'ri-play-circle-fill');
   if (isPlayable) audio.play();
   historyID = store.stream.id;
@@ -173,48 +174,43 @@ audio.oncanplaythrough = function() {
     getData(nextItem, true);
 }
 
-audio.onerror = async function() {
+audio.onerror = function() {
   audio.pause();
+  const id = store.stream.id;
   const message = 'Error 403 : Unauthenticated Stream';
-  const _ = store.api;
 
-  if (getSaved('custom_instance_2') || store.player.hls.on)
+  if (getSaved('custom_instance_2'))
     return notify(message);
 
-  if (_.piped[0] === location.origin) return;
+  if (store.player.HLS) {
+    notify(message);
+    player(id);
+    return;
+  }
 
 
   const origin = new URL(audio.src).origin;
 
-  if (_.index < _.invidious.length) {
-    const proxy = _.invidious[store.api.index];
+  if (store.api.index < store.api.invidious.length) {
+    const proxy = store.api.invidious[store.api.index];
     title.textContent = `Switching proxy to ${proxy.slice(8)}`;
     audio.src = audio.src.replace(origin, proxy);
-    _.index++;
+    store.api.index++;
   }
   else {
-    _.index = 0;
+    store.api.index = 0;
     notify(message);
     title.textContent = store.stream.title;
-    // Emergency Handling
-    const f = store.player.fallback;
 
-    if (!f) return;
-
-    _.piped.unshift(f);
-
-    const data = await getData(store.stream.id) as Piped;
-
-    if (data.audioStreams)
-      import('../modules/setAudioStreams')
-        .then(mod => mod.setAudioStreams(
-          data.audioStreams
-            .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-            ),
-          data.livestream
-        ));
-    else
-      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    getDownloadLink(store.stream.id)
+      .then(_ => {
+        if (_)
+          audio.src = _;
+        else throw new Error();
+      })
+      .catch(() => {
+        playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      })
 
   }
 
@@ -227,7 +223,8 @@ loopButton.onclick = function() {
 }
 
 
-function prev() {
+
+playPrevButton.onclick = function() {
   if (store.streamHistory.length > 1) {
     appendToQueuelist(store.stream, true);
     store.streamHistory.pop();
@@ -235,7 +232,6 @@ function prev() {
   }
 }
 
-playPrevButton.onclick = prev;
 
 
 function onEnd() {
@@ -301,10 +297,6 @@ if (msn) {
   });
   navigator.mediaSession.setActionHandler("nexttrack", () => {
     onEnd();
-    updatePositionState();
-  });
-  navigator.mediaSession.setActionHandler("previoustrack", () => {
-    prev();
     updatePositionState();
   });
 }

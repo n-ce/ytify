@@ -1,6 +1,6 @@
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { $, getDownloadLink, i18n, idFromURL, proxyHandler } from '../lib/utils';
+import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
@@ -12,8 +12,7 @@ export default async function() {
   if (custom_instance) {
 
     const [pi, iv] = custom_instance.split(',');
-    store.player.hls.api[0] =
-      store.api.piped[0] = pi;
+    store.api.piped[0] = pi;
     store.api.invidious[0] = iv;
 
   } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
@@ -22,13 +21,11 @@ export default async function() {
       store.api.piped = data.piped;
       store.api.invidious = data.invidious;
       store.api.hyperpipe = data.hyperpipe;
-      store.player.hls.api = data.hls;
-      store.player.usePiped = data.status === 1;
       store.player.fallback = location.origin;
     });
 
 
-  if (store.player.hls.on) {
+  if (getSaved('HLS')) {
     // handling bitrates with HLS will increase complexity, better to detach from DOM
     bitrateSelector.remove();
     if (store.player.legacy) return;
@@ -52,7 +49,7 @@ export default async function() {
   const id = params.get('s') || isPWA;
   let shareAction = getSaved('shareAction');
   if (isPWA && shareAction === 'ask')
-    shareAction = confirm(i18n('pwa_share_prompt')) ?
+    shareAction = confirm('Click ok to Play, click cancel to Download') ?
       '' : 'dl';
 
   if (id) {

@@ -8,16 +8,22 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is the fastest (56KB to load) and the lightest (7.5K LOC only) centralised audio streaming web application built with an unprecedented hybrid [HTML + SolidJS] approach for maximum efficiency.
+> [**ytify**](https://ytify.netlify.app) is the fastest (50KB to load) and the lightest (7K LOC only) audio streaming web application built with a unprecedented hybrid [Vanilla Typescript + SolidJS] approach for maximum efficiency.
 >  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 > As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
 
 ## What else are you getting ?
-- **Queuing Features** 🚦
-- **ytify collections** 🎷: create your own playlists disconnected from YouTube, share it with the world with share link.
-- **YouTube Playlists** 🎶: View them, queue them to the player. You can also both subscribe and import it into your own collections.
-- **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail with High Contrast Mode for increased legibility.
+- **Queue** 🚦:
+  - Add multiple streams to keep your audio streams going.
+  - You can share your queue with anyone just by sharing the url.
+  - Auto-Queue : automatically enqueues relevant streams.
+- **Playlists** 🎶:
+  - View YouTube playlists , queue them to the player. You can also both subscribe and import it into your own collection
+  - ytify Collections : create your own playlists disconnected from YouTube, share it with the world with share link.
+- **Theming** 🎨:
+  - Modern Autonomous themed UI based on stream thumbnail.
+  - High Contrast Mode for increased legibility.
 - **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
 - **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
 - **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
@@ -42,10 +48,8 @@
 
 
 ## Usage 👆
-- Instance
-  - [Official](https://ytify.us.kg)
-  - [Secondary](https://ytify.netlify.app)
-  - [Testing](https://dev--ytify.netlify.app)
+- Official Instance : https://ytify.us.kg
+- Secondary Instance : https://ytify.netlify.app
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Telegram Community [@ytifytg](https://t.me/ytifytg)
 - Join our Matrix Community
@@ -80,42 +84,6 @@ cd ytify ; npm run update; npm i
 npm run dev -- --open
 ```
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
-
-
-#### Vite building the project on my entry-level phone.
-
-```bash
-vite v6.0.11 building for production...
-✓ 56 modules transformed.
-dist/manifest.webmanifest                          1.00 kB
-dist/index.html                                   15.98 kB │ gzip:   4.12 kB
-dist/assets/UpdatePrompt-BVWVWGFX.css              0.72 kB │ gzip:   0.40 kB
-dist/assets/ActionsMenu-CZvdWJ42.css               0.91 kB │ gzip:   0.45 kB
-dist/assets/Settings-tEADDnJ_.css                  2.25 kB │ gzip:   0.73 kB
-dist/assets/index--EX9VXLN.css                    20.68 kB │ gzip:   5.01 kB
-dist/assets/enqueueRelatedStreams-DdHTYd6g.js      0.35 kB │ gzip:   0.27 kB
-dist/assets/extractColorFromImage-Cxdm9n2W.js      0.62 kB │ gzip:   0.42 kB
-dist/assets/setAudioStreams-BVS_1Ljb.js            0.84 kB │ gzip:   0.56 kB
-dist/assets/setDiscoveries-TaEtEbHx.js             0.93 kB │ gzip:   0.54 kB
-dist/assets/virtual_pwa-register-CvOwgYno.js       0.96 kB │ gzip:   0.55 kB
-dist/assets/UpdatePrompt-D5n4sX3r.js               1.09 kB │ gzip:   0.62 kB
-dist/assets/supermix-BtwNGR11.js                   1.11 kB │ gzip:   0.68 kB
-dist/assets/importPipedPlaylists-B2u7XIyS.js       1.24 kB │ gzip:   0.60 kB
-dist/assets/Lyrics-zDQNW8E2.js                     1.24 kB │ gzip:   0.80 kB
-dist/assets/start-BQEMUpCE.js                      1.95 kB │ gzip:   1.06 kB
-dist/assets/partsManager-DmWC75D0.js               1.96 kB │ gzip:   0.67 kB
-dist/assets/WatchOnYtify-LiGdckDA.js               2.84 kB │ gzip:   1.22 kB
-dist/assets/ActionsMenu-BzqUfV6s.js                4.06 kB │ gzip:   1.72 kB
-dist/assets/workbox-window.prod.es5-DL_hIMXg.js    5.72 kB │ gzip:   2.36 kB
-dist/assets/en-D06fOH0-.js                        11.19 kB │ gzip:   3.67 kB
-dist/assets/pl-D1p_NQ5j.js                        11.99 kB │ gzip:   4.26 kB
-dist/assets/Settings-CBM8jAms.js                  13.25 kB │ gzip:   4.38 kB
-dist/assets/index-pbIhJqLG.js                     89.34 kB │ gzip:  32.19 kB
-dist/assets/hls-CySapf1N.js                      399.85 kB │ gzip: 123.78 kB
-✓ built in 9.51s
-```
-
-
  
 ## Acknowledgements 🙏
 - [Uma](https://github.com/n-ce/Uma) - Instances Manager

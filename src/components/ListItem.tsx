@@ -11,33 +11,39 @@ export default function ListItem(
   uploader_data: string,
   url: string,
 ) {
-
   const [getThumbnail, setThumbnail] = createSignal(thumbnail);
-  let img!: HTMLImageElement;
+  const showImage = (store.loadImage === 'off') ? undefined : store.loadImage;
 
-  function unravel() {
+  function handleError(e: Event) {
+    const img = e.target as HTMLImageElement;
     img.parentElement!.classList.remove('ravel');
-  }
-  function handleError() {
-    unravel();
     setThumbnail('/logo192.png');
   }
 
+
+
+
+  function handleLoad(e: Event) {
+    const img = e.target as HTMLImageElement;
+    img.parentElement!.classList.remove('ravel');
+  }
+
+
   return (
     <a
-      class={'listItem ' + (store.loadImage ? 'ravel' : '')}
+      class={'listItem ' + (showImage ? 'ravel' : '')}
       href={hostResolver(url)}
       data-title={title}
       data-url={url}
       data-thumbnail={thumbnail}
       data-uploader={uploader_data}
     >
-      <Show when={store.loadImage}>
+      <Show when={showImage}>
         <img
-          ref={img}
+          loading={showImage as 'lazy' | 'eager' | undefined}
           src={getThumbnail()}
           onError={handleError}
-          onLoad={unravel}
+          onLoad={handleLoad}
         />
       </Show>
       <div>

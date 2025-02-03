@@ -1,6 +1,6 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { i18n, errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
+import { errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
 
 export default async function fetchList(
@@ -8,7 +8,7 @@ export default async function fetchList(
   mix = false
 ) {
   if (!url)
-    return notify(i18n('fetchlist_url_null'));
+    return notify('No Channel URL provided');
 
 
   loadingScreen.showModal();
@@ -36,16 +36,17 @@ export default async function fetchList(
     })
     .catch(err => {
       if (err.message === 'Could not get playlistData')
-        notify(i18n('fetchlist_error'));
+        notify(err.message);
       else if (err.message === 'Got error: "The playlist does not exist."') {
-        notify(i18n('fetchlist_nonexistent'));
+        notify(err.message);
         const db = getDB();
         delete db.playlists[url.slice(11)];
         saveDB(db);
       }
       else errorHandler(
         mix ? 'No Mixes Found' : err.message,
-        () => fetchList(url, mix)
+        () => fetchList(url, mix),
+        () => ''
       )
     })
     .finally(() => loadingScreen.close());

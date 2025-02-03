@@ -1,15 +1,18 @@
+
+// piped import playlists into ytify collections
+
 import { addListToCollection, createCollection, superCollectionLoader } from "../lib/libraryUtils";
-import { i18n, convertSStoHHMMSS, notify } from "../lib/utils";
+import { convertSStoHHMMSS, notify } from "../lib/utils";
 
 export async function pipedPlaylistsImporter() {
 
-  const instance = prompt(i18n('piped_enter_auth'), 'https://pipedapi.kavin.rocks');
+  const instance = prompt('Enter the Piped Authentication Instance API URL :', 'https://pipedapi.kavin.rocks');
   if (!instance) return;
 
-  const username = prompt(i18n('piped_enter_username'));
+  const username = prompt('Enter Username :');
   if (!username) return;
 
-  const password = prompt(i18n('piped_enter_password'));
+  const password = prompt('Enter Password :');
   if (!password) return;
 
   // login 
@@ -18,14 +21,14 @@ export async function pipedPlaylistsImporter() {
     body: JSON.stringify({ username, password })
   })
     .then(res => res.json())
-    .catch(e => notify(i18n("piped_failed_login", e)));
+    .catch(e => notify(`Failed to Login, Error : ${e}`));
 
   if (!authId) {
-    notify(i18n("piped_failed_token"));
+    notify('No Auth Token Found! Aborted Login Process.');
     return;
   }
 
-  notify(i18n("piped_success_logged"));
+  notify('Succesfully logged in to account.');
 
   // fetch
   const playlists = await fetch(instance + '/user/playlists', {
@@ -33,9 +36,9 @@ export async function pipedPlaylistsImporter() {
       Authorization: authId.token
     }
   }).then(res => res.json())
-    .catch(e => notify(i18n("piped_failed_find", e)));
+    .catch(e => notify(`Failed to Find Playlists, Error : ${e}`));
   if (playlists.length)
-    notify(i18n("piped_success_fetched"));
+    notify('Succesfully fetched playlists from account.')
   else return;
 
 
@@ -63,10 +66,10 @@ export async function pipedPlaylistsImporter() {
         addListToCollection(listTitle, list);
       })
   )).then(() => {
-    notify(i18n('piped_success_imported'));
+    notify('Succesfully imported playlists from your piped account into ytify as collections');
   })
     .catch(e => {
-      notify(i18n("piped_failed_imported", e));
+      notify('Could not successfully import all playlists, Error : ' + e);
     });
 
   superCollectionLoader('collections');
@@ -79,12 +82,10 @@ export async function pipedPlaylistsImporter() {
       Authorization: authId.token
     }
   }).then(res => {
-    notify(i18n(
-      res.ok ?
-        'piped_success_auth' :
-        'piped_failed_auth'
-    ));
+    notify(res.ok ?
+      'Succesfully logged out of your piped account.' :
+      'Couldn\'t logout successfully'
+    );
   });
 }
-
 

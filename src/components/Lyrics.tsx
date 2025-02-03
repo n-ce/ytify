@@ -37,9 +37,6 @@ export default function Lyrics() {
           );
           store.lrcSync = (d: number) => {
             const i = durarr.findIndex(da => Math.abs(da - d) < 1);
-            if (i + 1 === durarr.length)
-              return dialog.click();
-
             if (i < 0 || active() === i)
               return;
             dialog
@@ -67,7 +64,6 @@ export default function Lyrics() {
       onclick={() => {
         dialog.close();
         dialog.remove();
-        store.lrcSync = () => '';
       }}
     >
       <section>

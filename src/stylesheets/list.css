@@ -1,15 +1,5 @@
 #listTools {
 
-  button {
-    i {
-      pointer-events: none;
-    }
-
-    &::after {
-      content: attr(aria-label);
-    }
-  }
-
   &.playlist {
 
     #clearListBtn,
@@ -58,7 +48,7 @@
   }
 
   &.supermix,
-  &.shared {
+  &.sharedClxn {
     button {
       display: none;
     }
@@ -70,7 +60,7 @@
   }
 }
 
-#listContainer {
+#playlist {
   width: 100%;
 
   &.reverse {

@@ -29,7 +29,7 @@ export async function setMetaData(data: CollectionItem) {
   };
 
   const imgX = generateImageUrl(data.id, 'maxres', music);
-  if (store.loadImage) {
+  if (store.loadImage !== 'off') {
     img.src = imgX
     metadataObj.artwork = [
       { src: img.src, sizes: '96x96' },

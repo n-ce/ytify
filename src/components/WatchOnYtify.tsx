@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createSignal, For, onMount } from "solid-js";
 import { generateImageUrl } from "../lib/imageUtils";
 import { store } from "../lib/store";
 import { getData } from "../modules/getStreamData";
@@ -8,43 +8,37 @@ import { loadingScreen } from "../lib/dom";
 
 export default function WatchOnYtify() {
 
-  const [data, setData] = createSignal({
-    video: [] as string[][],
-    audio: [] as string[][],
-    captions: [] as Captions[]
-  });
+  const [vFormats, setVF] = createSignal([] as string[][]);
+  const [aFormats, setAF] = createSignal([] as string[][]);
+  const audio = new Audio();
 
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
-  const audio = new Audio();
 
   onMount(async () => {
     loadingScreen.showModal();
     const data = await getData(store.actionsMenu.id) as unknown as Piped & {
-      captions: Captions[],
       videoStreams: Record<'url' | 'type' | 'resolution', string>[]
     };
     loadingScreen.close();
 
-    setData({
-      video: data.videoStreams
-        .map(f => {
-          const codec =
-            f.type.includes('avc1') ? 'AVC' :
-              f.type.includes('av01') ? 'AV1' : 'VP9';
-          return [`${f.resolution} ${codec}`, f.url];
-        }),
-      audio: data.audioStreams
-        .filter(a => !a.url.includes('acont%3Ddubbed'))
-        .map(f => {
-          const codec =
-            f.mimeType.includes('opus') ? 'opus' : 'M4A';
-          return [`${f.quality} ${codec}`, f.url];
-        }),
-      captions: data.captions
-    });
-  });
+    setVF(data.videoStreams
+      .map(f => {
+        const codec =
+          f.type.includes('avc1') ? 'AVC' :
+            f.type.includes('av01') ? 'AV1' : 'VP9';
+        return [`${f.resolution} ${codec}`, f.url];
+      }));
 
+    setAF(
+      data.audioStreams.map(f => {
+        const codec =
+          f.mimeType.includes('opus') ? 'opus' : 'M4A';
+        return [`${f.quality} ${codec}`, f.url];
+      })
+    );
+
+  });
 
   return (
     <dialog
@@ -71,17 +65,13 @@ export default function WatchOnYtify() {
         }}
         ontimeupdate={() => {
           const diff = audio.currentTime - video.currentTime;
-          const vpr = video.playbackRate;
-          const npr = vpr - diff;
-          if (npr < 0) return;
-          const rpr = Math.round(npr * 100) / 100;
-          if (rpr !== audio.playbackRate)
-            audio.playbackRate = rpr;
-
+          if (Math.abs(diff) > 0.1) {
+            console.log(diff);
+            audio.currentTime = video.currentTime - diff;
+          }
         }}
         onloadstart={() => {
-          if (!audio.paused)
-            audio.pause();
+          audio.pause();
         }}
         onplaying={() => {
           if (audio.paused)
@@ -99,27 +89,11 @@ export default function WatchOnYtify() {
           if (store.api.index < store.api.invidious.length) {
             const proxy = store.api.invidious[store.api.index];
             video.src = video.src.replace(origin, proxy);
-            audio.src = audio.src.replace(origin, proxy);
-
             store.api.index++;
           }
         }}
 
-      >
-        <Show when={data().captions.length}>
-          <option>Captions</option>
-          <For each={data().captions}>
-            {(v) =>
-              <track
-                src={store.api.invidious[0] + v.url}
-                srclang={v.label}
-              >
-              </track>
-            }
-          </For>
-        </Show>
-
-      </video>
+      ></video>
 
       <div>
 
@@ -139,8 +113,7 @@ export default function WatchOnYtify() {
           }}
           onMount={() => undefined}
         >
-          <option>Video</option>
-          <For each={data().video}>
+          <For each={vFormats()}>
             {(f) =>
               <option value={f[1]}>
                 {f[0]}
@@ -158,16 +131,14 @@ export default function WatchOnYtify() {
           }}
           onMount={() => undefined}
         >
-          <option>Audio</option>
-          <For each={data().audio}>
+          <For each={aFormats()}>
             {(f) =>
               <option value={f[1]}>
-                {f[0] + (f[1].includes('xtags=drc') ? ' DRC' : '')}
+                {f[0]}
               </option>
             }
           </For>
         </Selector>
-
 
       </div>
     </dialog >
