@@ -25,8 +25,8 @@ export default async (req: Request, context: Context) => {
 
     blobs.forEach(blob => {
       const oldDate = parseInt(blob.key);
-      const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
-      const expired = (now - oldDate) > oneWeekInMilliseconds;
+      const oneWeek = 7 * 24 * 60 * 60 * 1000;
+      const expired = (now - oldDate) > oneWeek;
 
       if (expired) _.delete(blob.key);
     });

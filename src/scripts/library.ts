@@ -1,15 +1,25 @@
 import { favButton, favIcon } from "../lib/dom";
 import { addToCollection, fetchCollection, getDB, removeFromCollection, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, i18n, removeSaved } from "../lib/utils";
-import { store } from "../lib/store";
+import { $, i18n, notify, removeSaved } from "../lib/utils";
+import { getSaved, store } from "../lib/store";
 
-
+const dbhash = getSaved('dbsync');
+const library = getSaved('library');
+const hashpoint = location.origin + '/dbs/' + dbhash;
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
 const collectionContainer = document.getElementById('collections') as HTMLDivElement;
 
 importBtn.addEventListener('change', async () => {
+  if (dbhash && confirm('You have enabled Database Sync, import data from cloud?')) {
+    const data = await fetch(hashpoint)
+      .then(res => res.json())
+      .catch(() => '');
+    if (data) saveDB(data);
+    else notify('No Data Found!');
+    return;
+  }
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
   const oldDB = getDB();
   if (!confirm(i18n('library_import_prompt'))) return;
@@ -55,3 +65,19 @@ collectionContainer.addEventListener('click', e => {
     fetchCollection(elm.id);
 });
 
+if (dbhash && library) {
+  fetch(hashpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: library,
+  })
+    .then(res => res.ok)
+    .then(() => {
+      notify('Library has been synced');
+    })
+    .catch(() => {
+      notify('Failed to sync library');
+    })
+}

@@ -337,6 +337,36 @@ export default function() {
         />
 
         <ToggleSwitch
+          id="startupTab"
+          name='settings_library_sync'
+          checked={Boolean(getSaved('dbsync'))}
+          onClick={async e => {
+            const _ = 'dbsync';
+            if (getSaved(_)) removeSaved(_);
+            else {
+              const username = prompt('Enter Username :');
+              const password = prompt('Enter Password :');
+              const confirmpw = prompt('Confirm Password :');
+
+              if (!username || password !== confirmpw) {
+                alert('Incorrect Information!');
+                e.preventDefault();
+                return;
+              }
+
+              const msgBuffer = new TextEncoder().encode(username + password);
+              const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+              const hash = Array
+                .from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+              save(_, hash);
+              location.reload();
+            };
+          }}
+        />
+
+        <ToggleSwitch
           id='discoverSwitch'
           name='settings_store_discoveries'
           checked={getSaved('discover') !== 'off'}
