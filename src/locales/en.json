@@ -109,6 +109,7 @@
   "settings_hls": "HTTP Live Streaming",
   "settings_library": "Library",
   "settings_set_as_default_tab": "Set as Default Tab",
+  "settings_library_sync": "Cloud Sync",
   "settings_store_discoveries": "Store Discoveries",
   "settings_clear_discoveries": "This will clear your existing $ discoveries, continue?",
   "settings_store_history": "Store History",

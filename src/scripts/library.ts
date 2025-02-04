@@ -3,9 +3,6 @@ import { addToCollection, fetchCollection, getDB, removeFromCollection, saveDB, 
 import { $, i18n, notify, removeSaved } from "../lib/utils";
 import { getSaved, store } from "../lib/store";
 
-const dbhash = getSaved('dbsync');
-const library = getSaved('library');
-const hashpoint = location.origin + '/dbs/' + dbhash;
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
@@ -56,6 +53,10 @@ collectionContainer.addEventListener('click', e => {
   if (elm.classList.contains('collectionItem'))
     fetchCollection(elm.id);
 });
+
+const dbhash = getSaved('dbsync');
+const library = getSaved('library');
+const hashpoint = location.origin + '/dbs/' + dbhash;
 
 if (dbhash) {
   if (library) {
