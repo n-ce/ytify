@@ -7,7 +7,7 @@ import { fetchCollection } from "../lib/libraryUtils";
 
 export default async function() {
 
-  const custom_instance = getSaved('custom_instance_2');
+  const custom_instance = getSaved('custom_instance');
 
   if (custom_instance) {
 
