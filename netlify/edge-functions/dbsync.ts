@@ -15,8 +15,7 @@ export default async (req: Request, context: Context) => {
 
     const { blobs } = await hashStore.list();
     const now = Date.now();
-    //  const oneWeek = 7 * 24 * 60 * 60 * 1000;
-    const oneWeek = 5 * 60 * 1000; // 5 minutes for testing
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
     blobs.forEach(async blob => {
       const timestamp = await hashStore.get(blob.key);
