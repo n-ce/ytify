@@ -28,7 +28,7 @@ export default async function handler(_: Request, context: Context) {
              width="100"
               src="https://upload.wikimedia.org/wikipedia/commons/6/6f/UPI_logo.svg" />
               Please donate now at <b>animesh.5383@waicici</b> and support development, even 10rs can help.
-          </p>` : "<a style='background:var(--text);color:var(--bg);border-radius:var(--roundness);' href='https://en.m.wikipedia.org/wiki/Individual_action_on_climate_change' target='_blank'> Keeping our consumptions low is the only way to retain our planet's ability to host mankind.</a>"
+          </p>` : "<a style='text-decoration: underline;' href='https://en.m.wikipedia.org/wiki/Individual_action_on_climate_change' target='_blank'> Keeping our consumptions low is the only way to retain our planet's ability to host mankind.</a>"
     }
       </div>
     `;

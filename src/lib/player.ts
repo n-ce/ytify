@@ -3,7 +3,7 @@ import { convertSStoHHMMSS } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
-import { getData } from "../modules/getStreamData";
+import getStreamData from "../modules/getStreamData";
 
 export default async function player(id: string | null = '') {
 
@@ -12,7 +12,7 @@ export default async function player(id: string | null = '') {
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
   title.textContent = 'Fetching Data...';
 
-  const data = await getData(id);
+  const data = await getStreamData(id);
 
   if (data && 'audioStreams' in data)
     store.player.data = data;

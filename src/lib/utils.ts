@@ -53,7 +53,7 @@ export function proxyHandler(url: string) {
 
   return getSaved('enforceProxy') ?
     (url + (host ? '' : `&host=${origin}`)) :
-    (host && !getSaved('custom_instance_2')) ? url.replace(origin, host) : url;
+    (host && !getSaved('custom_instance')) ? url.replace(origin, host) : url;
 }
 
 export async function quickSwitch() {

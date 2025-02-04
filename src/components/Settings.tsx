@@ -71,17 +71,17 @@ export default function() {
         <ToggleSwitch
           id='customInstanceSwitch'
           name='settings_custom_instance'
-          checked={Boolean(getSaved('custom_instance_2'))}
+          checked={Boolean(getSaved('custom_instance'))}
           onClick={() => {
-            const _ = 'custom_instance_2';
-            if (getSaved(_))
-              removeSaved(_);
+            const _ = 'custom_instance';
+            if (getSaved(_)) removeSaved(_);
             else {
               const pi = prompt(i18n('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
               const iv = prompt(i18n('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
+              const useIv = confirm('Use Invidious For Playback?');
 
               if (pi && iv)
-                save(_, pi + ',' + iv);
+                save(_, pi + ',' + iv + ',' + useIv);
             }
             location.reload();
 
@@ -334,6 +334,45 @@ export default function() {
               removeSaved(_) :
               save(_, '/library')
           }}
+        />
+
+        <ToggleSwitch
+          id="dbsync"
+          name='settings_library_sync'
+          checked={Boolean(getSaved('dbsync'))}
+          onClick={e => {
+            const _ = 'dbsync';
+            if (getSaved(_)) removeSaved(_);
+            else {
+
+              function hashCreator(text: string) {
+                const msgBuffer = new TextEncoder().encode(text);
+                crypto.subtle.digest('SHA-256', msgBuffer)
+                  .then(hashBuffer => {
+                    const hash = Array
+                      .from(new Uint8Array(hashBuffer))
+                      .map(b => b.toString(16).padStart(2, '0'))
+                      .join('');
+                    save(_, hash);
+                    location.reload();
+                  });
+              }
+
+              const termsAccepted = confirm('Data will be automatically deleted after one week of inactivity.\nytify is not responsible for data loss.\n\nI Understand');
+              if (termsAccepted) {
+                const username = prompt('Enter Username :');
+                if (username) {
+                  const password = prompt('Enter Password :');
+                  const confirmpw = prompt('Confirm Password :');
+                  if (password && password === confirmpw)
+                    hashCreator(username + password);
+                  else alert('Incorrect Information!');
+                }
+              }
+              e.preventDefault();
+            };
+          }
+          }
         />
 
         <ToggleSwitch

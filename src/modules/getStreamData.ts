@@ -1,14 +1,12 @@
 import { store } from "../lib/store";
 
-export async function getData(
+export default async function(
   id: string,
   prefetch: boolean = false
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const inv = store.api.invidious;
-  const pip = store.api.piped;
-  const hls = store.player.hls;
-  const fbk = store.player.fallback;
+  const { invidious, piped } = store.api;
+  const { hls, fallback } = store.player;
 
   const fetchDataFromPiped = (
     api: string
@@ -56,26 +54,26 @@ export async function getData(
     }));
 
   const emergency = (e: Error) =>
-    (!prefetch && fbk) ?
-      fetchDataFromPiped(fbk)
+    (!prefetch && fallback) ?
+      fetchDataFromPiped(fallback)
         .catch(() => e) : e;
 
-  const useInvidious = (index = 0): Promise<Piped> => fetchDataFromInvidious(inv[index])
+  const useInvidious = (index = 0): Promise<Piped> => fetchDataFromInvidious(invidious[index])
     .catch(e => {
-      if (index + 1 === inv.length)
+      if (index + 1 === invidious.length)
         return emergency(e);
       else return useInvidious(index + 1);
     });
 
-  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(pip[index])
+  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(piped[index])
     .catch(() => {
-      if (index + 1 === pip.length)
+      if (index + 1 === piped.length)
         return useInvidious();
       else return usePiped(index + 1);
     });
 
   const useHls = () => Promise
-    .allSettled((hls.api.length ? hls.api : pip).map(fetchDataFromPiped))
+    .allSettled((hls.api.length ? hls.api : piped).map(fetchDataFromPiped))
     .then(res => {
       const ff = res.filter(r => r.status === 'fulfilled');
       hls.manifests.length = 0;

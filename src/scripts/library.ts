@@ -1,8 +1,7 @@
 import { favButton, favIcon } from "../lib/dom";
 import { addToCollection, fetchCollection, getDB, removeFromCollection, saveDB, toCollection } from "../lib/libraryUtils";
-import { $, i18n, removeSaved } from "../lib/utils";
-import { store } from "../lib/store";
-
+import { $, i18n, notify, removeSaved } from "../lib/utils";
+import { getSaved, store } from "../lib/store";
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
@@ -55,3 +54,33 @@ collectionContainer.addEventListener('click', e => {
     fetchCollection(elm.id);
 });
 
+const dbhash = getSaved('dbsync');
+const library = getSaved('library');
+const hashpoint = location.origin + '/dbs/' + dbhash;
+
+if (dbhash) {
+  if (library) {
+    fetch(hashpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: library,
+    })
+      .then(res => res.ok)
+      .then(() => {
+        notify('Library has been synced');
+      })
+      .catch(() => {
+        notify('Failed to sync library');
+      })
+  }
+  else {
+    if (confirm('Do you want to import your library from your account?')) {
+      fetch(hashpoint)
+        .then(res => res.json())
+        .then(saveDB)
+        .catch(() => notify('No Data Found!'));
+    }
+  }
+}

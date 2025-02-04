@@ -7,14 +7,15 @@ import { fetchCollection } from "../lib/libraryUtils";
 
 export default async function() {
 
-  const custom_instance = getSaved('custom_instance_2');
+  const custom_instance = getSaved('custom_instance');
 
   if (custom_instance) {
 
-    const [pi, iv] = custom_instance.split(',');
+    const [pi, iv, useInvidious] = custom_instance.split(',');
     store.player.hls.api[0] =
       store.api.piped[0] = pi;
     store.api.invidious[0] = iv;
+    store.player.usePiped = !useInvidious;
 
   } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
     .then(res => res.json())
