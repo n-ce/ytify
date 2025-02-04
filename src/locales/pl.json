@@ -18,7 +18,7 @@
     "player_seek_backward": "Przewiń do tyłu",
     "player_seek_forward": "Przewiń do przodu",
     "player_play_next": "Odtwórz następny",
-    "upcoming_clear": "Wyczyść",
+    "upcoming_clear": "Wyczyść kolejke",
     "upcoming_shuffle": "Losowo",
     "upcoming_remove": "Usuń",
     "upcoming_filter": "Filtruj < 10:00",
@@ -157,5 +157,10 @@
     "updater_changelog_full": "Przeczytaj wszystkie poprzednie zmiany",
     "updater_update": "Aktualizuj",
     "updater_later": "Później",
-    "pwa_share_prompt": "Kliknij OK, aby odtworzyć, kliknij Anuluj, aby pobrać"
+    "pwa_share_prompt": "Kliknij OK, aby odtworzyć, kliknij Anuluj, aby pobrać",
+    "settings_library_sync": "Synchronizacja",
+    "list_prompt_delete": "Czy na pewno chcesz usunąć kolekcję $?",
+    "upcoming_change": "Zmiany zostaną wprowadzone od następnego strumienia",
+    "list_prompt_clear": "Czy na pewno chcesz wyczyścić $?",
+    "list_prompt_rename": "Wprowadź nowy tytuł"
 }
