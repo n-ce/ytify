@@ -12,14 +12,6 @@ const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement
 const collectionContainer = document.getElementById('collections') as HTMLDivElement;
 
 importBtn.addEventListener('change', async () => {
-  if (dbhash && confirm('You have enabled Database Sync, import data from cloud?')) {
-    const data = await fetch(hashpoint)
-      .then(res => res.json())
-      .catch(() => '');
-    if (data) saveDB(data);
-    else notify('No Data Found!');
-    return;
-  }
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
   const oldDB = getDB();
   if (!confirm(i18n('library_import_prompt'))) return;
@@ -65,19 +57,30 @@ collectionContainer.addEventListener('click', e => {
     fetchCollection(elm.id);
 });
 
-if (dbhash && library) {
-  fetch(hashpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: library,
-  })
-    .then(res => res.ok)
-    .then(() => {
-      notify('Library has been synced');
+if (dbhash) {
+  if (library) {
+    fetch(hashpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: library,
     })
-    .catch(() => {
-      notify('Failed to sync library');
-    })
+      .then(res => res.ok)
+      .then(() => {
+        notify('Library has been synced');
+      })
+      .catch(() => {
+        notify('Failed to sync library');
+      })
+  }
+  else {
+    if (confirm('Do you want to import your library from your account?')) {
+      const data = await fetch(hashpoint)
+        .then(res => res.json())
+        .catch(() => '');
+      if (data) saveDB(data);
+      else notify('No Data Found!');
+    }
+  }
 }
