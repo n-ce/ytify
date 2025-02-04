@@ -340,22 +340,24 @@ export default function() {
           id="dbsync"
           name='settings_library_sync'
           checked={Boolean(getSaved('dbsync'))}
-          onClick={async e => {
+          onClick={e => {
             const _ = 'dbsync';
             if (getSaved(_)) removeSaved(_);
             else {
 
-              async function hashCreator(text: string) {
+              function hashCreator(text: string) {
                 const msgBuffer = new TextEncoder().encode(text);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-                const hash = Array
-                  .from(new Uint8Array(hashBuffer))
-                  .map(b => b.toString(16).padStart(2, '0'))
-                  .join('');
-                save(_, hash);
-                location.reload();
-
+                crypto.subtle.digest('SHA-256', msgBuffer)
+                  .then(hashBuffer => {
+                    const hash = Array
+                      .from(new Uint8Array(hashBuffer))
+                      .map(b => b.toString(16).padStart(2, '0'))
+                      .join('');
+                    save(_, hash);
+                    location.reload();
+                  });
               }
+
               const termsAccepted = confirm('Data will be automatically deleted after one week of inactivity.\nytify is not responsible for data loss.\n\nI Understand');
               if (termsAccepted) {
                 const username = prompt('Enter Username :');
@@ -363,13 +365,14 @@ export default function() {
                   const password = prompt('Enter Password :');
                   const confirmpw = prompt('Confirm Password :');
                   if (password && password === confirmpw)
-                    await hashCreator(username + password);
+                    hashCreator(username + password);
                   else alert('Incorrect Information!');
                 }
               }
               e.preventDefault();
             };
-          }}
+          }
+          }
         />
 
         <ToggleSwitch
