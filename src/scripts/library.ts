@@ -77,11 +77,10 @@ if (dbhash) {
   }
   else {
     if (confirm('Do you want to import your library from your account?')) {
-      const data = await fetch(hashpoint)
+      fetch(hashpoint)
         .then(res => res.json())
-        .catch(() => '');
-      if (data) saveDB(data);
-      else notify('No Data Found!');
+        .then(saveDB)
+        .catch(() => notify('No Data Found!'));
     }
   }
 }
