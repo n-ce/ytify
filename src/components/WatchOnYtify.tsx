@@ -124,13 +124,14 @@ export default function WatchOnYtify() {
       <div>
 
         <button onclick={() => {
+          audio.pause();
+          video.pause();
           dialog.close();
           dialog.remove();
 
         }}>Close</button>
 
         <Selector
-
           id='videoCodecSelector'
           label=''
           onChange={_ => {
