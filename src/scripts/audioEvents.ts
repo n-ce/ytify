@@ -1,10 +1,11 @@
 import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, getDownloadLink, goTo, notify, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection, getCollection } from "../lib/libraryUtils";
-import { getData } from "../modules/getStreamData";
+import audioErrorHandler from "../modules/audioErrorHandler";
+import getStreamData from "../modules/getStreamData";
 
 const playSpeed = <HTMLSelectElement>document.getElementById('playSpeed');
 const seekBwdButton = <HTMLButtonElement>document.getElementById('seekBwdButton');
@@ -24,7 +25,7 @@ function updatePositionState() {
     navigator.mediaSession.setPositionState({
       duration: audio.duration,
       playbackRate: audio.playbackRate,
-      position: audio.currentTime,
+      position: Math.floor(audio.currentTime),
     });
 }
 
@@ -108,8 +109,6 @@ audio.onwaiting = function() {
 }
 
 
-
-
 playSpeed.onchange = function() {
   const speed = parseFloat(playSpeed.value);
 
@@ -153,7 +152,7 @@ audio.ontimeupdate = function() {
   store.lrcSync(seconds);
   progress.value = seconds.toString();
   currentDuration.textContent = convertSStoHHMMSS(seconds);
-
+  updatePositionState();
 }
 
 
@@ -170,60 +169,10 @@ audio.oncanplaythrough = function() {
   // prefetch beforehand to speed up experience
   const nextItem = store.queue[0];
   if (nextItem)
-    getData(nextItem, true);
+    getStreamData(nextItem, true);
 }
 
-audio.onerror = async function() {
-  audio.pause();
-  const message = 'Error 403 : Unauthenticated Stream';
-  const _ = store.api;
-  const id = store.stream.id;
-
-  if (getSaved('custom_instance_2') || store.player.hls.on)
-    return notify(message);
-
-  if (_.piped[0] === location.origin) return;
-
-  const origin = new URL(audio.src).origin;
-
-  if (_.index < _.invidious.length) {
-    const proxy = _.invidious[store.api.index];
-    title.textContent = `Switching proxy to ${proxy.slice(8)}`;
-    audio.src = audio.src.replace(origin, proxy);
-    _.index++;
-  }
-  else {
-    _.index = 0;
-    notify(message);
-    title.textContent = store.stream.title;
-
-    // Emergency Handling
-    const fbk = store.player.fallback;
-    if (!fbk) useCobalt();
-    else
-      fetch(+ '/streams/' + id)
-        .then(res => res.json())
-        .then(data => {
-          import('../modules/setAudioStreams.ts')
-            .then(mod => mod.default(data.audioStreams));
-        })
-        .catch(useCobalt);
-
-    function useCobalt() {
-      getDownloadLink(id)
-        .then(_ => {
-          if (_)
-            audio.src = _;
-          else throw new Error();
-        })
-        .catch(() => {
-          playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-        })
-    }
-
-  }
-
-}
+audio.onerror = audioErrorHandler;
 
 
 loopButton.onclick = function() {

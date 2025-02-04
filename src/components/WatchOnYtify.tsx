@@ -1,10 +1,10 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { generateImageUrl } from "../lib/imageUtils";
 import { store } from "../lib/store";
-import { getData } from "../modules/getStreamData";
 import { Selector } from "./Settings";
 import { proxyHandler } from "../lib/utils";
-import { loadingScreen } from "../lib/dom";
+import { loadingScreen, title } from "../lib/dom";
+import getStreamData from "../modules/getStreamData";
 
 export default function WatchOnYtify() {
 
@@ -20,7 +20,7 @@ export default function WatchOnYtify() {
 
   onMount(async () => {
     loadingScreen.showModal();
-    const data = await getData(store.actionsMenu.id) as unknown as Piped & {
+    const data = await getStreamData(store.actionsMenu.id) as unknown as Piped & {
       captions: Captions[],
       videoStreams: Record<'url' | 'type' | 'resolution', string>[]
     };
@@ -128,7 +128,7 @@ export default function WatchOnYtify() {
           video.pause();
           dialog.close();
           dialog.remove();
-
+          title.textContent = store.stream.title || 'Now Playing';
         }}>Close</button>
 
         <Selector

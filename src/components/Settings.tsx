@@ -71,17 +71,17 @@ export default function() {
         <ToggleSwitch
           id='customInstanceSwitch'
           name='settings_custom_instance'
-          checked={Boolean(getSaved('custom_instance_2'))}
+          checked={Boolean(getSaved('custom_instance'))}
           onClick={() => {
-            const _ = 'custom_instance_2';
-            if (getSaved(_))
-              removeSaved(_);
+            const _ = 'custom_instance';
+            if (getSaved(_)) removeSaved(_);
             else {
               const pi = prompt(i18n('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
               const iv = prompt(i18n('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
+              const useIv = confirm('Use Invidious For Playback?');
 
               if (pi && iv)
-                save(_, pi + ',' + iv);
+                save(_, pi + ',' + iv + ',' + useIv);
             }
             location.reload();
 
