@@ -15,6 +15,7 @@ export default function WatchOnYtify() {
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
   const audio = new Audio();
+  const savedQ = getSaved('watchMode');
 
   onMount(async () => {
     loadingScreen.showModal();
@@ -47,7 +48,7 @@ export default function WatchOnYtify() {
 
     audio.src = proxyHandler(audioArray[0].url);
     audio.currentTime = video.currentTime;
-
+    loadingScreen.close();
     setData({
       video: data.videoStreams
         .filter(f => {
@@ -61,10 +62,7 @@ export default function WatchOnYtify() {
         .map(f => ([f.resolution, f.url])),
       captions: data.captions
     });
-
-    loadingScreen.close();
   });
-
 
   return (
     <dialog
@@ -158,17 +156,18 @@ export default function WatchOnYtify() {
             onChange={_ => {
               video.src = proxyHandler(_.target.value);
               video.currentTime = audio.currentTime;
-              if (getSaved('watchMode'))
+              if (savedQ)
                 save('watchMode', _.target.selectedOptions[0].textContent as string);
             }}
             onMount={_ => {
-              video.src = proxyHandler(_.value);
+              if (savedQ)
+                video.src = proxyHandler(_.value);
             }}
           >
             <option>Video</option>
             <For each={data().video}>
               {(f) =>
-                <option value={f[1]} selected={f[0] === getSaved('watchMode')}>
+                <option value={f[1]} selected={f[0] === savedQ}>
                   {f[0]}
                 </option>
               }
