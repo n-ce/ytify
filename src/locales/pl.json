@@ -163,5 +163,7 @@
     "upcoming_change": "Zmiany zostaną wprowadzone od następnego strumienia",
     "list_prompt_clear": "Czy na pewno chcesz wyczyścić $?",
     "list_prompt_rename": "Wprowadź nowy tytuł",
-    "settings_watchmode": "Tryb wideo"
+    "settings_watchmode": "Tryb wideo",
+    "upcoming_filter_ytm": "Filtruj YTM",
+    "upcoming_filter_lt10": "Filtruj < 10:00"
 }
