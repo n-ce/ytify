@@ -47,7 +47,6 @@ export default function WatchOnYtify() {
 
     audio.src = proxyHandler(audioArray[0].url);
     audio.currentTime = video.currentTime;
-    loadingScreen.close();
 
     setData({
       video: data.videoStreams
@@ -62,6 +61,8 @@ export default function WatchOnYtify() {
         .map(f => ([f.resolution, f.url])),
       captions: data.captions
     });
+
+    loadingScreen.close();
   });
 
 
@@ -150,26 +151,30 @@ export default function WatchOnYtify() {
           title.textContent = store.stream.title || 'Now Playing';
         }}>Close</button>
 
-        <Selector
-          id='videoCodecSelector'
-          label=''
-          onChange={_ => {
-            video.src = proxyHandler(_.target.value);
-            video.currentTime = audio.currentTime;
-            if (getSaved('watchMode'))
-              save('watchMode', _.target.selectedOptions[0].textContent as string);
-          }}
-          onMount={() => undefined}
-        >
-          <option>Video</option>
-          <For each={data().video}>
-            {(f) =>
-              <option value={f[1]} selected={f[0] === getSaved('watchMode')}>
-                {f[0]}
-              </option>
-            }
-          </For>
-        </Selector>
+        <Show when={data().video.length}>
+          <Selector
+            id='videoCodecSelector'
+            label=''
+            onChange={_ => {
+              video.src = proxyHandler(_.target.value);
+              video.currentTime = audio.currentTime;
+              if (getSaved('watchMode'))
+                save('watchMode', _.target.selectedOptions[0].textContent as string);
+            }}
+            onMount={_ => {
+              video.src = proxyHandler(_.value);
+            }}
+          >
+            <option>Video</option>
+            <For each={data().video}>
+              {(f) =>
+                <option value={f[1]} selected={f[0] === getSaved('watchMode')}>
+                  {f[0]}
+                </option>
+              }
+            </For>
+          </Selector>
+        </Show>
 
         <br /><br />
         <i>Because video streaming consumes a lot of energy, contributing to carbon emissions, please try to watch only what's necessary. When you do stream, select the lowest resolution / bitrate that meets your needs.</i>
