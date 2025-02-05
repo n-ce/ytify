@@ -1,8 +1,8 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { generateImageUrl } from "../lib/imageUtils";
-import { store } from "../lib/store";
+import { getSaved, store } from "../lib/store";
 import { Selector } from "./Settings";
-import { proxyHandler } from "../lib/utils";
+import { handleXtags, proxyHandler, save } from "../lib/utils";
 import { loadingScreen, title } from "../lib/dom";
 import getStreamData from "../modules/getStreamData";
 
@@ -10,41 +10,59 @@ export default function WatchOnYtify() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
-    audio: [] as string[][],
     captions: [] as Captions[]
   });
-
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
   const audio = new Audio();
+  const savedQ = getSaved('watchMode');
 
   onMount(async () => {
     loadingScreen.showModal();
+
+    const supportsAv1 = await navigator.mediaCapabilities
+      .decodingInfo({
+        type: 'file',
+        video: {
+          contentType: 'video/mp4; codecs="av01.0.00M.08"',
+          bitrate: 1e7,
+          framerate: 22,
+          height: 720,
+          width: 1280
+        }
+      })
+      .then(result => result.supported);
+
     const data = await getStreamData(store.actionsMenu.id) as unknown as Piped & {
       captions: Captions[],
       videoStreams: Record<'url' | 'type' | 'resolution', string>[]
     };
-    loadingScreen.close();
+    const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
+    const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
+    const supportsOpus = await store.player.supportsOpus;
+    const audioArray = handleXtags(data.audioStreams)
+      .filter(a => a.mimeType.includes(supportsOpus ? 'opus' : 'mp4a'))
+      .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
+    if (getSaved('hq')) audioArray.reverse();
+
+    audio.src = proxyHandler(audioArray[0].url);
+    audio.currentTime = video.currentTime;
+    loadingScreen.close();
     setData({
       video: data.videoStreams
-        .map(f => {
-          const codec =
-            f.type.includes('avc1') ? 'AVC' :
-              f.type.includes('av01') ? 'AV1' : 'VP9';
-          return [`${f.resolution} ${codec}`, f.url];
-        }),
-      audio: data.audioStreams
-        .filter(a => !a.url.includes('acont%3Ddubbed'))
-        .map(f => {
-          const codec =
-            f.mimeType.includes('opus') ? 'opus' : 'M4A';
-          return [`${f.quality} ${codec}`, f.url];
-        }),
+        .filter(f => {
+          const av1 = hasAv1 && supportsAv1 && f.type.includes('av01');
+          if (av1) return true;
+          const vp9 = !hasAv1 && f.type.includes('vp9');
+          if (vp9) return true;
+          const avc = !hasVp9 && f.type.includes('avc1');
+          if (avc) return true;
+        })
+        .map(f => ([f.resolution, f.url])),
       captions: data.captions
     });
   });
-
 
   return (
     <dialog
@@ -131,43 +149,32 @@ export default function WatchOnYtify() {
           title.textContent = store.stream.title || 'Now Playing';
         }}>Close</button>
 
-        <Selector
-          id='videoCodecSelector'
-          label=''
-          onChange={_ => {
-            video.src = proxyHandler(_.target.value);
-            video.currentTime = audio.currentTime;
-          }}
-          onMount={() => undefined}
-        >
-          <option>Video</option>
-          <For each={data().video}>
-            {(f) =>
-              <option value={f[1]}>
-                {f[0]}
-              </option>
-            }
-          </For>
-        </Selector>
+        <Show when={data().video.length}>
+          <Selector
+            id='videoCodecSelector'
+            label=''
+            onChange={_ => {
+              video.src = proxyHandler(_.target.value);
+              video.currentTime = audio.currentTime;
+              if (savedQ)
+                save('watchMode', _.target.selectedOptions[0].textContent as string);
+            }}
+            onMount={_ => {
+              if (savedQ)
+                video.src = proxyHandler(_.value);
+            }}
+          >
+            <option>Video</option>
+            <For each={data().video}>
+              {(f) =>
+                <option value={f[1]} selected={f[0] === savedQ}>
+                  {f[0]}
+                </option>
+              }
+            </For>
+          </Selector>
+        </Show>
 
-        <Selector
-          id='audioCodecSelector'
-          label=''
-          onChange={_ => {
-            audio.src = proxyHandler(_.target.value);
-            audio.currentTime = video.currentTime;
-          }}
-          onMount={() => undefined}
-        >
-          <option>Audio</option>
-          <For each={data().audio}>
-            {(f) =>
-              <option value={f[1]}>
-                {f[0] + (f[1].includes('xtags=drc') ? ' DRC' : '')}
-              </option>
-            }
-          </For>
-        </Selector>
         <br /><br />
         <i>Because video streaming consumes a lot of energy, contributing to carbon emissions, please try to watch only what's necessary. When you do stream, select the lowest resolution / bitrate that meets your needs.</i>
       </div>
@@ -175,3 +182,4 @@ export default function WatchOnYtify() {
 
   );
 }
+

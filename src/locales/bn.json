@@ -162,5 +162,6 @@
     "list_prompt_rename": "নতুন নাম এন্টার করুন",
     "list_prompt_clear": "আপনি কি সত্তি $ কে পরিষ্কার করতে চান?",
     "list_prompt_delete": "আপনি কি সত্তি এই $ নামক সংগ্রহ ডিলিট করতে চান?",
-    "settings_library_sync": "অনলাইন সিংক করুন"
+    "settings_library_sync": "অনলাইন সিংক করুন",
+    "settings_watchmode": "ভিডিও মোড"
 }
