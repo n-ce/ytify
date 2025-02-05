@@ -162,5 +162,6 @@
     "updater_changelog_full": "Lire tous les changements précédents",
     "updater_update": "Mettre à jour",
     "updater_later": "Plus tard",
-    "pwa_share_prompt": "Cliquez sur OK pour lire, cliquez sur Annuler pour télécharger"
+    "pwa_share_prompt": "Cliquez sur OK pour lire, cliquez sur Annuler pour télécharger",
+    "settings_watchmode": "Mode vidéo"
 }

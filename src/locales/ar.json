@@ -162,5 +162,6 @@
     "updater_changelog_full": "قراءة جميع التغييرات السابقة",
     "updater_update": "تحديث",
     "updater_later": "لاحقًا",
-    "pwa_share_prompt": "انقر فوق موافق للتشغيل، انقر فوق إلغاء للتنزيل"
+    "pwa_share_prompt": "انقر فوق موافق للتشغيل، انقر فوق إلغاء للتنزيل",
+    "settings_watchmode": "وضع الفيديو"
 }
