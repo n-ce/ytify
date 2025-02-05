@@ -163,5 +163,7 @@
     "updater_update": "更新",
     "updater_later": "稍后",
     "pwa_share_prompt": "单击确定播放，单击取消下载",
-    "settings_watchmode": "视频模式"
+    "settings_watchmode": "视频模式",
+    "upcoming_filter_ytm": "筛选 YTM",
+    "upcoming_filter_lt10": "筛选 < 10:00"
 }

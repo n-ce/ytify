@@ -163,5 +163,7 @@
     "updater_update": "Обновить",
     "updater_later": "Позже",
     "pwa_share_prompt": "Нажмите «ОК» для воспроизведения, нажмите «Отмена» для загрузки",
-    "settings_watchmode": "Видеорежим"
+    "settings_watchmode": "Видеорежим",
+    "upcoming_filter_lt10": "Фильтр < 10:00",
+    "upcoming_filter_ytm": "Фильтр YTM"
 }
