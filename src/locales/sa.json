@@ -6,7 +6,7 @@
     "player_audiostreams_setup": "श्रव्यप्रवाहस्य व्यवस्था...",
     "player_audiostreams_insert": "वादकयन्त्रे श्रव्यस्रोतसः समावेशनम्...",
     "player_livestreams_hls": "सजीवप्रवाहान् श्रोतुं HLS सक्रियं कुरु!",
-    "player_audiostreams_null": "श्रव्यप्रवाहाः न प्राप्ताः",
+    "player_audiostreams_null": "श्रव्यप्रवाहाः न प्राप्ता",
     "player_now_playing": "इदानीं वाद्यते",
     "player_channel": "वाहिनी",
     "player_volume": "ध्वनिमात्रा",
@@ -163,5 +163,7 @@
     "updater_update": "अद्यतनीकरणम्",
     "updater_later": "पश्चात्",
     "pwa_share_prompt": "वादनाय OK नुदतु, अवारोहणाय रद्द नुदतु",
-    "settings_watchmode": "विडियो मोड"
+    "settings_watchmode": "विडियो मोड",
+    "upcoming_filter_ytm": "फ़िल्टर YTM",
+    "upcoming_filter_lt10": "फ़िल्टर < 10:00"
 }
