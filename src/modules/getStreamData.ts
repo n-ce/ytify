@@ -42,7 +42,12 @@ export default async function(
         uploaderUrl: v.authorUrl,
         type: 'stream'
       })),
-      videoStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('video')),
+      videoStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('video')).map(v => ({
+        url: v.url,
+        quality: v.quality,
+        resolution: v.resolution,
+        type: v.type
+      })),
       audioStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({
         bitrate: parseInt(v.bitrate),
         codec: v.encoding,

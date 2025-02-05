@@ -1,15 +1,8 @@
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
-import { store, getSaved } from "../lib/store";
-import { i18n, proxyHandler } from "../lib/utils";
+import { store } from "../lib/store";
+import { handleXtags, i18n, proxyHandler } from "../lib/utils";
 
-export default function(audioStreams: {
-  codec: string,
-  url: string,
-  quality: string,
-  bitrate: string,
-  contentLength: number,
-  mimeType: string
-}[],
+export default function(audioStreams: AudioStream[],
   isLive = false) {
 
   title.textContent = i18n('player_audiostreams_setup');
@@ -30,13 +23,7 @@ export default function(audioStreams: {
 
   bitrateSelector.innerHTML = '';
 
-  const isDRC = (url: string) => url.includes('drc%3D1');
-  const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
-  const isOriginal = (a: { url: string }) => !a.url.includes('acont%3Ddubbed');
-
-  audioStreams
-    .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
-    .filter(isOriginal)
+  handleXtags(audioStreams)
     .forEach((_, i: number) => {
       const codec = _.codec === 'opus' ? 'opus' : 'aac';
       const size = (_.contentLength / (1024 * 1024)).toFixed(2) + ' MB';

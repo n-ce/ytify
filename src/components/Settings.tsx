@@ -314,6 +314,18 @@ export default function() {
           }}
         />
 
+        <ToggleSwitch
+          id="watchModeSwitch"
+          name='settings_watchmode'
+          checked={Boolean(getSaved('watchMode'))}
+          onClick={() => {
+            const _ = 'watchMode';
+            getSaved(_) ?
+              removeSaved(_) :
+              save(_, '144p');
+          }}
+        />
+
       </div>
 
       <div>

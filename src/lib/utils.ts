@@ -92,6 +92,16 @@ export function convertSStoHHMMSS(seconds: number): string {
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
 
+export function handleXtags(audioStreams: AudioStream[]) {
+  const isDRC = (url: string) => url.includes('drc%3D1');
+  const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
+  const isOriginal = (a: { url: string }) => !a.url.includes('acont%3Ddubbed');
+
+  return audioStreams
+    .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
+    .filter(isOriginal);
+}
+
 export async function getDownloadLink(id: string): Promise<string | null> {
   const streamUrl = 'https://youtu.be/' + id;
   const dl = await fetch('https://cobalt-api.kwiatekmiki.com', {

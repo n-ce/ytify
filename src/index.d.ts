@@ -89,6 +89,15 @@ declare global {
     children: JSXElement
   }
 
+  type AudioStream = {
+    codec: string,
+    url: string,
+    quality: string,
+    bitrate: string,
+    contentLength: number,
+    mimeType: string
+  }
+
   type Piped = {
     instance: string,
     title: string,
@@ -106,20 +115,13 @@ declare global {
       uploaderUrl: string,
       type: string
     }[],
-    audioStreams: {
-      codec: string,
-      url: string,
-      quality: string,
-      bitrate: string,
-      contentLength: number,
-      mimeType: string
-    }[]
+    audioStreams: AudioStream[]
   }
 
   type Captions = Record<'label' | 'url', string>;
 
   type Invidious = {
-    adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url', string>[],
+    adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url' | 'resolution' | 'quality', string>[],
     recommendedVideos: {
       title: string,
       author: string,
@@ -135,7 +137,6 @@ declare global {
     liveNow: boolean,
     hlsUrl: string,
     dashUrl: string,
-    videoThumbnails: Record<'url' | 'quality', string>[]
   }
 
   interface EventTarget {

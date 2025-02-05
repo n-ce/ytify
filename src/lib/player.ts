@@ -4,10 +4,18 @@ import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import getStreamData from "../modules/getStreamData";
+import { render } from "solid-js/web";
 
 export default async function player(id: string | null = '') {
 
   if (!id) return;
+
+  if (getSaved('watchMode')) {
+    store.actionsMenu.id = id;
+    import('../components/WatchOnYtify')
+      .then(mod => render(mod.default, document.body));
+    return;
+  }
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
   title.textContent = 'Fetching Data...';
