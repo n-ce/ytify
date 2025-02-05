@@ -163,5 +163,7 @@
     "updater_update": "Aktualisieren",
     "updater_later": "Später",
     "pwa_share_prompt": "Klicken Sie auf OK zum Abspielen, klicken Sie auf Abbrechen zum Herunterladen",
-    "settings_watchmode": "Videomodus"
+    "settings_watchmode": "Videomodus",
+    "upcoming_filter_ytm": "YTM filtern",
+    "upcoming_filter_lt10": "Filter < 10 Minuten"
 }
