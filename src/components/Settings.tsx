@@ -115,8 +115,9 @@ export default function() {
           id='linkHost'
           label='settings_links_host'
           onChange={(e) => {
-            e.target.selectedIndex === 0 ?
-              removeSaved('linkHost') :
+            if (e.target.selectedIndex === 0)
+              removeSaved('linkHost');
+            else
               save('linkHost', e.target.value);
             location.reload();
 
@@ -140,8 +141,9 @@ export default function() {
           label='settings_download_format'
           onChange={(e) => {
             store.downloadFormat = e.target.value as 'opus';
-            store.downloadFormat === 'opus' ?
-              removeSaved('dlFormat') :
+            if (store.downloadFormat === 'opus')
+              removeSaved('dlFormat');
+            else
               save('dlFormat', store.downloadFormat);
           }}
           onMount={(target) => {
@@ -199,8 +201,9 @@ export default function() {
           checked={getSaved('searchFilter') === 'music_songs'}
           onClick={() => {
             const _ = 'searchFilter';
-            getSaved(_) ?
-              removeSaved(_) :
+            if (getSaved(_))
+              removeSaved(_);
+            else
               save(_, 'music_songs');
             location.assign('/search');
           }}
@@ -212,8 +215,9 @@ export default function() {
           checked={getSaved('searchSuggestions') !== 'off'}
           onClick={() => {
             const _ = 'searchSuggestions';
-            getSaved(_) ?
-              removeSaved(_) :
+            if (getSaved(_))
+              removeSaved(_);
+            else
               save(_, 'off');
             location.reload();
           }}
@@ -234,8 +238,9 @@ export default function() {
           name='settings_hq_audio'
           checked={getSaved('hq') === 'true'}
           onClick={async () => {
-            getSaved('hq') ?
-              removeSaved('hq') :
+            if (getSaved('hq'))
+              removeSaved('hq');
+            else
               save('hq', 'true');
 
             store.player.hq = !store.player.hq;
@@ -252,8 +257,9 @@ export default function() {
             onChange={async (e) => {
 
               const i = e.target.selectedIndex;
-              i ?
-                save('codec', String(i)) :
+              if (i)
+                save('codec', String(i))
+              else
                 removeSaved('codec');
 
               store.player.codec = e.target.value as 'any';
@@ -280,8 +286,9 @@ export default function() {
             checked={getSaved('stableVolume') === 'true'}
             onClick={() => {
               const _ = 'stableVolume';
-              getSaved(_) ?
-                removeSaved(_) :
+              if (getSaved(_))
+                removeSaved(_);
+              else
                 save(_, 'true');
               quickSwitch();
             }}
@@ -293,8 +300,9 @@ export default function() {
             checked={getSaved('enforceProxy') === 'true'}
             onClick={() => {
               const _ = 'enforceProxy';
-              getSaved(_) ?
-                removeSaved(_) :
+              if (getSaved(_))
+                removeSaved(_);
+              else
                 save(_, 'true');
               quickSwitch();
             }}
@@ -307,8 +315,9 @@ export default function() {
           name='settings_hls'
           checked={getSaved('HLS') === 'true'}
           onClick={() => {
-            getSaved('HLS') ?
-              removeSaved('HLS') :
+            if (getSaved('HLS'))
+              removeSaved('HLS');
+            else
               save('HLS', 'true');
             location.reload();
           }}
@@ -320,8 +329,9 @@ export default function() {
           checked={Boolean(getSaved('watchMode'))}
           onClick={() => {
             const _ = 'watchMode';
-            getSaved(_) ?
-              removeSaved(_) :
+            if (getSaved(_))
+              removeSaved(_);
+            else
               save(_, '144p');
           }}
         />
@@ -341,8 +351,9 @@ export default function() {
           checked={getSaved('startupTab') === '/library'}
           onClick={() => {
             const _ = 'startupTab';
-            getSaved(_) ?
-              removeSaved(_) :
+            if (getSaved(_))
+              removeSaved(_);
+            else
               save(_, '/library')
           }}
         />
@@ -447,8 +458,9 @@ export default function() {
           checked={store.loadImage}
           onClick={() => {
             const _ = 'imgLoad';
-            getSaved(_) ?
-              removeSaved(_) :
+            if (getSaved(_))
+              removeSaved(_);
+            else
               save(_, 'off');
             location.reload();
           }}
@@ -459,8 +471,9 @@ export default function() {
           id='roundnessChanger'
           onChange={(e) => {
             cssVar('--roundness', e.target.value);
-            e.target.value === '0.4rem' ?
-              removeSaved('roundness') :
+            if (e.target.value === '0.4rem')
+              removeSaved('roundness')
+            else
               save('roundness', e.target.value)
           }}
           onMount={(target) => {
@@ -489,8 +502,9 @@ export default function() {
             else {
               const rgbText = i18n('settings_custom_color_prompt');
               const str = prompt(rgbText, '174,174,174');
-              str ?
-                save(_, str) :
+              if (str)
+                save(_, str)
+              else
                 e.preventDefault();
             }
             themer();
@@ -502,8 +516,9 @@ export default function() {
           id='themeSelector'
           onChange={(e) => {
             themer();
-            e.target.value === 'auto' ?
-              removeSaved('theme') :
+            if (e.target.value === 'auto')
+              removeSaved('theme');
+            else
               save('theme', e.target.value);
           }}
           onMount={(target) => {
@@ -522,13 +537,12 @@ export default function() {
           </optgroup>
         </Selector>
 
-        <p onClick={
-          () => {
-            document.fullscreenElement ?
-              document.exitFullscreen() :
-              document.documentElement.requestFullscreen();
-          }
-        }>{i18n('settings_fullscreen')}</p>
+        <p onClick={function() {
+          if (document.fullscreenElement)
+            document.exitFullscreen();
+          else
+            document.documentElement.requestFullscreen();
+        }}>{i18n('settings_fullscreen')}</p>
 
       </div>
 
