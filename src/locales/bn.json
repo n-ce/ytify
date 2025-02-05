@@ -163,5 +163,7 @@
     "list_prompt_clear": "আপনি কি সত্তি $ কে পরিষ্কার করতে চান?",
     "list_prompt_delete": "আপনি কি সত্তি এই $ নামক সংগ্রহ ডিলিট করতে চান?",
     "settings_library_sync": "অনলাইন সিংক করুন",
-    "settings_watchmode": "ভিডিও মোড"
+    "settings_watchmode": "ভিডিও মোড",
+    "upcoming_filter_lt10": "ফিল্টার < 10:00",
+    "upcoming_filter_ytm": "YTM ফিল্টার"
 }
