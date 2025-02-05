@@ -127,11 +127,10 @@ export default function() {
               target.value = savedLinkHost;
           }}
         >
-
           <option value="https://ytify.us.kg">ytify</option>
           <option value="https://youtube.com">YouTube</option>
           <option value="https://piped.video">Piped</option>
-          <option value="https://yewtu.be">Invidious</option>
+          <option value="https://redirect.invidious.io">Invidious</option>
           <option value="https://viewtube.io">ViewTube</option>
         </Selector>
 
