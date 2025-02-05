@@ -9,8 +9,7 @@ export default function() {
   const { usePiped, fallback, hls } = store.player;
   const { index, invidious } = store.api;
 
-  if (usePiped || hls.on)
-    return notify(message);
+  if (usePiped || hls.on) return notify(message);
 
   const origin = new URL(audio.src).origin;
 
@@ -31,7 +30,7 @@ export default function() {
       fetch(+ '/streams/' + id)
         .then(res => res.json())
         .then(data => {
-          import('../modules/setAudioStreams.ts')
+          import('./setAudioStreams.ts')
             .then(mod => mod.default(data.audioStreams));
         })
         .catch(useCobalt);
