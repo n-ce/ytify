@@ -55,17 +55,16 @@ collectionContainer.addEventListener('click', e => {
 });
 
 const dbhash = getSaved('dbsync');
-const library = getSaved('library');
 const hashpoint = location.origin + '/dbs/' + dbhash;
 
 if (dbhash) {
-  if (library) {
+  if (Object.keys(getDB()).length) {
     fetch(hashpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: library,
+      body: getSaved('library'),
     })
       .then(res => res.ok)
       .then(() => {

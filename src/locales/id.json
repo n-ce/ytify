@@ -163,5 +163,7 @@
     "updater_update": "Perbarui",
     "updater_later": "Nanti",
     "pwa_share_prompt": "Klik ok untuk Putar, klik batal untuk Unduh",
-    "settings_watchmode": "Modus Video"
+    "settings_watchmode": "Modus Video",
+    "upcoming_filter_lt10": "Saring < 10:00",
+    "upcoming_filter_ytm": "Saring YTM"
 }

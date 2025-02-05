@@ -129,9 +129,14 @@ a {
   --text: #eaa;
 }
 
-.filter {
+.filter_lt10 {
   --defaultBg: #055;
   --defaultText: #6dd;
+}
+
+.filter_ytm {
+  --defaultBg: #502;
+  --defaultText: #f9a;
 }
 
 .checked {

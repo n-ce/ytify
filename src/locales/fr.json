@@ -163,5 +163,7 @@
     "updater_update": "Mettre à jour",
     "updater_later": "Plus tard",
     "pwa_share_prompt": "Cliquez sur OK pour lire, cliquez sur Annuler pour télécharger",
-    "settings_watchmode": "Mode vidéo"
+    "settings_watchmode": "Mode vidéo",
+    "upcoming_filter_ytm": "Filtrer YTM",
+    "upcoming_filter_lt10": "Filtrer < 10:00"
 }

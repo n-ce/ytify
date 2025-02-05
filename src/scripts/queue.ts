@@ -11,6 +11,7 @@ const [
   shuffleQBtn,
   removeQBtn,
   filterLT10Btn,
+  filterYTMBtn,
   allowDuplicatesBtn,
   enqueueRelatedStreamsBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
@@ -20,12 +21,18 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
 
+  const { queue } = store;
+
   if (!allowDuplicatesBtn.classList.contains('redup'))
-    if (store.queue.includes(data.id))
+    if (queue.includes(data.id))
       return;
 
-  if (filterLT10Btn.classList.contains('filter'))
+  if (filterLT10Btn.classList.contains('filter_lt10'))
     if (isLongerThan10Min(<string>data.duration))
+      return;
+
+  if (filterYTMBtn.classList.contains('filter_ytm'))
+    if (!data.author?.endsWith('- Topic'))
       return;
 
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
@@ -33,9 +40,10 @@ export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: 
   if (removeQBtn.classList.contains('delete'))
     removeQBtn.click();
 
-  prepend ?
-    store.queue.unshift(data.id) :
-    store.queue.push(data.id);
+  if (prepend)
+    queue.unshift(data.id);
+  else
+    queue.push(data.id);
 
 
   const fragment = document.createDocumentFragment();
@@ -48,8 +56,9 @@ export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: 
     draggable: true
   }), fragment);
 
-  prepend ?
-    queuelist.prepend(fragment) :
+  if (prepend)
+    queuelist.prepend(fragment);
+  else
     queuelist.appendChild(fragment);
 
 }
@@ -69,9 +78,9 @@ queuelist.addEventListener('click', e => {
       sessionStorage.setItem('trashHistory', current + id);
   }
 
-  queueItem.classList.contains('delete') ?
-    addToTrash() :
-    player(id);
+  if (queueItem.classList.contains('delete'))
+    addToTrash();
+  else player(id);
 
   const index = store.queue.indexOf(id);
 
@@ -117,7 +126,8 @@ removeQBtn.addEventListener('click', () => {
 });
 
 const actions: [HTMLButtonElement, string, string][] = [
-  [filterLT10Btn, 'filterLT10', 'filter'],
+  [filterLT10Btn, 'filterLT10', 'filter_lt10'],
+  [filterYTMBtn, 'filterYTM', 'filter_ytm'],
   [enqueueRelatedStreamsBtn, 'enqueueRelatedStreams', 'checked'],
   [allowDuplicatesBtn, 'allowDuplicates', 'redup']
 ];
@@ -160,10 +170,6 @@ function filterLT10() {
 
   });
 }
-
-
-
-
 
 
 function isLongerThan10Min(duration: string) {
