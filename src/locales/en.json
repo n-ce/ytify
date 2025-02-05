@@ -107,6 +107,7 @@
   "settings_always_proxy_streams": "Always Proxy Streams",
   "settings_stable_volume": "Prefer Stable Volume",
   "settings_hls": "HTTP Live Streaming",
+  "settings_watchmode": "Watch Mode",
   "settings_library": "Library",
   "settings_set_as_default_tab": "Set as Default Tab",
   "settings_library_sync": "Cloud Sync",
