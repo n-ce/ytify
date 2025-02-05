@@ -162,5 +162,6 @@
     "updater_changelog_full": "Baca semua perubahan sebelumnya",
     "updater_update": "Perbarui",
     "updater_later": "Nanti",
-    "pwa_share_prompt": "Klik ok untuk Putar, klik batal untuk Unduh"
+    "pwa_share_prompt": "Klik ok untuk Putar, klik batal untuk Unduh",
+    "settings_watchmode": "Modus Video"
 }
