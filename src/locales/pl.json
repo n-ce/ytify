@@ -162,5 +162,6 @@
     "list_prompt_delete": "Czy na pewno chcesz usunąć kolekcję $?",
     "upcoming_change": "Zmiany zostaną wprowadzone od następnego strumienia",
     "list_prompt_clear": "Czy na pewno chcesz wyczyścić $?",
-    "list_prompt_rename": "Wprowadź nowy tytuł"
+    "list_prompt_rename": "Wprowadź nowy tytuł",
+    "settings_watchmode": "Tryb wideo"
 }
