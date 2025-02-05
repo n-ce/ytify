@@ -58,7 +58,7 @@ const dbhash = getSaved('dbsync');
 const hashpoint = location.origin + '/dbs/' + dbhash;
 
 if (dbhash) {
-  if (Object.keys(getDB).length) {
+  if (Object.keys(getDB()).length) {
     fetch(hashpoint, {
       method: 'POST',
       headers: {
