@@ -17,19 +17,18 @@ export default async (req: Request, context: Context) => {
   } else {
 
     const data = await req.json();
-    if (!data)
-      return;
+    if (!data) return;
 
     const { blobs } = await _.list();
     const now = Date.now();
+    const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
-    blobs.forEach(blob => {
+    for await (const blob of blobs) {
       const oldDate = parseInt(blob.key);
-      const oneWeek = 7 * 24 * 60 * 60 * 1000;
       const expired = (now - oldDate) > oneWeek;
-
-      if (expired) _.delete(blob.key);
-    });
+      if (expired)
+        await _.delete(blob.key);
+    }
 
     const id = now.toString();
     const link = context.url.origin + '/list?si=' + id;

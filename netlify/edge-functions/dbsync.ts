@@ -10,14 +10,13 @@ export default async (req: Request, context: Context) => {
   if (req.method === 'POST') {
 
     const data = await req.json();
-
     if (!data) return;
 
     const { blobs } = await hashStore.list();
     const now = Date.now();
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
-    blobs.forEach(async blob => {
+    for await (const blob of blobs) {
       const timestamp = await hashStore.get(blob.key);
       const oldDate = parseInt(timestamp);
       const expired = (now - oldDate) > oneWeek;
@@ -26,7 +25,7 @@ export default async (req: Request, context: Context) => {
         await hashStore.delete(blob.key);
         await blobStore.delete(timestamp);
       }
-    });
+    }
 
 
     const timestamp = Date.now().toString();

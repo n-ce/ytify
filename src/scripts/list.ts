@@ -62,7 +62,7 @@ listBtnsContainer.addEventListener('click', async e => {
       return;
     atcOption.remove();
     delete db[id];
-    saveDB(db);
+    saveDB(db, 'delete');
     history.back();
   }
   else if (btn === clearListBtn) {
@@ -80,7 +80,7 @@ listBtnsContainer.addEventListener('click', async e => {
     atcOption.value = newTitle;
     db[newTitle] = db[id];
     delete db[id];
-    saveDB(db);
+    saveDB(db, 'rename');
   }
   else if (btn === shareCollectionBtn)
     shareCollection(db[id]);

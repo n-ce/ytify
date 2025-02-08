@@ -4,7 +4,6 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
-
   type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
 
   type StreamItem = {
@@ -143,7 +142,7 @@ declare global {
     id: string
   }
   interface WindowEventMap {
-    'dbchange': CustomEvent<Library>;
+    'dbchange': CustomEvent<{ db: Library, change: string }>;
   }
 
 }

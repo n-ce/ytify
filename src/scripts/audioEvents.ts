@@ -23,9 +23,9 @@ const msn = 'mediaSession' in navigator;
 function updatePositionState() {
   if (msn && 'setPositionState' in navigator.mediaSession)
     navigator.mediaSession.setPositionState({
-      duration: audio.duration,
-      playbackRate: audio.playbackRate,
-      position: Math.floor(audio.currentTime),
+      duration: audio.duration || 0,
+      playbackRate: audio.playbackRate || 1,
+      position: Math.floor(audio.currentTime || 0),
     });
 }
 

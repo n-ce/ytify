@@ -24,23 +24,24 @@ export default function CollectionSelector(_: {
         tabindex={2}
         id="collectionSelector"
         onchange={(e) => {
-          const clxnSlctr = e.target;
+          const { value } = e.target;
+          const isNew = value === '+cl';
           let title;
 
-          if (!clxnSlctr.value) return;
-          if (clxnSlctr.value === '+cl') {
+          if (!value) return;
+          if (isNew) {
             title = prompt('Collection Title')?.trim();
 
             if (title)
               createCollection(title);
           }
-          else title = clxnSlctr.value;
+          else title = value;
 
           if (title)
-            addToCollection(title, _.collection);
+            addToCollection(title, _.collection, isNew ? 'addNew' : '');
 
           _.close();
-          clxnSlctr.selectedIndex = 0;
+          e.target.selectedIndex = 0;
         }}
       >
         <option>{i18n('collection_selector_add_to')}</option>

@@ -33,7 +33,10 @@ export default function() {
 
 
   onMount(() => {
-    addEventListener('dbchange', (e) => { setDB(e.detail) })
+    addEventListener('dbchange', (e) => {
+      const { db, change } = e.detail;
+      if (change) setDB(db);
+    })
 
     superCollectionList.addEventListener('click', superClick);
     superCollectionSelector.addEventListener('click', e => {
