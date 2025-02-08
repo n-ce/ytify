@@ -4,10 +4,6 @@
     i {
       pointer-events: none;
     }
-
-    &::after {
-      content: attr(aria-label);
-    }
   }
 
   &.playlist {
