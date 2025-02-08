@@ -4,10 +4,6 @@
     i {
       pointer-events: none;
     }
-
-    &::after {
-      content: attr(aria-label);
-    }
   }
 
   &.playlist {
@@ -71,17 +67,12 @@
 }
 
 #listContainer {
-  width: 100%;
+  width: 92%;
 
   &.reverse {
     display: flex;
     flex-direction: column-reverse;
   }
-}
-
-#list {
-  width: 92%;
-  margin: auto;
 }
 
 #viewOnYTBtn,

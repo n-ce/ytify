@@ -242,21 +242,15 @@ dialog.watcher {
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
   padding: 2vmin 0;
+  width: calc(92% + 3vmin);
+  
+  button::after {
+    content: attr(aria-label);
+  }
 }
 
-#upcoming {
-
-  #queuelist {
-    width: 92%;
-  }
-
-  #queuetools {
-    width: calc(92% + 3vmin);
-
-    button::after {
-      content: attr(aria-label);
-    }
-  }
+#queuelist {
+  width: 92%;
 }
 
 /* disable action during load events */
