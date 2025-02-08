@@ -6,9 +6,9 @@ export const reservedCollections = ['discover', 'history', 'favorites', 'listenL
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
-export function saveDB(data: Library) {
+export function saveDB(data: Library, change: string = '') {
   localStorage.setItem('library', JSON.stringify(data));
-  dispatchEvent(new CustomEvent('dbchange', { detail: data }));
+  dispatchEvent(new CustomEvent('dbchange', { detail: { db: data, change: change } }));
 }
 
 export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
@@ -48,14 +48,15 @@ export function toCollection(
 
 export function addToCollection(
   collection: string,
-  data: CollectionItem | DOMStringMap
+  data: CollectionItem | DOMStringMap,
+  change = ''
 ) {
 
   if (!collection) return;
 
   const db = getDB();
   toCollection(collection, data, db);
-  saveDB(db);
+  saveDB(db, change);
 }
 
 export function addListToCollection(
@@ -70,7 +71,7 @@ export function addListToCollection(
     const data = list[key];
     toCollection(collection, data, db);
   }
-  saveDB(db);
+  saveDB(db, 'listAdded');
 }
 
 export function createCollection(title: string) {

@@ -27,7 +27,7 @@ export function subscribeList(db: Library) {
     toCollection(l.type, dataset, db);
   }
   dom.dataset.state = state[1];
-  saveDB(db);
+  saveDB(db, 'subscribe');
 }
 
 export function importList() {
