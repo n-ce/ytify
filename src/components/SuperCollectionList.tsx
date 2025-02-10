@@ -133,7 +133,11 @@ function loadSubList(db: Library, flag: APAC) {
 const loadFeed = (db: Library) =>
   'channels' in db ?
     import('../modules/subfeedGenerator')
-      .then(mod => mod.default(Object.keys(db.channels))) :
+      .then(mod => mod.default(
+        Object.values(db.channels)
+          .filter(c => !c.name.startsWith('Artist -'))
+          .map(c => c.id)
+      )) :
     'You have not subscribed to any channels';
 
 
