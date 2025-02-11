@@ -39,9 +39,10 @@ export default function WatchOnYtify() {
     };
     const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
     const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
-    const supportsOpus = await store.player.supportsOpus;
+    const hasOpus = data.audioStreams.find(a => a.type.includes('opus'))?.url;
+    const useOpus = hasOpus && await store.player.supportsOpus;
     const audioArray = handleXtags(data.audioStreams)
-      .filter(a => a.mimeType.includes(supportsOpus ? 'opus' : 'mp4a'))
+      .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
       .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
     if (getSaved('hq')) audioArray.reverse();
