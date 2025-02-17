@@ -39,7 +39,7 @@ export default function WatchOnYtify() {
     };
     const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
     const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
-    const hasOpus = data.audioStreams.find(a => a.type.includes('opus'))?.url;
+    const hasOpus = data.audioStreams.find(a => a.mimeType.includes('opus'))?.url;
     const useOpus = hasOpus && await store.player.supportsOpus;
     const audioArray = handleXtags(data.audioStreams)
       .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
