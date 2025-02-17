@@ -44,6 +44,9 @@ export const fetchWithInvidious = (
   fetch(`${API}/api/v1/search?q=${q}&sort=${sortBy}&page=${resolvePage(q)}`)
     .then(res => res.json())
     .then(items => {
+      if (!items || !items.length)
+        throw new Error("No Items Found");
+      
       itemsLoader(
         items.filter(
           (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
@@ -71,7 +74,8 @@ const fetchWithPiped = (
   .then(async (searchResults) => {
     const items = searchResults.items;
     nextPageToken = searchResults.nextpage;
-    if (!items) throw new Error("No Items Found");
+    if (!items || !items.length)
+      throw new Error("No Items Found");
 
     // filter out shorts
     itemsLoader(
