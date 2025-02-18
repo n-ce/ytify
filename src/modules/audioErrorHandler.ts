@@ -28,7 +28,7 @@ export default function() {
     // Emergency Handling
     if (!fallback) useCobalt();
     else
-      fetch(+ '/streams/' + id)
+      fetch(fallback + '/streams/' + id)
         .then(res => res.json())
         .then(data => {
           import('./setAudioStreams.ts')
