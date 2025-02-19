@@ -23,12 +23,11 @@ export default async (req: Request, context: Context) => {
     const now = Date.now();
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
-    for await (const blob of blobs) {
+    blobs.forEach(blob => {
       const oldDate = parseInt(blob.key);
       const expired = (now - oldDate) > oneWeek;
-      if (expired)
-        await _.delete(blob.key);
-    }
+      if (expired) _.delete(blob.key);
+    });
 
     const id = now.toString();
     const link = context.url.origin + '/list?si=' + id;
