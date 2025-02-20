@@ -12,6 +12,11 @@ import { readdirSync } from 'fs';
 
 
 export default defineConfig(({ command }) => ({
+  clearScreen: false,
+  server: {
+    strictPort: true,
+    port: 5173
+  },
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Version: JSON.stringify(
