@@ -25,6 +25,11 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: Fix PNG format (Linux/macOS)
+        if: matrix.platform != 'windows-latest'
+        run: |
+          sudo apt-get install -y pngquant || brew install pngquant
+          pngquant --force --ext .png src-tauri/icons/*.png
       - uses: actions/checkout@v4
 
       - name: install dependencies (ubuntu only)
