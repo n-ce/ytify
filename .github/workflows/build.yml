@@ -56,9 +56,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: __VERSION__
+          tagName: v__VERSION__
           releaseName: 'ytify v__VERSION__'
-          releaseBody: 'Test Release Builds'
+          releaseBody: ''
           releaseDraft: false
           prerelease: true
           args: ${{ matrix.args }}
