@@ -12,7 +12,14 @@ export default function() {
 
   if (playViaPiped || hls.on) return notify(message);
 
-  const origin = new URL(audio.src).origin;
+  const curl = new URL(audio.src);
+  const origin = curl.origin;
+  const host = curl.searchParams.get('host');
+
+  if(!host) {
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    return;
+  }
 
   if (index < invidious.length) {
     const proxy = invidious[index];
