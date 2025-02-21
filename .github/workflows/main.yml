@@ -63,12 +63,3 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
-
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v1
-        with:
-          files: src-tauri/target/release/bundle/**/*
-          tag_name: app-v__VERSION__
-          body: "Generated release"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
