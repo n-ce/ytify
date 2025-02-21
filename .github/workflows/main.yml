@@ -29,7 +29,7 @@ jobs:
         if: matrix.platform != 'windows-latest'
         run: |
           sudo apt-get install -y pngquant || brew install pngquant
-          pngquant --force --ext .png src-tauri/icons/*.png
+          pngquant --force --ext .png ../src-tauri/icons/*.png
       - uses: actions/checkout@v4
 
       - name: install dependencies (ubuntu only)
