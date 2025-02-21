@@ -16,7 +16,8 @@ export default function() {
   const origin = curl.origin;
   const host = curl.searchParams.get('host');
 
-  if(!host) {
+  if (!host) { // likely coming from fallback
+    notify(message);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
   }
