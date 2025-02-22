@@ -14,6 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Desktop
           - platform: 'macos-latest' 
             args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest' 
@@ -23,9 +24,18 @@ jobs:
           - platform: 'windows-latest'
             args: ''
 
+          # Mobile
+          - platform: 'macos-latest'  # iOS
+            args: '--target aarch64-apple-ios'
+            mobile: true
+          - platform: 'ubuntu-22.04'  # Android
+            args: '--target aarch64-linux-android'
+            mobile: true
+
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+
       - name: setup node
         uses: actions/setup-node@v4
         with:
@@ -35,15 +45,15 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
-      
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin,aarch64-apple-ios' || matrix.platform == 'ubuntu-22.04' && 'aarch64-linux-android' || '' }}
+
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
-          
+
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-22.04' && matrix.mobile != true
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -51,7 +61,26 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: Build Tauri App
+      - name: Install Android dependencies
+        if: matrix.mobile == true && matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -o cmdline-tools.zip
+          unzip cmdline-tools.zip -d $ANDROID_HOME
+          mv $ANDROID_HOME/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.1" "ndk;25.2.9519653"
+
+      - name: Install iOS dependencies
+        if: matrix.mobile == true && matrix.platform == 'macos-latest'
+        run: |
+          brew install cocoapods
+          rustup target add aarch64-apple-ios x86_64-apple-ios
+
+      - name: Build Tauri App (Desktop)
+        if: matrix.mobile != true
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,3 +91,18 @@ jobs:
           releaseDraft: false
           prerelease: true
           args: ${{ matrix.args }}
+
+      - name: Build Tauri App (Mobile)
+        if: matrix.mobile == true
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PLATFORM: "mobile"
+        with:
+          tagName: v__VERSION__-mobile
+          releaseName: 'ytify v__VERSION__ (Mobile)'
+          releaseBody: 'Mobile version for Android & iOS'
+          releaseDraft: false
+          prerelease: true
+          args: ${{ matrix.args }}
+
