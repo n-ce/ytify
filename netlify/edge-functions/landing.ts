@@ -17,10 +17,11 @@ export default async function handler(_: Request, context: Context) {
           <a style="
             text-decoration: underline;
             font-weight: bold;
-          " href="https://ytify.us.kg">https://ytify.us.kg</a> is now our primary domain. PWA users can reinstall from
-          ytify.us.kg. You can easily
+          " href="https://ytify.pp.ua">https://ytify.pp.ua</a> is now our primary domain. PWA users can reinstall from
+          ytify.pp.ua. You can easily
           migrate your data by importing your settings and library export files, piped playlists need not be imported
           again.
+          If anything goes wrong, ytify.netlify.app is our original domain.
           <br><br>
         ${cgeo === 'IN' ?
       `<p style="font-size:smaller;margin-top:1rem">
