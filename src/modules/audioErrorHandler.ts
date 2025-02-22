@@ -12,11 +12,9 @@ export default function() {
 
   if (playViaPiped || hls.on) return notify(message);
 
-  const curl = new URL(audio.src);
-  const origin = curl.origin;
-  const host = curl.searchParams.get('host');
+  const origin = new URL(audio.src).origin;
 
-  if (!host) { // likely coming from fallback
+  if (audio.src.endsWith('&fallback')) {
     notify(message);
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
     return;
