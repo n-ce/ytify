@@ -14,13 +14,8 @@ export default async function handler(_: Request, context: Context) {
 
           ytify is a resource efficient audio streaming client for YouTube & YTMusic. <a style="text-decoration:underline;" target="_blank" href="https://github.com/n-ce/ytify/wiki/usage">Learn more about how to use the application effectively.</a>
           <br><br>
-          <a style="
-            text-decoration: underline;
-            font-weight: bold;
-          " href="https://ytify.us.kg">https://ytify.us.kg</a> is now our primary domain. PWA users can reinstall from
-          ytify.us.kg. You can easily
-          migrate your data by importing your settings and library export files, piped playlists need not be imported
-          again.
+          Our new primary domain is <a style="text-decoration: underline;font-weight: bold;" href="https://ytify.pp.ua">https://ytify.pp.ua</a>.
+          PWA users can reinstall from here. Data can be migrated via settings/library import. ytify.netlify.app remains active.
           <br><br>
         ${cgeo === 'IN' ?
       `<p style="font-size:smaller;margin-top:1rem">
