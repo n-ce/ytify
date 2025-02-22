@@ -9,7 +9,7 @@
 </div>
 
 
-> [**ytify**](https://ytify.netlify.app) is the fastest (56KB to load) and the lightest (7.5K LOC only) centralised audio streaming web application built with an unprecedented hybrid [HTML + SolidJS] approach for maximum efficiency.
+> [**ytify**](https://ytify.pp.ua) is the fastest (56KB to load) and the lightest (7.5K LOC only) centralised audio streaming web application built with an unprecedented hybrid [HTML + SolidJS] approach for maximum efficiency.
 >  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 > As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
@@ -44,7 +44,7 @@
 
 ## Usage 👆
 - Instance
-  - [Official](https://ytify.us.kg)
+  - [Official](https://ytify.pp.ua)
   - [Secondary](https://ytify.netlify.app)
   - [Testing](https://dev--ytify.netlify.app)
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
