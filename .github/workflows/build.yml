@@ -69,7 +69,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: 'ytify v__VERSION__'
-          releaseBody: ''
+          releaseBody: 'This is a rolling release, new commits trigger new releases. [View Changelog](https://github.com/n-ce/ytify/commits).'
           releaseDraft: false
           prerelease: true
           args: ${{ matrix.args }}
