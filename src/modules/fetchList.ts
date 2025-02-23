@@ -57,7 +57,7 @@ export default async function fetchList(
     listContainer.classList.remove('reverse');
   listContainer.innerHTML = '';
 
-  itemsLoader(group.relatedStreams.filter(s => s.views !== -1), listContainer);
+  itemsLoader(group.relatedStreams.filter((s: StreamItem) => s.views !== -1), listContainer);
 
 
   if (location.pathname !== '/list')
