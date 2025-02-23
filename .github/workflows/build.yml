@@ -119,7 +119,10 @@ jobs:
           crate: tauri-cli
           version: 2.2.7
           locked: true
-          
+
+      - name: Install frontend dependencies
+        run: npm install
+
       - name: 🔨 Build app bundle
         run: |
           cargo --locked auditable tauri android init
