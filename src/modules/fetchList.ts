@@ -53,12 +53,11 @@ export default async function fetchList(
   if (!group?.relatedStreams?.length)
     return;
 
-
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
   listContainer.innerHTML = '';
 
-  itemsLoader(group.relatedStreams, listContainer);
+  itemsLoader(group.relatedStreams.filter(s => s.views !== -1), listContainer);
 
 
   if (location.pathname !== '/list')
@@ -93,7 +92,7 @@ export default async function fetchList(
       });
       itemsLoader(
         data.relatedStreams.filter(
-          (item: StreamItem) => !existingItems.includes(
+          (item: StreamItem) => item.views !== -1 && !existingItems.includes(
             item.url.slice(-11))
         )
         , listContainer
