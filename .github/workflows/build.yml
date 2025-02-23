@@ -75,75 +75,111 @@ jobs:
           args: ${{ matrix.args }}
   publish-android:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    name: "📦"
     steps:
       - uses: actions/checkout@v4
+        name: 🔄 Checkout
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 8
-
-      - name: Setup Java
+      - name: ☕ Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: "zulu"
+          java-version: "17"
 
-      - name: Setup Android SDK
+      - name: 🤖 Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install NDK
+      - name: 🛠️ Install NDK
         run: sdkmanager "ndk;27.0.11902837"
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
-      - name: Install Rust stable (Android targets)
+      - name: 🦀 Install rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android,wasm32-unknown-unknown
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: 📝 Check spelling using typos-action
+        uses: crate-ci/typos@v1.29.9
 
-      - name: Build Android app
-        run: npm tauri android build -v
+      - name: 📥 Cached Install trunk
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: trunk
+          version: 0.21.7
+          locked: true
+          args: --no-default-features
+          features: rustls
+
+      - name: 📥 Cached install cargo-auditable
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-auditable
+          version: 0.6.6
+          locked: true
+
+      - name: 📥 Cached install tauri-cli
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: tauri-cli
+          version: 2.2.7
+          locked: true
+
+      - name: 🔨 Build app bundle
+        run: |
+          cargo --locked auditable tauri android init
+          cp -a src-tauri/icons/android/mipmap-* src-tauri/gen/android/app/src/main/res/
+          cargo --locked auditable tauri android build
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
+          RUSTFLAGS: "-D warnings"
 
-      - name: Extract Android signing key from env
+      - name: 🔑 Extract android signing key from env (publish only)
         run: |
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
           base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
 
-      - name: Sign APK
+      - name: 🔏 Sign APK
         run: |
           ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign --ks src-tauri/gen/android/release.decrypted.jks \
             --ks-key-alias ${{ secrets.ANDROID_RELEASE_KEY }} \
-            --ks-pass pass:${{ secrets.ANDROID_RELEASE_PASSWORD }} \
+            --ks-pass pass:${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }} \
             --key-pass pass:${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }} \
             --out src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk \
             src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
 
-      - name: Get Node project version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-
-      - name: Rename APK file
-        run: |
-          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk \
-             ./src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify-${{ steps.package-version.outputs.current-version}}.apk
-
-      - name: Publish Release
-        uses: softprops/action-gh-release@v1
+      - name: 📤 Upload build artifacts (push or pr builds only)
+        if: (!inputs.publish)
+        uses: actions/upload-artifact@v4.6.1
         with:
-          draft: true
-          name: App v${{ steps.package-version.outputs.current-version}}
-          tag_name: v${{ steps.package-version.outputs.current-version}}
-          generate_release_notes: true
-          files: |
-            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify-${{ steps.package-version.outputs.current-version}}.apk
+          name: "signed-apk"
+          path: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk
 
+      - name: 📝 Extract version from tauri.android.conf.json (publish only)
+        if: inputs.publish
+        id: get-version
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' src-tauri/tauri.android.conf.json)
+          echo "current-version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: ✏️  Rename APK file (publish only)
+        if: inputs.publish
+        run: |
+          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
+
+      - name: 🚀 Publish (publish only)
+        if: inputs.publish
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ytify Release v${{ steps.get-version.outputs.current-version }}
+          append_body: true
+          make_latest: false
+          generate_release_notes: false
+          files: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
+
+      - name: 🛡️ Attest build provenance (publish only)
+        if: inputs.publish
+        uses: actions/attest-build-provenance@v2.2.0
+        with:
+          subject-path: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
