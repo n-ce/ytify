@@ -19,7 +19,7 @@ export default async (_: Request, context: Context) => {
     audioStreams: streamData.adaptiveFormats
       .filter(_ => _.mimeType.startsWith('audio'))
       .map(_ => ({
-        url: _.url,
+        url: _.url + '&fallback',
         quality: `${Math.floor(_.bitrate / 1000)} kbps`,
         mimeType: _.mimeType,
         codec: _.mimeType.split('codecs="')[1]?.split('"')[0],
