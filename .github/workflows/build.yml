@@ -136,16 +136,6 @@ jobs:
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
           base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
 
-      - name: Debugging secrets
-        run: |
-          echo "ANDROID_RELEASE_KEY exists: ${{ secrets.ANDROID_RELEASE_KEY }}"
-          echo "Keystore password length: ${#secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}"
-          echo "Key password length: ${#secrets.ANDROID_RELEASE_KEY_PASSWORD}"
-      - name: Log apksigner version
-        run: |
-          echo "apksigner version:"
-          $ANDROID_HOME/build-tools/34.0.0/apksigner --version
-
       - name: 🔏 Sign APK
         run: |
           ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign \
