@@ -61,30 +61,6 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: Install Android dependencies
-        if: matrix.mobile == true && matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt update
-          sudo apt install -y openjdk-17-jdk unzip
-          
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -o cmdline-tools.zip
-          unzip cmdline-tools.zip -d $ANDROID_HOME/cmdline-tools
-          
-          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-          
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.1" "ndk;25.2.9519653"
-
-      - name: Install iOS dependencies
-        if: matrix.mobile == true && matrix.platform == 'macos-latest'
-        run: |
-          brew install cocoapods
-          rustup target add aarch64-apple-ios x86_64-apple-ios
-
       - name: Build Tauri App (Desktop)
         if: matrix.mobile != true
         uses: tauri-apps/tauri-action@v0
@@ -97,18 +73,77 @@ jobs:
           releaseDraft: false
           prerelease: true
           args: ${{ matrix.args }}
+  publish-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Build Tauri App (Mobile)
-        if: matrix.mobile == true
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_PLATFORM: "mobile"
+      - uses: pnpm/action-setup@v4
         with:
-          tagName: v__VERSION__-mobile
-          releaseName: 'ytify v__VERSION__ (Mobile)'
-          releaseBody: 'Mobile version for Android & iOS'
-          releaseDraft: false
-          prerelease: true
-          args: ${{ matrix.args }}
+          version: 8
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK
+        run: sdkmanager "ndk;27.0.11902837"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Install Rust stable (Android targets)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Android app
+        run: pnpm tauri android build -v
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
+
+      - name: Extract Android signing key from env
+        run: |
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
+          base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
+
+      # - name: Sign APK
+      #   run: |
+      #     ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign --ks src-tauri/gen/android/release.decrypted.jks \
+      #       --ks-key-alias ${{ secrets.ANDROID_RELEASE_KEY }} \
+      #       --ks-pass pass:${{ secrets.ANDROID_RELEASE_PASSWORD }} \
+      #       --key-pass pass:${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }} \
+      #       --out src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk \
+      #       src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+
+      - name: Get Node project version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+
+      - name: Rename APK file
+        run: |
+          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk \
+             ./src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify-${{ steps.package-version.outputs.current-version}}.apk
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          name: App v${{ steps.package-version.outputs.current-version}}
+          tag_name: v${{ steps.package-version.outputs.current-version}}
+          generate_release_notes: true
+          files: |
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify-${{ steps.package-version.outputs.current-version}}.apk
 
