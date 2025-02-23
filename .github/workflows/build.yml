@@ -110,7 +110,7 @@ jobs:
         run: pnpm install
 
       - name: Build Android app
-        run: pnpm tauri android build -v
+        run: npm tauri android build -v
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
 
