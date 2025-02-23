@@ -138,11 +138,11 @@ jobs:
 
       - name: 🔏 Sign APK
         run: |
-          ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign --ks src-tauri/gen/android/release.decrypted.jks \
+          ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign \
+            --ks src-tauri/gen/android/release.decrypted.jks \
             --ks-key-alias ${{ secrets.ANDROID_RELEASE_KEY }} \
             --ks-pass pass:${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }} \
             --key-pass pass:${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }} \
-            --out src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk \
             src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
 
       - name: 📤 Upload build artifacts (push or pr builds only)
