@@ -97,10 +97,32 @@ jobs:
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android,wasm32-unknown-unknown
 
+      - name: 📥 Cached Install trunk
+        uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3 # v3
+        with:
+          crate: trunk
+          version: 0.21.7
+          locked: true
+          args: --no-default-features
+          features: rustls
+
+      - name: 📥 Cached install cargo-auditable
+        uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3 # v3
+        with:
+          crate: cargo-auditable
+          version: 0.6.6
+          locked: true
+
+      - name: 📥 Cached install tauri-cli
+        uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3 # v3
+        with:
+          crate: tauri-cli
+          version: 2.2.7
+          locked: true
+          
       - name: 🔨 Build app bundle
         run: |
           cargo --locked auditable tauri android init
-          cp -a src-tauri/icons/android/mipmap-* src-tauri/gen/android/app/src/main/res/
           cargo --locked auditable tauri android build
         env:
           NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
