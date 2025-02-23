@@ -97,20 +97,6 @@ jobs:
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android,wasm32-unknown-unknown
 
-      - name: 📥 Cached install cargo-auditable
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: cargo-auditable
-          version: 0.6.6
-          locked: true
-
-      - name: 📥 Cached install tauri-cli
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: tauri-cli
-          version: 2.2.7
-          locked: true
-
       - name: 🔨 Build app bundle
         run: |
           cargo --locked auditable tauri android init
