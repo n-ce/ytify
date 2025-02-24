@@ -135,7 +135,7 @@ jobs:
         run: |
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
           base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
-          
+      ### DEBUG SECTION ###
       - name: DEBUG
         run: |
           ls -alh src-tauri/gen/android/app/build/outputs/apk/universal/release/
@@ -144,7 +144,25 @@ jobs:
           echo "ANDROID_HOME: $ANDROID_HOME"
           echo "APK path: src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk"
           echo "Keystore path: src-tauri/gen/android/release.decrypted.jks"
-          
+
+      - name: Check keystore file
+        run: |
+          ls -lh src-tauri/gen/android/release.decrypted.jks
+          file src-tauri/gen/android/release.decrypted.jks
+          hexdump -C src-tauri/gen/android/release.decrypted.jks | head -n 20
+      - name: Decrypt keystore
+        run: |
+          gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.KEYSTORE_PASSPHRASE }}" \
+            --output src-tauri/gen/android/release.decrypted.jks src-tauri/gen/android/release.jks.gpg
+      - name: Verify keystore
+        run: |
+          keytool -list -keystore src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}"
+
+      - name: Debug secrets
+        run: |
+          echo "Keystore password length: ${#secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}"
+          echo "Key password length: ${#secrets.ANDROID_RELEASE_KEY_PASSWORD}"
+       ### DEBUG SECTION ###
       - name: 🔏 Sign APK
         run: |
           ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign \
