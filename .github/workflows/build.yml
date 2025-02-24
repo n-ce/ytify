@@ -136,6 +136,14 @@ jobs:
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
           base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
       ### DEBUG SECTION ###
+      - name: Check extracted keystore
+        run: ls -lh src-tauri/gen/android/release.decrypted.jks
+      - name: Verify keystore
+        run: |
+          keytool -list -keystore src-tauri/gen/android/release.decrypted.jks \
+            -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}"
+          
+      
       - name: DEBUG
         run: |
           ls -alh src-tauri/gen/android/app/build/outputs/apk/universal/release/
