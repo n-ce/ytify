@@ -185,3 +185,46 @@ jobs:
         with:
           subject-path: |
             src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
+
+            
+  publish-ios:
+    runs-on: macos-latest
+    name: "🍏 Build iOS (Unsigned)"
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@v4
+  
+      - name: 🍎 Setup Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+  
+      - name: 🔧 Install Rust toolchain (iOS targets)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,x86_64-apple-ios
+  
+      - name: 🦀 Install cargo-apple
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-apple
+          version: latest
+  
+      - name: 📥 Install dependencies
+        run: npm install
+  
+      - name: 🔨 Build iOS app (Unsigned)
+        run: |
+          cargo apple build --target aarch64-apple-ios
+          xcodebuild -project src-tauri/gen/ios/Runner.xcodeproj \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/ \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+  
+      - name: 📦 Upload Unsigned `.app`
+        uses: actions/upload-artifact@v4
+        with:
+          name: "ytify-ios-unsigned"
+          path: build/Build/Products/Release-iphoneos/*.app
