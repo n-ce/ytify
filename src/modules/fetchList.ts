@@ -7,7 +7,6 @@ export default async function fetchList(
   url: string | undefined,
   mix = false
 ) {
-  const type = url.includes('channel') ? 'channel' : 'playlist';
   
   if (!url)
     return notify(i18n('fetchlist_url_null'));
@@ -26,7 +25,7 @@ export default async function fetchList(
   }
 
   const api = getApi('piped');
-
+  const type = url.includes('channel') ? 'channel' : 'playlist';
   const group = await fetch(api + url)
     .then(res => res.json())
     .then(data => {
