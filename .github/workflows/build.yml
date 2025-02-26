@@ -204,6 +204,9 @@ jobs:
   
       - name: 📥 Install dependencies
         run: npm install
+
+      - name: 📥 Install Tauri CLI
+        run: cargo install tauri-cli --locked
   
       - name: 🔨 Build iOS app (Unsigned)
         run: |
@@ -222,4 +225,5 @@ jobs:
         with:
           name: "ytify-ios-unsigned"
           path: src-tauri/gen/ios/target/aarch64-apple-ios/release/bundle/*.app
+
 
