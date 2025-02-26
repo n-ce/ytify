@@ -202,18 +202,12 @@ jobs:
         with:
           targets: aarch64-apple-ios,x86_64-apple-ios
   
-      - name: 🦀 Install cargo-apple
-        uses: baptiste0928/cargo-install@v3
-        with:
-          crate: cargo-apple
-          version: latest
-  
       - name: 📥 Install dependencies
         run: npm install
   
       - name: 🔨 Build iOS app (Unsigned)
         run: |
-          cargo apple build --target aarch64-apple-ios
+          cargo tauri ios build --target aarch64-apple-ios
           xcodebuild -project src-tauri/gen/ios/Runner.xcodeproj \
             -scheme Runner \
             -configuration Release \
@@ -227,4 +221,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "ytify-ios-unsigned"
-          path: build/Build/Products/Release-iphoneos/*.app
+          path: src-tauri/gen/ios/target/aarch64-apple-ios/release/bundle/*.app
+
