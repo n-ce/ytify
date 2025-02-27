@@ -57,7 +57,8 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     mimeType: string,
     url: string,
     bitrate: number,
-    contentLength: string
+    contentLength: string,
+    qualityLabel: string
   }[]
 }> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
   headers: {
