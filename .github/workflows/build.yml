@@ -210,7 +210,7 @@ jobs:
   
       - name: 🔨 Build iOS app (Unsigned)
         run: |
-          cargo tauri ios build --target aarch64-apple-ios
+          cargo tauri ios build --target aarch64
           xcodebuild -project src-tauri/gen/ios/Runner.xcodeproj \
             -scheme Runner \
             -configuration Release \
@@ -224,6 +224,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "ytify-ios-unsigned"
-          path: src-tauri/gen/ios/target/aarch64-apple-ios/release/bundle/*.app
+          path: src-tauri/gen/ios/target/aarch64/release/bundle/*.app
+
 
 
