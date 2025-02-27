@@ -29,12 +29,12 @@ export default async (_: Request, context: Context) => {
     videoStreams: streamData.adaptiveFormats
       .filter(_ => _.mimeType.startsWith('video'))
       .map(_ => ({
-        url: _.url + '&fallback',
+        url: _.url + '&fallback', // fallback parameter to indicate it's source
         resolution: _.qualityLabel,
         type: _.mimeType,
       })),
-    relatedStreams: [],
-    captions: [],
+    relatedStreams: [], // empty array for compatibility
+    captions: [], // empty array for compatibility
     livestream: streamData.isLiveContent
   };
 
