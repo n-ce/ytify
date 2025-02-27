@@ -26,6 +26,8 @@ export default async (_: Request, context: Context) => {
         bitrate: _.bitrate,
         contentLength: _.contentLength
       })),
+    videoStreams: streamData.adaptiveFormats
+      .filter(_ => _.mimeType.startsWith('video')),
     relatedStreams: [],
     livestream: streamData.isLiveContent
   };
