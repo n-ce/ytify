@@ -66,7 +66,7 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     qualityLabel: string
   }[],
   captions: {
-    captionsTracks: Record<'name'|'baseUrl', string>[]
+    captionTracks: Record<'name'|'baseUrl', string>[]
   }
 }> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
   headers: {
