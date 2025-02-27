@@ -34,11 +34,7 @@ export default async (_: Request, context: Context) => {
         type: _.mimeType,
       })),
     relatedStreams: [],
-    captions: streamData.captions?.captionTracks
-      ?.map(_ => ({
-        label: _.name,
-        url: _.baseUrl
-      })) || [],
+    captions: [],
     livestream: streamData.isLiveContent
   };
 
@@ -64,10 +60,7 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     bitrate: number,
     contentLength: string,
     qualityLabel: string
-  }[],
-  captions: {
-    captionTracks: Record<'name'|'baseUrl', string>[]
-  }
+  }[]
 }> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
   headers: {
     'X-RapidAPI-Key': <string>keys.shift(),
