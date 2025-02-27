@@ -6,7 +6,7 @@ import { handleXtags, proxyHandler, save } from "../lib/utils";
 import { loadingScreen, title } from "../lib/dom";
 import getStreamData from "../modules/getStreamData";
 
-export default function WatchOnYtify() {
+export default function WatchVideo() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
@@ -74,7 +74,6 @@ export default function WatchOnYtify() {
       <video
         ref={video}
         controls
-        crossorigin="anonymous"
         poster={generateImageUrl(store.actionsMenu.id, 'mq')}
         onplay={() => {
           audio.play();
@@ -113,6 +112,7 @@ export default function WatchOnYtify() {
           audio.playbackRate = video.playbackRate;
         }}
         onerror={() => {
+          if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
 
           if (store.api.index < store.api.invidious.length) {

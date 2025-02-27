@@ -7,14 +7,13 @@ export default async function fetchList(
   url: string | undefined,
   mix = false
 ) {
+  
   if (!url)
     return notify(i18n('fetchlist_url_null'));
-
 
   loadingScreen.showModal();
 
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
-
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
@@ -26,7 +25,7 @@ export default async function fetchList(
   }
 
   const api = getApi('piped');
-
+  const type = url.includes('channel') ? 'channel' : 'playlist';
   const group = await fetch(api + url)
     .then(res => res.json())
     .then(data => {
@@ -55,10 +54,14 @@ export default async function fetchList(
 
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
-  listContainer.innerHTML = '';
+  listContainer.innerHTML = ''
 
-  itemsLoader(group.relatedStreams.filter((s: StreamItem) => s.views !== -1), listContainer);
-
+  const filterOutMembersOnly = (streams:StreamItem[]) =>
+    (type === 'channel' && streams.length) ? // hide members-only streams
+    streams.filter((s: StreamItem) => s.views !== -1) :
+    streams;
+  
+  itemsLoader(filterOutMembersOnly(group.relatedStreams), listContainer);
 
   if (location.pathname !== '/list')
     goTo('/list');
@@ -90,17 +93,17 @@ export default async function fetchList(
       listContainer.querySelectorAll('.streamItem').forEach((v) => {
         existingItems.push((v as HTMLElement).dataset.id as string);
       });
-      itemsLoader(
-        data.relatedStreams.filter(
-          (item: StreamItem) => item.views !== -1 && !existingItems.includes(
+
+      
+      data.relatedStreams = data.relatedStreams.filter(
+          (item: StreamItem) => !existingItems.includes(
             item.url.slice(-11))
-        )
-        , listContainer
-      );
+        );
+      
+      itemsLoader(filterOutMembersOnly(data.relatedStreams), listContainer);
       return data.nextpage;
     });
 
-  const type = url.includes('channel') ? 'channel' : 'playlist';
 
   listBtnsContainer.className = type;
 

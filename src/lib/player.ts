@@ -12,7 +12,7 @@ export default async function player(id: string | null = '') {
 
   if (getSaved('watchMode')) {
     store.actionsMenu.id = id;
-    import('../components/WatchOnYtify')
+    import('../components/WatchVideo')
       .then(mod => render(mod.default, document.body));
     return;
   }
