@@ -34,11 +34,11 @@ export default async (_: Request, context: Context) => {
         type: _.mimeType,
       })),
     relatedStreams: [],
-    captions: streamData.captions.captionTracks
-      .map(_ => ({
+    captions: streamData.captions?.captionTracks
+      ?.map(_ => ({
         label: _.name,
         url: _.baseUrl
-      })),
+      })) || [],
     livestream: streamData.isLiveContent
   };
 
