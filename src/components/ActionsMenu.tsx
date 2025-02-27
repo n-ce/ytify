@@ -22,7 +22,7 @@ function close() {
 
 actionsMenu.onclick = close;
 
-const WatchOnYtify = lazy(() => import('./WatchOnYtify'));
+const WatchVideo = lazy(() => import('./WatchVideo'));
 const Lyrics = lazy(() => import('./Lyrics.tsx'));
 
 export default function() {
@@ -118,7 +118,7 @@ export default function() {
             if (getSaved('linkHost'))
               open(hostResolver('/watch?v=' + store.actionsMenu.id));
             else
-              render(WatchOnYtify, document.body);
+              render(WatchVideo, document.body);
           }}>
             <i class="ri-video-line"></i>{i18n('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>
