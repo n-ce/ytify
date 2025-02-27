@@ -6,7 +6,7 @@ import { handleXtags, proxyHandler, save } from "../lib/utils";
 import { loadingScreen, title } from "../lib/dom";
 import getStreamData from "../modules/getStreamData";
 
-export default function WatchOnYtify() {
+export default function WatchVideo() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
