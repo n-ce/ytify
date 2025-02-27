@@ -207,10 +207,13 @@ jobs:
 
       - name: 📥 Install Tauri CLI
         run: cargo install tauri-cli --locked
-  
+
+      - name: 📂 Initialize Tauri iOS project
+        run: cargo tauri ios init
+
       - name: 🔨 Build iOS app (Unsigned)
         run: |
-          cargo tauri ios build --target aarch64
+          cargo tauri ios build --target aarch64 --no-codesign
           xcodebuild -project src-tauri/gen/ios/Runner.xcodeproj \
             -scheme Runner \
             -configuration Release \
@@ -225,6 +228,7 @@ jobs:
         with:
           name: "ytify-ios-unsigned"
           path: src-tauri/gen/ios/target/aarch64/release/bundle/*.app
+
 
 
 
