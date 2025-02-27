@@ -113,7 +113,7 @@ export default function WatchVideo() {
           audio.playbackRate = video.playbackRate;
         }}
         onerror={() => {
-          if (video.src.endsWith('&fallback') return;
+          if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
 
           if (store.api.index < store.api.invidious.length) {
