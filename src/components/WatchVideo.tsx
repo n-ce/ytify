@@ -74,7 +74,6 @@ export default function WatchVideo() {
       <video
         ref={video}
         controls
-        crossorigin="anonymous"
         poster={generateImageUrl(store.actionsMenu.id, 'mq')}
         onplay={() => {
           audio.play();
