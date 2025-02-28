@@ -209,12 +209,12 @@ jobs:
         run: cargo install tauri-cli --locked
 
       - name: 📂 Initialize Tauri iOS project
-        run: cargo tauri ios init
+        run: cargo tauri ios init || echo "Tauri iOS project already initialized"
 
       - name: 🔨 Build iOS app (Unsigned)
         run: |
-          cargo tauri ios build --target aarch64 --no-codesign
-          xcodebuild -project src-tauri/gen/ios/Runner.xcodeproj \
+          cargo tauri ios build --target aarch64
+          xcodebuild -workspace src-tauri/gen/apple/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -sdk iphoneos \
@@ -227,7 +227,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "ytify-ios-unsigned"
-          path: src-tauri/gen/ios/target/aarch64/release/bundle/*.app
+          path: build/Build/Products/Release-iphoneos/*.app
+
 
 
 
