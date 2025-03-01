@@ -12,9 +12,8 @@ import { appendToQueuelist } from "../scripts/queue";
 export default function(data: StreamItem[]) {
 
   const { stream, streamHistory } = store;
-  const filterYTM = (a: string) =>(
-    stream.author.endsWith(' - Topic') &&
-    data.filter(_ => _.uploaderName.endsWith('- Topic')).length > 3) ? 
+  const filterYTM = (a: string) => 
+    stream.author.endsWith(' - Topic') ?
     a.endsWith(' - Topic') : true;
 
   data.forEach(stream => {
