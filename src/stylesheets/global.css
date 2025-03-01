@@ -134,11 +134,6 @@ a {
   --defaultText: #6dd;
 }
 
-.filter_ytm {
-  --defaultBg: #502;
-  --defaultText: #f9a;
-}
-
 .checked {
   --defaultBg: #505;
   --defaultText: #faf;
