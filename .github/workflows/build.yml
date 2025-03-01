@@ -1,0 +1,235 @@
+name: 'publish'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Desktop
+          - platform: 'macos-latest' 
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' 
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+          # Mobile
+          - platform: 'macos-latest'  # iOS
+            args: '--target aarch64-apple-ios'
+            mobile: true
+          - platform: 'ubuntu-22.04'  # Android
+            args: '--target aarch64-linux-android'
+            mobile: true
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin,aarch64-apple-ios' || matrix.platform == 'ubuntu-22.04' && 'aarch64-linux-android' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04' && matrix.mobile != true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - name: Build Tauri App (Desktop)
+        if: matrix.mobile != true
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'ytify v__VERSION__'
+          releaseBody: 'This is a rolling release, new commits trigger new releases. [View Changelog](https://github.com/n-ce/ytify/commits).'
+          releaseDraft: false
+          prerelease: true
+          args: ${{ matrix.args }}
+  publish-android:
+    runs-on: ubuntu-latest
+    name: "📦"
+    steps:
+      - uses: actions/checkout@v4
+        name: 🔄 Checkout
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: 🤖 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 🛠️ Install NDK
+        run: sdkmanager "ndk;27.0.11902837"
+
+      - name: 🦀 Install rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android,wasm32-unknown-unknown
+
+      - name: 📥 Cached Install trunk
+        uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3 # v3
+        with:
+          crate: trunk
+          version: 0.21.7
+          locked: true
+          args: --no-default-features
+          features: rustls
+
+      - name: 📥 Cached install cargo-auditable
+        uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3 # v3
+        with:
+          crate: cargo-auditable
+          version: 0.6.6
+          locked: true
+
+      - name: 📥 Cached install tauri-cli
+        uses: baptiste0928/cargo-install@91c5da15570085bcde6f4d7aed98cb82d6769fd3 # v3
+        with:
+          crate: tauri-cli
+          version: 2.2.7
+          locked: true
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: 🔨 Build app bundle
+        run: |
+          cargo --locked auditable tauri android init
+          cargo --locked auditable tauri android build
+        env:
+          NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/27.0.11902837
+          RUSTFLAGS: "-D warnings"
+
+      - name: 🔑 Extract android signing key from env (publish only)
+        run: |
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > src-tauri/gen/android/release.jks.base64
+          base64 -d src-tauri/gen/android/release.jks.base64 > src-tauri/gen/android/release.decrypted.jks
+
+      - name: 🔏 Sign APK
+        run: |
+          export KEYSTORE_PASSWORD=${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}
+          export KEY_PASSWORD=${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+      
+          ${{ env.ANDROID_HOME }}/build-tools/34.0.0/apksigner sign \
+            --ks src-tauri/gen/android/release.decrypted.jks \
+            --ks-key-alias ${{ secrets.ANDROID_RELEASE_KEY }} \
+            --key-pass pass:$KEY_PASSWORD \
+            --ks-pass pass:$KEYSTORE_PASSWORD \
+            --out src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+          
+      - name: 📤 Upload build artifacts (push or pr builds only)
+        if: (!inputs.publish)
+        uses: actions/upload-artifact@v4.6.1
+        with:
+          name: "signed-apk"
+          path: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk
+
+      - name: 📝 Extract version from tauri.android.conf.json (publish only)
+        if: inputs.publish
+        id: get-version
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' src-tauri/tauri.android.conf.json)
+          echo "current-version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: ✏️  Rename APK file (publish only)
+        if: inputs.publish
+        run: |
+          mv ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
+
+      - name: 🚀 Publish (publish only)
+        if: inputs.publish
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ytify Release v${{ steps.get-version.outputs.current-version }}
+          append_body: true
+          make_latest: false
+          generate_release_notes: false
+          files: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
+
+      - name: 🛡️ Attest build provenance (publish only)
+        if: inputs.publish
+        uses: actions/attest-build-provenance@v2.2.0
+        with:
+          subject-path: |
+            src-tauri/gen/android/app/build/outputs/apk/universal/release/ytify_${{ steps.get-version.outputs.current-version }}.apk
+
+            
+  publish-ios:
+    runs-on: macos-latest
+    name: "🍏 Build iOS (Unsigned)"
+    steps:
+      - name: 🔄 Checkout
+        uses: actions/checkout@v4
+  
+      - name: 🍎 Setup Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app/Contents/Developer
+  
+      - name: 🔧 Install Rust toolchain (iOS targets)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,x86_64-apple-ios
+  
+      - name: 📥 Install dependencies
+        run: npm install
+
+      - name: 📥 Install Tauri CLI
+        run: cargo install tauri-cli --locked
+
+      - name: 📂 Initialize Tauri iOS project
+        run: cargo tauri ios init || echo "Tauri iOS project already initialized"
+
+      - name: 🔨 Build iOS app (Unsigned)
+        run: |
+          cargo tauri ios build --target aarch64
+          xcodebuild -workspace src-tauri/gen/apple/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/ \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+  
+      - name: 📦 Upload Unsigned `.app`
+        uses: actions/upload-artifact@v4
+        with:
+          name: "ytify-ios-unsigned"
+          path: build/Build/Products/Release-iphoneos/*.app
+
+
+
+
+
