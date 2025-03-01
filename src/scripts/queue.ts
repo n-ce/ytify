@@ -20,7 +20,7 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
 
-  const { queue, stream } = store;
+  const { queue } = store;
 
   if (!allowDuplicatesBtn.classList.contains('redup'))
     if (queue.includes(data.id))
