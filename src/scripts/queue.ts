@@ -11,7 +11,6 @@ const [
   shuffleQBtn,
   removeQBtn,
   filterLT10Btn,
-  filterYTMBtn,
   allowDuplicatesBtn,
   enqueueRelatedStreamsBtn
 ] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
@@ -21,7 +20,7 @@ export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
 export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
   if (!data.id) return;
 
-  const { queue } = store;
+  const { queue, stream } = store;
 
   if (!allowDuplicatesBtn.classList.contains('redup'))
     if (queue.includes(data.id))
@@ -29,10 +28,6 @@ export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: 
 
   if (filterLT10Btn.classList.contains('filter_lt10'))
     if (isLongerThan10Min(<string>data.duration))
-      return;
-
-  if (filterYTMBtn.classList.contains('filter_ytm'))
-    if (!data.author?.endsWith('- Topic'))
       return;
 
   if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
@@ -127,7 +122,6 @@ removeQBtn.addEventListener('click', () => {
 
 const actions: [HTMLButtonElement, string, string][] = [
   [filterLT10Btn, 'filterLT10', 'filter_lt10'],
-  [filterYTMBtn, 'filterYTM', 'filter_ytm'],
   [enqueueRelatedStreamsBtn, 'enqueueRelatedStreams', 'checked'],
   [allowDuplicatesBtn, 'allowDuplicates', 'redup']
 ];
