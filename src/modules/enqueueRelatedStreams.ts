@@ -3,14 +3,19 @@ import { convertSStoHHMMSS } from "../lib/utils";
 import { appendToQueuelist } from "../scripts/queue";
 
 /*
->Get all related streams of a stream
->Check if stream exists in stream history or trash history or queue, if not enqueue it
+> Get all related streams of a stream
+> Check if stream exists in stream history or trash history or queue, if not enqueue it
+> sometimes users will remove items from queue manually,
+> we need to account for this using the trashHistory array
 */
 
 export default function(data: StreamItem[]) {
 
-  // sometimes users will remove items from queue manually,
-  // we need to account for this using the trashHistory array
+  const { stream, streamHistory } = store;
+  const filterYTM = (a: string) =>(
+    stream.author.endsWith(' - Topic') &&
+    data.filter(_ => _.uploaderName.endsWith('- Topic')).length > 3) ? 
+    a.endsWith(' - Topic') : true;
 
   data.forEach(stream => {
 
@@ -21,7 +26,8 @@ export default function(data: StreamItem[]) {
       stream.type === 'stream' &&
       stream.duration > 45 &&
       !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
-      !store.streamHistory.includes(id)
+      !streamHistory.includes(id) &&
+      filterYTM(stream.uploaderName)
     )
       appendToQueuelist({
         id: id,
