@@ -21,7 +21,7 @@ export default async (request: Request, context: Context) => {
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.channelTitle.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
-    .replace('ytify.us.kg', `ytify.us.kg?s=${id}`)
+    .replace('ytify.pp.ua', `ytify.pp.ua?s=${id}`)
     .replaceAll('/ytify_thumbnail_min.webp', thumbnail);
 
   return new Response(newPage, response);

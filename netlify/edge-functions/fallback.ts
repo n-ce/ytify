@@ -19,14 +19,22 @@ export default async (_: Request, context: Context) => {
     audioStreams: streamData.adaptiveFormats
       .filter(_ => _.mimeType.startsWith('audio'))
       .map(_ => ({
-        url: _.url,
+        url: _.url + '&fallback',
         quality: `${Math.floor(_.bitrate / 1000)} kbps`,
         mimeType: _.mimeType,
         codec: _.mimeType.split('codecs="')[1]?.split('"')[0],
         bitrate: _.bitrate,
         contentLength: _.contentLength
       })),
-    relatedStreams: [],
+    videoStreams: streamData.adaptiveFormats
+      .filter(_ => _.mimeType.startsWith('video'))
+      .map(_ => ({
+        url: _.url + '&fallback', // fallback parameter to indicate it's source
+        resolution: _.qualityLabel,
+        type: _.mimeType,
+      })),
+    relatedStreams: [], // empty array for compatibility
+    captions: [], // empty array for compatibility
     livestream: streamData.isLiveContent
   };
 
@@ -50,7 +58,8 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     mimeType: string,
     url: string,
     bitrate: number,
-    contentLength: string
+    contentLength: string,
+    qualityLabel: string
   }[]
 }> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
   headers: {

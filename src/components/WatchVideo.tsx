@@ -6,7 +6,7 @@ import { handleXtags, proxyHandler, save } from "../lib/utils";
 import { loadingScreen, title } from "../lib/dom";
 import getStreamData from "../modules/getStreamData";
 
-export default function WatchOnYtify() {
+export default function WatchVideo() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
@@ -39,9 +39,10 @@ export default function WatchOnYtify() {
     };
     const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
     const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
-    const supportsOpus = await store.player.supportsOpus;
+    const hasOpus = data.audioStreams.find(a => a.mimeType.includes('opus'))?.url;
+    const useOpus = hasOpus && await store.player.supportsOpus;
     const audioArray = handleXtags(data.audioStreams)
-      .filter(a => a.mimeType.includes(supportsOpus ? 'opus' : 'mp4a'))
+      .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
       .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
     if (getSaved('hq')) audioArray.reverse();
@@ -73,7 +74,6 @@ export default function WatchOnYtify() {
       <video
         ref={video}
         controls
-        crossorigin="anonymous"
         poster={generateImageUrl(store.actionsMenu.id, 'mq')}
         onplay={() => {
           audio.play();
@@ -112,6 +112,7 @@ export default function WatchOnYtify() {
           audio.playbackRate = video.playbackRate;
         }}
         onerror={() => {
+          if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
 
           if (store.api.index < store.api.invidious.length) {

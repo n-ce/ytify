@@ -1,5 +1,5 @@
 import { title, audio, playButton } from '../lib/dom.ts';
-import { store } from '../lib/store.ts';
+import { store, getSaved } from '../lib/store.ts';
 import { getDownloadLink, notify } from '../lib/utils.ts';
 
 export default function() {
@@ -8,10 +8,17 @@ export default function() {
   const id = store.stream.id;
   const { usePiped, fallback, hls } = store.player;
   const { index, invidious } = store.api;
+  const playViaPiped = usePiped && getSaved('custom_instance');
 
-  if (usePiped || hls.on) return notify(message);
+  if (playViaPiped || hls.on) return notify(message);
 
   const origin = new URL(audio.src).origin;
+
+  if (audio.src.endsWith('&fallback')) {
+    notify(message);
+    playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+    return;
+  }
 
   if (index < invidious.length) {
     const proxy = invidious[index];
@@ -27,7 +34,7 @@ export default function() {
     // Emergency Handling
     if (!fallback) useCobalt();
     else
-      fetch(+ '/streams/' + id)
+      fetch(fallback + '/streams/' + id)
         .then(res => res.json())
         .then(data => {
           import('./setAudioStreams.ts')
