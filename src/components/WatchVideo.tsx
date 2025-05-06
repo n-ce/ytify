@@ -4,7 +4,7 @@ import { getSaved, store } from "../lib/store";
 import { Selector } from "./Settings";
 import { handleXtags, proxyHandler, save } from "../lib/utils";
 import { loadingScreen, title, queuelist } from "../lib/dom";
-import { firstItemInQueue } from "./queue";
+import { firstItemInQueue } from "../scripts/queue";
 import getStreamData from "../modules/getStreamData";
 
 export default function WatchVideo() {
