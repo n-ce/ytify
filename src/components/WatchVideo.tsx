@@ -3,7 +3,8 @@ import { generateImageUrl } from "../lib/imageUtils";
 import { getSaved, store } from "../lib/store";
 import { Selector } from "./Settings";
 import { handleXtags, proxyHandler, save } from "../lib/utils";
-import { loadingScreen, title } from "../lib/dom";
+import { loadingScreen, title, queuelist } from "../lib/dom";
+import { firstItemInQueue } from "./queue";
 import getStreamData from "../modules/getStreamData";
 
 export default function WatchVideo() {
@@ -65,6 +66,14 @@ export default function WatchVideo() {
     });
   });
 
+  function close() {
+    audio.pause();
+    video.pause();
+    dialog.close();
+    dialog.remove();
+    title.textContent = store.stream.title || 'Now Playing';    
+  }
+
   return (
     <dialog
       open
@@ -82,6 +91,11 @@ export default function WatchVideo() {
         onpause={() => {
           audio.pause();
           audio.currentTime = video.currentTime;
+        }}
+        onended={() => {
+          if (!queuelist.childElementCount) return;
+          close();
+          firstItemInQueue().click();
         }}
         onwaiting={() => {
           if (!audio.paused)
@@ -142,13 +156,7 @@ export default function WatchVideo() {
 
       <div>
 
-        <button onclick={() => {
-          audio.pause();
-          video.pause();
-          dialog.close();
-          dialog.remove();
-          title.textContent = store.stream.title || 'Now Playing';
-        }}>Close</button>
+        <button onclick={close}>Close</button>
 
         <Show when={data().video.length}>
           <Selector
