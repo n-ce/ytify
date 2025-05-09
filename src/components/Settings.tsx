@@ -65,7 +65,7 @@ export default function() {
     <>
       <div>
         <b id="ytifyIconContainer">
-          <p>ytify {Version}</p>
+          <p>ytify {Build}</p>
         </b>
 
         <ToggleSwitch
