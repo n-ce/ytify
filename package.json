@@ -6,9 +6,12 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "update": "npx npm-check-updates -u"
+    "update": "npx npm-check-updates -u",
+    "dev-os": "cargo tauri dev",
+    "build-os": "cargo tauri build"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.2.0",
     "hls.js": "^1.5.20",
     "solid-js": "^1.9.4",
     "sortablejs": "^1.15.6"
