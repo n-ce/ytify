@@ -1,5 +1,5 @@
 import { createSignal, onMount } from 'solid-js';
-import { getDB, reservedCollections } from '../lib/libraryUtils';
+import { getDB } from '../lib/libraryUtils';
 import { superCollectionSelector, superCollectionList } from '../lib/dom';
 import { removeSaved, save, superClick } from '../lib/utils';
 import ItemsLoader from './ItemsLoader';
@@ -77,7 +77,7 @@ function loadCollections(db: Library) {
   const keys = Object.keys(db);
   return keys.length ?
     keys
-      .filter(v => !reservedCollections.includes(v))
+      .filter(v => v !== 'channels' && v !== 'playlists')
       .map(v => ({ type: 'collection', name: v })) :
     'No Collections in Library';
 }

@@ -1,11 +1,17 @@
 import { createEffect, createSignal, For, Show } from "solid-js";
 import { generateImageUrl, getThumbIdFromLink } from "../lib/imageUtils";
-import { convertSStoHHMMSS, hostResolver } from "../lib/utils";
+import { convertSStoHHMMSS, hostResolver, i18n } from "../lib/utils";
 import ListItem from "./ListItem";
 import StreamItem from "./StreamItem";
 
 const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
+const reservedCollections = {
+  discover: ['ri-compass-3-line', 'library_discover'],
+  history: ['ri-memories-line', 'library_history'],
+  favorites: ['ri-heart-fill', 'library_favorites'],
+  listenLater: ['ri-calendar-schedule-line', 'library_listen_later']
+}
 
 export default function ItemsLoader(data: { itemsArray: StreamItem[] }) {
   const [items, setItems] = createSignal(data.itemsArray);
@@ -23,7 +29,16 @@ export default function ItemsLoader(data: { itemsArray: StreamItem[] }) {
           item.type === 'collection' ?
 
             <a href={'./list?collection=' + item.name} class={'clxn_item'} >
-              <i class='ri-play-list-2-fill'></i>{item.name}
+
+              <Show when={item.name in reservedCollections} fallback={
+                <>
+                  <i class='ri-play-list-2-fill'></i>{item.name}
+                </>
+              }>
+                <i class={reservedCollections[item.name as 'history'][0]
+                }></i>
+                {i18n(reservedCollections[item.name as 'history'][1] as 'library_history')}
+              </Show>
             </a> :
 
             (item.type === 'stream' || item.type === 'video') ?
