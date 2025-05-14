@@ -34,17 +34,17 @@ addEventListener('DOMContentLoaded', async () => {
           dialog.open = true;
           dialog.addEventListener('click', (e) => {
             const elm = e.target as HTMLButtonElement;
-            if (elm.matches('#updateBtn'))
+            if (elm.id === 'updateBtn' || elm.closest('#updateBtn'))
               handleUpdate();
-            if (elm.matches('#laterBtn')) {
+            if (elm.id === 'laterBtn' || elm.closest('#laterBtn')) {
               dialog.close();
               dialog.remove();
             }
           })
 
           import('./components/UpdatePrompt')
-            .then(async mod =>
-              uhtml(dialog, await mod.default()));
+            .then(async mod => uhtml(dialog, await mod.default()))
+            .then(() => document.body.appendChild(dialog));
         }
       });
     });
