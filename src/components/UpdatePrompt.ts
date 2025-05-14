@@ -11,29 +11,33 @@ export default async function UpdatePrompt(handleUpdate: () => void) {
   const list = await fetch(commitsSrc)
     .then(res => res.json())
     .then(data => data.commit.message.split('-'))
-    .then(data => data.map((text: string) => (html`<li>${text}</li>`)));
+    .then(data => data.map((text: string) => (html`<li>${text}</li>`)))
+    .catch(() => html`<li>Failed to load update data from Github.</li>`);
 
 
-  const template = html`
-    <dialog
-      id="changelog"
-      ref=${(el: HTMLDialogElement) => { dialog = el }}
-      open
+  return html`
+  <dialog
+    id="changelog"
+    ref=${(el: HTMLDialogElement) => { dialog = el }}
+    open
     >
-      <ul>
-        ${list}
-        <hr />
-        <li @click=${() => open(commitsLink)}>${i18n('updater_changelog_full')}</li>
-      </ul>
-      <span>
-        <button @click=${handleUpdate} autofocus>${i18n('updater_update')}</button>
-        <button @click=${() => {
+    <ul>
+      ${list}
+      <hr />
+      <li @click=${() => { open(commitsLink) }}>
+        ${i18n('updater_changelog_full')}
+      </li>
+    </ul>
+    <span>
+      <button @click=${handleUpdate} autofocus>
+      ${i18n('updater_update')}
+      </button>
+      <button @click=${() => {
       dialog.close();
       dialog.remove();
     }}>${i18n('updater_later')}</button>
-      </span>
-    </dialog>`;
+    </span>
+  </dialog>`;
 
-  return template;
 
 }
