@@ -2,9 +2,8 @@ import './UpdatePrompt.css';
 import { i18n } from "../lib/utils";
 import { html } from 'uhtml';
 
-export default async function UpdatePrompt(handleUpdate: () => void) {
+export default async function UpdatePrompt() {
 
-  let dialog!: HTMLDialogElement;
   const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/main';
   const commitsLink = 'https://github.com/n-ce/ytify/commits';
 
@@ -16,11 +15,6 @@ export default async function UpdatePrompt(handleUpdate: () => void) {
 
 
   return html`
-  <dialog
-    id="changelog"
-    ref=${(el: HTMLDialogElement) => { dialog = el }}
-    open
-    >
     <ul>
       ${list}
       <hr />
@@ -29,15 +23,10 @@ export default async function UpdatePrompt(handleUpdate: () => void) {
       </li>
     </ul>
     <span>
-      <button @click=${handleUpdate} autofocus>
+      <button id="updateBtn" autofocus>
       ${i18n('updater_update')}
       </button>
-      <button @click=${() => {
-      dialog.close();
-      dialog.remove();
-    }}>${i18n('updater_later')}</button>
-    </span>
-  </dialog>`;
-
+      <button id="laterBtn">${i18n('updater_later')}</button>
+    </span>`;
 
 }

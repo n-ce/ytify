@@ -29,9 +29,22 @@ addEventListener('DOMContentLoaded', async () => {
     await import('virtual:pwa-register').then(pwa => {
       const handleUpdate = pwa.registerSW({
         onNeedRefresh() {
-          import('./components/UpdatePrompt').then(async mod =>
-            uhtml(document.body, await mod.default(handleUpdate)
-            ));
+          const dialog = document.createElement('dialog') as HTMLDialogElement;
+          dialog.id = 'changelog';
+          dialog.open = true;
+          dialog.addEventListener('click', (e) => {
+            const elm = e.target as HTMLButtonElement;
+            if (elm.matches('#updateBtn'))
+              handleUpdate();
+            if (elm.matches('#laterBtn')) {
+              dialog.close();
+              dialog.remove();
+            }
+          })
+
+          import('./components/UpdatePrompt')
+            .then(async mod =>
+              uhtml(dialog, await mod.default()));
         }
       });
     });
