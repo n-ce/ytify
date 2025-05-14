@@ -4,6 +4,7 @@ import { $, getDownloadLink, i18n, idFromURL, proxyHandler } from '../lib/utils'
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
+import { render } from 'solid-js/web';
 
 export default async function() {
 
@@ -58,7 +59,12 @@ export default async function() {
 
   if (id) {
     loadingScreen.showModal();
-    if (isPWA && shareAction) {
+    if (isPWA && shareAction === 'watch') {
+      store.actionsMenu.id = id;
+      import('../components/WatchVideo')
+        .then(mod => render(mod.default, document.body));
+    }
+    else if (isPWA && shareAction) {
       const a = $('a');
       const l = await getDownloadLink(store.actionsMenu.id);
       if (l) {
