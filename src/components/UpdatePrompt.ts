@@ -17,13 +17,13 @@ export default async function UpdatePrompt(handleUpdate: () => void) {
   const template = html`
     <dialog
       id="changelog"
-      ref=${dialog}
+      ref=${(el: HTMLDialogElement) => { dialog = el }}
       open
     >
       <ul>
         ${list}
         <hr />
-        <li @click={()=>open(${commitsLink})}>{i18n('updater_changelog_full')}</li>
+        <li @click=${() => open(commitsLink)}>${i18n('updater_changelog_full')}</li>
       </ul>
       <span>
         <button @click=${handleUpdate} autofocus>${i18n('updater_update')}</button>
