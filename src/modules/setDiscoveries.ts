@@ -1,7 +1,6 @@
-import { listAnchor } from "../lib/dom";
 import { addListToCollection, getDB } from "../lib/libraryUtils";
-import { params, store } from "../lib/store";
-import { convertSStoHHMMSS, goTo } from "../lib/utils";
+import { store } from "../lib/store";
+import { convertSStoHHMMSS } from "../lib/utils";
 
 export default function(
   id: string,
@@ -61,10 +60,5 @@ export default function(
 
   // insert the upgraded collection to discover;
   addListToCollection('discover', Object.fromEntries(array), db);
-
-  // just in case we are already in the discover collection 
-  if (listAnchor.classList.contains('view') && params.get('collection') === 'discover')
-    goTo('discover');
-
 
 }
