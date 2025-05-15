@@ -6,6 +6,7 @@ import './scripts/list';
 import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
+import { render as uhtml } from 'uhtml';
 import { actionsMenu, superCollectionList } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
@@ -28,10 +29,22 @@ addEventListener('DOMContentLoaded', async () => {
     await import('virtual:pwa-register').then(pwa => {
       const handleUpdate = pwa.registerSW({
         onNeedRefresh() {
-          import('./components/UpdatePrompt').then(mod =>
-            render(() => mod.default(handleUpdate),
-              document.body
-            ));
+          const dialog = document.createElement('dialog') as HTMLDialogElement;
+          dialog.id = 'changelog';
+          dialog.open = true;
+          dialog.addEventListener('click', (e) => {
+            const elm = e.target as HTMLButtonElement;
+            if (elm.id === 'updateBtn' || elm.closest('#updateBtn'))
+              handleUpdate();
+            if (elm.id === 'laterBtn' || elm.closest('#laterBtn')) {
+              dialog.close();
+              dialog.remove();
+            }
+          })
+
+          import('./components/UpdatePrompt')
+            .then(async mod => uhtml(dialog, await mod.default()))
+            .then(() => document.body.appendChild(dialog));
         }
       });
     });

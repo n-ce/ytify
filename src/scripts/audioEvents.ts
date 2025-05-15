@@ -1,9 +1,9 @@
-import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
+import { audio, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { appendToQueuelist, firstItemInQueue } from "./queue";
-import { addToCollection, getCollection } from "../lib/libraryUtils";
+import { addToCollection } from "../lib/libraryUtils";
 import audioErrorHandler from "../modules/audioErrorHandler";
 import getStreamData from "../modules/getStreamData";
 
@@ -58,21 +58,10 @@ audio.onplaying = function() {
   if (getSaved('history') === 'off')
     return;
 
-  const firstElementInHistory = <HTMLElement | null>getCollection('history').firstElementChild;
-
-  if (firstElementInHistory?.dataset.id !== id)
-    historyTimeoutId = window.setTimeout(() => {
-      if (historyID === id) {
-        addToCollection('history', store.stream);
-        // just in case we are already in the history collection 
-        if (
-          listAnchor.classList.contains('view') &&
-          params.get('collection') === 'history'
-        )
-          goTo('history');
-
-      }
-    }, 1e4);
+  historyTimeoutId = window.setTimeout(() => {
+    if (historyID === id)
+      addToCollection('history', store.stream, 'addNew');
+  }, 1e4);
 }
 
 audio.onpause = function() {

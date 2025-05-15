@@ -182,6 +182,7 @@ export default function() {
           }}
         >
           <option value='play'>{i18n('settings_pwa_play')}</option>
+          <option value='watch'>{i18n('settings_pwa_watch')}</option>
           <option value='dl'>{i18n('settings_pwa_download')}</option>
           <option value='ask'>{i18n('settings_pwa_always_ask')}</option>
         </Selector>

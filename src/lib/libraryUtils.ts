@@ -11,9 +11,6 @@ export function saveDB(data: Library, change: string = '') {
   dispatchEvent(new CustomEvent('dbchange', { detail: { db: data, change: change } }));
 }
 
-export const getCollection = (name: string) => <HTMLDivElement>(<HTMLDetailsElement>document.getElementById(name)).lastElementChild;
-
-
 export function removeFromCollection(
   collection: string,
   id: string
@@ -156,7 +153,7 @@ function getLocalCollection(
 
   if (collection === 'discover') {
     for (const i in data)
-      if ((data[i] as CollectionItem & { frequency: number }).frequency < 2)
+      if (usePagination && (data[i] as CollectionItem & { frequency: number }).frequency < 2)
         delete db.discover?.[i];
     saveDB(db);
   }

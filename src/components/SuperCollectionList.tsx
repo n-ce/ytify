@@ -75,11 +75,12 @@ function loadForYou(db: Library) {
 
 function loadCollections(db: Library) {
   const keys = Object.keys(db);
-  return keys.length ?
-    keys
-      .filter(v => !reservedCollections.includes(v))
-      .map(v => ({ type: 'collection', name: v })) :
-    'No Collections in Library';
+  return (keys.length ?
+    keys : reservedCollections)
+    .filter(v => v !== 'channels' && v !== 'playlists')
+    .map(v => ({ type: 'collection', name: v }));
+
+
 }
 
 // APAC : artists | playlists | albums | channels

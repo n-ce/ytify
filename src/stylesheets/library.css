@@ -1,35 +1,6 @@
 #library {
   width: 100%;
 
-  #collections {
-    margin: 0 4vmin;
-    padding: 0;
-
-
-    a {
-      border: var(--border);
-      background: var(--onBg);
-      border-radius: var(--roundness);
-      padding: 2vmin 3vmin;
-      margin: 0 2vmin;
-      margin-top: 6vmin;
-      padding-right: calc(3vmin + 0.4rem);
-      display: inline-flex;
-      align-items: center;
-
-      &::after {
-        content: attr(aria-label);
-      }
-
-      i {
-        font-weight: initial;
-        pointer-events: none;
-        margin-right: 0.4rem;
-      }
-    }
-
-  }
-
   select {
     margin: 1rem 0 1%;
     background: var(--onBg);

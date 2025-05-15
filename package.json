@@ -1,29 +1,28 @@
 {
   "name": "ytify",
   "type": "module",
-  "version": "7.8",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
-    "update": "npx npm-check-updates -u"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "hls.js": "^1.5.20",
-    "solid-js": "^1.9.4",
-    "sortablejs": "^1.15.6"
+    "hls.js": "^1.6.2",
+    "solid-js": "^1.9.6",
+    "sortablejs": "^1.15.6",
+    "uhtml": "^4.7.1"
   },
   "devDependencies": {
-    "@netlify/blobs": "^8.1.0",
-    "@netlify/edge-functions": "^2.11.1",
-    "@types/node": "^22.13.1",
+    "@netlify/blobs": "^9.1.1",
+    "@netlify/edge-functions": "^2.12.0",
+    "@types/node": "^22.15.17",
     "@types/sortablejs": "^1.15.8",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "eruda": "^3.4.1",
-    "typescript": "^5.7.3",
-    "vite": "^6.1.0",
-    "vite-plugin-pwa": "^0.21.1",
-    "vite-plugin-solid": "^2.11.1"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^1.0.0",
+    "vite-plugin-solid": "^2.11.6"
   },
   "browserslist": [
     "defaults"
