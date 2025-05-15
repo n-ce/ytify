@@ -1,12 +1,11 @@
 import { favButton, favIcon } from "../lib/dom";
-import { addToCollection, fetchCollection, getDB, removeFromCollection, saveDB, toCollection } from "../lib/libraryUtils";
+import { addToCollection, getDB, removeFromCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { $, i18n, notify, removeSaved } from "../lib/utils";
 import { getSaved, store } from "../lib/store";
 
 const importBtn = document.getElementById('upload') as HTMLInputElement;
 const exportBtn = document.getElementById('exportBtn') as HTMLButtonElement;
 const cleanBtn = document.getElementById('cleanLibraryBtn') as HTMLButtonElement;
-const collectionContainer = document.getElementById('collections') as HTMLDivElement;
 
 importBtn.addEventListener('change', async () => {
   const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
@@ -47,12 +46,6 @@ favButton.addEventListener('click', () => {
 });
 
 
-collectionContainer.addEventListener('click', e => {
-  e.preventDefault();
-  const elm = e.target as HTMLAnchorElement;
-  if (elm.classList.contains('collectionItem'))
-    fetchCollection(elm.id);
-});
 
 const dbhash = getSaved('dbsync');
 const hashpoint = location.origin + '/dbs/' + dbhash;
