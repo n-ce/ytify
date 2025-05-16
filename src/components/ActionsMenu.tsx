@@ -5,7 +5,7 @@ import { appendToQueuelist } from "../scripts/queue";
 import { getSaved, store } from "../lib/store";
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
-import { createSignal, lazy, onMount, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { render } from "solid-js/web";
 
 declare module "solid-js" {
@@ -22,8 +22,6 @@ function close() {
 
 actionsMenu.onclick = close;
 
-const WatchVideo = lazy(() => import('./WatchVideo'));
-const Lyrics = lazy(() => import('./Lyrics.tsx'));
 
 export default function() {
 
@@ -105,7 +103,16 @@ export default function() {
         <li tabindex={6} on:click={
           () => {
             close();
-            render(Lyrics, document.body);
+            const dialog = document.createElement('dialog') as HTMLDialogElement;
+            dialog.className = 'displayer';
+            dialog.addEventListener('click', () => {
+              dialog.close();
+              dialog.remove();
+              store.lrcSync = () => '';
+            });
+            document.body.appendChild(dialog);
+            import('./Lyrics.ts')
+              .then(async mod => await mod.default(dialog))
           }
         }>
           <i class="ri-music-2-line"></i>{i18n('actions_menu_view_lyrics')}
@@ -117,8 +124,15 @@ export default function() {
             close();
             if (getSaved('linkHost'))
               open(hostResolver('/watch?v=' + store.actionsMenu.id));
-            else
-              render(WatchVideo, document.body);
+            else {
+
+              const dialog = document.createElement('dialog') as HTMLDialogElement;
+              dialog.open = true;
+              dialog.className = 'watcher';
+              document.body.appendChild(dialog);
+              import('./WatchVideo.ts')
+                .then(mod => mod.default(dialog));
+            }
           }}>
             <i class="ri-video-line"></i>{i18n('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>

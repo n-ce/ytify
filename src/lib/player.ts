@@ -4,7 +4,6 @@ import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import getStreamData from "../modules/getStreamData";
-import { render } from "solid-js/web";
 
 export default async function player(id: string | null = '') {
 
@@ -12,8 +11,12 @@ export default async function player(id: string | null = '') {
 
   if (getSaved('watchMode')) {
     store.actionsMenu.id = id;
-    import('../components/WatchVideo')
-      .then(mod => render(mod.default, document.body));
+    const dialog = document.createElement('dialog') as HTMLDialogElement;
+    dialog.open = true;
+    dialog.className = 'watcher';
+    document.body.appendChild(dialog);
+    import('../components/WatchVideo.ts')
+      .then(mod => mod.default(dialog));
     return;
   }
 
