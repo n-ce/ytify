@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "hls.js": "^1.6.2",
-    "solid-js": "^1.9.6",
+    "solid-js": "^1.9.7",
     "sortablejs": "^1.15.6",
     "uhtml": "^4.7.1"
   },
