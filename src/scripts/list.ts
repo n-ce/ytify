@@ -60,7 +60,7 @@ listBtnsContainer.addEventListener('click', async e => {
 
     if (!confirm(i18n('list_prompt_delete', id)))
       return;
-    store.addToCollectionOptions.splice(atcIdx);
+    store.addToCollectionOptions.splice(atcIdx, 1);
     delete db[id];
     saveDB(db, 'delete');
     history.back();
