@@ -6,8 +6,7 @@ import './scripts/list';
 import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
-import { render as uhtml } from 'uhtml';
-import { actionsMenu, superCollectionList } from './lib/dom';
+import { superCollectionList } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
 
@@ -18,9 +17,6 @@ addEventListener('DOMContentLoaded', async () => {
 
   const start = await import('./modules/start')
   start.default();
-
-  const amenu = await import('./components/ActionsMenu');
-  render(amenu.default, actionsMenu);
 
   const sclist = await import('./components/SuperCollectionList.tsx');
   render(sclist.default, superCollectionList);
@@ -43,8 +39,7 @@ addEventListener('DOMContentLoaded', async () => {
           })
 
           import('./components/UpdatePrompt')
-            .then(async mod => uhtml(dialog, await mod.default()))
-            .then(() => document.body.appendChild(dialog));
+            .then(mod => mod.default(dialog))
         }
       });
     });

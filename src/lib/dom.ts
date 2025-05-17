@@ -20,8 +20,6 @@ export const playButton = <HTMLButtonElement>document.getElementById('playButton
 
 export const audio = <HTMLAudioElement>document.querySelector('audio');
 
-export const actionsMenu = <HTMLDialogElement>document.getElementById('actionsMenu');
-
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
 export const listSection = <HTMLDivElement>document.getElementById('list');

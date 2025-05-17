@@ -1,4 +1,4 @@
-import { actionsMenu, searchFilters, superInput, ytifyIcon } from "../lib/dom";
+import { searchFilters, superInput, ytifyIcon } from "../lib/dom";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
@@ -122,8 +122,9 @@ ytifyIcon.addEventListener('click', () => {
 
 onpopstate = function() {
 
-  if (actionsMenu.open) {
-    actionsMenu.close();
+  const actionsMenu = document.getElementById('actionsMenu') as HTMLDialogElement | null;
+  if (actionsMenu && actionsMenu.open) {
+    actionsMenu.click();
     return;
   }
 

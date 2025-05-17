@@ -33,8 +33,10 @@ export const store: {
   linkHost: string,
   searchQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
+  addToCollectionOptions: string[],
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
+
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
@@ -93,6 +95,7 @@ export const store: {
     uploader: '',
     thumbnail: ''
   },
+  addToCollectionOptions: [],
   downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
 }
 

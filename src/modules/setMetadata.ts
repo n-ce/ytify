@@ -1,4 +1,4 @@
-import { actionsMenu, author, img, title } from "../lib/dom";
+import { author, img, title } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
 import { store } from "../lib/store";
 import { hostResolver } from "../lib/utils";
@@ -50,10 +50,11 @@ export async function setMetaData(data: CollectionItem) {
 
   more = function() {
     store.actionsMenu = data;
-    actionsMenu.showModal();
-    history.pushState({}, '', '#');
+    const dialog = document.createElement('dialog') as HTMLDialogElement;
+    document.body.appendChild(dialog);
+    import('../components/ActionsMenu.ts')
+      .then(mod => mod.default(dialog));
   }
-
 
   if (location.pathname === '/')
     document.title = data.title + ' - ytify';
