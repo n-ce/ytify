@@ -2,10 +2,8 @@ import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solidPlugin from 'vite-plugin-solid';
 import autoprefixer from 'autoprefixer';
-/*
 import postcssJitProps from 'postcss-jit-props';
 import OpenProps from 'open-props';
-*/
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
 
@@ -97,7 +95,7 @@ export default defineConfig(({ command }) => ({
     postcss: {
       plugins: [
         autoprefixer(),
-        //  postcssJitProps(OpenProps)
+        postcssJitProps(OpenProps)
       ]
     }
   }

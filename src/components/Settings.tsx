@@ -63,6 +63,7 @@ export default function() {
 
   return (
     <>
+      <h1>{i18n('nav_settings')}</h1>
       <div>
         <b id="ytifyIconContainer">
           <p>ytify {Build}</p>

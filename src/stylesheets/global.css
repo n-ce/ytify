@@ -8,8 +8,6 @@
 @import 'library.css';
 @import 'list.css';
 @import 'snackbar.css';
-/* @import 'open-props/normalize.min.css';*/
-
 
 :root {
   --bg: transparent;
@@ -23,12 +21,6 @@
   --defaultBg: var(--text);
   --defaultText: var(--bg);
   --pageTransitionEffect: translateX(100%);
-}
-
-@font-face {
-  font-family: "Noto Sans";
-  src: url("/NotoSans.woff2") format("woff2");
-  font-display: swap;
 }
 
 *,
@@ -238,7 +230,7 @@ dialog.watcher {
   border-bottom-right-radius: var(--roundness);
   padding: 2vmin 0;
   width: calc(92% + 3vmin);
-  
+
   button::after {
     content: attr(aria-label);
   }
@@ -251,4 +243,14 @@ dialog.watcher {
 /* disable action during load events */
 #playButton.ri-loader-3-line {
   pointer-events: none;
+}
+
+section>h1 {
+  width: 90%;
+  margin: 5vmin;
+  color: var(--text);
+}
+
+#queuetools {
+  padding-top: 0;
 }

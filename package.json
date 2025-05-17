@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "hls.js": "^1.6.2",
+    "open-props": "^1.7.15",
+    "postcss-jit-props": "^1.0.16",
     "solid-js": "^1.9.7",
     "sortablejs": "^1.15.6",
     "uhtml": "^4.7.1"

@@ -1,14 +1,6 @@
 #library {
   width: 100%;
 
-  select {
-    margin: 1rem 0 1%;
-    background: var(--onBg);
-    border: var(--border);
-    border-radius: var(--roundness);
-    padding: 0.25rem 0.5rem;
-  }
-
   #superCollectionList {
     width: calc(100% - 2rem);
 
@@ -50,8 +42,8 @@
 
 
 #superCollectionSelector {
-  padding: 2vmin;
-  margin: 3vmin 2vmin 0;
+  padding: 0 3vmin;
+  margin: 0 2vmin 0;
 }
 
 input[type='radio'] {

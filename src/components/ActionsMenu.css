@@ -33,7 +33,7 @@
     user-select: none;
     display: flex;
     align-items: center;
-    gap: 5dvmin;
+    gap: 3dvmin;
     padding: 1vmin 2vmin;
     border: 0.1vmin solid transparent;
     border-radius: var(--roundness);
