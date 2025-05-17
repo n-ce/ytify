@@ -31,7 +31,7 @@ listBtnsContainer.addEventListener('click', async e => {
 
   const db = getDB();
   const id = store.list.id;
-  const atcOption = <HTMLOptionElement>document.getElementById('collectionSelector')!.querySelector(`[value="${id}"]`);
+  const atcIdx = store.addToCollectionOptions.indexOf(id);
 
   if (btn === playAllBtn) {
     clearQ();
@@ -60,7 +60,7 @@ listBtnsContainer.addEventListener('click', async e => {
 
     if (!confirm(i18n('list_prompt_delete', id)))
       return;
-    atcOption.remove();
+    store.addToCollectionOptions.splice(atcIdx);
     delete db[id];
     saveDB(db, 'delete');
     history.back();
@@ -76,8 +76,7 @@ listBtnsContainer.addEventListener('click', async e => {
 
     const newTitle = prompt(i18n('list_prompt_rename'), id)?.trim();
     if (!newTitle) return;
-    atcOption.text = newTitle;
-    atcOption.value = newTitle;
+    store.addToCollectionOptions[atcIdx] = newTitle;
     db[newTitle] = db[id];
     delete db[id];
     saveDB(db, 'rename');

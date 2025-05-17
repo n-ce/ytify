@@ -6,7 +6,7 @@ import './scripts/list';
 import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
-import { actionsMenu, superCollectionList } from './lib/dom';
+import { superCollectionList } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
 
@@ -17,9 +17,6 @@ addEventListener('DOMContentLoaded', async () => {
 
   const start = await import('./modules/start')
   start.default();
-
-  const amenu = await import('./components/ActionsMenu');
-  render(amenu.default, actionsMenu);
 
   const sclist = await import('./components/SuperCollectionList.tsx');
   render(sclist.default, superCollectionList);

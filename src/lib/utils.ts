@@ -1,4 +1,4 @@
-import { audio, actionsMenu, title } from "./dom";
+import { audio, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
@@ -68,7 +68,7 @@ export async function quickSwitch() {
 
 export function notify(text: string) {
   const el = $('p');
-  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
+  const clear = () => el.isConnected && el.remove();
   el.className = 'snackbar';
   el.textContent = text;
   el.onclick = clear;
@@ -200,8 +200,6 @@ export async function superClick(e: Event) {
 
 
   else if (elc('ri-more-2-fill')) {
-    actionsMenu.showModal();
-    history.pushState({}, '', '#');
     const elp = elem.parentElement!.dataset;
     const sta = store.actionsMenu;
     sta.id = elp.id as string;
@@ -209,6 +207,11 @@ export async function superClick(e: Event) {
     sta.author = elp.author as string;
     sta.channelUrl = elp.channel_url as string;
     sta.duration = elp.duration as string;
+    const dialog = $('dialog') as HTMLDialogElement;
+    document.body.appendChild(dialog);
+    import('../components/ActionsMenu.ts')
+      .then(mod => mod.default(dialog));
+
 
   }
 

@@ -60,7 +60,7 @@ export default async function() {
     loadingScreen.showModal();
     if (isPWA && shareAction === 'watch') {
       store.actionsMenu.id = id;
-      const dialog = document.createElement('dialog') as HTMLDialogElement;
+      const dialog = $('dialog') as HTMLDialogElement;
       dialog.open = true;
       dialog.className = 'watcher';
       document.body.appendChild(dialog);

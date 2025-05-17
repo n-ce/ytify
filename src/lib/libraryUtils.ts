@@ -72,15 +72,14 @@ export function addListToCollection(
 }
 
 export function createCollection(title: string) {
-  const collectionSelector = document.getElementById('collectionSelector') as HTMLSelectElement;
 
   reservedCollections
     .concat(
-      [...collectionSelector.options].slice(2).map(opt => opt.value)
+      store.addToCollectionOptions
     )
     .includes(title) ?
     notify('This Playlist Already Exists!') :
-    collectionSelector.add(new Option(title, title));
+    store.addToCollectionOptions.push(title);
 }
 
 

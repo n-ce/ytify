@@ -4,7 +4,7 @@ import { notify } from "../lib/utils";
 import { loadingScreen } from "../lib/dom";
 
 
-export default async function Lyrics(dialog: HTMLDialogElement) {
+export default async function(dialog: HTMLDialogElement) {
   loadingScreen.showModal();
 
   const data = await fetch(

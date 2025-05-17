@@ -7,7 +7,7 @@ import { firstItemInQueue } from "../scripts/queue";
 import Selector from "./Selector";
 import { html, render } from 'uhtml';
 
-export default async function WatchVideo(dialog: HTMLDialogElement) {
+export default async function(dialog: HTMLDialogElement) {
 
   loadingScreen.showModal();
 
@@ -133,7 +133,6 @@ export default async function WatchVideo(dialog: HTMLDialogElement) {
     >
       ${media.captions.length ?
       html`
-          <option>Captions</option>
           ${media.captions.map(v => html`
             <track
               src=${store.api.invidious[0] + v.url}

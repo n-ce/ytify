@@ -1,7 +1,7 @@
 import { Hole, html } from "uhtml";
 import { i18n } from "../lib/utils";
 
-export default function Selector(_: {
+export default function(_: {
   id: string,
   label: string,
   handler: (e: Event & {

@@ -1,5 +1,5 @@
 import { audio, favButton, favIcon, playButton, title } from "./dom";
-import { convertSStoHHMMSS } from "./utils";
+import { $, convertSStoHHMMSS } from "./utils";
 import { params, store, getSaved } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
@@ -11,11 +11,11 @@ export default async function player(id: string | null = '') {
 
   if (getSaved('watchMode')) {
     store.actionsMenu.id = id;
-    const dialog = document.createElement('dialog') as HTMLDialogElement;
+    const dialog = $('dialog') as HTMLDialogElement;
     dialog.open = true;
     dialog.className = 'watcher';
     document.body.appendChild(dialog);
-    import('../components/WatchVideo.ts')
+    import('../components/WatchVideo')
       .then(mod => mod.default(dialog));
     return;
   }
