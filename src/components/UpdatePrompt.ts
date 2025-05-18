@@ -12,15 +12,16 @@ export default async function(dialog: HTMLDialogElement) {
     .then(data => data.map((text: string) => (html`<li>${text}</li>`)))
     .catch(() => html`<li>Failed to load update data from Github.</li>`);
 
-
+  dialog.id = 'changelog';
+  dialog.open = true;
   render(dialog, html`
     <ul>
       ${list}
       <hr />
-      <li @click=${() => {
-      open(commitsLink);
-    }}>
+      <li>
+        <a href=${commitsLink} target="_blank">
         ${i18n('updater_changelog_full')}
+        </a>
       </li>
     </ul>
     <span>

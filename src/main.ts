@@ -23,8 +23,6 @@ addEventListener('DOMContentLoaded', async () => {
       const handleUpdate = pwa.registerSW({
         onNeedRefresh() {
           const dialog = document.createElement('dialog') as HTMLDialogElement;
-          dialog.id = 'changelog';
-          dialog.open = true;
           dialog.addEventListener('click', (e) => {
             const elm = e.target as HTMLButtonElement;
             if (elm.id === 'updateBtn' || elm.closest('#updateBtn'))
@@ -37,6 +35,7 @@ addEventListener('DOMContentLoaded', async () => {
 
           import('./components/UpdatePrompt')
             .then(mod => mod.default(dialog))
+            .then(() => document.body.appendChild(dialog));
         }
       });
     });
