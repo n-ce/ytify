@@ -13,6 +13,9 @@ export default async function handler(_: Request, context: Context) {
           </svg>
 
           ytify is a resource efficient audio streaming client for YouTube & YTMusic. <a style="text-decoration:underline;" target="_blank" href="https://github.com/n-ce/ytify/wiki/usage">Learn more about how to use it effectively.</a>
+          
+          Alert :
+          If you're on the '17th May' Build, you have to clear cache in settings to Force an update.
           <br><br>
         ${cgeo === 'IN' ?
       `<p style="font-size:smaller;margin-top:1rem">
