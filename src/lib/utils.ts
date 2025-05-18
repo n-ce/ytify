@@ -2,12 +2,11 @@ import { audio, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
-import { render } from 'solid-js/web';
+import { html, render } from 'uhtml';
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
 import { json } from "../scripts/i18n";
-import ItemsLoader from "../components/ItemsLoader";
 
 export const $ = document.createElement.bind(document);
 
@@ -151,23 +150,21 @@ export function renderDataIntoFragment(
   draggable = false
 ) {
 
-  for (const item in data) {
-    const d = data[item] as CollectionItem;
-    if (d.id)
-      render(() => StreamItem({
-        id: d.id,
-        href: hostResolver(`/watch?v=${d.id}`),
-        title: d.title,
-        author: d.author,
-        duration: d.duration,
-        channelUrl: d.channelUrl,
-        draggable: draggable
-      }), fragment);
-  }
-}
-
-export function itemsLoader(itemsArray: StreamItem[], container: HTMLElement) {
-  return render(() => ItemsLoader({ itemsArray }), container);
+  render(fragment, html`${Object
+      .entries(data)
+      .filter(v => v[1].id)
+      .map(v =>
+        StreamItem({
+          id: v[1].id!,
+          href: hostResolver(`/watch?v=${v[1].id}`),
+          title: v[1].title!,
+          author: v[1].author,
+          duration: v[1].duration!,
+          channelUrl: v[1].channelUrl,
+          draggable: draggable
+        })
+      )
+    }`);
 }
 
 

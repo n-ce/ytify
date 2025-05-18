@@ -1,5 +1,7 @@
+import { render } from "uhtml";
 import { searchlist } from "../lib/dom";
-import { getApi, itemsLoader } from "../lib/utils";
+import { getApi } from "../lib/utils";
+import ItemsLoader from "../components/ItemsLoader";
 
 export const getSearchResults = (
   query: string,
@@ -46,11 +48,11 @@ export const fetchWithInvidious = (
     .then(items => {
       if (!items || !items.length)
         throw new Error("No Items Found");
-      
-      itemsLoader(
+
+      render(searchlist, ItemsLoader(
         items.filter(
           (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
-        ), searchlist);
+        )));
       previousQuery = q;
       setObserver(() => fetchWithInvidious(API, q, sortBy));
     })
@@ -78,18 +80,19 @@ const fetchWithPiped = (
       throw new Error("No Items Found");
 
     // filter out shorts
-    itemsLoader(
+    render(searchlist, ItemsLoader(
       items?.filter((item: StreamItem) => !item.isShort)
-      , searchlist
-    );
+    ));
     // load more results when 3rd last element is visible
     if (nextPageToken !== 'null')
       setObserver(async () => {
         const data = await loadMoreResults(API, nextPageToken, query.substring(7));
-        itemsLoader(
+
+        const fragment = document.createDocumentFragment();
+        render(fragment, ItemsLoader(
           data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-          , searchlist
-        );
+        ));
+        searchlist.appendChild(fragment);
         return data.nextpage;
       });
   })

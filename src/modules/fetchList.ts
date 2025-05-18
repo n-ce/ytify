@@ -1,13 +1,15 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { i18n, errorHandler, getApi, goTo, itemsLoader, notify, superClick } from "../lib/utils";
+import { i18n, errorHandler, getApi, goTo, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
+import { render } from "uhtml";
+import ItemsLoader from "../components/ItemsLoader";
 
 export default async function fetchList(
   url: string | undefined,
   mix = false
 ) {
-  
+
   if (!url)
     return notify(i18n('fetchlist_url_null'));
 
@@ -56,35 +58,40 @@ export default async function fetchList(
     listContainer.classList.remove('reverse');
   listContainer.innerHTML = ''
 
-  const filterOutMembersOnly = (streams:StreamItem[]) =>
+  const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
-    streams.filter((s: StreamItem) => s.views !== -1) :
-    streams;
-  
-  itemsLoader(filterOutMembersOnly(group.relatedStreams), listContainer);
+      streams.filter((s: StreamItem) => s.views !== -1) :
+      streams;
+
+  render(listContainer,
+    ItemsLoader(filterOutMembersOnly(group.relatedStreams))
+  );
 
   if (location.pathname !== '/list')
     goTo('/list');
   listSection.scrollTo(0, 0);
 
-  let token = group.nextpage;
+  const tokens = [group.nextpage];
+
   function setObserver(callback: () => Promise<string>) {
     new IntersectionObserver((entries, observer) =>
       entries.forEach(async e => {
         if (e.isIntersecting) {
-          token = await callback();
+
+          const token = await callback();
           observer.disconnect();
-          if (token)
-            setObserver(callback);
+          if (!token || tokens.indexOf(token) !== -1) return;
+          tokens.push(token);
+          setObserver(callback);
         }
       }))
       .observe(listContainer.children[listContainer.childElementCount - 3]);
   }
-  if (!mix && token)
+  if (!mix && group.nextpage)
     setObserver(async () => {
       const data = await fetch(
         api + '/nextpage/' +
-        url.substring(1) + '?nextpage=' + encodeURIComponent(token)
+        url.substring(1) + '?nextpage=' + encodeURIComponent(tokens[tokens.length - 1])
       )
         .then(res => res.json())
         .catch(e => console.log(e));
@@ -94,14 +101,18 @@ export default async function fetchList(
         existingItems.push((v as HTMLElement).dataset.id as string);
       });
 
-      
+
       data.relatedStreams = data.relatedStreams.filter(
-          (item: StreamItem) => !existingItems.includes(
-            item.url.slice(-11))
-        );
-      
-      itemsLoader(filterOutMembersOnly(data.relatedStreams), listContainer);
-      return data.nextpage;
+        (item: StreamItem) => !existingItems.includes(
+          item.url.slice(-11))
+      );
+      const fragment = document.createDocumentFragment();
+
+      render(fragment,
+        ItemsLoader(filterOutMembersOnly(data.relatedStreams))
+      );
+      listContainer.appendChild(fragment);
+      return data.nextpage || '';
     });
 
 

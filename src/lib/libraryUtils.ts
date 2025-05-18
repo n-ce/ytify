@@ -87,7 +87,6 @@ export async function fetchCollection(
   id: string | null,
   shared: boolean = false
 ) {
-
   if (!id) return;
 
   const fragment = document.createDocumentFragment();
@@ -159,6 +158,7 @@ function getLocalCollection(
 
   if (usePagination)
     data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
+
   renderDataIntoFragment(data, fragment, sort);
   listContainer.innerHTML = '';
   listContainer.appendChild(fragment);
@@ -167,12 +167,14 @@ function getLocalCollection(
     setObserver(() => {
       itemsToShow -= 1;
       const part = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
-      renderDataIntoFragment(part, fragment);
+      const nextFragment = document.createDocumentFragment();
+      renderDataIntoFragment(part, nextFragment);
       if (removeFromListBtn.classList.contains('delete'))
-        fragment.childNodes.forEach(v => {
+        nextFragment.childNodes.forEach(v => {
           (v as HTMLElement).classList.add('delete');
         })
-      listContainer.prepend(fragment);
+      listContainer.prepend(nextFragment);
+
       return itemsToShow;
     });
 

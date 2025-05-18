@@ -1,64 +1,62 @@
-import { createSignal, onMount } from 'solid-js';
-import { getDB, reservedCollections } from '../lib/libraryUtils';
+
+import { getDB, reservedCollections, saveDB } from '../lib/libraryUtils';
 import { superCollectionSelector, superCollectionList } from '../lib/dom';
 import { removeSaved, save, superClick } from '../lib/utils';
 import ItemsLoader from './ItemsLoader';
 import { getSaved } from '../lib/store';
-import { createResource } from 'solid-js';
-
-const savedName = getSaved('defaultSuperCollection') as SuperCollection;
-if (savedName)
-  document.getElementById('r.' + savedName)?.toggleAttribute('checked');
-
-export default function() {
-
-  const [db, setDB] = createSignal(getDB());
-  const [name, setName] = createSignal(savedName || 'featured');
-  const data = () => [name(), db()] as [SuperCollection, Library];
-  const [dataResource] = createResource(data, async (data) => {
-    const [name, db] = data;
-    switch (name) {
-      case 'featured':
-        return loadFeaturedPls();
-      case 'collections':
-        return loadCollections(db);
-      case 'feed':
-        return loadFeed(db);
-      case 'for_you':
-        return loadForYou(db);
-      default:
-        return loadSubList(db, name as APAC);
-    }
-  });
+import { render } from 'uhtml';
 
 
-  onMount(() => {
-    addEventListener('dbchange', (e) => {
-      const { db, change } = e.detail;
-      if (change) setDB(db);
-    })
+let name = getSaved('defaultSuperCollection') as SuperCollection;
 
-    superCollectionList.addEventListener('click', superClick);
-    superCollectionSelector.addEventListener('click', e => {
+if (name)
+  document.getElementById('r.' + name)?.toggleAttribute('checked')
+else name = 'featured';
 
-      const elm = e.target as HTMLInputElement & { value: SuperCollection };
+superCollectionList.addEventListener('click', superClick);
 
-      if (!elm.value) return;
+addEventListener('dbchange', (e) => {
+  const { db, change } = e.detail;
+  if (change) saveDB(db);
+  main();
+});
 
-      if (elm.value !== 'for_you') {
-        elm.value === 'featured' ?
-          removeSaved('defaultSuperCollection') :
-          save('defaultSuperCollection', elm.value);
-      }
-      setName(elm.value);
-    });
-  });
+superCollectionSelector.addEventListener('click', e => {
 
-  return (
-    <ItemsLoader itemsArray={dataResource() as StreamItem[]} />
-  );
+  const elm = e.target as HTMLInputElement & { value: SuperCollection };
+
+  if (!elm.value) return;
+
+  if (elm.value !== 'for_you') {
+    elm.value === 'featured' ?
+      removeSaved('defaultSuperCollection') :
+      save('defaultSuperCollection', elm.value);
+  }
+  name = elm.value;
+  main();
+});
+
+export default async function main() {
+  const db = getDB();
+  const data = await loadData(name, db);
+  const template = ItemsLoader(data as StreamItem[]);
+  render(superCollectionList, template);
 }
 
+async function loadData(name: string, db: Library) {
+  switch (name) {
+    case 'featured':
+      return loadFeaturedPls();
+    case 'collections':
+      return loadCollections(db);
+    case 'feed':
+      return loadFeed(db);
+    case 'for_you':
+      return loadForYou(db);
+    default:
+      return loadSubList(db, name as APAC);
+  }
+}
 
 function loadForYou(db: Library) {
   if ('favorites' in db) {
