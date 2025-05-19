@@ -1,8 +1,8 @@
 import { goTo, i18n, notify, removeSaved, save } from "../lib/utils";
 import { queuelist } from "../lib/dom";
 import player from "../lib/player";
-import StreamItem from "../components/StreamItem";
-import { render } from "solid-js/web";
+import StreamItem from "../components/StreamItem.ts";
+import { render } from "uhtml";
 import { store, getSaved } from "../lib/store";
 import Sortable, { type SortableEvent } from 'sortablejs';
 
@@ -43,13 +43,15 @@ export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: 
 
   const fragment = document.createDocumentFragment();
 
-  render(() => StreamItem({
-    id: data.id || '',
-    title: data.title || '',
-    author: data.author || '',
-    duration: data.duration || '',
-    draggable: true
-  }), fragment);
+  render(fragment,
+    StreamItem({
+      id: data.id || '',
+      title: data.title || '',
+      author: data.author || '',
+      duration: data.duration || '',
+      draggable: true
+    }));
+
 
   if (prepend)
     queuelist.prepend(fragment);

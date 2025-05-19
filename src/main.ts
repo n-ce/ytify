@@ -6,7 +6,6 @@ import './scripts/list';
 import './scripts/search';
 import './scripts/library';
 import { render } from 'solid-js/web';
-import { superCollectionList } from './lib/dom';
 
 addEventListener('DOMContentLoaded', async () => {
 
@@ -15,19 +14,15 @@ addEventListener('DOMContentLoaded', async () => {
   render(stngs.default, settingsContainer);
   settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 
-  const start = await import('./modules/start')
-  start.default();
+  (await import('./modules/start')).default();
 
-  const sclist = await import('./components/SuperCollectionList.tsx');
-  render(sclist.default, superCollectionList);
+  (await import('./components/SuperCollectionList')).default();
 
   if (import.meta.env.PROD)
     await import('virtual:pwa-register').then(pwa => {
       const handleUpdate = pwa.registerSW({
         onNeedRefresh() {
           const dialog = document.createElement('dialog') as HTMLDialogElement;
-          dialog.id = 'changelog';
-          dialog.open = true;
           dialog.addEventListener('click', (e) => {
             const elm = e.target as HTMLButtonElement;
             if (elm.id === 'updateBtn' || elm.closest('#updateBtn'))
@@ -40,6 +35,7 @@ addEventListener('DOMContentLoaded', async () => {
 
           import('./components/UpdatePrompt')
             .then(mod => mod.default(dialog))
+            .then(() => document.body.appendChild(dialog));
         }
       });
     });

@@ -43,12 +43,11 @@ export default async function(dialog: HTMLDialogElement) {
       if (i < 0 || active === i)
         return;
 
+      dialog.querySelectorAll('.active').forEach(el => { el.className = '' });
       p[i].scrollIntoView({
         block: 'center',
         behavior: 'smooth'
       });
-      if (i !== 0)
-        p[i - 1].classList.remove('active');
       p[i].className = 'active';
 
       active = i;

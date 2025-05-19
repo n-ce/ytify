@@ -1,13 +1,12 @@
-import { audio, title } from "./dom";
+import { audio, listContainer, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
-import { render } from 'solid-js/web';
+import { html, render } from 'uhtml';
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
 import { json } from "../scripts/i18n";
-import ItemsLoader from "../components/ItemsLoader";
 
 export const $ = document.createElement.bind(document);
 
@@ -145,29 +144,23 @@ export async function errorHandler(
 
 
 
-export function renderDataIntoFragment(
-  data: Collection,
-  fragment: DocumentFragment,
-  draggable = false
+export function renderCollection(
+  data: (DOMStringMap | CollectionItem)[],
+  draggable = false,
+  fragment: DocumentFragment | undefined = undefined
 ) {
-
-  for (const item in data) {
-    const d = data[item] as CollectionItem;
-    if (d.id)
-      render(() => StreamItem({
-        id: d.id,
-        href: hostResolver(`/watch?v=${d.id}`),
-        title: d.title,
-        author: d.author,
-        duration: d.duration,
-        channelUrl: d.channelUrl,
-        draggable: draggable
-      }), fragment);
-  }
-}
-
-export function itemsLoader(itemsArray: StreamItem[], container: HTMLElement) {
-  return render(() => ItemsLoader({ itemsArray }), container);
+  render(fragment || listContainer, html`${data.map(v =>
+    StreamItem({
+      id: v.id || '',
+      href: hostResolver(`/watch?v=${v.id}`),
+      title: v.title || '',
+      author: v.author,
+      duration: v.duration || '',
+      channelUrl: v.channelUrl,
+      draggable: draggable
+    })
+  )
+    }`);
 }
 
 

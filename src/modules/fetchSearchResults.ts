@@ -1,5 +1,7 @@
+import { render } from "uhtml";
 import { searchlist } from "../lib/dom";
-import { getApi, itemsLoader } from "../lib/utils";
+import { getApi } from "../lib/utils";
+import ItemsLoader from "../components/ItemsLoader";
 
 export const getSearchResults = (
   query: string,
@@ -9,9 +11,11 @@ export const getSearchResults = (
     fetchWithInvidious(getApi('invidious'), query, sortBy) :
     fetchWithPiped(getApi('piped'), query);
 
+
 let nextPageToken = '';
 let previousQuery: string;
 let page: number = 1;
+let results: StreamItem[] = [];
 
 function setObserver(callback: () => Promise<string | void>) {
 
@@ -46,11 +50,10 @@ export const fetchWithInvidious = (
     .then(items => {
       if (!items || !items.length)
         throw new Error("No Items Found");
-      
-      itemsLoader(
-        items.filter(
-          (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
-        ), searchlist);
+      results = items.filter(
+        (item: StreamItem) => (item.lengthSeconds > 62) && (item.viewCount > 1000)
+      );
+      render(searchlist, ItemsLoader(results));
       previousQuery = q;
       setObserver(() => fetchWithInvidious(API, q, sortBy));
     })
@@ -78,18 +81,17 @@ const fetchWithPiped = (
       throw new Error("No Items Found");
 
     // filter out shorts
-    itemsLoader(
-      items?.filter((item: StreamItem) => !item.isShort)
-      , searchlist
-    );
+    results =
+      items?.filter((item: StreamItem) => !item.isShort);
+
+    render(searchlist, ItemsLoader(results));
     // load more results when 3rd last element is visible
     if (nextPageToken !== 'null')
       setObserver(async () => {
         const data = await loadMoreResults(API, nextPageToken, query.substring(7));
-        itemsLoader(
-          data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1)
-          , searchlist
-        );
+        results = results.concat(data.items?.filter((item: StreamItem) => !item.isShort && item.duration !== -1));
+        render(searchlist, ItemsLoader(
+          results));
         return data.nextpage;
       });
   })

@@ -50,7 +50,7 @@
   position: absolute;
   width: 80vmin;
   z-index: 1;
-  margin-top: calc(1.5rem + 8.8vmin);
+  margin-top: calc(5rem + 6.8vmin);
   background-color: var(--bg);
   list-style-type: none;
   padding: 0;
