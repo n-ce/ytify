@@ -199,7 +199,7 @@ async function getSharedCollection(
   if (data)
     renderCollection(data);
   else
-    listContainer.innerHTML = 'Collection does not exist';
+    render(listContainer, html`Collection does not exist`);
 
   loadingScreen.close();
 }

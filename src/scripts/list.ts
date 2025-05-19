@@ -71,7 +71,7 @@ listBtnsContainer.addEventListener('click', async e => {
       return;
     delete db[id];
     saveDB(db);
-    listContainer.innerHTML = '';
+    history.back();
   }
   else if (btn === renameCollectionBtn) {
 

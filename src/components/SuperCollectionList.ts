@@ -39,7 +39,7 @@ superCollectionSelector.addEventListener('click', e => {
 export default async function main() {
   const db = getDB();
   const data = await loadData(name, db);
-  const template = ItemsLoader(data as StreamItem[]);
+  const template = ItemsLoader(data as string);
   render(superCollectionList, template);
 }
 
