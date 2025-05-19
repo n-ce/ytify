@@ -13,6 +13,10 @@ body {
   font-weight: 600;
   -webkit-font-smoothing: antialiased;
 
+  i {
+    font-weight: 500;
+  }
+
   main {
     display: flex;
     flex-direction: column;

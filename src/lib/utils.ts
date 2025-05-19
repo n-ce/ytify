@@ -1,4 +1,4 @@
-import { audio, title } from "./dom";
+import { audio, listContainer, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
@@ -144,26 +144,22 @@ export async function errorHandler(
 
 
 
-export function renderDataIntoFragment(
-  data: Collection,
-  fragment: DocumentFragment,
-  draggable = false
+export function renderCollection(
+  data: (DOMStringMap | CollectionItem)[],
+  draggable = false,
+  fragment: DocumentFragment | undefined = undefined
 ) {
-
-  render(fragment, html`${Object
-      .entries(data)
-      .filter(v => v[1].id)
-      .map(v =>
-        StreamItem({
-          id: v[1].id!,
-          href: hostResolver(`/watch?v=${v[1].id}`),
-          title: v[1].title!,
-          author: v[1].author,
-          duration: v[1].duration!,
-          channelUrl: v[1].channelUrl,
-          draggable: draggable
-        })
-      )
+  render(fragment || listContainer, html`${data.map(v =>
+    StreamItem({
+      id: v.id || '',
+      href: hostResolver(`/watch?v=${v.id}`),
+      title: v.title || '',
+      author: v.author,
+      duration: v.duration || '',
+      channelUrl: v.channelUrl,
+      draggable: draggable
+    })
+  )
     }`);
 }
 

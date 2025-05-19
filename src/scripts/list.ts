@@ -1,10 +1,11 @@
 import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn } from '../lib/dom';
 import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver, i18n, renderDataIntoFragment } from '../lib/utils';
+import { hostResolver, i18n, renderCollection } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
 import { getDB, saveDB } from '../lib/libraryUtils';
 import Sortable, { type SortableEvent } from 'sortablejs';
+import { render, html } from 'uhtml';
 
 
 new Sortable(listContainer, {
@@ -87,15 +88,10 @@ listBtnsContainer.addEventListener('click', async e => {
     import('../modules/supermix').then(mod => mod.default(Object.keys(db[id])))
   else if (btn === sortCollectionBtn) {
 
-    listContainer.innerHTML = '';
     sortCollectionBtn.classList.toggle('checked');
-
-    const fragment = document.createDocumentFragment();
-
-    renderDataIntoFragment(db[id], fragment, sortCollectionBtn.classList.contains('checked'));
-
-    listContainer.appendChild(fragment);
-
+    const clxnArr = Object.values(db[id]);
+    render(listContainer, html``);
+    renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
   }
 });
 

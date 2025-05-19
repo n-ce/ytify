@@ -1,6 +1,7 @@
-import { goTo, notify, renderDataIntoFragment } from "./utils";
+import { goTo, notify, renderCollection } from "./utils";
 import { listBtnsContainer, listContainer, listSection, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
+import { render, html } from "uhtml";
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
@@ -89,14 +90,13 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
-  const fragment = document.createDocumentFragment();
   const isReserved = reservedCollections.includes(id);
   const isReversed = listContainer.classList.contains('reverse');
 
 
   shared ?
-    await getSharedCollection(id, fragment) :
-    getLocalCollection(id, fragment, isReserved);
+    await getSharedCollection(id) :
+    getLocalCollection(id, isReserved);
 
   if (!shared && isReserved) {
     if (!isReversed)
@@ -123,10 +123,11 @@ function setObserver(callback: () => number) {
   new IntersectionObserver((entries, observer) =>
     entries.forEach(e => {
       if (e.isIntersecting) {
-        const itemsLeft = callback();
         observer.disconnect();
+        const itemsLeft = callback();
         if (itemsLeft)
           setObserver(callback);
+
       }
     }))
     .observe(listContainer.children[0]);
@@ -135,45 +136,49 @@ function setObserver(callback: () => number) {
 
 function getLocalCollection(
   collection: string,
-  fragment: DocumentFragment,
   isReserved: boolean
 ) {
   const db = getDB();
   const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
-  let data = db[decodeURI(collection)];
+  let dataObj = db[decodeURI(collection)];
 
-  if (!data)
+  if (!dataObj)
     notify('No items found');
 
-  const items = Object.entries(data);
+  const items = Object.values(dataObj);
+  let listData: (CollectionItem | DOMStringMap)[] = items;
   let itemsToShow = items.length;
   const usePagination = isReserved && itemsToShow > 20;
 
   if (collection === 'discover') {
-    for (const i in data)
-      if (usePagination && (data[i] as CollectionItem & { frequency: number }).frequency < 2)
+    for (const i in dataObj)
+      if (usePagination && (dataObj[i] as CollectionItem & { frequency: number }).frequency < 2)
         delete db.discover?.[i];
     saveDB(db);
   }
 
-  if (usePagination)
-    data = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
+  if (usePagination) {
+    listData = items.slice(itemsToShow - 1, itemsToShow);;
+  }
 
-  renderDataIntoFragment(data, fragment, sort);
-  listContainer.innerHTML = '';
-  listContainer.appendChild(fragment);
+  render(listContainer, html``);
+  renderCollection(listData, sort);
 
   if (usePagination)
     setObserver(() => {
       itemsToShow -= 1;
-      const part = Object.fromEntries(items.slice(itemsToShow - 1, itemsToShow));
-      const nextFragment = document.createDocumentFragment();
-      renderDataIntoFragment(part, nextFragment);
+      const next = items.slice(itemsToShow - 1, itemsToShow);
+      const frag = document.createDocumentFragment();
+      renderCollection(next, sort, frag);
+
+
       if (removeFromListBtn.classList.contains('delete'))
-        nextFragment.childNodes.forEach(v => {
-          (v as HTMLElement).classList.add('delete');
-        })
-      listContainer.prepend(nextFragment);
+        frag.childNodes.forEach(v => {
+          if (v instanceof HTMLElement)
+            v.classList.add('delete');
+        });
+
+      listContainer.prepend(frag);
 
       return itemsToShow;
     });
@@ -182,8 +187,7 @@ function getLocalCollection(
 }
 
 async function getSharedCollection(
-  id: string,
-  fragment: DocumentFragment
+  id: string
 ) {
 
   loadingScreen.showModal();
@@ -192,11 +196,8 @@ async function getSharedCollection(
     .then(res => res.json())
     .catch(() => '');
 
-  if (data) {
-    renderDataIntoFragment(data, fragment)
-    listContainer.innerHTML = '';
-    listContainer.appendChild(fragment);
-  }
+  if (data)
+    renderCollection(data);
   else
     listContainer.innerHTML = 'Collection does not exist';
 

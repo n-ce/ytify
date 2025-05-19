@@ -5,6 +5,7 @@ import { store } from "../lib/store";
 import { render } from "uhtml";
 import ItemsLoader from "../components/ItemsLoader";
 
+
 export default async function fetchList(
   url: string | undefined,
   mix = false
@@ -15,6 +16,7 @@ export default async function fetchList(
 
   loadingScreen.showModal();
 
+  let listData: StreamItem[] = [];
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
 
   if (useHyperpipe) {
@@ -56,16 +58,14 @@ export default async function fetchList(
 
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
-  listContainer.innerHTML = ''
 
   const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
       streams.filter((s: StreamItem) => s.views !== -1) :
       streams;
 
-  render(listContainer,
-    ItemsLoader(filterOutMembersOnly(group.relatedStreams))
-  );
+  listData = filterOutMembersOnly(group.relatedStreams);
+  render(listContainer, ItemsLoader(listData));
 
   if (location.pathname !== '/list')
     goTo('/list');
@@ -106,12 +106,9 @@ export default async function fetchList(
         (item: StreamItem) => !existingItems.includes(
           item.url.slice(-11))
       );
-      const fragment = document.createDocumentFragment();
 
-      render(fragment,
-        ItemsLoader(filterOutMembersOnly(data.relatedStreams))
-      );
-      listContainer.appendChild(fragment);
+      listData = listData.concat(filterOutMembersOnly(data.relatedStreams));
+      render(listContainer, ItemsLoader(listData));
       return data.nextpage || '';
     });
 

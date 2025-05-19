@@ -16,15 +16,16 @@ function searchLoader() {
   const useInvidious = searchFilters.selectedIndex > 8;
 
   store.searchQuery = searchQuery + (filterQuery.includes('all') ? '' : filterQuery);
-  searchlist.innerHTML = '';
 
   if (!superInput.value) {
     history.replaceState({}, '', location.origin + location.pathname);
     return
   }
 
+  document.querySelector('#search>h1')?.scrollIntoView({
+    behavior: 'smooth'
+  });
   loadingScreen.showModal();
-
   getSearchResults(
     useInvidious ?
       superInput.value : query,
