@@ -1,4 +1,4 @@
-import { searchFilters, superInput, ytifyIcon } from "../lib/dom";
+import { searchFilters, superInput } from "../lib/dom";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
@@ -114,7 +114,7 @@ else {
 
 goTo(route as Routes);
 
-ytifyIcon.addEventListener('click', () => {
+document.querySelector('svg')!.addEventListener('click', () => {
   goTo(getSaved('startupTab') as '/' || '/search');
 });
 

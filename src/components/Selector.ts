@@ -5,10 +5,7 @@ export default function(_: {
   id: string,
   label: string,
   handler: (e: Event & {
-    target: EventTarget & {
-      value: string,
-      selectedOptions: HTMLOptionsCollection
-    }
+    target: HTMLSelectElement
   }) => void
   children: Hole,
   onmount?: (t: HTMLSelectElement) => void

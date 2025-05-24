@@ -1,7 +1,7 @@
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
 import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
-import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
+import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
 import { i18n } from '../scripts/i18n.ts';
@@ -82,7 +82,6 @@ export default async function() {
 
     loadingScreen.close();
   }
-  else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
   if (params.has('q')) {
     superInput.value = params.get('q') || '';
     if (params.has('f'))

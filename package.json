@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "hls.js": "^1.6.2",
-    "solid-js": "^1.9.7",
     "sortablejs": "^1.15.6",
     "uhtml": "^4.7.1"
   },
@@ -21,8 +20,7 @@
     "eruda": "^3.4.1",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
-    "vite-plugin-pwa": "^1.0.0",
-    "vite-plugin-solid": "^2.11.6"
+    "vite-plugin-pwa": "^1.0.0"
   },
   "browserslist": [
     "defaults"

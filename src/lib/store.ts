@@ -64,10 +64,10 @@ export const store: {
     fallback: '',
     usePiped: true
   },
-  lrcSync: () => '',
+  lrcSync: () => { },
   queue: {
     list: [],
-    append: () => '',
+    append: () => { },
     firstChild: () => undefined,
   },
   stream: {

@@ -64,6 +64,11 @@ section>header {
         display: flex;
         align-items: center;
 
+        &.checked {
+          background: var(--text);
+          color: var(--bg);
+        }
+
         i {
           margin-right: 0.5rem;
         }

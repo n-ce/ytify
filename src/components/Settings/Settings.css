@@ -1,10 +1,18 @@
 #settings {
-  width: auto;
-  padding: 4%;
-  row-gap: 3%;
-  user-select: none;
 
-  h1 {
+  background-color: var(--bg);
+  color: inherit;
+  margin: auto;
+  padding: 5%;
+  user-select: none;
+  overflow: scroll;
+  border-radius: var(--roundness);
+
+  @media(orientation:landscape) {
+    width: 60%;
+  }
+
+  h3 {
     margin: 0;
     width: 100%;
   }
@@ -14,6 +22,7 @@
     border: var(--border);
     border-radius: var(--roundness);
     width: 100%;
+    margin: 5% 0;
 
     &.toggleSwitch,
     >span {

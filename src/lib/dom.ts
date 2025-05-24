@@ -1,7 +1,5 @@
 export const img = <HTMLImageElement>document.getElementById('img');
 
-export const ytifyIcon = <HTMLElement>document.getElementById('ytifyIcon')
-
 export const title = <HTMLAnchorElement>document.getElementById('title');
 
 export const author = <HTMLParagraphElement>document.getElementById('author');
@@ -44,3 +42,5 @@ export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitra
 export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLDivElement;
 
 export const superCollectionList = document.getElementById('superCollectionList') as HTMLDivElement;
+
+export const settingsContainer = document.getElementById('settings') as HTMLDialogElement;
