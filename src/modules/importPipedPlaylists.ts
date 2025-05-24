@@ -1,5 +1,6 @@
 import { addListToCollection, createCollection } from "../lib/libraryUtils";
-import { i18n, convertSStoHHMMSS, notify, goTo } from "../lib/utils";
+import { convertSStoHHMMSS, notify, goTo } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 export default async function() {
 

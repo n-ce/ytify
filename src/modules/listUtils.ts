@@ -2,7 +2,8 @@ import { listContainer, loadingScreen, subscribeListBtn } from "../lib/dom";
 import { getThumbIdFromLink } from "../lib/imageUtils";
 import { addListToCollection, createCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { store } from "../lib/store";
-import { i18n, notify } from "../lib/utils";
+import { notify } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 export function subscribeList(db: Library) {
   const l = store.list;

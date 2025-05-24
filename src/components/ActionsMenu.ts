@@ -1,11 +1,11 @@
 import './ActionsMenu.css';
 import { html, render } from "uhtml";
 import { loadingScreen, openInYtBtn } from "../lib/dom";
-import { appendToQueuelist } from "../scripts/queue";
 import { getSaved, store } from "../lib/store";
-import { $, getDownloadLink, hostResolver, i18n } from "../lib/utils";
+import { $, getDownloadLink, hostResolver } from "../lib/utils";
 import CollectionSelector from "./CollectionSelector";
 import fetchList from "../modules/fetchList";
+import { i18n } from '../scripts/i18n';
 
 
 export default function(dialog: HTMLDialogElement) {
@@ -28,14 +28,14 @@ export default function(dialog: HTMLDialogElement) {
     <ul @click=${(e: Event) => e.stopPropagation()}>
 
       <li tabindex="0" @click=${() => {
-      appendToQueuelist(store.actionsMenu, true);
+      store.queue.append(store.actionsMenu, true);
       close();
     }}>
         <i class="ri-skip-forward-line"></i>${i18n('actions_menu_play_next')}
       </li>
 
       <li tabindex="1" @click=${() => {
-      appendToQueuelist(store.actionsMenu);
+      store.queue.append(store.actionsMenu);
       close();
     }}>
         <i class="ri-list-check-2"></i>${i18n('actions_menu_enqueue')}

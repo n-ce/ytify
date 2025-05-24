@@ -3,7 +3,6 @@ import { generateImageUrl } from "../lib/imageUtils";
 import { getSaved, store } from "../lib/store";
 import { handleXtags, proxyHandler, save } from "../lib/utils";
 import getStreamData from "../modules/getStreamData";
-import { firstItemInQueue } from "../scripts/queue";
 import Selector from "./Selector";
 import { html, render } from 'uhtml';
 
@@ -87,7 +86,7 @@ export default async function(dialog: HTMLDialogElement) {
       @ended=${() => {
       if (!queuelist.childElementCount) return;
       close();
-      firstItemInQueue().click();
+      store.queue.firstChild()?.click();
     }}
       @waiting=${() => {
       if (!audio.paused)

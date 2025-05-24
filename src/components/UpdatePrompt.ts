@@ -1,5 +1,5 @@
+import { i18n } from '../scripts/i18n';
 import './UpdatePrompt.css';
-import { i18n } from '../lib/utils';
 import { html, render } from 'uhtml';
 
 export default async function(dialog: HTMLDialogElement) {

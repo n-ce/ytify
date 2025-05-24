@@ -1,7 +1,7 @@
 import { addToCollection, createCollection, getDB, reservedCollections } from '../lib/libraryUtils';
 import { store } from '../lib/store';
-import { i18n } from '../lib/utils';
 import { html } from 'uhtml';
+import { i18n } from '../scripts/i18n';
 
 export default function(_: {
   collection: CollectionItem,

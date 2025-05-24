@@ -8,6 +8,7 @@
 @import 'library.css';
 @import 'list.css';
 @import 'snackbar.css';
+@import 'header.css';
 
 :root {
   --bg: transparent;
@@ -138,7 +139,6 @@ a {
 
 
 
-#queuetools,
 #listTools,
 #settings,
 #changelog {
@@ -220,7 +220,6 @@ dialog.watcher {
 }
 
 
-#queuetools,
 #listTools {
   position: sticky;
   top: 0;
@@ -243,14 +242,4 @@ dialog.watcher {
 /* disable action during load events */
 #playButton.ri-loader-3-line {
   pointer-events: none;
-}
-
-section>h1 {
-  width: 90%;
-  margin: 5vmin;
-  color: var(--text);
-}
-
-#queuetools {
-  padding-top: 0;
 }

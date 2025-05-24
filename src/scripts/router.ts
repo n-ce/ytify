@@ -1,4 +1,4 @@
-import { searchFilters, superInput, ytifyIcon } from "../lib/dom";
+import { searchFilters, superInput } from "../lib/dom";
 import { goTo } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
@@ -8,7 +8,7 @@ import { fetchCollection } from "../lib/libraryUtils";
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
-const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
+const routes = ['/', '/upcoming', '/search', '/library', '/list'];
 
 let prevPageIdx = routes.indexOf(location.pathname);
 
@@ -114,7 +114,7 @@ else {
 
 goTo(route as Routes);
 
-ytifyIcon.addEventListener('click', () => {
+document.querySelector('svg')!.addEventListener('click', () => {
   goTo(getSaved('startupTab') as '/' || '/search');
 });
 

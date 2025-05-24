@@ -6,7 +6,7 @@ import { html, render } from 'uhtml';
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { json } from "../scripts/i18n";
+import { i18n } from "../scripts/i18n.ts";
 
 export const $ = document.createElement.bind(document);
 
@@ -36,12 +36,6 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
-export const i18n = (
-  key: TranslationKeys,
-  value: string = ''
-) => value ?
-    (json?.[key] || key).replace('$', value) :
-    json?.[key] || key;
 
 export function proxyHandler(url: string) {
   store.api.index = 0;

@@ -1,14 +1,11 @@
 import { Hole, html } from "uhtml";
-import { i18n } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 export default function(_: {
   id: string,
   label: string,
   handler: (e: Event & {
-    target: EventTarget & {
-      value: string,
-      selectedOptions: HTMLOptionsCollection
-    }
+    target: HTMLSelectElement
   }) => void
   children: Hole,
   onmount?: (t: HTMLSelectElement) => void

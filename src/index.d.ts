@@ -145,6 +145,10 @@ declare global {
     'dbchange': CustomEvent<{ db: Library, change: string }>;
   }
 
+  interface elEv extends Event {
+    target: HTMLElement
+  }
+
 }
 
 

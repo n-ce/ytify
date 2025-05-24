@@ -1,6 +1,7 @@
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
 import { store } from "../lib/store";
-import { handleXtags, i18n, proxyHandler } from "../lib/utils";
+import { handleXtags, proxyHandler } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 export default function(audioStreams: AudioStream[],
   isLive = false) {

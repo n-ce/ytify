@@ -11,11 +11,6 @@ body {
   transition: all 0.4s;
   font-family: ui-rounded, Hiragino Maru Gothic ProN, Quicksand, Comfortaa, Manjari, Arial Rounded MT, Arial Rounded MT Bold, Calibri, source-sans-pro, sans-serif;
   font-weight: 600;
-  -webkit-font-smoothing: antialiased;
-
-  i {
-    font-weight: 500;
-  }
 
   main {
     display: flex;
@@ -54,6 +49,7 @@ body {
       margin: auto;
 
       section {
+        height: 100%;
         animation: fromBelow 0.2s cubic-bezier(0.19, 1, 0.22, 1);
       }
     }

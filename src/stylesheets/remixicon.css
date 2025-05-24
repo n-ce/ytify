@@ -15,8 +15,7 @@
 [class*="ri-"] {
   font-family: 'remixicon' !important;
   font-style: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-weight: 500;
 }
 
 .ri-search-2-line:before {

@@ -32,6 +32,8 @@ nav {
       height: 100%;
       flex-direction: column;
       justify-content: space-evenly;
+      flex: 1;
+      text-align: center;
 
       i {
         font-size: 1.2rem;
