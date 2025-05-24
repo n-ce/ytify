@@ -1,11 +1,11 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn } from '../lib/dom';
-import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver, i18n, renderCollection } from '../lib/utils';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist } from '../lib/dom';
+import { goTo, hostResolver, renderCollection } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
 import { getDB, saveDB } from '../lib/libraryUtils';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { render, html } from 'uhtml';
+import { i18n } from './i18n';
 
 
 new Sortable(listContainer, {
@@ -25,6 +25,17 @@ new Sortable(listContainer, {
   }
 });
 
+
+// clones any list items from the provided container to queue
+
+function listToQ(container: HTMLDivElement) {
+  const items = container.querySelectorAll('.streamItem') as NodeListOf<HTMLElement>;
+  items.forEach(item => {
+    store.queue.append(item.dataset);
+  });
+  goTo('/upcoming');
+}
+
 listBtnsContainer.addEventListener('click', async e => {
   const btn = e.target as HTMLButtonElement;
   if (!btn.matches('button'))
@@ -35,9 +46,10 @@ listBtnsContainer.addEventListener('click', async e => {
   const atcIdx = store.addToCollectionOptions.indexOf(id);
 
   if (btn === playAllBtn) {
-    clearQ();
+    store.queue.list.length = 0;
+    queuelist.innerHTML = '';
     listToQ(listContainer);
-    firstItemInQueue().click();
+    store.queue.firstChild()?.click();
   }
   else if (btn === enqueueBtn)
     listToQ(listContainer);

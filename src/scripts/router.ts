@@ -8,7 +8,7 @@ import { fetchCollection } from "../lib/libraryUtils";
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
-const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
+const routes = ['/', '/upcoming', '/search', '/library', '/list'];
 
 let prevPageIdx = routes.indexOf(location.pathname);
 

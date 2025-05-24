@@ -1,9 +1,12 @@
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { $, getDownloadLink, i18n, idFromURL, proxyHandler } from '../lib/utils';
+import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
 import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
+import { i18n } from '../scripts/i18n.ts';
+import '../scripts/library';
+import '../scripts/queue';
 
 export default async function() {
 

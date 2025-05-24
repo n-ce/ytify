@@ -20,7 +20,11 @@ export const store: {
     usePiped: boolean
   },
   lrcSync: (arg0: number) => {} | void,
-  queue: string[],
+  queue: {
+    list: string[],
+    append: (data: DOMStringMap | CollectionItem, prepend?: boolean) => void,
+    firstChild: () => HTMLElement | undefined
+  },
   stream: CollectionItem,
   streamHistory: string[]
   api: {
@@ -61,7 +65,11 @@ export const store: {
     usePiped: true
   },
   lrcSync: () => '',
-  queue: [],
+  queue: {
+    list: [],
+    append: () => '',
+    firstChild: () => undefined,
+  },
   stream: {
     id: params.get('s') || '',
     title: '',

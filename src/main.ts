@@ -4,7 +4,6 @@ import './scripts/router';
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
-import './scripts/library';
 import { render } from 'solid-js/web';
 
 addEventListener('DOMContentLoaded', async () => {

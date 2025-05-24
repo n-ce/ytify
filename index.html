@@ -52,10 +52,6 @@
         <i class="ri-stack-line"></i>
         <p data-translation="nav_library">Library</p>
       </a>
-      <a href="/settings" id="/settings">
-        <i class="ri-settings-line"></i>
-        <p data-translation="nav_settings">Settings</p>
-      </a>
       <a href="/list" id="/list" class="hide">
         <p>list</p>
       </a>
@@ -152,36 +148,35 @@
 
 
     <section id="upcoming">
-      <h1 data-translation="nav_upcoming">Upcoming</h1>
-      <span id="queuetools">
-        <button data-translation-aria-label="upcoming_clear">
-          <i class="ri-close-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_shuffle">
-          <i class="ri-shuffle-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_remove">
-          <i class="ri-subtract-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_filter_lt10">
-          <i class="ri-filter-2-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_allow_duplicates">
-          <i class="ri-file-copy-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_enqueue_related">
-          <i class="ri-list-check-2"></i>
-        </button>
-      </span>
-      <br>
+      <header>
+        <p>Upcoming</p>
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul id="queuetools"></ul>
+        </details>
+      </header>
       <div id="queuelist">
-        <h1 data-translation="upcoming_info">Upcoming streams show here</h1>
+        <p data-translation="upcoming_info">The Queue is Empty.</p>
       </div>
     </section>
 
 
     <section id="search">
-      <h1 data-translation="nav_search">Search</h1>
+      <header>
+        <p>Search</p>
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul>
+            <li>Settings</li>
+            <li>Set Songs as Default Filter</li>
+            <li>Display Search Suggestions</li>
+            <li>Github</li>
+            <li>Telegram</li>
+            <li>Matrix</li>
+          </ul>
+        </details>
+      </header>
+
       <form id="superInputContainer">
         <input data-translation-placeholder="search_placeholder" type="search" id="superInput" autocomplete="off" />
         <select id="searchFilters">
@@ -210,7 +205,16 @@
 
 
     <section id="library">
-      <h1 data-translation="nav_library">Library</h1>
+      <header>
+        <p>Library</p>
+
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul id="libraryActions"></ul>
+        </details>
+
+      </header>
+
 
       <div id="superCollectionSelector">
         <input type="radio" id="r.featured" name="superCollectionChips" value="featured" checked>
@@ -236,55 +240,8 @@
 
       <div id="superCollectionList"></div>
 
-      <div id="libraryActions">
-        <label data-translation-aria-label="library_import" id="importBtn" for="upload">
-          <i class="ri-import-line"></i>
-        </label>
-        <input type="file" id="upload" class="hide">
-        <label data-translation-aria-label="library_export" id="exportBtn">
-          <i class="ri-export-line"></i>
-        </label>
-        <label id="cleanLibraryBtn" data-translation-aria-label="library_clean">
-          <i class="ri-delete-bin-2-line"></i>
-        </label>
-      </div>
-
     </section>
 
-
-    <section id="settings">
-
-
-      <div id="actionsContainer">
-        <form netlify name="feedback" method="POST">
-          <textarea data-translation-placeholder="settings_feedback_placeholder" name="->" id="netlifyForm"
-            required></textarea>
-
-          <button data-translation="settings_feedback_submit" type="submit">Submit Feedback</button>
-
-          <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
-
-          <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore Settings</button>
-
-          <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export Settings</button>
-          <button type="button">
-            <label data-translation="settings_import" for="importSettingsBtn">Import Settings</label>
-            <input type="file" id="importSettingsBtn" class="hide">
-          </button>
-
-          <a data-translation="settings_changelog" href="https://github.com/n-ce/ytify/wiki/changelog"
-            target="_blank">Changelog</a>
-
-          <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
-
-          <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
-
-          <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
-
-        </form>
-
-      </div>
-    </section>
 
     <section id="list">
       <span id="listTools">
@@ -337,6 +294,40 @@
 
   <dialog id="loadingScreen">
     <i class="ri-loader-3-line"></i>
+  </dialog>
+
+  <dialog id="settings">
+
+
+    <div id="actionsContainer">
+      <form netlify name="feedback" method="POST">
+        <textarea data-translation-placeholder="settings_feedback_placeholder" name="->" id="netlifyForm"
+          required></textarea>
+
+        <button data-translation="settings_feedback_submit" type="submit">Submit Feedback</button>
+
+        <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
+
+        <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore Settings</button>
+
+        <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export Settings</button>
+        <button type="button">
+          <label data-translation="settings_import" for="importSettingsBtn">Import Settings</label>
+          <input type="file" id="importSettingsBtn" class="hide">
+        </button>
+
+        <a data-translation="settings_changelog" href="https://github.com/n-ce/ytify/wiki/changelog"
+          target="_blank">Changelog</a>
+
+        <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
+
+        <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
+
+        <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
+
+      </form>
+
+    </div>
   </dialog>
 
   <script src="/src/main.ts" type="module"></script>

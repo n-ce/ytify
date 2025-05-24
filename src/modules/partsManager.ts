@@ -1,5 +1,6 @@
 import { getSaved } from "../lib/store";
-import { i18n, removeSaved, save } from "../lib/utils";
+import { removeSaved, save } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 
 export default function(): {

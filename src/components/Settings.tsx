@@ -1,9 +1,10 @@
 import './Settings.css';
 import { createSignal, For, onMount, Show } from "solid-js";
-import { $, i18n, quickSwitch, removeSaved, save } from "../lib/utils";
+import { $, quickSwitch, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from '../lib/store';
 import { cssVar, themer } from "../scripts/theme";
 import { getDB, saveDB } from '../lib/libraryUtils';
+import { i18n } from '../scripts/i18n';
 
 
 function ToggleSwitch(_: ToggleSwitch) {

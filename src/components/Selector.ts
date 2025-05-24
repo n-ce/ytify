@@ -1,5 +1,5 @@
 import { Hole, html } from "uhtml";
-import { i18n } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 export default function(_: {
   id: string,

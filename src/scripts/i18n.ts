@@ -41,5 +41,10 @@ function attributeHandler(attr: string) {
   });
 }
 
-export { json };
+export const i18n = (
+  key: TranslationKeys,
+  value: string = ''
+) => value ?
+    (json?.[key] || key).replace('$', value) :
+    json?.[key] || key;
 

@@ -1,5 +1,6 @@
 import { generateImageUrl, getThumbIdFromLink } from "../lib/imageUtils";
-import { convertSStoHHMMSS, hostResolver, i18n } from "../lib/utils";
+import { convertSStoHHMMSS, hostResolver } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 import ListItem from "./ListItem";
 import StreamItem from "./StreamItem";
 import { html } from "uhtml";

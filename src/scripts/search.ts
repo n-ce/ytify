@@ -22,7 +22,7 @@ function searchLoader() {
     return
   }
 
-  document.querySelector('#search>h1')?.scrollIntoView({
+  document.querySelector('#search>header')?.scrollIntoView({
     behavior: 'smooth'
   });
   loadingScreen.showModal();
