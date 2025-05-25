@@ -165,5 +165,6 @@
     "list_prompt_rename": "Wprowadź nowy tytuł",
     "settings_watchmode": "Tryb wideo",
     "upcoming_filter_ytm": "Filtruj YTM",
-    "upcoming_filter_lt10": "Filtruj < 10:00"
+    "upcoming_filter_lt10": "Filtruj < 10:00",
+    "settings_pwa_watch": "Obejrzyj"
 }
