@@ -166,12 +166,6 @@ export async function superClick(e: Event) {
 
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
-  const rcn = {
-    Discover: 'discover',
-    History: 'history',
-    Favorites: 'favorites',
-    'Listen Later': 'listenLater'
-  }
 
   if (elc('streamItem'))
     return elc('delete') ?
@@ -179,11 +173,7 @@ export async function superClick(e: Event) {
       : player(eld.id);
 
   else if (elc('clxn_item'))
-    fetchCollection(
-      (elem.textContent! in rcn) ?
-        rcn[elem.textContent as 'History'] :
-        elem.textContent as string
-    );
+    fetchCollection(elem.href.split('=')[1]);
 
 
   else if (elc('ri-more-2-fill')) {

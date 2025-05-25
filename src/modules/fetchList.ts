@@ -1,4 +1,4 @@
-import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
+import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
 import { errorHandler, getApi, goTo, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
@@ -126,6 +126,7 @@ export default async function fetchList(
     store.list.id = url.slice(type === 'playlist' ? 11 : 9);
     store.list.thumbnail = store.list.thumbnail || group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
     store.list.type = type + 's';
+    listTitle.textContent = store.list.name;
   }
 
   const db = Object(getDB());

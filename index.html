@@ -173,6 +173,7 @@
             <li><a href="https://github.com/n-ce/ytify" target="_blank">Github</a></li>
             <li><a href="https://t.me/ytifytg" target="_blank">Telegram</a></li>
             <li><a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a></li>
+            <li id="fullscreenBtn" data-translation="settings_fullscreen">Fullscreen</li>
           </ul>
         </details>
       </header>
@@ -244,46 +245,50 @@
 
 
     <section id="list">
-      <span id="listTools">
-        <button id="playAllBtn" data-translation-aria-label="list_play">
-          <i class="ri-play-large-line"></i>
-        </button>
-        <button id="enqueueAllBtn" data-translation-aria-label="list_enqueue">
-          <i class="ri-list-check-2"></i>
-        </button>
-        <button id="importListBtn" data-translation-aria-label="list_import">
-          <i class="ri-import-line"></i>
-        </button>
-        <button id="subscribeListBtn">
-          <i class="ri-stack-line" data-state="Subscribe"></i>
-        </button>
-        <button id="viewOnYTBtn">
-          <i class="ri-external-link-line" data-state=" View on YouTube"></i>
-        </button>
-        <button id="clearListBtn" data-translation-aria-label="list_clear_all">
-          <i class="ri-close-line"></i>
-        </button>
-        <button id="removeFromListBtn" data-translation-aria-label="list_remove">
-          <i class="ri-subtract-line"></i>
-        </button>
-        <button id="deleteCollectionBtn" data-translation-aria-label="list_delete">
-          <i class="ri-delete-bin-2-line"></i>
-        </button>
-        <button id="renameCollectionBtn" data-translation-aria-label="list_rename">
-          <i class="ri-edit-line"></i>
-        </button>
-        <button id="shareCollectionBtn" data-translation-aria-label="list_share">
-          <i class="ri-link"></i>
-        </button>
-        <button id="radioCollectionBtn" data-translation-aria-label="list_radio">
-          <i class="ri-radio-line"></i>
-        </button>
-        <button id="sortCollectionBtn" data-translation-aria-label="list_sort">
-          <i class="ri-draggable"></i>
-        </button>
-
-
-      </span>
+      <header>
+        <p id="listTitle">List</p>
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul id="listTools">
+            <li id="playAllBtn" data-translation-aria-label="list_play">
+              <i class="ri-play-large-line"></i>
+            </li>
+            <li id="enqueueAllBtn" data-translation-aria-label="list_enqueue">
+              <i class="ri-list-check-2"></i>
+            </li>
+            <li id="importListBtn" data-translation-aria-label="list_import">
+              <i class="ri-import-line"></i>
+            </li>
+            <li id="subscribeListBtn">
+              <i class="ri-stack-line" data-state="Subscribe"></i>
+            </li>
+            <li id="viewOnYTBtn">
+              <i class="ri-external-link-line" data-state=" View on YouTube"></i>
+            </li>
+            <li id="clearListBtn" data-translation-aria-label="list_clear_all">
+              <i class="ri-close-line"></i>
+            </li>
+            <li id="removeFromListBtn" data-translation-aria-label="list_remove">
+              <i class="ri-subtract-line"></i>
+            </li>
+            <li id="deleteCollectionBtn" data-translation-aria-label="list_delete">
+              <i class="ri-delete-bin-2-line"></i>
+            </li>
+            <li id="renameCollectionBtn" data-translation-aria-label="list_rename">
+              <i class="ri-edit-line"></i>
+            </li>
+            <li id="shareCollectionBtn" data-translation-aria-label="list_share">
+              <i class="ri-link"></i>
+            </li>
+            <li id="radioCollectionBtn" data-translation-aria-label="list_radio">
+              <i class="ri-radio-line"></i>
+            </li>
+            <li id="sortCollectionBtn" data-translation-aria-label="list_sort">
+              <i class="ri-draggable"></i>
+            </li>
+          </ul>
+        </details>
+      </header>
       <br>
       <div id="listContainer">
         <h1 data-translation="list_info">Playlist, channel or your collection items show here</h1>

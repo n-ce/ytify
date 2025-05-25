@@ -1,8 +1,12 @@
 #listTools {
 
-  button {
+  li {
     i {
       pointer-events: none;
+    }
+
+    &::after {
+      content: attr(aria-label);
     }
   }
 
@@ -21,7 +25,7 @@
 
 
   &.channel {
-    button {
+    li {
       display: none;
     }
 
@@ -32,7 +36,7 @@
   }
 
   &.reserved {
-    button {
+    li {
       display: none;
     }
 
@@ -55,7 +59,7 @@
 
   &.supermix,
   &.shared {
-    button {
+    li {
       display: none;
     }
 
@@ -78,11 +82,9 @@
 #viewOnYTBtn,
 #subscribeListBtn {
   i {
-    pointer-events: none;
-
     &:after {
       content: attr(data-state);
-      font-family: 'Noto Sans', sans-serif;
+      font-family: inherit;
     }
   }
 }

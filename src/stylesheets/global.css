@@ -9,6 +9,7 @@
 @import 'list.css';
 @import 'snackbar.css';
 @import 'header.css';
+@import 'upcoming.css';
 
 :root {
   --bg: transparent;
@@ -139,7 +140,6 @@ a {
 
 
 
-#listTools,
 #settings,
 #changelog {
   button {
@@ -219,25 +219,6 @@ dialog.watcher {
   }
 }
 
-
-#listTools {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  backdrop-filter: blur(0.5rem);
-  border-bottom-left-radius: var(--roundness);
-  border-bottom-right-radius: var(--roundness);
-  padding: 2vmin 0;
-  width: calc(92% + 3vmin);
-
-  button::after {
-    content: attr(aria-label);
-  }
-}
-
-#queuelist {
-  width: 92%;
-}
 
 /* disable action during load events */
 #playButton.ri-loader-3-line {

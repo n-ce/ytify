@@ -1,0 +1,45 @@
+#queuelist {
+  width: 92%;
+}
+
+
+#queuetools {
+
+  li {
+    i {
+      padding: 0.5rem;
+      border-radius: var(--roundness);
+    }
+
+    &:nth-child(5).on i {
+      background: #f0f3;
+      color: #f0f;
+    }
+
+    &:nth-child(4).on i {
+      background: #aa16;
+      color: #ee4;
+    }
+
+    &:nth-child(3).on i {
+      background: #1bb2;
+      color: #1bb;
+    }
+
+    &:nth-child(2).on i {
+      background: #f002;
+      color: #f00;
+    }
+
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &:hover {
+      text-decoration-line: none;
+      background: #fff7;
+    }
+  }
+
+}

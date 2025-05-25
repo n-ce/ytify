@@ -14,9 +14,16 @@ addEventListener('DOMContentLoaded', async () => {
   (await import('./components/SuperCollectionList')).default();
 
 
-  const settingsHandler = document.getElementById('settingsHandler') as HTMLLIElement;
-  settingsHandler.addEventListener('click', async () => {
+  const settingsHandler = document.getElementById('settingsHandler');
+  settingsHandler?.addEventListener('click', async () => {
     (await import('./components/Settings/index')).default();
+  });
+  const fullscreenToggle = document.getElementById('fullscreenBtn');
+  fullscreenToggle?.addEventListener('click', () => {
+    if (document.fullscreenElement)
+      document.exitFullscreen();
+    else
+      document.documentElement.requestFullscreen();
   });
 
   if (import.meta.env.PROD)

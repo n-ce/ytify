@@ -37,8 +37,8 @@ function listToQ(container: HTMLDivElement) {
 }
 
 listBtnsContainer.addEventListener('click', async e => {
-  const btn = e.target as HTMLButtonElement;
-  if (!btn.matches('button'))
+  const btn = e.target as HTMLLIElement;
+  if (!btn.matches('li'))
     return;
 
   const db = getDB();
