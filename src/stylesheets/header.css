@@ -6,6 +6,7 @@ section>header {
   >p {
     font-size: x-large;
     font-weight: bold;
+    padding-right: 2rem;
   }
 
   details {

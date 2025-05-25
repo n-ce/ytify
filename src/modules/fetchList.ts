@@ -126,9 +126,9 @@ export default async function fetchList(
     store.list.id = url.slice(type === 'playlist' ? 11 : 9);
     store.list.thumbnail = store.list.thumbnail || group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
     store.list.type = type + 's';
-    listTitle.textContent = store.list.name;
   }
 
+  listTitle.textContent = store.list.name;
   const db = Object(getDB());
 
 

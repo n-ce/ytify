@@ -58,7 +58,6 @@ const template = html`
       .forEach(el => {
         el.classList.toggle('delete');
       });
-    removeQBtn.classList.toggle('delete');
   }}
   >
     <i class="ri-subtract-line"></i>${i18n('upcoming_remove')}
@@ -74,13 +73,12 @@ const template = html`
     const btn = e.currentTarget as HTMLElement;
     const ls = 'filterLT10';
 
-    btn.classList.toggle('on');
-
     if (btn.classList.contains('on'))
       removeSaved(ls);
     else
       save(ls, 'on');
 
+    btn.classList.toggle('on');
     filterLT10();
   }}
   >
@@ -91,20 +89,19 @@ const template = html`
     ref=${(el: HTMLButtonElement) => {
     allowDuplicatesBtn = el;
     if (getSaved('allowDuplicates') === 'on') {
-      allowDuplicatesBtn.className = 'redup';
+      allowDuplicatesBtn.className = 'on';
     }
   }}
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
     const ls = 'allowDuplicates';
 
-    btn.classList.toggle('on');
-
     if (btn.classList.contains('on'))
       removeSaved(ls);
     else
       save(ls, 'on');
 
+    btn.classList.toggle('on');
     notify(i18n('upcoming_change'));
   }}
   >
@@ -122,13 +119,12 @@ const template = html`
     const btn = e.currentTarget as HTMLElement;
     const ls = 'enqueueRelatedStreams';
 
-    btn.classList.toggle('on');
-
     if (btn.classList.contains('on'))
       removeSaved(ls);
     else
       save(ls, 'on');
 
+    btn.classList.toggle('on');
     notify(i18n('upcoming_change'));
   }}
   >
