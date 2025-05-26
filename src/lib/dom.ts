@@ -34,7 +34,7 @@ export const listTitle = <HTMLSpanElement>document.getElementById('listTitle');
 
 export const listBtnsContainer = <HTMLSpanElement>document.getElementById('listTools');
 
-export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn, shareCollectionBtn, radioCollectionBtn, sortCollectionBtn, sortByTitleBtn, sortByArtistBtn] = <HTMLCollectionOf<HTMLLIElement>>listBtnsContainer.children;
+export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn, shareCollectionBtn, radioCollectionBtn, sortCollectionBtn, sortByTitleBtn, sortByAuthorBtn] = <HTMLCollectionOf<HTMLLIElement>>listBtnsContainer.children;
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());

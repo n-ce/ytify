@@ -1,4 +1,4 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByArtistBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByAuthorBtn } from '../lib/dom';
 import { goTo, hostResolver, renderCollection } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
@@ -104,7 +104,7 @@ listBtnsContainer.addEventListener('click', async e => {
   else if (btn === sortByTitleBtn)
     sort('title');
 
-  else if (btn === sortByArtistBtn)
+  else if (btn === sortByAuthorBtn)
     sort('author');
 
   function sort(field: keyof CollectionItem | '' = '') {

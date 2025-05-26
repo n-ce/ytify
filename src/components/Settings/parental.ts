@@ -6,7 +6,7 @@ import { getSaved } from '../../lib/store';
 
 let parts: {
   name: string,
-  callback: (arg0: Event) => void
+  callback: (arg0: Event & { target: HTMLElement }) => void
 }[] = [];
 
 (async () => {
