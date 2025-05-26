@@ -4,19 +4,27 @@ import './scripts/router';
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
-import './scripts/library';
-import { render } from 'solid-js/web';
+import './scripts/theme';
 
 addEventListener('DOMContentLoaded', async () => {
 
-  const settingsContainer = document.getElementById('settings') as HTMLDivElement;
-  const stngs = await import('./components/Settings');
-  render(stngs.default, settingsContainer);
-  settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 
   (await import('./modules/start')).default();
 
   (await import('./components/SuperCollectionList')).default();
+
+
+  const settingsHandler = document.getElementById('settingsHandler');
+  settingsHandler?.addEventListener('click', async () => {
+    (await import('./components/Settings/index')).default();
+  });
+  const fullscreenToggle = document.getElementById('fullscreenBtn');
+  fullscreenToggle?.addEventListener('click', () => {
+    if (document.fullscreenElement)
+      document.exitFullscreen();
+    else
+      document.documentElement.requestFullscreen();
+  });
 
   if (import.meta.env.PROD)
     await import('virtual:pwa-register').then(pwa => {

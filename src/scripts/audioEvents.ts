@@ -2,7 +2,6 @@ import { audio, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
 import { convertSStoHHMMSS, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
-import { appendToQueuelist, firstItemInQueue } from "./queue";
 import { addToCollection } from "../lib/libraryUtils";
 import audioErrorHandler from "../modules/audioErrorHandler";
 import getStreamData from "../modules/getStreamData";
@@ -156,7 +155,7 @@ audio.onloadedmetadata = function() {
 
 audio.oncanplaythrough = function() {
   // prefetch beforehand to speed up experience
-  const nextItem = store.queue[0];
+  const nextItem = store.queue.list[0];
   if (nextItem)
     getStreamData(nextItem, true);
 }
@@ -172,7 +171,7 @@ loopButton.onclick = function() {
 
 function prev() {
   if (store.streamHistory.length > 1) {
-    appendToQueuelist(store.stream, true);
+    store.queue.append(store.stream, true);
     store.streamHistory.pop();
     player(store.streamHistory[store.streamHistory.length - 1]);
   }
@@ -184,7 +183,7 @@ playPrevButton.onclick = prev;
 function onEnd() {
   playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   if (queuelist.childElementCount)
-    firstItemInQueue().click();
+    store.queue.firstChild()?.click();
 }
 
 audio.onended = playNextButton.onclick = onEnd;

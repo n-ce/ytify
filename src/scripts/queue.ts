@@ -1,45 +1,170 @@
-import { goTo, i18n, notify, removeSaved, save } from "../lib/utils";
+import { notify, removeSaved, save } from "../lib/utils";
 import { queuelist } from "../lib/dom";
 import player from "../lib/player";
-import StreamItem from "../components/StreamItem.ts";
-import { render } from "uhtml";
+import StreamItem from "../components/StreamItem";
+import { render, html } from "uhtml";
 import { store, getSaved } from "../lib/store";
 import Sortable, { type SortableEvent } from 'sortablejs';
+import { i18n } from "./i18n";
 
-const [
-  clearQBtn,
-  shuffleQBtn,
-  removeQBtn,
-  filterLT10Btn,
-  allowDuplicatesBtn,
-  enqueueRelatedStreamsBtn
-] = (<HTMLSpanElement>document.getElementById('queuetools')).children as HTMLCollectionOf<HTMLButtonElement>;
+const queuetools = document.getElementById('queuetools');
+let allowDuplicatesBtn!: HTMLButtonElement;
+let filterLT10Btn!: HTMLButtonElement;
+let removeQBtn!: HTMLButtonElement;
+let enqueueRelatedStreamsBtn!: HTMLButtonElement;
 
-export const firstItemInQueue = () => <HTMLElement>queuelist.firstElementChild;
+function isLongerThan10Min(duration: string): boolean {
+  const hhmmss = duration.split(':');
+  return !(
+    hhmmss.length === 2 &&
+    parseInt(hhmmss[0]) < 10
+  );
+}
 
-export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
-  if (!data.id) return;
-
-  const { queue } = store;
-
-  if (!allowDuplicatesBtn.classList.contains('redup'))
-    if (queue.includes(data.id))
-      return;
-
-  if (filterLT10Btn.classList.contains('filter_lt10'))
-    if (isLongerThan10Min(<string>data.duration))
-      return;
-
-  if (firstItemInQueue()?.matches('h1')) firstItemInQueue().remove();
-
+function filterLT10() {
   if (removeQBtn.classList.contains('delete'))
     removeQBtn.click();
 
-  if (prepend)
-    queue.unshift(data.id);
-  else
-    queue.push(data.id);
+  const items = queuelist.querySelectorAll('.streamItem') as NodeListOf<HTMLElement>;
+  items.forEach(el => {
+    const duration = el.dataset.duration as string;
+    if (!isLongerThan10Min(duration))
+      return;
+    el.classList.add('delete');
+    el.click();
+  });
+}
 
+const template = html`
+  <li @click=${() => {
+    for (let i = queuelist.children.length; i >= 0; i--)
+      queuelist.appendChild(queuelist.children[Math.random() * i | 0]);
+
+    store.queue.list.length = 0;
+
+    for (const item of queuelist.children)
+      store.queue.list.push((item as HTMLElement).dataset.id || '');
+  }}>
+    <i class="ri-shuffle-line"></i>${i18n('upcoming_shuffle')}
+  </li>
+
+  <li
+    ref=${(el: HTMLButtonElement) => {
+    removeQBtn = el;
+  }}
+    @click=${(e: MouseEvent) => {
+    (e.currentTarget as HTMLElement).classList.toggle('on');
+    queuelist.querySelectorAll('.streamItem')
+      .forEach(el => {
+        el.classList.toggle('delete');
+      });
+  }}
+  >
+    <i class="ri-subtract-line"></i>${i18n('upcoming_remove')}
+  </li>
+
+  <li
+    ref=${(el: HTMLButtonElement) => {
+    filterLT10Btn = el;
+    if (getSaved('filterLT10') === 'on')
+      filterLT10Btn.className = 'on';
+  }}
+    @click=${(e: MouseEvent) => {
+    const btn = e.currentTarget as HTMLElement;
+    const ls = 'filterLT10';
+
+    if (btn.classList.contains('on'))
+      removeSaved(ls);
+    else
+      save(ls, 'on');
+
+    btn.classList.toggle('on');
+    filterLT10();
+  }}
+  >
+    <i class="ri-filter-2-line"></i>${i18n('upcoming_filter_lt10')}
+  </li>
+
+  <li
+    ref=${(el: HTMLButtonElement) => {
+    allowDuplicatesBtn = el;
+    if (getSaved('allowDuplicates') === 'on') {
+      allowDuplicatesBtn.className = 'on';
+    }
+  }}
+    @click=${(e: MouseEvent) => {
+    const btn = e.currentTarget as HTMLElement;
+    const ls = 'allowDuplicates';
+
+    if (btn.classList.contains('on'))
+      removeSaved(ls);
+    else
+      save(ls, 'on');
+
+    btn.classList.toggle('on');
+    notify(i18n('upcoming_change'));
+  }}
+  >
+    <i class="ri-file-copy-line"></i>${i18n('upcoming_allow_duplicates')}
+  </li>
+
+  <li
+    ref=${(el: HTMLButtonElement) => {
+    enqueueRelatedStreamsBtn = el;
+    if (getSaved('enqueueRelatedStreams') === 'on') {
+      enqueueRelatedStreamsBtn.className = 'on';
+    }
+  }}
+    @click=${(e: MouseEvent) => {
+    const btn = e.currentTarget as HTMLElement;
+    const ls = 'enqueueRelatedStreams';
+
+    if (btn.classList.contains('on'))
+      removeSaved(ls);
+    else
+      save(ls, 'on');
+
+    btn.classList.toggle('on');
+    notify(i18n('upcoming_change'));
+  }}
+  >
+    <i class="ri-list-check-2"></i>${i18n('upcoming_enqueue_related')}
+  </li>
+
+  <li @click=${() => {
+    store.queue.list.length = 0;
+    queuelist.innerHTML = '';
+  }}>
+    <i class="ri-close-line"></i>${i18n('upcoming_clear')}
+  </li>
+`;
+
+render(queuetools, template);
+
+store.queue.firstChild = () => queuelist.firstElementChild as HTMLElement;
+
+store.queue.append = function(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
+  if (!data.id) return;
+
+  const { list, firstChild } = store.queue;
+
+  if (!allowDuplicatesBtn.classList.contains('on'))
+    if (list.includes(data.id))
+      return;
+
+  if (filterLT10Btn.classList.contains('on'))
+    if (isLongerThan10Min(data.duration as string))
+      return;
+
+  if (firstChild()?.matches('p')) firstChild()?.remove();
+
+  if (removeQBtn.classList.contains('on'))
+    removeQBtn.click();
+
+  if (prepend)
+    list.unshift(data.id);
+  else
+    list.push(data.id);
 
   const fragment = document.createDocumentFragment();
 
@@ -52,17 +177,13 @@ export function appendToQueuelist(data: DOMStringMap | CollectionItem, prepend: 
       draggable: true
     }));
 
-
   if (prepend)
     queuelist.prepend(fragment);
   else
     queuelist.appendChild(fragment);
-
-}
-
+};
 
 queuelist.addEventListener('click', e => {
-
   e.preventDefault();
 
   const queueItem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
@@ -79,108 +200,19 @@ queuelist.addEventListener('click', e => {
     addToTrash();
   else player(id);
 
-  const index = store.queue.indexOf(id);
+  const { list } = store.queue;
 
-  store.queue.splice(index, 1);
+  const index = list.indexOf(id);
+
+  list.splice(index, 1);
   queuelist.children[index].remove();
 });
-
-
-// clones any list items from the provided container to queue
-
-export function listToQ(container: HTMLDivElement) {
-  const items = container.querySelectorAll('.streamItem') as NodeListOf<HTMLElement>;
-  items.forEach(item => {
-    appendToQueuelist(item.dataset);
-  });
-  goTo('/upcoming');
-}
-
-export function clearQ() {
-  store.queue.length = 0;
-  queuelist.innerHTML = '';
-}
-
-clearQBtn.addEventListener('click', clearQ);
-
-shuffleQBtn.addEventListener('click', () => {
-
-  for (let i = queuelist.children.length; i >= 0; i--)
-    queuelist.appendChild(queuelist.children[Math.random() * i | 0]);
-
-  store.queue.length = 0;
-
-  for (const item of queuelist.children)
-    store.queue.push((<HTMLElement>item).dataset.id || '');
-
-});
-
-removeQBtn.addEventListener('click', () => {
-  queuelist.querySelectorAll('.streamItem').forEach(el => {
-    el.classList.toggle('delete')
-  });
-  removeQBtn.classList.toggle('delete');
-});
-
-const actions: [HTMLButtonElement, string, string][] = [
-  [filterLT10Btn, 'filterLT10', 'filter_lt10'],
-  [enqueueRelatedStreamsBtn, 'enqueueRelatedStreams', 'checked'],
-  [allowDuplicatesBtn, 'allowDuplicates', 'redup']
-];
-
-actions.forEach(_ => {
-  const [btn, ls, clss] = _;
-
-  btn.addEventListener('click', () => {
-
-    if (btn.classList.contains(clss))
-      removeSaved(ls);
-    else
-      save(ls, 'on');
-
-    btn.classList.toggle(clss);
-
-    if (ls === 'filterLT10')
-      filterLT10();
-    else
-      notify(i18n('upcoming_change'));
-  });
-
-  if (getSaved(ls) === 'on')
-    btn.className = clss;
-});
-
-
-function filterLT10() {
-  // Prevent Queue Conflicts
-  if (removeQBtn.classList.contains('delete'))
-    removeQBtn.click();
-
-  const items = queuelist.querySelectorAll('.streamItem') as NodeListOf<HTMLElement>;
-  items.forEach(el => {
-    const duration = el.dataset.duration as string
-    if (!isLongerThan10Min(duration))
-      return;
-    el.classList.add('delete');
-    el.click()
-
-  });
-}
-
-
-function isLongerThan10Min(duration: string) {
-  const hhmmss = duration.split(':');
-  return !(
-    hhmmss.length === 2 &&
-    parseInt(hhmmss[0]) < 10
-  );
-}
 
 new Sortable(queuelist, {
   handle: '.ri-draggable',
   onUpdate(e: SortableEvent) {
     if (e.oldIndex == null || e.newIndex == null) return;
-    const queueArray = store.queue;
+    const queueArray = store.queue.list;
     queueArray.splice(e.newIndex, 0, queueArray.splice(e.oldIndex, 1)[0]);
   }
 });

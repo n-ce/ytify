@@ -1,10 +1,11 @@
 import { getSaved } from "../lib/store";
-import { i18n, removeSaved, save } from "../lib/utils";
+import { removeSaved, save } from "../lib/utils";
+import { i18n } from "../scripts/i18n";
 
 
 export default function(): {
   name: string,
-  callback: (arg0: Event) => void
+  callback: (arg0: Event & { target: HTMLElement }) => void
 }[] {
   if (getSaved('kidsMode_Navigation Settings'))
     toggle('/settings');
@@ -106,7 +107,7 @@ const lsHandler = (id: string | undefined) => id ?
     save(id, 'hidden')
   : undefined;
 
-function toggle(part: string, e: Event | undefined = undefined) {
+function toggle(part: string, e: Event & { target: HTMLElement } | undefined = undefined) {
 
   const id = e?.target?.id;
   if (id) {

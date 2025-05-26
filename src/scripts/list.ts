@@ -1,12 +1,11 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn } from '../lib/dom';
-import { clearQ, firstItemInQueue, listToQ } from './queue';
-import { hostResolver, i18n, renderCollection } from '../lib/utils';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByAuthorBtn } from '../lib/dom';
+import { goTo, hostResolver, renderCollection } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
 import { getDB, saveDB } from '../lib/libraryUtils';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { render, html } from 'uhtml';
-
+import { i18n } from './i18n';
 
 new Sortable(listContainer, {
   handle: '.ri-draggable',
@@ -25,9 +24,20 @@ new Sortable(listContainer, {
   }
 });
 
+
+// clones any list items from the provided container to queue
+
+function listToQ(container: HTMLDivElement) {
+  const items = container.querySelectorAll('.streamItem') as NodeListOf<HTMLElement>;
+  items.forEach(item => {
+    store.queue.append(item.dataset);
+  });
+  goTo('/upcoming');
+}
+
 listBtnsContainer.addEventListener('click', async e => {
-  const btn = e.target as HTMLButtonElement;
-  if (!btn.matches('button'))
+  const btn = e.target as HTMLLIElement;
+  if (!btn.matches('li'))
     return;
 
   const db = getDB();
@@ -35,9 +45,10 @@ listBtnsContainer.addEventListener('click', async e => {
   const atcIdx = store.addToCollectionOptions.indexOf(id);
 
   if (btn === playAllBtn) {
-    clearQ();
+    store.queue.list.length = 0;
+    queuelist.innerHTML = '';
     listToQ(listContainer);
-    firstItemInQueue().click();
+    store.queue.firstChild()?.click();
   }
   else if (btn === enqueueBtn)
     listToQ(listContainer);
@@ -87,12 +98,31 @@ listBtnsContainer.addEventListener('click', async e => {
   else if (btn === radioCollectionBtn)
     import('../modules/supermix').then(mod => mod.default(Object.keys(db[id])))
   else if (btn === sortCollectionBtn) {
-
     sortCollectionBtn.classList.toggle('checked');
-    const clxnArr = Object.values(db[id]);
+    sort();
+  }
+  else if (btn === sortByTitleBtn)
+    sort('title');
+
+  else if (btn === sortByAuthorBtn)
+    sort('author');
+
+  function sort(field: keyof CollectionItem | '' = '') {
+
+    let clxnArr = Object.values(db[id]);
+    if (field) {
+      clxnArr = clxnArr.sort((a, b) => {
+        if (a[field]! > b[field]!) return 1;
+        if (a[field]! < b[field]!) return -1;
+        return 0;
+      });
+      db[id] = Object.fromEntries(clxnArr.map((v) => [v.id, v]));
+      saveDB(db);
+    }
     render(listContainer, html``);
     renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
   }
+
 });
 
 

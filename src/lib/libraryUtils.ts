@@ -1,5 +1,5 @@
 import { goTo, notify, renderCollection } from "./utils";
-import { listBtnsContainer, listContainer, listSection, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
+import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 import { render, html } from "uhtml";
 
@@ -93,6 +93,7 @@ export async function fetchCollection(
   const isReserved = reservedCollections.includes(id);
   const isReversed = listContainer.classList.contains('reverse');
 
+  listTitle.textContent = decodeURIComponent(id);
 
   shared ?
     await getSharedCollection(id) :
@@ -149,6 +150,7 @@ function getLocalCollection(
   let listData: (CollectionItem | DOMStringMap)[] = items;
   let itemsToShow = items.length;
   const usePagination = isReserved && itemsToShow > 20;
+  listTitle.textContent += ` | ${items.length} streams`;
 
   if (collection === 'discover') {
     for (const i in dataObj)
