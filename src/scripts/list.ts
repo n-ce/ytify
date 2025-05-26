@@ -7,7 +7,6 @@ import Sortable, { type SortableEvent } from 'sortablejs';
 import { render, html } from 'uhtml';
 import { i18n } from './i18n';
 
-
 new Sortable(listContainer, {
   handle: '.ri-draggable',
   onUpdate(e: SortableEvent) {
@@ -99,30 +98,24 @@ listBtnsContainer.addEventListener('click', async e => {
   else if (btn === radioCollectionBtn)
     import('../modules/supermix').then(mod => mod.default(Object.keys(db[id])))
   else if (btn === sortCollectionBtn) {
-
     sortCollectionBtn.classList.toggle('checked');
-    const clxnArr = Object.values(db[id]);
-    render(listContainer, html``);
-    renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
+    sort();
   }
-  else if (btn === sortByTitleBtn) {
+  else if (btn === sortByTitleBtn)
+    sort('title');
 
-    const clxnArr = Object.values(db[id]).sort((a, b) => {
-      if (a.title! > b.title!) return 1;
-      if (a.title! < b.title!) return -1;
-      return 0;
-    });
-    render(listContainer, html``);
-    renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
-  }
+  else if (btn === sortByArtistBtn)
+    sort('author');
 
-  else if (btn === sortByArtistBtn) {
+  function sort(field: keyof CollectionItem | '' = '') {
 
-    const clxnArr = Object.values(db[id]).sort((a, b) => {
-      if (a.author! > b.author!) return 1;
-      if (a.author! < b.author!) return -1;
-      return 0;
-    });
+    let clxnArr = Object.values(db[id]);
+    if (field)
+      clxnArr = clxnArr.sort((a, b) => {
+        if (a[field]! > b[field]!) return 1;
+        if (a[field]! < b[field]!) return -1;
+        return 0;
+      });
     render(listContainer, html``);
     renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
   }
