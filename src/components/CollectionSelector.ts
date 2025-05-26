@@ -21,7 +21,7 @@ export default function(_: {
       <select
         tabindex="2"
         id="collectionSelector"
-        @change=${(e: Event & { target: EventTarget & { value: string, selectedIndex: number } }) => {
+        @change=${(e: Event & { target: HTMLSelectElement }) => {
       const { value } = e.target;
       const isNew = value === '+cl';
       let title;

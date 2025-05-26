@@ -138,17 +138,15 @@ declare global {
     dashUrl: string,
   }
 
-  interface EventTarget {
-    id: string
-  }
   interface WindowEventMap {
     'dbchange': CustomEvent<{ db: Library, change: string }>;
   }
 
-  interface elEv extends Event {
-    target: HTMLElement
+  interface FileEv extends Event {
+    target: HTMLInputElement & {
+      files: FileList
+    }
   }
-
 }
 
 

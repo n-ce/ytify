@@ -15,7 +15,9 @@ export default function() {
   const settingsFrag = document.createDocumentFragment();
 
   render(settingsFrag, html`
-      <h3>${i18n('nav_settings')}</h3>
+      <h3
+      @click=${() => settingsContainer.close()}
+      >← ${i18n('nav_settings')}</h3>
       ${app()}
       ${search()}
       ${playback()}
@@ -27,8 +29,7 @@ export default function() {
   settingsContainer.showModal();
   settingsContainer.addEventListener('close', () => {
     settingsContainer.innerHTML = document.getElementById('actionsContainer')!.outerHTML;
-
-  })
+  });
 
 }
 

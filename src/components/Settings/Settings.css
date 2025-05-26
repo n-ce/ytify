@@ -94,14 +94,6 @@
       }
     }
 
-    >p {
-      text-align: right;
-      margin: 1ch;
-      padding: 1vmin;
-      background: linear-gradient(to right, transparent, var(--onBg));
-      border-radius: var(--roundness);
-    }
-
     >span {
       display: flex;
       justify-content: space-between;

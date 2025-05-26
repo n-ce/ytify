@@ -9,10 +9,10 @@ import { i18n } from "./i18n";
 const libraryActions = document.getElementById('libraryActions');
 const actionTemplate = html`
 <li>
-  <label id="importBtn" for="upload">
+  <label id="importBtn" for="upload_ytify">
     <i class="ri-import-line"></i>&nbsp;${i18n('library_import')}
   </label>
-  <input type="file" id="upload" @change=${importLibrary}/>
+  <input type="file" id="upload_ytify" @change=${importLibrary}/>
 </li>
 <li id="exportBtn" @click=${exportLibrary}>
   <i class="ri-export-line"></i>&nbsp;${i18n('library_export')}
@@ -27,14 +27,20 @@ const actionTemplate = html`
   }>
   <i class="ri-import-line"></i>&nbsp;${i18n('settings_import_from_piped')}
 </li>
+<li>
+  <label id="importSongshiftBtn" for="upload_songshift">
+    <i class="ri-import-line"></i>&nbsp;Import From Songshift
+  </label>
+  <input type="file" id="upload_songshift" @change=${async (e: FileEv) => (await import('../modules/importSongshiftStreams')).default(e.target.files[0])}/>
+</li>
 `;
 render(libraryActions, actionTemplate);
 
 
 
-async function importLibrary(e: Event) {
-  const importBtn = e.target as HTMLInputElement;
-  const newDB = JSON.parse(await (<FileList>importBtn.files)[0].text());
+async function importLibrary(e: FileEv) {
+  const importBtn = e.target;
+  const newDB = JSON.parse(await importBtn.files[0].text());
   const oldDB = getDB();
   if (!confirm(i18n('library_import_prompt'))) return;
   for (const collection in newDB) for (const item in newDB[collection])

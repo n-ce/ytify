@@ -19,12 +19,6 @@ section>header {
     padding: 0;
     background: none;
 
-    &:open {
-      summary {
-        transform: rotate(90deg);
-      }
-    }
-
     summary {
       background: none;
       list-style: none;
@@ -64,18 +58,16 @@ section>header {
         border-radius: var(--roundness);
         display: flex;
         align-items: center;
-
-        &.checked {
-          background: var(--text);
-          color: var(--bg);
-        }
+        user-select: none;
 
         i {
           margin-right: 0.5rem;
         }
 
         &:hover {
-          text-decoration-line: underline;
+          background: var(--text);
+          color: var(--bg);
+          filter: invert();
         }
       }
     }

@@ -11,6 +11,10 @@
       border-radius: var(--roundness);
     }
 
+    &:hover.on i {
+      filter: invert();
+    }
+
     &:nth-child(5).on i {
       background: #f0f3;
       color: #f0f;
@@ -31,15 +35,6 @@
       color: #f00;
     }
 
-
-    &:active {
-      transform: scale(0.95);
-    }
-
-    &:hover {
-      text-decoration-line: none;
-      background: #fff7;
-    }
   }
 
 }

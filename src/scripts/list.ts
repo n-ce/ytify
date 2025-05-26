@@ -1,4 +1,4 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByArtistBtn } from '../lib/dom';
 import { goTo, hostResolver, renderCollection } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
@@ -105,6 +105,28 @@ listBtnsContainer.addEventListener('click', async e => {
     render(listContainer, html``);
     renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
   }
+  else if (btn === sortByTitleBtn) {
+
+    const clxnArr = Object.values(db[id]).sort((a, b) => {
+      if (a.title! > b.title!) return 1;
+      if (a.title! < b.title!) return -1;
+      return 0;
+    });
+    render(listContainer, html``);
+    renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
+  }
+
+  else if (btn === sortByArtistBtn) {
+
+    const clxnArr = Object.values(db[id]).sort((a, b) => {
+      if (a.author! > b.author!) return 1;
+      if (a.author! < b.author!) return -1;
+      return 0;
+    });
+    render(listContainer, html``);
+    renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));
+  }
+
 });
 
 
