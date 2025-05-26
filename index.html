@@ -52,10 +52,6 @@
         <i class="ri-stack-line"></i>
         <p data-translation="nav_library">Library</p>
       </a>
-      <a href="/settings" id="/settings">
-        <i class="ri-settings-line"></i>
-        <p data-translation="nav_settings">Settings</p>
-      </a>
       <a href="/list" id="/list" class="hide">
         <p>list</p>
       </a>
@@ -140,8 +136,8 @@
         <select id="bitrateSelector">
           <option>Bitrate</option>
         </select>
-        <svg id="ytifyIcon" xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 4172 4172" width="1.5rem"
-          height="1.5rem" style="transform: scale(1.5);overflow:hidden;">
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 4172 4172" width="1.5rem" height="1.5rem"
+          style="transform: scale(1.5);overflow:hidden;">
 
           <path fill="var(--text)"
             d="m1368 3037-55-10-23-6a369 369 0 0 1-57-19 552 552 0 0 1-266-246 437 437 0 0 1-31-74 590 590 0 0 1-18-245l5-25c7-35 21-77 35-105l9-19a522 522 0 0 1 679-236c1 5-1 77-3 91a1059 1059 0 0 1-24 119 274 274 0 0 1-19 53c-1 0-7-5-14-13-40-46-95-77-160-91a290 290 0 0 0-186 542 287 287 0 0 0 202 23c61-15 120-54 159-105a1108 1108 0 0 0 149-360 1296 1296 0 0 0 27-274 1164 1164 0 0 0-226-667 146 146 0 0 1-21-39l-4-9-4-11c-8-16-18-53-24-84-5-27-5-72 0-95 10-49 32-84 69-115 24-20 50-34 87-47a740 740 0 0 1 79-19c23-4 134-6 167-3a1364 1364 0 0 1 446 118l20 8 20 8 18 8a2232 2232 0 0 1 652 439 1008 1008 0 0 1 234 338c4 5 16 57 20 83 2 17 1 63-3 79-18 83-71 135-171 167-34 11-106 20-130 16-43-7-194-7-249 0-67 9-142 23-179 34l-34 10a974 974 0 0 0-94 33 1245 1245 0 0 0-170 84 1182 1182 0 0 0-405 414 529 529 0 0 1-347 244c-40 9-112 11-160 6zm1441-892 14-2c21-2 58-13 76-22 34-17 54-37 67-69 6-16 7-19 7-44 1-26 1-28-6-54-32-125-167-280-368-420-80-56-200-124-282-159l-26-12a1286 1286 0 0 0-124-47c-39-14-128-36-170-42l-18-3c-19-3-41-4-87-4-56 0-71 2-105 13-68 23-101 65-101 130a201 201 0 0 0 17 82c3 9 21 46 31 64 68 112 187 227 351 338a1827 1827 0 0 0 446 214 1084 1084 0 0 0 219 39c1 1 50-1 59-2z" />
@@ -152,36 +148,36 @@
 
 
     <section id="upcoming">
-      <h1 data-translation="nav_upcoming">Upcoming</h1>
-      <span id="queuetools">
-        <button data-translation-aria-label="upcoming_clear">
-          <i class="ri-close-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_shuffle">
-          <i class="ri-shuffle-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_remove">
-          <i class="ri-subtract-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_filter_lt10">
-          <i class="ri-filter-2-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_allow_duplicates">
-          <i class="ri-file-copy-line"></i>
-        </button>
-        <button data-translation-aria-label="upcoming_enqueue_related">
-          <i class="ri-list-check-2"></i>
-        </button>
-      </span>
-      <br>
+      <header>
+        <p data-translation="nav_upcoming">Upcoming</p>
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul id="queuetools"></ul>
+        </details>
+      </header>
       <div id="queuelist">
-        <h1 data-translation="upcoming_info">Upcoming streams show here</h1>
+        <p data-translation="upcoming_info">The Queue is Empty.</p>
       </div>
     </section>
 
 
     <section id="search">
-      <h1 data-translation="nav_search">Search</h1>
+      <header>
+        <p data-translation="nav_search">Search</p>
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul>
+            <li id="settingsHandler" data-translation="nav_settings">Settings</li>
+            <li><a data-translation="settings_changelog" href="https://github.com/n-ce/ytify/wiki/changelog"
+                target="_blank">Changelog</a></li>
+            <li><a href="https://github.com/n-ce/ytify" target="_blank">Github</a></li>
+            <li><a href="https://t.me/ytifytg" target="_blank">Telegram</a></li>
+            <li><a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a></li>
+            <li id="fullscreenBtn" data-translation="settings_fullscreen">Fullscreen</li>
+          </ul>
+        </details>
+      </header>
+
       <form id="superInputContainer">
         <input data-translation-placeholder="search_placeholder" type="search" id="superInput" autocomplete="off" />
         <select id="searchFilters">
@@ -210,7 +206,16 @@
 
 
     <section id="library">
-      <h1 data-translation="nav_library">Library</h1>
+      <header>
+        <p data-translation="nav_library">Library</p>
+
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul id="libraryActions"></ul>
+        </details>
+
+      </header>
+
 
       <div id="superCollectionSelector">
         <input type="radio" id="r.featured" name="superCollectionChips" value="featured" checked>
@@ -236,97 +241,60 @@
 
       <div id="superCollectionList"></div>
 
-      <div id="libraryActions">
-        <label data-translation-aria-label="library_import" id="importBtn" for="upload">
-          <i class="ri-import-line"></i>
-        </label>
-        <input type="file" id="upload" class="hide">
-        <label data-translation-aria-label="library_export" id="exportBtn">
-          <i class="ri-export-line"></i>
-        </label>
-        <label id="cleanLibraryBtn" data-translation-aria-label="library_clean">
-          <i class="ri-delete-bin-2-line"></i>
-        </label>
-      </div>
-
     </section>
 
-
-    <section id="settings">
-
-
-      <div id="actionsContainer">
-        <form netlify name="feedback" method="POST">
-          <textarea data-translation-placeholder="settings_feedback_placeholder" name="->" id="netlifyForm"
-            required></textarea>
-
-          <button data-translation="settings_feedback_submit" type="submit">Submit Feedback</button>
-
-          <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
-
-          <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore Settings</button>
-
-          <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export Settings</button>
-          <button type="button">
-            <label data-translation="settings_import" for="importSettingsBtn">Import Settings</label>
-            <input type="file" id="importSettingsBtn" class="hide">
-          </button>
-
-          <a data-translation="settings_changelog" href="https://github.com/n-ce/ytify/wiki/changelog"
-            target="_blank">Changelog</a>
-
-          <a href="https://github.com/n-ce/ytify/" target="_blank">Github</a>
-
-          <a href="https://t.me/ytifytg" target="_blank">Telegram</a>
-
-          <a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a>
-
-        </form>
-
-      </div>
-    </section>
 
     <section id="list">
-      <span id="listTools">
-        <button id="playAllBtn" data-translation-aria-label="list_play">
-          <i class="ri-play-large-line"></i>
-        </button>
-        <button id="enqueueAllBtn" data-translation-aria-label="list_enqueue">
-          <i class="ri-list-check-2"></i>
-        </button>
-        <button id="importListBtn" data-translation-aria-label="list_import">
-          <i class="ri-import-line"></i>
-        </button>
-        <button id="subscribeListBtn">
-          <i class="ri-stack-line" data-state="Subscribe"></i>
-        </button>
-        <button id="viewOnYTBtn">
-          <i class="ri-external-link-line" data-state=" View on YouTube"></i>
-        </button>
-        <button id="clearListBtn" data-translation-aria-label="list_clear_all">
-          <i class="ri-close-line"></i>
-        </button>
-        <button id="removeFromListBtn" data-translation-aria-label="list_remove">
-          <i class="ri-subtract-line"></i>
-        </button>
-        <button id="deleteCollectionBtn" data-translation-aria-label="list_delete">
-          <i class="ri-delete-bin-2-line"></i>
-        </button>
-        <button id="renameCollectionBtn" data-translation-aria-label="list_rename">
-          <i class="ri-edit-line"></i>
-        </button>
-        <button id="shareCollectionBtn" data-translation-aria-label="list_share">
-          <i class="ri-link"></i>
-        </button>
-        <button id="radioCollectionBtn" data-translation-aria-label="list_radio">
-          <i class="ri-radio-line"></i>
-        </button>
-        <button id="sortCollectionBtn" data-translation-aria-label="list_sort">
-          <i class="ri-draggable"></i>
-        </button>
-
-
-      </span>
+      <header>
+        <p id="listTitle">List</p>
+        <details>
+          <summary><i class="ri-more-2-fill"></i></summary>
+          <ul id="listTools">
+            <li id="playAllBtn" data-translation-aria-label="list_play">
+              <i class="ri-play-large-line"></i>
+            </li>
+            <li id="enqueueAllBtn" data-translation-aria-label="list_enqueue">
+              <i class="ri-list-check-2"></i>
+            </li>
+            <li id="importListBtn" data-translation-aria-label="list_import">
+              <i class="ri-import-line"></i>
+            </li>
+            <li id="subscribeListBtn">
+              <i class="ri-stack-line" data-state="Subscribe"></i>
+            </li>
+            <li id="viewOnYTBtn">
+              <i class="ri-external-link-line" data-state=" View on YouTube"></i>
+            </li>
+            <li id="clearListBtn" data-translation-aria-label="list_clear_all">
+              <i class="ri-close-line"></i>
+            </li>
+            <li id="removeFromListBtn" data-translation-aria-label="list_remove">
+              <i class="ri-subtract-line"></i>
+            </li>
+            <li id="deleteCollectionBtn" data-translation-aria-label="list_delete">
+              <i class="ri-delete-bin-2-line"></i>
+            </li>
+            <li id="renameCollectionBtn" data-translation-aria-label="list_rename">
+              <i class="ri-edit-line"></i>
+            </li>
+            <li id="shareCollectionBtn" data-translation-aria-label="list_share">
+              <i class="ri-link"></i>
+            </li>
+            <li id="radioCollectionBtn" data-translation-aria-label="list_radio">
+              <i class="ri-radio-line"></i>
+            </li>
+            <li id="sortCollectionBtn" data-translation-aria-label="list_sort">
+              <i class="ri-draggable"></i>
+            </li>
+            <li id="sortByTitleBtn">
+              <i class="ri-draggable"></i> Sort Title A↔Z
+            </li>
+            <li id="sortByArtistBtn">
+              <i class="ri-draggable"></i> Sort Artist A↔Z
+            </li>
+          </ul>
+        </details>
+      </header>
       <br>
       <div id="listContainer">
         <h1 data-translation="list_info">Playlist, channel or your collection items show here</h1>
@@ -337,6 +305,30 @@
 
   <dialog id="loadingScreen">
     <i class="ri-loader-3-line"></i>
+  </dialog>
+
+  <dialog id="settings">
+
+
+    <div id="actionsContainer">
+      <form netlify name="feedback" method="POST">
+        <textarea data-translation-placeholder="settings_feedback_placeholder" name="->" id="netlifyForm"
+          required></textarea>
+
+        <button data-translation="settings_feedback_submit" type="submit">Submit Feedback</button>
+
+        <button data-translation="settings_clear_cache" id="clearCacheBtn" type="button">Clear Caches</button>
+
+        <button data-translation="settings_restore" id="restoreSettingsBtn" type="button">Restore Settings</button>
+
+        <button data-translation="settings_export" id="exportSettingsBtn" type="button">Export Settings</button>
+        <button type="button">
+          <label data-translation="settings_import" for="importSettingsBtn">Import Settings</label>
+          <input type="file" id="importSettingsBtn" class="hide">
+        </button>
+      </form>
+
+    </div>
   </dialog>
 
   <script src="/src/main.ts" type="module"></script>

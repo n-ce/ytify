@@ -1,7 +1,7 @@
 import { addToCollection, createCollection, getDB, reservedCollections } from '../lib/libraryUtils';
 import { store } from '../lib/store';
-import { i18n } from '../lib/utils';
 import { html } from 'uhtml';
+import { i18n } from '../scripts/i18n';
 
 export default function(_: {
   collection: CollectionItem,
@@ -21,7 +21,7 @@ export default function(_: {
       <select
         tabindex="2"
         id="collectionSelector"
-        @change=${(e: Event & { target: EventTarget & { value: string, selectedIndex: number } }) => {
+        @change=${(e: Event & { target: HTMLSelectElement }) => {
       const { value } = e.target;
       const isNew = value === '+cl';
       let title;

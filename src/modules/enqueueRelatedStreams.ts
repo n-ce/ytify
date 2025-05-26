@@ -1,6 +1,5 @@
 import { store } from "../lib/store";
 import { convertSStoHHMMSS } from "../lib/utils";
-import { appendToQueuelist } from "../scripts/queue";
 
 /*
 > Get all related streams of a stream
@@ -12,9 +11,9 @@ import { appendToQueuelist } from "../scripts/queue";
 export default function(data: StreamItem[]) {
 
   const { stream, streamHistory } = store;
-  const filterYTM = (a: string) => 
+  const filterYTM = (a: string) =>
     stream.author.endsWith(' - Topic') ?
-    a.endsWith(' - Topic') : true;
+      a.endsWith(' - Topic') : true;
 
   data.forEach(stream => {
 
@@ -28,7 +27,7 @@ export default function(data: StreamItem[]) {
       !streamHistory.includes(id) &&
       filterYTM(stream.uploaderName)
     )
-      appendToQueuelist({
+      store.queue.append({
         id: id,
         title: stream.title,
         author: stream.uploaderName,

@@ -6,7 +6,7 @@ import { html, render } from 'uhtml';
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { json } from "../scripts/i18n";
+import { i18n } from "../scripts/i18n.ts";
 
 export const $ = document.createElement.bind(document);
 
@@ -36,12 +36,6 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
-export const i18n = (
-  key: TranslationKeys,
-  value: string = ''
-) => value ?
-    (json?.[key] || key).replace('$', value) :
-    json?.[key] || key;
 
 export function proxyHandler(url: string) {
   store.api.index = 0;
@@ -172,12 +166,6 @@ export async function superClick(e: Event) {
 
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
-  const rcn = {
-    Discover: 'discover',
-    History: 'history',
-    Favorites: 'favorites',
-    'Listen Later': 'listenLater'
-  }
 
   if (elc('streamItem'))
     return elc('delete') ?
@@ -185,11 +173,7 @@ export async function superClick(e: Event) {
       : player(eld.id);
 
   else if (elc('clxn_item'))
-    fetchCollection(
-      (elem.textContent! in rcn) ?
-        rcn[elem.textContent as 'History'] :
-        elem.textContent as string
-    );
+    fetchCollection(elem.href.split('=')[1]);
 
 
   else if (elc('ri-more-2-fill')) {

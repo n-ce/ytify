@@ -1,9 +1,10 @@
-import { listBtnsContainer, listContainer, listSection, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
+import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { i18n, errorHandler, getApi, goTo, notify, superClick } from "../lib/utils";
+import { errorHandler, getApi, goTo, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
 import { render } from "uhtml";
 import ItemsLoader from "../components/ItemsLoader";
+import { i18n } from "../scripts/i18n";
 
 
 export default async function fetchList(
@@ -127,6 +128,7 @@ export default async function fetchList(
     store.list.type = type + 's';
   }
 
+  listTitle.textContent = store.list.name;
   const db = Object(getDB());
 
 
