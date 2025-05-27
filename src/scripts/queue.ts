@@ -80,7 +80,7 @@ const template = html`
       });
   }}
   >
-    <i class="ri-subtract-line"></i>${i18n('upcoming_remove')}
+    <i class="ri-indeterminate-circle-line"></i>${i18n('upcoming_remove')}
   </li>
 
   <li
