@@ -1,10 +1,14 @@
-section>header {
+#list>header {
   position: sticky;
   top: 0;
   z-index: 20;
+  background: var(--bg);
+}
+
+section>header {
+  position: relative;
   width: 92%;
   padding: 4dvmin 0;
-  background: var(--bg);
 
   >p {
     font-size: x-large;

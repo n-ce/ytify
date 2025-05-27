@@ -25,7 +25,6 @@ export default function() {
     title.textContent = `Switching proxy to ${proxy.slice(8)}`;
     audio.src = audio.src.replace(origin, proxy);
     store.api.index++;
-    audio.play();
   }
   else {
     store.api.index = 0;
