@@ -1,5 +1,6 @@
 import { loadingScreen, queuelist, title } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
+import player from "../lib/player";
 import { getSaved, store } from "../lib/store";
 import { handleXtags, proxyHandler, save } from "../lib/utils";
 import getStreamData from "../modules/getStreamData";
@@ -176,6 +177,11 @@ export default async function(dialog: HTMLDialogElement) {
         }
       })
       : ''}
+    
+      <button @click=${() => {
+      player(store.actionsMenu.id);
+      close();
+    }}>Listen</button>
 
       <br/> <br/>
       <i> Because video streaming consumes a lot of energy, contributing to carbon emissions, please try to watch only what's necessary. When you do stream, select the lowest resolution that meets your needs.</i>
