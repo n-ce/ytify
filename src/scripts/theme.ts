@@ -125,8 +125,9 @@ function themer() {
 
 }
 
-if (getSaved('roundness'))
-  cssVar('--roundness', target.value);
+const savedRoundness = getSaved('roundness');
+if (savedRoundness)
+  cssVar('--roundness', savedRoundness);
 
 if (store.loadImage) {
   if (location.pathname !== '/')
