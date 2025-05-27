@@ -92,9 +92,7 @@ export default function() {
     onmount: (target) => {
       const savedDownloadFormat = getSaved('dlFormat');
       if (savedDownloadFormat)
-        target.value =
-          store.downloadFormat =
-          savedDownloadFormat as 'opus';
+        target.value = savedDownloadFormat as 'opus';
     },
     children: html`
           <option value='opus'>Opus</option>

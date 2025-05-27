@@ -48,7 +48,15 @@ export default async function() {
     audio.play();
   });
 
+  // codec handling
 
+  const codecSaved = getSaved('codec') as 'opus';
+  store.player.codec = codecSaved ||
+    ((await store.player.supportsOpus) ? 'opus' : 'aac');
+
+  const savedDownloadFormat = getSaved('dlFormat');
+  if (savedDownloadFormat)
+    store.downloadFormat = savedDownloadFormat as 'opus';
 
   // params handling
 

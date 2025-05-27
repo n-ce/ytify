@@ -34,13 +34,13 @@ export default function() {
     label: 'settings_codec_preference',
     id: 'codecPreference',
     handler: async (e) => {
-      const i = e.target.selectedIndex;
-      if (i)
-        save('codec', String(i))
+      const c = e.target.value as '' | 'opus' | 'aac';
+      if (c)
+        save('codec', c)
       else
         removeSaved('codec');
 
-      store.player.codec = e.target.value as 'any';
+      store.player.codec = c || 'any';
       quickSwitch();
     },
     onmount: async (target) => {
