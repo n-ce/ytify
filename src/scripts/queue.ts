@@ -9,6 +9,7 @@ import { i18n } from "./i18n";
 
 const queuetools = document.getElementById('queuetools');
 let allowDuplicatesBtn!: HTMLButtonElement;
+let shuffleBtn!: HTMLButtonElement;
 let filterLT10Btn!: HTMLButtonElement;
 let removeQBtn!: HTMLButtonElement;
 let enqueueRelatedStreamsBtn!: HTMLButtonElement;
@@ -35,15 +36,34 @@ function filterLT10() {
   });
 }
 
+function shuffle() {
+  for (let i = queuelist.children.length; i >= 0; i--)
+    queuelist.appendChild(queuelist.children[Math.random() * i | 0]);
+
+  store.queue.list.length = 0;
+
+  for (const item of queuelist.children)
+    store.queue.list.push((item as HTMLElement).dataset.id || '');
+}
+
 const template = html`
-  <li @click=${() => {
-    for (let i = queuelist.children.length; i >= 0; i--)
-      queuelist.appendChild(queuelist.children[Math.random() * i | 0]);
+  <li 
+    ref=${(el: HTMLButtonElement) => {
+    shuffleBtn = el;
+    if (getSaved('shuffle') === 'on')
+      shuffleBtn.className = 'on';
+  }}
+  @click=${(e: Event) => {
+    const btn = e.currentTarget as HTMLElement;
+    const ls = 'shuffle';
 
-    store.queue.list.length = 0;
+    if (btn.classList.contains('on'))
+      removeSaved(ls);
+    else
+      save(ls, 'on');
 
-    for (const item of queuelist.children)
-      store.queue.list.push((item as HTMLElement).dataset.id || '');
+    btn.classList.toggle('on');
+    shuffle();
   }}>
     <i class="ri-shuffle-line"></i>${i18n('upcoming_shuffle')}
   </li>
@@ -60,7 +80,7 @@ const template = html`
       });
   }}
   >
-    <i class="ri-subtract-line"></i>${i18n('upcoming_remove')}
+    <i class="ri-indeterminate-circle-line"></i>${i18n('upcoming_remove')}
   </li>
 
   <li
@@ -206,6 +226,9 @@ queuelist.addEventListener('click', e => {
 
   list.splice(index, 1);
   queuelist.children[index].remove();
+
+  if (getSaved('shuffle'))
+    shuffle();
 });
 
 new Sortable(queuelist, {

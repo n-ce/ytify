@@ -48,7 +48,15 @@ export default async function() {
     audio.play();
   });
 
+  // codec handling
 
+  const codecSaved = getSaved('codec') as 'opus';
+  store.player.codec = codecSaved ||
+    ((await store.player.supportsOpus) ? 'opus' : 'aac');
+
+  const savedDownloadFormat = getSaved('dlFormat');
+  if (savedDownloadFormat)
+    store.downloadFormat = savedDownloadFormat as 'opus';
 
   // params handling
 
@@ -111,5 +119,14 @@ export default async function() {
         .split('=')
         .join('/')
     );
+
+  // header state handling
+  (document.querySelectorAll('header details') as NodeListOf<HTMLDetailsElement>).forEach(d => {
+    d.addEventListener('click', (e) => {
+      const elm = e.target as HTMLElement;
+      if (!elm.matches('i') && d.open)
+        d.removeAttribute('open');
+    })
+  })
 
 }

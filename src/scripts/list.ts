@@ -101,9 +101,9 @@ listBtnsContainer.addEventListener('click', async e => {
     sortCollectionBtn.classList.toggle('checked');
     sort();
   }
-  else if (btn === sortByTitleBtn)
+  else if (btn === sortByTitleBtn) {
     sort('title');
-
+  }
   else if (btn === sortByAuthorBtn)
     sort('author');
 
@@ -116,8 +116,21 @@ listBtnsContainer.addEventListener('click', async e => {
         if (a[field]! < b[field]!) return -1;
         return 0;
       });
+
+      const cls = 'ri-sort-' + (field === 'title' ? 'alphabet-' : '');
+      const ico = (field === 'title' ? sortByTitleBtn : sortByAuthorBtn).firstElementChild as HTMLElement;
+      const state = ['asc', 'desc'];
+      if (ico.className.endsWith('desc')) {
+        state.reverse();
+        clxnArr = clxnArr.reverse();
+      }
+      ico.classList.replace(
+        cls + state[0], cls + state[1]
+      );
+
       db[id] = Object.fromEntries(clxnArr.map((v) => [v.id, v]));
       saveDB(db);
+
     }
     render(listContainer, html``);
     renderCollection(clxnArr, sortCollectionBtn.classList.contains('checked'));

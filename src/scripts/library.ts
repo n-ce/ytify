@@ -25,11 +25,11 @@ const actionTemplate = html`
     (await import('../modules/importPipedPlaylists')).default();
   }
   }>
-  <i class="ri-import-line"></i>&nbsp;${i18n('settings_import_from_piped')}
+  <i class="ri-download-cloud-line"></i>&nbsp;${i18n('settings_import_from_piped')}
 </li>
 <li>
   <label id="importSongshiftBtn" for="upload_songshift">
-    <i class="ri-import-line"></i>&nbsp;Import From Songshift
+    <i class="ri-refresh-line"></i>&nbsp;Import From Songshift
   </label>
   <input type="file" id="upload_songshift" @change=${async (e: FileEv) => (await import('../modules/importSongshiftStreams')).default(e.target.files[0])}/>
 </li>
