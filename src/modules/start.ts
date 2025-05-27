@@ -124,9 +124,7 @@ export default async function() {
   (document.querySelectorAll('header details') as NodeListOf<HTMLDetailsElement>).forEach(d => {
     d.addEventListener('click', (e) => {
       const elm = e.target as HTMLElement;
-      if (elm.matches('i'))
-        return;
-      if (d.open)
+      if (!elm.matches('i') && d.open)
         d.removeAttribute('open');
     })
   })
