@@ -120,4 +120,15 @@ export default async function() {
         .join('/')
     );
 
+  // header state handling
+  (document.querySelectorAll('header details') as NodeListOf<HTMLDetailsElement>).forEach(d => {
+    d.addEventListener('click', (e) => {
+      const elm = e.target as HTMLElement;
+      if (elm.matches('i'))
+        return;
+      if (d.open)
+        d.removeAttribute('open');
+    })
+  })
+
 }

@@ -108,6 +108,13 @@ export async function fetchCollection(
 
   listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'shared' : 'collection');
 
+  if (listBtnsContainer.classList.contains('favorites')) {
+    if (id !== 'favorites')
+      listBtnsContainer.classList.remove('favorites');
+  }
+  else if (id === 'favorites')
+    listBtnsContainer.classList.add('favorites');
+
   if (location.pathname !== '/list')
     goTo('/list');
 
