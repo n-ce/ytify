@@ -29,39 +29,37 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   }
 
 
-  if (Object.keys(getDB()).length) {
+  let timeoutId = 0;
+  addEventListener('dbchange', () => {
+    syncBtn.className = cls('-off');
+    const newTimeoutId = window.setTimeout(sync, 30000);
+    if (timeoutId)
+      clearTimeout(timeoutId);
+    timeoutId = newTimeoutId;
+  });
 
-    let timeoutId = 0;
-    addEventListener('dbchange', () => {
-      syncBtn.className = cls('-off');
-      const newTimeoutId = window.setTimeout(sync, 30000);
-      if (timeoutId)
-        clearTimeout(timeoutId);
-      timeoutId = newTimeoutId;
-    });
+  syncBtn.addEventListener('click', () => {
+    if (syncBtn.className = cls()) {
+      syncBtn.className = 'ri-loader-3-line';
+      fetch(hashpoint)
+        .then(res => res.json())
+        .then(saveDB)
+        .then(() => {
+          syncBtn.className = cls();
+        })
+        .catch(() => {
+          syncBtn.className = cls('-off') + ' error';
+        });
+    }
+    else sync();
+  });
 
-    syncBtn.addEventListener('click', () => {
-      if (syncBtn.className = cls()) {
-        syncBtn.className = 'ri-loader-3-line';
-        fetch(hashpoint)
-          .then(res => res.json())
-          .then(saveDB)
-          .then(() => {
-            syncBtn.className = cls();
-          })
-          .catch(() => {
-            syncBtn.className = cls('-off') + ' error';
-          });
-      }
-      else sync();
-    })
-  }
-  else {
+  if (!Object.keys(getDB()).length) {
     if (confirm('Do you want to import your library from your account?')) {
       fetch(hashpoint)
         .then(res => res.json())
         .then(saveDB)
-        .catch(() => notify('No Data Found!'));
+        .catch(() => notify('No Existing Library Found.'));
     }
   }
 
