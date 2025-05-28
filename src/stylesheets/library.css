@@ -9,6 +9,19 @@
     #syncNow {
       display: inline-block;
 
+      &.ri-cloud-fill:hover::after {
+
+        position: fixed;
+        content: 'Import from cloud';
+        font-size: small;
+      }
+
+      &.ri-cloud-off-fill:hover::after {
+        position: fixed;
+        content: 'Save to cloud';
+        font-size: small;
+      }
+
       &.ri-loader-3-line {
         pointer-events: none;
       }

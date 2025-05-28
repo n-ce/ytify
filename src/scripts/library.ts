@@ -1,5 +1,5 @@
 import { favButton, favIcon } from "../lib/dom";
-import { $, notify, removeSaved } from "../lib/utils";
+import { $, removeSaved } from "../lib/utils";
 import { addToCollection, getDB, removeFromCollection, saveDB, toCollection } from "../lib/libraryUtils";
 import { getSaved, store } from "../lib/store";
 import { render, html } from "uhtml";
@@ -80,54 +80,7 @@ favButton.addEventListener('click', () => {
 
 
 const dbhash = getSaved('dbsync');
-const hashpoint = location.origin + '/dbs/' + dbhash;
 const syncBtn = document.getElementById('syncNow') as HTMLElement;
-const cls = (state: string = '') => `ri-cloud${state}-fill`;
 
-function sync() {
-
-  fetch(hashpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: getSaved('library'),
-  })
-    .then(res => res.ok)
-    .then(() => {
-
-      syncBtn.className = cls();
-    })
-    .catch(() => {
-      syncBtn.className = cls() + ' error';
-    })
-}
-
-let timeoutId = 0;
-addEventListener('dbchange', () => {
-  const newTimeoutId = window.setTimeout(sync, 30000);
-  if (timeoutId)
-    clearTimeout(timeoutId);
-  timeoutId = newTimeoutId;
-});
-
-
-if (dbhash) {
-  if (Object.keys(getDB()).length) {
-
-    syncBtn.addEventListener('click', () => {
-      if (syncBtn.className === cls())
-        return;
-      syncBtn.className = 'ri-loader-3-line';
-      sync();
-    })
-  }
-  else {
-    if (confirm('Do you want to import your library from your account?')) {
-      fetch(hashpoint)
-        .then(res => res.json())
-        .then(saveDB)
-        .catch(() => notify('No Data Found!'));
-    }
-  }
-}
+if (dbhash) import('../modules/cloudSync').then(mod => mod.default(dbhash, syncBtn));
+// else syncBtn.remove();
