@@ -69,9 +69,9 @@ or
 ```
  gh repo clone n-ce/ytify -- --depth 1
 ```
-3. Move to Directory, Update & Install Dependencies
+3. Move to Directory, Install Dependencies
 ```
-cd ytify ; npm run update; npm i
+cd ytify ; npm i
 ```
 4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts)
 `injectEruda(false),`

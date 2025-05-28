@@ -1,3 +1,10 @@
+#list>header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+}
+
 #listTools {
 
   li {
@@ -33,7 +40,7 @@
 
     #subscribeListBtn,
     #viewOnYTBtn {
-      display: inline-block !important;
+      display: block !important;
     }
   }
 
@@ -44,8 +51,24 @@
 
     #clearListBtn,
     #removeFromListBtn {
-      display: inline-block !important;
+      display: block !important;
     }
+  }
+
+  &.favorites {
+    li {
+      display: block !important;
+    }
+
+    #deleteCollectionBtn,
+    #renameCollectionBtn,
+    #radioCollectionBtn,
+    #importListBtn,
+    #subscribeListBtn,
+    #viewOnYTBtn {
+      display: none !important;
+    }
+
   }
 
   &.collection {
@@ -67,7 +90,7 @@
 
     #importListBtn,
     #enqueueAllBtn {
-      display: inline-block !important;
+      display: block !important;
     }
   }
 }

@@ -39,10 +39,8 @@ export default function() {
         save('roundness', e.target.value);
     },
     onmount: (target) => {
-      if (getSaved('roundness')) {
+      if (getSaved('roundness'))
         target.value = getSaved('roundness') || '0.4rem';
-        cssVar('--roundness', target.value);
-      }
     },
     children: html`
           <option value="none">${i18n('settings_roundness_none')}</option>

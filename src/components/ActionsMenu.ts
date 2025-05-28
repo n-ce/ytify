@@ -67,7 +67,7 @@ export default function(dialog: HTMLDialogElement) {
       }
       loadingScreen.close();
     }}>
-        <i class="ri-download-2-fill"></i>${i18n('actions_menu_download')}
+        <i class="ri-download-2-line"></i>${i18n('actions_menu_download')}
       </li>
 
       
@@ -87,7 +87,7 @@ export default function(dialog: HTMLDialogElement) {
           fetchList(smd.channelUrl);
         }}>
 
-          <i class="ri-user-line"></i>
+          <i class="ri-user-3-line"></i>
           ${i18n(isMusic ?
           'actions_menu_view_artist' :
           'actions_menu_view_channel')
@@ -153,7 +153,7 @@ export default function(dialog: HTMLDialogElement) {
       displayer.showModal();
 
     }}>
-        <i class="ri-bug-line"></i>${i18n('actions_menu_debug_info')}
+        <i class="ri-braces-line"></i>${i18n('actions_menu_debug_info')}
       </li>
 
 

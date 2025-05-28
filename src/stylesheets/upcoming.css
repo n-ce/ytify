@@ -16,13 +16,13 @@
     }
 
     &:nth-child(5).on i {
-      background: #f0f3;
-      color: #f0f;
+      background: #a0a2;
+      color: #a0a;
     }
 
     &:nth-child(4).on i {
-      background: #aa16;
-      color: #ee4;
+      background: #aa02;
+      color: #aa0;
     }
 
     &:nth-child(3).on i {
@@ -31,8 +31,13 @@
     }
 
     &:nth-child(2).on i {
-      background: #f002;
-      color: #f00;
+      background: #f222;
+      color: #f22;
+    }
+
+    &:nth-child(1).on i {
+      background: #55f2;
+      color: #55f;
     }
 
   }
