@@ -83,4 +83,4 @@ const dbhash = getSaved('dbsync');
 const syncBtn = document.getElementById('syncNow') as HTMLElement;
 
 if (dbhash) import('../modules/cloudSync').then(mod => mod.default(dbhash, syncBtn));
-// else syncBtn.remove();
+else syncBtn.remove();

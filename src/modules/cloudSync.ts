@@ -8,6 +8,9 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   const cls = (state: string = '') => `ri-cloud${state}-fill`;
 
   function sync() {
+    if (syncBtn.className === cls())
+      return;
+    syncBtn.className = 'ri-loader-3-line';
 
     fetch(hashpoint, {
       method: 'POST',
@@ -36,9 +39,10 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
         clearTimeout(timeoutId);
       timeoutId = newTimeoutId;
     });
+
     syncBtn.addEventListener('click', () => {
-      syncBtn.className = 'ri-loader-3-line';
       if (syncBtn.className = cls()) {
+        syncBtn.className = 'ri-loader-3-line';
         fetch(hashpoint)
           .then(res => res.json())
           .then(saveDB)
