@@ -28,6 +28,11 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
       })
   }
 
+  const fetchFromCloud = () =>
+    fetch(hashpoint)
+      .then(res => res.json())
+      .then(saveDB)
+
 
   let timeoutId = 0;
   addEventListener('dbchange', () => {
@@ -41,9 +46,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   syncBtn.addEventListener('click', () => {
     if (syncBtn.className = cls()) {
       syncBtn.className = 'ri-loader-3-line';
-      fetch(hashpoint)
-        .then(res => res.json())
-        .then(saveDB)
+      fetchFromCloud()
         .then(() => {
           syncBtn.className = cls();
         })
@@ -56,12 +59,11 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
 
   if (!Object.keys(getDB()).length) {
     if (confirm('Do you want to import your library from your account?')) {
-      fetch(hashpoint)
-        .then(res => res.json())
-        .then(saveDB)
+      fetchFromCloud()
         .catch(() => notify('No Existing Library Found.'))
         .finally(() => syncBtn.className = cls());
     }
   }
+  else fetchFromCloud();
 
 }
