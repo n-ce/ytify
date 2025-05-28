@@ -59,7 +59,8 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
       fetch(hashpoint)
         .then(res => res.json())
         .then(saveDB)
-        .catch(() => notify('No Existing Library Found.'));
+        .catch(() => notify('No Existing Library Found.'))
+        .finally(() => syncBtn.className = cls());
     }
   }
 
