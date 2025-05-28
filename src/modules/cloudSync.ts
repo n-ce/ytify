@@ -31,11 +31,13 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   const fetchFromCloud = () =>
     fetch(hashpoint)
       .then(res => res.json())
-      .then(saveDB)
+      .then((l) => saveDB(l, 'cloud'))
 
 
   let timeoutId = 0;
-  addEventListener('dbchange', () => {
+  addEventListener('dbchange', (e) => {
+    if (e.detail.change === 'cloud')
+      return;
     syncBtn.className = cls('-off');
     const newTimeoutId = window.setTimeout(sync, 30000);
     if (timeoutId)
