@@ -1,6 +1,25 @@
 #library {
   width: 100%;
 
+  header {
+    >p {
+      display: inline;
+    }
+
+    #syncNow {
+      display: inline-block;
+
+      &.ri-loader-3-line {
+        pointer-events: none;
+      }
+
+      &.error {
+        color: #f20a;
+      }
+    }
+  }
+
+
   #superCollectionList {
     width: calc(100% - 2rem);
 

@@ -81,23 +81,46 @@ favButton.addEventListener('click', () => {
 
 const dbhash = getSaved('dbsync');
 const hashpoint = location.origin + '/dbs/' + dbhash;
+const syncBtn = document.getElementById('syncNow') as HTMLElement;
+const cls = (state: string = '') => `ri-cloud${state}-fill`;
+
+function sync() {
+
+  fetch(hashpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: getSaved('library'),
+  })
+    .then(res => res.ok)
+    .then(() => {
+
+      syncBtn.className = cls();
+    })
+    .catch(() => {
+      syncBtn.className = cls() + ' error';
+    })
+}
+
+let timeoutId = 0;
+addEventListener('dbchange', () => {
+  const newTimeoutId = window.setTimeout(sync, 30000);
+  if (timeoutId)
+    clearTimeout(timeoutId);
+  timeoutId = newTimeoutId;
+});
+
 
 if (dbhash) {
   if (Object.keys(getDB()).length) {
-    fetch(hashpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: getSaved('library'),
+
+    syncBtn.addEventListener('click', () => {
+      if (syncBtn.className === cls())
+        return;
+      syncBtn.className = 'ri-loader-3-line';
+      sync();
     })
-      .then(res => res.ok)
-      .then(() => {
-        notify('Library has been synced');
-      })
-      .catch(() => {
-        notify('Failed to sync library');
-      })
   }
   else {
     if (confirm('Do you want to import your library from your account?')) {

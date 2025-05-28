@@ -67,7 +67,7 @@ export default function(dialog: HTMLDialogElement) {
       }
       loadingScreen.close();
     }}>
-        <i class="ri-download-2-line"></i>${i18n('actions_menu_download')}
+        <i class="ri-download-2-fill"></i>${i18n('actions_menu_download')}
       </li>
 
       
