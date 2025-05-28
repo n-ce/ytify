@@ -64,6 +64,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
         .finally(() => syncBtn.className = cls());
     }
   }
-  else fetchFromCloud();
+  else fetchFromCloud()
+    .finally(() => syncBtn.className = cls());
 
 }
