@@ -29,19 +29,18 @@ export default function() {
     id: "dbsync",
     name: 'settings_library_sync',
     checked: Boolean(state.dbsync),
-    handler: e => {
+    handler: async e => {
       let hash = '';
-      function hashCreator(text: string) {
+      async function hashCreator(text: string) {
         const msgBuffer = new TextEncoder().encode(text);
-        crypto.subtle.digest('SHA-256', msgBuffer)
-          .then(hashBuffer => {
-            hash = Array
-              .from(new Uint8Array(hashBuffer))
-              .map(b => b.toString(16).padStart(2, '0'))
-              .join('');
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
 
-            notify(i18n('settings_reload'));
-          });
+        hash = Array
+          .from(new Uint8Array(hashBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        notify(i18n('settings_reload'));
       }
       if (!state.dbsync) {
 
@@ -52,7 +51,7 @@ export default function() {
             const password = prompt('Enter Password :');
             const confirmpw = prompt('Confirm Password :');
             if (password && password === confirmpw)
-              hashCreator(username + password);
+              await hashCreator(username + password);
             else alert('Incorrect Information!');
           }
         }
