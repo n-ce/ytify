@@ -4,9 +4,12 @@ import { handleXtags, proxyHandler } from "../lib/utils";
 import { i18n } from "../scripts/i18n";
 
 export default async function(audioStreams: AudioStream[],
-  isLive = false) {
-
-  title.textContent = i18n('player_audiostreams_setup');
+  isLive = false,
+  receiver: HTMLAudioElement = audio
+) {
+  const prefetch = !receiver.parentNode;
+  if (!prefetch)
+    title.textContent = i18n('player_audiostreams_setup');
 
   const preferedCodec = state.codec === 'any' ? ((await store.player.supportsOpus) ? 'opus' : 'aac') : state.codec;
   const noOfBitrates = audioStreams.length;
@@ -41,5 +44,5 @@ export default async function(audioStreams: AudioStream[],
 
   bitrateSelector.selectedIndex = index;
 
-  audio.src = proxyHandler(bitrateSelector.value);
+  receiver.src = proxyHandler(bitrateSelector.value, prefetch);
 }

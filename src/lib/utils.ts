@@ -32,9 +32,10 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 
-export function proxyHandler(url: string) {
+export function proxyHandler(url: string, prefetch: boolean = false) {
   store.api.index = 0;
-  title.textContent = i18n('player_audiostreams_insert');
+  if (!prefetch)
+    title.textContent = i18n('player_audiostreams_insert');
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
@@ -63,8 +64,7 @@ export function notify(text: string) {
   setTimeout(clear, 8e3);
   if (settingsContainer.open) {
     const settingsHeader = settingsContainer.firstElementChild as HTMLHeadingElement;
-    if (!settingsHeader.textContent?.includes(text))
-      settingsHeader.textContent += ' | ' + text;
+    settingsHeader.appendChild(el);
   } else
     document.body.appendChild(el);
 }

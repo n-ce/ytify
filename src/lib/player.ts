@@ -46,10 +46,10 @@ export default async function player(id: string | null = '') {
     audio.load();
   }
   else {
-    const h = store.player.hls;
-    if (h.on) {
-      const hlsUrl = h.manifests.shift();
-      if (hlsUrl) h.src(hlsUrl);
+    const { hls } = store.player;
+    if (state.HLS) {
+      const hlsUrl = hls.manifests.shift();
+      if (hlsUrl) hls.src(hlsUrl);
     }
     else import('../modules/setAudioStreams')
       .then(mod => mod.default(

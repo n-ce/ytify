@@ -153,11 +153,22 @@ audio.onloadedmetadata = function() {
 }
 
 
-audio.oncanplaythrough = function() {
+audio.oncanplaythrough = async function() {
   // prefetch beforehand to speed up experience
   const nextItem = store.queue.list[0];
-  if (nextItem)
-    getStreamData(nextItem, true);
+  if (!nextItem) return;
+
+  const data = await getStreamData(nextItem, true);
+  const sandbox = new Audio();
+  if ('audioStreams' in data)
+    import('../modules/setAudioStreams')
+      .then(mod => mod.default(
+        data.audioStreams
+          .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+          ),
+        data.livestream,
+        sandbox
+      ));
 }
 
 audio.onerror = audioErrorHandler;
