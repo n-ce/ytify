@@ -1,4 +1,4 @@
-import { store } from "../lib/store";
+import { state, store } from "../lib/store";
 import { notify } from "../lib/utils";
 import { audio, playButton } from '../lib/dom';
 import Hls from "hls.js";
@@ -9,7 +9,7 @@ export default function() {
   h.attachMedia(audio);
   store.player.hls.src = h.loadSource.bind(h);
   h.on(Hls.Events.MANIFEST_PARSED, () => {
-    h.currentLevel = store.player.hq ?
+    h.currentLevel = state.hq ?
       h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
     audio.play();
   });

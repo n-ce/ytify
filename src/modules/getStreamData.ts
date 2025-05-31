@@ -1,4 +1,4 @@
-import { store } from "../lib/store";
+import { state, store } from "../lib/store";
 
 export default async function(
   id: string,
@@ -6,14 +6,14 @@ export default async function(
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
   const { invidious, piped } = store.api;
-  const { hls, fallback } = store.player;
+  const { fallback, hls } = store.player;
 
   const fetchDataFromPiped = (
     api: string
   ) => fetch(`${api}/streams/${id}`)
     .then(res => res.json())
     .then(data => {
-      if (hls.on ? data.hls : data.audioStreams.length)
+      if (state.HLS ? data.hls : data.audioStreams.length)
         return data;
       else throw new Error(data.message);
     });
@@ -93,7 +93,7 @@ export default async function(
     });
 
 
-  return hls.on ? useHls() : store.player.usePiped ? usePiped() : useInvidious();
+  return state.HLS ? useHls() : store.player.usePiped ? usePiped() : useInvidious();
 
 }
 

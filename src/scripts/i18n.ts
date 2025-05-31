@@ -1,7 +1,7 @@
-import { getSaved } from '../lib/store';
+import { state } from "../lib/store";
 
 const nl = navigator.language.slice(0, 2);
-const locale = getSaved('language') || (Locales.includes(nl) ? nl : 'en');
+const locale = state.language || (Locales.includes(nl) ? nl : 'en');
 document.documentElement.lang = locale;
 
 const attributes = [

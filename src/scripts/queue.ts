@@ -1,9 +1,9 @@
-import { notify, removeSaved, save } from "../lib/utils";
+import { notify } from "../lib/utils";
 import { queuelist } from "../lib/dom";
 import player from "../lib/player";
 import StreamItem from "../components/StreamItem";
 import { render, html } from "uhtml";
-import { store, getSaved } from "../lib/store";
+import { setState, state, store } from "../lib/store";
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { i18n } from "./i18n";
 
@@ -50,19 +50,15 @@ const template = html`
   <li 
     ref=${(el: HTMLButtonElement) => {
     shuffleBtn = el;
-    if (getSaved('shuffle') === 'on')
+    if (state.shuffle)
       shuffleBtn.className = 'on';
   }}
   @click=${(e: Event) => {
     const btn = e.currentTarget as HTMLElement;
-    const ls = 'shuffle';
-
-    if (btn.classList.contains('on'))
-      removeSaved(ls);
-    else
-      save(ls, 'on');
 
     btn.classList.toggle('on');
+    setState('shuffle', btn.classList.contains('on'));
+
     shuffle();
   }}>
     <i class="ri-shuffle-line"></i>${i18n('upcoming_shuffle')}
@@ -86,19 +82,15 @@ const template = html`
   <li
     ref=${(el: HTMLButtonElement) => {
     filterLT10Btn = el;
-    if (getSaved('filterLT10') === 'on')
+    if (state.filterLT10)
       filterLT10Btn.className = 'on';
   }}
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
-    const ls = 'filterLT10';
-
-    if (btn.classList.contains('on'))
-      removeSaved(ls);
-    else
-      save(ls, 'on');
 
     btn.classList.toggle('on');
+    setState('filterLT10', btn.classList.contains('on'));
+
     filterLT10();
   }}
   >
@@ -108,20 +100,15 @@ const template = html`
   <li
     ref=${(el: HTMLButtonElement) => {
     allowDuplicatesBtn = el;
-    if (getSaved('allowDuplicates') === 'on') {
+    if (state.allowDuplicates) {
       allowDuplicatesBtn.className = 'on';
     }
   }}
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
-    const ls = 'allowDuplicates';
-
-    if (btn.classList.contains('on'))
-      removeSaved(ls);
-    else
-      save(ls, 'on');
-
     btn.classList.toggle('on');
+    setState('allowDuplicates', btn.classList.contains('on'));
+
     notify(i18n('upcoming_change'));
   }}
   >
@@ -131,20 +118,15 @@ const template = html`
   <li
     ref=${(el: HTMLButtonElement) => {
     enqueueRelatedStreamsBtn = el;
-    if (getSaved('enqueueRelatedStreams') === 'on') {
+    if (state.enqueueRelatedStreams)
       enqueueRelatedStreamsBtn.className = 'on';
-    }
   }}
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
-    const ls = 'enqueueRelatedStreams';
-
-    if (btn.classList.contains('on'))
-      removeSaved(ls);
-    else
-      save(ls, 'on');
 
     btn.classList.toggle('on');
+    setState('enqueueRelatedStreams', btn.classList.contains('on'));
+
     notify(i18n('upcoming_change'));
   }}
   >
@@ -208,7 +190,7 @@ queuelist.addEventListener('click', e => {
 
   const queueItem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
   if (!queueItem.classList.contains('streamItem')) return;
-  const id = queueItem.dataset.id || '';
+  const { id } = queueItem.dataset || '';
 
   function addToTrash() {
     const current = sessionStorage.getItem('trashHistory') || '';
@@ -227,7 +209,7 @@ queuelist.addEventListener('click', e => {
   list.splice(index, 1);
   queuelist.children[index].remove();
 
-  if (getSaved('shuffle'))
+  if (state.shuffle)
     shuffle();
 });
 

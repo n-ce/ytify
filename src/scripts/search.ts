@@ -1,7 +1,7 @@
 import { loadingScreen, searchFilters, searchlist, superInput } from "../lib/dom";
 import player from "../lib/player";
-import { $, errorHandler, getApi, idFromURL, superClick } from "../lib/utils";
-import { store, getSaved } from "../lib/store";
+import { errorHandler, getApi, idFromURL, superClick } from "../lib/utils";
+import { state, store } from "../lib/store";
 import { getSearchResults } from "../modules/fetchSearchResults";
 
 
@@ -60,7 +60,7 @@ superInput.addEventListener('input', async () => {
     prevID = id;
     return;
   }
-  if (getSaved('search_suggestions')) return;
+  if (!state.searchSuggestions) return;
 
   suggestions.innerHTML = '';
   suggestions.style.display = 'none';
@@ -80,7 +80,7 @@ superInput.addEventListener('input', async () => {
   const fragment = document.createDocumentFragment();
 
   for (const suggestion of data) {
-    const li = $('li');
+    const li = document.createElement('li');
     li.textContent = suggestion;
     li.onclick = () => {
       superInput.value = suggestion;
@@ -105,7 +105,7 @@ superInput.addEventListener('keydown', _ => {
     _.preventDefault();
   }
   if (_.key === 'Backspace' ||
-    getSaved('search_suggestions') ||
+    !state.searchSuggestions ||
     !suggestions.hasChildNodes()
   ) return;
 
@@ -153,12 +153,11 @@ searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
 
-if (getSaved('searchSuggestions'))
+if (!state.searchSuggestions)
   suggestions.remove();
 
-const savedSearchFilter = getSaved('searchFilter');
-if (savedSearchFilter)
-  searchFilters.value = savedSearchFilter;
+if (state.searchFilter)
+  searchFilters.value = state.searchFilter;
 
 
 

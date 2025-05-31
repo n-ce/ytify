@@ -1,18 +1,73 @@
+
 export const params = (new URL(location.href)).searchParams;
 
-export const getSaved = localStorage.getItem.bind(localStorage);
+export let state = {
+  enforceProxy: false,
+  defaultSuperCollection: 'featured',
+  customInstance: '',
+  stableVolume: false,
+  HLS: false,
+  hq: false,
+  loadImage: true,
+  linkHost: '',
+  dlFormat: 'opus',
+  theme: 'auto',
+  customTheme: '',
+  roundness: '0.4rem',
+  searchSuggestions: true,
+  searchFilter: '',
+  startupTab: '/search',
+  watchMode: '',
+  enqueueRelatedStreams: true,
+  discover: true,
+  shuffle: false,
+  filterLT10: false,
+  allowDuplicates: false,
+  history: true,
+  volume: '100',
+  shareAction: 'play',
+  dbsync: '',
+  language: 'en',
+  codec: 'any',
+  partsManagerPIN: '',
+  'part Reserved Collections': true,
+  'part Navigation Library': true,
+  'part Featured Playlists': true,
+  'part Subscription Feed': true,
+  'part Collections': true,
+  'part Start Radio': true,
+  'part View Author': true,
+  'part Playlists': true,
+  'part Channels': true,
+  'part Watch On': true,
+  'part For You': true,
+  'part Artists': true,
+  'part Albums': true
+}
+
+type AppSettings = typeof state;
+
+
+const savedStore = localStorage.getItem('store');
+if (savedStore)
+  state = JSON.parse(savedStore);
+
+
+export function setState<K extends keyof AppSettings>(key: K, val: AppSettings[K]) {
+  state[key] = val;
+  const str = JSON.stringify(state);
+  localStorage.setItem('store', str);
+}
+
 
 export const store: {
   player: {
     playbackState: 'none' | 'playing' | 'paused',
     hls: {
-      on: boolean,
       src: (arg0: string) => void,
       api: string[],
       manifests: string[]
     }
-    hq: boolean,
-    codec: 'opus' | 'aac' | 'any'
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
@@ -33,7 +88,6 @@ export const store: {
     hyperpipe: string,
     index: number
   },
-  loadImage: boolean,
   linkHost: string,
   searchQuery: string,
   superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
@@ -46,13 +100,10 @@ export const store: {
   player: {
     playbackState: 'none',
     hls: {
-      on: Boolean(getSaved('HLS')),
       src: () => '',
       manifests: [],
       api: ['https://pipedapi.kavin.rocks']
     },
-    hq: Boolean(getSaved('hq')),
-    codec: 'opus',
     supportsOpus: navigator.mediaCapabilities.decodingInfo({
       type: 'file',
       audio: {
@@ -84,10 +135,9 @@ export const store: {
     hyperpipe: 'https://hyperpipeapi.onrender.com',
     index: 0
   },
-  loadImage: getSaved('imgLoad') !== 'off',
-  linkHost: getSaved('linkHost') || location.origin,
+  linkHost: state.linkHost || location.origin,
   searchQuery: '',
-  superCollectionType: 'featured',
+  superCollectionType: state.defaultSuperCollection as 'featured',
   actionsMenu: {
     id: '',
     title: '',
@@ -104,6 +154,6 @@ export const store: {
     thumbnail: ''
   },
   addToCollectionOptions: [],
-  downloadFormat: getSaved('dlFormat') as 'opus' || 'opus'
+  downloadFormat: state.dlFormat as 'opus'
 }
 

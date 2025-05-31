@@ -150,6 +150,7 @@
   "settings_restore": "Restore Settings",
   "settings_export": "Export Settings",
   "settings_import": "Import Settings",
+  "settings_reload": "Reload Page to apply changes",
   "piped_enter_auth": "Enter the Piped Authentication Instance API URL :",
   "piped_enter_username": "Enter username:",
   "piped_enter_password": "Password",

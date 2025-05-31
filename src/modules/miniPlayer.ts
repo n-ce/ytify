@@ -1,10 +1,10 @@
 import { author, img, miniPlayer, playButton, title } from '../lib/dom';
 import { goTo } from '../lib/utils';
-import { store } from '../lib/store';
+import { state } from '../lib/store';
 
 let imgMem: HTMLImageElement | '' = img;
 
-if (!store.loadImage) {
+if (!state.loadImage) {
   img.remove();
   imgMem = '';
 }

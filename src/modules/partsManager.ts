@@ -1,49 +1,32 @@
-import { getSaved } from "../lib/store";
-import { removeSaved, save } from "../lib/utils";
+import { setState, state } from "../lib/store";
 import { i18n } from "../scripts/i18n";
-
 
 export default function(): {
   name: string,
   callback: (arg0: Event & { target: HTMLElement }) => void
 }[] {
-  if (getSaved('kidsMode_Navigation Settings'))
-    toggle('/settings');
-  if (getSaved('kidsMode_Navigation Search'))
-    toggle('/search');
-  if (getSaved('kidsMode_Navigation Library'))
+  if (state['part Navigation Library'])
     toggle('/library');
-  if (getSaved('kidsMode_Reserved Collections'))
+  if (state['part Reserved Collections'])
     toggle('collections');
-  if (getSaved('kidsMode_Featured Playlists'))
+  if (state['part Featured Playlists'])
     toggle('r.featured');
-  if (getSaved('kidsMode_For You'))
+  if (state['part For You'])
     toggle('r.for_you');
-  if (getSaved('kidsMode_Subscription Feed'))
+  if (state['part Subscription Feed'])
     toggle('r.feed');
-  if (getSaved('kidsMode_Channels'))
+  if (state['part Channels'])
     toggle('r.channels');
-  if (getSaved('kidsMode_Albums'))
+  if (state['part Albums'])
     toggle('r.albums');
-  if (getSaved('kidsMode_Artists'))
+  if (state['part Artists'])
     toggle('r.artists');
-  if (getSaved('kidsMode_Playlists'))
+  if (state['part Playlists'])
     toggle('r.playlists');
-  if (getSaved('kidsMode_Collections'))
+  if (state['part Collections'])
     toggle('r.collections');
 
-
-
-
   return [
-    {
-      name: 'Navigation Settings',
-      callback: e => toggle('/settings', e)
-    },
-    {
-      name: 'Navigation Search',
-      callback: e => toggle('/search', e)
-    },
     {
       name: 'Navigation Library',
       callback: e => toggle('/library', e)
@@ -99,23 +82,20 @@ export default function(): {
   ];
 }
 
-
-
-const lsHandler = (id: string | undefined) => id ?
-  getSaved(id) ?
-    removeSaved(id) :
-    save(id, 'hidden')
-  : undefined;
+function lsHandler(id: string | undefined) {
+  if (!id) return;
+  const stateKey = id as keyof typeof state;
+  setState(stateKey, !state[stateKey]);
+}
 
 function toggle(part: string, e: Event & { target: HTMLElement } | undefined = undefined) {
-
   const id = e?.target?.id;
   if (id) {
     const askpin = prompt(i18n('settings_pin_prompt'));
     if (!askpin) return e?.preventDefault();
-    if (getSaved('kidsMode') !== askpin) {
+    if (state.partsManagerPIN !== askpin) {
       e?.preventDefault();
-      return alert(i18n('settings_pin_incorrect'))
+      return alert(i18n('settings_pin_incorrect'));
     }
     lsHandler(id);
   }
@@ -125,5 +105,3 @@ function toggle(part: string, e: Event & { target: HTMLElement } | undefined = u
 
   elm?.classList.toggle('hide');
 }
-
-

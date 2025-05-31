@@ -1,13 +1,13 @@
 
 import { getDB, reservedCollections, saveDB } from '../lib/libraryUtils';
 import { superCollectionSelector, superCollectionList } from '../lib/dom';
-import { removeSaved, save, superClick } from '../lib/utils';
+import { superClick } from '../lib/utils';
 import ItemsLoader from './ItemsLoader';
-import { getSaved } from '../lib/store';
 import { render } from 'uhtml';
+import { setState, state } from '../lib/store';
 
 
-let name = getSaved('defaultSuperCollection') as SuperCollection;
+let name = state.defaultSuperCollection as SuperCollection;
 
 if (name)
   document.getElementById('r.' + name)?.toggleAttribute('checked')
@@ -27,11 +27,9 @@ superCollectionSelector.addEventListener('click', e => {
 
   if (!elm.value) return;
 
-  if (elm.value !== 'for_you') {
-    elm.value === 'featured' ?
-      removeSaved('defaultSuperCollection') :
-      save('defaultSuperCollection', elm.value);
-  }
+  if (elm.value !== 'for_you')
+    setState('defaultSuperCollection', elm.value);
+
   name = elm.value;
   main();
 });

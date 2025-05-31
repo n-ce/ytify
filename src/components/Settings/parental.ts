@@ -1,8 +1,8 @@
 import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import { i18n } from '../../scripts/i18n';
-import { removeSaved, save } from '../../lib/utils';
-import { getSaved } from '../../lib/store';
+import { setState, state } from '../../lib/store';
+import { notify } from '../../lib/utils';
 
 let parts: {
   name: string,
@@ -10,7 +10,7 @@ let parts: {
 }[] = [];
 
 (async () => {
-  if (getSaved('kidsMode')) {
+  if (state.partsManagerPIN) {
     const pm = await import('../../modules/partsManager');
     parts = pm.default();
   }
@@ -27,18 +27,16 @@ export default function() {
       ${ToggleSwitch({
     id: "kidsSwitch",
     name: 'settings_pin_toggle',
-    checked: Boolean(getSaved('kidsMode')),
+    checked: Boolean(state.partsManagerPIN),
     handler: e => {
-      const savedPin = getSaved('kidsMode');
-      if (savedPin) {
-        if (prompt('Enter PIN to disable parental controls :') === savedPin) {
-          const len = localStorage.length;
-          for (let i = 0; i <= len; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('kidsMode'))
-              removeSaved(key);
-          }
-          location.reload();
+      const { partsManagerPIN } = state;
+      if (partsManagerPIN) {
+        if (prompt('Enter PIN to disable parental controls :') === partsManagerPIN) {
+          for (const key in state)
+            if (key.startsWith('part '))
+              setState(key as keyof typeof state, false);
+          setState('partsManagerPIN', '');
+          notify(i18n('settings_reload'));
         } else {
           alert(i18n('settings_pin_incorrect'));
           e.preventDefault();
@@ -47,8 +45,8 @@ export default function() {
       }
       const pin = prompt(i18n('settings_pin_message'));
       if (pin) {
-        save('kidsMode', pin);
-        location.reload();
+        setState('partsManagerPIN', pin);
+        notify(i18n('settings_reload'));
       }
       else e.preventDefault();
     }
@@ -58,7 +56,7 @@ export default function() {
           ${ToggleSwitch({
     id: 'kidsMode_' + item.name,
     name: item.name as TranslationKeys,
-    checked: !getSaved('kidsMode_' + item.name),
+    checked: !state[('part ' + item.name) as keyof typeof state],
     handler: item.callback
   })}
         `)

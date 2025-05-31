@@ -1,6 +1,6 @@
 import { author, img, title } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
-import { store } from "../lib/store";
+import { state, store } from "../lib/store";
 import { hostResolver } from "../lib/utils";
 
 let more = () => undefined;
@@ -29,7 +29,7 @@ export async function setMetaData(data: CollectionItem) {
   };
 
   const imgX = generateImageUrl(data.id, 'maxres', music);
-  if (store.loadImage) {
+  if (state.loadImage) {
     img.src = imgX
     metadataObj.artwork = [
       { src: img.src, sizes: '96x96' },
