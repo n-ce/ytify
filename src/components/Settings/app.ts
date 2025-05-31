@@ -3,6 +3,7 @@ import ToggleSwitch from './ToggleSwitch';
 import Selector from '../Selector';
 import { i18n } from '../../scripts/i18n';
 import { setState, state, store } from '../../lib/store';
+import { notify } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -31,7 +32,7 @@ export default function() {
           stateVal = pi + ',' + iv + ',' + useIv;
       }
       setState('customInstance', stateVal);
-      location.reload();
+      notify(i18n('settings_reload'));
     }
   })}
 
@@ -41,7 +42,7 @@ export default function() {
     handler: (e) => {
       const lang = e.target.value;
       setState('language', lang);
-      location.reload();
+      notify(i18n('settings_reload'));
     },
     onmount: (target) => {
       target.value = document.documentElement.lang;
@@ -58,7 +59,7 @@ export default function() {
       const stateVal = e.target.selectedIndex === 0 ? '' : e.target.value;
       store.linkHost = stateVal || location.origin;
       setState('linkHost', stateVal);
-      location.reload();
+      notify(i18n('settings_reload'));
     },
     onmount: (target) => {
       const { linkHost } = state;

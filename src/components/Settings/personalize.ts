@@ -4,6 +4,7 @@ import Selector from '../Selector';
 import { i18n } from '../../scripts/i18n';
 import { setState, state } from '../../lib/store';
 import { cssVar, themer } from '../../scripts/theme';
+import { notify } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -19,7 +20,7 @@ export default function() {
     checked: state.loadImage,
     handler: () => {
       setState('loadImage', !state.loadImage);
-      location.reload();
+      notify(i18n('settings_reload'));
     }
   })}
 

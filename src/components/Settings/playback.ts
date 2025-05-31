@@ -3,7 +3,7 @@ import ToggleSwitch from './ToggleSwitch';
 import Selector from '../Selector';
 import { i18n } from '../../scripts/i18n';
 import { setState, state } from '../../lib/store';
-import { quickSwitch } from '../../lib/utils';
+import { notify, quickSwitch } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -68,7 +68,7 @@ export default function() {
     checked: state.HLS,
     handler: () => {
       setState('HLS', !state.HLS);
-      location.reload();
+      notify(i18n('settings_reload'));
     }
   })}
 

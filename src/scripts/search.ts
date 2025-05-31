@@ -60,7 +60,7 @@ superInput.addEventListener('input', async () => {
     prevID = id;
     return;
   }
-  if (state.searchSuggestions) return;
+  if (!state.searchSuggestions) return;
 
   suggestions.innerHTML = '';
   suggestions.style.display = 'none';
@@ -105,7 +105,7 @@ superInput.addEventListener('keydown', _ => {
     _.preventDefault();
   }
   if (_.key === 'Backspace' ||
-    state.searchSuggestions ||
+    !state.searchSuggestions ||
     !suggestions.hasChildNodes()
   ) return;
 
@@ -153,7 +153,7 @@ searchlist.addEventListener('click', superClick);
 
 searchFilters.addEventListener('change', searchLoader);
 
-if (state.searchSuggestions)
+if (!state.searchSuggestions)
   suggestions.remove();
 
 if (state.searchFilter)

@@ -45,7 +45,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   });
 
   syncBtn.addEventListener('click', () => {
-    if (syncBtn.className = cls()) {
+    if (syncBtn.className === cls()) {
       syncBtn.className = 'ri-loader-3-line';
       fetchFromCloud()
         .then(() => {

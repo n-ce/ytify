@@ -2,6 +2,7 @@ import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import { i18n } from '../../scripts/i18n';
 import { setState, state } from '../../lib/store';
+import { notify } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -30,7 +31,7 @@ export default function() {
     checked: state.searchSuggestions,
     handler: () => {
       setState('searchSuggestions', !state.searchSuggestions);
-      location.reload();
+      notify(i18n('settings_reload'));
     }
   })}
     </div>

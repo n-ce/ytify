@@ -56,9 +56,9 @@ const template = html`
   @click=${(e: Event) => {
     const btn = e.currentTarget as HTMLElement;
 
+    btn.classList.toggle('on');
     setState('shuffle', btn.classList.contains('on'));
 
-    btn.classList.toggle('on');
     shuffle();
   }}>
     <i class="ri-shuffle-line"></i>${i18n('upcoming_shuffle')}
@@ -88,9 +88,9 @@ const template = html`
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
 
+    btn.classList.toggle('on');
     setState('filterLT10', btn.classList.contains('on'));
 
-    btn.classList.toggle('on');
     filterLT10();
   }}
   >
@@ -106,9 +106,9 @@ const template = html`
   }}
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
+    btn.classList.toggle('on');
     setState('allowDuplicates', btn.classList.contains('on'));
 
-    btn.classList.toggle('on');
     notify(i18n('upcoming_change'));
   }}
   >
@@ -118,16 +118,15 @@ const template = html`
   <li
     ref=${(el: HTMLButtonElement) => {
     enqueueRelatedStreamsBtn = el;
-    if (state.enqueueRelatedStreams) {
+    if (state.enqueueRelatedStreams)
       enqueueRelatedStreamsBtn.className = 'on';
-    }
   }}
     @click=${(e: MouseEvent) => {
     const btn = e.currentTarget as HTMLElement;
 
+    btn.classList.toggle('on');
     setState('enqueueRelatedStreams', btn.classList.contains('on'));
 
-    btn.classList.toggle('on');
     notify(i18n('upcoming_change'));
   }}
   >

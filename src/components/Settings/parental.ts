@@ -2,6 +2,7 @@ import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import { i18n } from '../../scripts/i18n';
 import { setState, state } from '../../lib/store';
+import { notify } from '../../lib/utils';
 
 let parts: {
   name: string,
@@ -35,7 +36,7 @@ export default function() {
             if (key.startsWith('part '))
               setState(key as keyof typeof state, false);
           setState('partsManagerPIN', '');
-          location.reload();
+          notify(i18n('settings_reload'));
         } else {
           alert(i18n('settings_pin_incorrect'));
           e.preventDefault();
@@ -45,7 +46,7 @@ export default function() {
       const pin = prompt(i18n('settings_pin_message'));
       if (pin) {
         setState('partsManagerPIN', pin);
-        location.reload();
+        notify(i18n('settings_reload'));
       }
       else e.preventDefault();
     }

@@ -3,6 +3,7 @@ import ToggleSwitch from './ToggleSwitch';
 import { i18n } from '../../scripts/i18n';
 import { setState, state } from '../../lib/store';
 import { getDB, saveDB } from '../../lib/libraryUtils';
+import { notify } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -18,7 +19,7 @@ export default function() {
     checked: state.startupTab === '/library',
     handler: () => {
       setState('startupTab',
-        state.startupTab === 'library' ?
+        state.startupTab === '/library' ?
           '/search' : '/library'
       );
     }
@@ -39,7 +40,7 @@ export default function() {
               .map(b => b.toString(16).padStart(2, '0'))
               .join('');
 
-            location.reload();
+            notify(i18n('settings_reload'));
           });
       }
       if (!state.dbsync) {
