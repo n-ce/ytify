@@ -7,7 +7,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   const importIcon = 'ri-cloud-fill';
   const needsSyncIcon = 'ri-cloud-off-fill'
   const isSynced = () => syncBtn.className === importIcon;
-  const startLoad = () => syncBtn.className === 'ri-loader-3-line';
+  const startLoad = () => syncBtn.className = 'ri-loader-3-line';
 
   function sync() {
     if (isSynced()) return;
