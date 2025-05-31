@@ -1,9 +1,9 @@
 #settings {
-
   background-color: var(--bg);
   color: inherit;
   margin: auto;
   padding: 5%;
+  padding-top: 0;
   user-select: none;
   overflow: scroll;
   border-radius: var(--roundness);
@@ -12,9 +12,14 @@
     width: 60%;
   }
 
-  h3 {
+  >h3 {
+    position: sticky;
+    top: 0;
     margin: 0;
     width: 100%;
+    background: var(--bg);
+    padding: 2.5% 0;
+    z-index: 9;
   }
 
   div {

@@ -40,8 +40,7 @@ export default function() {
     label: 'settings_language',
     id: 'languageSelector',
     handler: (e) => {
-      const lang = e.target.value;
-      setState('language', lang);
+      setState('language', e.target.value);
       notify(i18n('settings_reload'));
     },
     onmount: (target) => {

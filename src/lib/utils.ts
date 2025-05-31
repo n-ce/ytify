@@ -1,4 +1,4 @@
-import { audio, listContainer, title } from "./dom";
+import { audio, listContainer, settingsContainer, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { state, store } from "./store";
@@ -61,7 +61,12 @@ export function notify(text: string) {
   el.textContent = text;
   el.onclick = clear;
   setTimeout(clear, 8e3);
-  document.body.appendChild(el);
+  if (settingsContainer.open) {
+    const settingsHeader = settingsContainer.firstElementChild as HTMLHeadingElement;
+    if (!settingsHeader.textContent?.includes(text))
+      settingsHeader.textContent += ' | ' + text;
+  } else
+    document.body.appendChild(el);
 }
 
 
