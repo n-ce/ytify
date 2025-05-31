@@ -4,12 +4,15 @@ import { notify } from "../lib/utils";
 export default function(dbhash: string, syncBtn: HTMLElement) {
 
   const hashpoint = location.origin + '/dbs/' + dbhash;
-  const cls = (state: string = '') => `ri-cloud${state}-fill`;
+  const importIcon = 'ri-cloud-fill';
+  const needsSyncIcon = 'ri-cloud-off-fill'
+  const isSynced = () => syncBtn.className === importIcon;
+  const startLoad = () => syncBtn.className === 'ri-loader-3-line';
 
   function sync() {
-    if (syncBtn.className === cls())
-      return;
-    syncBtn.className = 'ri-loader-3-line';
+    if (isSynced()) return;
+
+    startLoad();
 
     fetch(hashpoint, {
       method: 'POST',
@@ -20,24 +23,37 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
     })
       .then(res => res.ok)
       .then(() => {
-        syncBtn.className = cls();
+        syncBtn.className = importIcon;
+        setTimeout(() => {
+          readyToFetch = true;
+        }, 1e5);
       })
       .catch(() => {
-        syncBtn.className = cls('-off') + ' error';
+        syncBtn.className = needsSyncIcon + ' error';
       })
   }
 
+
+  let readyToFetch = false;
   const fetchFromCloud = () =>
-    fetch(hashpoint)
-      .then(res => res.json())
-      .then((l) => saveDB(l, 'cloud'))
+    readyToFetch ?
+      fetch(hashpoint)
+        .then(res => res.json())
+        .then((l) => saveDB(l, 'cloud')) :
+      new Promise((res) => {
+        const id = setInterval(() => {
+          if (readyToFetch)
+            clearInterval(id);
+          res(fetchFromCloud());
+        }, 1e4);
+      });
 
 
   let timeoutId = 0;
   addEventListener('dbchange', (e) => {
     if (e.detail.change === 'cloud')
       return;
-    syncBtn.className = cls('-off');
+    syncBtn.className = needsSyncIcon;
     const newTimeoutId = window.setTimeout(sync, 1e4);
     if (timeoutId)
       clearTimeout(timeoutId);
@@ -45,14 +61,14 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   });
 
   syncBtn.addEventListener('click', () => {
-    if (syncBtn.className === cls()) {
-      syncBtn.className = 'ri-loader-3-line';
+    if (isSynced()) {
+      startLoad();
       fetchFromCloud()
         .then(() => {
-          syncBtn.className = cls();
+          syncBtn.className = importIcon;
         })
         .catch(() => {
-          syncBtn.className = cls('-off') + ' error';
+          syncBtn.className = needsSyncIcon + ' error';
         });
     }
     else sync();
@@ -62,10 +78,10 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
     if (confirm('Do you want to import your library from your account?')) {
       fetchFromCloud()
         .catch(() => notify('No Existing Library Found.'))
-        .finally(() => syncBtn.className = cls());
+        .finally(() => syncBtn.className = importIcon);
     }
   }
   else fetchFromCloud()
-    .finally(() => syncBtn.className = cls());
+    .finally(() => syncBtn.className = importIcon);
 
 }
