@@ -34,12 +34,12 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   }
 
 
-  let readyToFetch = false;
+  let readyToFetch = true;
   const fetchFromCloud = () =>
     readyToFetch ?
       fetch(hashpoint)
         .then(res => res.json())
-        .then((l) => saveDB(l, 'cloud')) :
+        .then(l => saveDB(l, 'cloud')) :
       new Promise((res) => {
         const id = setInterval(() => {
           if (readyToFetch)
