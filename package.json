@@ -4,9 +4,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev-os": "cargo tauri dev",
+    "build-os": "cargo tauri build"
   },
   "dependencies": {
+    "@tauri-apps/api": "^2.2.0",
     "hls.js": "^1.6.2",
     "sortablejs": "^1.15.6",
     "uhtml": "^4.7.1"
