@@ -1,8 +1,8 @@
 import { loadingScreen, queuelist, title } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
 import player from "../lib/player";
-import { getSaved, store } from "../lib/store";
-import { handleXtags, proxyHandler, save } from "../lib/utils";
+import { setState, state, store } from "../lib/store";
+import { handleXtags, proxyHandler } from "../lib/utils";
 import getStreamData from "../modules/getStreamData";
 import Selector from "./Selector";
 import { html, render } from 'uhtml';
@@ -17,7 +17,7 @@ export default async function(dialog: HTMLDialogElement) {
   };
   let video!: HTMLVideoElement;
   const audio = new Audio();
-  const savedQ = getSaved('watchMode');
+  const savedQ = state.watchMode;
 
   const supportsAv1 = await navigator.mediaCapabilities
     .decodingInfo({
@@ -45,7 +45,7 @@ export default async function(dialog: HTMLDialogElement) {
     .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
     .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
-  if (getSaved('hq')) audioArray.reverse();
+  if (state.hq) audioArray.reverse();
 
 
   media.video = data.videoStreams
@@ -160,7 +160,7 @@ export default async function(dialog: HTMLDialogElement) {
           video.src = proxyHandler(_.target.value);
           video.currentTime = audio.currentTime;
           if (savedQ)
-            save('watchMode', _.target.selectedOptions[0].textContent as string);
+            setState('watchMode', _.target.selectedOptions[0].textContent as string);
         },
         children: html`
               <option>Video</option>

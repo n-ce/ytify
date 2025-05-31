@@ -1,14 +1,14 @@
 import { audio, bitrateSelector, playButton, title } from "../lib/dom";
-import { store } from "../lib/store";
+import { state, store } from "../lib/store";
 import { handleXtags, proxyHandler } from "../lib/utils";
 import { i18n } from "../scripts/i18n";
 
-export default function(audioStreams: AudioStream[],
+export default async function(audioStreams: AudioStream[],
   isLive = false) {
 
   title.textContent = i18n('player_audiostreams_setup');
 
-  const preferedCodec = store.player.codec;
+  const preferedCodec = state.codec === 'any' ? ((await store.player.supportsOpus) ? 'opus' : 'aac') : state.codec;
   const noOfBitrates = audioStreams.length;
   let index = -1;
 
@@ -35,7 +35,7 @@ export default function(audioStreams: AudioStream[],
       (<HTMLOptionElement>bitrateSelector?.lastElementChild).dataset.type = _.mimeType;
       // find preferred bitrate
       const codecPref = preferedCodec ? codec === preferedCodec : true;
-      const hqPref = store.player.hq ? noOfBitrates : 0;
+      const hqPref = state.hq ? noOfBitrates : 0;
       if (codecPref && index < hqPref) index = i;
     });
 

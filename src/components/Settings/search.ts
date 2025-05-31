@@ -1,8 +1,7 @@
 import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import { i18n } from '../../scripts/i18n';
-import { getSaved } from '../../lib/store';
-import { removeSaved, save } from '../../lib/utils';
+import { setState, state } from '../../lib/store';
 
 export default function() {
   return html`
@@ -15,13 +14,12 @@ export default function() {
       ${ToggleSwitch({
     id: "defaultFilterSongs",
     name: 'settings_set_songs_as_default_filter',
-    checked: getSaved('searchFilter') === 'music_songs',
+    checked: state.searchFilter === 'music_songs',
     handler: () => {
-      const _ = 'searchFilter';
-      if (getSaved(_))
-        removeSaved(_);
-      else
-        save(_, 'music_songs');
+      setState('searchFilter',
+        state.searchFilter ?
+          '' : 'music_songs'
+      );
       location.assign('/search');
     }
   })}
@@ -29,13 +27,9 @@ export default function() {
       ${ToggleSwitch({
     id: "suggestionsSwitch",
     name: 'settings_display_suggestions',
-    checked: getSaved('searchSuggestions') !== 'off',
+    checked: state.searchSuggestions,
     handler: () => {
-      const _ = 'searchSuggestions';
-      if (getSaved(_))
-        removeSaved(_);
-      else
-        save(_, 'off');
+      setState('searchSuggestions', !state.searchSuggestions);
       location.reload();
     }
   })}

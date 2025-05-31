@@ -1,5 +1,4 @@
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { getSaved } from "../lib/store";
 import { notify } from "../lib/utils";
 
 export default function(dbhash: string, syncBtn: HTMLElement) {
@@ -17,7 +16,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: getSaved('library'),
+      body: localStorage.getItem('library'),
     })
       .then(res => res.ok)
       .then(() => {
@@ -39,7 +38,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
     if (e.detail.change === 'cloud')
       return;
     syncBtn.className = cls('-off');
-    const newTimeoutId = window.setTimeout(sync, 30000);
+    const newTimeoutId = window.setTimeout(sync, 1e4);
     if (timeoutId)
       clearTimeout(timeoutId);
     timeoutId = newTimeoutId;

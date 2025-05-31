@@ -2,8 +2,8 @@ import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import Selector from '../Selector';
 import { i18n } from '../../scripts/i18n';
-import { getSaved, store } from '../../lib/store';
-import { quickSwitch, removeSaved, save } from '../../lib/utils';
+import { setState, state } from '../../lib/store';
+import { quickSwitch } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -16,58 +16,37 @@ export default function() {
       ${ToggleSwitch({
     id: "qualitySwitch",
     name: 'settings_hq_audio',
-    checked: getSaved('hq') === 'true',
+    checked: state.hq,
     handler: async () => {
-      if (getSaved('hq'))
-        removeSaved('hq');
-      else
-        save('hq', 'true');
-
-      store.player.hq = !store.player.hq;
-
+      setState('hq', !state.hq);
       quickSwitch();
     }
   })}
 
-      ${!store.player.hls.on ? html`
+      ${!state.HLS ? html`
         ${Selector({
     label: 'settings_codec_preference',
     id: 'codecPreference',
     handler: async (e) => {
-      const c = e.target.value as '' | 'opus' | 'aac';
-      if (c)
-        save('codec', c)
-      else
-        removeSaved('codec');
-
-      store.player.codec = c || 'any';
+      setState('codec', e.target.value);
       quickSwitch();
     },
     onmount: async (target) => {
-      const codecSaved = getSaved('codec');
-      target.selectedIndex = codecSaved ?
-        parseInt(codecSaved) :
-        ((await store.player.supportsOpus) ? 0 : 1);
-
-      store.player.codec = target.value as 'any';
+      target.value = state.codec;
     },
     children: html`
             <option value="opus">Opus</option>
             <option value="aac">AAC</option>
-            <option value="">Any</option>
+            <option value="any">Any</option>
           `
   })}
 
         ${ToggleSwitch({
     id: "stableVolumeSwitch",
     name: 'settings_stable_volume',
-    checked: getSaved('stableVolume') === 'true',
+    checked: Boolean(state.stableVolume),
     handler: () => {
-      const _ = 'stableVolume';
-      if (getSaved(_))
-        removeSaved(_);
-      else
-        save(_, 'true');
+      setState('stableVolume', !state.stableVolume);
       quickSwitch();
     }
   })}
@@ -75,13 +54,9 @@ export default function() {
         ${ToggleSwitch({
     id: "enforceProxySwitch",
     name: 'settings_always_proxy_streams',
-    checked: getSaved('enforceProxy') === 'true',
+    checked: state.enforceProxy,
     handler: () => {
-      const _ = 'enforceProxy';
-      if (getSaved(_))
-        removeSaved(_);
-      else
-        save(_, 'true');
+      setState('enforceProxy', !state.enforceProxy);
       quickSwitch();
     }
   })}
@@ -90,12 +65,9 @@ export default function() {
       ${ToggleSwitch({
     id: "HLS_Switch",
     name: 'settings_hls',
-    checked: getSaved('HLS') === 'true',
+    checked: state.HLS,
     handler: () => {
-      if (getSaved('HLS'))
-        removeSaved('HLS');
-      else
-        save('HLS', 'true');
+      setState('HLS', !state.HLS);
       location.reload();
     }
   })}
@@ -103,13 +75,12 @@ export default function() {
       ${ToggleSwitch({
     id: "watchModeSwitch",
     name: 'settings_watchmode',
-    checked: Boolean(getSaved('watchMode')),
+    checked: Boolean(state.watchMode),
     handler: () => {
-      const _ = 'watchMode';
-      if (getSaved(_))
-        removeSaved(_);
-      else
-        save(_, '144p');
+      setState('watchMode',
+        state.watchMode ?
+          '' : '144p'
+      );
     }
   })}
     </div>

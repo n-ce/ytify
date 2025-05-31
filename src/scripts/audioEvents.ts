@@ -1,7 +1,7 @@
 import { audio, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, removeSaved, save } from "../lib/utils";
-import { getSaved, params, store } from "../lib/store";
+import { convertSStoHHMMSS } from "../lib/utils";
+import { params, setState, state, store } from "../lib/store";
 import { addToCollection } from "../lib/libraryUtils";
 import audioErrorHandler from "../modules/audioErrorHandler";
 import getStreamData from "../modules/getStreamData";
@@ -54,7 +54,7 @@ audio.onplaying = function() {
   if (!store.streamHistory.includes(id))
     store.streamHistory.push(id);
 
-  if (getSaved('history') === 'off')
+  if (!state.history)
     return;
 
   historyTimeoutId = window.setTimeout(() => {
@@ -202,10 +202,7 @@ volumeIcon.onclick = function() {
 volumeChanger.oninput = function() {
   audio.volume = parseFloat(volumeChanger.value) / 100;
 
-  audio.volume === 1 ?
-    removeSaved('volume') :
-    save('volume', volumeChanger.value);
-
+  setState('volume', volumeChanger.value);
 
   volumeIcon.classList.replace(
     volumeIcon.className,
@@ -214,9 +211,9 @@ volumeChanger.oninput = function() {
       'ri-volume-mute-fill');
 }
 
-const savedVol = getSaved('volume');
-if (savedVol) {
-  volumeChanger.value = savedVol;
+const { volume } = state;
+if (volume) {
+  volumeChanger.value = volume;
   audio.volume = parseFloat(volumeChanger.value) / 100;
 }
 

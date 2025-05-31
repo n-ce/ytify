@@ -1,5 +1,5 @@
 import { title, audio, playButton } from '../lib/dom.ts';
-import { store, getSaved } from '../lib/store.ts';
+import { store, state } from '../lib/store.ts';
 import { getDownloadLink, notify } from '../lib/utils.ts';
 
 export default function() {
@@ -8,7 +8,7 @@ export default function() {
   const id = store.stream.id;
   const { usePiped, fallback, hls } = store.player;
   const { index, invidious } = store.api;
-  const playViaPiped = usePiped && getSaved('custom_instance');
+  const playViaPiped = usePiped && state.customInstance;
 
   if (playViaPiped || hls.on) return notify(message);
 

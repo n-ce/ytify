@@ -1,8 +1,8 @@
 import './ActionsMenu.css';
 import { html, render } from "uhtml";
 import { loadingScreen, openInYtBtn } from "../lib/dom";
-import { getSaved, store } from "../lib/store";
-import { $, getDownloadLink, hostResolver } from "../lib/utils";
+import { state, store } from "../lib/store";
+import { getDownloadLink, hostResolver } from "../lib/utils";
 import CollectionSelector from "./CollectionSelector";
 import fetchList from "../modules/fetchList";
 import { i18n } from '../scripts/i18n';
@@ -45,7 +45,7 @@ export default function(dialog: HTMLDialogElement) {
       { collection: store.actionsMenu, close }
     )}
 
-      ${!getSaved('kidsMode_Start Radio Button') ?
+      ${state['part Start Radio'] ?
       html`
         <li tabindex="3" @click=${async () => {
           close();
@@ -59,7 +59,7 @@ export default function(dialog: HTMLDialogElement) {
       <li tabindex="4" @click=${async () => {
       close();
       loadingScreen.showModal();
-      const a = $('a');
+      const a = document.createElement('a');
       const l = await getDownloadLink(store.actionsMenu.id);
       if (l) {
         a.href = l;
@@ -71,7 +71,7 @@ export default function(dialog: HTMLDialogElement) {
       </li>
 
       
-      ${!getSaved('kidsMode_View Channel/Artist Button') ?
+      ${state['part View Author'] ?
       html`
         <li tabindex="5" @click=${() => {
           close();
@@ -101,7 +101,7 @@ export default function(dialog: HTMLDialogElement) {
       html`
         <li tabindex="6" @click=${() => {
           close();
-          const dialog = $('dialog') as HTMLDialogElement;
+          const dialog = document.createElement('dialog');
           dialog.className = 'displayer';
           dialog.addEventListener('click', () => {
             dialog.close();
@@ -117,15 +117,15 @@ export default function(dialog: HTMLDialogElement) {
         </li>
         `:
 
-      !getSaved('kidsMode_Watch On Button') ?
+      state['part Watch On'] ?
         html`
           <li tabindex="6" @click=${() => {
             close();
-            if (getSaved('linkHost'))
+            if (state.linkHost)
               open(hostResolver('/watch?v=' + store.actionsMenu.id));
             else {
 
-              const dialog = $('dialog') as HTMLDialogElement;
+              const dialog = document.createElement('dialog');
               dialog.open = true;
               dialog.className = 'watcher';
               document.body.appendChild(dialog);
@@ -142,7 +142,7 @@ export default function(dialog: HTMLDialogElement) {
       close();
 
       const output = location.pathname === '/' ? store.player.data : store.actionsMenu;
-      const displayer = $('dialog') as HTMLDialogElement;
+      const displayer = document.createElement('dialog');
       displayer.className = 'displayer';
       displayer.addEventListener('click', () => {
         displayer.close();

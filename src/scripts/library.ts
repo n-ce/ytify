@@ -1,7 +1,6 @@
 import { favButton, favIcon } from "../lib/dom";
-import { $, removeSaved } from "../lib/utils";
 import { addToCollection, getDB, removeFromCollection, saveDB, toCollection } from "../lib/libraryUtils";
-import { getSaved, store } from "../lib/store";
+import { state, store } from "../lib/store";
 import { render, html } from "uhtml";
 import { i18n } from "./i18n";
 
@@ -50,7 +49,7 @@ async function importLibrary(e: FileEv) {
 };
 
 function exportLibrary() {
-  const link = $('a');
+  const link = document.createElement('a');
   link.download = 'ytify_library.json';
   link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
   link.click();
@@ -59,7 +58,7 @@ function exportLibrary() {
 function cleanLibrary() {
   const count = Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0);
   if (confirm(i18n('library_clean_prompt', count.toString()))) {
-    removeSaved('library');
+    localStorage.removeItem('library');
     location.reload();
   }
 };
@@ -79,8 +78,8 @@ favButton.addEventListener('click', () => {
 
 
 
-const dbhash = getSaved('dbsync');
+const { dbsync } = state;
 const syncBtn = document.getElementById('syncNow') as HTMLElement;
 
-if (dbhash) import('../modules/cloudSync').then(mod => mod.default(dbhash, syncBtn));
+if (dbsync) import('../modules/cloudSync').then(mod => mod.default(dbsync, syncBtn));
 else syncBtn.remove();
