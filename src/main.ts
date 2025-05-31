@@ -4,34 +4,46 @@ import './scripts/router';
 import './scripts/audioEvents';
 import './scripts/list';
 import './scripts/search';
-import './scripts/library';
-import { render } from 'solid-js/web';
-import { actionsMenu, superCollectionList } from './lib/dom';
+import './scripts/theme';
 
 addEventListener('DOMContentLoaded', async () => {
 
-  const settingsContainer = document.getElementById('settings') as HTMLDivElement;
-  const stngs = await import('./components/Settings');
-  render(stngs.default, settingsContainer);
-  settingsContainer.appendChild(document.getElementById('actionsContainer')!);
 
-  const start = await import('./modules/start')
-  start.default();
+  (await import('./modules/start')).default();
 
-  const amenu = await import('./components/ActionsMenu');
-  render(amenu.default, actionsMenu);
+  (await import('./components/SuperCollectionList')).default();
 
-  const sclist = await import('./components/SuperCollectionList.tsx');
-  render(sclist.default, superCollectionList);
+
+  const settingsHandler = document.getElementById('settingsHandler');
+  settingsHandler?.addEventListener('click', async () => {
+    (await import('./components/Settings/index')).default();
+  });
+  const fullscreenToggle = document.getElementById('fullscreenBtn');
+  fullscreenToggle?.addEventListener('click', () => {
+    if (document.fullscreenElement)
+      document.exitFullscreen();
+    else
+      document.documentElement.requestFullscreen();
+  });
 
   if (import.meta.env.PROD)
     await import('virtual:pwa-register').then(pwa => {
       const handleUpdate = pwa.registerSW({
         onNeedRefresh() {
-          import('./components/UpdatePrompt').then(mod =>
-            render(() => mod.default(handleUpdate),
-              document.body
-            ));
+          const dialog = document.createElement('dialog') as HTMLDialogElement;
+          dialog.addEventListener('click', (e) => {
+            const elm = e.target as HTMLButtonElement;
+            if (elm.id === 'updateBtn' || elm.closest('#updateBtn'))
+              handleUpdate();
+            if (elm.id === 'laterBtn' || elm.closest('#laterBtn')) {
+              dialog.close();
+              dialog.remove();
+            }
+          })
+
+          import('./components/UpdatePrompt')
+            .then(mod => mod.default(dialog))
+            .then(() => document.body.appendChild(dialog));
         }
       });
     });

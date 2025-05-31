@@ -9,7 +9,7 @@
 </div>
 
 
-> [**ytify**](https://ytify.pp.ua) is the fastest (56KB to load) and the lightest (7.5K LOC only) centralised audio streaming web application built with an unprecedented hybrid [HTML + SolidJS] approach for maximum efficiency.
+> [**ytify**](https://ytify.pp.ua) is the fastest and the lightest centralised audio streaming web application built with modern technologies as close to the browser to squeeze out maximum efficiency.
 >  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 > As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
@@ -69,9 +69,9 @@ or
 ```
  gh repo clone n-ce/ytify -- --depth 1
 ```
-3. Move to Directory, Update & Install Dependencies
+3. Move to Directory, Install Dependencies
 ```
-cd ytify ; npm run update; npm i
+cd ytify ; npm i
 ```
 4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts)
 `injectEruda(false),`
@@ -83,38 +83,6 @@ npm run dev -- --open
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
 
 
-#### Vite building the project on my entry-level phone.
-
-```bash
-vite v6.0.11 building for production...
-✓ 56 modules transformed.
-dist/manifest.webmanifest                          1.00 kB
-dist/index.html                                   15.98 kB │ gzip:   4.12 kB
-dist/assets/UpdatePrompt-BVWVWGFX.css              0.72 kB │ gzip:   0.40 kB
-dist/assets/ActionsMenu-CZvdWJ42.css               0.91 kB │ gzip:   0.45 kB
-dist/assets/Settings-tEADDnJ_.css                  2.25 kB │ gzip:   0.73 kB
-dist/assets/index--EX9VXLN.css                    20.68 kB │ gzip:   5.01 kB
-dist/assets/enqueueRelatedStreams-DdHTYd6g.js      0.35 kB │ gzip:   0.27 kB
-dist/assets/extractColorFromImage-Cxdm9n2W.js      0.62 kB │ gzip:   0.42 kB
-dist/assets/setAudioStreams-BVS_1Ljb.js            0.84 kB │ gzip:   0.56 kB
-dist/assets/setDiscoveries-TaEtEbHx.js             0.93 kB │ gzip:   0.54 kB
-dist/assets/virtual_pwa-register-CvOwgYno.js       0.96 kB │ gzip:   0.55 kB
-dist/assets/UpdatePrompt-D5n4sX3r.js               1.09 kB │ gzip:   0.62 kB
-dist/assets/supermix-BtwNGR11.js                   1.11 kB │ gzip:   0.68 kB
-dist/assets/importPipedPlaylists-B2u7XIyS.js       1.24 kB │ gzip:   0.60 kB
-dist/assets/Lyrics-zDQNW8E2.js                     1.24 kB │ gzip:   0.80 kB
-dist/assets/start-BQEMUpCE.js                      1.95 kB │ gzip:   1.06 kB
-dist/assets/partsManager-DmWC75D0.js               1.96 kB │ gzip:   0.67 kB
-dist/assets/WatchOnYtify-LiGdckDA.js               2.84 kB │ gzip:   1.22 kB
-dist/assets/ActionsMenu-BzqUfV6s.js                4.06 kB │ gzip:   1.72 kB
-dist/assets/workbox-window.prod.es5-DL_hIMXg.js    5.72 kB │ gzip:   2.36 kB
-dist/assets/en-D06fOH0-.js                        11.19 kB │ gzip:   3.67 kB
-dist/assets/pl-D1p_NQ5j.js                        11.99 kB │ gzip:   4.26 kB
-dist/assets/Settings-CBM8jAms.js                  13.25 kB │ gzip:   4.38 kB
-dist/assets/index-pbIhJqLG.js                     89.34 kB │ gzip:  32.19 kB
-dist/assets/hls-CySapf1N.js                      399.85 kB │ gzip: 123.78 kB
-✓ built in 9.51s
-```
 
 ## Translations 🗺️
 [![Translation status](https://hosted.weblate.org/widget/ytify/multi-auto.svg)](https://hosted.weblate.org/engage/ytify/)
@@ -128,11 +96,9 @@ ytify is being translated into multiple languages using [Weblate](https://hosted
 - [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
 - [LRCLIB](https://lrclib.net) - Synced Lyrics Provider
 - [wsrv](https://wsrv.nl) - Image Proxy Provider
-- [Solid](https://github.com/solidjs/solid) - Delightful JSX Library
+- [uhtml](https://webreflection.github.io/uhtml) - Efficient HTML Templating Library
 - [HLS.js](https://github.com/video-dev/hls.js) - HLS Support Library
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms, Edge Functions
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
 - [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
 - [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution.
-- [Google Fonts](https://fonts.google.com) - NotoSans Font.
-

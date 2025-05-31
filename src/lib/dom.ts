@@ -1,7 +1,5 @@
 export const img = <HTMLImageElement>document.getElementById('img');
 
-export const ytifyIcon = <HTMLElement>document.getElementById('ytifyIcon')
-
 export const title = <HTMLAnchorElement>document.getElementById('title');
 
 export const author = <HTMLParagraphElement>document.getElementById('author');
@@ -20,8 +18,6 @@ export const playButton = <HTMLButtonElement>document.getElementById('playButton
 
 export const audio = <HTMLAudioElement>document.querySelector('audio');
 
-export const actionsMenu = <HTMLDialogElement>document.getElementById('actionsMenu');
-
 export const queuelist = <HTMLElement>document.getElementById('queuelist');
 
 export const listSection = <HTMLDivElement>document.getElementById('list');
@@ -34,9 +30,11 @@ export const favButton = <HTMLInputElement>document.getElementById('favButton');
 
 export const favIcon = <HTMLLabelElement>favButton.nextElementSibling;
 
+export const listTitle = <HTMLSpanElement>document.getElementById('listTitle');
+
 export const listBtnsContainer = <HTMLSpanElement>document.getElementById('listTools');
 
-export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn, shareCollectionBtn, radioCollectionBtn, sortCollectionBtn] = <HTMLCollectionOf<HTMLButtonElement>>listBtnsContainer.children;
+export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtBtn, clearListBtn, removeFromListBtn, deleteCollectionBtn, renameCollectionBtn, shareCollectionBtn, radioCollectionBtn, sortCollectionBtn, sortByTitleBtn, sortByAuthorBtn] = <HTMLCollectionOf<HTMLLIElement>>listBtnsContainer.children;
 
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());
@@ -46,3 +44,5 @@ export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitra
 export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLDivElement;
 
 export const superCollectionList = document.getElementById('superCollectionList') as HTMLDivElement;
+
+export const settingsContainer = document.getElementById('settings') as HTMLDialogElement;

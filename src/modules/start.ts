@@ -1,9 +1,12 @@
 import player from '../lib/player';
 import { getSaved, params, store } from '../lib/store';
-import { $, getDownloadLink, i18n, idFromURL, proxyHandler } from '../lib/utils';
-import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, ytifyIcon, searchlist } from '../lib/dom';
+import { $, getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
+import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
+import { i18n } from '../scripts/i18n.ts';
+import '../scripts/library';
+import '../scripts/queue';
 
 export default async function() {
 
@@ -45,7 +48,15 @@ export default async function() {
     audio.play();
   });
 
+  // codec handling
 
+  const codecSaved = getSaved('codec') as 'opus';
+  store.player.codec = codecSaved ||
+    ((await store.player.supportsOpus) ? 'opus' : 'aac');
+
+  const savedDownloadFormat = getSaved('dlFormat');
+  if (savedDownloadFormat)
+    store.downloadFormat = savedDownloadFormat as 'opus';
 
   // params handling
 
@@ -58,7 +69,16 @@ export default async function() {
 
   if (id) {
     loadingScreen.showModal();
-    if (isPWA && shareAction) {
+    if (isPWA && shareAction === 'watch') {
+      store.actionsMenu.id = id;
+      const dialog = $('dialog') as HTMLDialogElement;
+      dialog.open = true;
+      dialog.className = 'watcher';
+      document.body.appendChild(dialog);
+      import('../components/WatchVideo.ts')
+        .then(mod => mod.default(dialog));
+    }
+    else if (isPWA && shareAction) {
       const a = $('a');
       const l = await getDownloadLink(store.actionsMenu.id);
       if (l) {
@@ -70,7 +90,6 @@ export default async function() {
 
     loadingScreen.close();
   }
-  else document.getElementById('ytifyIconContainer')?.prepend(ytifyIcon);
   if (params.has('q')) {
     superInput.value = params.get('q') || '';
     if (params.has('f'))
@@ -100,5 +119,14 @@ export default async function() {
         .split('=')
         .join('/')
     );
+
+  // header state handling
+  (document.querySelectorAll('header details') as NodeListOf<HTMLDetailsElement>).forEach(d => {
+    d.addEventListener('click', (e) => {
+      const elm = e.target as HTMLElement;
+      if (!elm.matches('i') && d.open)
+        d.removeAttribute('open');
+    })
+  })
 
 }

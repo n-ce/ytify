@@ -1,9 +1,8 @@
-import { audio, listAnchor, playButton, progress, queuelist, title } from "../lib/dom";
+import { audio, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, goTo, removeSaved, save } from "../lib/utils";
+import { convertSStoHHMMSS, removeSaved, save } from "../lib/utils";
 import { getSaved, params, store } from "../lib/store";
-import { appendToQueuelist, firstItemInQueue } from "./queue";
-import { addToCollection, getCollection } from "../lib/libraryUtils";
+import { addToCollection } from "../lib/libraryUtils";
 import audioErrorHandler from "../modules/audioErrorHandler";
 import getStreamData from "../modules/getStreamData";
 
@@ -58,21 +57,10 @@ audio.onplaying = function() {
   if (getSaved('history') === 'off')
     return;
 
-  const firstElementInHistory = <HTMLElement | null>getCollection('history').firstElementChild;
-
-  if (firstElementInHistory?.dataset.id !== id)
-    historyTimeoutId = window.setTimeout(() => {
-      if (historyID === id) {
-        addToCollection('history', store.stream);
-        // just in case we are already in the history collection 
-        if (
-          listAnchor.classList.contains('view') &&
-          params.get('collection') === 'history'
-        )
-          goTo('history');
-
-      }
-    }, 1e4);
+  historyTimeoutId = window.setTimeout(() => {
+    if (historyID === id)
+      addToCollection('history', store.stream, 'addNew');
+  }, 1e4);
 }
 
 audio.onpause = function() {
@@ -167,7 +155,7 @@ audio.onloadedmetadata = function() {
 
 audio.oncanplaythrough = function() {
   // prefetch beforehand to speed up experience
-  const nextItem = store.queue[0];
+  const nextItem = store.queue.list[0];
   if (nextItem)
     getStreamData(nextItem, true);
 }
@@ -183,7 +171,7 @@ loopButton.onclick = function() {
 
 function prev() {
   if (store.streamHistory.length > 1) {
-    appendToQueuelist(store.stream, true);
+    store.queue.append(store.stream, true);
     store.streamHistory.pop();
     player(store.streamHistory[store.streamHistory.length - 1]);
   }
@@ -195,7 +183,7 @@ playPrevButton.onclick = prev;
 function onEnd() {
   playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
   if (queuelist.childElementCount)
-    firstItemInQueue().click();
+    store.queue.firstChild()?.click();
 }
 
 audio.onended = playNextButton.onclick = onEnd;

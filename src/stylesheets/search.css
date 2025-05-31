@@ -4,7 +4,7 @@
   padding: 2.4vmin 4vmin;
   position: sticky;
   z-index: 3;
-  top: 4vmin;
+  top: calc(2rem + 8vmin);
   background-color: var(--onBg);
   backdrop-filter: blur(2vmin);
   border-radius: var(--roundness);
@@ -50,7 +50,7 @@
   position: absolute;
   width: 80vmin;
   z-index: 1;
-  margin-top: calc(1.5rem + 8.8vmin);
+  margin-top: calc(3.4rem + 12.8vmin);
   background-color: var(--bg);
   list-style-type: none;
   padding: 0;

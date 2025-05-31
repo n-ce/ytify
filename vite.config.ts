@@ -1,11 +1,6 @@
 import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import solidPlugin from 'vite-plugin-solid';
 import autoprefixer from 'autoprefixer';
-/*
-import postcssJitProps from 'postcss-jit-props';
-import OpenProps from 'open-props';
-*/
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
 
@@ -19,13 +14,12 @@ export default defineConfig(({ command }) => ({
   },
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
-    Version: JSON.stringify(
-      ((today = new Date()) => `${process.env.npm_package_version} (${today.getDate()} ${today.toLocaleString('default', { month: 'short' })} ${today.getFullYear()})`)()
+    Build: JSON.stringify(
+      ((today = new Date()) => `${today.getDate()} ${today.toLocaleString('default', { month: 'short' })} ${today.getFullYear()}`)()
     ),
   },
   plugins: [
     injectEruda(command === 'serve'),
-    solidPlugin(),
     VitePWA({
       manifest: {
         "short_name": "Ytify",
@@ -101,8 +95,7 @@ export default defineConfig(({ command }) => ({
   css: {
     postcss: {
       plugins: [
-        autoprefixer(),
-        //  postcssJitProps(OpenProps)
+        autoprefixer()
       ]
     }
   }

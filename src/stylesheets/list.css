@@ -1,8 +1,19 @@
+#list>header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+}
+
 #listTools {
 
-  button {
+  li {
     i {
       pointer-events: none;
+    }
+
+    &::after {
+      content: attr(aria-label);
     }
   }
 
@@ -11,6 +22,8 @@
     #clearListBtn,
     #removeFromListBtn,
     #sortCollectionBtn,
+    #sortByTitleBtn,
+    #sortByArtistBtn,
     #shareCollectionBtn,
     #radioCollectionBtn,
     #renameCollectionBtn,
@@ -21,25 +34,41 @@
 
 
   &.channel {
-    button {
+    li {
       display: none;
     }
 
     #subscribeListBtn,
     #viewOnYTBtn {
-      display: inline-block !important;
+      display: block !important;
     }
   }
 
   &.reserved {
-    button {
+    li {
       display: none;
     }
 
     #clearListBtn,
     #removeFromListBtn {
-      display: inline-block !important;
+      display: block !important;
     }
+  }
+
+  &.favorites {
+    li {
+      display: block !important;
+    }
+
+    #deleteCollectionBtn,
+    #renameCollectionBtn,
+    #radioCollectionBtn,
+    #importListBtn,
+    #subscribeListBtn,
+    #viewOnYTBtn {
+      display: none !important;
+    }
+
   }
 
   &.collection {
@@ -55,13 +84,13 @@
 
   &.supermix,
   &.shared {
-    button {
+    li {
       display: none;
     }
 
     #importListBtn,
     #enqueueAllBtn {
-      display: inline-block !important;
+      display: block !important;
     }
   }
 }
@@ -78,11 +107,9 @@
 #viewOnYTBtn,
 #subscribeListBtn {
   i {
-    pointer-events: none;
-
     &:after {
       content: attr(data-state);
-      font-family: 'Noto Sans', sans-serif;
+      font-family: inherit;
     }
   }
 }

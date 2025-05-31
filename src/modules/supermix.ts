@@ -1,6 +1,6 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen } from "../lib/dom";
 import { store } from "../lib/store";
-import { convertSStoHHMMSS, goTo, renderDataIntoFragment } from "../lib/utils";
+import { convertSStoHHMMSS, goTo, renderCollection } from "../lib/utils";
 
 export default async function(ids: string[]) {
 
@@ -50,23 +50,16 @@ export default async function(ids: string[]) {
     });
 
   const mixArray = Object
-    .entries(map)
-    .sort((a, b) => b[1].count! - a[1].count!)
+    .values(map)
+    .sort((a, b) => b.count! - a.count!)
 
 
   loadingScreen.close();
   store.list.id = 'supermix';
   listBtnsContainer.className = 'supermix';
 
-  const fragment = document.createDocumentFragment();
-  renderDataIntoFragment(
-    Object.fromEntries(mixArray)
-    , fragment);
+  renderCollection(mixArray);
 
-  if (!fragment) return;
-
-  listContainer.innerHTML = '';
-  listContainer.appendChild(fragment);
   const isReversed = listContainer.classList.contains('reverse');
 
   if (isReversed)

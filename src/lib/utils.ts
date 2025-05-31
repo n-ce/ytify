@@ -1,13 +1,12 @@
-import { audio, actionsMenu, title } from "./dom";
+import { audio, listContainer, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { getSaved, store } from "./store";
-import { render } from 'solid-js/web';
+import { html, render } from 'uhtml';
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { json } from "../scripts/i18n";
-import ItemsLoader from "../components/ItemsLoader";
+import { i18n } from "../scripts/i18n.ts";
 
 export const $ = document.createElement.bind(document);
 
@@ -37,12 +36,6 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
-export const i18n = (
-  key: TranslationKeys,
-  value: string = ''
-) => value ?
-    (json?.[key] || key).replace('$', value) :
-    json?.[key] || key;
 
 export function proxyHandler(url: string) {
   store.api.index = 0;
@@ -68,7 +61,7 @@ export async function quickSwitch() {
 
 export function notify(text: string) {
   const el = $('p');
-  const clear = () => document.getElementsByClassName('snackbar')[0] && el.remove();
+  const clear = () => el.isConnected && el.remove();
   el.className = 'snackbar';
   el.textContent = text;
   el.onclick = clear;
@@ -145,29 +138,23 @@ export async function errorHandler(
 
 
 
-export function renderDataIntoFragment(
-  data: Collection,
-  fragment: DocumentFragment,
-  draggable = false
+export function renderCollection(
+  data: (DOMStringMap | CollectionItem)[],
+  draggable = false,
+  fragment: DocumentFragment | undefined = undefined
 ) {
-
-  for (const item in data) {
-    const d = data[item] as CollectionItem;
-    if (d.id)
-      render(() => StreamItem({
-        id: d.id,
-        href: hostResolver(`/watch?v=${d.id}`),
-        title: d.title,
-        author: d.author,
-        duration: d.duration,
-        channelUrl: d.channelUrl,
-        draggable: draggable
-      }), fragment);
-  }
-}
-
-export function itemsLoader(itemsArray: StreamItem[], container: HTMLElement) {
-  return render(() => ItemsLoader({ itemsArray }), container);
+  render(fragment || listContainer, html`${data.map(v =>
+    StreamItem({
+      id: v.id || '',
+      href: hostResolver(`/watch?v=${v.id}`),
+      title: v.title || '',
+      author: v.author,
+      duration: v.duration || '',
+      channelUrl: v.channelUrl,
+      draggable: draggable
+    })
+  )
+    }`);
 }
 
 
@@ -186,11 +173,10 @@ export async function superClick(e: Event) {
       : player(eld.id);
 
   else if (elc('clxn_item'))
-    fetchCollection(elem.textContent as string);
+    fetchCollection(elem.href.split('=')[1]);
+
 
   else if (elc('ri-more-2-fill')) {
-    actionsMenu.showModal();
-    history.pushState({}, '', '#');
     const elp = elem.parentElement!.dataset;
     const sta = store.actionsMenu;
     sta.id = elp.id as string;
@@ -198,6 +184,11 @@ export async function superClick(e: Event) {
     sta.author = elp.author as string;
     sta.channelUrl = elp.channel_url as string;
     sta.duration = elp.duration as string;
+    const dialog = $('dialog') as HTMLDialogElement;
+    document.body.appendChild(dialog);
+    import('../components/ActionsMenu.ts')
+      .then(mod => mod.default(dialog));
+
 
   }
 

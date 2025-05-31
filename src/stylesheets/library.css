@@ -1,43 +1,6 @@
 #library {
   width: 100%;
 
-  #collections {
-    margin: 0 4vmin;
-    padding: 0;
-
-
-    a {
-      border: var(--border);
-      background: var(--onBg);
-      border-radius: var(--roundness);
-      padding: 2vmin 3vmin;
-      margin: 0 2vmin;
-      margin-top: 6vmin;
-      padding-right: calc(3vmin + 0.4rem);
-      display: inline-flex;
-      align-items: center;
-
-      &::after {
-        content: attr(aria-label);
-      }
-
-      i {
-        font-weight: initial;
-        pointer-events: none;
-        margin-right: 0.4rem;
-      }
-    }
-
-  }
-
-  select {
-    margin: 1rem 0 1%;
-    background: var(--onBg);
-    border: var(--border);
-    border-radius: var(--roundness);
-    padding: 0.25rem 0.5rem;
-  }
-
   #superCollectionList {
     width: calc(100% - 2rem);
 
@@ -57,30 +20,16 @@
   }
 
   #libraryActions {
-    display: flex;
-    width: 100%;
-    margin: 5% 0;
-    justify-content: space-around;
-    user-select: none;
-
-    label {
-      transition: transform 0.4s;
-
-      &::after {
-        content: attr(aria-label);
-      }
-
-      &:hover {
-        transform: scale(1.1);
-      }
+    input {
+      display: none;
     }
   }
 }
 
 
 #superCollectionSelector {
-  padding: 2vmin;
-  margin: 3vmin 2vmin 0;
+  padding: 0 3vmin;
+  margin: 0 2vmin 0;
 }
 
 input[type='radio'] {
