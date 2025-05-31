@@ -10,8 +10,9 @@ import personalize from './personalize';
 import parental from './parental';
 import { settingsContainer } from '../../lib/dom';
 
-export default function() {
+export default async function() {
   const settingsFrag = document.createDocumentFragment();
+  const partsM = await parental();
 
   render(settingsFrag, html`
       <h3
@@ -22,7 +23,7 @@ export default function() {
       ${playback()}
       ${library()}
       ${personalize()}
-      ${parental()}
+      ${partsM}
   `);
   settingsContainer.prepend(settingsFrag);
   settingsContainer.showModal();

@@ -5,25 +5,25 @@ export default function(): {
   name: string,
   callback: (arg0: Event & { target: HTMLElement }) => void
 }[] {
-  if (state['part Navigation Library'])
+  if (!state['part Navigation Library'])
     toggle('/library');
-  if (state['part Reserved Collections'])
+  if (!state['part Reserved Collections'])
     toggle('collections');
-  if (state['part Featured Playlists'])
+  if (!state['part Featured Playlists'])
     toggle('r.featured');
-  if (state['part For You'])
+  if (!state['part For You'])
     toggle('r.for_you');
-  if (state['part Subscription Feed'])
+  if (!state['part Subscription Feed'])
     toggle('r.feed');
-  if (state['part Channels'])
+  if (!state['part Channels'])
     toggle('r.channels');
-  if (state['part Albums'])
+  if (!state['part Albums'])
     toggle('r.albums');
-  if (state['part Artists'])
+  if (!state['part Artists'])
     toggle('r.artists');
-  if (state['part Playlists'])
+  if (!state['part Playlists'])
     toggle('r.playlists');
-  if (state['part Collections'])
+  if (!state['part Collections'])
     toggle('r.collections');
 
   return [
@@ -68,15 +68,15 @@ export default function(): {
       callback: e => toggle('r.collections', e)
     },
     {
-      name: 'Watch On Button',
+      name: 'Watch On',
       callback: e => lsHandler(e.target?.id)
     },
     {
-      name: 'View Channel/Artist Button',
+      name: 'View Author',
       callback: e => lsHandler(e.target?.id)
     },
     {
-      name: 'Start Radio Button',
+      name: 'Start Radio',
       callback: e => lsHandler(e.target?.id)
     }
   ];

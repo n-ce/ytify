@@ -4,19 +4,18 @@ import { i18n } from '../../scripts/i18n';
 import { setState, state } from '../../lib/store';
 import { notify } from '../../lib/utils';
 
-let parts: {
-  name: string,
-  callback: (arg0: Event & { target: HTMLElement }) => void
-}[] = [];
 
-(async () => {
-  if (state.partsManagerPIN) {
-    const pm = await import('../../modules/partsManager');
-    parts = pm.default();
-  }
-})();
+export default async function() {
+  const parts = state.partsManagerPIN ? (await import('../../modules/partsManager')).default() : [];
 
-export default function() {
+  const template = () => parts.map(item => html`
+          ${ToggleSwitch({
+    id: 'part ' + item.name,
+    name: item.name as TranslationKeys,
+    checked: state[('part ' + item.name) as keyof typeof state] as boolean,
+    handler: item.callback
+  })}`)
+
   return html`
     <div>
       <b>
@@ -34,7 +33,7 @@ export default function() {
         if (prompt('Enter PIN to disable parental controls :') === partsManagerPIN) {
           for (const key in state)
             if (key.startsWith('part '))
-              setState(key as keyof typeof state, false);
+              setState(key as keyof typeof state, true);
           setState('partsManagerPIN', '');
           notify(i18n('settings_reload'));
         } else {
@@ -52,15 +51,7 @@ export default function() {
     }
   })}
 
-      ${parts.map(item => html`
-          ${ToggleSwitch({
-    id: 'kidsMode_' + item.name,
-    name: item.name as TranslationKeys,
-    checked: !state[('part ' + item.name) as keyof typeof state],
-    handler: item.callback
-  })}
-        `)
-    }
+      ${template()}
     </div>
   `;
 }
