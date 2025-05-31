@@ -192,7 +192,7 @@ function getLocalCollection(
       return itemsToShow;
     });
 
-  store.list.id = collection;
+  store.list.id = decodeURI(collection);
 }
 
 async function getSharedCollection(

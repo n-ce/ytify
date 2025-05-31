@@ -1,10 +1,9 @@
-import { $ } from '../lib/utils';
 
-export async function extractColorFromImage(src: string, useOffscreenCanvas: boolean): Promise<number[]> {
+export default async function(src: string, useOffscreenCanvas: boolean): Promise<number[]> {
 
   const canvas = useOffscreenCanvas ?
     new OffscreenCanvas(512, 512) :
-    <HTMLCanvasElement>$('canvas');
+    document.createElement('canvas');
   const context = <OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D>canvas.getContext('2d', { alpha: false });
 
   const canvasImg = new Image();

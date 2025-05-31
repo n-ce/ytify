@@ -1,8 +1,7 @@
 import './Settings.css';
 import { html, render } from 'uhtml';
 import { i18n } from "../../scripts/i18n";
-import { getSaved, params } from '../../lib/store';
-import { save, $ } from '../../lib/utils';
+import { params } from '../../lib/store';
 import app from './app';
 import search from './search';
 import playback from './playback';
@@ -11,8 +10,9 @@ import personalize from './personalize';
 import parental from './parental';
 import { settingsContainer } from '../../lib/dom';
 
-export default function() {
+export default async function() {
   const settingsFrag = document.createDocumentFragment();
+  const partsM = await parental();
 
   render(settingsFrag, html`
       <h3
@@ -23,7 +23,7 @@ export default function() {
       ${playback()}
       ${library()}
       ${personalize()}
-      ${parental()}
+      ${partsM}
   `);
   settingsContainer.prepend(settingsFrag);
   settingsContainer.showModal();
@@ -42,61 +42,39 @@ async function clearCache(_: Event | undefined = undefined) {
   if (_?.type === 'click') location.reload();
 }
 
-function restoreSettings(_: Event | undefined = undefined) {
-  const temp = getSaved('library');
-  localStorage.clear();
-
-  if (temp) save('library', temp);
-
-  if (_?.type === 'click') location.reload();
-}
-
-function extractSettings() {
-  const keys: { [index: string]: string } = {};
-  const len = localStorage.length;
-  for (let i = 0; i < len; i++) {
-    const key = localStorage.key(i) as string;
-    if (key === 'library') continue;
-    keys[key] = getSaved(key) as string;
-  }
-  return keys;
-}
 
 function exportSettings() {
-  const link = $('a');
+  const link = document.createElement('a');
   link.download = 'ytify_settings.json';
-  link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(extractSettings(), undefined, 2))}`;
+  link.href = `data:text/json;charset=utf-8,${encodeURIComponent(localStorage.getItem('store') || '{}')}`;
   link.click();
 }
 
 async function importSettings(e: Event) {
   e.preventDefault();
-  const newSettings = JSON.parse(
-    await (
-      (e.target as HTMLInputElement).files as FileList
-    )[0].text()
-  );
+  const newSettings = await (
+    (e.target as HTMLInputElement).files as FileList
+  )[0].text();
 
-  if (confirm('This will merge your current settings with the imported settings, continue?')) {
-    for (const key in newSettings)
-      save(key, newSettings[key]);
-
-    location.reload();
-  }
+  if (confirm('This will overwrite your current settings with the imported settings, continue?'))
+    localStorage.setItem('store', newSettings);
 }
 
 
 // emergency use
 if (params.has('reset')) {
   clearCache();
-  restoreSettings();
+  localStorage.removeItem('store');
   history.replaceState({}, '', location.pathname);
 }
 
 
 document.getElementById('clearCacheBtn')!.addEventListener('click', clearCache);
-document.getElementById('restoreSettingsBtn')!.addEventListener('click', restoreSettings);
 document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSettings);
 document.getElementById('importSettingsBtn')!.addEventListener('change', importSettings);
+document.getElementById('restoreSettingsBtn')!.addEventListener('click', () => {
+  localStorage.removeItem('store');
+  location.reload();
+});
 
 

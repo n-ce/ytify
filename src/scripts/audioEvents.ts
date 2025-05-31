@@ -1,7 +1,7 @@
 import { audio, playButton, progress, queuelist, title } from "../lib/dom";
 import player from "../lib/player";
-import { convertSStoHHMMSS, removeSaved, save } from "../lib/utils";
-import { getSaved, params, store } from "../lib/store";
+import { convertSStoHHMMSS } from "../lib/utils";
+import { params, setState, state, store } from "../lib/store";
 import { addToCollection } from "../lib/libraryUtils";
 import audioErrorHandler from "../modules/audioErrorHandler";
 import getStreamData from "../modules/getStreamData";
@@ -54,7 +54,7 @@ audio.onplaying = function() {
   if (!store.streamHistory.includes(id))
     store.streamHistory.push(id);
 
-  if (getSaved('history') === 'off')
+  if (!state.history)
     return;
 
   historyTimeoutId = window.setTimeout(() => {
@@ -153,14 +153,26 @@ audio.onloadedmetadata = function() {
 }
 
 
-audio.oncanplaythrough = function() {
+audio.oncanplaythrough = async function() {
   // prefetch beforehand to speed up experience
   const nextItem = store.queue.list[0];
-  if (nextItem)
-    getStreamData(nextItem, true);
+  if (!nextItem) return;
+
+  const data = await getStreamData(nextItem, true);
+  const sandbox = new Audio();
+  sandbox.onerror = () => audioErrorHandler(sandbox);
+  if ('audioStreams' in data)
+    import('../modules/setAudioStreams')
+      .then(mod => mod.default(
+        data.audioStreams
+          .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+          ),
+        data.livestream,
+        sandbox
+      ));
 }
 
-audio.onerror = audioErrorHandler;
+audio.onerror = () => audioErrorHandler(audio);
 
 
 loopButton.onclick = function() {
@@ -202,10 +214,7 @@ volumeIcon.onclick = function() {
 volumeChanger.oninput = function() {
   audio.volume = parseFloat(volumeChanger.value) / 100;
 
-  audio.volume === 1 ?
-    removeSaved('volume') :
-    save('volume', volumeChanger.value);
-
+  setState('volume', volumeChanger.value);
 
   volumeIcon.classList.replace(
     volumeIcon.className,
@@ -214,9 +223,9 @@ volumeChanger.oninput = function() {
       'ri-volume-mute-fill');
 }
 
-const savedVol = getSaved('volume');
-if (savedVol) {
-  volumeChanger.value = savedVol;
+const { volume } = state;
+if (volume) {
+  volumeChanger.value = volume;
   audio.volume = parseFloat(volumeChanger.value) / 100;
 }
 

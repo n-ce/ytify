@@ -1,9 +1,9 @@
 import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import { i18n } from '../../scripts/i18n';
-import { removeSaved, save } from '../../lib/utils';
-import { getSaved } from '../../lib/store';
+import { setState, state } from '../../lib/store';
 import { getDB, saveDB } from '../../lib/libraryUtils';
+import { notify } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -16,36 +16,33 @@ export default function() {
       ${ToggleSwitch({
     id: "startupTab",
     name: 'settings_set_as_default_tab',
-    checked: getSaved('startupTab') === '/library',
+    checked: state.startupTab === '/library',
     handler: () => {
-      const _ = 'startupTab';
-      if (getSaved(_))
-        removeSaved(_);
-      else
-        save(_, '/library');
+      setState('startupTab',
+        state.startupTab === '/library' ?
+          '/search' : '/library'
+      );
     }
   })}
 
       ${ToggleSwitch({
     id: "dbsync",
     name: 'settings_library_sync',
-    checked: Boolean(getSaved('dbsync')),
-    handler: e => {
-      const _ = 'dbsync';
-      if (getSaved(_)) removeSaved(_);
-      else {
-        function hashCreator(text: string) {
-          const msgBuffer = new TextEncoder().encode(text);
-          crypto.subtle.digest('SHA-256', msgBuffer)
-            .then(hashBuffer => {
-              const hash = Array
-                .from(new Uint8Array(hashBuffer))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('');
-              save(_, hash);
-              location.reload();
-            });
-        }
+    checked: Boolean(state.dbsync),
+    handler: async e => {
+      let hash = '';
+      async function hashCreator(text: string) {
+        const msgBuffer = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+
+        hash = Array
+          .from(new Uint8Array(hashBuffer))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join('');
+
+        notify(i18n('settings_reload'));
+      }
+      if (!state.dbsync) {
 
         const termsAccepted = confirm('Data will be automatically deleted after one week of inactivity.\nytify is not responsible for data loss.\n\nI Understand');
         if (termsAccepted) {
@@ -54,51 +51,52 @@ export default function() {
             const password = prompt('Enter Password :');
             const confirmpw = prompt('Confirm Password :');
             if (password && password === confirmpw)
-              hashCreator(username + password);
+              await hashCreator(username + password);
             else alert('Incorrect Information!');
           }
         }
         e.preventDefault();
       }
+      setState('dbsync', hash);
     }
   })}
 
       ${ToggleSwitch({
     id: 'discoverSwitch',
     name: 'settings_store_discoveries',
-    checked: getSaved('discover') !== 'off',
+    checked: state.discover,
     handler: e => {
-      if (e.target.checked)
-        removeSaved('discover');
-      else {
+      let stateVal = e.target.checked;
+      if (!stateVal) {
         const db = getDB();
         const count = Object.keys(db.discover || {}).length || 0;
         if (confirm(i18n("settings_clear_discoveries", count.toString()))) {
           delete db.discover;
           saveDB(db);
-          save('discover', 'off');
+          stateVal = false;
         }
         else e.preventDefault();
       }
+      setState('discover', stateVal);
     }
   })}
 
       ${ToggleSwitch({
     id: 'historySwitch',
     name: 'settings_store_history',
-    checked: getSaved('history') !== 'off',
-    handler: e => { // Changed from onClick to handler
-      if (e.target.checked)
-        removeSaved('history');
-      else {
+    checked: state.history,
+    handler: e => {
+      let stateVal = e.target.checked;
+      if (!stateVal) {
         const db = getDB();
         const count = Object.keys(db.history || {}).length || 0;
         if (confirm(i18n("settings_clear_history", count.toString()))) {
           delete db.history;
           saveDB(db);
-          save('history', 'off');
+          stateVal = false;
         } else e.preventDefault();
       }
+      setState('history', stateVal);
     }
   })}
     </div>

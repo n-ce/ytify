@@ -1,6 +1,6 @@
 import { audio, favButton, favIcon, playButton, title } from "./dom";
-import { $, convertSStoHHMMSS } from "./utils";
-import { params, store, getSaved } from "./store";
+import { convertSStoHHMMSS } from "./utils";
+import { params, state, store } from "./store";
 import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import getStreamData from "../modules/getStreamData";
@@ -9,9 +9,9 @@ export default async function player(id: string | null = '') {
 
   if (!id) return;
 
-  if (getSaved('watchMode')) {
+  if (state.watchMode) {
     store.actionsMenu.id = id;
-    const dialog = $('dialog') as HTMLDialogElement;
+    const dialog = document.createElement('dialog');
     dialog.open = true;
     dialog.className = 'watcher';
     document.body.appendChild(dialog);
@@ -46,10 +46,10 @@ export default async function player(id: string | null = '') {
     audio.load();
   }
   else {
-    const h = store.player.hls;
-    if (h.on) {
-      const hlsUrl = h.manifests.shift();
-      if (hlsUrl) h.src(hlsUrl);
+    const { hls } = store.player;
+    if (state.HLS) {
+      const hlsUrl = hls.manifests.shift();
+      if (hlsUrl) hls.src(hlsUrl);
     }
     else import('../modules/setAudioStreams')
       .then(mod => mod.default(
@@ -68,7 +68,7 @@ export default async function player(id: string | null = '') {
 
 
 
-  if (getSaved('enqueueRelatedStreams') === 'on')
+  if (state.enqueueRelatedStreams)
     import('../modules/enqueueRelatedStreams')
       .then(mod => mod.default(data.relatedStreams as StreamItem[]));
 
@@ -89,7 +89,7 @@ export default async function player(id: string | null = '') {
 
   // related streams imported into discovery after 1min 40seconds, short streams are naturally filtered out
 
-  if (getSaved('discover') !== 'off')
+  if (state.discover)
     import('../modules/setDiscoveries')
       .then(mod => {
         setTimeout(() => {

@@ -1,5 +1,5 @@
 import { hostResolver } from '../lib/utils';
-import { store } from '../lib/store';
+import { state } from '../lib/store';
 import { html } from 'uhtml';
 import './ListItem.css';
 
@@ -24,14 +24,14 @@ export default function(data: {
 
   return html`
     <a
-      class=${'listItem ' + (store.loadImage ? 'ravel' : '')}
+      class=${'listItem ' + (state.loadImage ? 'ravel' : '')}
       href=${hostResolver(data.url)}
       data-title=${data.title}
       data-url=${data.url}
       data-thumbnail=${data.thumbnail}
       data-uploader=${data.uploader_data}
     >
-      ${store.loadImage ? html`
+      ${state.loadImage ? html`
         <img
           ref=${(_: HTMLImageElement) => { img = _; }}
           src=${data.thumbnail}

@@ -1,6 +1,6 @@
 import { img, audio } from '../lib/dom';
 import { generateImageUrl } from '../lib/imageUtils';
-import { store, getSaved } from '../lib/store';
+import { state, store } from '../lib/store';
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
@@ -86,7 +86,7 @@ const palette: Scheme = {
 function colorInjector(colorArray: number[]) {
   const autoDark = systemDark.matches;
   Promise.resolve()
-    .then(() => getSaved('theme') || 'auto')
+    .then(() => state.theme || 'auto')
     .then(theme => {
 
       const scheme = theme === 'auto' ?
@@ -109,11 +109,11 @@ function colorInjector(colorArray: number[]) {
 
 function themer() {
   const initColor = '127,127,127';
-  const custom = getSaved('custom_theme') || (store.player.legacy ? initColor : '');
+  const custom = state.customTheme || (store.player.legacy ? initColor : '');
 
-  if (store.loadImage && store.stream.id && !custom)
+  if (state.loadImage && store.stream.id && !custom)
     import('../modules/extractColorFromImage')
-      .then(mod => mod.extractColorFromImage)
+      .then(mod => mod.default)
       .then(e => e(generateImageUrl(store.stream.id, 'mq'), !store.player.legacy))
       .then(colorInjector);
   else
@@ -125,11 +125,10 @@ function themer() {
 
 }
 
-const savedRoundness = getSaved('roundness');
-if (savedRoundness)
-  cssVar('--roundness', savedRoundness);
+if (state.roundness !== '0.4rem')
+  cssVar('--roundness', state.roundness);
 
-if (store.loadImage) {
+if (state.loadImage) {
   if (location.pathname !== '/')
     themer();
   audio.addEventListener('loadeddata', themer);

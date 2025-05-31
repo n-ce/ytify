@@ -1,6 +1,6 @@
 import { searchFilters, superInput } from "../lib/dom";
 import { goTo } from "../lib/utils";
-import { getSaved, params, store } from "../lib/store";
+import { params, state, store } from "../lib/store";
 import { miniPlayerRoutingHandler } from "../modules/miniPlayer";
 import fetchList from "../modules/fetchList";
 import { fetchCollection } from "../lib/libraryUtils";
@@ -106,7 +106,7 @@ else {
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
 
   if (route === '/' && !hasStreamQuery && !params.has('reset'))
-    route = getSaved('startupTab') || '/search';
+    route = state.startupTab;
 
 }
 
@@ -115,7 +115,7 @@ else {
 goTo(route as Routes);
 
 document.querySelector('svg')!.addEventListener('click', () => {
-  goTo(getSaved('startupTab') as '/' || '/search');
+  goTo(state.startupTab as Routes);
 });
 
 // enables back button functionality

@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url('/remixicon.woff2');
+  src: url("/remixicon.woff2") format("woff2");
   font-display: swap;
 }
 
@@ -126,10 +126,6 @@
   content: "\eb99";
 }
 
-.ri-download-2-line:before {
-  content: "\ec54";
-}
-
 .ri-import-line:before {
   content: "\f447";
 }
@@ -172,18 +168,6 @@
 
 .ri-t-shirt-2-line:before {
   content: "\f1d5";
-}
-
-.ri-volume-down-fill:before {
-  content: "\f29b";
-}
-
-.ri-volume-mute-fill:before {
-  content: "\f29d";
-}
-
-.ri-volume-up-fill:before {
-  content: "\f2a1";
 }
 
 .ri-video-line:before {
@@ -232,4 +216,28 @@
 
 .ri-play-large-line:before {
   content: "\f509";
+}
+
+.ri-cloud-off-fill:before {
+  content: "\eb9e";
+}
+
+.ri-cloud-fill:before {
+  content: "\eb9c";
+}
+
+.ri-volume-down-fill:before {
+  content: "\f29b";
+}
+
+.ri-volume-mute-fill:before {
+  content: "\f29d";
+}
+
+.ri-volume-up-fill:before {
+  content: "\f2a1";
+}
+
+.ri-download-2-fill:before {
+  content: "\ec53";
 }

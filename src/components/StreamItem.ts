@@ -1,5 +1,5 @@
 import { html } from "uhtml";
-import { store } from "../lib/store";
+import { state } from "../lib/store";
 import { generateImageUrl } from "../lib/imageUtils";
 import './StreamItem.css';
 
@@ -44,14 +44,14 @@ export default function(data: {
   }
 
 
-  if (store.loadImage)
+  if (state.loadImage)
     imgsrc = generateImageUrl(data.img || data.id, 'mq');
 
 
   return html`
     
     <a
-      class=${'streamItem ' + (store.loadImage ? 'ravel' : '')}
+      class=${'streamItem ' + (state.loadImage ? 'ravel' : '')}
       href=${data.href}
       ref=${(_: HTMLAnchorElement) => { anchor = _ }}
       data-id=${data.id}
@@ -63,7 +63,7 @@ export default function(data: {
     >
       <span>
       
-        ${store.loadImage ?
+        ${state.loadImage ?
 
       html`<img
             crossorigin='anonymous'

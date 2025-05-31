@@ -1,18 +1,13 @@
-import { audio, listContainer, title } from "./dom";
+import { audio, listContainer, settingsContainer, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
-import { getSaved, store } from "./store";
+import { state, store } from "./store";
 import { html, render } from 'uhtml';
 import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
 import { i18n } from "../scripts/i18n.ts";
 
-export const $ = document.createElement.bind(document);
-
-export const save = localStorage.setItem.bind(localStorage);
-
-export const removeSaved = localStorage.removeItem.bind(localStorage);
 
 export const goTo = (route: Routes | 'history' | 'discover') => (<HTMLAnchorElement>document.getElementById(route)).click();
 
@@ -37,16 +32,17 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 
-export function proxyHandler(url: string) {
+export function proxyHandler(url: string, prefetch: boolean = false) {
   store.api.index = 0;
-  title.textContent = i18n('player_audiostreams_insert');
+  if (!prefetch)
+    title.textContent = i18n('player_audiostreams_insert');
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
 
-  return getSaved('enforceProxy') ?
+  return state.enforceProxy ?
     (url + (host ? '' : `&host=${origin}`)) :
-    (host && !getSaved('custom_instance')) ? url.replace(origin, host) : url;
+    (host && !state.customInstance) ? url.replace(origin, host) : url;
 }
 
 export async function quickSwitch() {
@@ -60,13 +56,17 @@ export async function quickSwitch() {
 }
 
 export function notify(text: string) {
-  const el = $('p');
+  const el = document.createElement('p');
   const clear = () => el.isConnected && el.remove();
   el.className = 'snackbar';
   el.textContent = text;
   el.onclick = clear;
   setTimeout(clear, 8e3);
-  document.body.appendChild(el);
+  if (settingsContainer.open) {
+    const settingsHeader = settingsContainer.firstElementChild as HTMLHeadingElement;
+    settingsHeader.appendChild(el);
+  } else
+    document.body.appendChild(el);
 }
 
 
@@ -87,7 +87,7 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 export function handleXtags(audioStreams: AudioStream[]) {
   const isDRC = (url: string) => url.includes('drc%3D1');
-  const useDRC = getSaved('stableVolume') && Boolean(audioStreams.find(a => isDRC(a.url)));
+  const useDRC = state.stableVolume && Boolean(audioStreams.find(a => isDRC(a.url)));
   const isOriginal = (a: { url: string }) => !a.url.includes('acont%3Ddubbed');
 
   return audioStreams
@@ -184,7 +184,7 @@ export async function superClick(e: Event) {
     sta.author = elp.author as string;
     sta.channelUrl = elp.channel_url as string;
     sta.duration = elp.duration as string;
-    const dialog = $('dialog') as HTMLDialogElement;
+    const dialog = document.createElement('dialog');
     document.body.appendChild(dialog);
     import('../components/ActionsMenu.ts')
       .then(mod => mod.default(dialog));
@@ -205,7 +205,7 @@ export async function superClick(e: Event) {
 
     store.list.name = (
       (location.search.endsWith('music_artists') ||
-        (location.pathname === '/library' && getSaved('defaultSuperCollection') === 'artists')
+        (location.pathname === '/library' && state.defaultSuperCollection === 'artists')
       )
         ? 'Artist - ' : ''
     ) + eld.title;

@@ -2,8 +2,8 @@ import { html } from 'uhtml';
 import ToggleSwitch from './ToggleSwitch';
 import Selector from '../Selector';
 import { i18n } from '../../scripts/i18n';
-import { getSaved, store } from '../../lib/store';
-import { removeSaved, save } from '../../lib/utils';
+import { setState, state, store } from '../../lib/store';
+import { notify } from '../../lib/utils';
 
 export default function() {
   return html`
@@ -20,19 +20,19 @@ export default function() {
       ${ToggleSwitch({
     id: 'customInstanceSwitch',
     name: 'settings_custom_instance',
-    checked: Boolean(getSaved('custom_instance')),
+    checked: Boolean(state.customInstance),
     handler: () => {
-      const _ = 'custom_instance';
-      if (getSaved(_)) removeSaved(_);
-      else {
+      let stateVal = '';
+      if (!state.customInstance) {
         const pi = prompt(i18n('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
         const iv = prompt(i18n('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
         const useIv = confirm('Use Invidious For Playback?');
 
         if (pi && iv)
-          save(_, pi + ',' + iv + ',' + useIv);
+          stateVal = pi + ',' + iv + ',' + useIv;
       }
-      location.reload();
+      setState('customInstance', stateVal);
+      notify(i18n('settings_reload'));
     }
   })}
 
@@ -40,12 +40,8 @@ export default function() {
     label: 'settings_language',
     id: 'languageSelector',
     handler: (e) => {
-      const lang = e.target.value;
-      if (lang === 'en')
-        removeSaved('language');
-      else
-        save('language', lang);
-      location.reload();
+      setState('language', e.target.value);
+      notify(i18n('settings_reload'));
     },
     onmount: (target) => {
       target.value = document.documentElement.lang;
@@ -59,16 +55,15 @@ export default function() {
     id: 'linkHost',
     label: 'settings_links_host',
     handler: (e) => {
-      if (e.target.selectedIndex === 0)
-        removeSaved('linkHost');
-      else
-        save('linkHost', e.target.value);
-      location.reload();
+      const stateVal = e.target.selectedIndex === 0 ? '' : e.target.value;
+      store.linkHost = stateVal || location.origin;
+      setState('linkHost', stateVal);
+      notify(i18n('settings_reload'));
     },
     onmount: (target) => {
-      const savedLinkHost = getSaved('linkHost');
-      if (savedLinkHost)
-        target.value = savedLinkHost;
+      const { linkHost } = state;
+      if (linkHost)
+        target.value = linkHost;
     },
     children: html`
           <option value="https://ytify.pp.ua">ytify</option>
@@ -83,16 +78,12 @@ export default function() {
     id: 'downloadFormatSelector',
     label: 'settings_download_format',
     handler: (e) => {
-      store.downloadFormat = e.target.value as 'opus';
-      if (store.downloadFormat === 'opus')
-        removeSaved('dlFormat');
-      else
-        save('dlFormat', store.downloadFormat);
+      setState('dlFormat', e.target.value);
     },
     onmount: (target) => {
-      const savedDownloadFormat = getSaved('dlFormat');
-      if (savedDownloadFormat)
-        target.value = savedDownloadFormat as 'opus';
+      const { dlFormat } = state;
+      if (dlFormat)
+        target.value = dlFormat as 'opus';
     },
     children: html`
           <option value='opus'>Opus</option>
@@ -106,23 +97,16 @@ export default function() {
     id: 'shareAction',
     label: 'settings_pwa_share_action',
     handler: (e) => {
-      const val = e.target.value;
-      if (val === 'play')
-        removeSaved('shareAction');
-      else {
-        save('shareAction', val);
-      }
+      setState('shareAction', e.target.value);
     },
     onmount: (target) => {
-      const val = getSaved('shareAction');
-      if (val)
-        target.value = val;
+      if (state.shareAction)
+        target.value = state.shareAction;
     },
     children: html`
           <option value='play'>${i18n('settings_pwa_play')}</option>
           <option value='watch'>${i18n('settings_pwa_watch')}</option>
           <option value='dl'>${i18n('settings_pwa_download')}</option>
-          <option value='ask'>${i18n('settings_pwa_always_ask')}</option>
         `
   })}
     </div>
