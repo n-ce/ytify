@@ -1,7 +1,8 @@
-import { goTo, notify, renderCollection } from "./utils";
+import { goTo, hostResolver, notify } from "./utils";
 import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 import { render, html } from "uhtml";
+import StreamItem from "../components/StreamItem";
 
 export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
@@ -83,6 +84,24 @@ export function createCollection(title: string) {
     store.addToCollectionOptions.push(title);
 }
 
+export function renderCollection(
+  data: (DOMStringMap | CollectionItem)[],
+  draggable = false,
+  fragment: DocumentFragment | HTMLDivElement = listContainer
+) {
+  render(fragment, html`${data.map(v =>
+    StreamItem({
+      id: v.id || '',
+      href: hostResolver(`/watch?v=${v.id}`),
+      title: v.title || '',
+      author: v.author,
+      duration: v.duration || '',
+      channelUrl: v.channelUrl,
+      draggable: draggable
+    })
+  )
+    }`);
+}
 
 export async function fetchCollection(
   id: string | null,

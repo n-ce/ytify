@@ -61,9 +61,8 @@ export default function() {
       notify(i18n('settings_reload'));
     },
     onmount: (target) => {
-      const { linkHost } = state;
-      if (linkHost)
-        target.value = linkHost;
+      if (state.linkHost)
+        target.value = state.linkHost;
     },
     children: html`
           <option value="https://ytify.pp.ua">ytify</option>
@@ -81,9 +80,7 @@ export default function() {
       setState('dlFormat', e.target.value);
     },
     onmount: (target) => {
-      const { dlFormat } = state;
-      if (dlFormat)
-        target.value = dlFormat as 'opus';
+      target.value = state.dlFormat;
     },
     children: html`
           <option value='opus'>Opus</option>
@@ -100,8 +97,7 @@ export default function() {
       setState('shareAction', e.target.value);
     },
     onmount: (target) => {
-      if (state.shareAction)
-        target.value = state.shareAction;
+      target.value = state.shareAction;
     },
     children: html`
           <option value='play'>${i18n('settings_pwa_play')}</option>

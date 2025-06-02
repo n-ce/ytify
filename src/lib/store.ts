@@ -12,7 +12,7 @@ export let state = {
   linkHost: '',
   dlFormat: 'opus',
   theme: 'auto',
-  customTheme: '',
+  customColor: '',
   roundness: '0.4rem',
   searchSuggestions: true,
   searchFilter: '',
@@ -90,11 +90,9 @@ export const store: {
   },
   linkHost: string,
   searchQuery: string,
-  superCollectionType: 'featured' | 'collections' | 'channels' | 'feed' | 'playlists',
   addToCollectionOptions: string[],
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
-
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
@@ -137,7 +135,6 @@ export const store: {
   },
   linkHost: state.linkHost || location.origin,
   searchQuery: '',
-  superCollectionType: state.defaultSuperCollection as 'featured',
   actionsMenu: {
     id: '',
     title: '',
