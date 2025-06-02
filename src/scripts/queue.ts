@@ -53,15 +53,12 @@ const template = html`
     if (state.shuffle)
       shuffleBtn.className = 'on';
   }}
-  @click=${(e: Event) => {
-    const btn = e.currentTarget as HTMLElement;
-
-    btn.classList.toggle('on');
-    setState('shuffle', btn.classList.contains('on'));
-
-    shuffle();
-  }}>
-    <i class="ri-shuffle-line"></i>${i18n('upcoming_shuffle')}
+  @click=${shuffle}>
+    <i @click=${() => {
+    shuffleBtn.classList.toggle('on');
+    setState('shuffle', shuffleBtn.classList.contains('on'));
+  }}
+    class="ri-shuffle-line"></i>${i18n('upcoming_shuffle')}
   </li>
 
   <li

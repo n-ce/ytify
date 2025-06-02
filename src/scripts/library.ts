@@ -3,6 +3,7 @@ import { addToCollection, getDB, removeFromCollection, saveDB, toCollection } fr
 import { state, store } from "../lib/store";
 import { render, html } from "uhtml";
 import { i18n } from "./i18n";
+import { notify } from "../lib/utils";
 
 
 const libraryActions = document.getElementById('libraryActions');
@@ -45,7 +46,7 @@ async function importLibrary(e: FileEv) {
   for (const collection in newDB) for (const item in newDB[collection])
     toCollection(collection, newDB[collection][item], oldDB)
   saveDB(oldDB);
-  location.reload();
+  notify('Library Imported');
 };
 
 function exportLibrary() {

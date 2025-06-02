@@ -93,7 +93,6 @@ export const store: {
   addToCollectionOptions: string[],
   actionsMenu: CollectionItem,
   list: List & Record<'url' | 'type' | 'uploader', string>,
-
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   player: {
