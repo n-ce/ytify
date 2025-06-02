@@ -109,10 +109,12 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
+
+  const display = shared ? 'Shared Collection' : id
   const isReserved = reservedCollections.includes(id);
   const isReversed = listContainer.classList.contains('reverse');
 
-  listTitle.textContent = decodeURIComponent(id);
+  listTitle.textContent = decodeURIComponent(display);
 
   shared ?
     await getSharedCollection(id) :
@@ -142,7 +144,7 @@ export async function fetchCollection(
     location.origin + location.pathname +
     (shared ? '?si=' : '?collection=') + id
   );
-  document.title = (shared ? 'Shared Collection' : id) + ' - ytify';
+  document.title = display + ' - ytify';
 
 }
 
