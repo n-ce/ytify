@@ -187,7 +187,7 @@ queuelist.addEventListener('click', e => {
 
   const queueItem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
   if (!queueItem.classList.contains('streamItem')) return;
-  const { id } = queueItem.dataset || '';
+  const { id } = queueItem.dataset;
 
   function addToTrash() {
     const current = sessionStorage.getItem('trashHistory') || '';
@@ -195,8 +195,9 @@ queuelist.addEventListener('click', e => {
       sessionStorage.setItem('trashHistory', current + id);
   }
 
-  if (queueItem.classList.contains('delete'))
-    addToTrash();
+  const removeState = queueItem.classList.contains('delete');
+
+  if (removeState) addToTrash();
   else player(id);
 
   const { list } = store.queue;
@@ -206,7 +207,7 @@ queuelist.addEventListener('click', e => {
   list.splice(index, 1);
   queuelist.children[index].remove();
 
-  if (state.shuffle)
+  if (state.shuffle && !removeState)
     shuffle();
 });
 
