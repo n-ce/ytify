@@ -46,7 +46,7 @@ async function importLibrary(e: FileEv) {
   for (const collection in newDB) for (const item in newDB[collection])
     toCollection(collection, newDB[collection][item], oldDB)
   saveDB(oldDB);
-  notify('Library Imported');
+  notify(i18n('library_imported'));
 };
 
 function exportLibrary() {

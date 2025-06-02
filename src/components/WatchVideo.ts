@@ -157,7 +157,7 @@ export default async function(dialog: HTMLDialogElement) {
         id: 'videoCodecSelector',
         label: '',
         handler: (_) => {
-          video.src = proxyHandler(_.target.value);
+          video.src = proxyHandler(_.target.value, true);
           video.currentTime = audio.currentTime;
           if (savedQ)
             setState('watchMode', _.target.selectedOptions[0].textContent as string);
@@ -173,7 +173,7 @@ export default async function(dialog: HTMLDialogElement) {
           }`,
         onmount: (_) => {
           if (savedQ)
-            video.src = proxyHandler(_.value);
+            video.src = proxyHandler(_.value, true);
         }
       })
       : ''}
@@ -193,7 +193,7 @@ export default async function(dialog: HTMLDialogElement) {
     ${footerTemplate}
   `);
 
-  audio.src = proxyHandler(audioArray[0].url);
+  audio.src = proxyHandler(audioArray[0].url, true);
   audio.currentTime = video.currentTime;
   loadingScreen.close();
 }
