@@ -10,7 +10,7 @@ export default defineConfig(({ command }) => ({
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Build: JSON.stringify(
-      ((today = new Date()) => `${today.getDate()} ${today.toLocaleString('default', { month: 'short' })} ${today.getFullYear()}`)()
+      ((today = new Date()) => `${today.getDate()} ${today.toLocaleString('default', { month: 'short' })}`)()
     ),
   },
   plugins: [
