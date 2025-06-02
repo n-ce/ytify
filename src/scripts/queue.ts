@@ -188,6 +188,7 @@ queuelist.addEventListener('click', e => {
   const queueItem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
   if (!queueItem.classList.contains('streamItem')) return;
   const { id } = queueItem.dataset;
+  if (!id) return;
 
   function addToTrash() {
     const current = sessionStorage.getItem('trashHistory') || '';
