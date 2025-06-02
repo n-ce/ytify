@@ -1,9 +1,7 @@
-import { audio, listContainer, settingsContainer, title } from "./dom";
+import { audio, settingsContainer, title } from "./dom";
 import { getThumbIdFromLink } from "./imageUtils";
 import player from "./player";
 import { state, store } from "./store";
-import { html, render } from 'uhtml';
-import StreamItem from "../components/StreamItem";
 import fetchList from "../modules/fetchList";
 import { fetchCollection, removeFromCollection } from "./libraryUtils";
 import { i18n } from "../scripts/i18n.ts";
@@ -134,27 +132,6 @@ export async function errorHandler(
   }
   notify(message);
   store.api.index = 0;
-}
-
-
-
-export function renderCollection(
-  data: (DOMStringMap | CollectionItem)[],
-  draggable = false,
-  fragment: DocumentFragment | undefined = undefined
-) {
-  render(fragment || listContainer, html`${data.map(v =>
-    StreamItem({
-      id: v.id || '',
-      href: hostResolver(`/watch?v=${v.id}`),
-      title: v.title || '',
-      author: v.author,
-      duration: v.duration || '',
-      channelUrl: v.channelUrl,
-      draggable: draggable
-    })
-  )
-    }`);
 }
 
 
