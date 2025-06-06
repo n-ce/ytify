@@ -13,13 +13,29 @@ export default function() {
         <p>${i18n('settings_playback')}</p>
       </b>
 
-      ${ToggleSwitch({
-    id: "qualitySwitch",
-    name: 'settings_hq_audio',
-    checked: state.hq,
-    handler: async () => {
-      setState('hq', !state.hq);
+        ${Selector({
+    label: 'settings_audio_quality',
+    id: 'qualityPreference',
+    handler: async (e) => {
+      setState('quality', e.target.value as 'low' | 'medium' | 'high');
       quickSwitch();
+    },
+    onmount: async (target) => {
+      target.value = state.quality || 'medium';
+    },
+    children: html`
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          `
+  })}
+
+        ${ToggleSwitch({
+    id: "prefetchSwitch",
+    name: 'settings_prefetch',
+    checked: Boolean(state.stableVolume),
+    handler: () => {
+      setState('prefetch', !state.prefetch);
     }
   })}
 
@@ -28,7 +44,7 @@ export default function() {
     label: 'settings_codec_preference',
     id: 'codecPreference',
     handler: async (e) => {
-      setState('codec', e.target.value);
+      setState('codec', e.target.value as 'opus' | 'any' | 'aac');
       quickSwitch();
     },
     onmount: async (target) => {

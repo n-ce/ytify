@@ -2,7 +2,7 @@ import { loadingScreen, queuelist, title } from "../lib/dom";
 import { generateImageUrl } from "../lib/imageUtils";
 import player from "../lib/player";
 import { setState, state, store } from "../lib/store";
-import { handleXtags, proxyHandler } from "../lib/utils";
+import { handleXtags, preferredStream, proxyHandler } from "../lib/utils";
 import getStreamData from "../modules/getStreamData";
 import Selector from "./Selector";
 import { html, render } from 'uhtml';
@@ -44,8 +44,6 @@ export default async function(dialog: HTMLDialogElement) {
   const audioArray = handleXtags(data.audioStreams)
     .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
     .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
-
-  if (state.hq) audioArray.reverse();
 
 
   media.video = data.videoStreams
@@ -193,7 +191,10 @@ export default async function(dialog: HTMLDialogElement) {
     ${footerTemplate}
   `);
 
-  audio.src = proxyHandler(audioArray[0].url, true);
+
+  const stream = await preferredStream(handleXtags(audioArray));
+
+  audio.src = proxyHandler(stream.url, true);
   audio.currentTime = video.currentTime;
   loadingScreen.close();
 }
