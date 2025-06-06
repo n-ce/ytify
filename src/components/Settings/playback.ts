@@ -33,7 +33,7 @@ export default function() {
         ${ToggleSwitch({
     id: "prefetchSwitch",
     name: 'settings_prefetch',
-    checked: Boolean(state.stableVolume),
+    checked: Boolean(state.prefetch),
     handler: () => {
       setState('prefetch', !state.prefetch);
     }
