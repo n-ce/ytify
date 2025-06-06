@@ -22,7 +22,7 @@
     "jsxImportSource": "solid-js"
   },
   "include": [
-    "src",
-    "netlify"
+    "src"
+    // "netlify"
   ]
 }
