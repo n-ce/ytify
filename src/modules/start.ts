@@ -1,7 +1,7 @@
 import player from '../lib/player';
 import { params, state, store } from '../lib/store';
-import { getDownloadLink, idFromURL, proxyHandler } from '../lib/utils';
-import { bitrateSelector, searchFilters, superInput, audio, loadingScreen, searchlist } from '../lib/dom';
+import { getDownloadLink, idFromURL } from '../lib/utils';
+import { searchFilters, superInput, loadingScreen, searchlist } from '../lib/dom';
 import fetchList from '../modules/fetchList';
 import { fetchCollection } from "../lib/libraryUtils";
 import '../scripts/library';
@@ -31,21 +31,8 @@ export default async function() {
     });
 
 
-  if (HLS) {
-    // handling bitrates with HLS will increase complexity, better to detach from DOM
-    bitrateSelector.remove();
-    if (store.player.legacy) return;
+  if (HLS && !store.player.legacy)
     (await import('./hls')).default();
-  } else
-    bitrateSelector.addEventListener('change', async () => {
-      if (store.player.playbackState === 'playing')
-        audio.pause();
-      const timeOfSwitch = audio.currentTime;
-      audio.src = proxyHandler(bitrateSelector.value);
-      audio.currentTime = timeOfSwitch;
-      audio.play();
-    });
-
 
   // params handling
 
@@ -62,7 +49,7 @@ export default async function() {
       document.body.appendChild(dialog);
       import('../components/WatchVideo.ts')
         .then(mod => mod.default(dialog));
-    } else if (isPWA && shareAction) {
+    } else if (isPWA && shareAction === 'download') {
       const a = document.createElement('a');
       const l = await getDownloadLink(store.actionsMenu.id);
       if (l) {

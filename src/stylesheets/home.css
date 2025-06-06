@@ -108,10 +108,22 @@
     }
   }
 
-  #playerSelectors {
+  #playerFooter {
     display: flex;
     width: 100%;
     justify-content: space-between;
+    align-items: center;
+
+
+    p {
+      font-size: 0.9rem;
+      font-style: italic;
+      text-align: center;
+      font-weight: 700;
+      margin-left: -3ch;
+      opacity: 0.5;
+    }
+
   }
 
   @media(orientation:portrait) {

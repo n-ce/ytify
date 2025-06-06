@@ -77,7 +77,7 @@ export default function() {
     id: 'downloadFormatSelector',
     label: 'settings_download_format',
     handler: (e) => {
-      setState('dlFormat', e.target.value);
+      setState('dlFormat', e.target.value as 'opus' | 'mp3' | 'wav' | 'ogg');
     },
     onmount: (target) => {
       target.value = state.dlFormat;
@@ -94,7 +94,7 @@ export default function() {
     id: 'shareAction',
     label: 'settings_pwa_share_action',
     handler: (e) => {
-      setState('shareAction', e.target.value);
+      setState('shareAction', e.target.value as 'play' | 'watch' | 'download');
     },
     onmount: (target) => {
       target.value = state.shareAction;

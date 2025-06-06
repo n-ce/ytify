@@ -53,6 +53,34 @@ export async function quickSwitch() {
   audio.play();
 }
 
+
+export async function preferredStream(audioStreams: AudioStream[]) {
+  const preferedCodec: 'opus' | 'aac' = state.codec === 'any' ? ((await store.player.supportsOpus) ? 'opus' : 'aac') : state.codec;
+  const itags = ({
+    low: {
+      opus: [600, 249, 251],
+      aac: [599, 139, 140]
+    },
+    medium: {
+      opus: [250, 249],
+      aac: [139, 140]
+    },
+    high: {
+      opus: [251],
+      aac: [140]
+    }
+  })[state.quality || 'medium'][preferedCodec];
+  let stream!: AudioStream;
+  for (const itag of itags) {
+    if (stream?.url) continue;
+    const v = audioStreams.find(v => v.url.includes(`itag=${itag}`));
+    if (v) stream = v;
+  }
+
+  return stream;
+}
+
+
 export function notify(text: string) {
   const el = document.createElement('p');
   const clear = () => el.isConnected && el.remove();

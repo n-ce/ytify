@@ -6,11 +6,12 @@ export let state = {
   defaultSuperCollection: 'featured',
   customInstance: '',
   stableVolume: false,
+  prefetch: false,
   HLS: false,
-  hq: false,
+  quality: 'medium' as 'low' | 'medium' | 'high',
   loadImage: true,
   linkHost: '',
-  dlFormat: 'opus',
+  dlFormat: 'opus' as typeof store.downloadFormat,
   theme: 'auto',
   customColor: '',
   roundness: '0.4rem',
@@ -18,17 +19,17 @@ export let state = {
   searchFilter: '',
   startupTab: '/search',
   watchMode: '',
-  enqueueRelatedStreams: true,
-  discover: true,
+  enqueueRelatedStreams: false,
   shuffle: false,
   filterLT10: false,
   allowDuplicates: false,
   history: true,
+  discover: true,
   volume: '100',
-  shareAction: 'play',
+  shareAction: 'play' as 'play' | 'watch' | 'download',
   dbsync: '',
   language: 'en',
-  codec: 'any',
+  codec: 'any' as 'opus' | 'aac' | 'any',
   partsManagerPIN: '',
   'part Reserved Collections': true,
   'part Navigation Library': true,
@@ -67,7 +68,7 @@ export const store: {
       src: (arg0: string) => void,
       api: string[],
       manifests: string[]
-    }
+    },
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
@@ -151,6 +152,6 @@ export const store: {
     thumbnail: ''
   },
   addToCollectionOptions: [],
-  downloadFormat: state.dlFormat as 'opus'
+  downloadFormat: state.dlFormat
 }
 

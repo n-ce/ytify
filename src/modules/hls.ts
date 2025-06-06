@@ -9,7 +9,7 @@ export default function() {
   h.attachMedia(audio);
   store.player.hls.src = h.loadSource.bind(h);
   h.on(Hls.Events.MANIFEST_PARSED, () => {
-    h.currentLevel = state.hq ?
+    h.currentLevel = state.quality === 'high' ?
       h.levels.findIndex(l => l.audioCodec === 'mp4a.40.2') : 0;
     audio.play();
   });
