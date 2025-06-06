@@ -9,9 +9,7 @@ import { readdirSync } from 'fs';
 export default defineConfig(({ command }) => ({
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
-    Build: JSON.stringify(
-      ((today = new Date()) => `${today.getDate()} ${today.toLocaleString('default', { month: 'short' })}`)()
-    ),
+    Build: 'v7x8 June',
   },
   plugins: [
     injectEruda(command === 'serve'),

@@ -69,7 +69,6 @@ export const store: {
       api: string[],
       manifests: string[]
     },
-    qualities: Record<'url' | 'bitrate' | 'codec', string>[],
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
@@ -104,7 +103,6 @@ export const store: {
       manifests: [],
       api: ['https://pipedapi.kavin.rocks']
     },
-    qualities: [],
     supportsOpus: navigator.mediaCapabilities.decodingInfo({
       type: 'file',
       audio: {
