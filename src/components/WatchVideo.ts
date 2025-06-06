@@ -191,9 +191,7 @@ export default async function(dialog: HTMLDialogElement) {
     ${footerTemplate}
   `);
 
-
   const stream = await preferredStream(handleXtags(audioArray));
-
   audio.src = proxyHandler(stream.url, true);
   audio.currentTime = video.currentTime;
   loadingScreen.close();
