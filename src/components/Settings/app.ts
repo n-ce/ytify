@@ -94,7 +94,7 @@ export default function() {
     id: 'shareAction',
     label: 'settings_pwa_share_action',
     handler: (e) => {
-      setState('shareAction', e.target.value as 'play');
+      setState('shareAction', e.target.value as 'play' | 'watch' | 'download');
     },
     onmount: (target) => {
       target.value = state.shareAction;
