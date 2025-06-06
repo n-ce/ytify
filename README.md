@@ -9,7 +9,7 @@
 </div>
 
 
-> [**ytify**](https://ytify.pp.ua) is the fastest and the lightest centralised audio streaming web application modern browser features to squeeze out maximum efficiency.
++ > [**ytify**](https://ytify.pp.ua) is the fastest and the lightest centralised audio streaming web application, using modern browser features to squeeze out maximum efficiency.
 >  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 > As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
