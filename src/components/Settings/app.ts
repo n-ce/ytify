@@ -77,7 +77,7 @@ export default function() {
     id: 'downloadFormatSelector',
     label: 'settings_download_format',
     handler: (e) => {
-      setState('dlFormat', e.target.value as 'opus');
+      setState('dlFormat', e.target.value as 'opus' | 'mp3' | 'wav' | 'ogg');
     },
     onmount: (target) => {
       target.value = state.dlFormat;
