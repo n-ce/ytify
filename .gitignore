@@ -2,3 +2,4 @@
 .idea
 package-lock.json
 dist
+.vercel
