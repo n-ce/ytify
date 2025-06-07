@@ -7,11 +7,9 @@ import { render } from 'uhtml';
 import { setState, state } from '../lib/store';
 
 
-let name = state.defaultSuperCollection as SuperCollection;
+let { defaultSuperCollection } = state;
 
-if (name)
-  document.getElementById('r.' + name)?.toggleAttribute('checked')
-else name = 'featured';
+document.getElementById('r.' + defaultSuperCollection)?.toggleAttribute('checked')
 
 superCollectionList.addEventListener('click', superClick);
 
@@ -30,13 +28,13 @@ superCollectionSelector.addEventListener('click', e => {
   if (elm.value !== 'for_you')
     setState('defaultSuperCollection', elm.value);
 
-  name = elm.value;
+  defaultSuperCollection = elm.value;
   main();
 });
 
 export default async function main() {
   const db = getDB();
-  const data = await loadData(name, db);
+  const data = await loadData(defaultSuperCollection, db);
   const template = ItemsLoader(data as string);
   render(superCollectionList, template);
 }

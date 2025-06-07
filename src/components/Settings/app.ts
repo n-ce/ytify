@@ -61,9 +61,8 @@ export default function() {
       notify(i18n('settings_reload'));
     },
     onmount: (target) => {
-      const { linkHost } = state;
-      if (linkHost)
-        target.value = linkHost;
+      if (state.linkHost)
+        target.value = state.linkHost;
     },
     children: html`
           <option value="https://ytify.pp.ua">ytify</option>
@@ -78,12 +77,10 @@ export default function() {
     id: 'downloadFormatSelector',
     label: 'settings_download_format',
     handler: (e) => {
-      setState('dlFormat', e.target.value);
+      setState('dlFormat', e.target.value as 'opus' | 'mp3' | 'wav' | 'ogg');
     },
     onmount: (target) => {
-      const { dlFormat } = state;
-      if (dlFormat)
-        target.value = dlFormat as 'opus';
+      target.value = state.dlFormat;
     },
     children: html`
           <option value='opus'>Opus</option>
@@ -97,11 +94,10 @@ export default function() {
     id: 'shareAction',
     label: 'settings_pwa_share_action',
     handler: (e) => {
-      setState('shareAction', e.target.value);
+      setState('shareAction', e.target.value as 'play' | 'watch' | 'download');
     },
     onmount: (target) => {
-      if (state.shareAction)
-        target.value = state.shareAction;
+      target.value = state.shareAction;
     },
     children: html`
           <option value='play'>${i18n('settings_pwa_play')}</option>

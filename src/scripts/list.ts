@@ -1,8 +1,8 @@
 import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByAuthorBtn } from '../lib/dom';
-import { goTo, hostResolver, renderCollection } from '../lib/utils';
+import { goTo, hostResolver } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
-import { getDB, saveDB } from '../lib/libraryUtils';
+import { getDB, saveDB, renderCollection } from '../lib/libraryUtils';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { render, html } from 'uhtml';
 import { i18n } from './i18n';

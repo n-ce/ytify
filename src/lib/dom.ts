@@ -39,7 +39,7 @@ export const [playAllBtn, enqueueBtn, importListBtn, subscribeListBtn, openInYtB
 export const loadingScreen = <HTMLDialogElement>document.getElementById('loadingScreen');
 loadingScreen.addEventListener('click', () => loadingScreen.close());
 
-export const bitrateSelector = <HTMLSelectElement>document.getElementById('bitrateSelector');
+export const qualityView = document.getElementById('qualityView') as HTMLParagraphElement;
 
 export const superCollectionSelector = document.getElementById('superCollectionSelector') as HTMLDivElement;
 

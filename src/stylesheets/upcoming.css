@@ -4,41 +4,62 @@
 
 
 #queuetools {
+  width: 96%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 2%;
+  margin-bottom: 0.5rem;
+  background: var(--onBg);
+  border-bottom-left-radius: var(--roundness);
+  border-bottom-right-radius: var(--roundness);
+
+  @media(orientation:landscape) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 
   li {
+    user-select: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding: 0.3rem 0.2rem;
+    border-radius: var(--roundness);
+
     i {
-      padding: 0.5rem;
-      border-radius: var(--roundness);
+      padding: 0.2rem;
     }
 
-    &:hover.on i {
-      filter: invert();
-    }
-
-    &:nth-child(5).on i {
+    &:nth-child(5).on {
       background: #a0a2;
       color: #a0a;
     }
 
-    &:nth-child(4).on i {
+    &:nth-child(4).on {
       background: #aa02;
       color: #aa0;
     }
 
-    &:nth-child(3).on i {
+    &:nth-child(3).on {
       background: #1bb2;
       color: #1bb;
     }
 
-    &:nth-child(2).on i {
+    &:nth-child(2).on {
       background: #f222;
       color: #f22;
     }
 
-    &:nth-child(1).on i {
+    &:nth-child(1).on {
       background: #55f2;
       color: #55f;
     }
+
+    &:hover {
+      text-decoration: underline dotted;
+    }
+
 
   }
 

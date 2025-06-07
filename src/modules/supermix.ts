@@ -1,6 +1,7 @@
 import { listBtnsContainer, listContainer, listSection, loadingScreen } from "../lib/dom";
+import { renderCollection } from "../lib/libraryUtils";
 import { store } from "../lib/store";
-import { convertSStoHHMMSS, goTo, renderCollection } from "../lib/utils";
+import { convertSStoHHMMSS, goTo } from "../lib/utils";
 
 export default async function(ids: string[]) {
 

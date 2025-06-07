@@ -47,11 +47,11 @@ export default function() {
       ${ToggleSwitch({
     id: "custom_theme",
     name: 'settings_use_custom_color',
-    checked: Boolean(state.customTheme),
+    checked: Boolean(state.customColor),
     handler: e => {
       let colorString = '';
 
-      if (!state.customTheme) {
+      if (!state.customColor) {
         const rgbText = i18n('settings_custom_color_prompt');
         const str = prompt(rgbText, '174,174,174');
         if (str)
@@ -59,7 +59,7 @@ export default function() {
         else
           e.preventDefault();
       }
-      setState('customTheme', colorString);
+      setState('customColor', colorString);
       themer();
     }
   })}

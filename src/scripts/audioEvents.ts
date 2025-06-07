@@ -155,7 +155,7 @@ audio.onloadedmetadata = function() {
 
 audio.oncanplaythrough = async function() {
   // prefetch beforehand to speed up experience
-  const nextItem = store.queue.list[0];
+  const nextItem = state.prefetch && store.queue.list[0];
   if (!nextItem) return;
 
   const data = await getStreamData(nextItem, true);
