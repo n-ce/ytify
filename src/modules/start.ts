@@ -9,7 +9,7 @@ import '../scripts/queue';
 
 export default async function() {
 
-  const { customInstance, shareAction, HLS, enforcePiped } = state;
+  const { customInstance, shareAction, HLS } = state;
 
   if (customInstance) {
 
