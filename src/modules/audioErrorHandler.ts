@@ -6,11 +6,12 @@ export default function(audio: HTMLAudioElement) {
   audio.pause();
   const message = 'Error 403 : Unauthenticated Stream';
   const id = store.stream.id;
-  const { usePiped, fallback } = store.player;
+  const { fallback } = store.player;
   const { index, invidious } = store.api;
-  const playViaPiped = usePiped && state.customInstance;
+  const { enforcePiped, HLS, customInstance } = state;
 
-  if (playViaPiped || state.HLS) return notify(message);
+  if (enforcePiped || HLS || customInstance)
+    return notify(message);
 
   const origin = new URL(audio.src).origin;
 
