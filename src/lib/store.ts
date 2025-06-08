@@ -3,6 +3,7 @@ export const params = (new URL(location.href)).searchParams;
 
 export let state = {
   enforceProxy: false,
+  enforcePiped: false,
   defaultSuperCollection: 'featured',
   customInstance: '',
   stableVolume: false,
