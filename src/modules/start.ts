@@ -17,7 +17,7 @@ export default async function() {
     store.player.hls.api[0] =
       store.api.piped[0] = pi;
     store.api.invidious[0] = iv;
-    store.player.usePiped = !useInvidious;
+    state.enforcePiped = !useInvidious;
 
   } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
     .then(res => res.json())
@@ -26,7 +26,7 @@ export default async function() {
       store.api.invidious = data.invidious;
       store.api.hyperpipe = data.hyperpipe;
       store.player.hls.api = data.hls;
-      store.player.usePiped = data.status === 1;
+      state.enforcePiped = state.enforcePiped || data.status === 1;
       store.player.fallback = location.origin;
     });
 

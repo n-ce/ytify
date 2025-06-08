@@ -93,7 +93,7 @@ export default async function(
     });
 
 
-  return state.HLS ? useHls() : store.player.usePiped ? usePiped() : useInvidious();
+  return state.HLS ? useHls() : state.enforcePiped ? usePiped() : useInvidious();
 
 }
 
