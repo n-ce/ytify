@@ -6,7 +6,9 @@ export default async (_: Request, context: Context) => {
   const cgeo = context.geo.country?.code || 'IN';
 
   if (!id || id.length < 11) return;
-  const keys = process.env.rkeys.split(',');
+// Use this ONLY if you're 100% sure the variable exists
+  const keysString = process.env.rkeys!; // Note the exclamation mark
+  const keys = keysString.split(',');
 
   shuffle(keys);
 
