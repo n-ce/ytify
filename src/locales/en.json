@@ -110,6 +110,7 @@
   "settings_audio_quality": "Audio Quality",
   "settings_prefetch": "Queue Prefetch",
   "settings_codec_preference": "Codec Preference",
+  "settings_enforce_piped": "Enforce Piped for Playback",
   "settings_always_proxy_streams": "Always Proxy Streams",
   "settings_stable_volume": "Prefer Stable Volume",
   "settings_hls": "HTTP Live Streaming",
