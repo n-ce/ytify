@@ -9,7 +9,7 @@ import '../scripts/queue';
 
 export default async function() {
 
-  const { customInstance, shareAction, HLS } = state;
+  const { customInstance, shareAction, HLS, enforcePiped } = state;
 
   if (customInstance) {
 
@@ -26,7 +26,7 @@ export default async function() {
       store.api.invidious = data.invidious;
       store.api.hyperpipe = data.hyperpipe;
       store.player.hls.api = data.hls;
-      store.player.usePiped = data.status === 1;
+      store.player.usePiped = state.enforcePiped || data.status === 1;
       store.player.fallback = location.origin;
     });
 
