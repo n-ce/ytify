@@ -9,8 +9,7 @@ export default async (request: Request, context: Context) => {
 
   const response = await context.next();
   const page = await response.text();
-  // Use this ONLY if you're 100% sure the variable exists
-const keysString = process.env.rkeys!; // Note the exclamation mark
+const keysString = process.env.rkeys!; 
 const keys = keysString.split(',');
 
   shuffle(keys);
