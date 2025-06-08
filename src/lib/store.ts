@@ -73,8 +73,7 @@ export const store: {
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
-    fallback: string,
-    usePiped: boolean
+    fallback: string
   },
   lrcSync: (arg0: number) => {} | void,
   queue: {
@@ -112,8 +111,7 @@ export const store: {
     }).then(res => res.supported),
     data: undefined,
     legacy: !('OffscreenCanvas' in window),
-    fallback: '',
-    usePiped: true
+    fallback: ''
   },
   lrcSync: () => { },
   queue: {
