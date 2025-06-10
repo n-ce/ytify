@@ -6,7 +6,11 @@ export default async (_: Request, context: Context) => {
   const cgeo = context.geo.country?.code || 'IN';
 
   if (!id || id.length < 11) return;
-  const keys = process.env.rkeys!.split(',');
+  const raw = process.env.rkeys;
+  if (!raw) {
+    throw new Error('Missing environment variable: rkeys');
+  }
+  const keys = raw.split(',');
 
   shuffle(keys);
 
