@@ -62,7 +62,7 @@ export async function preferredStream(audioStreams: AudioStream[]) {
       aac: [599, 139, 140]
     },
     medium: {
-      opus: [250, 249],
+      opus: [250, 249, 251],
       aac: [139, 140]
     },
     high: {
