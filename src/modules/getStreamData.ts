@@ -50,7 +50,7 @@ export default async function(
       })),
       audioStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({
         bitrate: parseInt(v.bitrate),
-        codec: v.encoding,
+        codec: v.encoding || (v.type.includes('webm') ? 'opus' : 'aac'),
         contentLength: parseInt(v.clen),
         quality: Math.floor(parseInt(v.bitrate) / 1024) + ' kbps',
         mimeType: v.type,
