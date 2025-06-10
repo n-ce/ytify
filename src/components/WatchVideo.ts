@@ -83,9 +83,9 @@ export default async function(dialog: HTMLDialogElement) {
       audio.currentTime = video.currentTime;
     }}
       @ended=${() => {
-      if (!queuelist.childElementCount) return;
       close();
-      store.queue.firstChild()?.click();
+      if (queuelist.childElementCount && savedQ)
+        store.queue.firstChild()?.click();
     }}
       @waiting=${() => {
       if (!audio.paused)
@@ -182,7 +182,9 @@ export default async function(dialog: HTMLDialogElement) {
     }}>Listen</button>
 
       <br/> <br/>
-      <i> Because video streaming consumes a lot of energy, contributing to carbon emissions, please try to watch only what's necessary. When you do stream, select the lowest resolution that meets your needs.</i>
+      <i> Because video streaming consumes a lot of energy,
+      contributing to carbon emissions, please try to watch only what's necessary.
+      When you do stream, select the lowest resolution that meets your needs.</i>
     </div>
     `;
 
