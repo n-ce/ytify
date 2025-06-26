@@ -173,7 +173,7 @@ export async function superClick(e: Event) {
   const elc = elem.classList.contains.bind(elem.classList);
   
   // Saavn Test
-  if (eld.title.endsWidth('Topic'))
+  if (eld.title.endsWith('Topic'))
     fetch('https://www.jiosaavn.com/api.php?p=1&_format=json&__call=search.getResults&q='+ eld.title + ' ' + eld.author.slice(0, -8))
       .then(res => res.json())
       .then(data => data.results[0].id)
