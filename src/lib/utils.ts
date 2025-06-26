@@ -171,7 +171,18 @@ export async function superClick(e: Event) {
 
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
-
+  
+  // Saavn Test
+  if (eld.title.endsWidth('Topic'))
+    fetch('https://www.jiosaavn.com/api.php?p=1&_format=json&__call=search.getResults&q='+ eld.title + ' ' + eld.author.slice(0, -8))
+      .then(res => res.json())
+      .then(data => data.results[0].id)
+      .then(id => fetch('https://saavn.dev/api/songs/'+id)
+            .then(res => res.json())
+            .then(data => data.data[0].downloadUrl)
+            .catch(console.error)
+           ).catch(console.error);
+  
   if (elc('streamItem'))
     return elc('delete') ?
       removeFromCollection(store.list.id, eld.id as string)
