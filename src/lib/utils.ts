@@ -122,26 +122,36 @@ export function handleXtags(audioStreams: AudioStream[]) {
 }
 
 export async function getDownloadLink(id: string): Promise<string | null> {
-  const streamUrl = 'https://youtu.be/' + id;
-  const dl = await fetch('https://cobalt-api.kwiatekmiki.com', {
-    method: 'POST',
-    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url: streamUrl,
-      downloadMode: 'audio',
-      audioFormat: store.downloadFormat,
-      filenameStyle: 'basic'
-    })
-  })
-    .then(_ => _.json())
-    .then(_ => {
-      if ('url' in _)
-        return _.url;
-      else throw new Error(_.error.code);
-    })
-    .catch(notify);
+  const streamUrl = 'https://youtu.be/' + id;
+  let dl = '';
+  dl = await fetch('https://cobalt-api.kwiatekmiki.com', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url: streamUrl,
+      downloadMode: 'audio',
+      audioFormat: store.downloadFormat,
+      filenameStyle: 'basic'
+    })
+  })
+    .then(_ => _.json())
+    .then(_ => {
+      if ('url' in _)
+        return _.url;
+      else throw new Error(_.error.code);
+    });
 
-  return dl || '';
+  if (!dl)
+    dl = await fetch(`${store.player.fallback}/download/${id}?f=${store.downloadFormat}`)
+      .then(_ => _.json())
+      .then(_ => {
+        if ('url' in _)
+          return _.url;
+        else throw new Error(_.error.code);
+      })
+      .catch(notify);
+
+  return dl || '';
 }
 
 export async function errorHandler(
