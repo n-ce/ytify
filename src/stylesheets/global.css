@@ -117,27 +117,9 @@ a {
 }
 
 .delete {
-  --defaultBg: #800;
-  --defaultText: #eaa;
-  --onBg: #800;
-  --text: #eaa;
+  --onBg: #f222;
+  --text: #f22c;
 }
-
-.filter_lt10 {
-  --defaultBg: #055;
-  --defaultText: #6dd;
-}
-
-.checked {
-  --defaultBg: #505;
-  --defaultText: #faf;
-}
-
-.redup {
-  --defaultBg: #550;
-  --defaultText: #ffa;
-}
-
 
 
 #settings,
@@ -145,8 +127,8 @@ a {
   button {
     border: var(--border);
     border-radius: var(--roundness);
-    background: var(--defaultBg);
-    color: var(--defaultText);
+    background: var(--onBg);
+    color: var(--text);
     font-family: inherit;
     font-size: inherit;
     padding: 1vmin 2vmin;

@@ -2,6 +2,7 @@
 	width: 100%;
 	user-select: none;
 	background-color: var(--onBg);
+	color: var(--text);
 	padding: 1dvmin;
 	margin-bottom: 2dvmin;
 	border: var(--border);
