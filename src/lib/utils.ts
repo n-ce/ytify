@@ -188,7 +188,7 @@ export async function superClick(e: Event) {
     const api = 'https://saavn-sigma.vercel.app/api';
     const getDls = (id: string) => fetch(`${api}/songs/${id}`)
       .then(res => res.json())
-      .then(data => data[0].downloadUrl);
+      .then(data => data.results[0].downloadUrl);
     fetch(`${api}/search/songs?query=${query}`)
        .then(res => res.json())
        .then(data => data.results[0].id)
