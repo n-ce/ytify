@@ -49,6 +49,10 @@ select {
   cursor: pointer;
 }
 
+select option {
+  cursor: pointer;
+}
+
 p,
 h1,
 h2,

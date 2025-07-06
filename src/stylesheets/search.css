@@ -42,10 +42,6 @@
   color: inherit;
   text-align: right;
   appearance: none;
-
-  option {
-    cursor: pointer;
-  }
 }
 
 #suggestions {
