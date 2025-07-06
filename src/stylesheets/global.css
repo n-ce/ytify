@@ -46,6 +46,7 @@ input,
 button,
 select {
   font: inherit;
+  cursor: pointer;
 }
 
 p,
@@ -205,4 +206,12 @@ dialog.watcher {
 /* disable action during load events */
 #playButton.ri-loader-3-line {
   pointer-events: none;
+}
+
+.ri-draggable:hover {
+  cursor: grab;
+}
+
+.ri-draggable:active {
+  cursor: grabbing;
 }
