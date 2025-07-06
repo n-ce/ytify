@@ -61,6 +61,10 @@ section>header {
         user-select: none;
         cursor: pointer;
 
+        &:has(a) {
+          cursor: auto;
+        }
+
         i {
           margin-right: 0.5rem;
         }

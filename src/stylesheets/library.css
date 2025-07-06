@@ -56,7 +56,8 @@
   }
 
   #libraryActions {
-    li {
+
+    label {
       cursor: pointer;
     }
 
