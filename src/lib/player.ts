@@ -119,7 +119,10 @@ function saavnPlayer() {
       const { name, downloadUrl } = _.data.results[0];
       if (name !== store.stream.title)
         throw new Error('Track not found');
-      else return downloadUrl;
+      else {
+        store.player.data = _.data.results[0];
+        return downloadUrl;
+      }
     })
     .then(dl => {
       setMetaData({
