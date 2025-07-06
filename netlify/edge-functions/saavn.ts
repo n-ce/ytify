@@ -38,7 +38,7 @@ export default async (_: Request, context: Context) => {
 
     const downloadUrls = songData.data[0].downloadUrl;
 
-    return new Response(JSON.stringify(downloadUrls), {
+    return new Response(JSON.stringify({dl: downloadUrls, src: searchData}), {
       headers: { 'content-type': 'application/json' },
     });
 
