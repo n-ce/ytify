@@ -185,11 +185,16 @@ export async function superClick(e: Event) {
   // Saavn Test
   if (elc('streamItem') && eld.author.endsWith('Topic')) {
     const query = encodeURIComponent(`${eld.title} ${eld.author.slice(0, -8)}`);
-    fetch(`/saavn/${query}`) // Use the new endpoint with a single query parameter
+    const api = 'https://saavn-sigma.vercel.app/api/';
+    const getDls = (id: string) => fetch(`${api}/songs/${id}`)
+      .then(res => res.json())
+      .then(data => data[0].downloadUrl);
+    fetch(`${api}/search/songs?query=${query}`)
        .then(res => res.json())
-       .then(downloadUrls => { // The response is directly the downloadUrl array
+       .then(data => data.results[0].id)
+       .then(async id => await getDls(id))
+       .then(downloadUrls => {
         console.log('JioSaavn Download URLs:', downloadUrls);
-          // You can now use downloadUrls here, e.g., to display them or trigger a download
        })
        .catch(console.error);
   }
