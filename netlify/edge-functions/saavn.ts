@@ -11,7 +11,7 @@ export default async (_: Request, context: Context) => {
   }
 
   try {
-    const saavnSearchUrl = `https://www.jiosaavn.com/api.php?p=1&_format=json&__call=search.getResults&q=${query}`;
+    const saavnSearchUrl = `https://saavn-sigma.vercel.app/api/search/songs?query=${query}`;
 
     const searchRes = await fetch(saavnSearchUrl);
     const searchData = await searchRes.json();
@@ -24,7 +24,7 @@ export default async (_: Request, context: Context) => {
     }
 
     const songId = searchData.results[0].id;
-    const saavnSongUrl = `https://saavn.dev/api/songs/${songId}`;
+    const saavnSongUrl = `https://saavn-sigma.vercel.app/api/songs/${songId}`;
 
     const songRes = await fetch(saavnSongUrl);
     const songData = await songRes.json();
