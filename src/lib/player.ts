@@ -5,13 +5,17 @@ import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import getStreamData from "../modules/getStreamData";
 
+let trigger = true;
+
 export default async function player(id: string | null = '') {
 
   if (!id) return;
 
   const useSaavn = state.jiosaavn && store.stream.author.endsWith('Topic');
-  if (useSaavn)
+
+  if (useSaavn && trigger)
     return saavnPlayer();
+  trigger = true;
 
 
   if (state.watchMode) {
@@ -111,8 +115,13 @@ function saavnPlayer() {
 
   fetch(`${api}/search/songs?query=${query}`)
     .then(res => res.json())
-    .then(data => data.data.results[0].downloadUrl)
-    .then(downloadUrls => {
+    .then(_ => {
+      const { name, downloadUrl } = _.data.results[0];
+      if (name !== store.stream.title)
+        throw new Error('Track not found');
+      else return downloadUrl;
+    })
+    .then(dl => {
       setMetaData({
         id: store.stream.id,
         title: store.stream.title,
@@ -120,14 +129,18 @@ function saavnPlayer() {
         duration: store.stream.duration,
         channelUrl: store.stream.channelUrl
       });
-      audio.src = downloadUrls[1].url;
+      audio.src = dl[1].url;
       const q = {
         low: 1,
         medium: 2,
-        high: downloadUrls.length
+        high: dl.length - 1
       }[state.quality];
 
-      qualityView.textContent = downloadUrls[q].quality + ' AAC';
+      qualityView.textContent = dl[q].quality + ' AAC';
     })
-    .catch(console.error);
+    .catch(_ => {
+      title.textContent = _.message;
+      trigger = false;
+      player(store.stream.id);
+    });
 }
