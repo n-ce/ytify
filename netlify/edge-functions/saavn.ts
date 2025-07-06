@@ -11,7 +11,7 @@ export default async (_: Request, context: Context) => {
   }
 
   try {
-    const saavnSearchUrl = `https://www.jiosaavn.com/api.php?p=1&_format=json&__call=search.getResults&q=${encodeURIComponent(query)}`;
+    const saavnSearchUrl = `https://www.jiosaavn.com/api.php?p=1&_format=json&__call=search.getResults&q=${query}`;
 
     const searchRes = await fetch(saavnSearchUrl);
     const searchData = await searchRes.json();
