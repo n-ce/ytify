@@ -185,7 +185,7 @@ export async function superClick(e: Event) {
   // Saavn Test
   if (elc('streamItem') && eld.author.endsWith('Topic')) {
     const query = encodeURIComponent(`${eld.title} ${eld.author.slice(0, -8)}`);
-    const api = 'https://saavn-sigma.vercel.app/api/';
+    const api = 'https://saavn-sigma.vercel.app/api';
     const getDls = (id: string) => fetch(`${api}/songs/${id}`)
       .then(res => res.json())
       .then(data => data[0].downloadUrl);
