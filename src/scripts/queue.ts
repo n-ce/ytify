@@ -173,6 +173,7 @@ store.queue.append = function(data: DOMStringMap | CollectionItem, prepend: bool
       title: data.title || '',
       author: data.author || '',
       duration: data.duration || '',
+      channelUrl: data.channelUrl,
       draggable: true
     }));
 
@@ -199,7 +200,19 @@ queuelist.addEventListener('click', e => {
   const removeState = queueItem.classList.contains('delete');
 
   if (removeState) addToTrash();
-  else player(id);
+  else {
+    const eld = queueItem.dataset;
+    if (state.jiosaavn && eld.author.endsWith('Topic')) {
+      const sta = store.stream;
+      sta.id = eld.id as string;
+      sta.title = eld.title as string;
+      sta.author = eld.author as string;
+      sta.channelUrl = eld.channel_url as string;
+      sta.duration = eld.duration as string;
+    }
+
+    player(id);
+  }
 
   const { list } = store.queue;
 

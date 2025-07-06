@@ -49,10 +49,6 @@ select {
   cursor: pointer;
 }
 
-select option {
-  cursor: pointer;
-}
-
 p,
 h1,
 h2,
@@ -92,6 +88,7 @@ select {
   /* fix white on white issue on dark mode */
   option,
   optgroup {
+    cursor: pointer;
     background: var(--bg);
   }
 }

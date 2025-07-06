@@ -1,4 +1,4 @@
-import { audio, favButton, favIcon, playButton, title } from "./dom";
+import { audio, favButton, favIcon, playButton, qualityView, title } from "./dom";
 import { convertSStoHHMMSS } from "./utils";
 import { params, state, store } from "./store";
 import { setMetaData } from "../modules/setMetadata";
@@ -8,6 +8,11 @@ import getStreamData from "../modules/getStreamData";
 export default async function player(id: string | null = '') {
 
   if (!id) return;
+
+  const useSaavn = state.jiosaavn && store.stream.author.endsWith('Topic');
+  if (useSaavn)
+    return saavnPlayer();
+
 
   if (state.watchMode) {
     store.actionsMenu.id = id;
@@ -22,6 +27,7 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
   title.textContent = 'Fetching Data...';
+
 
   const data = await getStreamData(id);
 
@@ -97,4 +103,31 @@ export default async function player(id: string | null = '') {
         }, 1e5);
       });
 
+}
+function saavnPlayer() {
+  const query = encodeURIComponent(`${store.stream.title} ${store.stream.channelUrl.slice(0, -8)}`);
+  const api = 'https://saavn-sigma.vercel.app/api';
+  title.textContent = 'Fetching Data via JioSaavn...';
+
+  fetch(`${api}/search/songs?query=${query}`)
+    .then(res => res.json())
+    .then(data => data.data.results[0].downloadUrl)
+    .then(downloadUrls => {
+      setMetaData({
+        id: store.stream.id,
+        title: store.stream.title,
+        author: store.stream.author,
+        duration: store.stream.duration,
+        channelUrl: store.stream.channelUrl
+      });
+      audio.src = downloadUrls[1].url;
+      const q = {
+        low: 1,
+        medium: 2,
+        high: downloadUrls.length
+      }[state.quality];
+
+      qualityView.textContent = downloadUrls[q].quality + ' AAC';
+    })
+    .catch(console.error);
 }
