@@ -5,18 +5,10 @@ import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import getStreamData from "../modules/getStreamData";
 
-let trigger = true;
 
 export default async function player(id: string | null = '') {
 
   if (!id) return;
-
-  const useSaavn = state.jiosaavn && store.stream.author.endsWith('Topic');
-
-  if (useSaavn && trigger)
-    return saavnPlayer();
-  trigger = true;
-
 
   if (state.watchMode) {
     store.actionsMenu.id = id;
@@ -30,8 +22,14 @@ export default async function player(id: string | null = '') {
   }
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
-  title.textContent = 'Fetching Data...';
 
+  if (useSaavn) {
+    if (state.jiosaavn && store.stream.author.endsWith('Topic'))
+      return saavnPlayer();
+  }
+  else useSaavn = true;
+
+  title.textContent = 'Fetching Data...';
 
   const data = await getStreamData(id);
 
@@ -108,42 +106,48 @@ export default async function player(id: string | null = '') {
       });
 
 }
+
+
+let useSaavn = true;
 function saavnPlayer() {
   const query = encodeURIComponent(`${store.stream.title} ${store.stream.author.slice(0, -8)}`);
-  const api = 'https://saavn-sigma.vercel.app/api';
   title.textContent = 'Fetching Data via JioSaavn...';
 
-  fetch(`${api}/search/songs?query=${query}`)
+  fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
     .then(res => res.json())
-    .then(_ => {
-      const { name, downloadUrl, artists } = _.data.results[0];
-      if (store.stream.title.startsWith(name) && store.stream.author.startsWith(artists.primary[0].name)
-      ) {
-        store.player.data = _.data.results[0];
-        return downloadUrl;
-      }
-      else throw new Error('Track not found');
-    })
-    .then(dl => {
-      setMetaData({
-        id: store.stream.id,
-        title: store.stream.title,
-        author: store.stream.author,
-        duration: store.stream.duration,
-        channelUrl: store.stream.channelUrl
-      });
-      const q = {
-        low: 1,
-        medium: 2,
-        high: dl.length - 1
-      }[state.quality];
+    .then(_ => _.data.results[0])
+    .then(data => {
+      const { name, downloadUrl, artists } = data;
+      const { title, author, id } = store.stream;
 
-      audio.src = dl[q].url.replace('http', 'https');
-      qualityView.textContent = dl[q].quality + ' AAC';
+      if (
+        title.startsWith(name) &&
+        author.startsWith(artists.primary[0].name
+        )
+      )
+        store.player.data = data;
+
+      else throw new Error('Track not found');
+
+      setMetaData(store.stream);
+
+      const { url, quality } = downloadUrl[{
+        low: 1,
+        medium: downloadUrl.length - 2,
+        high: downloadUrl.length - 1
+      }[state.quality]];
+
+      audio.src = url.replace('http:', 'https:');
+      qualityView.textContent = quality + ' AAC';
+
+      params.set('s', id);
+
+      if (location.pathname === '/')
+        history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
     })
     .catch(_ => {
       title.textContent = _.message;
-      trigger = false;
+      useSaavn = false;
       player(store.stream.id);
     });
 }

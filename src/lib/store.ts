@@ -88,6 +88,7 @@ export const store: {
     piped: string[],
     invidious: string[],
     hyperpipe: string,
+    jiosaavn: string,
     index: number
   },
   linkHost: string,
