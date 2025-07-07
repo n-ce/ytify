@@ -5,7 +5,6 @@ import { setMetaData } from "../modules/setMetadata";
 import { getDB } from "./libraryUtils";
 import getStreamData from "../modules/getStreamData";
 
-
 export default async function player(id: string | null = '') {
 
   if (!id) return;
@@ -110,24 +109,23 @@ export default async function player(id: string | null = '') {
 
 let useSaavn = true;
 function saavnPlayer() {
-  const query = encodeURIComponent(`${store.stream.title} ${store.stream.author.slice(0, -8)}`);
   title.textContent = 'Fetching Data via JioSaavn...';
+  const { title, author, id } = store.stream;
+  const query = encodeURIComponent(`${title} ${author.slice(0, -8)}`);
 
   fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
     .then(res => res.json())
     .then(_ => _.data.results[0])
     .then(data => {
       const { name, downloadUrl, artists } = data;
-      const { title, author, id } = store.stream;
 
       if (
         title.startsWith(name) &&
-        author.startsWith(artists.primary[0].name
-        )
+        author.startsWith(artists.primary[0].name)
       )
         store.player.data = data;
 
-      else throw new Error('Track not found');
+      else throw new Error('Music stream not found');
 
       setMetaData(store.stream);
 
@@ -139,7 +137,6 @@ function saavnPlayer() {
 
       audio.src = url.replace('http:', 'https:');
       qualityView.textContent = quality + ' AAC';
-
       params.set('s', id);
 
       if (location.pathname === '/')
