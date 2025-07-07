@@ -117,14 +117,12 @@ function saavnPlayer() {
     .then(res => res.json())
     .then(_ => {
       const { name, downloadUrl, artists } = _.data.results[0];
-      if (name !== store.stream.title ||
-        !store.stream.author.startsWith(artists.primary[0].name)
-      )
-        throw new Error('Track not found');
-      else {
+      if (store.stream.title.startsWith(name) && store.stream.author.startsWith(artists.primary[0].name)
+      ) {
         store.player.data = _.data.results[0];
         return downloadUrl;
       }
+      else throw new Error('Track not found');
     })
     .then(dl => {
       setMetaData({
