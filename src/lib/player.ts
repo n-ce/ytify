@@ -117,7 +117,7 @@ function saavnPlayer() {
     .then(res => res.json())
     .then(_ => {
       const { name, downloadUrl, artists } = _.data.results[0];
-      if (name !== store.stream.title &&
+      if (name !== store.stream.title ||
         !store.stream.author.startsWith(artists.primary[0].name)
       )
         throw new Error('Track not found');
