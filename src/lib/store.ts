@@ -4,6 +4,7 @@ export const params = (new URL(location.href)).searchParams;
 export let state = {
   enforceProxy: false,
   enforcePiped: false,
+  jiosaavn: false,
   defaultSuperCollection: 'featured',
   customInstance: '',
   stableVolume: false,
@@ -87,6 +88,7 @@ export const store: {
     piped: string[],
     invidious: string[],
     hyperpipe: string,
+    jiosaavn: string,
     index: number
   },
   linkHost: string,
@@ -131,6 +133,7 @@ export const store: {
     piped: ['https://pipedapi.kavin.rocks'],
     invidious: ['https://iv.ggtyler.dev'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
+    jiosaavn: 'https://saavn.dev',
     index: 0
   },
   linkHost: state.linkHost || location.origin,

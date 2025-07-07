@@ -25,6 +25,7 @@ export default async function() {
       store.api.piped = data.piped;
       store.api.invidious = data.invidious;
       store.api.hyperpipe = data.hyperpipe;
+      store.api.jiosaavn = data.jiosaavn;
       store.player.hls.api = data.hls;
       state.enforcePiped = state.enforcePiped || data.status === 1;
       store.player.fallback = location.origin;
