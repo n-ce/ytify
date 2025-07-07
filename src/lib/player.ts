@@ -109,7 +109,7 @@ export default async function player(id: string | null = '') {
 
 }
 function saavnPlayer() {
-  const query = encodeURIComponent(`${store.stream.title} ${store.stream.channelUrl.slice(0, -8)}`);
+  const query = encodeURIComponent(`${store.stream.title} ${store.stream.author.slice(0, -8)}`);
   const api = 'https://saavn-sigma.vercel.app/api';
   title.textContent = 'Fetching Data via JioSaavn...';
 
