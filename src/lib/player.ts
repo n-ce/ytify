@@ -116,8 +116,10 @@ function saavnPlayer() {
   fetch(`${api}/search/songs?query=${query}`)
     .then(res => res.json())
     .then(_ => {
-      const { name, downloadUrl } = _.data.results[0];
-      if (name !== store.stream.title)
+      const { name, downloadUrl, artists } = _.data.results[0];
+      if (name !== store.stream.title &&
+        store.stream.author.startsWith(artists.primary[0].name)
+      )
         throw new Error('Track not found');
       else {
         store.player.data = _.data.results[0];
@@ -132,13 +134,13 @@ function saavnPlayer() {
         duration: store.stream.duration,
         channelUrl: store.stream.channelUrl
       });
-      audio.src = dl[1].url;
       const q = {
         low: 1,
         medium: 2,
         high: dl.length - 1
       }[state.quality];
 
+      audio.src = dl[q].url.replace('http', 'https');
       qualityView.textContent = dl[q].quality + ' AAC';
     })
     .catch(_ => {
