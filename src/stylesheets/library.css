@@ -8,6 +8,7 @@
 
     #syncNow {
       display: inline-block;
+      cursor: pointer;
 
       &.ri-cloud-fill:hover::after {
 
@@ -35,15 +36,18 @@
 
   #superCollectionList {
     width: calc(100% - 2rem);
+    background: var(--onBg);
+    border-radius: var(--roundness);
+
+    a.listItem {
+      background: none;
+      border: none;
+    }
 
     a.clxn_item {
-      background: var(--onBg);
       display: flex;
       align-items: center;
       padding: 2vmin;
-      margin-top: 2vmin;
-      border: var(--border);
-      border-radius: var(--roundness);
 
       i {
         margin-right: 2vmin;
@@ -52,6 +56,11 @@
   }
 
   #libraryActions {
+
+    label {
+      cursor: pointer;
+    }
+
     input {
       display: none;
     }
@@ -74,6 +83,7 @@ input[type='radio'] {
   }
 
   &+label {
+    cursor: pointer;
     font-size: small;
     display: inline-block;
     padding: 1vmin 2vmin;

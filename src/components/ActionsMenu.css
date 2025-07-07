@@ -28,6 +28,7 @@
   }
 
   li {
+    cursor: pointer;
     color: var(--text);
     font-size: large;
     user-select: none;

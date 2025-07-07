@@ -11,6 +11,10 @@
     border-radius: 0;
   }
 
+  svg,
+  [aria-label] {
+    cursor: pointer;
+  }
 
   #upperLayer {
     width: 100%;
