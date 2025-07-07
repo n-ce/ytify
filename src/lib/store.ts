@@ -133,6 +133,7 @@ export const store: {
     piped: ['https://pipedapi.kavin.rocks'],
     invidious: ['https://iv.ggtyler.dev'],
     hyperpipe: 'https://hyperpipeapi.onrender.com',
+    jiosaavn: 'https://saavn.dev',
     index: 0
   },
   linkHost: state.linkHost || location.origin,

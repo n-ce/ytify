@@ -1,4 +1,4 @@
-import { audio, favButton, favIcon, playButton, qualityView, title } from "./dom";
+import { audio, favButton, favIcon, playButton, qualityView, title as ptitle } from "./dom";
 import { convertSStoHHMMSS } from "./utils";
 import { params, state, store } from "./store";
 import { setMetaData } from "../modules/setMetadata";
@@ -28,7 +28,7 @@ export default async function player(id: string | null = '') {
   }
   else useSaavn = true;
 
-  title.textContent = 'Fetching Data...';
+  ptitle.textContent = 'Fetching Data...';
 
   const data = await getStreamData(id);
 
@@ -36,7 +36,7 @@ export default async function player(id: string | null = '') {
     store.player.data = data;
   else {
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    title.textContent = data.message || data.error || 'Fetching Data Failed';
+    ptitle.textContent = data.message || data.error || 'Fetching Data Failed';
     return;
   }
 
@@ -109,7 +109,7 @@ export default async function player(id: string | null = '') {
 
 let useSaavn = true;
 function saavnPlayer() {
-  title.textContent = 'Fetching Data via JioSaavn...';
+  ptitle.textContent = 'Fetching Data via JioSaavn...';
   const { title, author, id } = store.stream;
   const query = encodeURIComponent(`${title} ${author.slice(0, -8)}`);
 
@@ -142,8 +142,8 @@ function saavnPlayer() {
       if (location.pathname === '/')
         history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
     })
-    .catch(_ => {
-      title.textContent = _.message;
+    .catch(e => {
+      ptitle.textContent = e.message || e.error || 'JioSaavn Playback Failure';
       useSaavn = false;
       player(store.stream.id);
     });
