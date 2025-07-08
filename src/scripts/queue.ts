@@ -202,7 +202,7 @@ queuelist.addEventListener('click', e => {
   if (removeState) addToTrash();
   else {
     const eld = queueItem.dataset;
-    if (state.jiosaavn && eld.author.endsWith('Topic')) {
+    if (state.jiosaavn) {
       const sta = store.stream;
       sta.id = eld.id as string;
       sta.title = eld.title as string;
@@ -210,7 +210,6 @@ queuelist.addEventListener('click', e => {
       sta.channelUrl = eld.channel_url as string;
       sta.duration = eld.duration as string;
     }
-
     player(id);
   }
 

@@ -187,7 +187,7 @@ export async function superClick(e: Event) {
     if (elc('delete'))
       removeFromCollection(store.list.id, eld.id as string)
     else {
-      if (state.jiosaavn && eld.author.endsWith('Topic')) {
+      if (state.jiosaavn) {
         const sta = store.stream;
         sta.id = eld.id as string;
         sta.title = eld.title as string;
@@ -195,7 +195,6 @@ export async function superClick(e: Event) {
         sta.channelUrl = eld.channel_url as string;
         sta.duration = eld.duration as string;
       }
-
       player(eld.id);
     }
 
