@@ -5,8 +5,7 @@ export default function(_: {
   track: JSX.Element,
   playBtn: JSX.Element,
   playNext: JSX.Element,
-  close: () => void,
-  queue: () => void
+  close: () => void
 }) {
   let playerSection!: HTMLDivElement;
   onMount(() => {
@@ -61,25 +60,30 @@ export default function(_: {
           <option value="3.50">3.50x</option>
           <option value="4.00">4.00x</option>
         </select>
-        <label data-translation-aria-label="player_volume" for="volumeSlider" class="ri-volume-up-fill"></label>
-        <input type="range" min="0" max="100" value="100" id="volumeSlider" />
-
-        <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton"></i>
-        <input type="checkbox" id="favButton" />
-        <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
-        <i data-translation-aria-label="player_more" class="ri-more-2-fill" id="moreBtn"></i>
-      </div>
-
-      <div id="playerTertiary">
-        <i
-          class="ri-fullscreen-line"></i>
         <i
           onclick={_.close}
           class="ri-close-line"></i>
-        <i
-          onclick={_.queue}
-          class="ri-list-check-2"></i>
+
+        <input type="checkbox" id="favButton" />
+        <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
+
+        <i data-translation-aria-label="player_more" class="ri-more-2-fill" id="moreBtn"></i>
+
+        <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton"></i>
+
+        <select id="volumeChanger">
+          <option value="100%">0%</option>
+          <option value="100%">15%</option>
+          <option value="100%">25%</option>
+          <option value="33">33%</option>
+          <option value="100%">50%</option>
+          <option value="33">66%</option>
+          <option value="100%">75%</option>
+          <option value="100%">85%</option>
+          <option value="100%">100%</option>
+        </select>
       </div>
+
     </section>
   )
 }

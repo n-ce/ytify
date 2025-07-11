@@ -1,0 +1,10 @@
+#searchSection {
+  header {
+    display: flex;
+    justify-content: space-between;
+
+    i {
+      font-size: var(--font-size-4);
+    }
+  }
+}

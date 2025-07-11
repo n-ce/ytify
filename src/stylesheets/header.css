@@ -1,7 +1,7 @@
 section>header {
   position: relative;
   width: 100%;
-  padding: 4dvmin 0;
+  padding: var(--size-3) 0;
 
   >p {
     font-size: x-large;
@@ -11,7 +11,7 @@ section>header {
   details {
     width: auto;
     position: absolute;
-    top: 4dvmin;
+    top: var(--size-3);
     right: 0;
     z-index: 20;
     margin: 0;
@@ -23,8 +23,9 @@ section>header {
       list-style: none;
       text-align: right;
       padding: 0;
-      margin: 0 0 1rem auto;
-      width: 2rem;
+      margin: 0 0 var(--size-3) auto;
+      width: var(--size-7);
+      font-size: var(--font-size-3);
       aspect-ratio: 1;
       border-radius: 0.25rem;
       display: flex;
@@ -34,7 +35,7 @@ section>header {
       cursor: pointer;
 
       &:hover {
-        background: var(--onBg);
+        background: #8882;
       }
 
       i {

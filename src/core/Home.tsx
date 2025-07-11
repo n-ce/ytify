@@ -1,13 +1,25 @@
+import { createSignal } from 'solid-js';
 import { i18n } from '../scripts/i18n';
+import About from '../components/About';
 
 export default function(_: {
-  settings: () => void
+  settings: () => void,
+  search: () => void
 }) {
+
+  const [item, setItem] = createSignal('');
+
   return (
     <section>
 
       <header>
-        <p>Home</p>
+        <p>Home </p>
+        <i id="syncNow" class="ri-cloud-fill"></i>
+        <i
+          id="searchToggle"
+          class="ri-search-2-line"
+          onclick={_.search}
+        ></i>
         <details>
           <summary><i class="ri-more-2-fill"></i></summary>
           <ul>
@@ -48,9 +60,15 @@ export default function(_: {
       </header>
 
 
-      <div id="catalogueSelector">
-        <input type="radio" id="r.for_you" name="superCollectionChips" value="for_you" />
-        <label for="r.for_you">About</label>
+      <div id="catalogueSelector"
+
+        onclick={e => {
+          const input = e.target as HTMLInputElement;
+          if (input.matches('input'))
+            setItem(input.value);
+
+        }}
+      >
         <input type="radio" id="r.featured" name="superCollectionChips" value="featured" />
         <label for="r.featured">Hub</label>
         <input type="radio" id="r.collections" name="superCollectionChips" value="collections" />
@@ -64,18 +82,18 @@ export default function(_: {
         <input type="radio" id="r.channels" name="superCollectionChips" value="channels" />
         <label data-translation="library_channels" for="r.channels">Channels</label>
 
-        <input type="radio" id="r.feed" name="superCollectionChips" value="feed" />
-        <label data-translation="library_feed" for="r.feed">Subscription Feed</label>
-
-
+        <input type="radio" id="r.about" name="superCollectionChips" checked value="" />
+        <label for="r.about">About</label>
       </div>
+
+
       <div id="catalogue">
-        <li><a data-translation="settings_changelog" href="https://github.com/n-ce/ytify/wiki/changelog"
-          target="_blank">Changelog</a></li>
-        <li><a href="https://github.com/n-ce/ytify" target="_blank">Github</a></li>
-        <li><a href="https://t.me/ytifytg" target="_blank">Telegram</a></li>
-        <li><a href="https://matrix.to/#/#ytify:matrix.org" target="_blank">Matrix</a></li>
+        {item() ?
+          'test'
+          :
+          <About />
+        }
       </div>
-    </section>
+    </section >
   )
 }

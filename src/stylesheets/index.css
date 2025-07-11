@@ -3,6 +3,7 @@
 @import '../core/player.css';
 @import '../core/queue.css';
 @import '../core/home.css';
+@import '../core/search.css';
 @import 'remixicon.css';
 @import 'sliders.css';
 @import 'header.css';
@@ -19,13 +20,17 @@
   --roundness: 0.4rem;
 }
 
+* {
+  transition: all 0.4s ease;
+}
+
 html,
 body {
   height: 100dvh;
 }
 
 body {
-  font-family: var(--font-system-ui);
+  font-family: var(--font-rounded-sans);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -41,6 +46,7 @@ main {
     height: 100%;
     flex: 1 0 0;
     padding: var(--size-3);
+    padding-top: 0;
     overflow-y: scroll;
   }
 

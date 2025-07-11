@@ -10,6 +10,7 @@ import Player from './core/Player';
 import { createStore } from 'solid-js/store';
 import Queue from './core/Queue';
 import Settings from './core/Settings';
+import Search from './core/Search';
 
 
 const [store, setStore] = createStore({
@@ -64,11 +65,18 @@ const Track = (
 const [getPlayer, setPlayer] = createSignal(false);
 const [getQueue, setQueue] = createSignal(false);
 const [getSettings, setSettings] = createSignal(false);
+const [showSearch, setSearch] = createSignal(false);
 
 render(() =>
   <>
     <main>
-      <Home settings={() => setSettings(true)} />
+      <Home
+        settings={() => setSettings(true)}
+        search={() => setSearch(true)}
+      />
+      <Show when={showSearch()}>
+        <Search close={() => setSearch(false)} />
+      </Show>
       <Show when={getPlayer()}>
         <Player
           img={Image}

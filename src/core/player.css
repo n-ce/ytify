@@ -1,7 +1,7 @@
 #playerSection {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-between;
 
 
   button {
@@ -15,16 +15,14 @@
   }
 
   img {
-    width: 50dvh;
-    margin: auto;
+    width: 100%;
   }
 
 }
 
 @media(orientation:landscape) {
   img {
-    width: auto;
-    margin: 0;
+    width: 50dvh;
   }
 
   #track {
@@ -33,7 +31,6 @@
 }
 
 #track {
-  border: 1px dashed orange;
 
   a {
     font-size: var(--size-4);
@@ -48,7 +45,6 @@
 #playerPrimary {
   display: flex;
   justify-content: space-between;
-  border: 1px dashed blue;
 
   #playButton {
     transform: scale(1.5)
@@ -60,7 +56,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px dashed red;
 
   input[type='checkbox'] {
     display: none
@@ -75,15 +70,13 @@
     appearance: none;
   }
 
+  #volumeChanger {
+    text-align: right;
+  }
+
   i,
   label {
     width: var(--size-6);
   }
 
-}
-
-#playerTertiary {
-  display: flex;
-  justify-content: space-around;
-  border: 1px dashed green;
 }

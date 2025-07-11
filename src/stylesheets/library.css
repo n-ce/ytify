@@ -1,37 +1,7 @@
 #library {
   width: 100%;
 
-  header {
-    >p {
-      display: inline;
-    }
-
-    #syncNow {
-      display: inline-block;
-      cursor: pointer;
-
-      &.ri-cloud-fill:hover::after {
-
-        position: fixed;
-        content: 'Import from cloud';
-        font-size: small;
-      }
-
-      &.ri-cloud-off-fill:hover::after {
-        position: fixed;
-        content: 'Save to cloud';
-        font-size: small;
-      }
-
-      &.ri-loader-3-line {
-        pointer-events: none;
-      }
-
-      &.error {
-        color: #f20a;
-      }
-    }
-  }
+  header {}
 
 
   #superCollectionList {

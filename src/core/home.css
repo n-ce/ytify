@@ -1,4 +1,6 @@
 header {
+  display: flex;
+  align-items: center;
 
   label {
     cursor: pointer;
@@ -7,29 +9,71 @@ header {
   input {
     display: none;
   }
+
+
+  #searchToggle {
+    margin-left: auto;
+    margin-right: var(--size-8);
+    margin-top: var(--size-00);
+    font-size: var(--font-size-4);
+  }
+
+  #syncNow {
+    cursor: pointer;
+    font-size: var(--font-size-2);
+    margin-top: var(--size-1);
+    margin-left: var(--size-2);
+
+    &.ri-cloud-fill:hover::after {
+      position: fixed;
+      content: 'Import from cloud';
+      font-size: var(--font-size-1);
+    }
+
+    &.ri-cloud-off-fill:hover::after {
+      position: fixed;
+      content: 'Save to cloud';
+      font-size: var(--font-size-1);
+    }
+
+    &.ri-loader-3-line {
+      pointer-events: none;
+    }
+
+    &.error {
+      color: #f20a;
+    }
+  }
+
 }
 
-#superCollectionSelector {
-  padding: 0 3vmin;
-  margin: 0 2vmin 0;
+#catalogueSelector {
+
+  display: flex;
+  overflow: scroll;
+  margin-bottom: var(--size-3);
 
   input[type='radio'] {
     display: none;
 
-    &:checked+label {
-      background: var(--text);
-      color: var(--bg);
-      border: var(--border);
-    }
-
     &+label {
       cursor: pointer;
-      font-size: small;
+      font-size: var(--font-size-1);
       display: inline-block;
-      padding: 1vmin 2vmin;
-      margin: 1vmin 0;
+      padding: var(--size-1) var(--size-2);
+      margin-right: var(--size-3);
       border-radius: var(--roundness);
+      opacity: 0.6;
+      background: #7777;
     }
+
+    &:checked+label {
+      font-weight: bold;
+      opacity: 1;
+      background: var(--text);
+      color: var(--bg);
+    }
+
 
   }
 }
