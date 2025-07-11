@@ -64,11 +64,12 @@ footer {
     font-size: var(--size-7);
   }
 
-  .info {
+  #track {
     width: 100%;
     overflow: hidden;
     pointer-events: none;
 
+    a,
     p {
       white-space: nowrap;
       overflow: hidden;
@@ -77,7 +78,7 @@ footer {
     }
 
 
-    .artist {
+    p {
       font-size: calc(var(--size-6) / 2);
       opacity: 90%;
     }

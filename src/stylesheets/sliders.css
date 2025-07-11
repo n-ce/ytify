@@ -1,7 +1,19 @@
-#volumeSlider {}
+#volumeSlider {
 
-#durationSlider {}
+  input {
+    width: calc(100% - var(--size-12));
+    margin: 0 var(--size-2);
+  }
+}
 
-#player {
-  input[type="range"] {}
+
+#durationSlider {
+  input {
+    width: 100%;
+  }
+
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
 }

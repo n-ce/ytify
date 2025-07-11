@@ -14,23 +14,41 @@
     font-size: var(--font-size-4);
   }
 
-}
-
-
-#trackline {
-  input {
-    width: 100%;
+  img {
+    width: 50dvh;
+    margin: auto;
   }
 
-  div {
-    display: flex;
-    justify-content: space-between;
+}
+
+@media(orientation:landscape) {
+  img {
+    width: auto;
+    margin: 0;
+  }
+
+  #track {
+    text-align: center;
   }
 }
+
+#track {
+  border: 1px dashed orange;
+
+  a {
+    font-size: var(--size-4);
+  }
+
+  p {
+    font-size: var(--size-3);
+  }
+}
+
 
 #playerPrimary {
   display: flex;
   justify-content: space-between;
+  border: 1px dashed blue;
 
   #playButton {
     transform: scale(1.5)
@@ -42,15 +60,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border: 1px dashed red;
 
   input[type='checkbox'] {
     display: none
   }
 
-  input[type='range'] {
-    width: calc(100% - var(--size-12));
-    margin: 0 var(--size-2);
-  }
 
   select {
     background: none;
@@ -70,8 +85,5 @@
 #playerTertiary {
   display: flex;
   justify-content: space-around;
-}
-
-#qualityView {
-  text-align: center;
+  border: 1px dashed green;
 }

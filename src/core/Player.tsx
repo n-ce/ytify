@@ -2,9 +2,9 @@ import { JSX, onMount } from "solid-js"
 
 export default function(_: {
   img: JSX.Element,
+  track: JSX.Element,
   playBtn: JSX.Element,
   playNext: JSX.Element,
-  titleAuthor: JSX.Element,
   close: () => void,
   queue: () => void
 }) {
@@ -19,8 +19,10 @@ export default function(_: {
     <section
       id="playerSection"
       ref={playerSection}>
+
       {_.img}
-      {_.titleAuthor}
+
+      {_.track}
 
       <span id="durationSlider">
         <input type="range" value="0" id="progress" />
@@ -78,8 +80,6 @@ export default function(_: {
           onclick={_.queue}
           class="ri-list-check-2"></i>
       </div>
-
-      <p id="qualityView">0 kbps</p>
     </section>
   )
 }

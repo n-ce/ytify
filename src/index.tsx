@@ -54,14 +54,14 @@ const PlayNextButton = (
     id="playNextButton"></button>
 );
 
-const TitleAuthor = (<>
-  <a data-translation="player_now_playing" id="title" href="" target="_blank">Now Playing</a>
-  <p data-translation="player_channel" id="author">Channel</p>
-</>
+const Track = (
+  <div id="track">
+    <a data-translation="player_now_playing" id="title" href="" target="_blank">Now Playing</a>
+    <p data-translation="player_channel" id="author">Channel</p>
+  </div>
 );
 
 const [getPlayer, setPlayer] = createSignal(false);
-
 const [getQueue, setQueue] = createSignal(false);
 const [getSettings, setSettings] = createSignal(false);
 
@@ -74,7 +74,7 @@ render(() =>
           img={Image}
           playBtn={PlayButton}
           playNext={PlayNextButton}
-          titleAuthor={TitleAuthor}
+          track={Track}
           close={() => setPlayer(false)}
           queue={() => setQueue(!getQueue())}
         />
@@ -92,7 +92,7 @@ render(() =>
         img={Image}
         playBtn={PlayButton}
         playNext={PlayNextButton}
-        titleAuthor={TitleAuthor}
+        track={Track}
         handleClick={setPlayer}
       />
     </Show >

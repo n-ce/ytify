@@ -8,14 +8,12 @@
 @import 'header.css';
 
 :root {
-  --border: var(--border-size-1) solid var(--accent);
-  --radius: var(--radius-2);
-  background-color: var(--bg);
   --bg: transparent;
   --onBg: transparent;
   --text: black;
+  --radius: var(--radius-2);
   --borderColor: transparent;
-  --border: 0.1vmin solid var(--borderColor);
+  --border: var(--border-size-1) solid var(--text);
   --shadowColor: transparent;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundness: 0.4rem;

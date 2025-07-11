@@ -2,9 +2,9 @@ import { JSX, Setter } from "solid-js";
 
 export default function(_: {
   img: JSX.Element,
+  track: JSX.Element,
   playBtn: JSX.Element,
   playNext: JSX.Element,
-  titleAuthor: JSX.Element,
   handleClick: Setter<boolean>
 }) {
   return (
@@ -15,9 +15,7 @@ export default function(_: {
     }>
       <progress value="0.35" ></progress>
       {_.img}
-      <div class="info">
-        {_.titleAuthor}
-      </div>
+      {_.track}
       {_.playBtn}
       {_.playNext}
     </footer>
