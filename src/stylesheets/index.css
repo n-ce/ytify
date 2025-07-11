@@ -1,0 +1,78 @@
+@import 'open-props/normalize.min.css';
+@import '../core/miniPlayer.css';
+@import '../core/player.css';
+@import '../core/queue.css';
+@import '../core/home.css';
+@import 'remixicon.css';
+@import 'sliders.css';
+@import 'header.css';
+
+:root {
+  --border: var(--border-size-1) solid var(--accent);
+  --radius: var(--radius-2);
+  background-color: var(--bg);
+  --bg: transparent;
+  --onBg: transparent;
+  --text: black;
+  --borderColor: transparent;
+  --border: 0.1vmin solid var(--borderColor);
+  --shadowColor: transparent;
+  --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
+  --roundness: 0.4rem;
+}
+
+html,
+body {
+  height: 100dvh;
+}
+
+body {
+  font-family: var(--font-system-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100%;
+  user-select: none;
+
+
+  section {
+    height: 100%;
+    flex: 1 0 0;
+    padding: var(--size-3);
+    overflow-y: scroll;
+  }
+
+  @media (orientation: portrait) {
+    overflow-x: scroll;
+    flex-direction: row;
+    scroll-snap-type: x mandatory;
+
+    section {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+    }
+  }
+}
+
+
+
+dialog {
+  height: 100dvh;
+  width: 100dvw;
+  border-radius: 0;
+  background: blue;
+  box-shadow: none;
+
+  @media(orientation:landscape) {
+    width: calc(100dvw / 1.5);
+    margin-left: calc(100dvw / 3);
+  }
+
+  &::backdrop {
+    background: red;
+  }
+}

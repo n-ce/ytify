@@ -1,0 +1,77 @@
+#playerSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+
+
+  button {
+    background: none;
+  }
+
+  i,
+  button,
+  label {
+    font-size: var(--font-size-4);
+  }
+
+}
+
+
+#trackline {
+  input {
+    width: 100%;
+  }
+
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+#playerPrimary {
+  display: flex;
+  justify-content: space-between;
+
+  #playButton {
+    transform: scale(1.5)
+  }
+}
+
+#playerSecondary {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  input[type='checkbox'] {
+    display: none
+  }
+
+  input[type='range'] {
+    width: calc(100% - var(--size-12));
+    margin: 0 var(--size-2);
+  }
+
+  select {
+    background: none;
+    width: calc(var(--size-8) + var(--size-2));
+    padding: 0;
+    margin: 0;
+    appearance: none;
+  }
+
+  i,
+  label {
+    width: var(--size-6);
+  }
+
+}
+
+#playerTertiary {
+  display: flex;
+  justify-content: space-around;
+}
+
+#qualityView {
+  text-align: center;
+}

@@ -7,20 +7,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "hls.js": "^1.6.6",
+    "hls.js": "^1.6.7",
+    "solid-js": "1.9.7",
     "sortablejs": "^1.15.6",
     "uhtml": "^4.7.1"
   },
   "devDependencies": {
     "@netlify/blobs": "^10.0.3",
-    "@netlify/edge-functions": "^2.15.5",
+    "@netlify/edge-functions": "^2.15.6",
     "@types/node": "^24.0.10",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.21",
     "eruda": "^3.4.3",
+    "open-props": "1.7.15",
+    "postcss-jit-props": "1.0.16",
     "typescript": "^5.8.3",
-    "vite": "^7.0.2",
-    "vite-plugin-pwa": "^1.0.1"
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^1.0.1",
+    "vite-plugin-solid": "^2.11.7"
   },
   "browserslist": [
     "defaults"

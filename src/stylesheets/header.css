@@ -1,6 +1,6 @@
 section>header {
   position: relative;
-  width: 92%;
+  width: 100%;
   padding: 4dvmin 0;
 
   >p {
@@ -60,10 +60,6 @@ section>header {
         align-items: center;
         user-select: none;
         cursor: pointer;
-
-        &:has(a) {
-          cursor: auto;
-        }
 
         i {
           margin-right: 0.5rem;

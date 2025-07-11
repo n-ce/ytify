@@ -1,0 +1,35 @@
+header {
+
+  label {
+    cursor: pointer;
+  }
+
+  input {
+    display: none;
+  }
+}
+
+#superCollectionSelector {
+  padding: 0 3vmin;
+  margin: 0 2vmin 0;
+
+  input[type='radio'] {
+    display: none;
+
+    &:checked+label {
+      background: var(--text);
+      color: var(--bg);
+      border: var(--border);
+    }
+
+    &+label {
+      cursor: pointer;
+      font-size: small;
+      display: inline-block;
+      padding: 1vmin 2vmin;
+      margin: 1vmin 0;
+      border-radius: var(--roundness);
+    }
+
+  }
+}

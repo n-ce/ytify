@@ -1,6 +1,38 @@
-import { img, audio } from '../lib/dom';
-import { generateImageUrl } from '../lib/imageUtils';
-import { state, store } from '../lib/store';
+import { state, store } from './store';
+
+export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+// Generates both channel and stream thumbnails
+
+
+export const generateImageUrl = (
+  id: string,
+  res: string,
+  music: string = ''
+) => 'https://wsrv.nl?url=https://' + (id.startsWith('/') ?
+  `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj&output=webp&w=${res === 'mq' ? '180' : '360'}` :
+  `i.ytimg.com/vi_webp/${id}/${res}default.webp${music}`);
+
+
+
+export function getThumbIdFromLink(url: string) {
+
+  if (url.startsWith('/vi_webp'))
+    url = url.slice(9, 20);
+
+  // for featured playlists
+  if (url.startsWith('/') || url.length === 11) return url;
+  // simplify url 
+  if (url.includes('wsrv.nl'))
+    url = url.replace('https://wsrv.nl?url=', '');
+
+  const l = new URL(url);
+  const p = l.pathname;
+
+  return l.search.includes('ytimg') ?
+    p.split('/')[2] :
+    p.split('=')[0];
+}
 
 const style = document.documentElement.style;
 const cssVar = style.setProperty.bind(style);
@@ -85,6 +117,7 @@ const palette: Scheme = {
 
 function colorInjector(colorArray: number[]) {
   const autoDark = systemDark.matches;
+  console.log(colorArray);
   Promise.resolve()
     .then(() => state.theme || 'auto')
     .then(theme => {
@@ -107,7 +140,7 @@ function colorInjector(colorArray: number[]) {
 
 
 
-function themer() {
+export function themer() {
   const initColor = '127,127,127';
   const custom = state.customColor || (store.player.legacy ? initColor : '');
 
@@ -128,21 +161,6 @@ function themer() {
 if (state.roundness !== '0.4rem')
   cssVar('--roundness', state.roundness);
 
-if (state.loadImage) {
-  if (location.pathname !== '/')
-    themer();
-  audio.addEventListener('loadeddata', themer);
-}
-else {
-  img.remove();
-  themer(); // one time only
-}
 
 systemDark.addEventListener('change', themer);
-
-export { themer, cssVar };
-
-
-
-
 

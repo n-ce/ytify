@@ -1,3 +1,4 @@
+import { JSXElement } from 'solid-js';
 import type en from './locales/en.json';
 
 declare global {
@@ -49,10 +50,10 @@ declare global {
   }
 
   type Library = {
-    history?: Collection,
+    history: Collection,
     favorites: Collection,
     listenLater: Collection,
-    discover?: {
+    discover: {
       [index: string]: CollectionItem & { frequency: number }
     },
     channels: { [index: string]: List & { uploader: string } },
@@ -72,14 +73,14 @@ declare global {
       text: string
     }
   }
-
-  type ToggleSwitch = {
-    name: TranslationKeys | string,
-    id: string,
-    checked: boolean,
-    onClick: (e: EventHandler<HTMLInputElement>) => void
-  }
-
+  /*
+    type ToggleSwitch = {
+      name: TranslationKeys | string,
+      id: string,
+      checked: boolean,
+      onClick: (e: EventHandler<HTMLInputElement>) => void
+    }
+  */
   type Selector = {
     label: TranslationKeys | string,
     id: string,
@@ -102,7 +103,6 @@ declare global {
     title: string,
     uploader: string,
     duration: number,
-    uploader: string,
     uploaderUrl: string,
     livestream: boolean,
     hls: string

@@ -1,0 +1,7 @@
+#volumeSlider {}
+
+#durationSlider {}
+
+#player {
+  input[type="range"] {}
+}

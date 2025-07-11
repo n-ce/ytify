@@ -1,25 +1,30 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": false,
+    "target": "ESNext",
     "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "lib": [
-      "ES2021",
+      "ESNext",
       "DOM",
       "DOM.Iterable"
     ],
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js"
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "src",

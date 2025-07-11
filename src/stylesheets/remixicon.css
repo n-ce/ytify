@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url("/remixicon.woff2") format("woff2");
+  src: url('/remixicon.woff2');
   font-display: swap;
 }
 
@@ -15,8 +15,10 @@
 [class*="ri-"] {
   font-family: 'remixicon' !important;
   font-style: normal;
-  font-weight: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
 
 .ri-sort-alphabet-asc:before {
   content: "\f460";
@@ -27,11 +29,11 @@
 }
 
 .ri-sort-desc:before {
-  content: "\f15f";
+  content: "\f160";
 }
 
 .ri-sort-asc:before {
-  content: "\f160";
+  content: "\f15f";
 }
 
 .ri-calendar-schedule-line:before {
@@ -240,4 +242,12 @@
 
 .ri-download-2-fill:before {
   content: "\ec53";
+}
+
+.ri-settings-line:before {
+  content: "\f0ee";
+}
+
+.ri-fullscreen-line:before {
+  content: "\ed9c";
 }
