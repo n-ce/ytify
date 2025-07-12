@@ -46,6 +46,7 @@ input,
 button,
 select {
   font: inherit;
+  cursor: pointer;
 }
 
 p,
@@ -87,6 +88,7 @@ select {
   /* fix white on white issue on dark mode */
   option,
   optgroup {
+    cursor: pointer;
     background: var(--bg);
   }
 }
@@ -117,27 +119,9 @@ a {
 }
 
 .delete {
-  --defaultBg: #800;
-  --defaultText: #eaa;
-  --onBg: #800;
-  --text: #eaa;
+  --onBg: #f222;
+  --text: #f22c;
 }
-
-.filter_lt10 {
-  --defaultBg: #055;
-  --defaultText: #6dd;
-}
-
-.checked {
-  --defaultBg: #505;
-  --defaultText: #faf;
-}
-
-.redup {
-  --defaultBg: #550;
-  --defaultText: #ffa;
-}
-
 
 
 #settings,
@@ -145,8 +129,8 @@ a {
   button {
     border: var(--border);
     border-radius: var(--roundness);
-    background: var(--defaultBg);
-    color: var(--defaultText);
+    background: var(--onBg);
+    color: var(--text);
     font-family: inherit;
     font-size: inherit;
     padding: 1vmin 2vmin;
@@ -223,4 +207,12 @@ dialog.watcher {
 /* disable action during load events */
 #playButton.ri-loader-3-line {
   pointer-events: none;
+}
+
+.ri-draggable:hover {
+  cursor: grab;
+}
+
+.ri-draggable:active {
+  cursor: grabbing;
 }

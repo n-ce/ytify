@@ -31,6 +31,7 @@ section>header {
       justify-content: center;
       align-items: center;
       transition: transform 0.3s ease-in;
+      cursor: pointer;
 
       &:hover {
         background: var(--onBg);
@@ -58,6 +59,11 @@ section>header {
         display: flex;
         align-items: center;
         user-select: none;
+        cursor: pointer;
+
+        &:has(a) {
+          cursor: auto;
+        }
 
         i {
           margin-right: 0.5rem;

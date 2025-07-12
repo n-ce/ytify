@@ -123,7 +123,8 @@ export function handleXtags(audioStreams: AudioStream[]) {
 
 export async function getDownloadLink(id: string): Promise<string | null> {
   const streamUrl = 'https://youtu.be/' + id;
-  const dl = await fetch('https://cobalt-api.kwiatekmiki.com', {
+  let dl = '';
+  dl = await fetch('https://cobalt-api.kwiatekmiki.com', {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -138,8 +139,17 @@ export async function getDownloadLink(id: string): Promise<string | null> {
       if ('url' in _)
         return _.url;
       else throw new Error(_.error.code);
-    })
-    .catch(notify);
+    });
+
+  if (!dl)
+    dl = await fetch(`${store.player.fallback}/download/${id}?f=${store.downloadFormat}`)
+      .then(_ => _.json())
+      .then(_ => {
+        if ('url' in _)
+          return _.url;
+        else throw new Error(_.error.code);
+      })
+      .catch(notify);
 
   return dl || '';
 }
@@ -172,10 +182,21 @@ export async function superClick(e: Event) {
   const eld = elem.dataset;
   const elc = elem.classList.contains.bind(elem.classList);
 
+
   if (elc('streamItem'))
-    return elc('delete') ?
+    if (elc('delete'))
       removeFromCollection(store.list.id, eld.id as string)
-      : player(eld.id);
+    else {
+      if (state.jiosaavn) {
+        const sta = store.stream;
+        sta.id = eld.id as string;
+        sta.title = eld.title as string;
+        sta.author = eld.author as string;
+        sta.channelUrl = eld.channel_url as string;
+        sta.duration = eld.duration as string;
+      }
+      player(eld.id);
+    }
 
   else if (elc('clxn_item'))
     fetchCollection(elem.href.split('=')[1]);
@@ -221,4 +242,3 @@ export async function superClick(e: Event) {
     fetchList(url);
   }
 }
-
