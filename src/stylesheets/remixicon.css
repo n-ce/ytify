@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url('/remixicon.woff2');
+  src: url("/remixicon.woff2");
   font-display: swap;
 }
 
@@ -122,10 +122,6 @@
 
 .ri-more-2-fill:before {
   content: "\ef76";
-}
-
-.ri-close-line:before {
-  content: "\eb99";
 }
 
 .ri-import-line:before {
@@ -250,4 +246,12 @@
 
 .ri-fullscreen-line:before {
   content: "\ed9c";
+}
+
+.ri-close-large-line:before {
+  content: "\f4c8";
+}
+
+.ri-arrow-right-s-line:before {
+  content: "\ea6e";
 }

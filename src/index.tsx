@@ -7,15 +7,10 @@ import { state } from './lib/store';
 import { themer } from './lib/gfxUtils';
 import Home from './core/Home';
 import Player from './core/Player';
-import { createStore } from 'solid-js/store';
 import Queue from './core/Queue';
 import Settings from './core/Settings';
 import Search from './core/Search';
 
-
-const [store, setStore] = createStore({
-
-});
 
 const thumbnail =
   "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";

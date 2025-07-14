@@ -4,22 +4,25 @@ export default function(_: {
   close: () => void
 }) {
   let searchSection!: HTMLDivElement;
+  let superInput!: HTMLInputElement;
   onMount(() => {
-    console.log(true);
-    searchSection.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    superInput.focus();
+
   });
   return (
     <section ref={searchSection} id="searchSection">
       <header>
         <p>Search</p>
-        <i class="ri-close-line" onclick={_.close}></i>
+        <i class="ri-close-large-line" onclick={_.close}></i>
 
       </header>
       <form id="superInputContainer">
-        <input data-translation-placeholder="search_placeholder" type="search" id="superInput" autocomplete="off" />
+        <input
+          placeholder="search_placeholder"
+          type="search"
+          id="superInput"
+          ref={superInput}
+          autocomplete="off" />
         <select id="searchFilters">
           <optgroup label="YouTube">
             <option data-translation="search_filter_all" value="all">All</option>

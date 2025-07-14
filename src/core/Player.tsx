@@ -62,7 +62,7 @@ export default function(_: {
         </select>
         <i
           onclick={_.close}
-          class="ri-close-line"></i>
+          class="ri-close-large-line"></i>
 
         <input type="checkbox" id="favButton" />
         <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>

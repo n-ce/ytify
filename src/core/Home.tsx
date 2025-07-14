@@ -1,6 +1,7 @@
 import { createSignal } from 'solid-js';
 import { i18n } from '../scripts/i18n';
 import About from '../components/About';
+import Hub from '../components/Hub';
 
 export default function(_: {
   settings: () => void,
@@ -69,8 +70,8 @@ export default function(_: {
 
         }}
       >
-        <input type="radio" id="r.featured" name="superCollectionChips" value="featured" />
-        <label for="r.featured">Hub</label>
+        <input type="radio" id="r.hub" name="superCollectionChips" value="hub" />
+        <label for="r.hub">Hub</label>
         <input type="radio" id="r.collections" name="superCollectionChips" value="collections" />
         <label data-translation="library_collections" for="r.collections">Collections</label>
         <input type="radio" id="r.playlists" name="superCollectionChips" value="playlists" />
@@ -88,8 +89,8 @@ export default function(_: {
 
 
       <div id="catalogue">
-        {item() ?
-          'test'
+        {item() === 'hub' ?
+          <Hub />
           :
           <About />
         }

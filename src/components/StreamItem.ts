@@ -1,6 +1,6 @@
 import { html } from "uhtml";
 import { state } from "../lib/store";
-import { generateImageUrl } from "../lib/imageUtils";
+import { generateImageUrl } from "../lib/gfxUtils";
 import './StreamItem.css';
 
 export default function(data: {

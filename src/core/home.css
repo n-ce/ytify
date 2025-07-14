@@ -50,7 +50,7 @@ header {
 #catalogueSelector {
 
   display: flex;
-  overflow: scroll;
+  overflow-x: auto;
   margin-bottom: var(--size-3);
 
   input[type='radio'] {

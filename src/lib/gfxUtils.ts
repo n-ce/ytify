@@ -143,7 +143,6 @@ function colorInjector(colorArray: number[]) {
 export function themer() {
   const initColor = '127,127,127';
   const custom = state.customColor || (store.player.legacy ? initColor : '');
-
   if (state.loadImage && store.stream.id && !custom)
     import('../modules/extractColorFromImage')
       .then(mod => mod.default)

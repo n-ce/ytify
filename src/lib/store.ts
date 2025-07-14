@@ -1,3 +1,4 @@
+import { createStore } from "solid-js/store";
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -63,7 +64,9 @@ export function setState<K extends keyof AppSettings>(key: K, val: AppSettings[K
 }
 
 
-export const store: {
+
+
+const storeInit: {
   player: {
     playbackState: 'none' | 'playing' | 'paused',
     hls: {
@@ -155,5 +158,6 @@ export const store: {
   },
   addToCollectionOptions: [],
   downloadFormat: state.dlFormat
-}
+};
 
+export const [store, setStore] = createStore(storeInit);
