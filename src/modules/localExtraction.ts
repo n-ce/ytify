@@ -1,4 +1,4 @@
-export default async function fetchDatafromLocal(id: string): Promise<Piped> {
+export async function(id: string): Promise<Piped> {
   const res = await fetch('https://localhost:9999/streams/'+ id);
 
   if (!res.ok) {
@@ -6,13 +6,10 @@ export default async function fetchDatafromLocal(id: string): Promise<Piped> {
     throw new Error(`Local/production fetch failed: ${errorData.message || 'Unknown error'}`);
   }
 
-  const data = await res.json();
+  const { videoDetails, streamingData, captions } = await res.json();
 
-  const { videoDetails, streamingData, captions } = data;
-
-  if (!videoDetails || !streamingData) {
+  if (!videoDetails || !streamingData)
     throw new Error('Invalid local data structure: missing videoDetails or streamingData.');
-  }
 
   const audioStreams = streamingData.adaptiveFormats
     ? streamingData.adaptiveFormats
