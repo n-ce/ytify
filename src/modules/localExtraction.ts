@@ -1,5 +1,5 @@
 export async function fetchDataFromLocal(id: string): Promise<Piped & { captions: [], videoStreams: [] }> {
-  const res = await fetch('https://localhost:9999/streams/' + id);
+  const res = await fetch('http://localhost:9999/streams/' + id);
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({ message: `HTTP error! status: ${res.status}` }));
