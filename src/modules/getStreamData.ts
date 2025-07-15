@@ -92,7 +92,7 @@ export default async function(
       return ff[0].value || { message: 'No HLS sources are available.' };
     });
 
-  const useLocal = async () => await import('localExtraction.ts').then(mod => mod.default(id));
+  const useLocal = async () => await import('./localExtraction.ts').then(mod => mod.fetchDataFromLocal(id));
 
 
   return (location.port === '9999') ? useLocal() : state.HLS ? useHls() : state.enforcePiped ? usePiped() : useInvidious();
