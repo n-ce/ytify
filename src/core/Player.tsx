@@ -1,4 +1,6 @@
 import { JSX, onMount } from "solid-js"
+import './player.css'
+
 
 export default function(_: {
   img: JSX.Element,

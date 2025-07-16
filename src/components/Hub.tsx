@@ -10,17 +10,21 @@ export default function() {
     <>
 
       <article>
-        <h3>Recently Listened</h3>
-        <ul>
-        </ul>
-      </article>
-
-      <article>
         <h3>Subscription Feed&nbsp;
           <i class="ri-arrow-right-s-line"></i>
         </h3>
         <ul></ul>
       </article>
+
+      {
+// Hub v1
+      /*
+      <article>
+        <h3>Recently Listened</h3>
+        <ul>
+        </ul>
+      </article>
+
 
       <article>
         <h3>You Might Like&nbsp;
@@ -33,7 +37,7 @@ export default function() {
         <h3>Explore Artists</h3>
         <ul></ul>
       </article>
-
+*/}
     </>
   );
 }

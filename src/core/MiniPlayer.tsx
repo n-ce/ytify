@@ -1,4 +1,5 @@
 import { JSX, Setter } from "solid-js";
+import './miniPlayer.css';
 
 export default function(_: {
   img: JSX.Element,

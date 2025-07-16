@@ -1,7 +1,6 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import { createSignal, Show } from 'solid-js';
-import MiniPlayer from './core/MiniPlayer';
 import './stylesheets/index.css';
 import { state } from './lib/store';
 import { themer } from './lib/gfxUtils';
@@ -10,12 +9,15 @@ import Player from './core/Player';
 import Queue from './core/Queue';
 import Settings from './core/Settings';
 import Search from './core/Search';
-
+import MiniPlayer from './core/MiniPlayer';
+import List from './core/List';
 
 const thumbnail =
   "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";
 
 let imgRef!: HTMLImageElement;
+const audio = new Audio();
+audio.onloadeddata = () => { console.log('loafed') }
 
 const Image = state.loadImage ? (<img
   ref={imgRef}
@@ -59,6 +61,7 @@ const Track = (
 
 const [getPlayer, setPlayer] = createSignal(false);
 const [getQueue, setQueue] = createSignal(false);
+const [getList] = createSignal(false);
 const [getSettings, setSettings] = createSignal(false);
 const [showSearch, setSearch] = createSignal(false);
 
@@ -85,6 +88,9 @@ render(() =>
       <Show when={getQueue()}>
         <Queue />
       </Show>
+      <Show when={getList()}>
+        <List />
+      </Show>
       <Show when={getSettings()}>
         <Settings close={() => setSettings(false)} />
       </Show>
@@ -99,13 +105,6 @@ render(() =>
         handleClick={setPlayer}
       />
     </Show >
-
-    <audio onloadeddata={() => {
-      if (state.loadImage)
-        themer();
-    }}
-    ></audio>
-    <dialog></dialog>
   </>
   , document.body);
 

@@ -1,9 +1,4 @@
 @import 'open-props/normalize.min.css';
-@import '../core/miniPlayer.css';
-@import '../core/player.css';
-@import '../core/queue.css';
-@import '../core/home.css';
-@import '../core/search.css';
 @import 'remixicon.css';
 @import 'sliders.css';
 @import 'header.css';

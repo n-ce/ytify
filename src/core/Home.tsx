@@ -2,6 +2,7 @@ import { createSignal } from 'solid-js';
 import { i18n } from '../scripts/i18n';
 import About from '../components/About';
 import Hub from '../components/Hub';
+import './home.css';
 
 export default function(_: {
   settings: () => void,

@@ -1,6 +1,7 @@
 import { onMount } from "solid-js";
 import { setState, state, store } from "../lib/store";
 import { i18n } from "../scripts/i18n";
+import './queue.css';
 
 export default function() {
 

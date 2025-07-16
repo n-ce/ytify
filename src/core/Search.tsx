@@ -1,4 +1,5 @@
 import { onMount } from "solid-js";
+import './search.css';
 
 export default function(_: {
   close: () => void
