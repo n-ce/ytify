@@ -1,17 +1,3 @@
-#durationSlider {
-  input {
-    width: 100%;
-  }
-
-
-  div {
-    display: flex;
-    justify-content: space-between;
-  }
-}
-
-
-
 /* === range theme and appearance === */
 input[type="range"] {
   font-size: 1.5rem;

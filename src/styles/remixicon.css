@@ -7,18 +7,17 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url("/remixicon.woff2");
+  src: url("/remixicon.woff2") format("woff2");
   font-display: swap;
 }
 
 [class^="ri-"],
 [class*="ri-"] {
   font-family: 'remixicon' !important;
-  font-style: normal;
+  font-style: inherit;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 .ri-sort-alphabet-asc:before {
   content: "\f460";
@@ -224,18 +223,6 @@
   content: "\eb9c";
 }
 
-.ri-volume-down-fill:before {
-  content: "\f29b";
-}
-
-.ri-volume-mute-fill:before {
-  content: "\f29d";
-}
-
-.ri-volume-up-fill:before {
-  content: "\f2a1";
-}
-
 .ri-download-2-fill:before {
   content: "\ec53";
 }
@@ -254,4 +241,36 @@
 
 .ri-arrow-right-s-line:before {
   content: "\ea6e";
+}
+
+.ri-sort-number-asc:before {
+  content: "\f462";
+}
+
+.ri-sort-number-desc:before {
+  content: "\f463";
+}
+
+.ri-loop-left-line:before {
+  content: "\f33d";
+}
+
+.ri-add-circle-line:before {
+  content: "\ea11";
+}
+
+.ri-checkbox-multiple-line:before {
+  content: "\eb89";
+}
+
+.ri-checkbox-multiple-fill:before {
+  content: "\eb88";
+}
+
+.ri-checkbox-line:before {
+  content: "\eb85";
+}
+
+.ri-checkbox-fill:before {
+  content: "\eb82";
 }

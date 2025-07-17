@@ -1,4 +1,4 @@
-import { JSX, onMount } from "solid-js"
+import { createSignal, JSX, onMount } from "solid-js"
 import './player.css'
 
 
@@ -11,81 +11,96 @@ export default function(_: {
 }) {
   let playerSection!: HTMLDivElement;
   onMount(() => {
-    playerSection.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  })
+    playerSection.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  const auxCtrls = [
+    [
+      <>
+        <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
+        <input type="checkbox" id="favButton" />
+      </>,
+      <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton"></i>
+    ],
+    [
+      <button data-translation-aria-label="player_play_previous" class="ri-skip-back-line"
+        id="playPrevButton"></button>,
+      _.playNext
+    ],
+    [
+      <select id="playSpeed">
+        <option value="0.25">0.25x</option>
+        <option value="0.50">0.50x</option>
+        <option value="0.75">0.75x</option>
+        <option value="0.87">0.87x</option>
+        <option value="1.00" selected>1.00x</option>
+        <option value="1.25">1.25x</option>
+        <option value="1.50">1.50x</option>
+        <option value="1.75">1.75x</option>
+        <option value="2.00">2.00x</option>
+        <option value="2.50">2.50x</option>
+        <option value="3.00">3.00x</option>
+        <option value="3.50">3.50x</option>
+        <option value="4.00">4.00x</option>
+      </select>,
+      <select id="volumeChanger">
+        <option value="0">0%</option>
+        <option value="0.15">15%</option>
+        <option value="0.25">25%</option>
+        <option value="0.33">33%</option>
+        <option value="0.50">50%</option>
+        <option value="0.66">66%</option>
+        <option value="0.75">75%</option>
+        <option value="0.85">85%</option>
+        <option value="1.00" selected>100%</option>
+      </select>
+    ]
+  ];
+
+  const [ctrlIdx, setCtrlIdx] = createSignal(0);
+
   return (
     <section
       id="playerSection"
       ref={playerSection}>
 
+      <span class="topShelf">
+
+        <i
+          onclick={() => {
+            setCtrlIdx((ctrlIdx() + 1) % auxCtrls.length);
+          }}
+          class="ri-loop-left-line"></i>
+        <i
+          onclick={_.close}
+          class="ri-close-large-line"></i>
+
+      </span>
+
       {_.img}
 
       {_.track}
 
-      <span id="durationSlider">
-        <input type="range" value="0" id="progress" />
+      <span class="slider">
+        <input type="range" value="50" id="progress" />
         <div>
           <p id="currentDuration">00:00</p>
           <p id="fullDuration">00:00</p>
         </div>
       </span>
 
-      <div id="playerPrimary">
-        <button data-translation-aria-label="player_play_previous" class="ri-skip-back-line"
-          id="playPrevButton"></button>
+      <div class="mainShelf">
+        {auxCtrls[ctrlIdx()][0]}
+
         <button data-translation-aria-label="player_seek_backward" class="ri-replay-15-line"
           id="seekBwdButton"></button>
         {_.playBtn}
 
         <button data-translation-aria-label="player_seek_forward" class="ri-forward-15-line"
           id="seekFwdButton"></button>
-        {_.playNext}
 
+        {auxCtrls[ctrlIdx()][1]}
       </div>
-
-      <div id="playerSecondary">
-        <select id="playSpeed">
-          <option value="0.25">0.25x</option>
-          <option value="0.50">0.50x</option>
-          <option value="0.75">0.75x</option>
-          <option value="0.87">0.87x</option>
-          <option value="1.00" selected>1.00x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.50">1.50x</option>
-          <option value="1.75">1.75x</option>
-          <option value="2.00">2.00x</option>
-          <option value="2.50">2.50x</option>
-          <option value="3.00">3.00x</option>
-          <option value="3.50">3.50x</option>
-          <option value="4.00">4.00x</option>
-        </select>
-        <i
-          onclick={_.close}
-          class="ri-close-large-line"></i>
-
-        <input type="checkbox" id="favButton" />
-        <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
-
-        <i data-translation-aria-label="player_more" class="ri-more-2-fill" id="moreBtn"></i>
-
-        <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton"></i>
-
-        <select id="volumeChanger">
-          <option value="100%">0%</option>
-          <option value="100%">15%</option>
-          <option value="100%">25%</option>
-          <option value="33">33%</option>
-          <option value="100%">50%</option>
-          <option value="33">66%</option>
-          <option value="100%">75%</option>
-          <option value="100%">85%</option>
-          <option value="100%">100%</option>
-        </select>
-      </div>
-
     </section>
   )
 }

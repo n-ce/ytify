@@ -1,8 +1,6 @@
 @import 'open-props/normalize.min.css';
 @import 'remixicon.css';
-@import 'sliders.css';
 @import 'header.css';
-@import '../components/hub.css';
 
 :root {
   --bg: transparent;

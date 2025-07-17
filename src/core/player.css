@@ -1,9 +1,10 @@
+@import '../styles/range.css';
+
 #playerSection {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-evenly;
   width: 80%;
-
 
   button {
     background: none;
@@ -16,20 +17,14 @@
   }
 
   img {
-    width: 50dvh;
+    width: 41dvh;
     margin: 0 auto;
   }
 
 }
 
-@media(orientation:landscape) {
 
-  #track {
-    text-align: center;
-  }
-}
-
-#track {
+.track {
 
   a {
     font-size: var(--size-4);
@@ -38,28 +33,49 @@
   p {
     font-size: var(--size-3);
   }
+
+  @media(orientation:landscape) {
+    text-align: center;
+  }
 }
 
+.slider {
+  input {
+    width: 100%;
+  }
 
-#playerPrimary {
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.topShelf {
   display: flex;
   justify-content: space-between;
+}
+
+.mainShelf {
+  display: flex;
+  justify-content: space-between;
+
+  :first-child {
+    animation: var(--animation-slide-in-down) forwards;
+  }
+
+  :last-child {
+    animation: var(--animation-slide-in-up) forwards;
+
+  }
 
   #playButton {
     transform: scale(1.5)
   }
-}
 
-#playerSecondary {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 
   input[type='checkbox'] {
     display: none
   }
-
 
   select {
     background: none;
@@ -73,9 +89,5 @@
     text-align: right;
   }
 
-  i,
-  label {
-    width: var(--size-6);
-  }
 
 }

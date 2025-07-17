@@ -64,7 +64,7 @@ footer {
     font-size: var(--size-7);
   }
 
-  #track {
+  .track {
     width: 100%;
     overflow: hidden;
     pointer-events: none;

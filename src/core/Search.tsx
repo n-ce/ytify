@@ -2,13 +2,15 @@ import { onMount } from "solid-js";
 import './search.css';
 
 export default function(_: {
-  close: () => void
+  close: () => void,
 }) {
   let searchSection!: HTMLDivElement;
   let superInput!: HTMLInputElement;
   onMount(() => {
-    superInput.focus();
-
+    searchSection.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      superInput.focus();
+    }, 500);
   });
   return (
     <section ref={searchSection} id="searchSection">

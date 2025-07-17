@@ -3,8 +3,9 @@ import { setState, state, store } from "../lib/store";
 import { i18n } from "../scripts/i18n";
 import './queue.css';
 
-export default function() {
-
+export default function(_: {
+  close: () => void
+}) {
 
   let queueSection!: HTMLDivElement;
   let queuelist!: HTMLDivElement;
@@ -14,11 +15,7 @@ export default function() {
   let removeQBtn!: HTMLLIElement;
   let enqueueRelatedStreamsBtn!: HTMLLIElement;
   onMount(() => {
-    console.log(true);
-    queueSection.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
+    queueSection.scrollIntoView({ behavior: 'smooth' });
   })
 
   return (
@@ -102,6 +99,7 @@ export default function() {
           () => {
             store.queue.list.length = 0;
             queuelist.innerHTML = '';
+            _.close();
           }
         }>
           <i class="ri-close-line"></i>{i18n('upcoming_clear')}

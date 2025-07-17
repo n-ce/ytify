@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { createSignal, Show } from 'solid-js';
-import './stylesheets/index.css';
+import { Show } from 'solid-js';
+import './styles/index.css';
 import { state } from './lib/store';
 import { themer } from './lib/gfxUtils';
 import Home from './core/Home';
@@ -11,6 +11,7 @@ import Settings from './core/Settings';
 import Search from './core/Search';
 import MiniPlayer from './core/MiniPlayer';
 import List from './core/List';
+import { createStore } from 'solid-js/store';
 
 const thumbnail =
   "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";
@@ -53,56 +54,80 @@ const PlayNextButton = (
 );
 
 const Track = (
-  <div id="track">
+  <div class="track">
     <a data-translation="player_now_playing" id="title" href="" target="_blank">Now Playing</a>
     <p data-translation="player_channel" id="author">Channel</p>
   </div>
 );
 
-const [getPlayer, setPlayer] = createSignal(false);
-const [getQueue, setQueue] = createSignal(false);
-const [getList] = createSignal(false);
-const [getSettings, setSettings] = createSignal(false);
-const [showSearch, setSearch] = createSignal(false);
+const [nav, setNav] = createStore({
+  player: false,
+  queue: false,
+  list: false,
+  settings: false,
+  search: false
+});
+
+
+let homeRef!: HTMLElement;
+type tails = 'player' | 'queue' | 'list' | 'settings' | 'search';
+
+function closeSection(section: tails) {
+  homeRef.scrollIntoView({
+    behavior: 'smooth'
+  });
+  setTimeout(() => {
+    setNav(section, false);
+  }, 500)
+}
+
 
 render(() =>
   <>
     <main>
       <Home
-        settings={() => setSettings(true)}
-        search={() => setSearch(true)}
+        settings={() => setNav('settings', true)}
+        search={() => setNav('search', true)}
+        ref={(el) => homeRef = el}
       />
-      <Show when={showSearch()}>
-        <Search close={() => setSearch(false)} />
+      <Show when={nav.search}>
+        <Search
+          close={() => { closeSection('search') }}
+        />
       </Show>
-      <Show when={getPlayer()}>
+      <Show when={nav.player}>
         <Player
           img={Image}
           playBtn={PlayButton}
           playNext={PlayNextButton}
           track={Track}
-          close={() => setPlayer(false)}
-          queue={() => setQueue(!getQueue())}
+          close={() => { closeSection('player') }}
         />
       </Show>
-      <Show when={getQueue()}>
-        <Queue />
+      <Show when={nav.queue}>
+        <Queue
+          close={() => { closeSection('queue') }}
+        />
       </Show>
-      <Show when={getList()}>
-        <List />
+      <Show when={nav.list}>
+        <List
+          close={() => { closeSection('list') }}
+        />
       </Show>
-      <Show when={getSettings()}>
-        <Settings close={() => setSettings(false)} />
+      <Show when={nav.settings}>
+        <Settings
+          close={() => { closeSection('settings') }}
+        />
       </Show>
     </main>
 
-    <Show when={!getPlayer()}>
+    <Show when={!nav.player}>
       <MiniPlayer
         img={Image}
         playBtn={PlayButton}
         playNext={PlayNextButton}
         track={Track}
-        handleClick={setPlayer}
+        handleClick={() => setNav('player', true)}
       />
     </Show >
   </>

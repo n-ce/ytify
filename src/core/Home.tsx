@@ -1,4 +1,4 @@
-import { createSignal } from 'solid-js';
+import { createSignal, onMount } from 'solid-js';
 import { i18n } from '../scripts/i18n';
 import About from '../components/About';
 import Hub from '../components/Hub';
@@ -6,13 +6,18 @@ import './home.css';
 
 export default function(_: {
   settings: () => void,
-  search: () => void
+  search: () => void,
+  ref: (el: HTMLElement) => void;
 }) {
 
   const [item, setItem] = createSignal('');
+  let homeRef!: HTMLElement;
+  onMount(() => {
+    _.ref(homeRef);
+  });
 
   return (
-    <section>
+    <section ref={homeRef}>
 
       <header>
         <p>Home </p>

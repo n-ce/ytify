@@ -1,4 +1,4 @@
-import { JSX, Setter } from "solid-js";
+import { JSX } from "solid-js";
 import './miniPlayer.css';
 
 export default function(_: {
@@ -6,12 +6,12 @@ export default function(_: {
   track: JSX.Element,
   playBtn: JSX.Element,
   playNext: JSX.Element,
-  handleClick: Setter<boolean>
+  handleClick: () => void
 }) {
   return (
     <footer onclick={(e) => {
       if (!e.target.matches('button'))
-        _.handleClick(true);
+        _.handleClick();
     }
     }>
       <progress value="0.35" ></progress>
