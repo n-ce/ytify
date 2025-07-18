@@ -1,7 +1,7 @@
-import { html } from "uhtml";
-import { state } from "../lib/store";
-import { generateImageUrl } from "../lib/visualUtils";
+import { Show, createSignal } from 'solid-js';
 import './streamItem.css';
+import { state } from '../lib/store';
+import { generateImageUrl } from '../lib/visualUtils';
 
 export default function(data: {
   id: string,
@@ -15,75 +15,77 @@ export default function(data: {
   img?: string,
   draggable?: boolean
 }) {
-  let anchor!: HTMLAnchorElement;
-  let imgsrc = '';
+
+  const [getImage, setImage] = createSignal('');
+
+  let parent!: HTMLAnchorElement;
+
 
   function handleThumbnailLoad(e: Event) {
     const img = e.target as HTMLImageElement;
+    const src = getImage();
 
     if (img.naturalWidth !== 120) {
-      anchor.classList.remove('ravel');
+      parent.classList.remove('ravel');
       return;
     }
-    if (imgsrc.includes('webp'))
-      img.src = imgsrc.replace('.webp', '.jpg').replace('vi_webp', 'vi');
+    if (src.includes('webp'))
+      setImage(src.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
     else { // most likely been removed from yt so remove it 
-      anchor.classList.add('delete');
-      anchor.click();
+      parent.classList.add('delete');
+      parent.click();
     }
   }
 
-  function handleThumbnailError(e: Event) {
-    const img = e.target as HTMLImageElement;
-    img.src =
-      imgsrc.includes('vi_webp') ?
-        imgsrc.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
-        '/logo192.png';
+  function handleThumbnailError() {
 
-    anchor.classList.remove('ravel');
+    const src = getImage();
+
+    setImage(
+      src.includes('vi_webp') ?
+        src.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
+        '/logo192.png'
+    );
+
+    parent.classList.remove('ravel');
   }
+
 
 
   if (state.loadImage)
-    imgsrc = generateImageUrl(data.img || data.id, 'mq');
+    setImage(generateImageUrl(data.img || data.id, 'mq'));
 
-
-  return html`
-    
+  return (
     <a
-      class=${'streamItem ' + (state.loadImage ? 'ravel' : '')}
-      href=${data.href}
-      ref=${(_: HTMLAnchorElement) => { anchor = _ }}
-      data-id=${data.id}
-      data-title=${data.title}
-      data-author=${data.author}
-      data-channel_url=${data.channelUrl}
-      data-duration=${data.duration}
-      data-thumbnail=${imgsrc}
+      class={'streamItem ' + (state.loadImage ? 'ravel' : '')}
+      href={data.href}
+      ref={parent}
+      data-id={data.id}
+      data-title={data.title}
+      data-author={data.author}
+      data-channel_url={data.channelUrl}
+      data-duration={data.duration}
+      data-thumbnail={getImage()}
     >
       <span>
-      
-        ${state.loadImage ?
-
-      html`<img
+        <Show when={state.loadImage} fallback={data.duration}>
+          <img
             crossorigin='anonymous'
-            @error=${handleThumbnailError}
-            @load=${handleThumbnailLoad}
-            src=${imgsrc}
+            onerror={handleThumbnailError}
+            onload={handleThumbnailLoad}
+            src={getImage()}
           />
-          <p class='duration'>${data.duration}</p>` :
-      data.duration
-    }          
-
+          <p class='duration'>{data.duration}</p>
+        </Show>
       </span>
       <div class='metadata'>
-        <p class='title'>${data.title}</p>
+        <p class='title'>{data.title}</p>
         <div class='avu'>
-          <p class='author'>${data.author?.replace(' - Topic', '')}</p>
-          <p class='viewsXuploaded'>${(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
+          <p class='author'>{data.author?.replace(' - Topic', '')}</p>
+          <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
         </div>
       </div>
-      <i class=${'ri-' + (data.draggable ? 'draggable' : 'more-2-fill')}></i>
+      <i class={`ri-${data.draggable ? 'draggable' : 'more-2-fill'}`}></i>
     </a>
-  `;
+  )
 }

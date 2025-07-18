@@ -68,17 +68,6 @@ export function setState<K extends keyof AppSettings>(key: K, val: AppSettings[K
 
 
 
-const nl = navigator.language.slice(0, 2);
-const locale = state.language || (Locales.includes(nl) ? nl : 'en');
-document.documentElement.lang = locale;
-
-export let t: Record<TranslationKeys, string> | undefined;
-
-export const i18nize = async () => import(`../locales/${locale}.json`)
-  .then(_ => {
-    t = _.default;
-  });
-
 
 
 
@@ -96,6 +85,7 @@ const storeInit: {
     legacy: boolean,
     fallback: string
   },
+  i18nSrc?: Record<TranslationKeys, string>,
   lrcSync: (arg0: number) => {} | void,
   queue: {
     list: string[],

@@ -1,5 +1,4 @@
 import { goTo, hostResolver, notify } from "./utils";
-import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, removeFromListBtn, sortCollectionBtn } from "./dom";
 import { store } from "./store";
 import { render, html } from "uhtml";
 import StreamItem from "../components/StreamItem";

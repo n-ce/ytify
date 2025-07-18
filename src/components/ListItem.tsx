@@ -1,7 +1,7 @@
 import { hostResolver } from '../lib/utils';
 import { state } from '../lib/store';
-import { html } from 'uhtml';
-import './ListItem.css';
+import './listItem.css';
+import { Show, createSignal } from 'solid-js';
 
 
 export default function(data: {
@@ -12,6 +12,7 @@ export default function(data: {
   url: string,
 }) {
 
+  const [getThumbnail, setThumbnail] = createSignal(data.thumbnail);
   let img!: HTMLImageElement;
 
   function unravel() {
@@ -19,31 +20,31 @@ export default function(data: {
   }
   function handleError() {
     unravel();
-    img.src = '/logo192.png';
+    setThumbnail('/logo192.png');
   }
 
-  return html`
+  return (
     <a
-      class=${'listItem ' + (state.loadImage ? 'ravel' : '')}
-      href=${hostResolver(data.url)}
-      data-title=${data.title}
-      data-url=${data.url}
-      data-thumbnail=${data.thumbnail}
-      data-uploader=${data.uploader_data}
+      class={'listItem ' + (state.loadImage ? 'ravel' : '')}
+      href={hostResolver(data.url)}
+      data-title={data.title}
+      data-url={data.url}
+      data-thumbnail={data.thumbnail}
+      data-uploader={data.uploader_data}
     >
-      ${state.loadImage ? html`
+      <Show when={state.loadImage}>
         <img
-          ref=${(_: HTMLImageElement) => { img = _; }}
-          src=${data.thumbnail}
-          @error=${handleError}
-          @load=${unravel}
+          ref={img}
+          src={getThumbnail()}
+          onError={handleError}
+          onLoad={unravel}
         />
-      `: ''}
+      </Show>
       <div>
-        <p class="title">${data.title}</p>
-        <p class="uData">${data.uploader_data}</p>
-        <p class="stats">${data.stats}</p>
+        <p class="title">{data.title}</p>
+        <p class="uData">{data.uploader_data}</p>
+        <p class="stats">{data.stats}</p>
       </div>
     </a>
-  `;
+  );
 }

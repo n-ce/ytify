@@ -1,7 +1,7 @@
 // import { audio, settingsContainer, title } from "./dom";
 // import { getThumbIdFromLink } from "./visualUtils";
 // import player from "./player";
-import { t, state, store } from "./store";
+import { setStore, state, store } from "./store";
 //import fetchList from "../modules/fetchList";
 // import { fetchCollection, removeFromCollection } from "./libraryUtils";
 
@@ -9,6 +9,13 @@ import { t, state, store } from "./store";
 export const goTo = (route: Routes | 'history' | 'discover') => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
+
+const t = store.i18nSrc;
+setStore((prev) => {
+  delete prev.i18nSrc;
+  return prev;
+})
 
 export const i18n = (
   key: TranslationKeys,

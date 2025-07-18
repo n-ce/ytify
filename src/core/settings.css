@@ -7,6 +7,10 @@
     i {
       font-size: var(--font-size-4);
     }
+
+    .ri-close-large-line {
+      margin-right: var(--size-8);
+    }
   }
 
 }

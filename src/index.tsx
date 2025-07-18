@@ -1,23 +1,29 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { onMount, Show } from 'solid-js';
+import { lazy, onMount, Show } from 'solid-js';
 import './styles/index.css';
-import { state, store, setStore, i18nize } from './lib/store';
-import Home from './core/Home';
-import Player from './core/Player';
-import Queue from './core/Queue';
-import Settings from './core/Settings';
-import Search from './core/Search';
-import MiniPlayer from './core/MiniPlayer';
-import List from './core/List';
-import { themer } from './lib/visualUtils';
+import { state, store, setStore } from './lib/store';
+
+const Home = lazy(() => import('./core/Home'));
+const List = lazy(() => import('./core/List'));
+const Queue = lazy(() => import('./core/Queue'));
+const Player = lazy(() => import('./core/Player'));
+const Search = lazy(() => import('./core/Search'));
+const Settings = lazy(() => import('./core/Settings'));
+const MiniPlayer = lazy(() => import('./core/MiniPlayer'));
 
 const thumbnail =
   "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";
 
+const feedbackForm = document.forms[0] as HTMLFormElement;
+document.body.removeChild(feedbackForm);
+
+
 let imgRef!: HTMLImageElement;
 const audio = new Audio();
 audio.onloadeddata = () => { console.log('loafed') }
+
+
 
 const Image = state.loadImage ? (<img
   ref={imgRef}
@@ -73,12 +79,15 @@ function App() {
 
   onMount(() => {
 
-    if (state.loadImage) {
-      themer();
-    }
-    else {
-      themer(); // one time only
-    }
+    import('./lib/visualUtils')
+      .then(mod => {
+        if (state.loadImage) {
+          mod.themer();
+        }
+        else {
+          mod.themer(); // one time only     
+        }
+      });
   });
   return (
     <>
@@ -115,6 +124,7 @@ function App() {
         </Show>
         <Show when={store.views.settings}>
           <Settings
+            feedback={feedbackForm}
             close={() => { closeSection('settings') }}
           />
         </Show>
@@ -133,6 +143,15 @@ function App() {
   );
 }
 
-i18nize().then(() => render(() => <App />, document.body));
+
+const nl = navigator.language.slice(0, 2);
+const locale = state.language || (Locales.includes(nl) ? nl : 'en');
+document.documentElement.lang = locale;
+
+import(`./locales/${locale}.json`)
+  .then(_ => {
+    setStore('i18nSrc', _.default);
+  })
+  .then(() => render(() => <App />, document.body));
 
 
