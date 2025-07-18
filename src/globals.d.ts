@@ -52,10 +52,10 @@ declare global {
   }
 
   type Library = {
-    history: Collection,
+    history?: Collection,
     favorites: Collection,
     listenLater: Collection,
-    discover: {
+    discover?: {
       [index: string]: CollectionItem & { frequency: number }
     },
     channels: { [index: string]: List & { uploader: string } },
@@ -75,19 +75,19 @@ declare global {
       text: string
     }
   }
-  /*
-    type ToggleSwitch = {
-      name: TranslationKeys | string,
-      id: string,
-      checked: boolean,
-      onClick: (e: EventHandler<HTMLInputElement>) => void
-    }
-  */
+
+  type ToggleSwitch = {
+    name: TranslationKeys | string,
+    id: string,
+    checked: boolean,
+    onclick: (e: EventHandler<HTMLInputElement>) => void
+  }
+
   type Selector = {
     label: TranslationKeys | string,
     id: string,
-    onChange: (e: { target: HTMLSelectElement }) => void,
-    onMount: (target: HTMLSelectElement) => void,
+    onchange: (e: { target: HTMLSelectElement }) => void,
+    onmount: (target: HTMLSelectElement) => void,
     children: JSXElement
   }
 

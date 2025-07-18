@@ -9,14 +9,11 @@ const List = lazy(() => import('./core/List'));
 const Queue = lazy(() => import('./core/Queue'));
 const Player = lazy(() => import('./core/Player'));
 const Search = lazy(() => import('./core/Search'));
-const Settings = lazy(() => import('./core/Settings'));
+const Settings = lazy(() => import('./core/Settings/Index.tsx'));
 const MiniPlayer = lazy(() => import('./core/MiniPlayer'));
 
 const thumbnail =
   "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";
-
-const feedbackForm = document.forms[0] as HTMLFormElement;
-document.body.removeChild(feedbackForm);
 
 
 let imgRef!: HTMLImageElement;
@@ -56,6 +53,16 @@ const PlayNextButton = (
   <button data-translation-aria-label="player_play_next" class="ri-skip-forward-line"
     id="playNextButton"></button>
 );
+const LikeButton = (
+  <>
+    <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
+    <input
+      type="checkbox"
+      id="favButton"
+      style="display:none"
+    />
+  </>
+);
 
 const Track = (
   <div class="track">
@@ -64,20 +71,38 @@ const Track = (
   </div>
 );
 
+
 let homeRef!: HTMLElement;
 
-function closeSection(section: Views) {
-  homeRef.scrollIntoView({
-    behavior: 'smooth'
-  });
-  setTimeout(() => {
-    setStore('views', section, false);
-  }, 500)
-}
 
 function App() {
 
-  onMount(() => {
+  onMount(async () => {
+
+    const { customInstance } = state;
+
+    if (customInstance) {
+
+      const [pi, iv, useInvidious] = customInstance.split(',');
+      setStore('player', 'hls', 'api', 0, pi);
+      setStore('api', 'piped', 0, pi);
+      setStore('api', 'invidious', 0, iv);
+      state.enforcePiped = !useInvidious;
+
+    } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
+      .then(res => res.json())
+      .then(data => {
+        setStore('api', {
+          piped: data.piped,
+          invidious: data.invidious,
+          hyperpipe: data.hyperpipe,
+          jiosaavn: data.jiosaavn
+        });
+        setStore('player', 'hls', 'api', data.hls);
+        setStore('player', 'fallback', location.origin);
+        state.enforcePiped = state.enforcePiped || data.status === 1;
+      });
+
 
     import('./lib/visualUtils')
       .then(mod => {
@@ -89,6 +114,17 @@ function App() {
         }
       });
   });
+
+  function closeSection(section: Views) {
+    homeRef.scrollIntoView({
+      behavior: 'smooth'
+    });
+    setTimeout(() => {
+      setStore('views', section, false);
+    }, 500)
+  }
+
+
   return (
     <>
       <main>
@@ -107,7 +143,8 @@ function App() {
           <Player
             img={Image}
             playBtn={PlayButton}
-            playNext={PlayNextButton}
+            likeBtn={LikeButton}
+            playNextBtn={PlayNextButton}
             track={Track}
             close={() => { closeSection('player') }}
           />
@@ -124,17 +161,16 @@ function App() {
         </Show>
         <Show when={store.views.settings}>
           <Settings
-            feedback={feedbackForm}
             close={() => { closeSection('settings') }}
           />
         </Show>
       </main>
 
-      <Show when={!store.views.player}>
+      <Show when={!store.views.player && store.stream.id}>
         <MiniPlayer
           img={Image}
           playBtn={PlayButton}
-          playNext={PlayNextButton}
+          xtraBtn={store.queue.list.length ? PlayNextButton : LikeButton}
           track={Track}
           handleClick={() => setStore('views', 'player', true)}
         />

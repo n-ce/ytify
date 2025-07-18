@@ -55,15 +55,17 @@ export function proxyHandler(url: string, prefetch: boolean = false) {
     (url + (host ? '' : `&host=${origin}`)) :
     (host && !state.customInstance) ? url.replace(origin, host) : url;
 }
-
+*/
 export async function quickSwitch() {
   if (!store.stream.id) return;
-  if (store.player.playbackState === 'playing')
-    audio.pause();
-  const timeOfSwitch = audio.currentTime;
-  await player(store.stream.id);
-  audio.currentTime = timeOfSwitch;
-  audio.play();
+}
+/*
+if (store.player.playbackState === 'playing')
+  audio.pause();
+const timeOfSwitch = audio.currentTime;
+await player(store.stream.id);
+audio.currentTime = timeOfSwitch;
+audio.play();
 }
 */
 

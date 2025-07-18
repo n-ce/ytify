@@ -53,6 +53,7 @@
 .topShelf {
   display: flex;
   justify-content: space-between;
+
 }
 
 .mainShelf {

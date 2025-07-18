@@ -13,6 +13,7 @@ footer {
   overflow: hidden;
   height: var(--size-8);
   backdrop-filter: blur(var(--size-2));
+  animation: var(--animation-slide-in-up) forwards;
 
   &,
   * {
@@ -62,6 +63,10 @@ footer {
 
   #playButton {
     font-size: var(--size-7);
+  }
+
+  .ri-heart-line {
+    font-size: var(--size-6);
   }
 
   .track {

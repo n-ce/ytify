@@ -163,3 +163,5 @@ if (state.roundness !== '0.4rem')
 
 systemDark.addEventListener('change', themer);
 
+export { cssVar };
+

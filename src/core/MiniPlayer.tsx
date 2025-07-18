@@ -5,12 +5,13 @@ export default function(_: {
   img: JSX.Element,
   track: JSX.Element,
   playBtn: JSX.Element,
-  playNext: JSX.Element,
+  xtraBtn: JSX.Element,
   handleClick: () => void
 }) {
   return (
     <footer onclick={(e) => {
-      if (!e.target.matches('button'))
+      console.log(e.target);
+      if (!e.target.matches('button') && !e.target.matches('label'))
         _.handleClick();
     }
     }>
@@ -18,7 +19,7 @@ export default function(_: {
       {_.img}
       {_.track}
       {_.playBtn}
-      {_.playNext}
+      {_.xtraBtn}
     </footer>
   )
 }

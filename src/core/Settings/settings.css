@@ -1,4 +1,4 @@
-#settings {
+#settingsSection {
   background-color: var(--bg);
   color: inherit;
   margin: auto;
@@ -8,8 +8,13 @@
   overflow: scroll;
   border-radius: var(--roundness);
 
-  @media(orientation:landscape) {
-    width: 60%;
+  header {
+    display: flex;
+    justify-content: space-between;
+
+    i {
+      font-size: var(--font-size-4);
+    }
   }
 
   >h3 {

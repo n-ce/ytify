@@ -1,32 +1,20 @@
-import { Hole, html } from "uhtml";
-import { i18n } from "../scripts/i18n";
+import { onMount } from "solid-js";
+import { i18n } from "../lib/utils";
 
-export default function(_: {
-  id: string,
-  label: string,
-  handler: (e: Event & {
-    target: HTMLSelectElement
-  }) => void
-  children: Hole,
-  onmount?: (t: HTMLSelectElement) => void
-}) {
+export function Selector(_: Selector) {
+  let target!: HTMLSelectElement;
+  onMount(() => _.onmount(target));
 
-  return html`
+  return (
     <span>
-      <label for=${_.id}>
-        ${i18n(_.label as TranslationKeys)}
+      <label for={_.id}>
+        {i18n(_.label as TranslationKeys)}
       </label>
       <select
-        ref=${(s: HTMLSelectElement) => {
-      if (_.onmount)
-        Promise.resolve().then(() => {
-          if (s.isConnected && _.onmount)
-            _.onmount(s)
-        });
-    }}
-        id = ${_.id}
-        @change=${_.handler}
-      > ${_.children} </select>
+        id={_.id}
+        onchange={_.onchange}
+        ref={target}
+      >{_.children}</select>
     </span>
-    `;
+  );
 }

@@ -5,8 +5,9 @@ import './player.css'
 export default function(_: {
   img: JSX.Element,
   track: JSX.Element,
+  likeBtn: JSX.Element,
   playBtn: JSX.Element,
-  playNext: JSX.Element,
+  playNextBtn: JSX.Element,
   close: () => void
 }) {
   let playerSection!: HTMLDivElement;
@@ -16,16 +17,13 @@ export default function(_: {
 
   const auxCtrls = [
     [
-      <>
-        <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
-        <input type="checkbox" id="favButton" />
-      </>,
+      _.likeBtn,
       <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton"></i>
     ],
     [
       <button data-translation-aria-label="player_play_previous" class="ri-skip-back-line"
         id="playPrevButton"></button>,
-      _.playNext
+      _.playNextBtn
     ],
     [
       <select id="playSpeed">
@@ -67,8 +65,9 @@ export default function(_: {
       <span class="topShelf">
 
         <i
-          onclick={() => {
+          onclick={(e) => {
             setCtrlIdx((ctrlIdx() + 1) % auxCtrls.length);
+            (e.target as HTMLElement).style.transform = `rotateZ(-${120 * ctrlIdx()}deg)`;
           }}
           class="ri-loop-left-line"></i>
         <i

@@ -1,5 +1,5 @@
 import { setState, state } from "../lib/store";
-import { i18n } from "../scripts/i18n";
+import { i18n } from "../lib/utils";
 
 export default function(): {
   name: string,
