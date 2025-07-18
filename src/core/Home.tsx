@@ -1,8 +1,9 @@
-import { createSignal, onMount } from 'solid-js';
-import { i18n } from '../scripts/i18n';
+import { createSignal, onMount, Show } from 'solid-js';
 import About from '../components/About';
 import Hub from '../components/Hub';
 import './home.css';
+import { i18n } from '../lib/utils';
+import { store } from '../lib/store';
 
 export default function(_: {
   settings: () => void,
@@ -22,11 +23,13 @@ export default function(_: {
       <header>
         <p>Home </p>
         <i id="syncNow" class="ri-cloud-fill"></i>
-        <i
-          id="searchToggle"
-          class="ri-search-2-line"
-          onclick={_.search}
-        ></i>
+        <Show when={!store.views.search}>
+          <i
+            id="searchToggle"
+            class="ri-search-2-line"
+            onclick={_.search}
+          ></i>
+        </Show>
         <details>
           <summary><i class="ri-more-2-fill"></i></summary>
           <ul>
@@ -34,12 +37,13 @@ export default function(_: {
               id="settingsHandler"
               onclick={_.settings}
             >
-              <i class="ri-settings-line"></i> Settings
+              <i class="ri-settings-line"></i>&nbsp;{i18n('nav_settings')}
             </li>
 
             <li>
               <label id="importBtn" for="upload_ytify">
                 <i class="ri-import-line"></i>&nbsp;{i18n('library_import')}
+
               </label>
               <input type="file" id="upload_ytify" onchange={() => ''} />
             </li>
@@ -58,7 +62,7 @@ export default function(_: {
             </li>
             <li>
               <label id="importSongshiftBtn" for="upload_songshift">
-                <i class="ri-refresh-line"></i>&nbsp;Import From Songshift
+                <i class="ri-refresh-line"></i>&nbsp;Import Playlists From SongShift
               </label>
               <input type="file" id="upload_songshift" onchange={async (e) => (await import('../modules/importSongshiftStreams')).default(e.target.files![0])} />
             </li>

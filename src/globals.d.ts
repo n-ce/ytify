@@ -5,6 +5,8 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
+  type Views = 'player' | 'queue' | 'list' | 'settings' | 'search';
+
   type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
 
   type StreamItem = {

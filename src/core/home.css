@@ -49,29 +49,24 @@ header {
 
 #catalogueSelector {
 
-  display: flex;
-  overflow-x: auto;
   margin-bottom: var(--size-3);
 
   input[type='radio'] {
     display: none;
 
-    &+label {
-      cursor: pointer;
-      font-size: var(--font-size-1);
-      display: inline-block;
-      padding: var(--size-1) var(--size-2);
-      margin-right: var(--size-3);
-      border-radius: var(--roundness);
-      opacity: 0.6;
-      background: #7777;
-    }
-
     &:checked+label {
-      font-weight: bold;
-      opacity: 1;
       background: var(--text);
       color: var(--bg);
+      border: var(--border);
+    }
+
+    &+label {
+      cursor: pointer;
+      font-size: small;
+      display: inline-block;
+      padding: var(--size-1) var(--size-2);
+      margin: var(--size-1) 0;
+      border-radius: var(--roundness);
     }
 
 

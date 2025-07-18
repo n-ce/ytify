@@ -1,5 +1,5 @@
 import { author, img, title } from "../lib/dom";
-import { generateImageUrl } from "../lib/imageUtils";
+import { generateImageUrl } from "../lib/visualUtils";
 import { state, store } from "../lib/store";
 import { hostResolver } from "../lib/utils";
 

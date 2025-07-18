@@ -1,5 +1,30 @@
 #listSection {
-  h1 {
-    color: red
+  width: 100%;
+}
+
+#listSection>header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+
+  >p {
+    padding-right: 2rem;
+  }
+
+  &.reverse {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+
+#viewOnYTBtn,
+#subscribeListBtn {
+  i {
+    &:after {
+      content: attr(data-state);
+      font-family: inherit;
+    }
   }
 }

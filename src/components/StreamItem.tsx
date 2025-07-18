@@ -1,7 +1,7 @@
 import { html } from "uhtml";
 import { state } from "../lib/store";
-import { generateImageUrl } from "../lib/gfxUtils";
-import './StreamItem.css';
+import { generateImageUrl } from "../lib/visualUtils";
+import './streamItem.css';
 
 export default function(data: {
   id: string,

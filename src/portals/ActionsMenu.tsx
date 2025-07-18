@@ -1,4 +1,4 @@
-import './ActionsMenu.css';
+import './actionsMenu.css';
 import { html, render } from "uhtml";
 import { loadingScreen, openInYtBtn } from "../lib/dom";
 import { state, store } from "../lib/store";

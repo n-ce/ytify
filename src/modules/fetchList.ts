@@ -1,10 +1,9 @@
 import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { errorHandler, getApi, goTo, notify, superClick } from "../lib/utils";
+import { errorHandler, getApi, goTo, i18n, notify, superClick } from "../lib/utils";
 import { store } from "../lib/store";
 import { render } from "uhtml";
 import ItemsLoader from "../components/ItemsLoader";
-import { i18n } from "../scripts/i18n";
 
 
 export default async function fetchList(

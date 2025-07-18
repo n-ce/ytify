@@ -1,5 +1,7 @@
 import { createStore } from "solid-js/store";
 
+
+
 export const params = (new URL(location.href)).searchParams;
 
 export let state = {
@@ -66,7 +68,22 @@ export function setState<K extends keyof AppSettings>(key: K, val: AppSettings[K
 
 
 
+const nl = navigator.language.slice(0, 2);
+const locale = state.language || (Locales.includes(nl) ? nl : 'en');
+document.documentElement.lang = locale;
+
+export let t: Record<TranslationKeys, string> | undefined;
+
+export const i18nize = async () => import(`../locales/${locale}.json`)
+  .then(_ => {
+    t = _.default;
+  });
+
+
+
+
 const storeInit: {
+  views: Record<Views, boolean>,
   player: {
     playbackState: 'none' | 'playing' | 'paused',
     hls: {
@@ -101,6 +118,13 @@ const storeInit: {
   list: List & Record<'url' | 'type' | 'uploader', string>,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
+  views: {
+    player: false,
+    queue: false,
+    list: false,
+    settings: false,
+    search: false
+  },
   player: {
     playbackState: 'none',
     hls: {
@@ -161,3 +185,4 @@ const storeInit: {
 };
 
 export const [store, setStore] = createStore(storeInit);
+

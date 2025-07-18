@@ -1,8 +1,8 @@
+import { getDB } from "../lib/libraryUtils";
 
 
 export default function() {
 
-  const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
   const recents = Object.values(getDB().history).reverse().slice(0, 5);
   console.log(recents);
 

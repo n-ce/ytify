@@ -1,5 +1,6 @@
 import { onMount } from "solid-js";
 import './search.css';
+import { i18n } from "../lib/utils";
 
 export default function(_: {
   close: () => void,
@@ -15,38 +16,48 @@ export default function(_: {
   return (
     <section ref={searchSection} id="searchSection">
       <header>
-        <p>Search</p>
+        <p>{i18n('nav_search')}</p>
         <i class="ri-close-large-line" onclick={_.close}></i>
-
       </header>
       <form id="superInputContainer">
         <input
-          placeholder="search_placeholder"
+          placeholder={i18n("search_placeholder")}
           type="search"
           id="superInput"
           ref={superInput}
           autocomplete="off" />
         <select id="searchFilters">
           <optgroup label="YouTube">
-            <option data-translation="search_filter_all" value="all">All</option>
-            <option data-translation="search_filter_videos" value="videos">Videos</option>
-            <option data-translation="search_filter_channels" value="channels">Channels</option>
-            <option data-translation="search_filter_playlists" value="playlists">Playlists</option>
+            <option value="all">{i18n('search_filter_all')}</option>
+            <option value="videos">{i18n('search_filter_videos')}</option>
+            <option value="channels">{i18n('search_filter_channels')}</option>
+            <option value="playlists">{i18n('search_filter_playlists')}</option>
           </optgroup>
           <optgroup label="YouTube Music">
-            <option data-translation="search_filter_music_songs" value="music_songs">Songs</option>
-            <option data-translation="search_filter_music_artists" value="music_artists">Artists</option>
-            <option data-translation="search_filter_music_videos" value="music_videos">Videos</option>
-            <option data-translation="search_filter_music_albums" value="music_albums">Albums</option>
-            <option data-translation="search_filter_music_playlists" value="music_playlists">Playlists</option>
+            <option value="music_songs">{i18n('search_filter_music_songs')}</option>
+            <option value="music_artists">{i18n('search_filter_music_artists')}</option>
+            <option value="music_videos">{i18n('search_filter_music_videos')}</option>
+            <option value="music_albums">{i18n('search_filter_music_albums')}</option>
+            <option value="music_playlists">{i18n('search_filter_music_playlists')}</option>
           </optgroup>
-          <optgroup data-translation-label="search_filter_sort_by" label="Sort By">
-            <option data-translation="search_filter_date" value="date">Time</option>
-            <option data-translation="search_filter_views" value="views">Views</option>
+          <optgroup label={i18n('search_filter_sort_by')}>
+            <option value="date">{i18n('search_filter_date')}</option>
+            <option value="views">{i18n('search_filter_views')}</option>
           </optgroup>
         </select>
       </form>
-      <ul id="suggestions"></ul>
+      <ul id="suggestions">
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+        <li>test</li>
+      </ul>
       <div id="searchlist">
       </div>
     </section>

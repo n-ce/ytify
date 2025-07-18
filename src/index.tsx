@@ -1,9 +1,8 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { Show } from 'solid-js';
+import { onMount, Show } from 'solid-js';
 import './styles/index.css';
-import { state } from './lib/store';
-import { themer } from './lib/gfxUtils';
+import { state, store, setStore, i18nize } from './lib/store';
 import Home from './core/Home';
 import Player from './core/Player';
 import Queue from './core/Queue';
@@ -11,7 +10,7 @@ import Settings from './core/Settings';
 import Search from './core/Search';
 import MiniPlayer from './core/MiniPlayer';
 import List from './core/List';
-import { createStore } from 'solid-js/store';
+import { themer } from './lib/visualUtils';
 
 const thumbnail =
   "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";
@@ -40,7 +39,6 @@ const Image = state.loadImage ? (<img
         .replace('.webp', '.jpg')
         .replace('vi_webp', 'vi')
   }}
-
 />) : null;
 
 
@@ -60,85 +58,81 @@ const Track = (
   </div>
 );
 
-const [nav, setNav] = createStore({
-  player: false,
-  queue: false,
-  list: false,
-  settings: false,
-  search: false
-});
-
-
 let homeRef!: HTMLElement;
-type tails = 'player' | 'queue' | 'list' | 'settings' | 'search';
 
-function closeSection(section: tails) {
+function closeSection(section: Views) {
   homeRef.scrollIntoView({
     behavior: 'smooth'
   });
   setTimeout(() => {
-    setNav(section, false);
+    setStore('views', section, false);
   }, 500)
 }
 
+function App() {
 
-render(() =>
-  <>
-    <main>
-      <Home
-        settings={() => setNav('settings', true)}
-        search={() => setNav('search', true)}
-        ref={(el) => homeRef = el}
-      />
-      <Show when={nav.search}>
-        <Search
-          close={() => { closeSection('search') }}
+  onMount(() => {
+
+    if (state.loadImage) {
+      themer();
+    }
+    else {
+      themer(); // one time only
+    }
+  });
+  return (
+    <>
+      <main>
+        <Home
+          settings={() => setStore('views', 'settings', true)}
+          search={() => setStore('views', 'search', true)}
+          ref={(el) => homeRef = el}
         />
-      </Show>
-      <Show when={nav.player}>
-        <Player
+
+        <Show when={store.views.search}>
+          <Search
+            close={() => { closeSection('search') }}
+          />
+        </Show>
+        <Show when={store.views.player}>
+          <Player
+            img={Image}
+            playBtn={PlayButton}
+            playNext={PlayNextButton}
+            track={Track}
+            close={() => { closeSection('player') }}
+          />
+        </Show>
+        <Show when={store.views.queue}>
+          <Queue
+            close={() => { closeSection('queue') }}
+          />
+        </Show>
+        <Show when={store.views.list}>
+          <List
+            close={() => { closeSection('list') }}
+          />
+        </Show>
+        <Show when={store.views.settings}>
+          <Settings
+            close={() => { closeSection('settings') }}
+          />
+        </Show>
+      </main>
+
+      <Show when={!store.views.player}>
+        <MiniPlayer
           img={Image}
           playBtn={PlayButton}
           playNext={PlayNextButton}
           track={Track}
-          close={() => { closeSection('player') }}
+          handleClick={() => setStore('views', 'player', true)}
         />
-      </Show>
-      <Show when={nav.queue}>
-        <Queue
-          close={() => { closeSection('queue') }}
-        />
-      </Show>
-      <Show when={nav.list}>
-        <List
-          close={() => { closeSection('list') }}
-        />
-      </Show>
-      <Show when={nav.settings}>
-        <Settings
-          close={() => { closeSection('settings') }}
-        />
-      </Show>
-    </main>
-
-    <Show when={!nav.player}>
-      <MiniPlayer
-        img={Image}
-        playBtn={PlayButton}
-        playNext={PlayNextButton}
-        track={Track}
-        handleClick={() => setNav('player', true)}
-      />
-    </Show >
-  </>
-  , document.body);
-
-if (state.loadImage) {
-  // if (location.pathname !== '/')
-  themer();
+      </Show >
+    </>
+  );
 }
-else {
-  themer(); // one time only
-}
+
+i18nize().then(() => render(() => <App />, document.body));
 
 

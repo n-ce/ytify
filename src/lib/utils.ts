@@ -1,15 +1,21 @@
-import { audio, settingsContainer, title } from "./dom";
-import { getThumbIdFromLink } from "./imageUtils";
-import player from "./player";
-import { state, store } from "./store";
-import fetchList from "../modules/fetchList";
-import { fetchCollection, removeFromCollection } from "./libraryUtils";
-import { i18n } from "../scripts/i18n.ts";
+// import { audio, settingsContainer, title } from "./dom";
+// import { getThumbIdFromLink } from "./visualUtils";
+// import player from "./player";
+import { t, state, store } from "./store";
+//import fetchList from "../modules/fetchList";
+// import { fetchCollection, removeFromCollection } from "./libraryUtils";
 
 
 export const goTo = (route: Routes | 'history' | 'discover') => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
+export const i18n = (
+  key: TranslationKeys,
+  value: string = ''
+) => value ?
+    (t?.[key] || key).replace('$', value) :
+    t?.[key] || key;
 
 export const getApi = (
   type: 'piped' | 'invidious',
@@ -29,7 +35,7 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
-
+/*
 export function proxyHandler(url: string, prefetch: boolean = false) {
   store.api.index = 0;
   if (!prefetch)
@@ -52,7 +58,7 @@ export async function quickSwitch() {
   audio.currentTime = timeOfSwitch;
   audio.play();
 }
-
+*/
 
 export async function preferredStream(audioStreams: AudioStream[]) {
   const preferedCodec: 'opus' | 'aac' = state.codec === 'any' ? ((await store.player.supportsOpus) ? 'opus' : 'aac') : state.codec;
@@ -87,12 +93,12 @@ export function notify(text: string) {
   el.className = 'snackbar';
   el.textContent = text;
   el.onclick = clear;
-  setTimeout(clear, 8e3);
+  setTimeout(clear, 8e3);/*
   if (settingsContainer.open) {
     const settingsHeader = settingsContainer.firstElementChild as HTMLHeadingElement;
     settingsHeader.appendChild(el);
   } else
-    document.body.appendChild(el);
+    document.body.appendChild(el);*/
 }
 
 
@@ -172,7 +178,7 @@ export async function errorHandler(
   store.api.index = 0;
 }
 
-
+/*
 // TLDR : Stream Item Click Action
 export async function superClick(e: Event) {
   const elem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
@@ -242,3 +248,4 @@ export async function superClick(e: Event) {
     fetchList(url);
   }
 }
+*/
