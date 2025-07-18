@@ -144,11 +144,6 @@ declare global {
     'dbchange': CustomEvent<{ db: Library, change: string }>;
   }
 
-  interface FileEv extends Event {
-    target: HTMLInputElement & {
-      files: FileList
-    }
-  }
 }
 
 

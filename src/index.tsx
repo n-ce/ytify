@@ -53,13 +53,31 @@ const PlayNextButton = (
   <button data-translation-aria-label="player_play_next" class="ri-skip-forward-line"
     id="playNextButton"></button>
 );
+
+
 const LikeButton = (
   <>
-    <label data-translation-aria-label="player_like" for="favButton" class="ri-heart-line"></label>
+    <label
+      aria-label="player_like"
+      for="favButton"
+      class="ri-heart-line"
+    ></label>
     <input
       type="checkbox"
       id="favButton"
       style="display:none"
+      onchange={async (e) => {
+        const favBtn = e.target as HTMLInputElement;
+        if (!store.stream.id) return;
+
+        const { addToCollection, removeFromCollection } = await import('./lib/libraryUtils.ts');
+        if (favBtn.checked)
+          addToCollection('favorites', store.stream)
+        else
+          removeFromCollection('favorites', store.stream.id);
+
+        favBtn.previousElementSibling!.classList.toggle('ri-heart-fill');
+      }}
     />
   </>
 );
@@ -113,6 +131,11 @@ function App() {
           mod.themer(); // one time only     
         }
       });
+
+
+
+
+
   });
 
   function closeSection(section: Views) {

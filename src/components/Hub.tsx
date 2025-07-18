@@ -2,8 +2,9 @@ import { getDB } from "../lib/libraryUtils";
 
 
 export default function() {
+  const { history } = getDB();
 
-  const recents = Object.values(getDB().history).reverse().slice(0, 5);
+  const recents = history ? Object.values(history).reverse().slice(0, 5) : [];
   console.log(recents);
 
   return (

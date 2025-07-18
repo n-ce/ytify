@@ -1,6 +1,6 @@
 export default function() {
   return (
-    <div align="center">
+    <div style="display:inline-flex;align-items:center;flex-direction:column">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4172 4172" width="4vmin" height="4vmin"
         style="transform: scale(9); margin:14vmin 0;">
         <path fill="var(--text)"

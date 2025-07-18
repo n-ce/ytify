@@ -66,7 +66,7 @@ export default function(_: {
       </header>
       <br />
       <div id="listContainer">
-        <h1 data-translation="list_info">{i18n("list_info")}</h1>
+        <h1>{i18n("list_info")}</h1>
       </div>
     </section>
   )

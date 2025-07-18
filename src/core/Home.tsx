@@ -2,8 +2,9 @@ import { createSignal, onMount, Show } from 'solid-js';
 import About from '../components/About';
 import Hub from '../components/Hub';
 import './home.css';
-import { i18n } from '../lib/utils';
-import { store } from '../lib/store';
+import { i18n, notify } from '../lib/utils';
+import { state, store } from '../lib/store';
+import { getDB, saveDB, toCollection } from '../lib/libraryUtils';
 
 export default function(_: {
   settings: () => void,
@@ -13,16 +14,54 @@ export default function(_: {
 
   const [item, setItem] = createSignal('');
   let homeRef!: HTMLElement;
+  let syncBtn!: HTMLElement;
   onMount(() => {
     _.ref(homeRef);
   });
+
+  const { dbsync } = state;
+
+  if (dbsync) import('../modules/cloudSync').then(mod => mod.default(dbsync, syncBtn));
+
+  async function importLibrary(e: Event) {
+    const importBtn = e.target as HTMLInputElement & { files: FileList };
+    const newDB = JSON.parse(await importBtn.files[0].text());
+    const oldDB = getDB();
+    if (!confirm(i18n('library_import_prompt'))) return;
+    for (const collection in newDB) for (const item in newDB[collection])
+      toCollection(collection, newDB[collection][item], oldDB)
+    saveDB(oldDB);
+    notify(i18n('library_imported'));
+  };
+
+  function exportLibrary() {
+    const link = document.createElement('a');
+    link.download = 'ytify_library.json';
+    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
+    link.click();
+  };
+
+  function cleanLibrary() {
+    const count = Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0);
+    if (confirm(i18n('library_clean_prompt', count.toString()))) {
+      localStorage.removeItem('library');
+      location.reload();
+    }
+  };
+
 
   return (
     <section ref={homeRef}>
 
       <header>
         <p>Home </p>
-        <i id="syncNow" class="ri-cloud-fill"></i>
+        <Show when={dbsync}>
+          <i
+            id="syncNow"
+            class="ri-cloud-fill"
+            ref={syncBtn}
+          ></i>
+        </Show>
         <Show when={!store.views.search}>
           <i
             id="searchToggle"
@@ -45,13 +84,13 @@ export default function(_: {
                 <i class="ri-import-line"></i>&nbsp;{i18n('library_import')}
 
               </label>
-              <input type="file" id="upload_ytify" onchange={() => ''} />
+              <input type="file" id="upload_ytify" onchange={importLibrary} />
             </li>
-            <li id="exportBtn" onclick={() => ''}>
+            <li id="exportBtn" onclick={exportLibrary}>
               <i class="ri-export-line"></i>&nbsp;{i18n('library_export')}
 
             </li>
-            <li id="cleanLibraryBtn" onclick={() => ''}>
+            <li id="cleanLibraryBtn" onclick={cleanLibrary}>
               <i class="ri-delete-bin-2-line"></i>&nbsp;{i18n('library_clean')}
             </li>
             <li id="importPipedBtn" onclick={async () => {
