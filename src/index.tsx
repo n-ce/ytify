@@ -1,99 +1,34 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { lazy, onMount, Show } from 'solid-js';
+import { createSignal, lazy, onMount, Show } from 'solid-js';
 import './styles/index.css';
 import { state, store, setStore } from './lib/store';
 
-const Home = lazy(() => import('./core/Home'));
-const List = lazy(() => import('./core/List'));
-const Queue = lazy(() => import('./core/Queue'));
-const Player = lazy(() => import('./core/Player'));
-const Search = lazy(() => import('./core/Search'));
-const Settings = lazy(() => import('./core/Settings/Index.tsx'));
-const MiniPlayer = lazy(() => import('./core/MiniPlayer'));
-
-const thumbnail =
-  "https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover";
-
-
-let imgRef!: HTMLImageElement;
-const audio = new Audio();
-audio.onloadeddata = () => { console.log('loafed') }
+const Home = lazy(() => import('./sections/Home'));
+const List = lazy(() => import('./sections/List'));
+const Queue = lazy(() => import('./sections/Queue'));
+const Player = lazy(() => import('./sections/Player'));
+const Search = lazy(() => import('./sections/Search/Index'));
+const Settings = lazy(() => import('./sections/Settings/Index'));
+const MiniPlayer = lazy(() => import('./components/MiniPlayer'));
+const Watcher = lazy(() => import('./sections/WatchVideo'));
+const Lyrics = lazy(() => import('./sections/Lyrics'));
+const Updater = lazy(() => import('./sections/UpdatePrompt'));
 
 
-
-const Image = state.loadImage ? (<img
-  ref={imgRef}
-  src={thumbnail}
-  crossorigin="anonymous"
-  id="miniThumbnail"
-  alt="mini player thumbnail"
-  onload={() => {
-    if (imgRef.naturalWidth === 120)
-      imgRef.src = imgRef.src
-        .replace('maxres', 'mq')
-        .replace('.webp', '.jpg')
-        .replace('vi_webp', 'vi')
-  }}
-  onerror={() => {
-    if (imgRef.src.includes('max'))
-      imgRef.src = imgRef.src
-        .replace('maxres', 'mq')
-        .replace('.webp', '.jpg')
-        .replace('vi_webp', 'vi')
-  }}
-/>) : null;
-
-
-const PlayButton = (
-  <button class="ri-stop-circle-fill" id="playButton" data-translation-aria-label="player_play_button"
-    data-playbackState="none"></button>
-);
 const PlayNextButton = (
-  <button data-translation-aria-label="player_play_next" class="ri-skip-forward-line"
-    id="playNextButton"></button>
+  <button
+    aria-label="player_play_next"
+    class="ri-skip-forward-line"
+    id="playNextButton"
+  ></button>
 );
-
-
-const LikeButton = (
-  <>
-    <label
-      aria-label="player_like"
-      for="favButton"
-      class="ri-heart-line"
-    ></label>
-    <input
-      type="checkbox"
-      id="favButton"
-      style="display:none"
-      onchange={async (e) => {
-        const favBtn = e.target as HTMLInputElement;
-        if (!store.stream.id) return;
-
-        const { addToCollection, removeFromCollection } = await import('./lib/libraryUtils.ts');
-        if (favBtn.checked)
-          addToCollection('favorites', store.stream)
-        else
-          removeFromCollection('favorites', store.stream.id);
-
-        favBtn.previousElementSibling!.classList.toggle('ri-heart-fill');
-      }}
-    />
-  </>
-);
-
-const Track = (
-  <div class="track">
-    <a data-translation="player_now_playing" id="title" href="" target="_blank">Now Playing</a>
-    <p data-translation="player_channel" id="author">Channel</p>
-  </div>
-);
-
-
-let homeRef!: HTMLElement;
-
 
 function App() {
+
+
+  const audio = new Audio();
+  audio.onloadeddata = () => { console.log('loafed') }
 
   onMount(async () => {
 
@@ -132,19 +67,18 @@ function App() {
         }
       });
 
-
-
-
-
   });
 
-  function closeSection(section: Views) {
+  let homeRef!: HTMLElement;
+
+  function closeSection(section: Views | undefined = undefined) {
     homeRef.scrollIntoView({
       behavior: 'smooth'
     });
-    setTimeout(() => {
-      setStore('views', section, false);
-    }, 500)
+    if (section)
+      setTimeout(() => {
+        setStore('views', section, false);
+      }, 500)
   }
 
 
@@ -164,18 +98,12 @@ function App() {
         </Show>
         <Show when={store.views.player}>
           <Player
-            img={Image}
-            playBtn={PlayButton}
-            likeBtn={LikeButton}
             playNextBtn={PlayNextButton}
-            track={Track}
             close={() => { closeSection('player') }}
           />
         </Show>
-        <Show when={store.views.queue}>
-          <Queue
-            close={() => { closeSection('queue') }}
-          />
+        <Show when={store.queuelist.length}>
+          <Queue close={() => closeSection()} />
         </Show>
         <Show when={store.views.list}>
           <List
@@ -187,14 +115,23 @@ function App() {
             close={() => { closeSection('settings') }}
           />
         </Show>
+        <Show when={update()}>
+          <Updater
+            updater={handleUpdate}
+            close={() => setUpdate(false)}
+          />
+        </Show>
+        <Show when={store.views.lyrics}>
+          <Lyrics close={() => { closeSection('lyrics') }} />
+        </Show>
+        <Show when={store.views.watch}>
+          <Watcher close={() => { closeSection('watch') }} />
+        </Show>
       </main>
 
       <Show when={!store.views.player && store.stream.id}>
         <MiniPlayer
-          img={Image}
-          playBtn={PlayButton}
-          xtraBtn={store.queue.list.length ? PlayNextButton : LikeButton}
-          track={Track}
+          playNextBtn={PlayNextButton}
           handleClick={() => setStore('views', 'player', true)}
         />
       </Show >
@@ -202,6 +139,24 @@ function App() {
   );
 }
 
+/////// UPDATER ///////
+
+const [update, setUpdate] = createSignal(false);
+
+let handleUpdate: () => void;
+
+if (import.meta.env.PROD)
+  await import('virtual:pwa-register').then(pwa => {
+
+    handleUpdate = pwa.registerSW({
+      onNeedRefresh() {
+        setUpdate(true);
+      }
+    });
+  });
+
+////////////////////////
+//////// I18N //////////
 
 const nl = navigator.language.slice(0, 2);
 const locale = state.language || (Locales.includes(nl) ? nl : 'en');
@@ -212,5 +167,4 @@ import(`./locales/${locale}.json`)
     setStore('i18nSrc', _.default);
   })
   .then(() => render(() => <App />, document.body));
-
 

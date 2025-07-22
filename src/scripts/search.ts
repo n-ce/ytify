@@ -51,6 +51,7 @@ function searchLoader() {
 
 let prevID: string | undefined;
 
+
 superInput.addEventListener('input', async () => {
   const text = superInput.value;
 
@@ -96,7 +97,6 @@ superInput.addEventListener('input', async () => {
 });
 
 let index = 0;
-
 
 superInput.addEventListener('keydown', _ => {
 

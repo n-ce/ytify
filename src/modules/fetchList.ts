@@ -1,6 +1,6 @@
-import { listBtnsContainer, listContainer, listSection, listTitle, loadingScreen, openInYtBtn, playAllBtn, subscribeListBtn } from "../lib/dom";
+import { listBtnsContainer, listContainer, listSection, listTitle } from "../lib/dom";
 import { getDB, saveDB } from "../lib/libraryUtils";
-import { errorHandler, getApi, goTo, i18n, notify, superClick } from "../lib/utils";
+import { errorHandler, getApi, goTo, i18n, notify } from "../lib/utils";
 import { store } from "../lib/store";
 import { render } from "uhtml";
 import ItemsLoader from "../components/ItemsLoader";
@@ -14,7 +14,8 @@ export default async function fetchList(
   if (!url)
     return notify(i18n('fetchlist_url_null'));
 
-  loadingScreen.showModal();
+  //  loadingScreen.showModal();
+
 
   let listData: StreamItem[] = [];
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
@@ -23,7 +24,7 @@ export default async function fetchList(
     url = await getPlaylistIdFromArtist(url) || '';
 
     if (!url) {
-      loadingScreen.close();
+      // loadingScreen.close();
       return;
     }
   }
@@ -51,7 +52,7 @@ export default async function fetchList(
         () => fetchList(url, mix)
       )
     })
-    .finally(() => loadingScreen.close());
+  //    .finally(() => loadingScreen.close());
 
   if (!group?.relatedStreams?.length)
     return;
@@ -115,9 +116,6 @@ export default async function fetchList(
 
   listBtnsContainer.className = type;
 
-  (openInYtBtn.firstElementChild as HTMLParagraphElement)
-    .dataset.state = ' ' + group.name;
-
 
   if (!useHyperpipe) {
     store.list.name = group.name;
@@ -128,15 +126,9 @@ export default async function fetchList(
   }
 
   listTitle.textContent = store.list.name;
-  const db = Object(getDB());
 
-
-  (subscribeListBtn.firstElementChild as HTMLParagraphElement)
-    .dataset.state = db.hasOwnProperty(store.list.type) && db[store.list.type].hasOwnProperty(store.list.id) ? ' Subscribed' : ' Subscribe';
-
-
-  if (mix) playAllBtn.click();
-  else {
+  if (mix) { // playAllBtn.click();
+  } else {
     // replace string for youtube playlist link support
     store.list.url = url.replace('ts/', 't?list=');
     document.title = group.name + ' - ytify';
@@ -153,7 +145,6 @@ export default async function fetchList(
 
 }
 
-listContainer.addEventListener('click', superClick);
 
 const getPlaylistIdFromArtist = (id: string): Promise<string> =>
   fetch(store.api.hyperpipe + id)

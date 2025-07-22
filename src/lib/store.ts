@@ -74,7 +74,9 @@ export function setState<K extends keyof AppSettings>(key: K, val: AppSettings[K
 const storeInit: {
   views: Record<Views, boolean>,
   player: {
-    playbackState: 'none' | 'playing' | 'paused',
+    playbackState: 'none' | 'playing' | 'paused' | 'loading',
+    title: string,
+    mediaArtwork: string,
     hls: {
       src: (arg0: string) => void,
       api: string[],
@@ -87,11 +89,7 @@ const storeInit: {
   },
   i18nSrc?: Record<TranslationKeys, string>,
   lrcSync: (arg0: number) => {} | void,
-  queue: {
-    list: string[],
-    append: (data: DOMStringMap | CollectionItem, prepend?: boolean) => void,
-    firstChild: () => HTMLElement | undefined
-  },
+  queuelist: string[],
   stream: CollectionItem,
   streamHistory: string[]
   api: {
@@ -105,18 +103,21 @@ const storeInit: {
   searchQuery: string,
   addToCollectionOptions: string[],
   actionsMenu: CollectionItem,
-  list: List & Record<'url' | 'type' | 'uploader', string>,
+  list: List & Record<'url' | 'type' | 'uploader', string> & { data: CollectionItem[] },
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg'
 } = {
   views: {
     player: false,
-    queue: false,
     list: false,
     settings: false,
-    search: false
+    search: true,
+    lyrics: false,
+    watch: false
   },
   player: {
     playbackState: 'none',
+    title: '',
+    mediaArtwork: 'https://wsrv.nl/?url=https://i.ytimg.com/vi_webp/O1PkZaFy61Y/maxresdefault.webp&w=720&h=720&fit=cover',
     hls: {
       src: () => '',
       manifests: [],
@@ -133,11 +134,7 @@ const storeInit: {
     fallback: ''
   },
   lrcSync: () => { },
-  queue: {
-    list: [],
-    append: () => { },
-    firstChild: () => undefined,
-  },
+  queuelist: [],
   stream: {
     id: params.get('s') || '',
     title: '',
@@ -168,7 +165,8 @@ const storeInit: {
     type: '',
     id: '',
     uploader: '',
-    thumbnail: ''
+    thumbnail: '',
+    data: []
   },
   addToCollectionOptions: [],
   downloadFormat: state.dlFormat

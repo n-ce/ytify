@@ -24,10 +24,11 @@
 }
 
 
-.track {
+.mediaDetails {
 
   a {
     font-size: var(--size-4);
+    color: inherit;
   }
 
   p {
@@ -50,11 +51,12 @@
   }
 }
 
-.topShelf {
+.topShelf,
+.midShelf {
   display: flex;
   justify-content: space-between;
-
 }
+
 
 .mainShelf {
   display: flex;

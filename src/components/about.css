@@ -1,0 +1,36 @@
+.about {
+  display: flex;
+  flex-direction: column;
+
+  svg {
+    transform: scale(9);
+    margin: 14dvmin 10dvmin;
+
+  }
+
+  a {
+    color: var(--text);
+    opacity: 0.8;
+  }
+
+  >p {
+    font-size: smaller;
+    margin-top: 1rem;
+
+    +a {
+      font-size: smaller;
+    }
+
+    svg {
+      margin: 0 8px 3px 6px;
+      display: inline-block;
+    }
+  }
+
+  span {
+    a {
+      margin-right: 1ch;
+    }
+  }
+
+}

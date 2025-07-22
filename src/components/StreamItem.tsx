@@ -2,6 +2,7 @@ import { Show, createSignal } from 'solid-js';
 import './streamItem.css';
 import { state } from '../lib/store';
 import { generateImageUrl } from '../lib/visualUtils';
+import ActionsMenu from './ActionsMenu';
 
 export default function(data: {
   id: string,
@@ -85,7 +86,10 @@ export default function(data: {
           <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
         </div>
       </div>
-      <i class={`ri-${data.draggable ? 'draggable' : 'more-2-fill'}`}></i>
+      {data.draggable ?
+        <i class="ri-draggable"></i> :
+        <ActionsMenu />
+      }
     </a>
   )
 }

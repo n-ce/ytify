@@ -50,6 +50,7 @@ footer {
   button {
     background: none;
     border: none;
+    color: var(--text);
     font-size: var(--size-5);
     aspect-ratio: 1;
     padding: 0;
@@ -69,7 +70,7 @@ footer {
     font-size: var(--size-6);
   }
 
-  .track {
+  .mediaDetails {
     width: 100%;
     overflow: hidden;
     pointer-events: none;
@@ -80,6 +81,7 @@ footer {
       overflow: hidden;
       text-overflow: ellipsis;
       font-size: var(--size-3);
+      color: var(--text);
     }
 
 

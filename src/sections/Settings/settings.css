@@ -1,11 +1,4 @@
 #settingsSection {
-  background-color: var(--bg);
-  color: inherit;
-  margin: auto;
-  padding: 5%;
-  padding-top: 0;
-  user-select: none;
-  overflow: scroll;
   border-radius: var(--roundness);
 
   header {
@@ -17,22 +10,12 @@
     }
   }
 
-  >h3 {
-    position: sticky;
-    top: 0;
-    margin: 0;
-    width: 100%;
-    background: var(--bg);
-    padding: 2.5% 0;
-    z-index: 9;
-  }
-
   div {
     background-color: var(--onBg);
     border: var(--border);
     border-radius: var(--roundness);
     width: 100%;
-    margin: 5% 0;
+    margin-bottom: var(--size-3);
 
     &.toggleSwitch,
     >span {

@@ -5,7 +5,7 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
-  type Views = 'player' | 'queue' | 'list' | 'settings' | 'search';
+  type Views = 'player' | 'list' | 'settings' | 'search' | 'lyrics' | 'watch';
 
   type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
 

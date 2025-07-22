@@ -57,7 +57,6 @@
   border-radius: 0 0 var(--roundness) var(--roundness);
   border: var(--border);
   box-shadow: var(--shadow);
-  display: none;
   user-select: none;
 
   li {

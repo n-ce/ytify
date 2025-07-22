@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from 'solid-js';
+import { createSignal, Match, onMount, Show, Switch } from 'solid-js';
 import About from '../components/About';
 import Hub from '../components/Hub';
 import './home.css';
@@ -12,7 +12,7 @@ export default function(_: {
   ref: (el: HTMLElement) => void;
 }) {
 
-  const [item, setItem] = createSignal('');
+  const [item, setItem] = createSignal('about');
   let homeRef!: HTMLElement;
   let syncBtn!: HTMLElement;
   onMount(() => {
@@ -119,6 +119,8 @@ export default function(_: {
 
         }}
       >
+        <input type="radio" id="r.about" name="superCollectionChips" checked value="about" />
+        <label for="r.about">About</label>
         <input type="radio" id="r.hub" name="superCollectionChips" value="hub" />
         <label for="r.hub">Hub</label>
         <input type="radio" id="r.collections" name="superCollectionChips" value="collections" />
@@ -132,17 +134,20 @@ export default function(_: {
         <input type="radio" id="r.channels" name="superCollectionChips" value="channels" />
         <label data-translation="library_channels" for="r.channels">Channels</label>
 
-        <input type="radio" id="r.about" name="superCollectionChips" checked value="" />
-        <label for="r.about">About</label>
       </div>
 
 
       <div id="catalogue">
-        {item() === 'hub' ?
-          <Hub />
-          :
-          <About />
-        }
+
+        <Switch>
+          <Match when={item() === 'hub'}>
+            <Hub />
+          </Match>
+          <Match when={item() === 'about'}>
+            <About />
+          </Match>
+
+        </Switch>
       </div>
     </section >
   )

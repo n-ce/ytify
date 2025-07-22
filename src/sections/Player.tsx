@@ -1,15 +1,19 @@
-import { createSignal, JSX, onMount } from "solid-js"
+import { createSignal, JSX, lazy, onMount, Show } from "solid-js"
 import './player.css'
+import LikeButton from "../components/LikeButton";
+import PlayButton from "../components/PlayButton";
+import { state, store } from "../lib/store";
+import MediaDetails from "../components/MediaDetails";
+import { i18n } from "../lib/utils";
 
+const MediaArtwork = lazy(() => import('../components/MediaArtwork'));
 
 export default function(_: {
-  img: JSX.Element,
-  track: JSX.Element,
-  likeBtn: JSX.Element,
-  playBtn: JSX.Element,
   playNextBtn: JSX.Element,
   close: () => void
 }) {
+
+
   let playerSection!: HTMLDivElement;
   onMount(() => {
     playerSection.scrollIntoView({ behavior: 'smooth' });
@@ -17,7 +21,7 @@ export default function(_: {
 
   const auxCtrls = [
     [
-      _.likeBtn,
+      <LikeButton />,
       <i data-translation-aria-label="player_loop" class="ri-repeat-line" id="loopButton"></i>
     ],
     [
@@ -76,9 +80,18 @@ export default function(_: {
 
       </span>
 
-      {_.img}
+      <Show when={state.loadImage}><MediaArtwork />
+      </Show>
 
-      {_.track}
+      <div class="midShelf">
+        <MediaDetails />
+        <i
+          aria-label={i18n('player_more')}
+          class="ri-more-2-fill"
+          id="moreBtn"
+          onclick={() => console.log(store.stream)}
+        ></i>
+      </div>
 
       <span class="slider">
         <input type="range" value="50" id="progress" />
@@ -91,12 +104,19 @@ export default function(_: {
       <div class="mainShelf">
         {auxCtrls[ctrlIdx()][0]}
 
-        <button data-translation-aria-label="player_seek_backward" class="ri-replay-15-line"
-          id="seekBwdButton"></button>
-        {_.playBtn}
+        <button
+          aria-label={i18n('player_seek_backward')}
+          class="ri-replay-15-line"
+          id="seekBwdButton"
+        ></button>
 
-        <button data-translation-aria-label="player_seek_forward" class="ri-forward-15-line"
-          id="seekFwdButton"></button>
+        {<PlayButton />}
+
+        <button
+          aria-label={i18n('player_seek_forward')}
+          class="ri-forward-15-line"
+          id="seekFwdButton"
+        ></button>
 
         {auxCtrls[ctrlIdx()][1]}
       </div>

@@ -1,7 +1,7 @@
 import { onMount } from "solid-js";
-import { setState, state, store } from "../lib/store";
+import { setState, setStore, state } from "../lib/store";
 import './queue.css';
-import { i18n } from "../lib/utils";
+import { i18n, notify } from "../lib/utils";
 
 export default function(_: {
   close: () => void
@@ -13,7 +13,9 @@ export default function(_: {
   let shuffleBtn!: HTMLLIElement;
   let filterLT10Btn!: HTMLLIElement;
   let removeQBtn!: HTMLLIElement;
-  let enqueueRelatedStreamsBtn!: HTMLLIElement;
+  let enqueueRelatedStreamsBtn!:
+    HTMLLIElement;
+
   onMount(() => {
     queueSection.scrollIntoView({ behavior: 'smooth' });
   })
@@ -72,7 +74,7 @@ export default function(_: {
             btn.classList.toggle('on');
             setState('allowDuplicates', btn.classList.contains('on'));
 
-            // notify(i18n('upcoming_change'));
+            notify(i18n('upcoming_change'));
           }
           }
         >
@@ -88,7 +90,7 @@ export default function(_: {
             btn.classList.toggle('on');
             setState('enqueueRelatedStreams', btn.classList.contains('on'));
 
-            //notify(i18n('upcoming_change'));
+            notify(i18n('upcoming_change'));
           }
           }
         >
@@ -97,9 +99,12 @@ export default function(_: {
 
         <li onclick={
           () => {
-            store.queue.list.length = 0;
-            queuelist.innerHTML = '';
             _.close();
+            setTimeout(() => {
+              setStore('queue', 'list', ['exam'])
+              queuelist.innerHTML = '';
+            }, 500);
+
           }
         }>
           <i class="ri-close-line"></i>{i18n('upcoming_clear')}

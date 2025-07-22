@@ -42,11 +42,13 @@ export const hostResolver = (url: string) =>
     ('?s' + url.slice(8)) :
     ('/list?' + pathModifier(url))) : url);
 
-/*
+
+
+
 export function proxyHandler(url: string, prefetch: boolean = false) {
   store.api.index = 0;
   if (!prefetch)
-    title.textContent = i18n('player_audiostreams_insert');
+    setStore('player', 'title', i18n('player_audiostreams_insert'));
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
@@ -55,7 +57,8 @@ export function proxyHandler(url: string, prefetch: boolean = false) {
     (url + (host ? '' : `&host=${origin}`)) :
     (host && !state.customInstance) ? url.replace(origin, host) : url;
 }
-*/
+
+
 export async function quickSwitch() {
   if (!store.stream.id) return;
 }

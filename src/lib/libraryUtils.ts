@@ -1,5 +1,5 @@
 import { goTo, hostResolver, notify } from "./utils";
-import { store } from "./store";
+import { setStore, store } from "./store";
 import { render, html } from "uhtml";
 import StreamItem from "../components/StreamItem";
 
@@ -80,7 +80,7 @@ export function createCollection(title: string) {
     )
     .includes(title) ?
     notify('This Playlist Already Exists!') :
-    store.addToCollectionOptions.push(title);
+    setStore('addToCollectionOptions', (prev) => [...prev, title]);
 }
 
 export function renderCollection(
@@ -219,7 +219,7 @@ async function getSharedCollection(
   id: string
 ) {
 
-  loadingScreen.showModal();
+  //  loadingScreen.showModal();
 
   const data = await fetch(`${location.origin}/blob/${id}`)
     .then(res => res.json())
@@ -230,7 +230,7 @@ async function getSharedCollection(
   else
     render(listContainer, html`Collection does not exist`);
 
-  loadingScreen.close();
+  // loadingScreen.close();
 }
 
 

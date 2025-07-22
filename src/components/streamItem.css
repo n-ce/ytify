@@ -3,15 +3,14 @@
 	user-select: none;
 	background-color: var(--onBg);
 	color: var(--text);
-	padding: 1dvmin;
-	margin-bottom: 2dvmin;
+	padding: var(--size-1);
+	margin-bottom: var(--size-2);
 	border: var(--border);
 	border-radius: calc(var(--roundness) + 0.75vmin);
 	display: flex;
 	align-items: center;
 	position: relative;
 	transition: transform 0.4s;
-	overflow: hidden;
 
 	div,
 	span {

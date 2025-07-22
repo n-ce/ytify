@@ -1,6 +1,6 @@
 import { onMount } from 'solid-js';
 import { addToCollection, createCollection, getDB, reservedCollections } from '../lib/libraryUtils';
-import { store } from '../lib/store';
+import { setStore, store } from '../lib/store';
 import { i18n } from '../lib/utils';
 
 export default function(_: {
@@ -10,7 +10,7 @@ export default function(_: {
 
   onMount(() => {
     const initialKeys = Object.keys(getDB());
-    store.addToCollectionOptions.length = 0;
+    setStore('addToCollectionOptions', []);
 
     for (const key of initialKeys) {
       if (!reservedCollections.includes(key)) {

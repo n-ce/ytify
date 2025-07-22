@@ -1,20 +1,12 @@
-import { author, img, title } from "../lib/dom";
 import { generateImageUrl } from "../lib/visualUtils";
-import { state, store } from "../lib/store";
-import { hostResolver } from "../lib/utils";
-
-let more = () => undefined;
-
-document.getElementById('moreBtn')!.addEventListener('click', () => more());
+import { setStore, state, store } from "../lib/store";
 
 
 export async function setMetaData(data: CollectionItem) {
 
-  // remove ' - Topic' from author name if it exists
-
-
   store.stream = data;
 
+  // remove ' - Topic' from author name if it exists
 
   let music = '';
   let authorText = store.stream.author;
@@ -28,32 +20,19 @@ export async function setMetaData(data: CollectionItem) {
     artist: authorText,
   };
 
-  const imgX = generateImageUrl(data.id, 'maxres', music);
+  const img = generateImageUrl(data.id, 'maxres', music);
   if (state.loadImage) {
-    img.src = imgX
+
+    setStore('player', 'mediaArtwork', img);
+
     metadataObj.artwork = [
-      { src: img.src, sizes: '96x96' },
-      { src: img.src, sizes: '128x128' },
-      { src: img.src, sizes: '192x192' },
-      { src: img.src, sizes: '256x256' },
-      { src: img.src, sizes: '384x384' },
-      { src: img.src, sizes: '512x512' },
+      { src: img, sizes: '96x96' },
+      { src: img, sizes: '128x128' },
+      { src: img, sizes: '192x192' },
+      { src: img, sizes: '256x256' },
+      { src: img, sizes: '384x384' },
+      { src: img, sizes: '512x512' },
     ]
-    img.alt = data.title;
-  }
-
-
-  title.href = hostResolver(`/watch?v=${data.id}`);
-  title.textContent = data.title;
-
-  author.textContent = authorText;
-
-  more = function() {
-    store.actionsMenu = data;
-    const dialog = document.createElement('dialog') as HTMLDialogElement;
-    document.body.appendChild(dialog);
-    import('../components/ActionsMenu.ts')
-      .then(mod => mod.default(dialog));
   }
 
   if (location.pathname === '/')
