@@ -112,13 +112,9 @@ const fetchWithPiped = (
           .filter((item) => !item.isShort && item.duration !== -1)
           .forEach((i) => {
             if (searchFilters.value === 'music_songs')
-              i = i.map(
-                (item: StreamItem) => {
-                  if (!item.uploaderName.endsWith(' - Topic'))
-                    item.uploaderName += ' - Topic';
-                  return item;
-                }
-              );
+              if(!i.uploaderName.endsWith(' - Topic'))
+                i.uploaderName += ' - Topic';
+                  
             if (results.find((v) => v.url === i.url) === undefined)
               results.push(i);
           });
