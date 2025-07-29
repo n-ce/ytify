@@ -60,12 +60,22 @@ export default async function fetchList(
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
 
+  if (useHyperpipe)
+    group.relatedStreams = group.relatedStreams.map(
+      (item: StreamItem) => {
+        if (!item.uploaderName.endsWith(' - Topic'))
+          item.uploaderName += ' - Topic';
+        return item;
+      }
+    );
+  
   const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
       streams.filter((s: StreamItem) => s.views !== -1) :
       streams;
 
   listData = filterOutMembersOnly(group.relatedStreams);
+  
   render(listContainer, ItemsLoader(listData));
 
   if (location.pathname !== '/list')
