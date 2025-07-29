@@ -22,11 +22,12 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  if (store.player.useSaavn) {
-    if (state.jiosaavn && store.stream.author.endsWith('Topic'))
+  if (state.jiosaavn) {
+    if (!store.player.useSaavn)
+      store.player.useSaavn = true;
+    else if (store.stream.author.endsWith('Topic'))
       return import('../modules/jioSaavn').then(mod => mod.default());
   }
-  else store.player.useSaavn = state.jiosaavn;
 
   title.textContent = 'Fetching Data...';
 
