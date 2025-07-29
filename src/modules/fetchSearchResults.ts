@@ -91,6 +91,15 @@ const fetchWithPiped = (
     results =
       items?.filter((item: StreamItem) => !item.isShort);
 
+    if (searchFilters.value === 'music_songs')
+        results = items.map(
+          (item: StreamItem) => {
+            if (!item.uploaderName.endsWith(' - Topic'))
+              item.uploaderName += ' - Topic';
+            return item;
+          }
+        );
+    
     if (currentObserver)
       currentObserver.disconnect();
 
@@ -102,6 +111,14 @@ const fetchWithPiped = (
         (data.items as StreamItem[])
           .filter((item) => !item.isShort && item.duration !== -1)
           .forEach((i) => {
+            if (searchFilters.value === 'music_songs')
+              i = i.map(
+                (item: StreamItem) => {
+                  if (!item.uploaderName.endsWith(' - Topic'))
+                    item.uploaderName += ' - Topic';
+                  return item;
+                }
+              );
             if (results.find((v) => v.url === i.url) === undefined)
               results.push(i);
           });
