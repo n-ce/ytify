@@ -11,17 +11,21 @@ export default function() {
 
   fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
     .then(res => res.json())
-    .then(_ => _.data.results[0])
-    .then(data => {
-      const { name, downloadUrl, artists } = data;
+    .then(res => {
 
-      if (
-        store.stream.title.startsWith(name) &&
-        author.startsWith(artists.primary[0].name)
-      )
-        store.player.data = data;
+      const matchingTrack = res.data.results.find((track: {
+        name: string,
+        artists: { primary: { name: string }[] }
+      }) =>
+        store.stream.title.startsWith(track.name) && author.startsWith(track.artists.primary[0].name)
 
-      else throw new Error('Music stream not found');
+      );
+      if (!matchingTrack) throw new Error('Music stream not found in JioSaavn results');
+      store.player.data = matchingTrack;
+
+      return matchingTrack.downloadUrl;
+    })
+    .then(downloadUrl => {
 
       setMetaData(store.stream);
 
