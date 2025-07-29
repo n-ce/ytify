@@ -17,8 +17,9 @@ export default function() {
         name: string,
         artists: { primary: { name: string }[] }
       }) =>
-        store.stream.title.startsWith(track.name) && author.startsWith(track.artists.primary[0].name)
 
+        store.stream.title.startsWith(track.name) &&
+        track.artists.primary.some(artist => author.startsWith(artist.name))
       );
       if (!matchingTrack) throw new Error('Music stream not found in JioSaavn results');
       store.player.data = matchingTrack;
