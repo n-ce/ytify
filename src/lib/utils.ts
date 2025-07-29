@@ -210,6 +210,7 @@ export async function superClick(e: Event) {
     sta.author = elp.author as string;
     sta.channelUrl = elp.channel_url as string;
     sta.duration = elp.duration as string;
+    sta.lastUpdated = elp.last_updated as string || new Date().toISOString();
     const dialog = document.createElement('dialog');
     document.body.appendChild(dialog);
     import('../components/ActionsMenu.ts')

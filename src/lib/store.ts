@@ -74,7 +74,8 @@ export const store: {
     supportsOpus: Promise<boolean>,
     data: Piped | undefined,
     legacy: boolean,
-    fallback: string
+    fallback: string,
+    useSaavn: boolean
   },
   lrcSync: (arg0: number) => {} | void,
   queue: {
@@ -113,7 +114,8 @@ export const store: {
     }).then(res => res.supported),
     data: undefined,
     legacy: !('OffscreenCanvas' in window),
-    fallback: ''
+    fallback: '',
+    useSaavn: state.jiosaavn,
   },
   lrcSync: () => { },
   queue: {

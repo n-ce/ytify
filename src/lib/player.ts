@@ -1,4 +1,4 @@
-import { audio, favButton, favIcon, playButton, qualityView, title as ptitle } from "./dom";
+import { audio, favButton, favIcon, playButton, title } from "./dom";
 import { convertSStoHHMMSS } from "./utils";
 import { params, state, store } from "./store";
 import { setMetaData } from "../modules/setMetadata";
@@ -22,13 +22,13 @@ export default async function player(id: string | null = '') {
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
 
-  if (useSaavn) {
+  if (store.player.useSaavn) {
     if (state.jiosaavn && store.stream.author.endsWith('Topic'))
-      return saavnPlayer();
+      return import('../modules/jioSaavn').then(mod => mod.default());
   }
-  else useSaavn = true;
+  else store.player.useSaavn = state.jiosaavn;
 
-  ptitle.textContent = 'Fetching Data...';
+  title.textContent = 'Fetching Data...';
 
   const data = await getStreamData(id);
 
@@ -36,7 +36,7 @@ export default async function player(id: string | null = '') {
     store.player.data = data;
   else {
     playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
-    ptitle.textContent = data.message || data.error || 'Fetching Data Failed';
+    title.textContent = data.message || data.error || 'Fetching Data Failed';
     return;
   }
 
@@ -107,44 +107,3 @@ export default async function player(id: string | null = '') {
 }
 
 
-let useSaavn = true;
-function saavnPlayer() {
-  ptitle.textContent = 'Fetching Data via JioSaavn...';
-  const { title, author, id } = store.stream;
-  const query = encodeURIComponent(`${title} ${author.slice(0, -8)}`);
-
-  fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
-    .then(res => res.json())
-    .then(_ => _.data.results[0])
-    .then(data => {
-      const { name, downloadUrl, artists } = data;
-
-      if (
-        title.startsWith(name) &&
-        author.startsWith(artists.primary[0].name)
-      )
-        store.player.data = data;
-
-      else throw new Error('Music stream not found');
-
-      setMetaData(store.stream);
-
-      const { url, quality } = downloadUrl[{
-        low: 1,
-        medium: downloadUrl.length - 2,
-        high: downloadUrl.length - 1
-      }[state.quality]];
-
-      audio.src = url.replace('http:', 'https:');
-      qualityView.textContent = quality + ' AAC';
-      params.set('s', id);
-
-      if (location.pathname === '/')
-        history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
-    })
-    .catch(e => {
-      ptitle.textContent = e.message || e.error || 'JioSaavn Playback Failure';
-      useSaavn = false;
-      player(store.stream.id);
-    });
-}

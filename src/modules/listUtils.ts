@@ -50,7 +50,8 @@ export function importList() {
         'title': sender.title,
         'author': sender.author,
         'duration': sender.duration,
-        'channelUrl': sender.channel_url
+        'channelUrl': sender.channel_url,
+        'lastUpdated': sender.last_updated || new Date().toISOString()
       };
     });
 
