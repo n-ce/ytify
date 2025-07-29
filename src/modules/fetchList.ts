@@ -19,6 +19,7 @@ export default async function fetchList(
 
   let listData: StreamItem[] = [];
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
+  const musicEnforcer = url.includes('OLAK5uy');
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
@@ -60,7 +61,7 @@ export default async function fetchList(
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
 
-  if (useHyperpipe)
+  if (musicEnforcer)
     group.relatedStreams = group.relatedStreams.map(
       (item: StreamItem) => {
         if (!item.uploaderName.endsWith(' - Topic'))
@@ -68,14 +69,14 @@ export default async function fetchList(
         return item;
       }
     );
-  
+
   const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
       streams.filter((s: StreamItem) => s.views !== -1) :
       streams;
 
   listData = filterOutMembersOnly(group.relatedStreams);
-  
+
   render(listContainer, ItemsLoader(listData));
 
   if (location.pathname !== '/list')
@@ -117,8 +118,8 @@ export default async function fetchList(
         (item: StreamItem) => !existingItems.includes(
           item.url.slice(-11))
       );
-      
-      if (useHyperpipe)
+
+      if (musicEnforcer)
         data.relatedStreams = data.relatedStreams.map(
           (item: StreamItem) => {
             if (!item.uploaderName.endsWith(' - Topic'))
