@@ -6,7 +6,7 @@ import player from '../lib/player';
 export default function() {
   title.textContent = 'Fetching Data via JioSaavn...';
   const { author, id } = store.stream;
-  const query = encodeURIComponent(`${store.stream.title.replace(/\(.*?\)/g, '')} ${author.slice(0, -8)}`);
+  const query = encodeURIComponent(`${store.stream.title.replace(/\(.*?\)/g, '')} ${author.replace(' - Topic', '')}`);
 
 
   fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)

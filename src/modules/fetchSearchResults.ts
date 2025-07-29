@@ -92,14 +92,14 @@ const fetchWithPiped = (
       items?.filter((item: StreamItem) => !item.isShort);
 
     if (searchFilters.value === 'music_songs')
-        results = items.map(
-          (item: StreamItem) => {
-            if (!item.uploaderName.endsWith(' - Topic'))
-              item.uploaderName += ' - Topic';
-            return item;
-          }
-        );
-    
+      results = results.map(
+        (item: StreamItem) => {
+          if (!item.uploaderName.endsWith(' - Topic'))
+            item.uploaderName += ' - Topic';
+          return item;
+        }
+      );
+
     if (currentObserver)
       currentObserver.disconnect();
 
@@ -112,9 +112,9 @@ const fetchWithPiped = (
           .filter((item) => !item.isShort && item.duration !== -1)
           .forEach((i) => {
             if (searchFilters.value === 'music_songs')
-              if(!i.uploaderName.endsWith(' - Topic'))
+              if (!i.uploaderName.endsWith(' - Topic'))
                 i.uploaderName += ' - Topic';
-                  
+
             if (results.find((v) => v.url === i.url) === undefined)
               results.push(i);
           });
