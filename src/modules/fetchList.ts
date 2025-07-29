@@ -107,6 +107,15 @@ export default async function fetchList(
         (item: StreamItem) => !existingItems.includes(
           item.url.slice(-11))
       );
+      
+      if (useHyperpipe)
+        data.relatedStreams = data.relatedStreams.map(
+          (item: StreamItem) => {
+            if (!item.uploaderName.endsWith(' - Topic'))
+              item.uploaderName += ' - Topic';
+            return item;
+          }
+        );
 
       listData = listData.concat(filterOutMembersOnly(data.relatedStreams));
       render(listContainer, ItemsLoader(listData));
