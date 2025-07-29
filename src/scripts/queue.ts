@@ -142,7 +142,7 @@ render(queuetools, template);
 
 store.queue.firstChild = () => queuelist.firstElementChild as HTMLElement;
 
-store.queue.append = function(data: DOMStringMap | CollectionItem, prepend: boolean = false) {
+store.queue.append = function(data: DOMStringMap | CollectionItem & { draggable: boolean }, prepend: boolean = false) {
   if (!data.id) return;
 
   const { list, firstChild } = store.queue;
@@ -174,6 +174,7 @@ store.queue.append = function(data: DOMStringMap | CollectionItem, prepend: bool
       author: data.author || '',
       duration: data.duration || '',
       channelUrl: data.channelUrl,
+      lastUpdated: data.lastUpdated,
       draggable: true
     }));
 
