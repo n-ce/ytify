@@ -40,7 +40,8 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string
+    channelUrl: string,
+    lastUpdated?: string
   }
 
   type List = Record<'id' | 'name' | 'thumbnail', string>
@@ -102,7 +103,6 @@ declare global {
     title: string,
     uploader: string,
     duration: number,
-    uploader: string,
     uploaderUrl: string,
     livestream: boolean,
     hls: string
