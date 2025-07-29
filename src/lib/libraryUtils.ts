@@ -97,6 +97,7 @@ export function renderCollection(
       author: v.author,
       duration: v.duration || '',
       channelUrl: v.channelUrl,
+      lastUpdated: v.lastUpdated || new Date().toISOString(),
       draggable: draggable
     })
   )
