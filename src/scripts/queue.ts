@@ -174,6 +174,7 @@ store.queue.append = function(data: DOMStringMap | CollectionItem, prepend: bool
       author: data.author || '',
       duration: data.duration || '',
       channelUrl: data.channelUrl,
+      lastUpdated: data.lastUpdated,
       draggable: true
     }));
 

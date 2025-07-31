@@ -30,6 +30,8 @@ new Sortable(listContainer, {
 function listToQ(container: HTMLDivElement) {
   const items = container.querySelectorAll('.streamItem') as NodeListOf<HTMLElement>;
   items.forEach(item => {
+    item.dataset.channelUrl = item.dataset.channel_url;
+    item.dataset.lastUpdated = item.dataset.last_updated;
     store.queue.append(item.dataset);
   });
   goTo('/upcoming');

@@ -38,7 +38,7 @@ export default async (_: Request, context: Context) => {
         type: _.mimeType,
       })),
     relatedStreams: [], // empty array for compatibility
-    captions: [], // empty array for compatibility
+    subtitles: [], // empty array for compatibility
     livestream: streamData.isLiveContent
   };
 

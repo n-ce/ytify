@@ -8,9 +8,9 @@ export default function(audio: HTMLAudioElement) {
   const id = store.stream.id;
   const { fallback } = store.player;
   const { index, invidious } = store.api;
-  const { enforcePiped, HLS, customInstance } = state;
+  const { HLS, customInstance } = state;
 
-  if (enforcePiped || HLS || customInstance)
+  if (HLS || customInstance)
     return notify(message);
 
   const origin = new URL(audio.src).origin;

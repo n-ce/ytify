@@ -13,7 +13,8 @@ export default function(data: {
   channelUrl?: string,
   views?: string,
   img?: string,
-  draggable?: boolean
+  draggable?: boolean,
+  lastUpdated?: string
 }) {
   let anchor!: HTMLAnchorElement;
   let imgsrc = '';
@@ -60,6 +61,7 @@ export default function(data: {
       data-channel_url=${data.channelUrl}
       data-duration=${data.duration}
       data-thumbnail=${imgsrc}
+      data-last_updated=${data.lastUpdated || new Date().toISOString()}
     >
       <span>
       

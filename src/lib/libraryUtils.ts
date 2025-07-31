@@ -41,7 +41,7 @@ export function toCollection(
   }
   // create if collection does not exists
   else db[collection] = {};
-
+  data.lastUpdated = new Date().toISOString();
   db[collection][id] = data;
 }
 
@@ -97,6 +97,7 @@ export function renderCollection(
       author: v.author,
       duration: v.duration || '',
       channelUrl: v.channelUrl,
+      lastUpdated: v.lastUpdated || new Date().toISOString(),
       draggable: draggable
     })
   )

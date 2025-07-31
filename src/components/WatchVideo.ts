@@ -13,7 +13,6 @@ export default async function(dialog: HTMLDialogElement) {
 
   const media = {
     video: [] as string[][],
-    captions: [] as Captions[]
   };
   let video!: HTMLVideoElement;
   const audio = new Audio();
@@ -34,30 +33,28 @@ export default async function(dialog: HTMLDialogElement) {
 
 
   const data = await getStreamData(store.actionsMenu.id) as unknown as Piped & {
-    captions: Captions[],
-    videoStreams: Record<'url' | 'type' | 'resolution', string>[]
+    videoStreams: Record<'url' | 'codec' | 'resolution' | 'quality', string>[]
   };
-  const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
-  const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
-  const hasOpus = data.audioStreams.find(a => a.mimeType.includes('opus'))?.url;
+  const hasAv1 = data.videoStreams.filter(v => v.codec?.includes('av01')).length === 4 ? data.videoStreams.find(v => v.codec?.includes('av01'))?.url : false;
+  const hasVp9 = data.videoStreams.find(v => v.codec?.includes('vp9'))?.url;
+  const hasOpus = data.audioStreams.find(a => a.mimeType.includes('webm'))?.url;
   const useOpus = hasOpus && await store.player.supportsOpus;
   const audioArray = handleXtags(data.audioStreams)
-    .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
+    .filter(a => a.mimeType.includes(useOpus ? 'webm' : 'mp4a'))
     .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
 
   media.video = data.videoStreams
     .filter(f => {
-      const av1 = hasAv1 && supportsAv1 && f.type.includes('av01');
+      const av1 = hasAv1 && supportsAv1 && f.codec?.includes('av01');
       if (av1) return true;
-      const vp9 = !hasAv1 && f.type.includes('vp9');
+      const vp9 = !hasAv1 && f.codec?.includes('vp9');
       if (vp9) return true;
-      const avc = !hasVp9 && f.type.includes('avc1');
+      const avc = !hasVp9 && f.codec?.includes('avc1');
       if (avc) return true;
     })
-    .map(f => ([f.resolution, f.url]));
+    .map(f => ([f.resolution || f.quality, f.url]));
 
-  media.captions = data.captions
 
 
   function close() {
@@ -129,12 +126,12 @@ export default async function(dialog: HTMLDialogElement) {
     }}
 
     >
-      ${media.captions.length ?
+      ${data.subtitles.length ?
       html`
-          ${media.captions.map(v => html`
+          ${data.subtitles.map(v => html`
             <track
-              src=${store.api.invidious[0] + v.url}
-              srclang=${v.label}
+              src=${(store.api.status === 'P' ? '' : store.api.invidious[0]) + v.url}
+              srclang=${v.name}
             >
             </track>
           `)}

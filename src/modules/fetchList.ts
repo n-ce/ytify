@@ -19,6 +19,7 @@ export default async function fetchList(
 
   let listData: StreamItem[] = [];
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
+  const musicEnforcer = url.includes('OLAK5uy');
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
@@ -60,12 +61,22 @@ export default async function fetchList(
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
 
+  if (musicEnforcer)
+    group.relatedStreams = group.relatedStreams.map(
+      (item: StreamItem) => {
+        if (!item.uploaderName.endsWith(' - Topic'))
+          item.uploaderName += ' - Topic';
+        return item;
+      }
+    );
+
   const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
       streams.filter((s: StreamItem) => s.views !== -1) :
       streams;
 
   listData = filterOutMembersOnly(group.relatedStreams);
+
   render(listContainer, ItemsLoader(listData));
 
   if (location.pathname !== '/list')
@@ -107,6 +118,15 @@ export default async function fetchList(
         (item: StreamItem) => !existingItems.includes(
           item.url.slice(-11))
       );
+
+      if (musicEnforcer)
+        data.relatedStreams = data.relatedStreams.map(
+          (item: StreamItem) => {
+            if (!item.uploaderName.endsWith(' - Topic'))
+              item.uploaderName += ' - Topic';
+            return item;
+          }
+        );
 
       listData = listData.concat(filterOutMembersOnly(data.relatedStreams));
       render(listContainer, ItemsLoader(listData));
@@ -156,8 +176,8 @@ export default async function fetchList(
 
 listContainer.addEventListener('click', superClick);
 
-const getPlaylistIdFromArtist = (id: string): Promise<string> =>
-  fetch(store.api.hyperpipe + id)
+const getPlaylistIdFromArtist = (id: string, index = 0): Promise<string> =>
+  fetch(store.api.hyperpipe[index] + id)
     .then(res => res.json())
     .then(data => {
       if (!('playlistId' in data))
@@ -167,7 +187,9 @@ const getPlaylistIdFromArtist = (id: string): Promise<string> =>
       store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
       return '/playlists/' + data.playlistId;
     })
-    .catch(err => {
+    .catch(async err => {
+      if (index + 1 === store.api.hyperpipe.length)
+        return await getPlaylistIdFromArtist(id, index);
       notify(err.message);
       return '';
     })

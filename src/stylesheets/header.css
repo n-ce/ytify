@@ -62,7 +62,11 @@ section>header {
         cursor: pointer;
 
         &:has(a) {
-          cursor: auto;
+          cursor: none;
+
+          a {
+            cursor: pointer;
+          }
         }
 
         i {

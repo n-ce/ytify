@@ -40,7 +40,8 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string
+    channelUrl: string,
+    lastUpdated?: string
   }
 
   type List = Record<'id' | 'name' | 'thumbnail', string>
@@ -102,7 +103,6 @@ declare global {
     title: string,
     uploader: string,
     duration: number,
-    uploader: string,
     uploaderUrl: string,
     livestream: boolean,
     hls: string
@@ -114,10 +114,10 @@ declare global {
       uploaderUrl: string,
       type: string
     }[],
-    audioStreams: AudioStream[]
+    audioStreams: AudioStream[],
+    subtitles: Record<'url' | 'name', string>[]
   }
 
-  type Captions = Record<'label' | 'url', string>;
 
   type Invidious = {
     adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url' | 'resolution' | 'quality', string>[],
@@ -128,8 +128,8 @@ declare global {
       authorUrl: string,
       videoId: string
     }[],
-    captions: Captions[],
     title: string,
+    captions: Record<'url' | 'label', string>[],
     author: string,
     lengthSeconds: number,
     authorUrl: string,
