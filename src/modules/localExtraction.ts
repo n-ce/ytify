@@ -1,4 +1,4 @@
-export async function fetchDataFromLocal(id: string): Promise<Piped & { captions: any[], videoStreams: any[] }> {
+export async function fetchDataFromLocal(id: string): Promise<Piped & { videoStreams: any[] }> {
   const res = await fetch('http://localhost:9999/streams/' + id);
 
   if (!res.ok) {
@@ -53,7 +53,7 @@ export async function fetchDataFromLocal(id: string): Promise<Piped & { captions
     duration: parseInt(videoDetails.lengthSeconds),
     uploaderUrl: `/channel/${videoDetails.channelId}`,
     livestream: videoDetails.isLiveContent,
-    captions: captionTracks,
+    subtitles: captionTracks,
     relatedStreams: [],
     videoStreams: videoStreams,
     audioStreams: audioStreams,
