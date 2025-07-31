@@ -5,7 +5,7 @@ export default async function(
   prefetch: boolean = false
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const { invidious, piped } = store.api;
+  const { invidious, piped, proxy, status } = store.api;
   const { fallback, hls } = store.player;
 
   const fetchDataFromPiped = (
@@ -70,11 +70,11 @@ export default async function(
       else return useInvidious(index + 1);
     });
 
-  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(piped[index])
+  const usePiped = (src = piped, index = 0): Promise<Piped> => fetchDataFromPiped(src[index])
     .catch(() => {
-      if (index + 1 === piped.length)
+      if (index + 1 === src.length)
         return useInvidious();
-      else return usePiped(index + 1);
+      else return usePiped(src, index + 1);
     });
 
   const useHls = () => Promise
@@ -95,7 +95,7 @@ export default async function(
   const useLocal = async () => await import('./localExtraction.ts').then(mod => mod.fetchDataFromLocal(id));
 
 
-  return (location.port === '9999') ? useLocal() : state.HLS ? useHls() : state.enforcePiped ? usePiped() : useInvidious();
+  return (location.port === '9999') ? useLocal() : state.HLS ? useHls() : status === 'I' ? useInvidious() : status === 'N' ? fetchDataFromPiped(fallback) : usePiped(status === 'U' ? piped : proxy);
 
 }
 

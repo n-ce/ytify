@@ -176,8 +176,8 @@ export default async function fetchList(
 
 listContainer.addEventListener('click', superClick);
 
-const getPlaylistIdFromArtist = (id: string): Promise<string> =>
-  fetch(store.api.hyperpipe + id)
+const getPlaylistIdFromArtist = (id: string, index = 0): Promise<string> =>
+  fetch(store.api.hyperpipe[index] + id)
     .then(res => res.json())
     .then(data => {
       if (!('playlistId' in data))
@@ -187,7 +187,9 @@ const getPlaylistIdFromArtist = (id: string): Promise<string> =>
       store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
       return '/playlists/' + data.playlistId;
     })
-    .catch(err => {
+    .catch(async err => {
+      if (index + 1 === store.api.hyperpipe.length)
+        return await getPlaylistIdFromArtist(id, index);
       notify(err.message);
       return '';
     })

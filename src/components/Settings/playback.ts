@@ -68,16 +68,6 @@ export default function() {
   })}
       
         ${ToggleSwitch({
-    id: "enforcePipedSwitch",
-    name: 'settings_enforce_piped',
-    checked: state.enforcePiped,
-    handler: () => {
-      setState('enforcePiped', !state.enforcePiped);
-      quickSwitch();
-    }
-  })}
-
-        ${ToggleSwitch({
     id: "enforceProxySwitch",
     name: 'settings_always_proxy_streams',
     checked: state.enforceProxy,

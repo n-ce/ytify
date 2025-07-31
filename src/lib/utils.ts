@@ -38,7 +38,7 @@ export function proxyHandler(url: string, prefetch: boolean = false) {
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
 
-  return state.enforceProxy ?
+  return (state.enforceProxy || store.api.status === 'P') ?
     (url + (host ? '' : `&host=${origin}`)) :
     (host && !state.customInstance) ? url.replace(origin, host) : url;
 }

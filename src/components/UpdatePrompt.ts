@@ -4,8 +4,8 @@ import { html, render } from 'uhtml';
 
 export default async function(dialog: HTMLDialogElement) {
 
-  const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/v7x8';
-  const commitsLink = 'https://github.com/n-ce/ytify/commits/v7x8';
+  const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits';
+  const commitsLink = 'https://github.com/n-ce/ytify/commits';
   const list = await fetch(commitsSrc)
     .then(res => res.json())
     .then(data => data.commit.message.split('-'))
