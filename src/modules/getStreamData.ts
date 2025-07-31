@@ -33,7 +33,10 @@ export default async function(
       duration: data.lengthSeconds,
       uploaderUrl: data.authorUrl,
       liveStream: data.liveNow,
-      captions: data.captions,
+      subtitles: data.captions.map(c => ({
+        name: c.label,
+        url: c.url
+      })),
       relatedStreams: data.recommendedVideos.map(v => ({
         url: '/watch?v=' + v.videoId,
         title: v.title,
@@ -46,7 +49,7 @@ export default async function(
         url: v.url,
         quality: v.quality,
         resolution: v.resolution,
-        type: v.type
+        codec: v.type
       })),
       audioStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({
         bitrate: parseInt(v.bitrate),
