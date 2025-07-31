@@ -33,14 +33,14 @@ export default async function(dialog: HTMLDialogElement) {
 
 
   const data = await getStreamData(store.actionsMenu.id) as unknown as Piped & {
-    videoStreams: Record<'url' | 'codec' | 'resolution', string>[]
+    videoStreams: Record<'url' | 'codec' | 'resolution' | 'quality', string>[]
   };
-  const hasAv1 = data.videoStreams.find(v => v.codec?.includes('av01'))?.url;
+  const hasAv1 = data.videoStreams.filter(v => v.codec?.includes('av01')).length === 4 ? data.videoStreams.find(v => v.codec?.includes('av01'))?.url : false;
   const hasVp9 = data.videoStreams.find(v => v.codec?.includes('vp9'))?.url;
   const hasOpus = data.audioStreams.find(a => a.mimeType.includes('webm'))?.url;
   const useOpus = hasOpus && await store.player.supportsOpus;
   const audioArray = handleXtags(data.audioStreams)
-    .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
+    .filter(a => a.mimeType.includes(useOpus ? 'webm' : 'mp4a'))
     .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
 
@@ -53,7 +53,8 @@ export default async function(dialog: HTMLDialogElement) {
       const avc = !hasVp9 && f.codec?.includes('avc1');
       if (avc) return true;
     })
-    .map(f => ([f.resolution, f.url]));
+    .map(f => ([f.resolution || f.quality, f.url]));
+
 
 
   function close() {

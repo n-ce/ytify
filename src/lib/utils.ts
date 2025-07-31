@@ -31,6 +31,7 @@ export const hostResolver = (url: string) =>
 
 
 export function proxyHandler(url: string, prefetch: boolean = false) {
+  const isVideo = Boolean(document.querySelector('video'));
   store.api.index = 0;
   if (!prefetch)
     title.textContent = i18n('player_audiostreams_insert');
@@ -38,7 +39,7 @@ export function proxyHandler(url: string, prefetch: boolean = false) {
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
 
-  return (state.enforceProxy || store.api.status === 'P') ?
+  return (state.enforceProxy || (!isVideo && store.api.status === 'P')) ?
     (url + (host ? '' : `&host=${origin}`)) :
     (host && !state.customInstance) ? url.replace(origin, host) : url;
 }
