@@ -96,9 +96,21 @@ export default async function(
     });
 
   const useLocal = async () => await import('./localExtraction.ts').then(mod => mod.fetchDataFromLocal(id));
-
-
-  return (location.port === '9999') ? useLocal() : state.HLS ? useHls() : status === 'I' ? useInvidious() : status === 'N' ? fetchDataFromPiped(fallback) : usePiped(status === 'U' ? piped : proxy);
-
+  
+  if (location.port === '9999')
+    return useLocal();
+  if (state.HLS)
+    return useHls();
+  
+  switch (status) {
+    case 'U':
+      return usePiped(piped);
+    case 'P':
+      return usePiped(proxy);
+    case 'I':
+      return useInvidious();
+    case 'N':
+      return usePiped(['']);
+  }
 }
 
