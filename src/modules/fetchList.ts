@@ -19,7 +19,6 @@ export default async function fetchList(
 
   let listData: StreamItem[] = [];
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
-  const musicEnforcer = url.includes('OLAK5uy');
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
@@ -61,7 +60,7 @@ export default async function fetchList(
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
 
-  if (musicEnforcer)
+  if (url.includes('OLAK5uy'))
     group.relatedStreams = group.relatedStreams.map(
       (item: StreamItem) => {
         if (!item.uploaderName.endsWith(' - Topic'))
