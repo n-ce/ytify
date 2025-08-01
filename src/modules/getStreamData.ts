@@ -73,7 +73,7 @@ export default async function(
       else return useInvidious(index + 1);
     });
 
-  const usePiped = (src = piped, index = 0): Promise<Piped> => fetchDataFromPiped(src[index])
+  const usePiped = (src, index = 0): Promise<Piped> => fetchDataFromPiped(src[index])
     .catch(() => {
       if (index + 1 === src.length)
         return useInvidious();
