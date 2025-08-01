@@ -19,7 +19,6 @@ export default async function fetchList(
 
   let listData: StreamItem[] = [];
   const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
-  const musicEnforcer = url.includes('OLAK5uy');
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
@@ -32,6 +31,7 @@ export default async function fetchList(
 
   const api = getApi('piped');
   const type = url.includes('channel') ? 'channel' : 'playlist';
+  const musicEnforcer = url.includes('OLAK5uy');
   const group = await fetch(api + url)
     .then(res => res.json())
     .then(data => {

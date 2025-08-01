@@ -25,9 +25,9 @@ export default async function() {
     .then(res => res.json())
     .then(data => {
       document.querySelector('samp')!.textContent = {
-        U: "⬛⬛⬛⬛", P: "⬛⬛⬛⬜", I: "🟧⬛⬛⬜⬜", N: "⬛⬜⬜⬜"
+        U: "⬛⬛⬛⬛", P: "⬛⬛⬛⬜", I: "⬛⬛⬜⬜", N: "⬛⬜⬜⬜"
       }[data.health as 'U'];
-
+      store.api.status = data.health;
       store.api.piped = data.piped;
       store.api.proxy = data.proxy;
       store.api.invidious = data.invidious;

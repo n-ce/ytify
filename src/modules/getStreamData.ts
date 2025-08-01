@@ -10,13 +10,14 @@ export default async function(
 
   const fetchDataFromPiped = (
     api: string
-  ) => fetch(`${api}/streams/${id}`)
-    .then(res => res.json())
-    .then(data => {
-      if (state.HLS ? data.hls : data.audioStreams.length)
-        return data;
-      else throw new Error(data.message);
-    });
+  ) =>
+    fetch(`${api}/streams/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (state.HLS ? data.hls : data.audioStreams.length)
+          return data;
+        else throw new Error(data.message);
+      });
 
   const fetchDataFromInvidious = (
     api: string
@@ -73,7 +74,7 @@ export default async function(
       else return useInvidious(index + 1);
     });
 
-  const usePiped = (src = piped, index = 0): Promise<Piped> => fetchDataFromPiped(src[index])
+  const usePiped = (src: string[], index = 0): Promise<Piped> => fetchDataFromPiped(src[index])
     .catch(() => {
       if (index + 1 === src.length)
         return useInvidious();
@@ -97,8 +98,20 @@ export default async function(
 
   const useLocal = async () => await import('./localExtraction.ts').then(mod => mod.fetchDataFromLocal(id));
 
+  if (location.port === '9999')
+    return useLocal();
+  if (state.HLS)
+    return useHls();
 
-  return (location.port === '9999') ? useLocal() : state.HLS ? useHls() : status === 'I' ? useInvidious() : status === 'N' ? fetchDataFromPiped(fallback) : usePiped(status === 'U' ? piped : proxy);
-
+  switch (status) {
+    case 'U':
+      return usePiped(piped);
+    case 'P':
+      return usePiped(proxy);
+    case 'I':
+      return useInvidious();
+    default:
+      return emergency(Error('Playback Unsuccesful'));
+  }
 }
 
