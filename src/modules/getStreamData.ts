@@ -10,13 +10,14 @@ export default async function(
 
   const fetchDataFromPiped = (
     api: string
-  ) => fetch(`${api}/streams/${id}`)
-    .then(res => res.json())
-    .then(data => {
-      if (state.HLS ? data.hls : data.audioStreams.length)
-        return data;
-      else throw new Error(data.message);
-    });
+  ) =>
+    fetch(`${api}/streams/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (state.HLS ? data.hls : data.audioStreams.length)
+          return data;
+        else throw new Error(data.message);
+      });
 
   const fetchDataFromInvidious = (
     api: string
@@ -96,12 +97,12 @@ export default async function(
     });
 
   const useLocal = async () => await import('./localExtraction.ts').then(mod => mod.fetchDataFromLocal(id));
-  
+
   if (location.port === '9999')
     return useLocal();
   if (state.HLS)
     return useHls();
-  
+
   switch (status) {
     case 'U':
       return usePiped(piped);
@@ -109,8 +110,8 @@ export default async function(
       return usePiped(proxy);
     case 'I':
       return useInvidious();
-    case 'N':
-      return usePiped([fallback]);
+    default:
+      return emergency(Error('Playback Unsuccesful'));
   }
 }
 
