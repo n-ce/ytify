@@ -110,7 +110,7 @@ export default async function(
     case 'I':
       return useInvidious();
     case 'N':
-      return usePiped(['']);
+      return usePiped([fallback]);
   }
 }
 
