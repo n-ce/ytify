@@ -31,6 +31,7 @@ export default async function fetchList(
 
   const api = getApi('piped');
   const type = url.includes('channel') ? 'channel' : 'playlist';
+  const musicEnforcer = url.includes('OLAK5uy');
   const group = await fetch(api + url)
     .then(res => res.json())
     .then(data => {
@@ -60,7 +61,7 @@ export default async function fetchList(
   if (listContainer.classList.contains('reverse'))
     listContainer.classList.remove('reverse');
 
-  if (url.includes('OLAK5uy'))
+  if (musicEnforcer)
     group.relatedStreams = group.relatedStreams.map(
       (item: StreamItem) => {
         if (!item.uploaderName.endsWith(' - Topic'))
