@@ -35,7 +35,7 @@ export default async (_: Request, context: Context) => {
       .map(_ => ({
         url: _.url + '&fallback', // fallback parameter to indicate it's source
         resolution: _.qualityLabel,
-        type: _.mimeType,
+        codec: _.mimeType,
       })),
     relatedStreams: [], // empty array for compatibility
     subtitles: [], // empty array for compatibility
