@@ -173,5 +173,6 @@
     "list_sort_title": "Trier par Titre A↔Z",
     "list_sort_author": "Trier par Auteur A↔Z",
     "settings_audio_quality": "Qualité Audio",
-    "settings_prefetch": "Prélecture de la file d'attente"
+    "settings_prefetch": "Prélecture de la file d'attente",
+    "settings_jiosaavn": "Préférez JioSaavn pour la musique"
 }
