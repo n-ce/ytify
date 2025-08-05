@@ -30,7 +30,7 @@ export default function(itemsArray: string | StreamItem[]) {
           id: item.videoId || item.url.substring(9),
           href: hostResolver(item.url || ('/watch?v=' + item.videoId)),
           title: item.title,
-          author: (item.uploaderName || item.author) + (location.search.endsWith('music_songs') ? ' - Topic' : ''),
+          author: (item.uploaderName || item.author),
           duration: (item.duration || item.lengthSeconds) > 0 ? convertSStoHHMMSS(item.duration || item.lengthSeconds) : 'LIVE',
           uploaded: item.uploadedDate || item.publishedText,
           channelUrl: item.uploaderUrl || item.authorUrl,

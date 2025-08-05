@@ -15,18 +15,25 @@ export default async function() {
 
     const [pi, iv, useInvidious] = customInstance.split(',');
     store.player.hls.api[0] =
-      store.api.piped[0] = pi;
-    store.api.invidious[0] = iv;
-    state.enforcePiped = !useInvidious;
+      store.api.proxy[0] = store.api.piped[0] = pi;
+    if (useInvidious) {
+      store.api.invidious[0] = iv;
+      store.api.status = 'I';
+    }
 
   } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
     .then(res => res.json())
     .then(data => {
+      document.querySelector('samp')!.textContent = {
+        U: "⬛⬛⬛⬛", P: "⬛⬛⬛⬜", I: "⬛⬛⬜⬜", N: "⬛⬜⬜⬜"
+      }[data.health as 'U'];
+      store.api.status = data.health;
       store.api.piped = data.piped;
+      store.api.proxy = data.proxy;
       store.api.invidious = data.invidious;
       store.api.hyperpipe = data.hyperpipe;
+      store.api.jiosaavn = data.jiosaavn;
       store.player.hls.api = data.hls;
-      state.enforcePiped = state.enforcePiped || data.status === 1;
       store.player.fallback = location.origin;
     });
 

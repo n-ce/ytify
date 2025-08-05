@@ -21,6 +21,14 @@ export default async function player(id: string | null = '') {
   }
 
   playButton.classList.replace(playButton.className, 'ri-loader-3-line');
+
+  if (state.jiosaavn) {
+    if (!store.player.useSaavn)
+      store.player.useSaavn = true;
+    else if (store.stream.author.endsWith('Topic'))
+      return import('../modules/jioSaavn').then(mod => mod.default());
+  }
+
   title.textContent = 'Fetching Data...';
 
   const data = await getStreamData(id);
@@ -98,3 +106,5 @@ export default async function player(id: string | null = '') {
       });
 
 }
+
+
