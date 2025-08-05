@@ -67,19 +67,38 @@ export default async function(
       fetchDataFromPiped(fallback)
         .catch(() => e) : e;
 
-  const useInvidious = (index = 0): Promise<Piped> => fetchDataFromInvidious(invidious[index])
-    .catch(e => {
-      if (index + 1 === invidious.length)
-        return emergency(e);
-      else return useInvidious(index + 1);
-    });
+  const useInvidious = (index = 0): Promise<Piped> =>
+    (status === 'N') ?
+      Promise.allSettled(invidious.map(fetchDataFromInvidious))
+        .then(res => {
+          const ff = res.find(r => r.status === 'fulfilled');
+          if (ff) return ff.value;
+          return emergency(Error('No Invidious sources are available'));
+        }) :
+      fetchDataFromInvidious(invidious[index])
+        .catch(e => {
+          if (index + 1 === invidious.length)
+            return emergency(e);
+          else return useInvidious(index + 1);
+        });
 
-  const usePiped = (src: string[], index = 0): Promise<Piped> => fetchDataFromPiped(src[index])
-    .catch(() => {
-      if (index + 1 === src.length)
-        return useInvidious();
-      else return usePiped(src, index + 1);
-    });
+
+  const usePiped = (src: string[], index = 0): Promise<Piped> =>
+    (status === 'N') ?
+      Promise.allSettled(src.map(fetchDataFromPiped))
+        .then(res => {
+          const ff = res.find(r => r.status === 'fulfilled');
+          if (ff) return ff.value;
+          return useInvidious();
+        }) :
+
+      fetchDataFromPiped(src[index])
+        .catch(() => {
+          if (index + 1 === src.length)
+            return useInvidious();
+          else return usePiped(src, index + 1);
+        });
+
 
   const useHls = () => Promise
     .allSettled((hls.api.length ? hls.api : piped).map(fetchDataFromPiped))
@@ -102,16 +121,13 @@ export default async function(
     return useLocal();
   if (state.HLS)
     return useHls();
+  if (status === 'I')
+    return useInvidious();
 
-  switch (status) {
-    case 'U':
-      return usePiped(piped);
-    case 'P':
-      return usePiped(proxy);
-    case 'I':
-      return useInvidious();
-    default:
-      return emergency(Error('Playback Unsuccesful'));
-  }
+  return usePiped(
+    status === 'P' ?
+      proxy : piped
+  );
+
 }
 
