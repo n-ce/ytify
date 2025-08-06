@@ -2,13 +2,12 @@
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
-[![Telegram Members](https://img.shields.io/endpoint?style=flat&url=https://mogyo.ro/quart-apis/tgmembercount?chat_id=ytifytg)](https://t.me/ytifytg)
+
 [![Telegram Online](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fytifytg)](https://t.me/ytifytg)
-[![Matrix](https://img.shields.io/matrix/ytify:matrix.org?label=Matrix)](https://matrix.to/#/#ytify:matrix.org)
 
 </div>
 
-> [**ytify**](https://ytify.pp.ua) is the fastest and the lightest centralised audio streaming web application, using modern browser features to squeeze out maximum efficiency.
+> [**ytify**](https://ytify.pp.ua) is the fastest and the lightest centralised audio streaming web application with simple but effective user experience.
 >  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
 
 > As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
@@ -47,9 +46,7 @@
   - [Secondary](https://ytify.netlify.app)
   - [Testing](https://dev--ytify.netlify.app)
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
-- Join our Telegram Community [@ytifytg](https://t.me/ytifytg)
-- Join our Matrix Community
-[@ytify](https://matrix.to/#/#ytify:matrix.org)
+- Join our Community [@ytifytg](https://t.me/ytifytg)
 
 
 ## License 📝
