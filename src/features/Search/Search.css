@@ -1,0 +1,96 @@
+.searchSection {
+
+  background-image: linear-gradient(transparent, var(--onBg));
+
+  header {
+    display: flex;
+    justify-content: space-between;
+
+    i {
+      font-size: var(--font-size-4);
+    }
+  }
+
+  .superInputContainer {
+    height: auto;
+    margin: var(--size-1) auto 0 auto;
+    padding: var(--size-2) var(--size-3);
+    position: sticky;
+    z-index: 3;
+    top: 0;
+    background-color: var(--onBg);
+    border-radius: var(--roundness);
+    border: var(--border);
+    box-shadow: var(--shadow-1);
+    display: flex;
+    align-items: center;
+
+    &:focus-within {
+      backdrop-filter: blur(var(--size-2));
+    }
+
+    .superInput {
+      border: none;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      outline: none;
+      background: none;
+      color: none;
+      font-size: medium;
+
+      &::placeholder {
+        color: inherit;
+        opacity: 75%;
+      }
+    }
+
+    .suggestions {
+      width: calc(100% - var(--size-3));
+      z-index: 3;
+      position: absolute;
+      list-style-type: none;
+      padding: 0;
+      top: calc(var(--size-7) + var(--size-2));
+      left: var(--size-2);
+      background-color: var(--bg);
+      border: var(--border);
+      border-radius: 0 0 var(--roundness) var(--roundness);
+      box-shadow: var(--shadow);
+      display: block;
+      user-select: none;
+
+      li {
+        padding: var(--size-1) var(--size-2);
+
+        &:hover,
+        &:focus,
+        &.hover {
+          background-color: var(--text);
+          color: var(--bg);
+        }
+      }
+    }
+
+    .searchFilters {
+      font-size: medium;
+      background: none;
+      max-width: var(--size-10);
+      margin-left: var(--size-3);
+      padding: 0;
+      border: none;
+      color: inherit;
+      text-align: right;
+      outline: none;
+      appearance: none;
+    }
+  }
+
+
+
+  .searchlist {
+    z-index: 1;
+    margin-top: var(--size-3);
+
+  }
+}

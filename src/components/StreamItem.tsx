@@ -1,8 +1,8 @@
 import { Show, createSignal } from 'solid-js';
-import './streamItem.css';
-import { state } from '../lib/store';
-import { generateImageUrl } from '../lib/visualUtils';
-import ActionsMenu from './ActionsMenu';
+import './StreamItem.css';
+import { config } from '../lib/utils';
+import { generateImageUrl } from '../lib/utils/image';
+import { loadAndPlay, openDialog } from '../lib/stores';
 
 export default function(data: {
   id: string,
@@ -14,7 +14,7 @@ export default function(data: {
   channelUrl?: string,
   views?: string,
   img?: string,
-  draggable?: boolean
+  draggable?: boolean,
 }) {
 
   const [getImage, setImage] = createSignal('');
@@ -53,12 +53,12 @@ export default function(data: {
 
 
 
-  if (state.loadImage)
+  if (config.loadImage)
     setImage(generateImageUrl(data.img || data.id, 'mq'));
 
   return (
     <a
-      class={'streamItem ' + (state.loadImage ? 'ravel' : '')}
+      class={'streamItem ' + (config.loadImage ? 'ravel' : '')}
       href={data.href}
       ref={parent}
       data-id={data.id}
@@ -67,9 +67,19 @@ export default function(data: {
       data-channel_url={data.channelUrl}
       data-duration={data.duration}
       data-thumbnail={getImage()}
+      onclick={(e) => {
+        e.preventDefault();
+        loadAndPlay({
+          id: data.id,
+          author: data.author || '',
+          duration: data.duration,
+          channelUrl: data.channelUrl || '',
+          title: data.title
+        });
+      }}
     >
       <span>
-        <Show when={state.loadImage} fallback={data.duration}>
+        <Show when={config.loadImage} fallback={data.duration}>
           <img
             crossorigin='anonymous'
             onerror={handleThumbnailError}
@@ -88,7 +98,19 @@ export default function(data: {
       </div>
       {data.draggable ?
         <i class="ri-draggable"></i> :
-        <ActionsMenu />
+        <i
+          class="ri-more-2-fill"
+          onclick={() => {
+            history.pushState({}, '', '#');
+            openDialog('actionsMenu', {
+              id: data.id,
+              title: data.title,
+              author: data.author || '',
+              duration: data.duration,
+              channelUrl: data.channelUrl || ''
+            });
+          }}
+        ></i>
       }
     </a>
   )

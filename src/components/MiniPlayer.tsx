@@ -1,14 +1,13 @@
-import { JSX, lazy, Show } from "solid-js";
-import './miniPlayer.css';
-import { state, store } from "../lib/store";
-import LikeButton from "../components/LikeButton";
-import PlayButton from "../components/PlayButton";
-import MediaDetails from "../components/MediaDetails";
+import { lazy, Show } from "solid-js";
+import './MiniPlayer.css';
+import { config } from "../lib/utils/config";
+import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "./MediaPartials";
+import { playerStore, store } from "../lib/stores";
 
-const MediaArtwork = lazy(() => import('../components/MediaArtwork'));
+
+const MediaArtwork = lazy(() => import('./MediaPartials/MediaArtwork'))
 
 export default function(_: {
-  playNextBtn: JSX.Element,
   handleClick: () => void
 }) {
   return (
@@ -17,12 +16,15 @@ export default function(_: {
         _.handleClick();
     }
     }>
-      <progress value="0.35" ></progress>
-      <Show when={state.loadImage}><MediaArtwork />
+      <progress value={playerStore.currentTime / playerStore.fullDuration}></progress>
+      <Show when={config.loadImage}>
+        <MediaArtwork />
       </Show>
       <MediaDetails />
       <PlayButton />
-      {store.queuelist.length ? _.playNextBtn : <LikeButton />}
+      <Show when={store.queuelist.length} fallback={<LikeButton />}>
+        <PlayNextButton />
+      </Show>
     </footer>
   )
 }

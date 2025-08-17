@@ -1,5 +1,5 @@
 import { onMount } from "solid-js";
-import { i18n } from "../lib/utils";
+import { t } from '../lib/stores';
 
 export function Selector(_: Selector) {
   let target!: HTMLSelectElement;
@@ -8,7 +8,7 @@ export function Selector(_: Selector) {
   return (
     <span>
       <label for={_.id}>
-        {i18n(_.label as TranslationKeys)}
+        {t(_.label as TranslationKeys)}
       </label>
       <select
         id={_.id}

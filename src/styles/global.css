@@ -1,218 +1,100 @@
-@import 'animations.css';
-@import 'layout.css';
+@import 'open-props/normalize.min.css';
 @import 'remixicon.css';
-@import 'nav.css';
-@import 'miniPlayer.css';
-@import 'home.css';
-@import 'search.css';
-@import 'library.css';
-@import 'list.css';
-@import 'snackbar.css';
 @import 'header.css';
-@import 'upcoming.css';
 
 :root {
   --bg: transparent;
   --onBg: transparent;
   --text: black;
+  --radius: var(--radius-2);
   --borderColor: transparent;
-  --border: 0.1vmin solid var(--borderColor);
+  --border: var(--borderColor) solid var(--text);
   --shadowColor: transparent;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundness: 0.4rem;
-  --defaultBg: var(--text);
-  --defaultText: var(--bg);
-  --pageTransitionEffect: translateX(100%);
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+  --blur: blur(var(--size-1));
+  --player-bg: none;
+  --player-bp: 0 0;
+  --font: var(--font-system-ui, var(--font-rounded-sans, var(--font-industrial, var(--font-monospace-code, var(--font-antique, var(--font-handwritten, var(--font-monospace-slab-serif)))))));
 }
 
 * {
-  margin: 0;
+  transition: all 0.4s ease;
 }
 
-
-img,
-svg {
-  display: block;
-  max-width: 100%;
+html,
+body {
+  height: 100dvh;
 }
 
-input,
-button,
-select {
-  font: inherit;
-  cursor: pointer;
+body {
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
 }
 
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  overflow-wrap: break-word;
-}
-
-
-button {
-  background: none;
-  border: none;
-  transition: all 0.3s ease;
-  user-select: none;
-
-  &:active {
-    transform: scale(0.8);
-  }
-}
-
-
-input {
-  font-family: inherit;
-  outline: none;
-}
-
-select {
-  font-family: inherit;
-  background: none;
-  outline: none;
-  color: var(--text);
-  border: none;
-  border-radius: var(--roundness);
-
-  /* fix white on white issue on dark mode */
-  option,
-  optgroup {
-    cursor: pointer;
-    background: var(--bg);
-  }
-}
-
-dialog[open] {
-  margin: auto;
-  background: none;
-  border: none;
-  animation: boing 0.3s ease-in-out forwards;
-}
-
-
-dialog::backdrop {
-  animation: dialogAppear 0.3s ease-in-out forwards;
-  background-color: #0007;
-}
-
-
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-
-.hide {
-  display: none !important;
-}
-
-.delete {
-  --onBg: #f222;
-  --text: #f22c;
-}
-
-
-#settings,
-#changelog {
-  button {
-    border: var(--border);
-    border-radius: var(--roundness);
-    background: var(--onBg);
-    color: var(--text);
-    font-family: inherit;
-    font-size: inherit;
-    padding: 1vmin 2vmin;
-    margin: 1vmin 2vmin;
-  }
-}
-
-
-.ri-loader-3-line {
-  animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
-}
-
-#loadingScreen {
+main {
   background-color: var(--bg);
   color: var(--text);
-  border-radius: var(--roundness);
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  flex-direction: row;
+  scroll-snap-type: x mandatory;
 
-  i {
-    display: block;
-    font-size: xx-large;
-  }
-
-}
-
-
-
-dialog.displayer {
-  white-space: pre;
-  background: var(--bg);
-  color: var(--text);
-  border-radius: var(--roundness);
 
   section {
-    white-space: normal;
-    overflow: scroll;
-
-    p {
-      margin-bottom: 1rem;
-      transition: all 0.5s;
-      font-size: small;
-    }
-
-    p.active {
-      font-size: large;
-      font-weight: bold;
-    }
+    height: 100%;
+    flex: 1 0 0;
+    padding: var(--size-3);
+    padding-top: 0;
+    overflow-y: auto;
+    scroll-snap-align: start;
+    min-width: calc(100dvw / 3);
+    flex-shrink: 0;
   }
 
+  @media (orientation: portrait) {
+
+    section {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+    }
+  }
 }
 
-dialog.watcher {
+
+
+dialog {
   height: 100dvh;
   width: 100dvw;
-  background: var(--bg);
-  color: var(--text);
+  border-radius: 0;
+  background: blue;
+  box-shadow: none;
 
-  button {
-    color: inherit;
+  @media(orientation:landscape) {
+    width: calc(100dvw / 1.5);
+    margin-left: calc(100dvw / 3);
   }
 
-  video {
-    width: 100%;
-    max-width: 100vmin;
-    border-radius: var(--roundness);
-  }
-
-  select {
-    width: 7ch;
-    margin-left: 1ch;
+  &::backdrop {
+    background: red;
   }
 }
 
+@keyframes spinner {
+  from {
+    transform: rotate(0turn)
+  }
 
-/* disable action during load events */
-#playButton.ri-loader-3-line {
-  pointer-events: none;
+  to {
+    transform: rotate(1turn)
+  }
 }
 
-.ri-draggable:hover {
-  cursor: grab;
-}
-
-.ri-draggable:active {
-  cursor: grabbing;
+.ri-loader-3-line {
+  display: block;
+  font-size: var(--font-size-6);
+  animation: spinner 1.5s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+  text-align: center;
+  margin-top: auto;
 }

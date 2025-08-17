@@ -1,0 +1,148 @@
+#settingsSection {
+  border-radius: var(--roundness);
+
+  header {
+    display: flex;
+    justify-content: space-between;
+
+    i {
+      font-size: var(--font-size-4);
+    }
+  }
+
+  >div {
+
+    padding: var(--size-1);
+  }
+
+  div {
+    background-color: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+    width: 100%;
+    margin-bottom: var(--size-3);
+
+    &.toggleSwitch,
+    >span {
+      width: calc(100% - 2ch);
+      margin: 1ch auto;
+    }
+
+    &.toggleSwitch {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+
+      label {
+        width: calc(100% - 2.2rem);
+      }
+
+      span {
+        cursor: pointer;
+        inset: 0;
+        margin: 0;
+        background-color: var(--onBg);
+        border-radius: var(--roundness);
+        border: var(--border);
+        width: 2.2rem;
+
+        &,
+        &:before {
+          height: 1.3rem;
+          transition: 0.3s;
+        }
+
+        &:before {
+          content: "";
+          height: calc(100% - 0.5rem);
+          aspect-ratio: 1;
+          margin: 0.25rem;
+          background-color: var(--text);
+          border-radius: calc(var(--roundness) / 2);
+        }
+
+      }
+
+      input {
+        display: none;
+      }
+
+      input:checked+span {
+        background: var(--bg);
+      }
+
+      input:checked+span:before {
+        transform: translateX(0.85rem);
+      }
+    }
+
+    b {
+      display: flex;
+      align-items: center;
+      column-gap: 1vmin;
+      margin: 1ch;
+
+      i {
+        font-size: 1.2rem;
+      }
+
+      svg {
+        overflow: hidden;
+      }
+    }
+
+    >span {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      select {
+        background-color: var(--onBg);
+        font-size: inherit;
+        border: var(--border);
+        padding: 0.5vmin 1vmin;
+        max-width: 50%;
+      }
+    }
+
+    a {
+      background-color: var(--onBg);
+      padding: 1vmin;
+      border: var(--border);
+      border-radius: var(--roundness);
+      display: inline-block;
+      margin-right: 2vmin;
+      margin-bottom: 4%;
+    }
+
+    button {
+      margin-left: 0;
+      margin-bottom: 4%;
+      background-color: var(--onBg) !important;
+      color: var(--text) !important;
+    }
+  }
+
+  >div:last-child {
+    background: none;
+    border: none;
+  }
+}
+
+#netlifyForm {
+  font-family: inherit;
+  font-size: medium;
+  background-color: var(--onBg);
+  border: var(--border);
+  border-radius: var(--roundness);
+  color: inherit;
+  padding: 1vmin;
+  width: 100%;
+  resize: none;
+
+  &::placeholder {
+    color: inherit;
+    opacity: 0.7;
+  }
+}

@@ -1,0 +1,112 @@
+.streamItem {
+	width: 100%;
+	user-select: none;
+	background-color: var(--onBg);
+	color: var(--text);
+	padding: var(--size-1);
+	margin-bottom: var(--size-2);
+	border: var(--border);
+	border-radius: calc(var(--roundness) + 0.75vmin);
+	display: flex;
+	align-items: center;
+	position: relative;
+	transition: transform 0.4s;
+	text-decoration: none;
+
+	div,
+	span {
+		pointer-events: none;
+		transition: opacity 0.4s;
+	}
+
+	&:hover {
+		transform: scale(0.95);
+	}
+
+	&.ravel {
+		* {
+			opacity: 0;
+		}
+	}
+
+
+	span {
+		position: relative;
+		z-index: 0;
+		max-width: 34.7vmin;
+		margin-right: 1vmin;
+
+		img {
+			height: 19.5vmin;
+			width: auto;
+			border-radius: var(--roundness);
+		}
+
+
+		.duration {
+			position: absolute;
+			padding: 0 1vmin;
+			bottom: 1.2vmin;
+			right: 1.2vmin;
+			background-color: #000a;
+			color: #fffc;
+			border-radius: calc(var(--roundness)*0.6);
+			font-size: 0.8rem;
+		}
+	}
+
+	div {
+		height: 100%;
+		width: calc(100% - 37vmin);
+		display: flex;
+		flex-direction: column;
+		justify-content: space-evenly;
+
+
+		.title {
+			max-height: 50%;
+			line-height: var(--font-lineheight-1);
+			font-size: 100%;
+			overflow: hidden;
+			font-size: var(--font-size-1);
+			font-weight: var(--font-weight-6);
+		}
+
+		.avu {
+			height: 9.5vmin;
+			overflow: hidden;
+			line-height: var(--font-lineheight-1);
+			width: 100%;
+
+			p {
+				font-size: var(--font-size-0);
+				font-weight: var(--font-weight-6);
+			}
+
+		}
+	}
+
+	i {
+		height: 19.5vmin;
+		aspect-ratio: 1;
+		font-size: 1.2rem;
+		padding: 0 0.25rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 2;
+		position: absolute;
+		right: -1rem;
+		bottom: -0.5rem;
+		border-radius: 50%;
+
+		&:hover {
+			background: var(--onBg);
+		}
+	}
+
+}
+
+#queuelist>a {
+	transition: initial;
+}
