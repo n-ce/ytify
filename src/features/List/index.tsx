@@ -1,24 +1,24 @@
 import { createSignal, For, onMount } from 'solid-js';
 import './list.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { goto, setStore, store, t } from '../../lib/stores';
+import { openFeature, t } from '../../lib/stores';
 import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
 import StreamItem from '../../components/StreamItem';
+import { listStore } from '../../lib/stores/list';
+import { setQueueStore } from '../../lib/stores/queue';
 
-export default function(_: {
-  close: () => void
-}) {
+export default function() {
   let listSection!: HTMLElement;
   let listContainer!: HTMLDivElement;
 
   onMount(() => {
-    goto(listSection);
+    openFeature('list', listSection);
 
     new Sortable(listContainer, {
       handle: '.ri-draggable',
       onUpdate(e: SortableEvent) {
         if (e.oldIndex == null || e.newIndex == null) return;
-        const collection = store.list.id;
+        const collection = listStore.id;
         const db = getDB();
         const dataArray = Object.entries(db[collection]);
         const [oldKey, oldItem] = dataArray.splice(e.oldIndex, 1)[0];
@@ -36,14 +36,14 @@ export default function(_: {
 
   const db = Object(getDB());
   const [isSubscribed, setSubscribed] = createSignal(
-    db.hasOwnProperty(store.list.type) &&
-    db[store.list.type].hasOwnProperty(store.list.id)
+    db.hasOwnProperty(listStore.type) &&
+    db[listStore.type].hasOwnProperty(listStore.id)
   );
 
 
   function subscriptionHandler() {
 
-    const l = store.list;
+    const l = listStore;
     const db = getDB();
     if (isSubscribed()) {
       delete db[l.type][l.id];
@@ -78,7 +78,7 @@ export default function(_: {
             <li
               id="playAllBtn"
               onclick={() => {
-                setStore('queuelist', []);
+                setQueueStore('list', []);
               }}
             >
               <i class="ri-play-large-line"></i>{t("list_play")}
@@ -101,7 +101,7 @@ export default function(_: {
 
             <li id="viewOnYTBtn">
               <i class="ri-external-link-line"></i>{
-                store.list.name || 'View on YouTube'
+                listStore.name || 'View on YouTube'
               }
             </li>
 
@@ -150,15 +150,15 @@ export default function(_: {
         ref={listContainer}
       >
         <For
-          each={store.list.data}
+          each={Object.values(listStore.list)}
           fallback={<h1>{t("list_info")}</h1>}
         >{
             (item) =>
               <StreamItem
-                id={item.id}
+                id={item.id || ''}
                 author={item.author}
-                title={item.title}
-                duration={item.duration}
+                title={item.title || ''}
+                duration={item.duration || ''}
                 channelUrl={item.channelUrl}
               />
           }

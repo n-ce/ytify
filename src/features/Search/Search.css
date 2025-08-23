@@ -46,22 +46,26 @@
     }
 
     .suggestions {
-      width: calc(100% - var(--size-3));
+      height: var(--size-fluid-9);
+      width: auto;
       z-index: 3;
       position: absolute;
       list-style-type: none;
       padding: 0;
-      top: calc(var(--size-7) + var(--size-2));
-      left: var(--size-2);
+      top: calc(calc(var(--size-4) * 2) + var(--size-px-1));
+      left: var(--size-3);
       background-color: var(--bg);
       border: var(--border);
       border-radius: 0 0 var(--roundness) var(--roundness);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-3);
       display: block;
       user-select: none;
+      overflow: hidden;
 
       li {
         padding: var(--size-1) var(--size-2);
+        background-color: var(--onBg);
+        margin-bottom: var(--size-px-1);
 
         &:hover,
         &:focus,

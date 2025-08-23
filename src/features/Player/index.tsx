@@ -2,19 +2,17 @@ import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
 import './Player.css'
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "../../components/MediaPartials";
 import { config, convertSStoHHMMSS, cssVar } from "../../lib/utils";
-import { goto, playerStore, setPlayerStore, store, t } from "../../lib/stores";
+import { closeFeature, openFeature, playerStore, setPlayerStore, store, t } from "../../lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 
-export default function(_: {
-  close: () => void
-}) {
+export default function() {
 
 
   let playerSection!: HTMLDivElement;
   let slider!: HTMLInputElement;
   onMount(() => {
-    goto(playerSection);
+    openFeature('player', playerSection);
 
     ['touchstart', 'touchmove', 'touchend'].forEach(type => {
       slider.addEventListener(type, (e) => e.stopPropagation());
@@ -95,7 +93,7 @@ export default function(_: {
           }}
           class="ri-loop-left-line"></i>
         <i
-          onclick={_.close}
+          onclick={() => { closeFeature('player') }}
           class="ri-close-large-line"></i>
 
       </span>

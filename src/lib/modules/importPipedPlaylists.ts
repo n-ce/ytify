@@ -1,16 +1,15 @@
-import { addListToCollection, createCollection } from "../lib/libraryUtils";
-import { convertSStoHHMMSS, notify, goTo } from "../lib/utils";
-import { i18n } from "../scripts/i18n";
+import { openDialog, t } from '../stores';
+import { addListToCollection, convertSStoHHMMSS, createCollection, goTo } from '../utils';
 
 export default async function() {
 
-  const instance = prompt(i18n('piped_enter_auth'), 'https://pipedapi.kavin.rocks');
+  const instance = prompt(t('piped_enter_auth'), 'https://pipedapi.kavin.rocks');
   if (!instance) return;
 
-  const username = prompt(i18n('piped_enter_username'));
+  const username = prompt(t('piped_enter_username'));
   if (!username) return;
 
-  const password = prompt(i18n('piped_enter_password'));
+  const password = prompt(t('piped_enter_password'));
   if (!password) return;
 
   // login 
@@ -19,14 +18,14 @@ export default async function() {
     body: JSON.stringify({ username, password })
   })
     .then(res => res.json())
-    .catch(e => notify(i18n("piped_failed_login", e)));
+    .catch(e => openDialog('snackbar', t("piped_failed_login", e)));
 
   if (!authId) {
-    notify(i18n("piped_failed_token"));
+    openDialog('snackbar', t("piped_failed_token"));
     return;
   }
 
-  notify(i18n("piped_success_logged"));
+  openDialog('snackbar', t("piped_success_logged"));
 
   // fetch
   const playlists = await fetch(instance + '/user/playlists', {
@@ -34,9 +33,9 @@ export default async function() {
       Authorization: authId.token
     }
   }).then(res => res.json())
-    .catch(e => notify(i18n("piped_failed_find", e)));
+    .catch(e => openDialog('snackbar', t("piped_failed_find", e)));
   if (playlists.length)
-    notify(i18n("piped_success_fetched"));
+    openDialog('snackbar', t("piped_success_fetched"));
   else return;
 
 
@@ -64,12 +63,12 @@ export default async function() {
         addListToCollection(listTitle, list);
       })
   )).then(() => {
-    notify(i18n('piped_success_imported'));
+    openDialog('snackbar', t('piped_success_imported'));
     document.getElementById('r.collections')?.click();
     goTo('/library');
   })
     .catch(e => {
-      notify(i18n("piped_failed_imported", e));
+      openDialog('snackbar', t("piped_failed_imported", e));
     });
 
   // logout
@@ -80,7 +79,7 @@ export default async function() {
       Authorization: authId.token
     }
   }).then(res => {
-    notify(i18n(
+    openDialog('snackbar', t(
       res.ok ?
         'piped_success_auth' :
         'piped_failed_auth'

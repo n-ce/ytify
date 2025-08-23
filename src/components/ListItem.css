@@ -1,0 +1,63 @@
+.listItem {
+  width: 48%;
+  height: auto;
+  background-color: var(--onBg);
+  padding: 1dvmin;
+  margin: 2% 1%;
+  border: var(--border);
+  border-radius: calc(var(--roundness) + 0.75vmin);
+  transition: all 0.3s ease-out;
+  display: inline-block;
+
+  @media(orientation:landscape) {
+    width: 23%;
+  }
+
+  * {
+    pointer-events: none;
+    transition: all 0.4s;
+  }
+
+  &:hover {
+    transform: scale(0.95);
+  }
+
+  &.ravel {
+    * {
+      opacity: 0;
+    }
+  }
+
+
+  img {
+    height: auto;
+    width: 100%;
+    border-radius: var(--roundness);
+    margin-bottom: 2vmin;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  p.title {
+    font-size: medium;
+    height: 2rem;
+    line-height: 1rem;
+    overflow: hidden;
+  }
+
+  p.uData {
+    font-size: x-small;
+    line-height: 0.8rem;
+    overflow: hidden;
+  }
+
+  p.stats {
+    font-size: small;
+    height: 1rem;
+    line-height: 1rem;
+  }
+
+}

@@ -1,4 +1,4 @@
-import { For, onMount, Show } from "solid-js";
+import { For, onCleanup, onMount, Show } from "solid-js";
 import { getSearchResults, getSearchSuggestions, searchStore, setSearchStore, store, t } from "../../lib/stores";
 import { config, idFromURL, player } from "../../lib/utils";
 
@@ -17,6 +17,10 @@ export default function() {
       if (event.ctrlKey && event.key === "K")
         superInput.focus();
     });
+  });
+
+  onCleanup(() => {
+
   });
 
   function textToSearch(text: string) {

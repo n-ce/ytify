@@ -1,5 +1,3 @@
-import { store } from "../lib/stores";
-import { convertSStoHHMMSS } from "../lib/utils";
 
 /*
 > Get all related streams of a stream
@@ -7,6 +5,10 @@ import { convertSStoHHMMSS } from "../lib/utils";
 > sometimes users will remove items from queue manually,
 > we need to account for this using the trashHistory array
 */
+
+import { store } from "../stores";
+import { setQueueStore } from "../stores/queue";
+import { convertSStoHHMMSS } from "../utils";
 
 export default function(data: StreamItem[]) {
 
@@ -27,12 +29,12 @@ export default function(data: StreamItem[]) {
       !streamHistory.includes(id) &&
       filterYTM(stream.uploaderName)
     )
-      store.queue.append({
+      setQueueStore('list', l => [...l, ({
         id: id,
         title: stream.title,
         author: stream.uploaderName,
-        duration: convertSStoHHMMSS(stream.duration),
-      })
+        duration: convertSStoHHMMSS(stream.duration)
+      }) as CollectionItem])
   });
 
 }

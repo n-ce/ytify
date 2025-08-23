@@ -69,13 +69,15 @@ export default function(data: {
       data-thumbnail={getImage()}
       onclick={(e) => {
         e.preventDefault();
-        loadAndPlay({
-          id: data.id,
-          author: data.author || '',
-          duration: data.duration,
-          channelUrl: data.channelUrl || '',
-          title: data.title
-        });
+
+        if (!e.target.classList.contains('ri-more-2-fill'))
+          loadAndPlay({
+            id: data.id,
+            author: data.author || '',
+            duration: data.duration,
+            channelUrl: data.channelUrl || '',
+            title: data.title
+          });
       }}
     >
       <span>

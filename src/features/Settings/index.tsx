@@ -6,17 +6,15 @@ import Playback from "./Playback";
 import Library from "./Library";
 import Personalize from "./Personalize";
 import Parental from "./Parental";
-import { goto, t } from '../../lib/stores';
+import { closeFeature, openFeature, t } from '../../lib/stores';
 
-export default function(_: {
-  close: () => void
-}) {
+export default function() {
   let settingsSection!: HTMLDivElement;
   let actionsSection!: HTMLDivElement;
   ;
 
   onMount(() => {
-    goto(settingsSection);
+    openFeature('settings', settingsSection);
   });
 
 
@@ -67,7 +65,7 @@ export default function(_: {
     >
       <header>
         <p>Settings</p>
-        <i class="ri-close-large-line" onclick={_.close}></i>
+        <i class="ri-close-large-line" onclick={() => closeFeature('settings')}></i>
       </header>
 
       <App />

@@ -1,14 +1,13 @@
 import { createSignal, For, onCleanup, onMount } from "solid-js";
-import { dialogState, openDialog, store } from "../../lib/stores";
+import { closeFeature, dialogState, openDialog, openFeature, store } from "../../lib/stores";
 
-export default function(_: {
-  close: () => void
-}) {
+export default function() {
 
   const [lrcMap, setLrcMap] = createSignal(['']);
   let lyricsSection!: HTMLElement;
 
   onMount(() => {
+    openFeature('lyrics', lyricsSection);
     const { title, author } = dialogState.data as CollectionItem;
     fetch(
       `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}`,
@@ -70,7 +69,7 @@ export default function(_: {
   })
 
   return (
-    <section ref={lyricsSection} onclick={_.close}>
+    <section ref={lyricsSection} onclick={() => { closeFeature('lyrics') }}>
       <For each={lrcMap()}>
         {(item) => (<p>{item}</p>)}
       </For>

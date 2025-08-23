@@ -47,9 +47,7 @@ export default function() {
           setI18nStore('locale', e.target.value);
           openDialog('snackbar', t('settings_reload'));
         }}
-        onmount={(target) => {
-          target.value = document.documentElement.lang;
-        }}
+        value={document.documentElement.lang}
       >
         <For each={Locales}>
           {(item) => (
@@ -67,16 +65,12 @@ export default function() {
           setConfig('linkHost', configVal);
           openDialog('snackbar', t('settings_reload'));
         }}
-        onmount={(target) => {
-          if (config.linkHost)
-            target.value = config.linkHost;
-        }}
+        value={config.linkHost || location.origin}
       >
-        <option value="https://ytify.pp.ua">ytify</option>
+        <option value={location.origin}>ytify</option>
         <option value="https://youtube.com">YouTube</option>
         <option value="https://piped.video">Piped</option>
         <option value="https://inv.nadeko.net">Invidious</option>
-        <option value="https://viewtube.io">ViewTube</option>
       </Selector>
 
       <Selector
@@ -85,9 +79,7 @@ export default function() {
         onchange={(e) => {
           setConfig('dlFormat', e.target.value as 'opus' | 'mp3' | 'wav' | 'ogg');
         }}
-        onmount={(target) => {
-          target.value = config.dlFormat;
-        }}
+        value={config.dlFormat}
       >
         <option value='opus'>Opus</option>
         <option value='mp3'>MP3</option>
@@ -101,9 +93,7 @@ export default function() {
         onchange={(e) => {
           setConfig('shareAction', e.target.value as 'play' | 'watch' | 'download');
         }}
-        onmount={(target) => {
-          target.value = config.shareAction;
-        }}
+        value={config.shareAction}
       >
         <option value='play'>{t('settings_pwa_play')}</option>
         <option value='watch'>{t('settings_pwa_watch')}</option>

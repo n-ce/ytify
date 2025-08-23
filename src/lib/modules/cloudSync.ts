@@ -1,5 +1,5 @@
-import { getDB, saveDB } from "../lib/libraryUtils";
-import { notify } from "../lib/utils";
+import { openDialog } from "../stores";
+import { getDB, saveDB } from "../utils";
 
 export default function(dbhash: string, syncBtn: HTMLElement) {
 
@@ -77,7 +77,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   if (!Object.keys(getDB()).length) {
     if (confirm('Do you want to import your library from your account?')) {
       fetchFromCloud()
-        .catch(() => notify('No Existing Library Found.'))
+        .catch(() => openDialog('snackbar', 'No Existing Library Found.'))
         .finally(() => syncBtn.className = importIcon);
     }
   }

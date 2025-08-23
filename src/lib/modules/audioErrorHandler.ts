@@ -1,40 +1,42 @@
-import { title, playButton } from '../lib/dom.ts';
-import { store, state } from '../lib/stores';
-import { getDownloadLink, notify } from '../lib/utils.ts';
+import { openDialog } from '../stores/dialog.ts';
+import { playerStore, setPlayerStore } from '../stores/player.ts';
+import { setStore, store } from '../stores/app.ts';
+import { config } from '../utils/config.ts';
+import { getDownloadLink } from '../utils/helpers.ts';
 
 export default function(audio: HTMLAudioElement) {
   audio.pause();
   const message = 'Error 403 : Unauthenticated Stream';
   const id = store.stream.id;
-  const { fallback } = store.player;
+  const { fallback } = playerStore;
   const { index, invidious } = store.api;
-  const { enforcePiped, HLS, customInstance } = state;
+  const { enforcePiped, HLS, customInstance } = config;
 
   if (enforcePiped || HLS || customInstance)
-    return notify(message);
+    return openDialog('snackbar', message);
 
   const origin = new URL(audio.src).origin;
 
   if (audio.src.endsWith('&fallback')) {
     if (audio.parentNode) {
-      notify(message);
-      playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+      openDialog('snackbar', message);
+      setPlayerStore('playbackState', 'none');
     }
     return;
   }
 
-  if (index < invidious.length) {
-    const proxy = invidious[index];
+  if (index.invidious < invidious.length) {
+    const proxy = invidious[index.invidious];
     if (audio.parentNode)
-      title.textContent = `Switching proxy to ${proxy.slice(8)}`;
+      setPlayerStore('title', `Switching proxy to ${proxy.slice(8)}`);
     audio.src = audio.src.replace(origin, proxy);
-    store.api.index++;
+    setStore('api', 'index', 'invidious', index.invidious + 1)
   }
   else {
-    store.api.index = 0;
+    setStore('api', 'index', 'invidious', 0)
     if (audio.parentNode) {
-      notify(message);
-      title.textContent = store.stream.title;
+      openDialog('snackbar', message);
+      setPlayerStore('title', store.stream.title);
     }
 
     // Emergency Handling
@@ -57,7 +59,7 @@ export default function(audio: HTMLAudioElement) {
         })
         .catch(() => {
           if (audio.parentNode)
-            playButton.classList.replace(playButton.className, 'ri-stop-circle-fill');
+            setPlayerStore('playbackState', 'none');
         })
     }
 

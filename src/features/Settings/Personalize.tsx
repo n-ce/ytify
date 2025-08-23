@@ -29,12 +29,7 @@ export default function() {
           cssVar('--font', `var(--font-${value})`);
           setConfig('font', e.target.value);
         }}
-        onmount={(target) => {
-          const { font } = config;
-
-          if (font)
-            target.value = font;
-        }}
+        value={config.font}
       >
         <option value="system-ui">System UI</option>
         <option value="rounded-sans">Rounded Sans</option>
@@ -46,16 +41,29 @@ export default function() {
       </Selector>
 
       <Selector
+        label='settings_landscape_sections'
+        onchange={(e) => {
+          const { value } = e.target;
+          cssVar('--landscape-sections', value);
+          setConfig('landscapeSections', e.target.value);
+        }}
+        id='sls'
+        value={config.landscapeSections}
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </Selector>
+
+      <Selector
         label='settings_roundness'
         id='roundnessChanger'
         onchange={(e) => {
           cssVar('--roundness', e.target.value);
           setConfig('roundness', e.target.value);
         }}
-        onmount={(target) => {
-          if (config.roundness)
-            target.value = config.roundness || '0.4rem';
-        }}
+        value={config.roundness}
       >
         <option value="none">{t('settings_roundness_none')}</option>
         <option value="0.2rem">{t('settings_roundness_lighter')}</option>
@@ -90,9 +98,7 @@ export default function() {
           themer();
           setConfig('theme', e.target.value);
         }}
-        onmount={(target) => {
-          target.value = config.theme || 'auto';
-        }}
+        value={config.theme}
       >
         <optgroup label={t('settings_theming_scheme_dynamic')}>
           <option value="auto" selected>{t('settings_theming_scheme_system')}</option>

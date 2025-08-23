@@ -29,5 +29,8 @@
   "include": [
     "src",
     "netlify"
+  ],
+  "exclude": [
+    "src/lib/modules"
   ]
 }

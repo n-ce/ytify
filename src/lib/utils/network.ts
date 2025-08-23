@@ -11,8 +11,8 @@ async function handleResponse(res: Response): Promise<any> {
 
 // SEARCH
 
-export const fetchSearchSuggestions = async (api: string, text: string): Promise<string[]> => {
-  const data = await handleResponse(await fetch(api + '/opensearch/suggestions/?query=' + text));
+export const fetchSearchSuggestions = async (api: string, text: string, signal: AbortSignal): Promise<string[]> => {
+  const data = await handleResponse(await fetch(api + '/opensearch/suggestions/?query=' + text, { signal }));
   if (!data?.[1]?.length) {
     throw new Error('No Suggestions Received');
   }

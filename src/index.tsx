@@ -1,20 +1,11 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
-import { lazy, onMount, Show } from 'solid-js';
+import { createEffect, For, lazy, onMount, Show } from 'solid-js';
 import './styles/global.css';
-import { themer } from './lib/utils';
-import { setStore, store, dialogState, openDialog, updateLang, initNetwork, navStore, setNavStore } from './lib/stores';
+import { binary2hex, hex2binary, setConfig, themer } from './lib/utils';
+import { dialogState, openDialog, updateLang, initNetwork, navStore, playerStore, params, setNavStore, setSearchStore, getSearchResults } from './lib/stores';
 
-const Home = lazy(() => import('./features/Home'));
-const List = lazy(() => import('./features/List'));
-const Queue = lazy(() => import('./features/Queue'));
-const Player = lazy(() => import('./features/Player'));
-const Search = lazy(() => import('./features/Search'));
-const Settings = lazy(() => import('./features/Settings'));
 const MiniPlayer = lazy(() => import('./components/MiniPlayer'));
-const Watcher = lazy(() => import('./features/Video'));
-const Lyrics = lazy(() => import('./features/Lyrics'));
-
 const UpdatePrompt = lazy(() => import('./components/Dialogs/UpdatePrompt'));
 const Snackbar = lazy(() => import('./components/Dialogs/Snackbar.tsx'));
 const ActionsMenu = lazy(() => import('./components/Dialogs/ActionsMenu'));
@@ -22,66 +13,71 @@ const ActionsMenu = lazy(() => import('./components/Dialogs/ActionsMenu'));
 
 function App() {
 
-
   onMount(async () => {
-    themer();
 
+    const f = Object.keys(navStore.features);
+    const p = params.get('p');
+    if (p && p !== '10') {
+      const binary = hex2binary(p).split('');
+      f.forEach((v, i) => {
+        if (binary[i] === '1')
+          setNavStore('features', v as Features, { state: true })
+      })
+    }
+    themer();
     await initNetwork();
+
+
+    const q = params.get('q');
+
+    if (q) {
+      if (!navStore.features.search.state)
+        setNavStore('features', 'search', 'state', true);
+      setConfig('searchFilter', params.get('f') || 'all');
+
+      setSearchStore('query', q);
+      getSearchResults();
+    }
   });
 
+  createEffect(() => {
+    const p = navStore.params;
 
-  function closeFeature(section: Features | undefined = undefined) {
-    setNavStore('features', features => features.slice(0, -1));
+    for (const navParam in p) {
+      const navParamVal = p[navParam as keyof typeof p];
 
-    navStore.features[navStore.features.length - 1].scrollIntoView({
-      behavior: 'smooth'
-    });
-    if (section)
-      setTimeout(() => {
-        setStore('features', section, false);
-      }, 500)
-  }
+      if (!navParamVal) params.delete(navParam);
+      else if (navParam === 'p') {
+        if (navParamVal === '00010000') params.delete(navParam);
+        else params.set('p', binary2hex(navParamVal))
+      }
+      else if (navParam === 'f') {
+        if (!p.q || navParamVal === 'all') params.delete(navParam);
+        else params.set('f', navParamVal)
+      }
+      else params.set(navParam, navParamVal);
+    }
+
+    if (params.toString())
+      history.replaceState({}, '', location.origin + '?' + params.toString());
+
+  })
+
 
   return (
     <>
       <main>
-        <Home />
-
-        <Show when={store.features.search}>
-          <Search
-            close={() => { closeFeature('search') }}
-          />
-        </Show>
-        <Show when={store.features.player}>
-          <Player
-            close={() => { closeFeature('player') }}
-          />
-        </Show>
-        <Show when={store.queuelist.length}>
-          <Queue close={() => closeFeature()} />
-        </Show>
-        <Show when={store.features.list}>
-          <List
-            close={() => { closeFeature('list') }}
-          />
-        </Show>
-        <Show when={store.features.settings}>
-          <Settings
-            close={() => { closeFeature('settings') }}
-          />
-        </Show>
-        <Show when={store.features.lyrics}>
-          <Lyrics close={() => { closeFeature('lyrics') }} />
-        </Show>
-        <Show when={store.features.video}>
-          <Watcher close={() => { closeFeature('video') }} />
-        </Show>
+        <For each={Object.values(navStore.features)}>
+          {(item) =>
+            <Show when={item.state}>
+              <item.component />
+            </Show>
+          }
+        </For>
       </main>
 
-      <Show when={!store.features.player && store.stream.id}>
-        <MiniPlayer
-          handleClick={() => setStore('features', 'player', true)}
-        />
+      <Show when={!navStore.features.player.state && playerStore.id}>
+        <MiniPlayer />
       </Show >
 
 

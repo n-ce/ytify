@@ -12,6 +12,7 @@
 	position: relative;
 	transition: transform 0.4s;
 	text-decoration: none;
+	overflow: hidden;
 
 	div,
 	span {

@@ -1,7 +1,5 @@
-import { loadingScreen } from "../lib/dom";
-import { getDB, saveDB } from "../lib/libraryUtils";
-import { store } from "../lib/stores";
-import { convertSStoHHMMSS, notify } from "../lib/utils";
+import { openDialog, store } from "../stores";
+import { convertSStoHHMMSS, getDB, saveDB } from "../utils";
 
 type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
 
@@ -9,7 +7,7 @@ type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
 export default async function(e: File) {
   const songshiftData = JSON.parse(await e.text()) as songshift;
   if (!Array.isArray(songshiftData)) {
-    notify('Incompatible Database!');
+    openDialog('snackbar', 'Incompatible Database!');
     return;
   }
   const db = getDB();
@@ -38,7 +36,7 @@ export default async function(e: File) {
         return getMetadata(seed, src, apiIndex + 1);
       else {
         console.error(e);
-        notify('Failed to import ' + seed);
+        openDialog('snackbar', 'Failed to import ' + seed);
         return;
       }
     });
@@ -48,7 +46,8 @@ export default async function(e: File) {
       `${s.track} ${s.artist}`, s.service
     )
   );
-  loadingScreen.showModal();
+
+  //loadingScreen.showModal();
 
   await Promise
     .all(promises)
@@ -60,11 +59,11 @@ export default async function(e: File) {
         }
       });
       saveDB(db);
-      notify('The Songshift streams have been imported')
+      openDialog('snackbar', 'The Songshift streams have been imported')
     })
     .finally(() => {
-      if (loadingScreen.open)
-        loadingScreen.close();
+      // if (loadingScreen.open)
+      //     loadingScreen.close();
     });
 
 }

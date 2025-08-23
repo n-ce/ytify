@@ -2,6 +2,7 @@ import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { setStore } from "./app";
 import { generateImageUrl } from "../utils";
+import { setNavStore } from "./navigation";
 
 
 type PlayerStore = {
@@ -99,7 +100,11 @@ function convertHHMMSStoSS(duration: string): number {
 
 export function loadAndPlay(data: CollectionItem) {
   setStore('stream', data);
+
   setPlayerStore('mediaArtwork', generateImageUrl(data.id, 'maxres', '&w=720&h=720&fit=cover'));
+  setNavStore('params', 's', data.id);
+
+  setPlayerStore('id', data.id);
   setPlayerStore('title', data.title);
   setPlayerStore('author', data.author);
   setPlayerStore('channelUrl', data.channelUrl);

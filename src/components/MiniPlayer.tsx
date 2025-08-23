@@ -2,18 +2,17 @@ import { lazy, Show } from "solid-js";
 import './MiniPlayer.css';
 import { config } from "../lib/utils/config";
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "./MediaPartials";
-import { playerStore, store } from "../lib/stores";
+import { playerStore, setNavStore } from "../lib/stores";
+import { queueStore } from "../lib/stores/queue";
 
 
 const MediaArtwork = lazy(() => import('./MediaPartials/MediaArtwork'))
 
-export default function(_: {
-  handleClick: () => void
-}) {
+export default function() {
   return (
     <footer onclick={(e) => {
       if (!e.target.matches('button'))
-        _.handleClick();
+        setNavStore('features', 'player', { state: true });
     }
     }>
       <progress value={playerStore.currentTime / playerStore.fullDuration}></progress>
@@ -22,7 +21,7 @@ export default function(_: {
       </Show>
       <MediaDetails />
       <PlayButton />
-      <Show when={store.queuelist.length} fallback={<LikeButton />}>
+      <Show when={queueStore.list.length} fallback={<LikeButton />}>
         <PlayNextButton />
       </Show>
     </footer>

@@ -1,9 +1,9 @@
-import fetchList from '../../../lib/modules/fetchList';
-import { setStore, store, closeDialog, t, playerStore } from '../../../lib/stores';
+// import fetchList from '../../../lib/modules/fetchList';
+import { store, closeDialog, t, playerStore, setListStore, setNavStore } from '../../../lib/stores';
 import { config, getDownloadLink, hostResolver } from '../../../lib/utils';
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
-import { Show } from 'solid-js';
+import { onMount, Show } from 'solid-js';
 
 
 export default function(_: {
@@ -14,10 +14,15 @@ export default function(_: {
   const isMusic = _.data.author.endsWith('- Topic');
   let dialog!: HTMLDialogElement;
 
+  onMount(() => {
+    dialog.showModal();
+  });
+
   return (
     <dialog
       id="actionsMenu"
       ref={dialog}
+      onclick={closeDialog}
     >
 
       <ul
@@ -27,6 +32,7 @@ export default function(_: {
         <li tabindex="0" onclick={() => {
           // store.queue.append(store.actionsMenu, true);
           closeDialog();
+
         }}>
           <i class="ri-skip-forward-line"></i>{t('actions_menu_play_next')}
         </li>
@@ -47,7 +53,7 @@ export default function(_: {
 
           <li tabindex="3" onclick={async () => {
             closeDialog();
-            fetchList('/playlists/RD' + _.data.id, true);
+            //fetchList('/playlists/RD' + _.data.id, true);
           }}>
             <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
           </li>
@@ -56,7 +62,7 @@ export default function(_: {
 
         <li tabindex="4" onclick={async () => {
           closeDialog();
-          //loadingScreen.showModal();
+
           const a = document.createElement('a');
           const l = await getDownloadLink(_.data.id);
           if (l) {
@@ -73,12 +79,12 @@ export default function(_: {
 
           <li tabindex="5" onclick={() => {
             closeDialog();
-            setStore('list', 'name',
+            setListStore('name',
               _.data.author.endsWith('- Topic') ?
                 ('Artist - ' + _.data.author.replace('- Topic', ''))
                 : '');
 
-            fetchList(_.data.channelUrl);
+            //fetchList(_.data.channelUrl);
           }}>
 
             <i class="ri-user-3-line"></i>
@@ -89,31 +95,28 @@ export default function(_: {
           </li>
         </Show>
 
-
-        {isMusic ?
-
+        <Show when={isMusic}>
           <li tabindex="6" onclick={() => {
             closeDialog();
-            setStore('features', 'lyrics', true);
+            setNavStore('features', 'lyrics', { state: true });
           }
           }>
             <i class="ri-music-2-line"></i>{t('actions_menu_view_lyrics')}
           </li>
-          :
-          <Show when={config['part Watch On']}>
+        </Show>
 
-            <li tabindex="6" onclick={() => {
-              closeDialog();
-              if (config.linkHost)
-                open(hostResolver('/watch?v=' + _.data.id));
-              else {
-                setStore('features', 'video', true);
-              }
-            }}>
-              <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
-            </li>
-          </Show>
-        }
+        <Show when={!isMusic && config['part Watch On']}>
+
+          <li tabindex="6" onclick={() => {
+            closeDialog();
+            if (config.linkHost)
+              open(hostResolver('/watch?v=' + _.data.id));
+            else
+              setNavStore('features', 'video', { state: true });
+          }}>
+            <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
+          </li>
+        </Show>
 
 
         <li tabindex="7" onclick={() => {

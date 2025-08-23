@@ -1,6 +1,5 @@
-import { addListToCollection, getDB } from "../lib/libraryUtils";
-import { store } from "../lib/stores";
-import { convertSStoHHMMSS } from "../lib/utils";
+import { store } from "../stores";
+import { addListToCollection, convertSStoHHMMSS, getDB } from "../utils";
 
 export default function(
   id: string,

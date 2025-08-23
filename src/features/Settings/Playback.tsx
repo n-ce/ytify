@@ -18,9 +18,7 @@ export default function() {
           setConfig('quality', e.target.value as 'low' | 'medium' | 'high');
           quickSwitch();
         }}
-        onmount={async (target) => {
-          target.value = config.quality || 'medium';
-        }}
+        value={config.quality}
       >
         <option value="low">Low</option>
         <option value="medium">Medium</option>
@@ -45,9 +43,7 @@ export default function() {
               setConfig('codec', e.target.value as 'opus' | 'any' | 'aac');
               quickSwitch();
             }}
-            onmount={async (target) => {
-              target.value = config.codec;
-            }}
+            value={config.codec}
           >
             <option value="opus">Opus</option>
             <option value="aac">AAC</option>

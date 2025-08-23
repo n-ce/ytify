@@ -3,7 +3,7 @@ import About from './About';
 import Hub from './Hub';
 import './Home.css';
 import { config, getDB, saveDB, toCollection } from '../../lib/utils';
-import { openDialog, setNavStore, setStore, store, t } from '../../lib/stores';
+import { navStore, openDialog, setNavStore, t } from '../../lib/stores';
 
 export default function() {
 
@@ -42,7 +42,7 @@ export default function() {
 
 
   return (
-    <section ref={(e) => setNavStore('features', [e])}>
+    <section ref={(e) => setNavStore('features', 'home', { ref: e })}>
 
       <header>
         <p>Home </p>
@@ -53,11 +53,11 @@ export default function() {
             ref={syncBtn}
           ></i>
         </Show>
-        <Show when={!store.features.search}>
+        <Show when={!navStore.features.search.state}>
           <i
             id="searchToggle"
             class="ri-search-2-line"
-            onclick={() => setStore('features', 'search', true)}
+            onclick={() => setNavStore('features', 'search', { state: true })}
           ></i>
         </Show>
         <details>
@@ -65,7 +65,7 @@ export default function() {
           <ul>
             <li
               id="settingsHandler"
-              onclick={() => setStore('features', 'settings', true)}
+              onclick={() => setNavStore('features', 'settings', { state: true })}
             >
               <i class="ri-settings-line"></i>&nbsp;{t('nav_settings')}
             </li>

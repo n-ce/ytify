@@ -15,7 +15,7 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 export const getApi = (
   type: 'piped' | 'invidious',
-  index: number = store.api.index
+  index: number = store.api.index.piped
 ) =>
   type === 'piped' ?
     store.api.piped.concat(playerStore.hls.api)[index] :
@@ -32,9 +32,35 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 
+export function binary2hex(binaryString: string): string {
+  while (binaryString.length % 4 !== 0) {
+    binaryString = '0' + binaryString;
+  }
+
+  let hexString = '';
+  for (let i = 0; i < binaryString.length; i += 4) {
+    const chunk = binaryString.substring(i, i + 4);
+    const decimalValue = parseInt(chunk, 2);
+    const hexCharacter = decimalValue.toString(16);
+    hexString += hexCharacter;
+  }
+
+  return hexString;
+}
+
+export function hex2binary(hexString: string): string {
+  let binaryString = '';
+  for (let i = 0; i < hexString.length; i++) {
+    const hexCharacter = hexString[i];
+    const binaryChunk = parseInt(hexCharacter, 16).toString(2).padStart(4, '0');
+    binaryString += binaryChunk;
+  }
+
+  return binaryString;
+}
 
 export function proxyHandler(url: string, prefetch: boolean = false) {
-  store.api.index = 0;
+  store.api.index.piped = 0;
   if (!prefetch)
     setPlayerStore('title', t('player_audiostreams_insert'));
   const link = new URL(url);

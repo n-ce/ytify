@@ -1,10 +1,7 @@
-import { onMount } from "solid-js";
 import { t } from '../lib/stores';
 
 export function Selector(_: Selector) {
   let target!: HTMLSelectElement;
-  onMount(() => _.onmount(target));
-
   return (
     <span>
       <label for={_.id}>
@@ -14,6 +11,7 @@ export function Selector(_: Selector) {
         id={_.id}
         onchange={_.onchange}
         ref={target}
+        value={_.value}
       >{_.children}</select>
     </span>
   );

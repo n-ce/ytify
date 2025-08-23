@@ -1,6 +1,7 @@
-import { goTo, hostResolver } from './helpers';
+import { openDialog, t } from '../stores';
+import { listStore, setListStore } from '../stores';
+import { goTo } from './helpers';
 
-export const reservedCollections = ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'];
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
@@ -18,7 +19,10 @@ export function removeFromCollection(
   const db = getDB();
 
   delete db[collection][id];
-  listContainer.querySelector(`[data-id="${id}"]`)?.remove();
+  setListStore('list', (currentList) => {
+    const { keyToRemove, ...newList } = currentList;
+    return newList;
+  });
   saveDB(db);
 }
 
@@ -70,34 +74,16 @@ export function addListToCollection(
 }
 
 export function createCollection(title: string) {
-
-  reservedCollections
-    .concat(
-      store.addToCollectionOptions
-    )
-    .includes(title) ?
-    notify('This Playlist Already Exists!') :
-    setStore('addToCollectionOptions', (prev) => [...prev, title]);
+  const exists = listStore
+    .reservedCollections
+    .concat(listStore.addToCollectionOptions)
+    .includes(title);
+  if (exists)
+    openDialog('snackbar', t('list_already_exists'))
+  else
+    setListStore('addToCollectionOptions', (prev) => [...prev, title]);
 }
 
-export function renderCollection(
-  data: (DOMStringMap | CollectionItem)[],
-  draggable = false,
-  fragment: DocumentFragment | HTMLDivElement = listContainer
-) {
-  render(fragment, html`${data.map(v =>
-    StreamItem({
-      id: v.id || '',
-      href: hostResolver(`/watch?v=${v.id}`),
-      title: v.title || '',
-      author: v.author,
-      duration: v.duration || '',
-      channelUrl: v.channelUrl,
-      draggable: draggable
-    })
-  )
-    }`);
-}
 
 export async function fetchCollection(
   id: string | null,
@@ -106,11 +92,11 @@ export async function fetchCollection(
   if (!id) return;
 
 
-  const display = shared ? 'Shared Collection' : id
+  const display = shared ? 'Shared Collection' : id;
+  const { reservedCollections, isReversed } = listStore;
   const isReserved = reservedCollections.includes(id);
-  const isReversed = listContainer.classList.contains('reverse');
 
-  listTitle.textContent = decodeURIComponent(display);
+  setListStore('name', decodeURIComponent(display));
 
   shared ?
     await getSharedCollection(id) :
@@ -118,24 +104,24 @@ export async function fetchCollection(
 
   if (!shared && isReserved) {
     if (!isReversed)
-      listContainer.classList.add('reverse');
+      setListStore('isReversed', true);
   }
   else if (isReversed)
-    listContainer.classList.remove('reverse');
+    setListStore('isReversed', false);
 
-  listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'shared' : 'collection');
-
-  if (listBtnsContainer.classList.contains('favorites')) {
-    if (id !== 'favorites')
-      listBtnsContainer.classList.remove('favorites');
-  }
-  else if (id === 'favorites')
-    listBtnsContainer.classList.add('favorites');
-
+  //listBtnsContainer.className = isReversed ? 'reserved' : (shared ? 'shared' : 'collection');
+  /*
+    if (listBtnsContainer.classList.contains('favorites')) {
+      if (id !== 'favorites')
+        listBtnsContainer.classList.remove('favorites');
+    }
+    else if (id === 'favorites')
+      listBtnsContainer.classList.add('favorites');
+  */
   if (location.pathname !== '/list')
     goTo('/list');
 
-  listSection.scrollTo(0, 0);
+  // listSection.scrollTo(0, 0);
   history.replaceState({}, '',
     location.origin + location.pathname +
     (shared ? '?si=' : '?collection=') + id
@@ -155,7 +141,7 @@ function setObserver(callback: () => number) {
 
       }
     }))
-    .observe(listContainer.children[0]);
+  // .observe(listContainer.children[0]);
 }
 
 
@@ -164,17 +150,17 @@ function getLocalCollection(
   isReserved: boolean
 ) {
   const db = getDB();
-  const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
+  //const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
   let dataObj = db[decodeURI(collection)];
 
   if (!dataObj)
-    notify('No items found');
+    openDialog('snackbar', 'No items found');
 
   const items = Object.values(dataObj);
   let listData: (CollectionItem | DOMStringMap)[] = items;
   let itemsToShow = items.length;
   const usePagination = isReserved && itemsToShow > 20;
-  listTitle.textContent += ` | ${items.length} streams`;
+  setListStore('name', listStore.name + ` | ${items.length} streams`);
 
   if (collection === 'discover') {
     for (const i in dataObj)
@@ -186,30 +172,31 @@ function getLocalCollection(
   if (usePagination) {
     listData = items.slice(itemsToShow - 1, itemsToShow);;
   }
-
-  render(listContainer, html``);
-  renderCollection(listData, sort);
+  console.log(listData);
+  // set list
 
   if (usePagination)
     setObserver(() => {
       itemsToShow -= 1;
       const next = items.slice(itemsToShow - 1, itemsToShow);
       const frag = document.createDocumentFragment();
-      renderCollection(next, sort, frag);
+      console.log(next, frag);
+      //  renderCollection(next, sort, frag);
 
-
-      if (removeFromListBtn.classList.contains('delete'))
-        frag.childNodes.forEach(v => {
-          if (v instanceof HTMLElement)
-            v.classList.add('delete');
-        });
-
-      listContainer.prepend(frag);
-
+      /*
+            if (removeFromListBtn.classList.contains('delete'))
+              frag.childNodes.forEach(v => {
+                if (v instanceof HTMLElement)
+                  v.classList.add('delete');
+              });
+              
+      
+            listContainer.prepend(frag);
+      */
       return itemsToShow;
     });
 
-  store.list.id = decodeURI(collection);
+  listStore.id = decodeURI(collection);
 }
 
 async function getSharedCollection(
@@ -221,12 +208,13 @@ async function getSharedCollection(
   const data = await fetch(`${location.origin}/blob/${id}`)
     .then(res => res.json())
     .catch(() => '');
-
-  if (data)
-    renderCollection(data);
-  else
-    render(listContainer, html`Collection does not exist`);
-
+  console.log(data);
+  /*
+    if (data)
+      renderCollection(data);
+    else
+      render(listContainer, html`Collection does not exist`);
+  */
   // loadingScreen.close();
 }
 

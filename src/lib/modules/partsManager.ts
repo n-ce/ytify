@@ -1,29 +1,29 @@
-import { setState, state } from "../lib/stores";
-import { i18n } from "../lib/utils";
+import { config, setConfig } from "../utils";
+import { t } from '../stores';
 
 export default function(): {
   name: string,
   callback: (arg0: Event & { target: HTMLElement }) => void
 }[] {
-  if (!state['part Navigation Library'])
+  if (!config['part Navigation Library'])
     toggle('/library');
-  if (!state['part Reserved Collections'])
+  if (!config['part Reserved Collections'])
     toggle('collections');
-  if (!state['part Featured Playlists'])
+  if (!config['part Featured Playlists'])
     toggle('r.featured');
-  if (!state['part For You'])
+  if (!config['part For You'])
     toggle('r.for_you');
-  if (!state['part Subscription Feed'])
+  if (!config['part Subscription Feed'])
     toggle('r.feed');
-  if (!state['part Channels'])
+  if (!config['part Channels'])
     toggle('r.channels');
-  if (!state['part Albums'])
+  if (!config['part Albums'])
     toggle('r.albums');
-  if (!state['part Artists'])
+  if (!config['part Artists'])
     toggle('r.artists');
-  if (!state['part Playlists'])
+  if (!config['part Playlists'])
     toggle('r.playlists');
-  if (!state['part Collections'])
+  if (!config['part Collections'])
     toggle('r.collections');
 
   return [
@@ -84,18 +84,18 @@ export default function(): {
 
 function lsHandler(id: string | undefined) {
   if (!id) return;
-  const stateKey = id as keyof typeof state;
-  setState(stateKey, !state[stateKey]);
+  const configKey = id as keyof typeof config;
+  setConfig(configKey, !config[configKey]);
 }
 
 function toggle(part: string, e: Event & { target: HTMLElement } | undefined = undefined) {
   const id = e?.target?.id;
   if (id) {
-    const askpin = prompt(i18n('settings_pin_prompt'));
+    const askpin = prompt(t('settings_pin_prompt'));
     if (!askpin) return e?.preventDefault();
-    if (state.partsManagerPIN !== askpin) {
+    if (config.partsManagerPIN !== askpin) {
       e?.preventDefault();
-      return alert(i18n('settings_pin_incorrect'));
+      return alert(t('settings_pin_incorrect'));
     }
     lsHandler(id);
   }

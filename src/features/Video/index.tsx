@@ -1,13 +1,11 @@
 import { createSignal, For, onMount, Show } from "solid-js";
-import { config, generateImageUrl, handleXtags, preferredStream, proxyHandler, setConfig } from "../../lib/utils";
+import { config, generateImageUrl, handleXtags, preferredStream, proxyHandler, setConfig, player } from "../../lib/utils";
 import getStreamData from "../../lib/modules/getStreamData";
-import { setStore, store } from "../../lib/stores";
+import { closeFeature, openFeature, playerStore, setPlayerStore, store } from "../../lib/stores";
 import { Selector } from "../../components/Selector";
-import player from "../../lib/utils/player";
+import { queueStore } from "../../lib/stores/queue";
 
-export default function(_: {
-  close: () => void
-}) {
+export default function() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
@@ -19,6 +17,8 @@ export default function(_: {
   const savedQ = config.watchMode;
 
   onMount(async () => {
+    openFeature('video', dialog);
+
     // loadingScreen.showModal();
 
     const supportsAv1 = await navigator.mediaCapabilities
@@ -34,14 +34,14 @@ export default function(_: {
       })
       .then(result => result.supported);
 
-    const data = await getStreamData(store.actionsMenu.id) as unknown as Piped & {
+    const data = await getStreamData(playerStore.id) as unknown as Piped & {
       captions: Captions[],
       videoStreams: Record<'url' | 'type' | 'resolution', string>[]
     };
     const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
     const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
     const hasOpus = data.audioStreams.find(a => a.mimeType.includes('opus'))?.url;
-    const useOpus = hasOpus && await store.player.supportsOpus;
+    const useOpus = hasOpus && await playerStore.supportsOpus;
     const audioArray = handleXtags(data.audioStreams)
       .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
       .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
@@ -69,8 +69,8 @@ export default function(_: {
   function close() {
     audio.pause();
     video.pause();
-    setStore('player', 'title', store.stream.title || 'Now Playing');
-    _.close();
+    setPlayerStore('title', store.stream.title || 'Now Playing');
+    closeFeature('video');
   }
 
   return (
@@ -83,7 +83,7 @@ export default function(_: {
       <video
         ref={video}
         controls
-        poster={generateImageUrl(store.actionsMenu.id, 'mq')}
+        poster={generateImageUrl(playerStore.id, 'mq')}
         onplay={() => {
           audio.play();
           audio.currentTime = video.currentTime;
@@ -93,7 +93,7 @@ export default function(_: {
           audio.currentTime = video.currentTime;
         }}
         onended={() => {
-          if (!store.queuelist.length) {
+          if (!queueStore.list.length) {
             close();
             // firstItemInQueue().click();
           }
@@ -130,12 +130,13 @@ export default function(_: {
           if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
 
-          if (store.api.index < store.api.invidious.length) {
-            const proxy = store.api.invidious[store.api.index];
+
+          if (store.api.index.invidious < store.api.invidious.length) {
+            const proxy = store.api.invidious[store.api.index.invidious];
             video.src = video.src.replace(origin, proxy);
             audio.src = audio.src.replace(origin, proxy);
 
-            store.api.index++;
+            store.api.index.invidious++;
           }
         }}
 
@@ -169,10 +170,7 @@ export default function(_: {
               if (savedQ)
                 setConfig('watchMode', _.target.selectedOptions[0].textContent as string);
             }}
-            onmount={_ => {
-              if (savedQ)
-                video.src = proxyHandler(_.value);
-            }}
+            value={''}
           >
             <option>Video</option>
             <For each={data().video}>
@@ -186,7 +184,7 @@ export default function(_: {
         </Show>
 
         <button onclick={() => {
-          player(store.actionsMenu.id);
+          player(playerStore.id);
           close();
         }}>Listen</button>
 

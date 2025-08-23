@@ -1,11 +1,10 @@
 import { onMount } from "solid-js";
 import './queue.css';
-import { goto, openDialog, setStore, t } from "../../lib/stores";
+import { openFeature, openDialog, t } from "../../lib/stores";
 import { config, setConfig } from "../../lib/utils";
+import { setQueueStore } from "../../lib/stores/queue";
 
-export default function(_: {
-  close: () => void
-}) {
+export default function() {
 
   let queueSection!: HTMLDivElement;
   let queuelist!: HTMLDivElement;
@@ -16,7 +15,7 @@ export default function(_: {
   let enqueueRelatedStreamsBtn!:
     HTMLLIElement;
 
-  onMount(() => { goto(queueSection) });
+  onMount(() => { openFeature('queue', queueSection) });
 
   return (
     <section
@@ -97,12 +96,10 @@ export default function(_: {
 
         <li onclick={
           () => {
-            _.close();
             setTimeout(() => {
-              setStore('queuelist', ['exam'])
+              setQueueStore('list', [])
               queuelist.innerHTML = '';
             }, 500);
-
           }
         }>
           <i class="ri-close-line"></i>{t('upcoming_clear')}

@@ -1,11 +1,12 @@
 import { JSXElement } from 'solid-js';
-import type en from '../../locales/en.json';
+import type en from './locales/en.json';
 
 declare global {
 
 
   type TranslationKeys = keyof typeof en;
-  type Features = 'player' | 'list' | 'settings' | 'search' | 'lyrics' | 'video';
+
+  type Features = 'home' | 'player' | 'list' | 'settings' | 'search' | 'queue' | 'lyrics' | 'video';
 
   type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
 
@@ -87,7 +88,7 @@ declare global {
     label: TranslationKeys | string,
     id: string,
     onchange: (e: { target: HTMLSelectElement }) => void,
-    onmount: (target: HTMLSelectElement) => void,
+    value: string,
     children: JSXElement
   }
 

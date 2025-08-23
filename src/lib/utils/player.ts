@@ -1,7 +1,7 @@
 import { convertSStoHHMMSS } from "./helpers";
 import { setMetaData } from "../modules/setMetadata";
 import getStreamData from "../modules/getStreamData";
-import { params, playerStore, setPlayerStore, setStore, store } from "../stores";
+import { params, playerStore, setNavStore, setPlayerStore, store } from "../stores";
 import { config } from "./config";
 
 export async function player(id: string | null = '') {
@@ -9,7 +9,7 @@ export async function player(id: string | null = '') {
   if (!id) return;
 
   if (config.watchMode) {
-    setStore('features', 'video', true);
+    setNavStore('features', 'video', { state: true });
     return;
   }
 
