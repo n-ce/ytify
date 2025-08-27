@@ -1,5 +1,5 @@
 import { createSignal, For, onMount } from 'solid-js';
-import './list.css';
+import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { openFeature, t } from '../../lib/stores';
 import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
