@@ -1,5 +1,5 @@
 import { onMount } from "solid-js";
-import './queue.css';
+import './Queue.css';
 import { openFeature, openDialog, t } from "../../lib/stores";
 import { config, setConfig } from "../../lib/utils";
 import { setQueueStore } from "../../lib/stores/queue";
