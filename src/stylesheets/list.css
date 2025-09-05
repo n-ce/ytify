@@ -59,7 +59,8 @@
     }
   }
 
-  &.favorites {
+  &.favorites,
+  &.listenLater {
     li {
       display: block !important;
     }
