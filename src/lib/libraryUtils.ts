@@ -130,13 +130,17 @@ export async function fetchCollection(
 
   listBtnsContainer.className = listContainer.classList.contains('reverse') ? 'reserved' : (shared ? 'shared' : 'collection');
 
-  if (listBtnsContainer.classList.contains('favorites')) {
-    if (id !== 'favorites')
-      listBtnsContainer.classList.remove('favorites');
+  function exceptions(idx: string) {
+    if (listBtnsContainer.classList.contains(idx)) {
+      if (id !== idx)
+        listBtnsContainer.classList.remove(idx);
+    }
+    else if (id === idx)
+      listBtnsContainer.classList.add(idx);
   }
-  else if (id === 'favorites')
-    listBtnsContainer.classList.add('favorites');
-
+  exceptions('favorites');
+  exceptions('listenLater');
+  
   if (location.pathname !== '/list')
     goTo('/list');
 
