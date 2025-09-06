@@ -72,7 +72,7 @@ export default async function(
       Promise.allSettled(invidious.map(fetchDataFromInvidious))
         .then(res => {
           const ff = res.find(r => r.status === 'fulfilled');
-          if (ff) return ff.value;
+          if (ff?.value) return ff.value;
           return emergency(Error('No Invidious sources are available'));
         }) :
       fetchDataFromInvidious(invidious[index])
@@ -88,7 +88,7 @@ export default async function(
       Promise.allSettled(src.map(fetchDataFromPiped))
         .then(res => {
           const ff = res.find(r => r.status === 'fulfilled');
-          if (ff) return ff.value;
+          if (ff?.value) return ff.value;
           return useInvidious();
         }) :
 
