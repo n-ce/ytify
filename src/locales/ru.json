@@ -173,6 +173,5 @@
     "settings_audio_quality": "Качество звука",
     "settings_prefetch": "Предскачивание очереди",
     "settings_enforce_piped": "Приниудительно Piped для проигрывания",
-    "settings_reload": "Перегрузить страницу для применения изменений",
-    "settings_jiosaavn": "Предпочитать JioSaavn для Музыки"
+    "settings_reload": "Перегрузить страницу для применения изменений"
 }
