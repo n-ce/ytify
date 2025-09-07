@@ -94,10 +94,12 @@ export default function() {
       ref={playerSection}>
 
       <Show when={playerStore.immersive} >
-        <div class="immersive bg-image" />
+        <div class="bg-pane" />
+        <div class="bg-image" />
       </Show>
 
-      <span class="topShelf">
+      <header class="topShelf">
+        <p>from 'Search'</p>
         <i
           style={{
             rotate: `-${120 * ctrlIdx()}deg`
@@ -109,65 +111,67 @@ export default function() {
         <i
           onclick={() => { closeFeature('player') }}
           class="ri-close-large-line"></i>
-      </span>
 
-      <Show when={config.loadImage}><MediaArtwork /></Show>
-
-      <div class="midShelf">
-        <MediaDetails />
         <i
           aria-label={t('player_more')}
           class="ri-more-2-fill"
           id="moreBtn"
           onclick={() => setStore('actionsMenu', playerStore.stream)}
         ></i>
-      </div>
 
-      <span class="slider">
-        <input
-          type="range"
-          value={playerStore.currentTime}
-          max={playerStore.fullDuration}
-          ref={slider}
-          onchange={(e) => {
-            const value = parseInt(e.target.value);
-            const { audio } = playerStore;
-            audio.pause();
-            setPlayerStore('currentTime', value);
-            audio.play();
-          }}
-        />
-        <div>
-          <p id="currentDuration">{convertSStoHHMMSS(playerStore.currentTime)}</p>
-          <p id="fullDuration">{convertSStoHHMMSS(playerStore.fullDuration)}</p>
+      </header>
+      <article>
+        <Show when={config.loadImage}><MediaArtwork /></Show>
+
+
+        <MediaDetails />
+
+        <span class="slider">
+          <input
+            type="range"
+            value={playerStore.currentTime}
+            max={playerStore.fullDuration}
+            ref={slider}
+            onchange={(e) => {
+              const value = parseInt(e.target.value);
+              const { audio } = playerStore;
+              audio.pause();
+              setPlayerStore('currentTime', value);
+              audio.play();
+            }}
+          />
+          <div>
+            <p id="currentDuration">{convertSStoHHMMSS(playerStore.currentTime)}</p>
+            <p id="fullDuration">{convertSStoHHMMSS(playerStore.fullDuration)}</p>
+          </div>
+        </span>
+
+        <div class="mainShelf">
+          {auxCtrls[ctrlIdx()][0]}
+
+          <button
+            aria-label={t('player_seek_backward')}
+            class="ri-replay-15-line"
+            id="seekBwdButton"
+            onclick={() => {
+              setPlayerStore('currentTime', _ => _ -= 15);
+            }}
+          ></button>
+
+          {<PlayButton />}
+
+          <button
+            aria-label={t('player_seek_forward')}
+            class="ri-forward-15-line"
+            id="seekFwdButton"
+            onclick={() => {
+              setPlayerStore('currentTime', _ => _ += 15);
+            }}
+          ></button>
+
+          {auxCtrls[ctrlIdx()][1]}
         </div>
-      </span>
-
-      <div class="mainShelf">
-        {auxCtrls[ctrlIdx()][0]}
-
-        <button
-          aria-label={t('player_seek_backward')}
-          class="ri-replay-15-line"
-          id="seekBwdButton"
-          onclick={() => {
-            setPlayerStore('currentTime', _ => _ -= 15);
-          }}
-        ></button>
-
-        {<PlayButton />}
-
-        <button
-          aria-label={t('player_seek_forward')}
-          class="ri-forward-15-line"
-          id="seekFwdButton"
-          onclick={() => {
-            setPlayerStore('currentTime', _ => _ += 15);
-          }}
-        ></button>
-
-        {auxCtrls[ctrlIdx()][1]}
-      </div>
+      </article>
     </section>
   )
 }

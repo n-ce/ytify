@@ -22,7 +22,7 @@
 	}
 
 	&:hover {
-		box-shadow: var(--inner-shadow-3);
+		box-shadow: none;
 	}
 
 	&.ravel {
@@ -41,6 +41,7 @@
 			max-height: var(--size-10);
 			max-width: var(--size-11);
 			border-radius: calc(var(--roundness) * 0.6);
+			box-shadow: var(--shadow-1);
 		}
 
 

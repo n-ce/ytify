@@ -48,7 +48,7 @@ main {
   section {
     height: 100%;
     flex: 1 0 0;
-    padding: calc(var(--gap) / 2);
+    padding: var(--gap) calc(var(--gap) / 2);
     padding-top: 0;
     overflow-y: auto;
     scroll-snap-align: start;
@@ -70,7 +70,7 @@ main {
     section {
       flex: 0 0 100%;
       scroll-snap-align: center;
-      padding: var(--gap);
+      padding: 0 var(--gap);
     }
   }
 }

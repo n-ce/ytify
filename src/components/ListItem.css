@@ -9,8 +9,9 @@
   cursor: pointer;
   background-color: var(--onBg);
   border: var(--border-size-1) solid transparent;
-  border-radius: calc(var(--roundness) * 0.7);
-  box-shadow: var(--shadow-2);
+  border-radius: var(--roundness);
+
+  border-bottom: var(--border);
 
   &:nth-child(odd) {
     margin-right: var(--gap);
@@ -24,6 +25,7 @@
   &:hover {
     transform: scale(0.99);
     border-color: var(--borderColor);
+    box-shadow: none;
   }
 
   &.ravel {
@@ -35,9 +37,11 @@
 
   img {
     height: auto;
-    width: 100%;
-    border-radius: calc(var(--roundness) * 0.7);
-    padding-bottom: var(--size-2);
+    width: calc(100% - var(--size-2));
+    border-radius: calc(var(--roundness) * 0.5);
+    box-shadow: var(--shadow-1);
+    margin: var(--size-1);
+    margin-bottom: var(--size-2);
   }
 
   div {

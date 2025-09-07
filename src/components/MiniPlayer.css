@@ -9,7 +9,7 @@ footer {
   padding: var(--size-1);
   background-color: var(--surface);
   border-radius: var(--roundness);
-  box-shadow: var(--shadow-4);
+  box-shadow: var(--shadow-2);
   overflow: hidden;
   height: var(--size-9);
   animation: var(--animation-slide-in-up) forwards;
@@ -52,6 +52,7 @@ footer {
     font-size: var(--size-7);
     margin: 0;
     margin-left: var(--size-2);
+    margin-right: var(--size-2);
   }
 
   .ri-heart-line {
@@ -64,14 +65,15 @@ footer {
     pointer-events: none;
 
     a {
-      font-weight: var(--font-weight-7);
+      font-weight: var(--font-weight-6);
       font-size: var(--font-size-2);
+      display: block;
     }
 
     a,
     p {
       white-space: nowrap;
-      overflow: hidden;
+      overflow: clip;
       text-overflow: ellipsis;
       color: var(--text);
     }

@@ -3,10 +3,6 @@
   header {
     display: flex;
     justify-content: space-between;
-
-    i {
-      font-size: var(--font-size-4);
-    }
   }
 
   .superInputContainer {
@@ -17,15 +13,14 @@
     z-index: 3;
     top: var(--gap);
     border-bottom: var(--border);
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--shadow-1);
     border-radius: var(--roundness);
     display: flex;
     align-items: center;
     background-color: var(--surface);
 
     &:focus-within {
-      background: var(--bg);
-      box-shadow: var(--shadow-1);
+      box-shadow: var(--inner-shadow-1);
     }
 
     .superInput {

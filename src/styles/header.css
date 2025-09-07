@@ -6,7 +6,33 @@ section>header {
   >p {
     font-size: var(--font-size-4);
     letter-spacing: var(--font-letterspacing-1);
-    font-weight: var(--font-weight-9);
+    font-weight: var(--font-weight-6);
+    white-space: nowrap;
+    width: calc(100% - var(--size-11));
+  }
+
+  >i,
+  div>i {
+    font-size: var(--font-size-4);
+  }
+
+  .right-group {
+    margin-left: auto;
+    margin-right: var(--size-8);
+    margin-top: var(--size-00);
+
+    & i:nth-child(2) {
+      margin-left: var(--size-4);
+    }
+  }
+
+  .ri-close-large-line {
+    font-size: var(--font-size-3);
+  }
+
+  .ri-more-2-fill {
+    font-size: var(--font-size-3);
+    font-weight: var(--font-weight-6);
   }
 
   details {

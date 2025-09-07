@@ -77,14 +77,17 @@ export default function() {
           mark mode
         </Show>
 
-        <i
-          class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
-          onclick={() => setMarkMode(!markMode())}
-        ></i>
-        <i
-          class="ri-close-large-line"
-          onclick={resetList}
-        ></i>
+        <div class="right-group">
+          <i
+            class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
+            onclick={() => setMarkMode(!markMode())}
+          ></i>
+          <i
+            class="ri-close-large-line"
+            onclick={resetList}
+          ></i>
+        </div>
+
         <details>
           <summary><i class="ri-more-2-fill"></i></summary>
           <ul id="listTools">
