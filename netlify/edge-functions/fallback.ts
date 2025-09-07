@@ -65,7 +65,7 @@ export const config: Config = {
 };
 
 const host = 'yt-api.p.rapidapi.com';
-export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
+type VideoDetails = {
   title: string,
   channelTitle: string,
   channelId: string,
@@ -78,10 +78,9 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     contentLength: string,
     qualityLabel: string
   }[]
-// netlify/edge-functions/fallback.ts
-// …inside your fetcher definition, replacing the old concise-arrow implementation…
+};
 
-export const fetcher = ({ host, id, cgeo }: Params): Promise<VideoDetails> => {
+export const fetcher = (cgeo, keys, id): Promise<VideoDetails> => {
   const key = keys.shift();
   if (!key) {
     // no more keys → stop recursion
@@ -109,7 +108,7 @@ export const fetcher = ({ host, id, cgeo }: Params): Promise<VideoDetails> => {
     })
     .catch(() =>
       // on any failure, try the next key
-      fetcher({ host, id, cgeo }, keys, id)
+      fetcher(cgeo, keys, id)
     );
 };
 
