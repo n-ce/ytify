@@ -78,20 +78,40 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
     contentLength: string,
     qualityLabel: string
   }[]
-}> => fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
-  headers: {
-    'X-RapidAPI-Key': <string>keys.shift(),
-    'X-RapidAPI-Host': host
-  }
-})
-  .then(res => res.json())
-  .then(data => {
-    if (data && 'adaptiveFormats' in data && data.adaptiveFormats.length)
-      return data;
-    else throw new Error(data.message);
-  })
-  .catch(() => fetcher(cgeo, keys, id));
+// netlify/edge-functions/fallback.ts
+// …inside your fetcher definition, replacing the old concise-arrow implementation…
 
+export const fetcher = ({ host, id, cgeo }: Params): Promise<VideoDetails> => {
+  const key = keys.shift();
+  if (!key) {
+    // no more keys → stop recursion
+    return Promise.reject(new Error('Exhausted RapidAPI keys'));
+  }
+
+  return fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
+    headers: {
+      'X-RapidAPI-Key': key,
+      'X-RapidAPI-Host': host
+    }
+  })
+    .then(res =>
+      // ensure we got a 2xx before parsing
+      res.ok
+        ? res.json()
+        : Promise.reject(new Error(`HTTP ${res.status}`))
+    )
+    .then(data => {
+      if (data && Array.isArray(data.adaptiveFormats) && data.adaptiveFormats.length) {
+        return data;
+      }
+      // missing or empty adaptiveFormats
+      throw new Error(data?.message || 'Missing adaptiveFormats');
+    })
+    .catch(() =>
+      // on any failure, try the next key
+      fetcher({ host, id, cgeo }, keys, id)
+    );
+};
 
 
 export function shuffle(array: string[]) {
