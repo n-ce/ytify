@@ -80,7 +80,7 @@ type VideoDetails = {
   }[]
 };
 
-export const fetcher = (cgeo, keys, id): Promise<VideoDetails> => {
+export const fetcher = (cgeo: string, keys: string[], id:string): Promise<VideoDetails> => {
   const key = keys.shift();
   if (!key) {
     // no more keys → stop recursion
