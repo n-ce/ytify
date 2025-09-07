@@ -4,21 +4,19 @@
 
   svg {
     transform: scale(9);
-    margin: 14dvmin 10dvmin;
-
+    margin: var(--font-size-7) var(--font-size-6);
   }
 
   a {
     color: var(--text);
-    opacity: 0.8;
   }
 
   >p {
-    font-size: smaller;
-    margin-top: 1rem;
+    font-size: var(--font-size-0);
 
     +a {
-      font-size: smaller;
+      font-size: var(font-size-1);
+      padding: 0;
     }
 
     svg {

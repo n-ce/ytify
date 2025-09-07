@@ -1,8 +1,7 @@
 export let config = {
   enforceProxy: false,
-  enforcePiped: false,
   jiosaavn: false,
-  defaultSuperCollection: 'featured',
+  home: 'about',
   customInstance: '',
   stableVolume: false,
   prefetch: false,

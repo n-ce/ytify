@@ -1,8 +1,8 @@
 import { createEffect, For } from 'solid-js';
-import ToggleSwitch from './ToggleSwitch.tsx';
 import { Selector } from '../../components/Selector.tsx';
 import { config, setConfig } from '../../lib/utils/config.ts';
-import { openDialog, setI18nStore, t, updateLang } from '../../lib/stores';
+import { setStore, setI18nStore, t, updateLang } from '../../lib/stores';
+import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {
 
@@ -20,24 +20,6 @@ export default function() {
         <p>ytify {Build}</p>
       </b>
 
-      <ToggleSwitch
-        name='settings_custom_instance'
-        id='customInstanceSwitch'
-        checked={Boolean(config.customInstance)}
-        onclick={() => {
-          let configVal = '';
-          if (!config.customInstance) {
-            const pi = prompt(t('settings_enter_piped_api'), 'https://pipedapi.kavin.rocks');
-            const iv = prompt(t('settings_enter_invidious_api'), 'https://iv.ggtyler.dev');
-            const useIv = confirm('Use Invidious For Playback?');
-
-            if (pi && iv)
-              configVal = pi + ',' + iv + ',' + useIv;
-          }
-          setConfig('customInstance', configVal);
-          openDialog('snackbar', t('settings_reload'));
-        }}
-      />
 
       <Selector
         label='settings_language'
@@ -45,7 +27,7 @@ export default function() {
         onchange={(e) => {
           setConfig('language', e.target.value);
           setI18nStore('locale', e.target.value);
-          openDialog('snackbar', t('settings_reload'));
+          setStore('snackbar', t('settings_reload'));
         }}
         value={document.documentElement.lang}
       >
@@ -63,7 +45,7 @@ export default function() {
           const configVal = e.target.selectedIndex === 0 ? '' : e.target.value;
           setConfig('linkHost', configVal || location.origin);
           setConfig('linkHost', configVal);
-          openDialog('snackbar', t('settings_reload'));
+          setStore('snackbar', t('settings_reload'));
         }}
         value={config.linkHost || location.origin}
       >
@@ -99,6 +81,17 @@ export default function() {
         <option value='watch'>{t('settings_pwa_watch')}</option>
         <option value='dl'>{t('settings_pwa_download')}</option>
       </Selector>
+
+      <ToggleSwitch
+        id="suggestionsSwitch"
+        name='settings_display_suggestions'
+        checked={config.searchSuggestions}
+        onclick={() => {
+          setConfig('searchSuggestions', !config.searchSuggestions);
+          setStore('snackbar', t('settings_reload'));
+        }}
+      />
+
     </div>
   );
 }

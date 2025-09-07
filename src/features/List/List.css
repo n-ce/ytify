@@ -7,10 +7,33 @@
   top: 0;
   z-index: 20;
   background: var(--bg);
+  display: flex;
+  align-items: center;
 
   >p {
-    padding-right: 2rem;
+    height: var(--size-5);
+    line-height: var(--size-5);
+    overflow: clip;
+    padding-right: var(--size-1);
+    text-overflow: ellipsis;
   }
+
+  i {
+    margin: 0
+  }
+
+  >.ri-close-large-line {
+    margin-right: var(--size-8);
+    font-size: var(--font-size-3);
+  }
+
+  >.ri-checkbox-line,
+  >.ri-checkbox-fill {
+    margin-left: auto;
+    margin-right: var(--size-5);
+    font-size: var(--font-size-3);
+  }
+
 
   &.reverse {
     display: flex;

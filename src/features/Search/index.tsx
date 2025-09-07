@@ -3,7 +3,7 @@ import './Search.css';
 import Results from './Results';
 import Input from "./Input";
 import { config, setConfig } from "../../lib/utils";
-import { getSearchResults, openFeature, resetSearch, searchStore, setNavStore, setSearchStore, t } from '../../lib/stores';
+import { getSearchResults, openFeature, resetSearch, searchStore, setSearchStore, t, updateParam } from '../../lib/stores';
 
 
 
@@ -34,18 +34,20 @@ export default function() {
         <select
           class="searchFilters"
           onchange={(e) => {
-            const { value } = e.target as HTMLSelectElement;
-            setSearchStore('sortBy', (
-              value === 'date' ||
-              value === 'views'
-            ) ? value : '')
+            const { value } = e.target;
+            searchStore.observer.disconnect();
+            setSearchStore({
+              page: 1,
+              nextPageToken: '',
+              results: [],
+            });
             setConfig('searchFilter', value);
-            setNavStore('params', 'f', value);
-            if (searchStore.query)
-              getSearchResults();
+            updateParam('f', value);
+
+            getSearchResults();
 
           }}
-          value={config.searchFilter || 'all'}
+          value={config.searchFilter}
         >
           <optgroup label="YouTube">
             <option value="all">{t('search_filter_all')}</option>
@@ -68,6 +70,6 @@ export default function() {
 
       </form>
       <Results />
-    </section>
+    </section >
   );
 }

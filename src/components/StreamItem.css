@@ -4,15 +4,16 @@
 	background-color: var(--onBg);
 	color: var(--text);
 	padding: var(--size-1);
-	margin-bottom: var(--size-2);
-	border: var(--border);
-	border-radius: calc(var(--roundness) + 0.75vmin);
+	margin-bottom: var(--gap);
+	border-bottom: var(--border);
+	border-radius: var(--roundness);
 	display: flex;
 	align-items: center;
 	position: relative;
 	transition: transform 0.4s;
 	text-decoration: none;
 	overflow: hidden;
+	cursor: pointer;
 
 	div,
 	span {
@@ -21,7 +22,7 @@
 	}
 
 	&:hover {
-		transform: scale(0.95);
+		box-shadow: var(--inner-shadow-3);
 	}
 
 	&.ravel {
@@ -34,75 +35,74 @@
 	span {
 		position: relative;
 		z-index: 0;
-		max-width: 34.7vmin;
-		margin-right: 1vmin;
+		margin-right: var(--size-2);
 
 		img {
-			height: 19.5vmin;
-			width: auto;
-			border-radius: var(--roundness);
+			max-height: var(--size-10);
+			max-width: var(--size-11);
+			border-radius: calc(var(--roundness) * 0.6);
 		}
 
 
 		.duration {
 			position: absolute;
-			padding: 0 1vmin;
-			bottom: 1.2vmin;
-			right: 1.2vmin;
+			padding: 0 var(--size-1);
+			bottom: var(--size-1);
+			right: var(--size-1);
 			background-color: #000a;
 			color: #fffc;
-			border-radius: calc(var(--roundness)*0.6);
-			font-size: 0.8rem;
+			border-radius: calc(var(--roundness) * 0.5);
+			font-size: var(--font-size-0);
+			font-weight: var(--font-weight-5);
 		}
 	}
 
 	div {
 		height: 100%;
-		width: calc(100% - 37vmin);
+		width: auto;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-evenly;
 
 
 		.title {
-			max-height: 50%;
-			line-height: var(--font-lineheight-1);
-			font-size: 100%;
+			max-height: 100%;
+			line-height: var(--size-5);
+			font-size: var(--font-size-2);
 			overflow: hidden;
-			font-size: var(--font-size-1);
+			text-overflow: ellipsis;
 			font-weight: var(--font-weight-6);
+			margin-bottom: auto;
 		}
 
 		.avu {
-			height: 9.5vmin;
+			height: var(--size-7);
 			overflow: hidden;
-			line-height: var(--font-lineheight-1);
+			line-height: var(--size-3);
 			width: 100%;
 
 			p {
 				font-size: var(--font-size-0);
 				font-weight: var(--font-weight-6);
+				opacity: 0.9
 			}
 
 		}
 	}
 
 	i {
-		height: 19.5vmin;
+		height: var(--size-9);
 		aspect-ratio: 1;
-		font-size: 1.2rem;
-		padding: 0 0.25rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		font-size: var(--font-size-3);
 		z-index: 2;
 		position: absolute;
-		right: -1rem;
-		bottom: -0.5rem;
+		right: calc(var(--size-2) - var(--size-8));
+		bottom: calc(var(--size-1) - var(--size-7));
 		border-radius: 50%;
+		cursor: pointer;
 
 		&:hover {
-			background: var(--onBg);
+			rotate: 90deg;
 		}
 	}
 

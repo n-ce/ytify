@@ -1,4 +1,4 @@
-import { playerStore, store, t } from "../../lib/stores";
+import { playerStore } from "../../lib/stores";
 import { hostResolver } from "../../lib/utils";
 
 export default function() {
@@ -7,12 +7,13 @@ export default function() {
     <div class="mediaDetails">
       <a
         id="title"
-        href={hostResolver(`/watch?v=${store.stream.id}`)}
+        href={hostResolver(`/watch?v=${playerStore.stream.id}`)}
         target="_blank"
       >{
-          playerStore.title || t('player_now_playing')
+          playerStore.status ||
+          playerStore.stream.title
         }</a>
-      <p id="author">{store.stream.author.replace('- Topic', '') || t('player_channel')}</p>
+      <p id="author">{playerStore.stream.author.replace('- Topic', '')}</p>
     </div>
   );
 

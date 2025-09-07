@@ -1,7 +1,7 @@
 import { For, createSignal, onMount } from 'solid-js';
 import ToggleSwitch from './ToggleSwitch.tsx';
 import { config, setConfig } from '../../lib/utils';
-import { openDialog, t } from '../../lib/stores';
+import { setStore, t } from '../../lib/stores';
 
 export default function() {
   const [parts, setParts] = createSignal<{
@@ -37,7 +37,7 @@ export default function() {
                 }
               }
               setConfig('partsManagerPIN', '');
-              openDialog('snackbar', t('settings_reload'));
+              setStore('snackbar', t('settings_reload'));
             } else {
               alert(t('settings_pin_incorrect'));
               e.preventDefault();
@@ -47,7 +47,7 @@ export default function() {
           const pin = prompt(t('settings_pin_message'));
           if (pin) {
             setConfig('partsManagerPIN', pin);
-            openDialog('snackbar', t('settings_reload'));
+            setStore('snackbar', t('settings_reload'));
           }
           else (e as Event).preventDefault();
         }}

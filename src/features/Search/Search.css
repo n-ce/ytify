@@ -1,7 +1,5 @@
 .searchSection {
 
-  background-image: linear-gradient(transparent, var(--onBg));
-
   header {
     display: flex;
     justify-content: space-between;
@@ -13,20 +11,21 @@
 
   .superInputContainer {
     height: auto;
-    margin: var(--size-1) auto 0 auto;
-    padding: var(--size-2) var(--size-3);
+    margin: 0;
+    padding: calc(var(--gap) / 2) var(--gap);
     position: sticky;
     z-index: 3;
-    top: 0;
-    background-color: var(--onBg);
+    top: var(--gap);
+    border-bottom: var(--border);
+    box-shadow: var(--shadow-2);
     border-radius: var(--roundness);
-    border: var(--border);
-    box-shadow: var(--shadow-1);
     display: flex;
     align-items: center;
+    background-color: var(--surface);
 
     &:focus-within {
-      backdrop-filter: blur(var(--size-2));
+      background: var(--bg);
+      box-shadow: var(--shadow-1);
     }
 
     .superInput {
@@ -38,6 +37,11 @@
       background: none;
       color: none;
       font-size: medium;
+
+      &::-webkit-search-cancel-button {
+        appearance: none;
+      }
+
 
       &::placeholder {
         color: inherit;
@@ -52,8 +56,8 @@
       position: absolute;
       list-style-type: none;
       padding: 0;
-      top: calc(calc(var(--size-4) * 2) + var(--size-px-1));
-      left: var(--size-3);
+      top: calc(var(--size-4) * 2);
+      left: var(--gap);
       background-color: var(--bg);
       border: var(--border);
       border-radius: 0 0 var(--roundness) var(--roundness);
@@ -80,7 +84,7 @@
       font-size: medium;
       background: none;
       max-width: var(--size-10);
-      margin-left: var(--size-3);
+      margin-left: var(--gap);
       padding: 0;
       border: none;
       color: inherit;
@@ -94,7 +98,7 @@
 
   .searchlist {
     z-index: 1;
-    margin-top: var(--size-3);
+    margin-top: var(--gap);
 
   }
 }

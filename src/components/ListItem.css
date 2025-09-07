@@ -1,16 +1,19 @@
 .listItem {
-  width: 48%;
+  width: calc(50% - calc(var(--gap) / 2));
   height: auto;
-  background-color: var(--onBg);
-  padding: 1dvmin;
-  margin: 2% 1%;
-  border: var(--border);
-  border-radius: calc(var(--roundness) + 0.75vmin);
+  margin: var(--size-2) 0;
   transition: all 0.3s ease-out;
   display: inline-block;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  background-color: var(--onBg);
+  border: var(--border-size-1) solid transparent;
+  border-radius: calc(var(--roundness) * 0.7);
+  box-shadow: var(--shadow-2);
 
-  @media(orientation:landscape) {
-    width: 23%;
+  &:nth-child(odd) {
+    margin-right: var(--gap);
   }
 
   * {
@@ -19,7 +22,8 @@
   }
 
   &:hover {
-    transform: scale(0.95);
+    transform: scale(0.99);
+    border-color: var(--borderColor);
   }
 
   &.ravel {
@@ -32,32 +36,36 @@
   img {
     height: auto;
     width: 100%;
-    border-radius: var(--roundness);
-    margin-bottom: 2vmin;
+    border-radius: calc(var(--roundness) * 0.7);
+    padding-bottom: var(--size-2);
   }
 
   div {
     display: flex;
     flex-direction: column;
+    text-align: center;
   }
 
   p.title {
-    font-size: medium;
-    height: 2rem;
-    line-height: 1rem;
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-6);
+    max-height: var(--size-7);
+    line-height: var(--size-3);
     overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--size-1);
   }
 
   p.uData {
-    font-size: x-small;
-    line-height: 0.8rem;
+    font-size: var(--font-size-0);
+    line-height: var(--size-3);
     overflow: hidden;
   }
 
   p.stats {
-    font-size: small;
-    height: 1rem;
-    line-height: 1rem;
+    font-size: var(--font-size-0);
+    height: var(--size-3);
+    line-height: var(--size-3);
   }
 
 }

@@ -1,18 +1,18 @@
-import { createSignal, For, onMount } from 'solid-js';
-import './list.css';
+import { createSignal, For, onMount, Show } from 'solid-js';
+import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { openFeature, t } from '../../lib/stores';
+import { openFeature, t, listStore, setQueueStore, resetList } from '../../lib/stores';
 import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
 import StreamItem from '../../components/StreamItem';
-import { listStore } from '../../lib/stores/list';
-import { setQueueStore } from '../../lib/stores/queue';
 
 export default function() {
   let listSection!: HTMLElement;
   let listContainer!: HTMLDivElement;
+  const [markMode, setMarkMode] = createSignal(false);
 
   onMount(() => {
     openFeature('list', listSection);
+    listSection.scrollTo(0, 0);
 
     new Sortable(listContainer, {
       handle: '.ri-draggable',
@@ -43,23 +43,22 @@ export default function() {
 
   function subscriptionHandler() {
 
-    const l = listStore;
+    const { name, type, id, uploader, thumbnail } = listStore;
     const db = getDB();
     if (isSubscribed()) {
-      delete db[l.type][l.id];
+      delete db[type + 's'][id];
     }
     else {
       const dataset: List & { uploader?: string } =
       {
-        id: l.id,
-        name: l.name,
-        thumbnail: getThumbIdFromLink(l.thumbnail)
+        id, name,
+        thumbnail: getThumbIdFromLink(thumbnail)
       };
 
-      if (l.type === 'playlists')
-        dataset.uploader = l.uploader;
+      if (type === 'playlist')
+        dataset.uploader = uploader;
 
-      toCollection(l.type, dataset, db);
+      toCollection(type + 's', dataset, db);
     }
     setSubscribed(!isSubscribed());
     saveDB(db, 'subscribe');
@@ -70,10 +69,26 @@ export default function() {
   return (
     <section ref={listSection} id="listSection">
       <header>
-        <p id="listTitle">Title</p>
+        <Show
+          when={markMode()}
+          fallback={
+            <p id="listTitle">{`${listStore.name} | ${listStore.length} streams`
+            }</p>}>
+          mark mode
+        </Show>
+
+        <i
+          class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
+          onclick={() => setMarkMode(!markMode())}
+        ></i>
+        <i
+          class="ri-close-large-line"
+          onclick={resetList}
+        ></i>
         <details>
           <summary><i class="ri-more-2-fill"></i></summary>
           <ul id="listTools">
+
 
             <li
               id="playAllBtn"
@@ -105,66 +120,79 @@ export default function() {
               }
             </li>
 
-            <li id="clearListBtn">
-              <i class="ri-close-large-line"></i>{t("list_clear_all")}
-            </li>
+            <Show when={listStore.type === 'collection' && listStore.isReversed}>
+              <li id="clearListBtn">
+                <i class="ri-close-large-line"></i>{t("list_clear_all")}
+              </li>
+            </Show>
 
             <li id="removeFromListBtn">
               <i class="ri-indeterminate-circle-line"></i>{t("list_remove")}
             </li>
 
-            <li id="deleteCollectionBtn">
-              <i class="ri-delete-bin-2-line"></i>{t("list_delete")}
-            </li>
+            <Show when={listStore.type === 'collection' && !listStore.isReversed}>
 
-            <li id="renameCollectionBtn">
-              <i class="ri-edit-line"></i>{t("list_rename")}
-            </li>
+              <li id="deleteCollectionBtn">
+                <i class="ri-delete-bin-2-line"></i>{t("list_delete")}
+              </li>
 
-            <li id="shareCollectionBtn">
-              <i class="ri-link"></i>{t("list_share")}
-            </li>
+              <li id="renameCollectionBtn">
+                <i class="ri-edit-line"></i>{t("list_rename")}
+              </li>
 
-            <li id="radioCollectionBtn">
-              <i class="ri-radio-line"></i>{t("list_radio")}
-            </li>
+              <li id="shareCollectionBtn">
+                <i class="ri-link"></i>{t("list_share")}
+              </li>
 
-            <li id="sortCollectionBtn">
-              <i class="ri-draggable"></i>{t("list_sort")}
-            </li>
+              <li id="radioCollectionBtn">
+                <i class="ri-radio-line"></i>{t("list_radio")}
+              </li>
 
-            <li id="sortByTitleBtn">
-              <i class="ri-sort-alphabet-asc"></i>{t("list_sort_title")}
-            </li>
+              <li
+                id="sortCollectionBtn"
+              >
+                <i class="ri-draggable"></i>{t("list_sort")}
+              </li>
 
-            <li id="sortByArtistBtn">
-              <i class="ri-sort-asc"></i>{t("list_sort_author")}
-            </li>
+              <li id="sortByTitleBtn">
+                <i class="ri-sort-alphabet-asc"></i>{t("list_sort_title")}
+              </li>
 
+              <li id="sortByArtistBtn">
+                <i class="ri-sort-asc"></i>{t("list_sort_author")}
+              </li>
+
+            </Show>
           </ul>
         </details>
       </header>
       <br />
-      <div
-        id="listContainer"
-        ref={listContainer}
+      <Show
+        when={!listStore.isLoading}
+        fallback={<i class="ri-loader-3-line"></i>}
       >
-        <For
-          each={Object.values(listStore.list)}
-          fallback={<h1>{t("list_info")}</h1>}
-        >{
-            (item) =>
-              <StreamItem
-                id={item.id || ''}
-                author={item.author}
-                title={item.title || ''}
-                duration={item.duration || ''}
-                channelUrl={item.channelUrl}
-              />
-          }
-        </For>
+        <div
+          id="listContainer"
+          ref={listContainer}
+        >
+          <For
+            each={listStore.list}
+          >{
+              (item) =>
+                <StreamItem
+                  id={item.id || ''}
+                  author={item.author}
+                  title={item.title || ''}
+                  duration={item.duration || ''}
+                  channelUrl={item.channelUrl}
+                  lastUpdated={item.lastUpdated}
+                  draggable={listStore.isSortable}
+                />
+            }
+          </For>
 
-      </div>
+        </div>
+      </Show>
     </section >
   )
 }

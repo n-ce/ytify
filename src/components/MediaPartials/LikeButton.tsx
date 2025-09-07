@@ -1,9 +1,9 @@
-import { store } from '../../lib/stores';
+import { playerStore } from '../../lib/stores';
 import { addToCollection, getDB, removeFromCollection } from '../..//lib/utils/library';
 
 export default function() {
 
-  const favState = () => getDB().favorites?.hasOwnProperty(store.stream.id);
+  const favState = () => getDB().favorites?.hasOwnProperty(playerStore.stream.id);
 
   return (
     <button
@@ -11,12 +11,10 @@ export default function() {
       class={`ri-heart-${favState() ? 'fill' : 'line'}`}
       id="favButton"
       onclick={async () => {
-        if (!store.stream.id) return;
-
         if (favState())
-          addToCollection('favorites', store.stream)
+          addToCollection('favorites', playerStore.stream)
         else
-          removeFromCollection('favorites', store.stream.id);
+          removeFromCollection('favorites', playerStore.stream.id);
       }}
     />
 

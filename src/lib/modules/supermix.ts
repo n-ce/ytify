@@ -1,17 +1,15 @@
-import { listBtnsContainer, listContainer, listSection, loadingScreen } from "../lib/dom";
-import { renderCollection } from "../lib/libraryUtils";
-import { store } from "../lib/stores";
-import { convertSStoHHMMSS, goTo } from "../lib/utils";
+import { setListStore, store, updateParam } from "../stores";
+import { convertSStoHHMMSS } from "../utils";
 
 export default async function(ids: string[]) {
 
   let index = 0;
-  const pi = store.api.piped.concat(store.player.hls.api);
+  const { piped } = store.api;
   function instance() {
-    if (index < pi.length - 1)
+    if (index < piped.length - 1)
       index++;
     else index = 0;
-    return pi[index];
+    return piped[index];
   }
 
   const fetcher = (id: string): Promise<{
@@ -26,8 +24,8 @@ export default async function(ids: string[]) {
       [] : data.relatedStreams)
     .catch(() => [])
 
-  loadingScreen.showModal();
 
+  setListStore('isLoading', true);
   const data = await Promise.all(ids.map(fetcher));
   const map: {
     [index: string]: CollectionItem & { count?: number }
@@ -55,27 +53,14 @@ export default async function(ids: string[]) {
     .sort((a, b) => b.count! - a.count!)
 
 
-  loadingScreen.close();
-  store.list.id = 'supermix';
-  listBtnsContainer.className = 'supermix';
+  setListStore('isLoading', false);
+  setListStore({
+    id: 'supermix',
+    list: mixArray,
+    isReversed: false
+  });
 
-  renderCollection(mixArray);
-
-  const isReversed = listContainer.classList.contains('reverse');
-
-  if (isReversed)
-    listContainer.classList.remove('reverse');
-
-
-  listBtnsContainer.className = 'supermix';
-
-  if (location.pathname !== '/list')
-    goTo('/list');
-
-  listSection.scrollTo(0, 0);
-  history.replaceState({}, '',
-    location.origin + location.pathname + '?supermix=' + ids.join('+')
-  );
+  updateParam('supermix', ids.join('+'));
 
   document.title = 'Supermix - ytify';
 }

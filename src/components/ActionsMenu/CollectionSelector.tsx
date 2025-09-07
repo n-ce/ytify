@@ -1,9 +1,8 @@
 import { onMount } from 'solid-js';
-import { addToCollection, createCollection, getDB } from '../../../lib/utils/library';
-import { listStore, setListStore, t } from '../../../lib/stores';
+import { addToCollection, createCollection, getDB } from '../../lib/utils/library';
+import { listStore, setListStore, store, t } from '../../lib/stores';
 
 export default function(_: {
-  collection: CollectionItem,
   close: () => void
 }) {
 
@@ -37,7 +36,7 @@ export default function(_: {
     }
 
     if (title) {
-      addToCollection(title, _.collection, isNew ? 'addNew' : '');
+      addToCollection(title, store.actionsMenu, isNew ? 'addNew' : '');
     }
 
     _.close();
@@ -51,7 +50,7 @@ export default function(_: {
       <select
         tabindex="2"
         id="collectionSelector"
-        onChange={handleCollectionChange}
+        onchange={handleCollectionChange}
       >
         <option value="">{t('collection_selector_add_to')}</option>
         <option value="+cl">{t('collection_selector_create_new')}</option>

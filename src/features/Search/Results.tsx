@@ -12,13 +12,10 @@ export default function SearchResults() {
       <Show when={searchStore.isLoading}>
         <i class="ri-loader-3-line"></i>
       </Show>
-      <Show when={!searchStore.results.length && !searchStore.isLoading}>
-        It's rather empty here isn't it?
-      </Show>
       <For each={searchStore.results}>
         {(item) => (
           <Switch>
-            <Match when={item.type === 'stream'}>
+            <Match when={item.type === 'stream' || item.type === 'video'}>
               <StreamItem
                 id={item.videoId || item.url.substring(9)}
                 href={hostResolver(item.url || ('/watch?v=' + item.videoId))}

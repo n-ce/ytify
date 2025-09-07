@@ -10,7 +10,7 @@
   padding: 0.5rem 2%;
   margin-bottom: 0.5rem;
   background: var(--onBg);
-  backdrop-filter: blur(1rem);
+  backdrop-filter: var(--blur);
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
 

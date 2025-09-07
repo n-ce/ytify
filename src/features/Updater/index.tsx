@@ -1,10 +1,8 @@
 import { createSignal, For, onMount } from 'solid-js';
-import './UpdatePrompt.css';
-import { closeDialog, t } from '../../lib/stores';
+import './Updater.css';
+import { closeFeature, store, t } from '../../lib/stores';
 
-export default function(_: {
-  updater: () => void
-}) {
+export default function() {
 
   const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/main';
   const commitsLink = 'https://github.com/n-ce/ytify/commits';
@@ -17,7 +15,7 @@ export default function(_: {
   });
 
   return (
-    <dialog id="changelog">
+    <section class="updater">
       <ul>
         <For
           each={list()}
@@ -35,17 +33,19 @@ export default function(_: {
       <span>
         <button
           id="updateBtn"
-          onclick={_.updater}
+          onclick={store.updater}
           autofocus
         >
           {t('updater_update')}
         </button>
         <button
           id="laterBtn"
-          onclick={closeDialog}
+          onclick={() => {
+            closeFeature('updater');
+          }}
         >{t('updater_later')}</button>
       </span>
-    </dialog>
+    </section>
   );
 
 }

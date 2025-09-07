@@ -1,8 +1,9 @@
 import { onMount } from "solid-js";
-import './queue.css';
-import { openFeature, openDialog, t } from "../../lib/stores";
+import './Queue.css';
+import { openFeature, setStore, t } from "../../lib/stores";
 import { config, setConfig } from "../../lib/utils";
 import { setQueueStore } from "../../lib/stores/queue";
+import List from "./List";
 
 export default function() {
 
@@ -71,7 +72,7 @@ export default function() {
             btn.classList.toggle('on');
             setConfig('allowDuplicates', btn.classList.contains('on'));
 
-            openDialog('snackbar', t('upcoming_change'));
+            setStore('snackbar', t('upcoming_change'));
           }
           }
         >
@@ -87,7 +88,7 @@ export default function() {
             btn.classList.toggle('on');
             setConfig('enqueueRelatedStreams', btn.classList.contains('on'));
 
-            openDialog('snackbar', t('upcoming_change'));
+            setStore('snackbar', t('upcoming_change'));
           }
           }
         >
@@ -102,16 +103,11 @@ export default function() {
             }, 500);
           }
         }>
-          <i class="ri-close-line"></i>{t('upcoming_clear')}
+          <i class="ri-close-large-line"></i>{t('upcoming_clear')}
         </li >
 
       </ul >
-      <div
-        id="queuelist"
-        ref={queuelist}
-      >
-        <p data-translation="upcoming_info">The Queue is Empty.</p>
-      </div>
+      <List />
     </section >
   );
 }

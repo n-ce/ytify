@@ -1,42 +1,40 @@
-import { openDialog } from '../stores/dialog.ts';
-import { playerStore, setPlayerStore } from '../stores/player.ts';
 import { setStore, store } from '../stores/app.ts';
-import { config } from '../utils/config.ts';
+import { playerStore, setPlayerStore } from '../stores/player.ts';
 import { getDownloadLink } from '../utils/helpers.ts';
 
-export default function(audio: HTMLAudioElement) {
+export default function(
+  audio: HTMLAudioElement,
+  prefetch = ''
+) {
   audio.pause();
   const message = 'Error 403 : Unauthenticated Stream';
-  const id = store.stream.id;
-  const { fallback } = playerStore;
-  const { index, invidious } = store.api;
-  const { enforcePiped, HLS, customInstance } = config;
-
-  if (enforcePiped || HLS || customInstance)
-    return openDialog('snackbar', message);
-
+  const { stream } = playerStore;
+  const id = prefetch || stream.id;
+  const { index, invidious, fallback } = store.api;
   const origin = new URL(audio.src).origin;
 
   if (audio.src.endsWith('&fallback')) {
     if (audio.parentNode) {
-      openDialog('snackbar', message);
+      setStore('snackbar', message);
       setPlayerStore('playbackState', 'none');
     }
     return;
   }
+  console.log(audio.src);
 
   if (index.invidious < invidious.length) {
     const proxy = invidious[index.invidious];
-    if (audio.parentNode)
-      setPlayerStore('title', `Switching proxy to ${proxy.slice(8)}`);
+    if (!prefetch)
+      setPlayerStore('status', `Switching proxy to ${proxy.slice(8)}`);
     audio.src = audio.src.replace(origin, proxy);
     setStore('api', 'index', 'invidious', index.invidious + 1)
   }
   else {
-    setStore('api', 'index', 'invidious', 0)
-    if (audio.parentNode) {
-      openDialog('snackbar', message);
-      setPlayerStore('title', store.stream.title);
+    setStore('api', 'index', 'invidious', 0);
+
+    if (!prefetch) {
+      setStore('snackbar', message);
+      setPlayerStore('status', '');
     }
 
     // Emergency Handling
@@ -53,12 +51,11 @@ export default function(audio: HTMLAudioElement) {
     function useCobalt() {
       getDownloadLink(id)
         .then(_ => {
-          if (_)
-            audio.src = _;
+          if (_) audio.src = _;
           else throw new Error();
         })
         .catch(() => {
-          if (audio.parentNode)
+          if (!prefetch)
             setPlayerStore('playbackState', 'none');
         })
     }

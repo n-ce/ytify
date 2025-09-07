@@ -1,9 +1,9 @@
-import { createStore } from 'solid-js/store';
-import { setStore, store } from './app';
-import { config, fetchSearchResultsInvidious, fetchSearchResultsPiped, fetchSearchSuggestions, setConfig } from '../utils';
-import { openDialog } from './dialog';
-import { closeFeature, navStore, params, setNavStore } from './navigation';
+// @ts-ignore
 
+import { setStore, store } from './app';
+import { config, fetchMoreSearchResultsPiped, fetchSearchResultsInvidious, fetchSearchResultsPiped, fetchSearchSuggestions } from '../utils';
+import { closeFeature, updateParam } from './navigation';
+import { createStore } from 'solid-js/store';
 
 const createInitialState = () => ({
   query: '',
@@ -11,22 +11,23 @@ const createInitialState = () => ({
   isLoading: false,
   nextPageToken: '',
   page: 1,
-  sortBy: '' as 'date' | 'views' | '',
   suggestions: {
     data: [] as string[],
     index: -1,
     controller: new AbortController()
-  }
+  },
+  observer: { disconnect() { } } as IntersectionObserver
 });
-
-
 
 export const [searchStore, setSearchStore] = createStore(createInitialState());
 
 export function resetSearch() {
   closeFeature('search');
+  console.log(searchStore);
+  searchStore.observer.disconnect();
   setSearchStore(createInitialState());
-  setNavStore('params', { q: '', f: 'all' });
+  updateParam('q');
+  updateParam('f');
 }
 
 export function getSearchSuggestions(text: string) {
@@ -48,76 +49,148 @@ export function getSearchSuggestions(text: string) {
       if (e.name === 'AbortError') return;
       const nextIndex = (store.api.index.piped + 1) % store.api.piped.length;
 
-      if (nextIndex !== 0) {
-        setStore('api', 'index', 'piped', nextIndex);
+      setStore('api', 'index', 'piped', nextIndex);
+      if (nextIndex !== 0)
         getSearchSuggestions(text);
-      } else {
-        openDialog('snackbar', e.message);
-        setStore('api', 'index', 'piped', 0);
+      else {
+        setStore('snackbar', e.message);
         setSearchStore('suggestions', 'data', []);
       }
     });
 }
 
-const _fetchWithRetry = async (apiType: 'piped' | 'invidious', fetcher: () => Promise<any>) => {
-  try {
-    const data = await fetcher();
-    return data;
-  } catch (e: any) {
-    console.error(e);
-    const { api } = store;
-    const nextIndex = (api.index[apiType] + 1) % api[apiType].length;
-
-    if (nextIndex !== 0) {
-      setStore('api', 'index', apiType, nextIndex);
-      return _fetchWithRetry(apiType, fetcher);
-    } else {
-      openDialog('snackbar', e.message);
-      setStore('api', 'index', apiType, 0);
-      return null;
-    }
-  }
-};
-
 export async function getSearchResults() {
-  console.log('getSearchResults called');
   const { api } = store;
-  const { query, sortBy, page } = searchStore;
-  const filter = config.searchFilter || 'all';
+  const { query, page, observer } = searchStore;
+  const { searchFilter } = config;
+
+  if (!query) return;
+
+  console.log('getSearchResults called');
 
   setSearchStore('isLoading', true);
   searchStore.suggestions.controller.abort();
   setSearchStore('suggestions', 'data', []);
+  observer.disconnect();
 
-  if (sortBy) {
-    const data = await _fetchWithRetry('invidious', () =>
-      fetchSearchResultsInvidious(api.invidious[api.index.invidious], query, sortBy, page)
-    );
-    setSearchStore('results', data ? data : []);
-  } else {
-    const data = await _fetchWithRetry('piped', () =>
-      fetchSearchResultsPiped(api.piped[api.index.piped], query, filter)
-    );
+  const useInvidious = searchFilter === 'views' || searchFilter === 'date';
+
+  const getData = (): Promise<StreamItem[] | { items: StreamItem[], nextpage: string }> =>
+    (useInvidious
+      ? fetchSearchResultsInvidious(
+        api.invidious[api.index.invidious],
+        query,
+        searchFilter,
+        page
+      )
+      : fetchSearchResultsPiped(
+        api.piped[api.index.piped],
+        query,
+        searchFilter
+      )
+    ).catch(async (e): Promise<StreamItem[] | { items: StreamItem[], nextpage: string }> => {
+      const type = useInvidious ? 'invidious' : 'piped';
+
+      const nextIndex = (api.index[type] + 1) % api[type].length;
+
+      setStore('api', 'index', type, nextIndex);
+
+      if (nextIndex !== 0) return await getData();
+      else {
+        setStore('snackbar', e.message);
+        return useInvidious ? [] : { nextpage: 'null', items: [] };
+      }
+    });
+
+  const data = await getData();
+
+  if (useInvidious) {
     if (data) {
-      setSearchStore('results', data.items);
-      setSearchStore('nextPageToken', data.nextpage);
+      setSearchStore({
+        page: page + 1,
+        results: (data as StreamItem[]).filter((x: StreamItem) => x.lengthSeconds > 65),
+      });
     } else {
       setSearchStore('results', []);
     }
+  } else {
+    const { items, nextpage } = data as { items: StreamItem[], nextpage: string };
+    if (!items) {
+      setSearchStore('results', []);
+      return;
+    }
+
+    setSearchStore({
+      nextPageToken: nextpage,
+      results: items,
+    });
   }
 
-  setNavStore('params', { q: query, f: filter });
+  async function callback() {
+    if (useInvidious) {
+      const data = await fetchSearchResultsInvidious(
+        api.invidious[api.index.invidious],
+        query,
+        searchFilter,
+        searchStore.page
+      );
+      if (data) {
+        setSearchStore('results', [...searchStore.results, ...data]);
+        setSearchStore('page', searchStore.page + 1);
+      }
+    } else {
+      const more = await fetchMoreSearchResultsPiped(
+        api.piped[api.index.piped],
+        searchStore.nextPageToken || 'null',
+        query,
+        searchFilter
+      );
+      const newResults = [
+        ...searchStore.results,
+        ...more.items.filter(
+          (item: StreamItem) =>
+            !item.isShort &&
+            item.duration !== -1 &&
+            !searchStore.results.find((v) => v.url === item.url)
+        ),
+      ];
+      setSearchStore('results', newResults);
+      setSearchStore('nextPageToken', more.nextpage);
+    }
+  }
+
+  setSearchStore({
+    observer: setObserver(callback),
+  });
+
+  updateParam('q', query);
+  updateParam('f', searchFilter === 'all' ? '' : searchFilter);
 
   setSearchStore('isLoading', false);
 }
 
+function setObserver(callback: () => Promise<void>): IntersectionObserver {
+  const { results, nextPageToken } = searchStore;
+  const { searchFilter } = config;
 
+  const useInvidious = searchFilter === 'views' || searchFilter === 'time'
+  if (!useInvidious && nextPageToken === 'null') return { disconnect() { } } as IntersectionObserver;
+  const { length } = results;
+  const index = length > 5 ? 5 : 1;
+  const ref = document.querySelector(`.searchlist a:nth-last-child(${index})`) as HTMLElement;
+  if (!ref) return { disconnect() { } } as IntersectionObserver;
+  const obs = new IntersectionObserver(async (entries, observer) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        observer.disconnect();
+        await callback();
+        if (useInvidious || searchStore.nextPageToken !== 'null') {
+          setSearchStore('observer', setObserver(callback));
+        }
+      }
+    }
+  });
+  obs.observe(ref);
 
-const q = params.get('q');
-if (q) {
-  if (!navStore.features.search.state)
-    setNavStore('features', 'search', 'state', true);
-  setConfig('searchFilter', params.get('f') || 'all');
-  setSearchStore('query', q);
-  getSearchResults();
+  return obs;
 }

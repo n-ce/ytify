@@ -1,5 +1,5 @@
 import { createSignal, For, onCleanup, onMount } from "solid-js";
-import { closeFeature, dialogState, openDialog, openFeature, store } from "../../lib/stores";
+import { closeFeature, openFeature, setStore, store } from "../../lib/stores";
 
 export default function() {
 
@@ -8,7 +8,7 @@ export default function() {
 
   onMount(() => {
     openFeature('lyrics', lyricsSection);
-    const { title, author } = dialogState.data as CollectionItem;
+    const { title, author } = store.actionsMenu;
     fetch(
       `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}`,
       {
@@ -58,7 +58,7 @@ export default function() {
 
         }
         else {
-          openDialog('snackbar', JSON.stringify(data));
+          setStore('snackbar', JSON.stringify(data));
         }
 
 

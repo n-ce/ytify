@@ -1,15 +1,15 @@
-import { setPlayerStore, store } from "../stores";
+import { playerStore, setPlayerStore } from "../stores";
 import { config, generateImageUrl } from "../utils";
 
 
-export async function setMetaData(data: CollectionItem) {
+export default async function(data: CollectionItem) {
 
-  store.stream = data;
+  setPlayerStore('stream', data);
 
   // remove ' - Topic' from author name if it exists
 
   let music = '';
-  let authorText = store.stream.author;
+  let authorText = playerStore.stream.author;
   if (data.author.endsWith(' - Topic')) {
     music = '&w=720&h=720&fit=cover';
     authorText = data.author.slice(0, -8);
@@ -35,8 +35,7 @@ export async function setMetaData(data: CollectionItem) {
     ]
   }
 
-  if (location.pathname === '/')
-    document.title = data.title + ' - ytify';
+  document.title = data.title + ' - ytify';
 
 
   if ('mediaSession' in navigator) {

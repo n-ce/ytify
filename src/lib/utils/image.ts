@@ -1,7 +1,6 @@
-import { playerStore, store } from '../stores';
+import { playerStore } from '../stores';
 import { config } from './config';
 
-export const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 // Generates both channel and stream thumbnails
 
@@ -142,15 +141,16 @@ function colorInjector(colorArray: number[]) {
 
 export function themer() {
   const initColor = '127,127,127';
-  const custom = config.customColor || (playerStore.legacy ? initColor : '');
-  if (config.loadImage && store.stream.id && !custom)
+  const { stream } = playerStore;
+  const { customColor, loadImage } = config;
+  if (loadImage && stream.id && !customColor)
     import('../modules/extractColorFromImage')
       .then(mod => mod.default)
-      .then(e => e(generateImageUrl(store.stream.id, 'mq'), !playerStore.legacy))
+      .then(e => e(generateImageUrl(stream.id, 'mq'), true))
       .then(colorInjector);
   else
     colorInjector(
-      (custom || initColor)
+      (customColor || initColor)
         .split(',')
         .map(s => parseInt(s))
     );

@@ -4,11 +4,10 @@
 //import fetchList from "../modules/fetchList";
 // import { fetchCollection, removeFromCollection } from "./libraryUtils";
 
-import { openDialog, playerStore, setPlayerStore, store, t } from "../stores";
+import { setStore, playerStore, setPlayerStore, store, t } from "../stores";
 import { config } from "./config";
+import { player } from "./player";
 
-
-export const goTo = (route: Routes | 'history' | 'discover') => (<HTMLAnchorElement>document.getElementById(route)).click();
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
@@ -17,9 +16,7 @@ export const getApi = (
   type: 'piped' | 'invidious',
   index: number = store.api.index.piped
 ) =>
-  type === 'piped' ?
-    store.api.piped.concat(playerStore.hls.api)[index] :
-    store.api.invidious[index];
+  store.api[type][index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -32,59 +29,33 @@ export const hostResolver = (url: string) =>
     ('/list?' + pathModifier(url))) : url);
 
 
-export function binary2hex(binaryString: string): string {
-  while (binaryString.length % 4 !== 0) {
-    binaryString = '0' + binaryString;
-  }
-
-  let hexString = '';
-  for (let i = 0; i < binaryString.length; i += 4) {
-    const chunk = binaryString.substring(i, i + 4);
-    const decimalValue = parseInt(chunk, 2);
-    const hexCharacter = decimalValue.toString(16);
-    hexString += hexCharacter;
-  }
-
-  return hexString;
-}
-
-export function hex2binary(hexString: string): string {
-  let binaryString = '';
-  for (let i = 0; i < hexString.length; i++) {
-    const hexCharacter = hexString[i];
-    const binaryChunk = parseInt(hexCharacter, 16).toString(2).padStart(4, '0');
-    binaryString += binaryChunk;
-  }
-
-  return binaryString;
-}
-
 export function proxyHandler(url: string, prefetch: boolean = false) {
+  const isVideo = Boolean(document.querySelector('video'));
+  const useProxy = config.enforceProxy || playerStore.stream.author.endsWith('- Topic') && !isVideo && store.api.status === 'P';
   store.api.index.piped = 0;
   if (!prefetch)
-    setPlayerStore('title', t('player_audiostreams_insert'));
+    setPlayerStore('status', t('player_audiostreams_insert'));
   const link = new URL(url);
   const origin = link.origin.slice(8);
   const host = link.searchParams.get('host');
 
-  return config.enforceProxy ?
+  return useProxy ?
     (url + (host ? '' : `&host=${origin}`)) :
     (host && !config.customInstance) ? url.replace(origin, host) : url;
 }
 
 
 export async function quickSwitch() {
-  if (!store.stream.id) return;
+  const { audio, stream, playbackState } = playerStore;
+  if (!stream.id) return;
+  if (playbackState === 'playing')
+    audio.pause();
+  const timeOfSwitch = audio.currentTime;
+  await player(stream.id);
+  setPlayerStore('currentTime', timeOfSwitch);
+  audio.play();
 }
-/*
-if (store.player.playbackState === 'playing')
-  audio.pause();
-const timeOfSwitch = audio.currentTime;
-await player(store.stream.id);
-audio.currentTime = timeOfSwitch;
-audio.play();
-}
-*/
+
 
 export async function preferredStream(audioStreams: AudioStream[]) {
   const preferedCodec: 'opus' | 'aac' = config.codec === 'any' ? ((await playerStore.supportsOpus) ? 'opus' : 'aac') : config.codec;
@@ -143,7 +114,7 @@ export function handleXtags(audioStreams: AudioStream[]) {
 export async function getDownloadLink(id: string): Promise<string | null> {
   const streamUrl = 'https://youtu.be/' + id;
   let dl = '';
-  dl = await fetch('https://cobalt-api.kwiatekmiki.com', {
+  dl = await fetch(store.api.cobalt, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -158,17 +129,10 @@ export async function getDownloadLink(id: string): Promise<string | null> {
       if ('url' in _)
         return _.url;
       else throw new Error(_.error.code);
-    });
-
-  if (!dl)
-    dl = await fetch(`${playerStore.fallback}/download/${id}?f=${store.downloadFormat}`)
-      .then(_ => _.json())
-      .then(_ => {
-        if ('url' in _)
-          return _.url;
-        else throw new Error(_.error.code);
-      })
-      .catch((e) => openDialog('snackbar', e));
+    })
+    .catch(e => {
+      setStore('snackbar', e.message);
+    })
 
   return dl || '';
 }

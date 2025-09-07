@@ -1,27 +1,28 @@
 import { For, onCleanup, onMount, Show } from "solid-js";
-import { getSearchResults, getSearchSuggestions, searchStore, setSearchStore, store, t } from "../../lib/stores";
+import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "../../lib/stores";
 import { config, idFromURL, player } from "../../lib/utils";
 
 export default function() {
 
   let superInput!: HTMLInputElement;
+  const ctrlk = (event: KeyboardEvent) => {
+    if (event.ctrlKey && event.key === "K")
+      superInput.focus();
+  }
 
   onMount(() => {
 
     setTimeout(() => {
       superInput.focus();
     }, 500);
+    document.addEventListener('keydown', ctrlk);
+    getSearchResults();
 
-    // CTRL + K focus search bar
-    document.addEventListener('keydown', (event) => {
-      if (event.ctrlKey && event.key === "K")
-        superInput.focus();
-    });
   });
-
   onCleanup(() => {
-
+    document.removeEventListener('keydown', ctrlk);
   });
+
 
   function textToSearch(text: string) {
     superInput.blur();
@@ -42,21 +43,18 @@ export default function() {
         onblur={() => {
           setTimeout(() => {
             setSearchStore('suggestions', 'data', []);
-          }, 500);
+          }, 100);
         }}
         oninput={async (e) => {
-          const ref = e.target as HTMLInputElement;
-          const text = ref.value;
-          setSearchStore('query', text);
+          const { value } = e.target;
 
-          const id = idFromURL(text);
-
-          if (id && id !== store.stream.id) {
+          const id = idFromURL(value);
+          if (id && id !== playerStore.stream.id) {
             player(id);
             return;
           }
 
-          getSearchSuggestions(text);
+          getSearchSuggestions(value);
         }}
         onkeydown={(e) => {
           const { data, index } = searchStore.suggestions;
@@ -65,7 +63,7 @@ export default function() {
             e.preventDefault();
             textToSearch(
               data[index] ||
-              searchStore.query
+              superInput.value
             );
             return;
           }

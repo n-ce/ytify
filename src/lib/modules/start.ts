@@ -1,72 +1,61 @@
-import player from '../lib/player';
-import { params, state, store } from '../stores';
-import { getDownloadLink, idFromURL } from '../lib/utils';
-import { searchFilters, superInput, loadingScreen, searchlist } from '../lib/dom';
-import fetchList from '../modules/fetchList';
-import { fetchCollection } from "../lib/libraryUtils";
-import '../scripts/library';
-import '../scripts/queue';
-
+import { navStore, params, setNavStore, t, setStore, setPlayerStore, setSearchStore } from '../stores';
+import { config, setConfig, getDownloadLink, idFromURL, themer, fetchCollection, uma, player } from '../utils';
 export default async function() {
 
-  const { customInstance, shareAction, HLS } = state;
 
-  if (customInstance) {
+  themer();
 
-    const [pi, iv, useInvidious] = customInstance.split(',');
-    store.player.hls.api[0] =
-      store.api.piped[0] = pi;
-    store.api.invidious[0] = iv;
-    state.enforcePiped = !useInvidious;
 
-  } else await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
-    .then(res => res.json())
-    .then(data => {
-      store.api.piped = data.piped;
-      store.api.invidious = data.invidious;
-      store.api.hyperpipe = data.hyperpipe;
-      store.api.jiosaavn = data.jiosaavn;
-      store.player.hls.api = data.hls;
-      state.enforcePiped = state.enforcePiped || data.status === 1;
-      store.player.fallback = location.origin;
+  const { shareAction } = config;
+
+  await uma()
+    .then(({ piped, invidious, hyperpipe, jiosaavn, cobalt, status }) => {
+      setStore('api', {
+        piped, invidious, hyperpipe, jiosaavn, cobalt, status,
+        index: { piped: 0, invidious: 0, hyperpipe: 0 }
+      })
+    })
+    .catch(() => {
+      setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');
     });
 
 
-  if (HLS && !store.player.legacy)
-    (await import('./hls')).default();
+  const q = params.get('q');
 
-  // params handling
+  if (q) {
+    if (!navStore.search.state)
+      setNavStore('search', 'state', true);
+    const f = params.get('f') || 'all';
+    setConfig('searchFilter', f);
+
+    setSearchStore('query', q);
+
+  }
+
 
   const isPWA = idFromURL(params.get('url') || params.get('text'));
   const id = params.get('s') || isPWA;
 
   if (id) {
-    loadingScreen.showModal();
     if (isPWA && shareAction === 'watch') {
-      store.actionsMenu.id = id;
-      const dialog = document.createElement('dialog');
-      dialog.open = true;
-      dialog.className = 'watcher';
-      document.body.appendChild(dialog);
-      import('../components/WatchVideo.ts')
-        .then(mod => mod.default(dialog));
+      setPlayerStore('stream', 'id', id);
+      setNavStore('video', 'state', true);
+
+
     } else if (isPWA && shareAction === 'download') {
+      setStore('snackbar', t('actions_menu_download_init'))
       const a = document.createElement('a');
-      const l = await getDownloadLink(store.actionsMenu.id);
+      const l = await getDownloadLink(id);
       if (l) {
         a.href = l;
         a.click();
       }
-    } else await player(id)
+    } else {
+      if (params.size === 1)
+        setNavStore('player', 'state', true);
+      await player(id);
+    }
 
-    loadingScreen.close();
-  }
-  if (params.has('q')) {
-    searchlist.innerHTML = '';
-    superInput.value = params.get('q') || '';
-    if (params.has('f'))
-      searchFilters.value = params.get('f') || '';
-    superInput.dispatchEvent(new KeyboardEvent('keydown', { 'key': 'Enter' }));
   }
 
 
@@ -76,26 +65,37 @@ export default async function() {
 
   fetchCollection(collection || shared, Boolean(shared));
   if (supermix)
-    import('./supermix').then(mod => mod.default(supermix.split(' ')));
+    import('./supermix')
+      .then(_ => _.default(supermix.split(' ')));
 
   // list loading
+  /*
+    if (params.has('channel') || params.has('playlists'))
+      fetchList('/' +
+        location.search
+          .substring(1)
+          .split('=')
+          .join('/')
+      );
+    */
 
-  if (params.has('channel') || params.has('playlists'))
-    fetchList('/' +
-      location.search
-        .substring(1)
-        .split('=')
-        .join('/')
-    );
+  document.addEventListener('click', (e) => {
 
-  // header state handling
-  (document.querySelectorAll('header details') as NodeListOf<HTMLDetailsElement>).forEach(d => {
-    d.addEventListener('click', (e) => {
-      const elm = e.target as HTMLElement;
-      // TODO
-      if (!elm.matches('i') && d.open)
-        d.removeAttribute('open');
-    })
-  })
+    const detail = document.querySelector('details:open');
+    if (!detail?.firstElementChild?.contains(e.target as HTMLElement))
+      detail?.removeAttribute('open');
+  });
+
+
+  if (import.meta.env.PROD)
+    await import('virtual:pwa-register').then(pwa => {
+
+      const handleUpdate = pwa.registerSW({
+        onNeedRefresh() {
+          setStore('updater', handleUpdate);
+          setNavStore('updater', 'state', true)
+        }
+      });
+    });
 
 }

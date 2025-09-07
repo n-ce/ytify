@@ -1,8 +1,8 @@
 import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { config } from '../lib/utils';
+import { config, player } from '../lib/utils';
 import { generateImageUrl } from '../lib/utils/image';
-import { loadAndPlay, openDialog } from '../lib/stores';
+import { setStore } from '../lib/stores';
 
 export default function(data: {
   id: string,
@@ -15,6 +15,7 @@ export default function(data: {
   views?: string,
   img?: string,
   draggable?: boolean,
+  lastUpdated?: string
 }) {
 
   const [getImage, setImage] = createSignal('');
@@ -61,23 +62,21 @@ export default function(data: {
       class={'streamItem ' + (config.loadImage ? 'ravel' : '')}
       href={data.href}
       ref={parent}
-      data-id={data.id}
-      data-title={data.title}
-      data-author={data.author}
-      data-channel_url={data.channelUrl}
-      data-duration={data.duration}
-      data-thumbnail={getImage()}
       onclick={(e) => {
         e.preventDefault();
 
         if (!e.target.classList.contains('ri-more-2-fill'))
-          loadAndPlay({
+          player(data.id);
+        else {
+          setStore('actionsMenu', {
             id: data.id,
+            title: data.title,
             author: data.author || '',
             duration: data.duration,
             channelUrl: data.channelUrl || '',
-            title: data.title
+            lastUpdated: data.lastUpdated || new Date().toISOString()
           });
+        }
       }}
     >
       <span>
@@ -100,19 +99,7 @@ export default function(data: {
       </div>
       {data.draggable ?
         <i class="ri-draggable"></i> :
-        <i
-          class="ri-more-2-fill"
-          onclick={() => {
-            history.pushState({}, '', '#');
-            openDialog('actionsMenu', {
-              id: data.id,
-              title: data.title,
-              author: data.author || '',
-              duration: data.duration,
-              channelUrl: data.channelUrl || ''
-            });
-          }}
-        ></i>
+        <i class="ri-more-2-fill"></i>
       }
     </a>
   )

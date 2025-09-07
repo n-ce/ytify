@@ -1,4 +1,4 @@
-import { openDialog } from "../stores";
+import { setStore } from "../stores";
 import { getDB, saveDB } from "../utils";
 
 export default function(dbhash: string, syncBtn: HTMLElement) {
@@ -77,7 +77,7 @@ export default function(dbhash: string, syncBtn: HTMLElement) {
   if (!Object.keys(getDB()).length) {
     if (confirm('Do you want to import your library from your account?')) {
       fetchFromCloud()
-        .catch(() => openDialog('snackbar', 'No Existing Library Found.'))
+        .catch(() => setStore('snackbar', 'No Existing Library Found.'))
         .finally(() => syncBtn.className = importIcon);
     }
   }

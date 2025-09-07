@@ -1,4 +1,4 @@
-import { openDialog, store } from "../stores";
+import { setListStore, setStore, store } from "../stores";
 import { convertSStoHHMMSS, getDB, saveDB } from "../utils";
 
 type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
@@ -7,7 +7,7 @@ type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
 export default async function(e: File) {
   const songshiftData = JSON.parse(await e.text()) as songshift;
   if (!Array.isArray(songshiftData)) {
-    openDialog('snackbar', 'Incompatible Database!');
+    setStore('snackbar', 'Incompatible Database!');
     return;
   }
   const db = getDB();
@@ -29,14 +29,14 @@ export default async function(e: File) {
       author: metadata.uploaderName + ' - Topic',
       duration: convertSStoHHMMSS(metadata.duration),
       channelUrl: metadata.uploaderUrl,
-      src: src
+      src
     }))
     .catch((e) => {
       if (apiIndex < piped.length - 1)
         return getMetadata(seed, src, apiIndex + 1);
       else {
         console.error(e);
-        openDialog('snackbar', 'Failed to import ' + seed);
+        setStore('snackbar', 'Failed to import ' + seed);
         return;
       }
     });
@@ -47,23 +47,22 @@ export default async function(e: File) {
     )
   );
 
-  //loadingScreen.showModal();
+  setListStore('isLoading', true);
 
   await Promise
     .all(promises)
-    .then((d) => {
-      d.forEach((v) => {
+    .then(d => {
+      d.forEach(v => {
         if (v) {
           if (!db[v.src]) db[v.src] = {};
           db[v.src][v.id] = v as CollectionItem;
         }
       });
       saveDB(db);
-      openDialog('snackbar', 'The Songshift streams have been imported')
+      setStore('snackbar', 'The Songshift streams have been imported')
     })
     .finally(() => {
-      // if (loadingScreen.open)
-      //     loadingScreen.close();
+      setListStore('isLoading', false);
     });
 
 }

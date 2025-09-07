@@ -1,7 +1,5 @@
 import { convertSStoHHMMSS } from "./helpers";
-import { setMetaData } from "../modules/setMetadata";
-import getStreamData from "../modules/getStreamData";
-import { params, playerStore, setNavStore, setPlayerStore, store } from "../stores";
+import { playerStore, setNavStore, setPlayerStore, setStore, store, updateParam } from "../stores";
 import { config } from "./config";
 
 export async function player(id: string | null = '') {
@@ -9,66 +7,59 @@ export async function player(id: string | null = '') {
   if (!id) return;
 
   if (config.watchMode) {
-    setNavStore('features', 'video', { state: true });
+    setNavStore('video', 'state', true);
     return;
   }
 
-  setPlayerStore('playbackState', 'loading');
-
-
-  if (useSaavn) {
-    if (config.jiosaavn && store.stream.author.endsWith('Topic'))
-      return saavnPlayer();
-  }
-  else useSaavn = true;
-
-  setPlayerStore('title', 'Fetching Data...');
-
-  const data = await getStreamData(id);
-
-  if (data && 'audioStreams' in data)
-    playerStore.data = data;
-  else {
-
-    setPlayerStore('playbackState', 'none');
-    setPlayerStore('title', data.message || data.error || 'Fetching Data Failed')
-    return;
-  }
-
-  await setMetaData({
-    id: id,
-    title: data.title,
-    author: data.uploader,
-    duration: convertSStoHHMMSS(data.duration),
-    channelUrl: data.uploaderUrl
+  setPlayerStore({
+    playbackState: 'loading',
+    status: 'Fetching Data...'
   });
 
-  if (playerStore.legacy) {
-    playerStore.audio.src = data.hls;
-    playerStore.audio.load();
+
+  if (config.jiosaavn) {
+    if (!store.useSaavn)
+      setStore('useSaavn', true);
+    else if (playerStore.stream.author.endsWith('Topic'))
+      return import('../modules/jioSaavn').then(mod => mod.default());
   }
+
+
+  const data = await import('../modules/getStreamData').then(mod => mod.default(id));
+
+  if (data && 'audioStreams' in data)
+    setPlayerStore({
+      data: data,
+      fullDuration: data.duration
+    });
   else {
-    const { hls } = playerStore;
-    if (config.HLS) {
-      const hlsUrl = hls.manifests.shift();
-      if (hlsUrl) hls.src(hlsUrl);
-    }
-    else import('../modules/setAudioStreams')
-      .then(mod => mod.default(
-        data.audioStreams
-          .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-          ),
-        data.livestream
-      ));
+    setPlayerStore({
+      playbackState: 'none',
+      status: data.message || data.error || 'Fetching Data Failed'
+    });
+    return;
   }
 
 
-  params.set('s', id);
+  import('../modules/setMetadata')
+    .then(mod => mod.default({
+      id: id,
+      title: data.title,
+      author: data.uploader,
+      duration: convertSStoHHMMSS(data.duration),
+      channelUrl: data.uploaderUrl
+    }));
 
-  if (location.pathname === '/')
-    history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
+  import('../modules/setAudioStreams')
+    .then(mod => mod.default(
+      data.audioStreams
+        .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
+        ),
+      data.livestream
+    ));
 
 
+  updateParam('s', id);
 
   if (config.enqueueRelatedStreams)
     import('../modules/enqueueRelatedStreams')
@@ -89,44 +80,3 @@ export async function player(id: string | null = '') {
 }
 
 
-let useSaavn = true;
-function saavnPlayer() {
-  setPlayerStore('title', 'Fetching Data via JioSaavn...');
-  const { title, author, id } = store.stream;
-  const query = encodeURIComponent(`${title} ${author.slice(0, -8)}`);
-
-  fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
-    .then(res => res.json())
-    .then(_ => _.data.results[0])
-    .then(data => {
-      const { name, downloadUrl, artists } = data;
-
-      if (
-        title.startsWith(name) &&
-        author.startsWith(artists.primary[0].name)
-      )
-        playerStore.data = data;
-
-      else throw new Error('Music stream not found');
-
-      setMetaData(store.stream);
-
-      const { url } = downloadUrl[{
-        low: 1,
-        medium: downloadUrl.length - 2,
-        high: downloadUrl.length - 1
-      }[config.quality]];
-
-      playerStore.audio.src = url.replace('http:', 'https:');
-
-      params.set('s', id);
-
-      if (location.pathname === '/')
-        history.replaceState({}, '', location.origin + '?s=' + params.get('s'));
-    })
-    .catch(e => {
-      setPlayerStore('title', e.message || e.error || 'JioSaavn Playback Failure');
-      useSaavn = false;
-      player(store.stream.id);
-    });
-}

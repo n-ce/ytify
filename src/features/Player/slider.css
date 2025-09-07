@@ -3,13 +3,12 @@ input[type="range"] {
   font-size: 1.5rem;
   color: var(--bg);
   filter: invert();
-  --thumb-height: 0.75em;
-  --thumb-width: 0.75em;
+  --thumb-height: 0.625em;
   --track-height: 0.125em;
   --track-color: var(--onBg);
   --brightness-hover: 180%;
   --brightness-down: 80%;
-  --clip-edges: 0;
+  --clip-edges: 0.125em;
   /* === range commons === */
   position: relative;
   background: #fff0;

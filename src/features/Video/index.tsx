@@ -1,7 +1,6 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { config, generateImageUrl, handleXtags, preferredStream, proxyHandler, setConfig, player } from "../../lib/utils";
-import getStreamData from "../../lib/modules/getStreamData";
-import { closeFeature, openFeature, playerStore, setPlayerStore, store } from "../../lib/stores";
+import { closeFeature, openFeature, playerStore, setListStore, setPlayerStore, store } from "../../lib/stores";
 import { Selector } from "../../components/Selector";
 import { queueStore } from "../../lib/stores/queue";
 
@@ -9,7 +8,7 @@ export default function() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
-    captions: [] as Captions[]
+    subtitles: [] as Record<'url' | 'name' | 'label', string>[]
   });
   let dialog!: HTMLDialogElement;
   let video!: HTMLVideoElement;
@@ -19,7 +18,7 @@ export default function() {
   onMount(async () => {
     openFeature('video', dialog);
 
-    // loadingScreen.showModal();
+    setListStore('isLoading', true);
 
     const supportsAv1 = await navigator.mediaCapabilities
       .decodingInfo({
@@ -34,42 +33,42 @@ export default function() {
       })
       .then(result => result.supported);
 
-    const data = await getStreamData(playerStore.id) as unknown as Piped & {
-      captions: Captions[],
-      videoStreams: Record<'url' | 'type' | 'resolution', string>[]
-    };
-    const hasAv1 = data.videoStreams.find(v => v.type.includes('av01'))?.url;
-    const hasVp9 = data.videoStreams.find(v => v.type.includes('vp9'))?.url;
-    const hasOpus = data.audioStreams.find(a => a.mimeType.includes('opus'))?.url;
+    const data = await import('../../lib/modules/getStreamData').then(mod => mod.default(playerStore.stream.id) as unknown as Piped & {
+      videoStreams: Record<'url' | 'codec' | 'resolution' | 'quality', string>[]
+    });
+
+    const hasAv1 = data.videoStreams.filter(v => v.codec?.includes('av01')).length === 4 ? data.videoStreams.find(v => v.codec?.includes('av01'))?.url : false;
+    const hasVp9 = data.videoStreams.find(v => v.codec?.includes('vp9'))?.url;
+    const hasOpus = data.audioStreams.find(a => a.mimeType.includes('webm'))?.url;
     const useOpus = hasOpus && await playerStore.supportsOpus;
     const audioArray = handleXtags(data.audioStreams)
-      .filter(a => a.mimeType.includes(useOpus ? 'opus' : 'mp4a'))
+      .filter(a => a.mimeType.includes(useOpus ? 'webm' : 'mp4a'))
       .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
 
     const audioStream = await preferredStream(handleXtags(audioArray));
     audio.src = proxyHandler(audioStream.url, true);
     audio.currentTime = video.currentTime;
-    // loadingScreen.close();
+    setListStore('isLoading', false);
     setData({
       video: data.videoStreams
         .filter(f => {
-          const av1 = hasAv1 && supportsAv1 && f.type.includes('av01');
+          const av1 = hasAv1 && supportsAv1 && f.codec?.includes('av01');
           if (av1) return true;
-          const vp9 = !hasAv1 && f.type.includes('vp9');
+          const vp9 = !hasAv1 && f.codec?.includes('vp9');
           if (vp9) return true;
-          const avc = !hasVp9 && f.type.includes('avc1');
+          const avc = !hasVp9 && f.codec?.includes('avc1');
           if (avc) return true;
         })
-        .map(f => ([f.resolution, f.url])),
-      captions: data.captions
+        .map(f => ([f.resolution || f.quality, f.url])),
+      subtitles: data.subtitles
     });
   });
 
   function close() {
     audio.pause();
     video.pause();
-    setPlayerStore('title', store.stream.title || 'Now Playing');
+    setPlayerStore('status', '');
     closeFeature('video');
   }
 
@@ -83,7 +82,7 @@ export default function() {
       <video
         ref={video}
         controls
-        poster={generateImageUrl(playerStore.id, 'mq')}
+        poster={generateImageUrl(playerStore.stream.id, 'mq')}
         onplay={() => {
           audio.play();
           audio.currentTime = video.currentTime;
@@ -141,13 +140,15 @@ export default function() {
         }}
 
       >
-        <Show when={data().captions.length}>
+        <Show when={data().subtitles.length}>
           <option>Captions</option>
-          <For each={data().captions}>
+          <For each={data().subtitles}>
             {(v) =>
               <track
-                src={store.api.invidious[0] + v.url}
-                srclang={v.label}
+                src={
+                  (store.api.status === 'P' ? '' :
+                    store.api.invidious[0]) + v.url}
+                srclang={v.name || v.label}
               >
               </track>
             }
@@ -184,7 +185,7 @@ export default function() {
         </Show>
 
         <button onclick={() => {
-          player(playerStore.id);
+          player(playerStore.stream.id);
           close();
         }}>Listen</button>
 

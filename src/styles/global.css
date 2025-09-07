@@ -6,13 +6,15 @@
   --bg: transparent;
   --onBg: transparent;
   --text: black;
+  --surface: color-mix(in srgb, rgba(from var(--onBg) r g b / 1), var(--bg) 80%);
+  --gap: var(--size-fluid-2);
   --radius: var(--radius-2);
   --borderColor: transparent;
-  --border: var(--borderColor) solid var(--text);
+  --border: var(--border-size-1) solid var(--borderColor);
   --shadowColor: transparent;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundness: 0.4rem;
-  --blur: blur(var(--size-1));
+  --blur: blur(var(--size-px-3));
   --player-bg: none;
   --player-bp: 0 0;
   --font: var(--font-system-ui, var(--font-rounded-sans, var(--font-industrial, var(--font-monospace-code, var(--font-antique, var(--font-handwritten, var(--font-monospace-slab-serif)))))));
@@ -46,19 +48,29 @@ main {
   section {
     height: 100%;
     flex: 1 0 0;
-    padding: var(--size-3);
+    padding: calc(var(--gap) / 2);
     padding-top: 0;
     overflow-y: auto;
     scroll-snap-align: start;
     min-width: calc(100dvw / var(--landscape-sections));
     flex-shrink: 0;
+
+    &:first-child {
+      padding-left: var(--gap);
+    }
+
+    &:last-child {
+      padding-right: var(--gap);
+    }
   }
+
 
   @media (orientation: portrait) {
 
     section {
       flex: 0 0 100%;
       scroll-snap-align: center;
+      padding: var(--gap);
     }
   }
 }
@@ -96,4 +108,18 @@ dialog {
   animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
   text-align: center;
   margin-top: auto;
+}
+
+
+select {
+  font-family: inherit;
+  background: none;
+  color: var(--text);
+
+  /* fix white on white issue on dark mode */
+  option,
+  optgroup {
+    cursor: pointer;
+    background: var(--bg);
+  }
 }

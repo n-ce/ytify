@@ -1,18 +1,18 @@
 import { playerStore, setPlayerStore, t } from "../stores";
 import { handleXtags, preferredStream, proxyHandler } from "../utils";
 
-export default async function(audioStreams: AudioStream[],
+export default async function(
+  audioStreams: AudioStream[],
   isLive = false,
-  receiver: HTMLAudioElement = playerStore.audio
+  prefetchNode: HTMLAudioElement | undefined = undefined
 ) {
-  const prefetch = !receiver.parentNode;
-  if (!prefetch)
-    setPlayerStore('title', t('player_audiostreams_setup'));
+  if (!prefetchNode)
+    setPlayerStore('status', t('player_audiostreams_setup'));
 
   const noOfBitrates = audioStreams.length;
 
   if (!noOfBitrates) {
-    setPlayerStore('title', t(
+    setPlayerStore('status', t(
       isLive ?
         'player_livestreams_hls' :
         'player_audiostreams_null'
@@ -24,6 +24,6 @@ export default async function(audioStreams: AudioStream[],
 
   const stream = await preferredStream(handleXtags(audioStreams));
   //qualityView.textContent = stream.quality + ' ' + stream.codec;
-  receiver.src = proxyHandler(stream.url, prefetch);
+  (prefetchNode || playerStore.audio).src = proxyHandler(stream.url, Boolean(prefetchNode));
 
 }

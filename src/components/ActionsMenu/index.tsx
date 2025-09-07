@@ -1,21 +1,28 @@
 // import fetchList from '../../../lib/modules/fetchList';
-import { store, closeDialog, t, playerStore, setListStore, setNavStore } from '../../../lib/stores';
-import { config, getDownloadLink, hostResolver } from '../../../lib/utils';
+
+import { store, t, playerStore, setListStore, setNavStore, setQueueStore, setStore } from '../../lib/stores';
+import { config, getDownloadLink, hostResolver } from '../../lib/utils';
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { onMount, Show } from 'solid-js';
 
 
-export default function(_: {
-  data: CollectionItem
-}) {
+export default function() {
 
-
-  const isMusic = _.data.author.endsWith('- Topic');
+  const { id, author } = store.actionsMenu;
+  const isMusic = author.endsWith('- Topic');
   let dialog!: HTMLDialogElement;
 
+  function closeDialog() {
+    dialog.close();
+    setStore('actionsMenu', 'id', '');
+  }
   onMount(() => {
     dialog.showModal();
+    history.pushState({}, '', '#');
+
+    console.log('add event called');
+    addEventListener('popstate', closeDialog);
   });
 
   return (
@@ -30,24 +37,23 @@ export default function(_: {
       >
 
         <li tabindex="0" onclick={() => {
-          // store.queue.append(store.actionsMenu, true);
-          closeDialog();
+
+          setNavStore('queue', 'state', true);
+          setQueueStore('list', list => [store.actionsMenu, ...list]);
 
         }}>
           <i class="ri-skip-forward-line"></i>{t('actions_menu_play_next')}
         </li>
 
         <li tabindex="1" onclick={() => {
-          // store.queue.append(store.actionsMenu);
+          setNavStore('queue', 'state', true);
+          setQueueStore('list', list => [...list, store.actionsMenu]);
           closeDialog();
         }}>
           <i class="ri-list-check-2"></i>{t('actions_menu_enqueue')}
         </li>
 
-        <CollectionSelector
-          collection={_.data}
-          close={closeDialog}
-        />
+        <CollectionSelector close={closeDialog} />
 
         <Show when={config['part Start Radio']}>
 
@@ -61,17 +67,18 @@ export default function(_: {
 
 
         <li tabindex="4" onclick={async () => {
-          closeDialog();
 
+          closeDialog();
+          setStore('snackbar', t('actions_menu_download_init'));
           const a = document.createElement('a');
-          const l = await getDownloadLink(_.data.id);
+          const l = await getDownloadLink(id);
           if (l) {
             a.href = l;
             a.click();
           }
-          //loadingScreen.close();
         }}>
-          <i class="ri-download-2-fill"></i>{t('actions_menu_download')}
+          <i class="ri-download-2-fill"></i>
+          {t('actions_menu_download')}
         </li>
 
 
@@ -80,8 +87,8 @@ export default function(_: {
           <li tabindex="5" onclick={() => {
             closeDialog();
             setListStore('name',
-              _.data.author.endsWith('- Topic') ?
-                ('Artist - ' + _.data.author.replace('- Topic', ''))
+              author.endsWith('- Topic') ?
+                ('Artist - ' + author.replace('- Topic', ''))
                 : '');
 
             //fetchList(_.data.channelUrl);
@@ -98,7 +105,7 @@ export default function(_: {
         <Show when={isMusic}>
           <li tabindex="6" onclick={() => {
             closeDialog();
-            setNavStore('features', 'lyrics', { state: true });
+            setNavStore('lyrics', 'state', true);
           }
           }>
             <i class="ri-music-2-line"></i>{t('actions_menu_view_lyrics')}
@@ -110,9 +117,9 @@ export default function(_: {
           <li tabindex="6" onclick={() => {
             closeDialog();
             if (config.linkHost)
-              open(hostResolver('/watch?v=' + _.data.id));
+              open(hostResolver('/watch?v=' + id));
             else
-              setNavStore('features', 'video', { state: true });
+              setNavStore('video', 'state', true);
           }}>
             <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>
@@ -122,7 +129,7 @@ export default function(_: {
         <li tabindex="7" onclick={() => {
           closeDialog();
 
-          const output = location.pathname === '/' ? playerStore.data : _.data;
+          const output = location.pathname === '/' ? playerStore.data : store.actionsMenu;
 
           const displayer = document.createElement('dialog');
           displayer.className = 'displayer';

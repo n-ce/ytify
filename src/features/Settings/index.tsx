@@ -1,7 +1,6 @@
 import { onMount } from "solid-js";
 import './Settings.css';
 import App from "./App";
-import Search from "./Search";
 import Playback from "./Playback";
 import Library from "./Library";
 import Personalize from "./Personalize";
@@ -69,7 +68,6 @@ export default function() {
       </header>
 
       <App />
-      <Search />
       <Playback />
       <Library />
       <Personalize />

@@ -6,9 +6,7 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
-  type Features = 'home' | 'player' | 'list' | 'settings' | 'search' | 'queue' | 'lyrics' | 'video';
-
-  type Routes = '/upcoming' | '/search' | '/list' | '/' | '/library';
+  type Features = 'home' | 'player' | 'list' | 'settings' | 'search' | 'queue' | 'lyrics' | 'video' | 'updater';
 
   type StreamItem = {
     url: string,
@@ -44,23 +42,24 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string
+    channelUrl: string,
+    lastUpdated?: string
   }
 
   type List = Record<'id' | 'name' | 'thumbnail', string>
   type Collection = {
-    [index: string]: CollectionItem | DOMStringMap
+    [index: string]: CollectionItem | List
   }
 
   type Library = {
     history?: Collection,
-    favorites: Collection,
-    listenLater: Collection,
+    favorites?: Collection,
+    listenLater?: Collection,
     discover?: {
       [index: string]: CollectionItem & { frequency: number }
     },
-    channels: { [index: string]: List & { uploader: string } },
-    playlists: { [index: string]: List },
+    channels?: { [index: string]: List & { uploader: string } },
+    playlists?: { [index: string]: List },
     [index: string]: Collection
   }
 
@@ -104,8 +103,8 @@ declare global {
   type Piped = {
     instance: string,
     title: string,
-    uploader: string,
     duration: number,
+    uploader: string,
     uploaderUrl: string,
     livestream: boolean,
     hls: string
@@ -117,10 +116,9 @@ declare global {
       uploaderUrl: string,
       type: string
     }[],
-    audioStreams: AudioStream[]
+    audioStreams: AudioStream[],
+    subtitles: Record<'url' | 'name' | 'label', string>[]
   }
-
-  type Captions = Record<'label' | 'url', string>;
 
   type Invidious = {
     adaptiveFormats: Record<'type' | 'bitrate' | 'encoding' | 'clen' | 'url' | 'resolution' | 'quality', string>[],
@@ -131,7 +129,7 @@ declare global {
       authorUrl: string,
       videoId: string
     }[],
-    captions: Captions[],
+    captions: Record<'url' | 'label', string>[],
     title: string,
     author: string,
     lengthSeconds: number,

@@ -1,23 +1,22 @@
-import { playerStore, store } from "../stores";
-import { config } from "../utils";
+import { store } from "../stores";
 
 export default async function(
   id: string,
   prefetch: boolean = false
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const { invidious, piped } = store.api;
-  const { fallback } = playerStore;
+  const { invidious, piped, status, fallback } = store.api;
 
   const fetchDataFromPiped = (
     api: string
-  ) => fetch(`${api}/streams/${id}`)
-    .then(res => res.json())
-    .then(data => {
-      if (config.HLS ? data.hls : data.audioStreams.length)
-        return data;
-      else throw new Error(data.message);
-    });
+  ) =>
+    fetch(`${api}/streams/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.audioStreams.length)
+          return data;
+        else throw new Error(data.message);
+      });
 
   const fetchDataFromInvidious = (
     api: string
@@ -34,7 +33,10 @@ export default async function(
       duration: data.lengthSeconds,
       uploaderUrl: data.authorUrl,
       liveStream: data.liveNow,
-      captions: data.captions,
+      subtitles: data.captions.map(c => ({
+        name: c.label,
+        url: c.url
+      })),
       relatedStreams: data.recommendedVideos.map(v => ({
         url: '/watch?v=' + v.videoId,
         title: v.title,
@@ -47,7 +49,7 @@ export default async function(
         url: v.url,
         quality: v.quality,
         resolution: v.resolution,
-        type: v.type
+        codec: v.type
       })),
       audioStreams: data.adaptiveFormats.filter((f) => f.type.startsWith('audio')).map((v) => ({
         bitrate: parseInt(v.bitrate),
@@ -64,22 +66,36 @@ export default async function(
       fetchDataFromPiped(fallback)
         .catch(() => e) : e;
 
-  const useInvidious = (index = 0): Promise<Piped> => fetchDataFromInvidious(invidious[index])
-    .catch(e => {
-      if (index + 1 === invidious.length)
-        return emergency(e);
-      else return useInvidious(index + 1);
-    });
+  const useInvidious = (index = 0): Promise<Piped> =>
+    (status === 'N') ?
+      Promise.allSettled(invidious.map(fetchDataFromInvidious))
+        .then(res => {
+          const ff = res.find(r => r.status === 'fulfilled');
+          if (ff?.value) return ff.value;
+          return emergency(Error('No Invidious sources are available'));
+        }) :
+      fetchDataFromInvidious(invidious[index])
+        .catch(e => {
+          if (index + 1 === invidious.length)
+            return emergency(e);
+          else return useInvidious(index + 1);
+        });
 
-  const usePiped = (index = 0): Promise<Piped> => fetchDataFromPiped(piped[index])
-    .catch(() => {
-      if (index + 1 === piped.length)
+
+  const usePiped = (): Promise<Piped> =>
+
+    fetchDataFromPiped(piped[0])
+      .catch(() => {
         return useInvidious();
-      else return usePiped(index + 1);
-    });
+      });
 
 
-  return config.enforcePiped ? usePiped() : useInvidious();
-
+  return status === 'P' ? usePiped() :
+    status === 'I' ? useInvidious() :
+      Promise.allSettled(piped.map(fetchDataFromPiped))
+        .then(res => {
+          const ff = res.find(r => r.status === 'fulfilled');
+          if (ff?.value) return ff.value;
+          return useInvidious();
+        });
 }
-

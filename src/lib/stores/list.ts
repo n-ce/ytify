@@ -1,16 +1,41 @@
 import { createStore } from "solid-js/store";
+import { store } from "./app";
+import { closeFeature, updateParam } from "./navigation";
 
 
-export const [listStore, setListStore] = createStore({
+const initialState = () => ({
   isLoading: false,
-  list: {} as Collection,
+  isSubscribed: false,
+  isSortable: false,
+  isReversed: false,
+  isShared: false,
+  list: [] as CollectionItem[],
+  length: 0,
   reservedCollections: ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'],
   addToCollectionOptions: [] as string[],
-  isReversed: false,
   name: '',
   url: '',
-  type: '',
+  type: 'collection' as 'channel' | 'playlist' | 'collection',
   id: '',
   uploader: '',
-  thumbnail: ''
+  thumbnail: '',
+  observer: { disconnect() { } } as IntersectionObserver
 });
+
+export const [listStore, setListStore] = createStore(initialState());
+
+
+export async function getList(url: string) {
+  const { api } = store;
+  const { piped, index } = api;
+  console.log(piped[index.piped], url)
+
+}
+
+export function resetList() {
+  closeFeature('list');
+  listStore.observer.disconnect();
+
+  updateParam('collection');
+  setListStore(initialState());
+}

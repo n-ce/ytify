@@ -1,6 +1,6 @@
 import ToggleSwitch from './ToggleSwitch.tsx';
 import { Selector } from '../../components/Selector.tsx';
-import { openDialog, t } from '../../lib/stores';
+import { setStore, t } from '../../lib/stores';
 import { config, cssVar, setConfig, themer } from '../../lib/utils';
 
 export default function() {
@@ -17,7 +17,7 @@ export default function() {
         checked={config.loadImage}
         onclick={() => {
           setConfig('loadImage', !config.loadImage);
-          openDialog('snackbar', t('settings_reload'));
+          setStore('snackbar', t('settings_reload'));
         }}
       />
 

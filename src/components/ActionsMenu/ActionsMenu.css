@@ -1,14 +1,17 @@
 #actionsMenu {
-  border: var(--border);
-  box-shadow: var(--shadow);
-  padding: var(--size-2) var(--size-2);
+  box-shadow: var(--shadow-3);
+  padding: 0;
   width: 100%;
   margin: auto;
   margin-bottom: var(--size-4);
-  border-radius: calc(var(--roundness) * 1.2);
-  background-color: var(--bg);
+  border-radius: var(--roundness);
+  background-color: var(--surface);
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
+
+  &::backdrop {
+    background-color: #0004;
+  }
 
   &:open {
     animation: var(--animation-slide-in-up) forwards;
@@ -16,7 +19,7 @@
 
   @media(orientation:landscape) {
     width: max-content;
-    margin: auto 8dvmin;
+    margin: auto var(--size-fluid-1);
     margin-left: auto;
     animation-name: fromRight;
 
@@ -24,10 +27,9 @@
 
   ul {
     list-style: none;
-    padding: var(--size-1);
+    padding: var(--gap);
     width: auto;
     display: grid;
-    gap: var(--size-1);
   }
 
   li {
@@ -35,12 +37,12 @@
     color: var(--text);
     user-select: none;
     font-size: var(--font-size-1);
-    font-weight: var(--font-weight-5);
+    font-weight: var(--font-weight-6);
     display: flex;
     align-items: center;
-    gap: var(--size-3);
+    gap: var(--gap);
     padding: 0 var(--size-1);
-    border: 0.1vmin solid transparent;
+    border: var(--border-size-1) solid transparent;
     border-radius: var(--roundness);
 
     &:hover {
@@ -50,7 +52,7 @@
 
     & i {
       font-size: var(--font-size-4);
-      font-weight: initial;
+      font-weight: var(--font-weight-4);
     }
 
   }

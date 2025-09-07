@@ -1,5 +1,5 @@
-import { openDialog, t } from '../stores';
-import { addListToCollection, convertSStoHHMMSS, createCollection, goTo } from '../utils';
+import { setStore, t } from '../stores';
+import { addListToCollection, convertSStoHHMMSS, createCollection } from '../utils';
 
 export default async function() {
 
@@ -18,14 +18,14 @@ export default async function() {
     body: JSON.stringify({ username, password })
   })
     .then(res => res.json())
-    .catch(e => openDialog('snackbar', t("piped_failed_login", e)));
+    .catch(e => setStore('snackbar', t("piped_failed_login", e)));
 
   if (!authId) {
-    openDialog('snackbar', t("piped_failed_token"));
+    setStore('snackbar', t("piped_failed_token"));
     return;
   }
 
-  openDialog('snackbar', t("piped_success_logged"));
+  setStore('snackbar', t("piped_success_logged"));
 
   // fetch
   const playlists = await fetch(instance + '/user/playlists', {
@@ -33,9 +33,9 @@ export default async function() {
       Authorization: authId.token
     }
   }).then(res => res.json())
-    .catch(e => openDialog('snackbar', t("piped_failed_find", e)));
+    .catch(e => setStore('snackbar', t("piped_failed_find", e)));
   if (playlists.length)
-    openDialog('snackbar', t("piped_success_fetched"));
+    setStore('snackbar', t("piped_success_fetched"));
   else return;
 
 
@@ -63,12 +63,11 @@ export default async function() {
         addListToCollection(listTitle, list);
       })
   )).then(() => {
-    openDialog('snackbar', t('piped_success_imported'));
+    setStore('snackbar', t('piped_success_imported'));
     document.getElementById('r.collections')?.click();
-    goTo('/library');
   })
     .catch(e => {
-      openDialog('snackbar', t("piped_failed_imported", e));
+      setStore('snackbar', t("piped_failed_imported", e));
     });
 
   // logout
@@ -79,7 +78,7 @@ export default async function() {
       Authorization: authId.token
     }
   }).then(res => {
-    openDialog('snackbar', t(
+    setStore('snackbar', t(
       res.ok ?
         'piped_success_auth' :
         'piped_failed_auth'

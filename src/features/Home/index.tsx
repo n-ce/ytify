@@ -1,13 +1,19 @@
-import { createSignal, Match, Show, Switch } from 'solid-js';
+import { createSignal, For, Match, Show, Switch } from 'solid-js';
 import About from './About';
 import Hub from './Hub';
 import './Home.css';
-import { config, getDB, saveDB, toCollection } from '../../lib/utils';
-import { navStore, openDialog, setNavStore, t } from '../../lib/stores';
+import { config, getDB, saveDB, setConfig, toCollection } from '../../lib/utils';
+import { navStore, setNavStore, setStore, t } from '../../lib/stores';
+import Collections from './Collections';
+import SubLists from './SubLists';
+
 
 export default function() {
 
-  const [item, setItem] = createSignal('about');
+  const catalogue = ['about', 'hub', 'collections', 'artists', 'albums', 'channels', 'playlists'];
+  const [catalogueItem, setCatalogueItem] = createSignal(config.home);
+
+
   let syncBtn!: HTMLElement;
 
   const { dbsync } = config;
@@ -22,7 +28,7 @@ export default function() {
     for (const collection in newDB) for (const item in newDB[collection])
       toCollection(collection, newDB[collection][item], oldDB)
     saveDB(oldDB);
-    openDialog('snackbar', t('library_imported'));
+    setStore('snackbar', t('library_imported'));
   };
 
   function exportLibrary() {
@@ -42,10 +48,10 @@ export default function() {
 
 
   return (
-    <section ref={(e) => setNavStore('features', 'home', { ref: e })}>
+    <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
 
       <header>
-        <p>Home </p>
+        <p >Home </p>
         <Show when={dbsync}>
           <i
             id="syncNow"
@@ -53,22 +59,25 @@ export default function() {
             ref={syncBtn}
           ></i>
         </Show>
-        <Show when={!navStore.features.search.state}>
-          <i
-            id="searchToggle"
-            class="ri-search-2-line"
-            onclick={() => setNavStore('features', 'search', { state: true })}
-          ></i>
-        </Show>
+        <div class="right-group">
+          <Show when={!navStore.search.state}>
+            <i
+              class="ri-search-2-line"
+              onclick={() => setNavStore('search', 'state', true)}
+            ></i>
+          </Show>
+
+          <Show when={!navStore.settings.state}>
+            <i
+              class="ri-settings-line"
+              onclick={() => setNavStore('settings', 'state', true)}
+            ></i>
+          </Show>
+        </div>
+
         <details>
           <summary><i class="ri-more-2-fill"></i></summary>
           <ul>
-            <li
-              id="settingsHandler"
-              onclick={() => setNavStore('features', 'settings', { state: true })}
-            >
-              <i class="ri-settings-line"></i>&nbsp;{t('nav_settings')}
-            </li>
 
             <li>
               <label id="importBtn" for="upload_ytify">
@@ -92,7 +101,7 @@ export default function() {
             </li>
             <li>
               <label id="importSongshiftBtn" for="upload_songshift">
-                <i class="ri-refresh-line"></i>&nbsp;Import Playlists From SongShift
+                <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift
               </label>
               <input type="file" id="upload_songshift" onchange={async (e) => (await import('../../lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
             </li>
@@ -100,43 +109,50 @@ export default function() {
         </details>
       </header>
 
-
-      <div id="catalogueSelector"
-
-        onclick={e => {
-          const input = e.target as HTMLInputElement;
-          if (input.matches('input'))
-            setItem(input.value);
-
-        }}
-      >
-        <input type="radio" id="r.about" name="superCollectionChips" checked value="about" />
-        <label for="r.about">About</label>
-        <input type="radio" id="r.hub" name="superCollectionChips" value="hub" />
-        <label for="r.hub">Hub</label>
-        <input type="radio" id="r.collections" name="superCollectionChips" value="collections" />
-        <label data-translation="library_collections" for="r.collections">Collections</label>
-        <input type="radio" id="r.playlists" name="superCollectionChips" value="playlists" />
-        <label data-translation="library_playlists" for="r.playlists">Playlists</label>
-        <input type="radio" id="r.albums" name="superCollectionChips" value="albums" />
-        <label data-translation="library_albums" for="r.albums">Albums</label>
-        <input type="radio" id="r.artists" name="superCollectionChips" value="artists" />
-        <label data-translation="library_artists" for="r.artists">Artists</label>
-        <input type="radio" id="r.channels" name="superCollectionChips" value="channels" />
-        <label data-translation="library_channels" for="r.channels">Channels</label>
+      <div id="catalogueSelector">
+        <For each={catalogue}>
+          {(item) => (
+            <>
+              <input
+                type="radio"
+                id={'r.' + item}
+                name="superCollectionChips"
+                onclick={() => {
+                  setCatalogueItem(item);
+                  setConfig('home', item);
+                }}
+                checked={item === catalogueItem()}
+              />
+              <label
+                for={'r.' + item}
+              >{t(('library_' + item) as 'library_hub')}</label>
+            </>
+          )}
+        </For>
 
       </div>
 
-
       <div id="catalogue">
 
-        <Switch>
-          <Match when={item() === 'hub'}>
+        <Switch fallback={
+          <About />
+        }>
+          <Match when={catalogueItem() === 'hub'}>
             <Hub />
           </Match>
-          <Match when={item() === 'about'}>
+          <Match when={catalogueItem() === 'about'}>
             <About />
           </Match>
+          <Match when={catalogueItem() === 'collections'}>
+            <Collections />
+          </Match>
+          <For each={['albums', 'playlists', 'channels', 'artists'] as APAC[]}>
+            {(item) =>
+              <Match when={catalogueItem() === item}>
+                <SubLists flag={item} />
+              </Match>
+            }
+          </For>
 
         </Switch>
       </div>

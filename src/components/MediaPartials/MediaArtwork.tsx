@@ -18,7 +18,7 @@ export default function() {
       ref={imgRef}
       src={playerStore.mediaArtwork}
       crossorigin="anonymous"
-      alt={"Media Artwork for " + playerStore.title}
+      alt={"Media Artwork for " + playerStore.stream.title}
       onclick={() => {
         setPlayerStore('immersive', !playerStore.immersive);
       }}

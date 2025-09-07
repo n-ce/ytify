@@ -26,10 +26,6 @@ export default function(data: {
     <a
       class={'listItem ' + (config.loadImage ? 'ravel' : '')}
       href={hostResolver(data.url)}
-      data-title={data.title}
-      data-url={data.url}
-      data-thumbnail={data.thumbnail}
-      data-uploader={data.uploader_data}
     >
       <Show when={config.loadImage}>
         <img

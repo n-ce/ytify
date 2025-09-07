@@ -12,10 +12,10 @@ export default function() {
   return (
     <footer onclick={(e) => {
       if (!e.target.matches('button'))
-        setNavStore('features', 'player', { state: true });
+        setNavStore('player', 'state', true);
     }
     }>
-      <progress value={playerStore.currentTime / playerStore.fullDuration}></progress>
+      <progress value={(playerStore.currentTime / playerStore.fullDuration) || '0'}></progress>
       <Show when={config.loadImage}>
         <MediaArtwork />
       </Show>

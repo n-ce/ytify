@@ -1,4 +1,4 @@
-import { openDialog, t } from '../../lib/stores';
+import { setStore, t } from '../../lib/stores';
 import { config, setConfig } from '../../lib/utils/config.ts';
 import { getDB, saveDB } from '../../lib/utils/library.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
@@ -10,18 +10,6 @@ export default function() {
         <i class="ri-stack-line"></i>
         <p>{t('settings_library')}</p>
       </b>
-
-      <ToggleSwitch
-        id="startupTab"
-        name='settings_set_as_default_tab'
-        checked={config.startupTab === '/library'}
-        onclick={() => {
-          setConfig('startupTab',
-            config.startupTab === '/library' ?
-              '/search' : '/library'
-          );
-        }}
-      />
 
       <ToggleSwitch
         id="dbsync"
@@ -38,7 +26,7 @@ export default function() {
               .map(b => b.toString(16).padStart(2, '0'))
               .join('');
 
-            openDialog('snackbar', t('settings_reload'));
+            setStore('snackbar', t('settings_reload'));
           }
           if (!config.dbsync) {
             const termsAccepted = confirm('Data will be automatically deleted after one week of inactivity.\nytify is not responsible for data loss.\n\nI Understand');

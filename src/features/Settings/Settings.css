@@ -16,10 +16,10 @@
 
   div {
     background-color: var(--onBg);
-    border: var(--border);
+    border-bottom: var(--border);
     border-radius: var(--roundness);
     width: 100%;
-    margin-bottom: var(--size-3);
+    margin-bottom: var(--gap);
 
     &.toggleSwitch,
     >span {
@@ -41,9 +41,9 @@
         cursor: pointer;
         inset: 0;
         margin: 0;
-        background-color: var(--onBg);
+        background-color: var(--surface);
         border-radius: var(--roundness);
-        border: var(--border);
+        border-bottom: var(--border);
         width: 2.2rem;
 
         &,
@@ -97,9 +97,10 @@
       align-items: center;
 
       select {
-        background-color: var(--onBg);
+        background-color: var(--surface);
         font-size: inherit;
-        border: var(--border);
+        border-bottom: var(--border);
+        border-radius: var(--roundness);
         padding: 0.5vmin 1vmin;
         max-width: 50%;
       }

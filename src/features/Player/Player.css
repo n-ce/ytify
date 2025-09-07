@@ -25,7 +25,7 @@
   &::after {
     --x: rgba(from var(--bg) r g b / 0.8);
     background-color: var(--x);
-    backdrop-filter: blur(var(--size-px-1));
+    backdrop-filter: var(--size-px-3);
     z-index: 1;
   }
 

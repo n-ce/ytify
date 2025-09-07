@@ -1,11 +1,11 @@
-import { store } from "../stores";
+import { playerStore } from "../stores";
 import { addListToCollection, convertSStoHHMMSS, getDB } from "../utils";
 
 export default function(
   id: string,
   relatedStreams: StreamItem[]
 ) {
-  if (id !== store.stream.id) return;
+  if (id !== playerStore.stream.id) return;
 
   const db = getDB();
 

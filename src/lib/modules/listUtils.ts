@@ -1,65 +1,48 @@
-import { listContainer, loadingScreen, subscribeListBtn } from "../lib/dom";
-import { getThumbIdFromLink } from "../lib/imageUtils";
-import { addListToCollection, createCollection, saveDB, toCollection } from "../lib/libraryUtils";
-import { store } from "../lib/stores";
-import { notify } from "../lib/utils";
+// @ts-ignore
+
+import { listStore, setListStore, setStore, t } from "../stores";
+import { addListToCollection, createCollection, getThumbIdFromLink, saveDB, toCollection } from "../utils";
 
 export function subscribeList(db: Library) {
-  const l = store.list;
-  const state = [' Subscribe', ' Subscribed'];
-  const dom = subscribeListBtn.firstElementChild as HTMLParagraphElement;
-  const domState = dom.dataset.state as ' Subscribe' | ' Subscribed';
-
-  if (domState === state[1]) {
-    delete db[l.type][l.id];
-    state.reverse();
-  }
+  const { isSubscribed, id, type, name, thumbnail, uploader } = listStore;
+  if (isSubscribed)
+    delete db[type][id];
   else {
     const dataset: List & { uploader?: string } = {
-      id: l.id,
-      name: l.name,
-      thumbnail: getThumbIdFromLink(l.thumbnail)
+      id, name,
+      thumbnail: getThumbIdFromLink(thumbnail)
     };
 
-    if (l.type === 'playlists')
-      dataset.uploader = l.uploader;
+    if (type === 'playlist')
+      dataset.uploader = uploader;
 
-    toCollection(l.type, dataset, db);
+    toCollection(type, dataset, db);
   }
-  dom.dataset.state = state[1];
+  setListStore('isSubscribed', !isSubscribed)
   saveDB(db, 'subscribe');
 }
 
 export function importList() {
 
-  const listTitle = prompt(i18n('list_set_title'), store.list.name);
+  const { list, name } = listStore;
+  const listTitle = prompt(t('list_set_title'), name);
+
 
   if (!listTitle) return;
 
   createCollection(listTitle);
 
-  const list: { [index: string]: DOMStringMap } = {};
-  listContainer
-    .querySelectorAll('.streamItem')
-    .forEach(_ => {
-      const sender = (<HTMLElement>_).dataset;
-      const sid = <string>sender.id;
-      list[sid] = {
-        'id': sender.id,
-        'title': sender.title,
-        'author': sender.author,
-        'duration': sender.duration,
-        'channelUrl': sender.channel_url
-      };
-    });
+  const listObject = list.reduce((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {} as { [index: string]: CollectionItem });
 
-  addListToCollection(listTitle, list);
-  notify(i18n('list_imported', listTitle));
+  addListToCollection(listTitle, listObject);
+  setStore('snackbar', t('list_imported', listTitle));
 }
 
 export function shareCollection(data: Collection) {
-
-  loadingScreen.showModal();
+  setListStore('isLoading', true);
 
   fetch(location.origin + '/blob', {
     method: 'POST',
@@ -78,8 +61,6 @@ export function shareCollection(data: Collection) {
     .catch(() => {
       alert('failed');
     })
-    .finally(() => loadingScreen.close());
+    .finally(() => setListStore('isLoading', false));
 
 }
-
-

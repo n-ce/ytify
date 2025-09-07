@@ -6,13 +6,13 @@
 > we need to account for this using the trashHistory array
 */
 
-import { store } from "../stores";
+import { playerStore } from "../stores";
 import { setQueueStore } from "../stores/queue";
 import { convertSStoHHMMSS } from "../utils";
 
 export default function(data: StreamItem[]) {
 
-  const { stream, streamHistory } = store;
+  const { stream, history } = playerStore;
   const filterYTM = (a: string) =>
     stream.author.endsWith(' - Topic') ?
       a.endsWith(' - Topic') : true;
@@ -26,7 +26,7 @@ export default function(data: StreamItem[]) {
       stream.type === 'stream' &&
       stream.duration > 45 &&
       !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
-      !streamHistory.includes(id) &&
+      !history.includes(id) &&
       filterYTM(stream.uploaderName)
     )
       setQueueStore('list', l => [...l, ({

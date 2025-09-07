@@ -1,3 +1,8 @@
+.home {
+  max-width: 100dvh;
+  margin: 0 auto;
+}
+
 header {
   display: flex;
   align-items: center;
@@ -11,12 +16,17 @@ header {
   }
 
 
-  #searchToggle {
+  .right-group {
+    font-size: var(--font-size-4);
     margin-left: auto;
     margin-right: var(--size-8);
     margin-top: var(--size-00);
-    font-size: var(--font-size-4);
+
+    & i:nth-child(2) {
+      margin-left: var(--size-4);
+    }
   }
+
 
   #syncNow {
     cursor: pointer;
@@ -47,27 +57,87 @@ header {
 
 }
 
-#catalogueSelector {
 
-  margin-bottom: var(--size-3);
+
+#catalogueSelector {
+  width: 100%;
 
   input[type='radio'] {
     display: none;
 
     &:checked+label {
-      background: var(--text);
+      opacity: 1;
+      background-color: var(--text);
       color: var(--bg);
     }
 
     &+label {
       cursor: pointer;
-      font-size: small;
+      font-size: var(--font-size-0);
       display: inline-block;
       padding: var(--size-1) var(--size-2);
-      margin: var(--size-1) 0;
+      font-weight: var(--font-weight-6);
       border-radius: var(--roundness);
+      opacity: 0.7;
+      margin-right: var(--size-2);
+      margin-bottom: var(--size-2);
+
+
+      &:hover {
+        cursor: pointer;
+        background-color: var(--text);
+        color: var(--bg);
+      }
+    }
+  }
+
+}
+
+#catalogue {
+  overflow-y: scroll;
+  width: 100%;
+  margin-top: var(--size-2);
+
+  a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  a.listItem {
+    margin-top: 0;
+    margin-bottom: var(--gap);
+  }
+
+  a.clxn_item {
+    display: flex;
+    align-items: center;
+    padding: var(--size-1);
+    color: var(--text);
+    font-size: var(--font-size-2);
+
+    i {
+      margin-right: var(--size-2);
     }
 
-
+    &:hover {
+      background-color: var(--onBg);
+      border-radius: var(--roundness);
+    }
   }
+
+
+  input[type="text"] {
+    width: 100%;
+    outline: none;
+    border-radius: var(--roundness);
+    margin: 0;
+    margin-bottom: var(--gap);
+    background: var(--onBg);
+    border-bottom: var(--border);
+
+    &::placeholder {
+      color: var(--text);
+    }
+  }
+
 }

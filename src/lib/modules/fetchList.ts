@@ -1,10 +1,14 @@
-import { listBtnsContainer, listContainer, listSection, listTitle } from "../lib/dom";
-import { getDB, saveDB } from "../lib/libraryUtils";
-import { errorHandler, getApi, goTo, i18n, notify } from "../lib/utils";
-import { store } from "../lib/stores";
-import { render } from "uhtml";
-import ItemsLoader from "../components/ItemsLoader";
+import { getDB, saveDB } from "../utils/library";
+import { getApi } from "../utils";
+import { store, setListStore, setStore, t, listStore } from "../stores";
 
+const streamToCollectionItem = (stream: StreamItem): CollectionItem => ({
+  id: stream.videoId,
+  title: stream.title,
+  author: stream.uploaderName,
+  duration: stream.duration.toString(),
+  channelUrl: stream.uploaderUrl,
+});
 
 export default async function fetchList(
   url: string | undefined,
@@ -12,19 +16,17 @@ export default async function fetchList(
 ) {
 
   if (!url)
-    return notify(i18n('fetchlist_url_null'));
+    return setStore('snackbar', t('fetchlist_url_null'));
 
-  //  loadingScreen.showModal();
+  setListStore('isLoading', true);
 
-
-  let listData: StreamItem[] = [];
-  const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || store.list.name.startsWith('Artist'));
+  const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || listStore.name.startsWith('Artist'));
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
 
     if (!url) {
-      // loadingScreen.close();
+      setListStore('isLoading', false);
       return;
     }
   }
@@ -40,97 +42,46 @@ export default async function fetchList(
     })
     .catch(err => {
       if (err.message === 'Could not get playlistData')
-        notify(i18n('fetchlist_error'));
+        setStore('snackbar', t('fetchlist_error'));
       else if (err.message === 'Got error: "The playlist does not exist."') {
-        notify(i18n('fetchlist_nonexistent'));
+        setStore('snackbar', t('fetchlist_nonexistent'));
         const db = getDB();
-        delete db.playlists[url.slice(11)];
+        if (db.playlists)
+          delete db.playlists[url.slice(11)];
         saveDB(db);
       }
-      else errorHandler(
-        mix ? 'No Mixes Found' : err.message,
-        () => fetchList(url, mix)
-      )
+      else setStore('snackbar', mix ? 'No Mixes Found' : err.message)
+      setListStore('isLoading', false);
     })
-  //    .finally(() => loadingScreen.close());
 
-  if (!group?.relatedStreams?.length)
+  if (!group?.relatedStreams?.length) {
+    setListStore('isLoading', false);
     return;
-
-  if (listContainer.classList.contains('reverse'))
-    listContainer.classList.remove('reverse');
+  }
 
   const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
       streams.filter((s: StreamItem) => s.views !== -1) :
       streams;
 
-  listData = filterOutMembersOnly(group.relatedStreams);
-  render(listContainer, ItemsLoader(listData));
+  const listData = filterOutMembersOnly(group.relatedStreams).map(streamToCollectionItem);
+  setListStore('list', listData);
 
   if (location.pathname !== '/list')
-    goTo('/list');
-  listSection.scrollTo(0, 0);
-
-  const tokens = [group.nextpage];
-
-  function setObserver(callback: () => Promise<string>) {
-    new IntersectionObserver((entries, observer) =>
-      entries.forEach(async e => {
-        if (e.isIntersecting) {
-
-          const token = await callback();
-          observer.disconnect();
-          if (!token || tokens.indexOf(token) !== -1) return;
-          tokens.push(token);
-          setObserver(callback);
-        }
-      }))
-      .observe(listContainer.children[listContainer.childElementCount - 3]);
-  }
-  if (!mix && group.nextpage)
-    setObserver(async () => {
-      const data = await fetch(
-        api + '/nextpage/' +
-        url.substring(1) + '?nextpage=' + encodeURIComponent(tokens[tokens.length - 1])
-      )
-        .then(res => res.json())
-        .catch(e => console.log(e));
-      if (!data) return;
-      const existingItems: string[] = [];
-      listContainer.querySelectorAll('.streamItem').forEach((v) => {
-        existingItems.push((v as HTMLElement).dataset.id as string);
-      });
-
-
-      data.relatedStreams = data.relatedStreams.filter(
-        (item: StreamItem) => !existingItems.includes(
-          item.url.slice(-11))
-      );
-
-      listData = listData.concat(filterOutMembersOnly(data.relatedStreams));
-      render(listContainer, ItemsLoader(listData));
-      return data.nextpage || '';
-    });
-
-
-  listBtnsContainer.className = type;
-
+    history.pushState({}, '', '/list');
 
   if (!useHyperpipe) {
-    store.list.name = group.name;
-    store.list.url = url;
-    store.list.id = url.slice(type === 'playlist' ? 11 : 9);
-    store.list.thumbnail = store.list.thumbnail || group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail;
-    store.list.type = type + 's';
+    setListStore('name', group.name);
+    setListStore('url', url);
+    setListStore('id', url.slice(type === 'playlist' ? 11 : 9));
+    setListStore('thumbnail', listStore.thumbnail || group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail);
+    setListStore('type', type);
   }
-
-  listTitle.textContent = store.list.name;
 
   if (mix) { // playAllBtn.click();
   } else {
     // replace string for youtube playlist link support
-    store.list.url = url.replace('ts/', 't?list=');
+    setListStore('url', url.replace('ts/', 't?list='));
     document.title = group.name + ' - ytify';
 
     history.replaceState({}, '',
@@ -140,9 +91,8 @@ export default async function fetchList(
         .join('=')
         .substring(1)
     );
-
   }
-
+  setListStore('isLoading', false);
 }
 
 
@@ -152,12 +102,12 @@ const getPlaylistIdFromArtist = (id: string): Promise<string> =>
     .then(data => {
       if (!('playlistId' in data))
         throw new Error('No Playlist Id found.');
-      store.list.id = id.slice(9);
-      store.list.type = 'channels';
-      store.list.thumbnail = store.list.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0];
+      setListStore('id', id.slice(9));
+      setListStore('type', 'channel');
+      setListStore('thumbnail', listStore.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0]);
       return '/playlists/' + data.playlistId;
     })
     .catch(err => {
-      notify(err.message);
+      setStore('snackbar', err.message);
       return '';
     })

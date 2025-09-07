@@ -1,6 +1,5 @@
-import { openDialog, t } from '../stores';
+import { setNavStore, setStore, t, updateParam } from '../stores';
 import { listStore, setListStore } from '../stores';
-import { goTo } from './helpers';
 
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
@@ -20,15 +19,17 @@ export function removeFromCollection(
 
   delete db[collection][id];
   setListStore('list', (currentList) => {
-    const { keyToRemove, ...newList } = currentList;
-    return newList;
+    console.log(currentList);
+    return {};
   });
   saveDB(db);
 }
 
+
+
 export function toCollection(
   collection: string,
-  data: CollectionItem | DOMStringMap,
+  data: CollectionItem | List,
   db: Library
 ) {
   if (!collection) return;
@@ -41,13 +42,14 @@ export function toCollection(
   }
   // create if collection does not exists
   else db[collection] = {};
-
+  if ('title' in data)
+    data.lastUpdated = new Date().toISOString();
   db[collection][id] = data;
 }
 
 export function addToCollection(
   collection: string,
-  data: CollectionItem | DOMStringMap,
+  data: CollectionItem,
   change = ''
 ) {
 
@@ -60,7 +62,7 @@ export function addToCollection(
 
 export function addListToCollection(
   collection: string,
-  list: { [index: string]: CollectionItem | DOMStringMap },
+  list: { [index: string]: CollectionItem },
   db = getDB()
 ) {
 
@@ -79,7 +81,7 @@ export function createCollection(title: string) {
     .concat(listStore.addToCollectionOptions)
     .includes(title);
   if (exists)
-    openDialog('snackbar', t('list_already_exists'))
+    setStore('snackbar', t('list_already_exists'))
   else
     setListStore('addToCollectionOptions', (prev) => [...prev, title]);
 }
@@ -91,41 +93,30 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
+  setListStore('isLoading', true);
 
   const display = shared ? 'Shared Collection' : id;
-  const { reservedCollections, isReversed } = listStore;
+  const { reservedCollections } = listStore;
   const isReserved = reservedCollections.includes(id);
 
-  setListStore('name', decodeURIComponent(display));
+  setListStore({
+    name: decodeURIComponent(display),
+    isReversed: isReserved,
+    isShared: shared
+  });
 
-  shared ?
-    await getSharedCollection(id) :
-    getLocalCollection(id, isReserved);
-
-  if (!shared && isReserved) {
-    if (!isReversed)
-      setListStore('isReversed', true);
+  if (shared) {
+    await getSharedCollection(id);
+    updateParam('si', id);
   }
-  else if (isReversed)
-    setListStore('isReversed', false);
+  else {
+    getLocalCollection(id, isReserved);
+    updateParam('collection', id);
+  }
 
-  //listBtnsContainer.className = isReversed ? 'reserved' : (shared ? 'shared' : 'collection');
-  /*
-    if (listBtnsContainer.classList.contains('favorites')) {
-      if (id !== 'favorites')
-        listBtnsContainer.classList.remove('favorites');
-    }
-    else if (id === 'favorites')
-      listBtnsContainer.classList.add('favorites');
-  */
-  if (location.pathname !== '/list')
-    goTo('/list');
+  setNavStore('list', 'state', true);
+  setListStore('isLoading', false);
 
-  // listSection.scrollTo(0, 0);
-  history.replaceState({}, '',
-    location.origin + location.pathname +
-    (shared ? '?si=' : '?collection=') + id
-  );
   document.title = display + ' - ytify';
 
 }
@@ -149,18 +140,23 @@ function getLocalCollection(
   collection: string,
   isReserved: boolean
 ) {
+
   const db = getDB();
   //const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
   let dataObj = db[decodeURI(collection)];
 
   if (!dataObj)
-    openDialog('snackbar', 'No items found');
+    setStore('snackbar', 'No items found');
 
-  const items = Object.values(dataObj);
-  let listData: (CollectionItem | DOMStringMap)[] = items;
+  const items = Object.values(dataObj) as CollectionItem[];
+
+  let listData = items;
   let itemsToShow = items.length;
   const usePagination = isReserved && itemsToShow > 20;
-  setListStore('name', listStore.name + ` | ${items.length} streams`);
+  setListStore({
+    name: collection,
+    length: items.length
+  });
 
   if (collection === 'discover') {
     for (const i in dataObj)
@@ -172,15 +168,17 @@ function getLocalCollection(
   if (usePagination) {
     listData = items.slice(itemsToShow - 1, itemsToShow);;
   }
-  console.log(listData);
+
+  setListStore('list', listData);
+
+
   // set list
 
   if (usePagination)
     setObserver(() => {
       itemsToShow -= 1;
       const next = items.slice(itemsToShow - 1, itemsToShow);
-      const frag = document.createDocumentFragment();
-      console.log(next, frag);
+      setListStore('list', next);
       //  renderCollection(next, sort, frag);
 
       /*
@@ -196,15 +194,15 @@ function getLocalCollection(
       return itemsToShow;
     });
 
-  listStore.id = decodeURI(collection);
+  setListStore('id', decodeURI(collection));
 }
 
 async function getSharedCollection(
   id: string
 ) {
 
-  //  loadingScreen.showModal();
 
+  setListStore('isLoading', true);
   const data = await fetch(`${location.origin}/blob/${id}`)
     .then(res => res.json())
     .catch(() => '');
@@ -215,7 +213,7 @@ async function getSharedCollection(
     else
       render(listContainer, html`Collection does not exist`);
   */
-  // loadingScreen.close();
+  setListStore('isLoading', false);
 }
 
 
