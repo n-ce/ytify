@@ -5,7 +5,12 @@ export default async (_: Request, context: Context) => {
   const { id } = context.params;
   const cgeo = context.geo.country?.code || 'IN';
 
-  if (!id || id.length < 11) return;
+  if (!id || id.length < 11) {
+    return new Response(JSON.stringify({ error: 'Invalid or missing id' }), {
+      status: 400,
+      headers: { 'content-type': 'application/json' }
+    });
+  }
   const raw = process.env.rkeys;
   if (!raw) {
     throw new Error('Missing environment variable: rkeys');
