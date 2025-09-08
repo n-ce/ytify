@@ -3,13 +3,8 @@ footer {
   align-items: center;
   position: relative;
   z-index: 2;
-  width: 100dvh;
-  margin: 0 auto;
-  bottom: var(--size-10);
+  width: 100dvmin;
   padding: var(--size-1);
-  background-color: var(--surface);
-  border-radius: var(--roundness);
-  box-shadow: var(--shadow-2);
   overflow: hidden;
   height: var(--size-9);
   animation: var(--animation-slide-in-up) forwards;
@@ -20,18 +15,37 @@ footer {
     transition: all 0.4s ease;
   }
 
-  @media(orientation:portrait) {
-    width: calc(100% - var(--size-5));
-  }
-
   img {
     height: calc(var(--size-8) + var(--size-2));
     margin-right: var(--size-2);
     object-fit: cover;
-    border-radius: calc(var(--roundness) * 0.6);
-    box-shadow: var(--shadow-1);
+    border-radius: calc(var(--roundness) * 0.5);
+    box-shadow: var(--shadow-2);
     pointer-events: none;
   }
+
+  @media(orientation:landscape) {
+    margin: 0 auto;
+    background: var(--surface);
+    border-bottom: var(--border);
+    box-shadow: var(--shadow-2);
+    bottom: var(--size-10);
+    border-radius: var(--roundness);
+  }
+
+  @media(orientation:portrait) {
+    bottom: var(--size-9);
+    background: linear-gradient(var(--surface), var(--bg));
+    box-shadow: var(--shadow-6);
+    border-top-left-radius: var(--roundness);
+    border-top-right-radius: var(--roundness);
+
+    img {
+      height: var(--size-8);
+      margin-left: var(--size-1);
+    }
+  }
+
 
   button {
     background: none;
@@ -96,17 +110,15 @@ footer {
     background-color: transparent;
     accent-color: auto;
     appearance: none;
-    padding: var(--size-1);
+    padding: var(--size-2);
 
     &::-webkit-progress-bar {
       background: transparent;
     }
 
     &::-webkit-progress-value {
-      --x: hsla(from var(--bg) h 100% 70% / 0.2);
-      --y: hsla(from var(--bg) h 50% 80% / 0.5);
-      background: linear-gradient(to right, var(--y), var(--x));
-      border-radius: calc(var(--roundness) - var(--size-1));
+      background-color: hsla(from var(--surface) h s 60% / 0.2);
+      border-radius: calc(var(--roundness) * 0.5);
       transition: all 0.4s linear;
     }
   }

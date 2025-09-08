@@ -112,13 +112,11 @@
     overflow: hidden
   }
 
-  .ri-loop-left-line {
-    margin-left: auto;
+  .right-group {
+    margin-right: var(--size-4);
+    margin-top: 0;
   }
 
-  .ri-close-large-line {
-    margin: 0 var(--size-4);
-  }
 }
 
 

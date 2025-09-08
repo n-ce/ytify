@@ -26,7 +26,7 @@ section>header {
     }
   }
 
-  .ri-close-large-line {
+  >.ri-close-large-line {
     font-size: var(--font-size-3);
   }
 
@@ -69,7 +69,7 @@ section>header {
     ul {
       background-color: var(--surface);
       color: var(--text);
-      padding: var(--size-1);
+      padding: var(--size-1) var(--size-2);
       list-style: none;
       border-bottom: var(--border);
       border-radius: var(--roundness);

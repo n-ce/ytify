@@ -28,6 +28,7 @@
 html,
 body {
   height: 100dvh;
+  background-color: var(--bg);
 }
 
 body {
@@ -36,7 +37,6 @@ body {
 }
 
 main {
-  background-color: var(--bg);
   color: var(--text);
   display: flex;
   height: 100%;

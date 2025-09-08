@@ -41,13 +41,9 @@ export default function() {
     [
       <select
         id="playSpeed"
-        onchange={(e) => {
+        onchange={e => {
           const ref = e.target;
           const speed = parseFloat(ref.value);
-
-          if (speed < 0 || speed > 4)
-            return;
-
           setPlayerStore('playbackRate', speed);
           ref.blur();
         }}
@@ -66,7 +62,15 @@ export default function() {
         <option value="3.50">3.50x</option>
         <option value="4.00">4.00x</option>
       </select >,
-      <select id="volumeChanger">
+      <select
+        id="volumeChanger"
+        onchange={e => {
+          const ref = e.target;
+          const vol = parseFloat(ref.value);
+          setPlayerStore('volume', vol);
+          ref.blur();
+        }}
+      >
         <option value="0">0%</option>
         <option value="0.15">15%</option>
         <option value="0.25">25%</option>
@@ -100,18 +104,19 @@ export default function() {
 
       <header class="topShelf">
         <p>from 'Search'</p>
-        <i
-          style={{
-            rotate: `-${120 * ctrlIdx()}deg`
-          }}
-          onclick={() => {
-            setCtrlIdx((ctrlIdx() + 1) % auxCtrls.length);
-          }}
-          class="ri-loop-left-line"></i>
-        <i
-          onclick={() => { closeFeature('player') }}
-          class="ri-close-large-line"></i>
-
+        <div class="right-group">
+          <i
+            style={{
+              rotate: `-${120 * ctrlIdx()}deg`
+            }}
+            onclick={() => {
+              setCtrlIdx((ctrlIdx() + 1) % auxCtrls.length);
+            }}
+            class="ri-loop-left-line"></i>
+          <i
+            onclick={() => { closeFeature('player') }}
+            class="ri-close-large-line"></i>
+        </div>
         <i
           aria-label={t('player_more')}
           class="ri-more-2-fill"

@@ -37,11 +37,10 @@
         cursor: pointer;
         inset: 0;
         margin: 0;
-        background-color: var(--surface);
+        background-color: var(--onBg);
         border-radius: var(--roundness);
-        border-bottom: var(--border);
-        box-shadow: var(--inner-shadow-1);
         width: 2.2rem;
+        border: var(--border);
 
         &,
         &:before {
@@ -56,7 +55,6 @@
           margin: 0.25rem;
           background-color: var(--text);
           border-radius: calc(var(--roundness) / 2);
-          box-shadow: var(--shadow-2);
         }
 
       }
@@ -77,11 +75,12 @@
     b {
       display: flex;
       align-items: center;
-      column-gap: 1vmin;
-      margin: 1ch;
+      column-gap: var(--size-1);
+      margin: var(--size-1);
+      font-weight: var(--font-weight-6);
 
       i {
-        font-size: 1.2rem;
+        font-size: var(--font-size-3);
       }
 
       svg {
@@ -95,12 +94,11 @@
       align-items: center;
 
       select {
-        background-color: var(--surface);
+        background-color: var(--onBg);
         font-size: inherit;
-        border-bottom: var(--border);
-        box-shadow: var(--inner-shadow-1);
+        border: var(--border);
         border-radius: var(--roundness);
-        padding: 0.5vmin 1vmin;
+        padding: var(--size-1) var(--size-2);
         max-width: 50%;
       }
     }

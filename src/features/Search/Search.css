@@ -53,10 +53,9 @@
       padding: 0;
       top: calc(var(--size-4) * 2);
       left: var(--gap);
-      background-color: var(--bg);
-      border: var(--border);
+      background-color: var(--surface);
       border-radius: 0 0 var(--roundness) var(--roundness);
-      box-shadow: var(--shadow-3);
+      box-shadow: var(--shadow-1);
       display: block;
       user-select: none;
       overflow: hidden;

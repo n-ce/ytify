@@ -1,7 +1,7 @@
 /* === range theme and appearance === */
 input[type="range"] {
   font-size: 1.5rem;
-  color: oklch(from var(--bg) 90% 80% h);
+  color: hsl(from var(--bg) h 70% 70%);
   --thumb-height: 0.625em;
   --track-height: 0.125em;
   --track-color: var(--onBg);
