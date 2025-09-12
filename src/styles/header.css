@@ -67,13 +67,14 @@ section>header {
     }
 
     ul {
-      background-color: var(--surface);
+      background-color: var(--blurMix);
+      backdrop-filter: blur(var(--size-px-2));
       color: var(--text);
       padding: var(--size-1) var(--size-2);
       list-style: none;
-      border-bottom: var(--border);
+      border: var(--border);
       border-radius: var(--roundness);
-      box-shadow: var(--shadow-2);
+      box-shadow: var(--shadow-1);
 
       li {
         font-size: var(--font-size-1);

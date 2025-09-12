@@ -20,7 +20,7 @@
     "open-props": "1.7.16",
     "postcss-jit-props": "1.0.16",
     "typescript": "^5.9.2",
-    "vite": "^7.1.4",
+    "vite": "^7.1.5",
     "vite-plugin-pwa": "^1.0.3",
     "vite-plugin-solid": "^2.11.8"
   },

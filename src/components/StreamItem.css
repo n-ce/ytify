@@ -4,8 +4,8 @@
 	background-color: var(--onBg);
 	color: var(--text);
 	padding: var(--size-1);
-	margin-bottom: calc(var(--gap) - var(--size-1));
-	border-bottom: var(--border);
+	margin-bottom: calc(var(--gap) - var(--size-2));
+	border: var(--border);
 	border-radius: var(--roundness);
 	display: flex;
 	align-items: center;
@@ -23,7 +23,7 @@
 
 	&:hover {
 		box-shadow: none;
-		transform: scale(0.99);
+		transform: scale(0.98);
 	}
 
 	&.ravel {
@@ -55,7 +55,7 @@
 			color: #fffc;
 			border-radius: calc(var(--roundness) * 0.5);
 			font-size: var(--font-size-0);
-			font-weight: var(--font-weight-5);
+			font-weight: var(--font-weight-6);
 		}
 	}
 
@@ -104,7 +104,7 @@
 		cursor: pointer;
 
 		&:hover {
-			rotate: 90deg;
+			background-color: var(--onBg);
 		}
 	}
 

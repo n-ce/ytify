@@ -6,6 +6,7 @@ import Library from "./Library";
 import Personalize from "./Personalize";
 import Parental from "./Parental";
 import { closeFeature, openFeature, t } from '../../lib/stores';
+import Search from "./Search";
 
 export default function() {
   let settingsSection!: HTMLDivElement;
@@ -68,6 +69,7 @@ export default function() {
       </header>
 
       <App />
+      <Search />
       <Playback />
       <Library />
       <Personalize />

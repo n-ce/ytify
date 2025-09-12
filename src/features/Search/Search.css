@@ -12,15 +12,18 @@
     position: sticky;
     z-index: 3;
     top: var(--gap);
-    border-bottom: var(--border);
+    border: var(--border);
     box-shadow: var(--shadow-1);
     border-radius: var(--roundness);
     display: flex;
     align-items: center;
-    background-color: var(--surface);
+    background-color: var(--blurMix);
+    backdrop-filter: blur(var(--size-px-2));
 
     &:focus-within {
-      box-shadow: var(--inner-shadow-1);
+      transform: scale(1.05);
+      background-color: var(--surface);
+      backdrop-filter: none;
     }
 
     .superInput {

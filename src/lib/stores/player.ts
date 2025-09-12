@@ -1,6 +1,6 @@
 import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
-import { addToCollection, config, cssVar } from "../utils";
+import { addToCollection, config, cssVar, themer } from "../utils";
 import { navStore, params } from "./navigation";
 import { store } from "./app";
 import { queueStore } from "./queue";
@@ -65,11 +65,10 @@ const createInitialState = (): PlayerStore => ({
 const [playerStore, setPlayerStore] = createStore(createInitialState());
 
 const dispose = createRoot((dispose) => {
-  const { audio } = playerStore;
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
 
-  audio.onplaying = () => {
+  playerStore.audio.onplaying = () => {
     setPlayerStore('playbackState', 'playing');
     const { stream, history } = playerStore;
     const { id } = stream;
@@ -84,10 +83,12 @@ const dispose = createRoot((dispose) => {
       }, 1e4);
   }
 
-  audio.onpause = () => {
+  playerStore.audio.onpause = () => {
     setPlayerStore('playbackState', 'paused');
     clearTimeout(historyTimeoutId);
   };
+  playerStore.audio.addEventListener('loadeddata', themer);
+
 
   let isPlayable = false;
   const playableCheckerID = setInterval(() => {
@@ -97,25 +98,26 @@ const dispose = createRoot((dispose) => {
     }
   }, 500);
 
-  audio.onloadstart = () => {
+  playerStore.audio.onloadstart = () => {
     console.log('loadstart');
     setPlayerStore('playbackState', 'paused');
     setPlayerStore('status', '');
-    if (isPlayable) audio.play();
+    if (isPlayable) playerStore.audio.play();
+
     historyID = playerStore.stream.id;
     clearTimeout(historyTimeoutId);
-    audio.playbackRate = playerStore.playbackRate;
+    playerStore.audio.playbackRate = playerStore.playbackRate;
   }
 
-  audio.onwaiting = () => {
+  playerStore.audio.onwaiting = () => {
     console.log('waiting');
     setPlayerStore('playbackState', 'loading')
   };
 
-  audio.ontimeupdate = () => {
+  playerStore.audio.ontimeupdate = () => {
     if (document.activeElement?.matches('input[type="range"]'))
       return;
-    const seconds = Math.floor(audio.currentTime);
+    const seconds = Math.floor(playerStore.audio.currentTime);
     store.lrcSync(seconds);
     const { ref } = navStore.player;
     if (ref) {
@@ -128,15 +130,15 @@ const dispose = createRoot((dispose) => {
     setPlayerStore('currentTime', seconds);
   }
 
-  audio.onloadedmetadata = () => {
+  playerStore.audio.onloadedmetadata = () => {
     console.log('loadedmetadata');
     setPlayerStore({
       currentTime: 0,
-      fullDuration: Math.floor(audio.duration)
+      fullDuration: Math.floor(playerStore.audio.duration)
     });
   }
 
-  audio.oncanplaythrough = async function() {
+  playerStore.audio.oncanplaythrough = async function() {
     console.log('canplaythrough');
     const nextItem = config.prefetch && queueStore.list[0].id;
 
@@ -156,14 +158,25 @@ const dispose = createRoot((dispose) => {
         ));
   }
 
-  audio.onerror = () => audioErrorHandler(playerStore.audio);
+  playerStore.audio.onerror = () => audioErrorHandler(playerStore.audio);
+
 
   createEffect(() => {
-    const { audio } = playerStore;
-    audio.volume = playerStore.volume;
-    audio.playbackRate = playerStore.playbackRate;
-    audio.loop = playerStore.loop;
-    audio.currentTime = playerStore.currentTime;
+    playerStore.audio.volume = playerStore.volume;
+  });
+
+  createEffect(() => {
+    playerStore.audio.loop = playerStore.loop;
+  });
+
+  createEffect(() => {
+    playerStore.audio.playbackRate = playerStore.playbackRate;
+
+    updatePositionState();
+
+  });
+  createEffect(() => {
+    playerStore.audio.currentTime = playerStore.currentTime;
     updatePositionState();
   });
 

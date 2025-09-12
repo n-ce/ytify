@@ -107,6 +107,7 @@
   "settings_pwa_download": "Download",
   "settings_pwa_always_ask": "Always ask",
   "settings_display_suggestions": "Display Search Suggestions",
+  "settings_link_capturing": "Capture YT Links in Search Bar",
   "settings_playback": "Playback",
   "settings_audio_quality": "Audio Quality",
   "settings_prefetch": "Queue Prefetch",

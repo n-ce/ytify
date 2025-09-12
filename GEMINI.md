@@ -1,15 +1,25 @@
-This is an audio streaming application, the dev branch is used for rehauling the entire application to use client side rendering with solid js with reactive programming but there are many errors due to clash between the old code because it was different way altogether basically hand written HTML with imperative JS handling and uhtml components rendering in an islands fashion.
-So we are starting from the top down.
-index.html is done
-index.tsx is being continuously changed to adapt to needs as we scale the reactive principles and convert the rest of the code.
-~~The developer is seemingly challenged by the reactive principles and get's anxious on loosing direct DOM control.~~
+This is an audio streaming application currently undergoing a major refactor to a client-side rendered, reactive architecture using Solid.js.
 
-**Refactor Progress & Developer Attitude Update:**
+The core of the application is a reactive, store-based state management system. A custom, state-driven routing system has been intentionally implemented to meet unique application requirements.
 
-The developer has clarified that they are now confident and proficient with the reactive, store-based architecture, seeing it as the 'heart of the codebase'. The initial anxiety about losing DOM control is no longer relevant.
+The current remaining before the refactor is complete:
+- a working intersection observer with search fluently managing different search filters
+- a working queue
+- a working list
+- all player issues resolved such as 'cannot modify Store directly'
+- efficient communication patterns
+- fully typed network responses
+- updating StreamItem ListItem and other types to be more robust
+- reduction of reliance on Type casting
+- efficient use of solidjs
+- using generics where possible, even existing code
+- using css relative color syntax to build themimg scheme instead of script
 
-A custom, state-driven routing system has been intentionally implemented to meet unique application requirements, and standard solutions like `solid-router` have been evaluated and rejected as unsuitable.
 
-The current major task is to refactor the remaining parts of the old codebase (`src/lib/modules`, `src/lib/utils/library.ts`) to integrate with the new reactive patterns. The developer has explicitly requested that this code be refactored, not deleted, to preserve its functionality.
+developer has specific coding preferences and standards:
+- **High-Quality Code:** A strong preference for fully-typed, generic, and reusable code over quick fixes or the use of `any`.
+- **Functional Programming:** Prefers functional programming paradigms over class-based approaches.
+- **Async Handling:** Prefers Promise-based `.then().catch()` syntax over `async/await` with `try...catch` blocks.
+- **Methodical Approach:** Analyzes build errors and existing code thoroughly before making changes.
+- **Code Optimization:** Keen on identifying opportunities for optimization, code reduction, and file consolidation to avoid redundancy.
 
-The developer prefers a methodical, step-by-step approach, analyzing build errors and existing code before approving any changes.

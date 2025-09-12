@@ -29,6 +29,7 @@ export async function updateLang() {
   const json = await import(`../../locales/${i18nStore.locale}.json`)
 
   setI18nStore('translations', json.default);
+  return true;
 
 }
 

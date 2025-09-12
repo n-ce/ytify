@@ -46,26 +46,27 @@ header {
 
 
 
+
 #catalogueSelector {
-  width: 100%;
   border-radius: var(--roundness);
-  margin-bottom: var(--size-3);
-  display: flex;
-  gap: var(--size-2);
-  overflow: auto;
 
-  &::-webkit-scrollbar {
-    display: none;
+  @media(orientation:portrait) {
+    display: flex;
+    overflow-x: scroll;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
-
 
   input[type='radio'] {
     display: none;
 
     &:checked+label {
       opacity: 1;
-      background-color: var(--surface);
-      border-bottom-color: var(--borderColor);
+      background-color: var(--text);
+      color: var(--bg);
     }
 
     &+label {
@@ -74,13 +75,19 @@ header {
       display: inline-block;
       padding: var(--size-1) var(--size-2);
       font-weight: var(--font-weight-9);
-      border-bottom: var(--border-size-1) solid transparent;
+      border: var(--border);
+      margin: var(--size-1);
+      margin-left: 0;
+      margin-right: var(--size-2);
+      background-color: var(--onBg);
       border-radius: calc(var(--roundness) * 0.8);
-      opacity: 0.7;
       cursor: pointer;
+      opacity: 0.8;
 
       &:hover {
-        background-color: var(--surface);
+        background-color: var(--text);
+        color: var(--bg);
+
       }
     }
   }
@@ -127,7 +134,7 @@ header {
     margin: 0;
     margin-bottom: var(--gap);
     background: var(--onBg);
-    border-bottom: var(--border);
+    border: var(--border);
 
     &::placeholder {
       color: var(--text);

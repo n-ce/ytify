@@ -11,7 +11,7 @@
   border: var(--border-size-1) solid transparent;
   border-radius: var(--roundness);
 
-  border-bottom: var(--border);
+  border: var(--border);
 
   &:nth-child(odd) {
     margin-right: var(--gap);

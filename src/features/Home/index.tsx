@@ -51,7 +51,7 @@ export default function() {
     <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
 
       <header>
-        <p >Home </p>
+        <p>Home</p>
         <Show when={dbsync}>
           <i
             id="syncNow"

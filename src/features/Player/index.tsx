@@ -41,6 +41,7 @@ export default function() {
     [
       <select
         id="playSpeed"
+        value={playerStore.playbackRate}
         onchange={e => {
           const ref = e.target;
           const speed = parseFloat(ref.value);
@@ -52,7 +53,7 @@ export default function() {
         <option value="0.50">0.50x</option>
         <option value="0.75">0.75x</option>
         <option value="0.87">0.87x</option>
-        <option value="1.00" selected>1.00x</option>
+        <option value="1.00">1.00x</option>
         <option value="1.25">1.25x</option>
         <option value="1.50">1.50x</option>
         <option value="1.75">1.75x</option>
@@ -61,9 +62,10 @@ export default function() {
         <option value="3.00">3.00x</option>
         <option value="3.50">3.50x</option>
         <option value="4.00">4.00x</option>
-      </select >,
+      </select>,
       <select
         id="volumeChanger"
+        value={playerStore.volume}
         onchange={e => {
           const ref = e.target;
           const vol = parseFloat(ref.value);
@@ -79,7 +81,7 @@ export default function() {
         <option value="0.66">66%</option>
         <option value="0.75">75%</option>
         <option value="0.85">85%</option>
-        <option value="1.00" selected>100%</option>
+        <option value="1.00">100%</option>
       </select>
     ]
   ];

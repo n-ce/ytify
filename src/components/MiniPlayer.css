@@ -3,6 +3,7 @@ footer {
   align-items: center;
   position: relative;
   z-index: 2;
+  backdrop-filter: blur(var(--size-px-2));
   width: 100dvmin;
   padding: var(--size-1);
   overflow: hidden;
@@ -17,28 +18,28 @@ footer {
 
   img {
     height: calc(var(--size-8) + var(--size-2));
-    margin-right: var(--size-2);
     object-fit: cover;
     border-radius: calc(var(--roundness) * 0.5);
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--shadow-1);
     pointer-events: none;
   }
 
   @media(orientation:landscape) {
     margin: 0 auto;
-    background: var(--surface);
-    border-bottom: var(--border);
+    border: var(--border);
     box-shadow: var(--shadow-2);
     bottom: var(--size-10);
     border-radius: var(--roundness);
+    background: var(--blurMix);
   }
 
   @media(orientation:portrait) {
     bottom: var(--size-9);
-    background: linear-gradient(var(--surface), var(--bg));
     box-shadow: var(--shadow-6);
+    border-top: var(--border);
     border-top-left-radius: var(--roundness);
     border-top-right-radius: var(--roundness);
+    background: linear-gradient(var(--blurMix), var(--bg));
 
     img {
       height: var(--size-8);
@@ -77,6 +78,7 @@ footer {
     width: 100%;
     overflow: hidden;
     pointer-events: none;
+    margin-left: var(--size-2);
 
     a {
       font-weight: var(--font-weight-6);

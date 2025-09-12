@@ -1,9 +1,8 @@
 import { navStore, params, setNavStore, t, setStore, setPlayerStore, setSearchStore } from '../stores';
-import { config, setConfig, getDownloadLink, idFromURL, themer, fetchCollection, uma, player } from '../utils';
+import { config, setConfig, getDownloadLink, idFromURL, fetchCollection, uma, player } from '../utils';
+
+
 export default async function() {
-
-
-  themer();
 
 
   const { shareAction } = config;
@@ -78,6 +77,7 @@ export default async function() {
           .join('/')
       );
     */
+
 
   document.addEventListener('click', (e) => {
 

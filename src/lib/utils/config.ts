@@ -16,6 +16,7 @@ export let config = {
   customColor: '',
   roundness: '0.4rem',
   searchSuggestions: true,
+  searchBarLinkCapture: true,
   searchFilter: 'all',
   startupTab: '/search',
   watchMode: '',

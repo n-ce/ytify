@@ -16,10 +16,10 @@ export default defineConfig(({ command }) => ({
       ((today = new Date()) => `v8 ${today.toLocaleString('default', { month: 'short' })} ${today.toLocaleDateString('en-US', { year: '2-digit' })}`)()
     ),
   },
-  build: { target: 'esnext' },
+
   plugins: [
-    injectEruda(command === 'serve'),
     solidPlugin(),
+    injectEruda(command === 'serve'),
     VitePWA({
       manifest: {
         "short_name": "Ytify",

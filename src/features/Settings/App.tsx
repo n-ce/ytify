@@ -2,7 +2,6 @@ import { createEffect, For } from 'solid-js';
 import { Selector } from '../../components/Selector.tsx';
 import { config, setConfig } from '../../lib/utils/config.ts';
 import { setStore, setI18nStore, t, updateLang } from '../../lib/stores';
-import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {
 
@@ -81,16 +80,6 @@ export default function() {
         <option value='watch'>{t('settings_pwa_watch')}</option>
         <option value='dl'>{t('settings_pwa_download')}</option>
       </Selector>
-
-      <ToggleSwitch
-        id="suggestionsSwitch"
-        name='settings_display_suggestions'
-        checked={config.searchSuggestions}
-        onclick={() => {
-          setConfig('searchSuggestions', !config.searchSuggestions);
-          setStore('snackbar', t('settings_reload'));
-        }}
-      />
 
     </div>
   );

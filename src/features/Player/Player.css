@@ -41,7 +41,8 @@
 #playerSection article {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: end;
+  gap: var(--gap);
   width: 100%;
   height: calc(100% - calc(var(--gap) * 2));
   margin: var(--gap) 0;
@@ -56,18 +57,17 @@
     font-size: var(--font-size-4);
   }
 
+
   img {
-    margin: 0 auto;
+    margin: 0;
     border-radius: var(--roundness);
     box-shadow: var(--shadow-2);
+    width: 100%;
 
     @media(orientation:landscape) {
       width: 50dvh
     }
 
-    @media(orientation:portrait) {
-      width: 100%;
-    }
   }
 
 }
@@ -78,6 +78,7 @@
   a {
     display: block;
     font-size: var(--size-4);
+    font-weight: var(--font-weight-6);
     color: inherit;
   }
 

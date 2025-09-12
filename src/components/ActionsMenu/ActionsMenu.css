@@ -4,8 +4,10 @@
   width: 100%;
   margin: auto;
   margin-bottom: var(--size-4);
+  border: var(--border);
   border-radius: var(--roundness);
-  background-color: var(--surface);
+  background-color: var(--blurMix);
+  backdrop-filter: blur(var(--size-px-2));
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
 

@@ -12,7 +12,7 @@
 
   div {
     background-color: var(--onBg);
-    border-bottom: var(--border);
+    border: var(--border);
     border-radius: var(--roundness);
     width: 100%;
     margin-bottom: var(--gap);

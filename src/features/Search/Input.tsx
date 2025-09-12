@@ -48,10 +48,12 @@ export default function() {
         oninput={async (e) => {
           const { value } = e.target;
 
-          const id = idFromURL(value);
-          if (id && id !== playerStore.stream.id) {
-            player(id);
-            return;
+          if (config.searchBarLinkCapture) {
+            const id = idFromURL(value);
+            if (id && id !== playerStore.stream.id) {
+              player(id);
+              return;
+            }
           }
 
           getSearchSuggestions(value);

@@ -3,15 +3,16 @@
 @import 'header.css';
 
 :root {
-  --bg: transparent;
-  --onBg: transparent;
-  --text: black;
+  --bg: initial;
+  --onBg: initial;
+  --text: initial;
   --surface: color-mix(in srgb, rgba(from var(--onBg) r g b / 1), var(--bg) 80%);
+  --blurMix: color-mix(in srgb, rgba(from var(--onBg) r g b / 0.5), var(--bg) 70%);
   --gap: var(--size-fluid-2);
   --radius: var(--radius-2);
-  --borderColor: transparent;
+  --borderColor: initial;
   --border: var(--border-size-1) solid var(--borderColor);
-  --shadowColor: transparent;
+  --shadowColor: initial;
   --shadow: 0 0.5vmin 1.5vmin var(--shadowColor);
   --roundness: 0.4rem;
   --blur: blur(var(--size-px-3));
@@ -22,16 +23,18 @@
 }
 
 * {
-  transition: all 0.4s ease;
+  transition: all 0.4s;
 }
 
-html,
-body {
+
+
+html {
   height: 100dvh;
   background-color: var(--bg);
 }
 
 body {
+  height: 100dvh;
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
 }

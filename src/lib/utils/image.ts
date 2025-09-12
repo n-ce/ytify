@@ -39,7 +39,7 @@ const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
-const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.5})`;
+const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.3})`;
 
 const accentLightener = (r: number, g: number, b: number) => {
   r /= 255;
