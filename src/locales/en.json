@@ -131,6 +131,7 @@
   "settings_roundness_lighter": "Lighter",
   "settings_roundness_light": "Light",
   "settings_roundness_heavy": "Heavy",
+  "settings_disable_yt_link_capturing": "Disable YT Link Capturing",
   "settings_roundness_heavier": "Heavier",
   "settings_use_custom_color": "Use Custom Color",
   "settings_custom_color_prompt": "Enter rgb in the format r,g,b",

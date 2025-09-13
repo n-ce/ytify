@@ -30,6 +30,7 @@ export let state = {
   shareAction: 'play' as 'play' | 'watch' | 'download',
   dbsync: '',
   language: 'en',
+  disableYTLinkCapturing: false,
   codec: 'any' as 'opus' | 'aac' | 'any',
   partsManagerPIN: '',
   'part Reserved Collections': true,

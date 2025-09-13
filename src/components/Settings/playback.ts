@@ -39,6 +39,15 @@ export default function() {
     }
   })}
 
+  ${ToggleSwitch({
+    id: "disableYTLinkCapturing",
+    name: 'settings_disable_yt_link_capturing',
+    checked: Boolean(state.disableYTLinkCapturing),
+    handler: () => {
+      setState('disableYTLinkCapturing', !state.disableYTLinkCapturing);
+    }
+  })}
+
       ${!state.HLS ? html`
         ${Selector({
     label: 'settings_codec_preference',

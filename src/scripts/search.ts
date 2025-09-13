@@ -56,7 +56,9 @@ superInput.addEventListener('input', async () => {
 
   const id = idFromURL(text);
   if (id !== prevID) {
-    player(id);
+    if(!state.disableYTLinkCapturing){
+      player(id);
+    }
     prevID = id;
     return;
   }
