@@ -83,13 +83,13 @@ export default async function(
         });
 
 
-  const usePiped = (): Promise<Piped> =>
-
-    fetchDataFromPiped(piped[0])
+  const usePiped = (index = 0): Promise<Piped> =>
+    fetchDataFromPiped(piped[index])
       .catch(() => {
-        return useInvidious();
+        if (index + 1 === piped.length)
+          return useInvidious();
+        else return usePiped(index + 1);
       });
-
 
   return status === 'P' ? usePiped() :
     status === 'I' ? useInvidious() :

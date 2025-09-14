@@ -6,29 +6,31 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   list-style: none;
-  gap: 0.5rem 1rem;
-  padding: 0.5rem 2%;
-  margin-bottom: 0.5rem;
-  background: var(--onBg);
-  backdrop-filter: var(--surface);
+  padding: var(--size-1);
+  gap: var(--size-1);
+  margin-bottom: var(--size-3);
+  background: var(--blurMix);
+  backdrop-filter: blur(--size-px-2);
+  border: var(--border);
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
-
-  @media(orientation:landscape) {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
 
   li {
     user-select: none;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding: 0.3rem 0.2rem;
     border-radius: var(--roundness);
     cursor: pointer;
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-5);
+    padding: var(--size-2) var(--size-1);
+    border: var(--border);
+    background: var(--blurMix);
+    letter-spacing: var(--font-letterspacing-0);
 
     i {
-      padding: 0.2rem;
+      margin: 0 var(--size-1);
     }
 
     &:nth-child(5).on {

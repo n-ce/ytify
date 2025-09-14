@@ -2,6 +2,14 @@
 @import 'remixicon.css';
 @import 'header.css';
 
+@font-face {
+  font-family: 'Figtree';
+  src: url('/Figtree-Variable.woff2') format('woff2-variations');
+  font-weight: 300 900;
+  font-display: swap;
+  font-optical-sizing: auto;
+}
+
 :root {
   --bg: initial;
   --onBg: initial;
@@ -18,7 +26,6 @@
   --blur: blur(var(--size-px-3));
   --player-bg: none;
   --player-bp: 0 0;
-  --font: var(--font-system-ui, var(--font-rounded-sans, var(--font-industrial, var(--font-monospace-code, var(--font-antique, var(--font-handwritten, var(--font-monospace-slab-serif)))))));
   --landscape-sections: 3;
 }
 
@@ -35,7 +42,7 @@ html {
 
 body {
   height: 100dvh;
-  font-family: var(--font);
+  font-family: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

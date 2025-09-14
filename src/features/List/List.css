@@ -9,8 +9,6 @@
   background: var(--bg);
 
   >p {
-    height: var(--size-5);
-    line-height: var(--size-5);
     overflow: clip;
     text-overflow: ellipsis;
   }
@@ -29,5 +27,12 @@
       content: attr(data-state);
       font-family: inherit;
     }
+  }
+}
+
+.markBar {
+
+  .ri-indeterminate-circle-line {
+    margin: 0 var(--size-3);
   }
 }

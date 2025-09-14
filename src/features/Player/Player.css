@@ -11,7 +11,8 @@
   }
 
   & div.bg-pane {
-    background-color: hsl(from var(--bg) h 50% l / 0.8);
+    background-color: hsl(from var(--bg) h s l / 0.8);
+    backdrop-filter: blur(var(--size-px-1));
     z-index: 1;
     position: absolute;
     width: 100%;

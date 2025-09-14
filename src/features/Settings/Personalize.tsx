@@ -22,25 +22,6 @@ export default function() {
       />
 
       <Selector
-        label='settings_font'
-        id='fontChanger'
-        onchange={(e) => {
-          const { value } = e.target;
-          cssVar('--font', `var(--font-${value})`);
-          setConfig('font', e.target.value);
-        }}
-        value={config.font}
-      >
-        <option value="system-ui">System UI</option>
-        <option value="rounded-sans">Rounded Sans</option>
-        <option value="antique">Antique</option>
-        <option value="handwritten">Handwritten</option>
-        <option value="monospace-slab-serif">Monospace Slab Serif</option>
-        <option value="monospace-code">Monospace Code</option>
-        <option value="industrial">Industrial</option>
-      </Selector>
-
-      <Selector
         label='settings_landscape_sections'
         onchange={(e) => {
           const { value } = e.target;

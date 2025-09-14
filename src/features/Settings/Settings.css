@@ -4,6 +4,11 @@
   header {
     display: flex;
     justify-content: space-between;
+
+    .ri-close-large-line {
+      margin-right: var(--size-7);
+      margin-top: var(--size-00);
+    }
   }
 
   >div {
@@ -77,7 +82,7 @@
       align-items: center;
       column-gap: var(--size-1);
       margin: var(--size-1);
-      font-weight: var(--font-weight-6);
+      letter-spacing: var(--font-letterspacing-2);
 
       i {
         font-size: var(--font-size-3);

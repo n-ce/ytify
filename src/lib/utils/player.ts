@@ -43,6 +43,7 @@ export async function player(id: string | null = '') {
       playbackState: 'none',
       status: data.message || data.error || 'Fetching Data Failed'
     });
+    setStore('snackbar', playerStore.status);
     return;
   }
 

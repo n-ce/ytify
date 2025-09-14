@@ -44,7 +44,7 @@ export default function() {
     })
     .catch(e => {
       setPlayerStore('status', e.message || e.error || 'JioSaavn Playback Failure');
-      setStore('useSaavn', true);
+      setStore('useSaavn', false);
       player(id);
     });
 }

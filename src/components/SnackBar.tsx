@@ -8,7 +8,7 @@ export default function() {
     setTimeout(() => {
       if (snackbar.textContent === store.snackbar)
         setStore('snackbar', '');
-    }, 3000);
+    }, 7000);
   });
 
   return (

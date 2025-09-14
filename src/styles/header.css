@@ -18,8 +18,12 @@ section>header {
 
   .right-group {
     margin-left: auto;
-    margin-right: var(--size-8);
+    margin-right: var(--size-7);
     margin-top: var(--size-00);
+
+    i {
+      font-size: var(--font-size-3);
+    }
 
     & i:nth-child(2) {
       margin-left: var(--size-4);
@@ -33,6 +37,7 @@ section>header {
   .ri-more-2-fill {
     font-size: var(--font-size-3);
     font-weight: var(--font-weight-6);
+    margin-left: var(--size-5);
   }
 
   details {

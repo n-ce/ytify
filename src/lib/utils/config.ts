@@ -11,7 +11,6 @@ export let config = {
   linkHost: location.origin,
   dlFormat: 'opus' as 'opus' | 'mp3' | 'wav' | 'ogg',
   theme: 'auto',
-  font: 'system-ui',
   landscapeSections: '3',
   customColor: '',
   roundness: '0.4rem',

@@ -39,7 +39,6 @@ const cssVar = style.setProperty.bind(style);
 const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color');
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
-const translucent = (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.3})`;
 
 const accentLightener = (r: number, g: number, b: number) => {
   r /= 255;
@@ -88,14 +87,14 @@ const palette: Scheme = {
     bg: accentLightener,
     onBg: '#fff3',
     text: '#000b',
-    borderColor: translucent,
+    borderColor: (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.2})`,
     shadowColor: '#0002'
   },
   dark: {
     bg: accentDarkener,
     onBg: '#fff1',
     text: '#fffb',
-    borderColor: translucent,
+    borderColor: (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.4})`,
     shadowColor: 'transparent'
   },
   white: {
@@ -160,8 +159,7 @@ export function themer() {
 if (config.roundness !== '0.4rem')
   cssVar('--roundness', config.roundness);
 
-if (config.font !== 'system-ui')
-  cssVar('--font', `var(--font-${config.font})`);
+
 
 systemDark.addEventListener('change', themer);
 
