@@ -10,7 +10,7 @@ export default function() {
   onMount(() => {
     fetch(commitsSrc)
       .then(res => res.json())
-      .then(data => data.commit.message.split('-'))
+      .then(data => data.commit.message.split('\n-'))
       .then(setList);
   });
 
@@ -23,7 +23,6 @@ export default function() {
         >
           {(item) => (<li>{item}</li>)}
         </For>
-        <hr />
         <li>
           <a href={commitsLink} target="_blank">
             {t('updater_changelog_full')}

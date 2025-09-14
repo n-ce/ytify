@@ -70,10 +70,10 @@
 		.title {
 			max-height: 100%;
 			line-height: var(--size-5);
-			font-size: var(--font-size-2);
+			font-size: var(--font-size-1);
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-weight: var(--font-weight-6);
+			font-weight: var(--font-weight-5);
 			margin-bottom: auto;
 		}
 
@@ -85,7 +85,8 @@
 
 			p {
 				font-size: var(--font-size-0);
-				font-weight: var(--font-weight-6);
+				font-weight: var(--font-weight-5);
+				letter-spacing: var(--font-letterspacing-0);
 				opacity: 0.9
 			}
 

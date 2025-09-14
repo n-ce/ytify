@@ -79,7 +79,7 @@ export default function() {
         <Dropdown />
       </header>
       <br />
-      <ListResults />
+      <ListResults ref={listContainer} />
     </section>
   )
 }

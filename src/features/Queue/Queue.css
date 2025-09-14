@@ -10,7 +10,7 @@
   gap: var(--size-1);
   margin-bottom: var(--size-3);
   background: var(--blurMix);
-  backdrop-filter: blur(--size-px-2);
+  backdrop-filter: blur(var(--size-px-2));
   border: var(--border);
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
@@ -26,8 +26,8 @@
     font-weight: var(--font-weight-5);
     padding: var(--size-2) var(--size-1);
     border: var(--border);
-    background: var(--blurMix);
     letter-spacing: var(--font-letterspacing-0);
+    box-shadow: var(--shadow-1);
 
     i {
       margin: 0 var(--size-1);
