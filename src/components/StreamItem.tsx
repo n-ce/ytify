@@ -2,7 +2,7 @@ import { Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, player } from '../lib/utils';
 import { generateImageUrl } from '../lib/utils/image';
-import { setStore } from '../lib/stores';
+import { playerStore, setPlayerStore, setStore } from '../lib/stores';
 
 export default function(data: {
   id: string,
@@ -15,7 +15,8 @@ export default function(data: {
   views?: string,
   img?: string,
   draggable?: boolean,
-  lastUpdated?: string
+  lastUpdated?: string,
+  context?: 'search' | 'collection' | 'channel' | 'playlist'
 }) {
 
   const [getImage, setImage] = createSignal('');
@@ -65,8 +66,13 @@ export default function(data: {
       onclick={(e) => {
         e.preventDefault();
 
-        if (!e.target.classList.contains('ri-more-2-fill'))
+        if (!e.target.classList.contains('ri-more-2-fill')) {
+          if (data.context === 'search') {
+            setPlayerStore('stream', data);
+            console.log(playerStore.stream);
+          }
           player(data.id);
+        }
         else {
           setStore('actionsMenu', {
             id: data.id,

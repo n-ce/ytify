@@ -2,7 +2,13 @@ import { convertSStoHHMMSS } from "./helpers";
 import { playerStore, setNavStore, setPlayerStore, setStore, store, updateParam } from "../stores";
 import { config } from "./config";
 
+let playerAbortController: AbortController;
 export async function player(id: string | null = '') {
+
+  if (playerAbortController)
+    playerAbortController.abort();
+
+  playerAbortController = new AbortController();
 
   if (!id) return;
 
@@ -25,7 +31,7 @@ export async function player(id: string | null = '') {
   }
 
 
-  const data = await import('../modules/getStreamData').then(mod => mod.default(id));
+  const data = await import('../modules/getStreamData').then(mod => mod.default(id, false, playerAbortController.signal));
 
   if (data && 'audioStreams' in data)
     setPlayerStore({

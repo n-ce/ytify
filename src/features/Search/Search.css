@@ -48,7 +48,7 @@
     }
 
     .suggestions {
-      height: var(--size-fluid-9);
+      max-height: var(--size-fluid-9);
       width: auto;
       z-index: 3;
       position: absolute;

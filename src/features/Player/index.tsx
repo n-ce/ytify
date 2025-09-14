@@ -1,4 +1,4 @@
-import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
+import { createEffect, lazy, onMount, Show } from "solid-js"
 import './Player.css'
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "../../components/MediaPartials";
 import { config, convertSStoHHMMSS, cssVar } from "../../lib/utils";
@@ -18,76 +18,6 @@ export default function() {
     });
   });
 
-  const auxCtrls = [
-    [
-      <LikeButton />,
-      <i
-        aria-label={t("player_loop")}
-        class={"ri-repeat-line" + (playerStore.loop ? ' on' : '')}
-        id="loopButton"
-        onclick={() => {
-          setPlayerStore('loop', !playerStore.loop);
-        }}
-      ></i>
-    ],
-    [
-      <button
-        aria-label={t('player_play_previous')}
-        class="ri-skip-back-line"
-        id="playPrevButton"
-      ></button>,
-      <PlayNextButton />
-    ],
-    [
-      <select
-        id="playSpeed"
-        value={playerStore.playbackRate}
-        onchange={e => {
-          const ref = e.target;
-          const speed = parseFloat(ref.value);
-          setPlayerStore('playbackRate', speed);
-          ref.blur();
-        }}
-      >
-        <option value="0.25">0.25x</option>
-        <option value="0.50">0.50x</option>
-        <option value="0.75">0.75x</option>
-        <option value="0.87">0.87x</option>
-        <option value="1.00">1.00x</option>
-        <option value="1.25">1.25x</option>
-        <option value="1.50">1.50x</option>
-        <option value="1.75">1.75x</option>
-        <option value="2.00">2.00x</option>
-        <option value="2.50">2.50x</option>
-        <option value="3.00">3.00x</option>
-        <option value="3.50">3.50x</option>
-        <option value="4.00">4.00x</option>
-      </select>,
-      <select
-        id="volumeChanger"
-        value={playerStore.volume}
-        onchange={e => {
-          const ref = e.target;
-          const vol = parseFloat(ref.value);
-          setPlayerStore('volume', vol);
-          ref.blur();
-        }}
-      >
-        <option value="0">0%</option>
-        <option value="0.15">15%</option>
-        <option value="0.25">25%</option>
-        <option value="0.33">33%</option>
-        <option value="0.50">50%</option>
-        <option value="0.66">66%</option>
-        <option value="0.75">75%</option>
-        <option value="0.85">85%</option>
-        <option value="1.00">100%</option>
-      </select>
-    ]
-  ];
-
-  const [ctrlIdx, setCtrlIdx] = createSignal(0);
-
   createEffect(() => {
     const { immersive, mediaArtwork } = playerStore;
     if (immersive)
@@ -105,16 +35,8 @@ export default function() {
       </Show>
 
       <header class="topShelf">
-        <p>from 'Search'</p>
+        <p>from {((a = playerStore.context) => a[0].toUpperCase() + a.slice(1))()}</p>
         <div class="right-group">
-          <i
-            style={{
-              rotate: `-${120 * ctrlIdx()}deg`
-            }}
-            onclick={() => {
-              setCtrlIdx((ctrlIdx() + 1) % auxCtrls.length);
-            }}
-            class="ri-loop-left-line"></i>
           <i
             onclick={() => { closeFeature('player') }}
             class="ri-close-large-line"></i>
@@ -154,7 +76,11 @@ export default function() {
         </span>
 
         <div class="mainShelf">
-          {auxCtrls[ctrlIdx()][0]}
+          <button
+            aria-label={t('player_play_previous')}
+            class="ri-skip-back-line"
+            id="playPrevButton"
+          ></button>
 
           <button
             aria-label={t('player_seek_backward')}
@@ -165,7 +91,7 @@ export default function() {
             }}
           ></button>
 
-          {<PlayButton />}
+          <PlayButton />
 
           <button
             aria-label={t('player_seek_forward')}
@@ -176,8 +102,71 @@ export default function() {
             }}
           ></button>
 
-          {auxCtrls[ctrlIdx()][1]}
+          <PlayNextButton />
+
         </div>
+
+        <div class="bottomShelf">
+
+          <select
+            id="playSpeed"
+            value={playerStore.playbackRate.toFixed(2)}
+            onchange={e => {
+              const ref = e.target;
+              const speed = parseFloat(ref.value);
+              setPlayerStore('playbackRate', speed);
+              ref.blur();
+            }}
+          >
+            <option value="0.25">0.25x</option>
+            <option value="0.50">0.50x</option>
+            <option value="0.75">0.75x</option>
+            <option value="0.87">0.87x</option>
+            <option value="1.00">1.00x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.50">1.50x</option>
+            <option value="1.75">1.75x</option>
+            <option value="2.00">2.00x</option>
+            <option value="2.50">2.50x</option>
+            <option value="3.00">3.00x</option>
+            <option value="3.50">3.50x</option>
+            <option value="4.00">4.00x</option>
+          </select>
+
+          <LikeButton />
+
+          <i
+            aria-label={t("player_loop")}
+            class={"ri-repeat-line" + (playerStore.loop ? ' on' : '')}
+            id="loopButton"
+            onclick={() => {
+              setPlayerStore('loop', !playerStore.loop);
+            }}
+          ></i>
+
+          <select
+            id="volumeChanger"
+            value={playerStore.volume.toFixed(2)}
+            onchange={e => {
+              const ref = e.target;
+              const vol = parseFloat(ref.value);
+              setPlayerStore('volume', vol);
+              ref.blur();
+            }}
+          >
+            <option value="0">0%</option>
+            <option value="0.15">15%</option>
+            <option value="0.25">25%</option>
+            <option value="0.33">33%</option>
+            <option value="0.50">50%</option>
+            <option value="0.66">66%</option>
+            <option value="0.75">75%</option>
+            <option value="0.85">85%</option>
+            <option value="1.00">100%</option>
+          </select>
+
+        </div>
+
       </article>
     </section>
   )

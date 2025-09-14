@@ -11,7 +11,7 @@ export default function() {
       </b>
 
       <ToggleSwitch
-        id="defaultFilterSongs"
+        id="LinkCaptureSwitch"
         name='settings_link_capturing'
         checked={config.searchBarLinkCapture}
         onclick={() => {

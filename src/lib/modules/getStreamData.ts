@@ -2,7 +2,8 @@ import { store } from "../stores";
 
 export default async function(
   id: string,
-  prefetch: boolean = false
+  prefetch: boolean = false,
+  signal?: AbortSignal
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
   const { invidious, piped, status, fallback } = store.api;
@@ -10,7 +11,7 @@ export default async function(
   const fetchDataFromPiped = (
     api: string
   ) =>
-    fetch(`${api}/streams/${id}`)
+    fetch(`${api}/streams/${id}`, { signal })
       .then(res => res.json())
       .then(data => {
         if (data.audioStreams.length)
@@ -20,7 +21,7 @@ export default async function(
 
   const fetchDataFromInvidious = (
     api: string
-  ) => fetch(`${api}/api/v1/videos/${id}`)
+  ) => fetch(`${api}/api/v1/videos/${id}`, { signal })
     .then(res => res.json())
     .then(data => {
       if (data && 'adaptiveFormats' in data)

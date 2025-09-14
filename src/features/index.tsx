@@ -24,7 +24,7 @@ export default function() {
         </For>
       </main>
 
-      <Show when={!navStore.player.state}>
+      <Show when={!navStore.player.state && playerStore.playbackState !== 'none'}>
         <MiniPlayer />
       </Show >
       <Show when={store.actionsMenu.id}>

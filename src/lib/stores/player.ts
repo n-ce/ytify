@@ -13,6 +13,7 @@ type PlayerStore = {
   stream: CollectionItem,
   history: string[],
   audio: HTMLAudioElement,
+  context: 'Search',
   currentTime: number,
   fullDuration: number,
   playbackRate: number,
@@ -33,6 +34,7 @@ type PlayerStore = {
 const createInitialState = (): PlayerStore => ({
   audio: new Audio(),
   playbackState: 'none',
+  context: 'Search',
   status: '',
   currentTime: 0,
   fullDuration: 0,
@@ -122,7 +124,7 @@ const dispose = createRoot((dispose) => {
     const { ref } = navStore.player;
     if (ref) {
       const { offsetHeight, offsetWidth } = ref;
-      const diff = offsetHeight - offsetWidth;
+      const diff = playerStore.isMusic ? (offsetHeight - offsetWidth) : offsetWidth;
       const scale = seconds / playerStore.fullDuration;
       const shift = Math.floor(scale * diff);
       cssVar('--player-bp', `-${shift}px 0`);

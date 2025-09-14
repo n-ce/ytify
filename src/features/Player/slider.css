@@ -1,13 +1,12 @@
 /* === range theme and appearance === */
 input[type="range"] {
   font-size: 1.5rem;
-  color: oklch(from var(--bg) 70% c h);
-  --thumb-height: 0.625em;
-  --track-height: 0.125em;
+  --thumb-height: 0.8em;
+  --track-height: 0.2em;
   --track-color: var(--onBg);
   --brightness-hover: 180%;
   --brightness-down: 80%;
-  --clip-edges: 0.125em;
+  --clip-edges: 0.2em;
   /* === range commons === */
   position: relative;
   background: #fff0;

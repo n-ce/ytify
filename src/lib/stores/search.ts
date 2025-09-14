@@ -75,6 +75,19 @@ export async function getSearchResults() {
 
   const useInvidious = searchFilter === 'views' || searchFilter === 'date';
 
+  const processResults = (results: StreamItem[]): StreamItem[] => {
+    if (searchFilter === 'music_songs') {
+      return results.map(
+        (item: StreamItem) => {
+          if (item.uploaderName && !item.uploaderName.endsWith(' - Topic'))
+            item.uploaderName += ' - Topic';
+          return item;
+        }
+      );
+    }
+    return results;
+  };
+
   const getData = (): Promise<StreamItem[] | { items: StreamItem[], nextpage: string }> =>
     (useInvidious
       ? fetchSearchResultsInvidious(
@@ -122,7 +135,7 @@ export async function getSearchResults() {
 
     setSearchStore({
       nextPageToken: nextpage,
-      results: items,
+      results: processResults(items),
     });
   }
 
@@ -135,7 +148,7 @@ export async function getSearchResults() {
         searchStore.page
       );
       if (data) {
-        setSearchStore('results', [...searchStore.results, ...data]);
+        setSearchStore('results', [...searchStore.results, ...data as StreamItem[]]);
         setSearchStore('page', searchStore.page + 1);
       }
     } else {
@@ -147,12 +160,12 @@ export async function getSearchResults() {
       );
       const newResults = [
         ...searchStore.results,
-        ...more.items.filter(
+        ...processResults(more.items.filter(
           (item: StreamItem) =>
             !item.isShort &&
             item.duration !== -1 &&
             !searchStore.results.find((v) => v.url === item.url)
-        ),
+        )),
       ];
       setSearchStore('results', newResults);
       setSearchStore('nextPageToken', more.nextpage);

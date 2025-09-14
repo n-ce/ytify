@@ -11,7 +11,7 @@
   }
 
   & div.bg-pane {
-    background-color: rgba(from var(--bg) r g b / 0.8);
+    background-color: hsl(from var(--bg) h 50% l / 0.8);
     z-index: 1;
     position: absolute;
     width: 100%;
@@ -42,7 +42,7 @@
   display: flex;
   flex-direction: column;
   justify-content: end;
-  gap: var(--gap);
+  gap: calc(var(--gap) + var(--size-1));
   width: 100%;
   height: calc(100% - calc(var(--gap) * 2));
   margin: var(--gap) 0;
@@ -96,7 +96,9 @@
 .slider {
   input {
     width: 100%;
+    color: color-mix(in srgb, oklch(from var(--bg) 60% 50% h), rgb(from var(--text) r g b / 1) 70%);
   }
+
 
   div {
     display: flex;
@@ -138,6 +140,12 @@
     transform: scale(1.5)
   }
 
+}
+
+.bottomShelf {
+  display: flex;
+  justify-content: space-between;
+
   #favButton {
     padding: 0;
   }
@@ -158,6 +166,4 @@
   #volumeChanger {
     text-align: right;
   }
-
-
 }

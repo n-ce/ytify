@@ -1,9 +1,9 @@
-import { createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { openFeature, t, listStore, setQueueStore, resetList } from '../../lib/stores';
 import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
-import StreamItem from '../../components/StreamItem';
+import ListResults from './Results';
 
 export default function() {
   let listSection!: HTMLElement;
@@ -170,32 +170,7 @@ export default function() {
         </details>
       </header>
       <br />
-      <Show
-        when={!listStore.isLoading}
-        fallback={<i class="ri-loader-3-line"></i>}
-      >
-        <div
-          id="listContainer"
-          ref={listContainer}
-        >
-          <For
-            each={listStore.list}
-          >{
-              (item) =>
-                <StreamItem
-                  id={item.id || ''}
-                  author={item.author}
-                  title={item.title || ''}
-                  duration={item.duration || ''}
-                  channelUrl={item.channelUrl}
-                  lastUpdated={item.lastUpdated}
-                  draggable={listStore.isSortable}
-                />
-            }
-          </For>
-
-        </div>
-      </Show>
-    </section >
+      <ListResults />
+    </section>
   )
 }

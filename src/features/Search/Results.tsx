@@ -26,6 +26,7 @@ export default function SearchResults() {
                 views={item.viewCountText || (item.views > 0 ? numFormatter(item.views) + ' views' : '')}
                 uploaded={item.uploadedDate || item.publishedText}
                 img={getThumbIdFromLink(item.thumbnail || 'https://i.ytimg.com/vi_webp/' + item.videoId + '/mqdefault.webp?host=i.ytimg.com')}
+                context='search'
               />
             </Match>
             <Match when={item.type === 'channel'}>

@@ -19,10 +19,6 @@ export default function() {
   }
   onMount(() => {
     dialog.showModal();
-    history.pushState({}, '', '#');
-
-    console.log('add event called');
-    addEventListener('popstate', closeDialog);
   });
 
   return (
