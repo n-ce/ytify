@@ -15,6 +15,10 @@
 	overflow: hidden;
 	cursor: pointer;
 
+	.marked {
+		background-color: lightsalmon;
+	}
+
 	div,
 	span {
 		pointer-events: none;

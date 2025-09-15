@@ -1,4 +1,4 @@
-import { Show } from 'solid-js';
+
 import { getDB, saveDB, toCollection } from '../../lib/utils';
 import { setStore, t } from '../../lib/stores';
 

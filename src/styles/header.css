@@ -4,9 +4,9 @@ section>header {
   padding: var(--gap) 0;
 
   >p {
-    font-size: var(--font-size-4);
+    font-size: var(--font-size-3);
     letter-spacing: var(--font-letterspacing-1);
-    font-weight: var(--font-weight-6);
+    font-weight: var(--font-weight-5);
     white-space: nowrap;
     width: calc(100% - var(--size-11));
   }
@@ -19,7 +19,7 @@ section>header {
   .right-group {
     margin-left: auto;
     margin-right: var(--size-7);
-    margin-top: var(--size-00);
+    margin-top: var(--size-0);
 
     i {
       font-size: var(--font-size-3);
@@ -35,7 +35,7 @@ section>header {
   }
 
   .ri-more-2-fill {
-    font-size: var(--font-size-3);
+    font-size: var(--font-size-2);
     font-weight: var(--font-weight-6);
     margin-left: var(--size-5);
   }
@@ -55,7 +55,7 @@ section>header {
       list-style: none;
       text-align: right;
       padding: 0;
-      margin: 0 0 var(--gap) auto;
+      margin: 0 0 calc(var(--gap) - var(--size-3)) auto;
       width: var(--size-7);
       font-size: var(--font-size-3);
       aspect-ratio: 1;

@@ -1,38 +1,40 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { openFeature, t, listStore, resetList } from '../../lib/stores';
-import { getDB, saveDB } from '../../lib/utils';
+import { openFeature, listStore, resetList, setQueueStore } from '../../lib/stores';
+import { getDB, removeFromCollection, saveDB } from '../../lib/utils';
 import ListResults from './Results';
 import Dropdown from './Dropdown';
 
 export default function() {
   let listSection!: HTMLElement;
-  let listContainer!: HTMLDivElement;
+  let listContainerRef: HTMLDivElement | undefined;
   const [markMode, setMarkMode] = createSignal(false);
-  const [markList, setMarkList] = createSignal<CollectionItem[]>([]);
+  const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
 
   onMount(() => {
     openFeature('list', listSection);
     listSection.scrollTo(0, 0);
 
-    new Sortable(listContainer, {
-      handle: '.ri-draggable',
-      onUpdate(e: SortableEvent) {
-        if (e.oldIndex == null || e.newIndex == null) return;
-        const collection = listStore.id;
-        const db = getDB();
-        const dataArray = Object.entries(db[collection]);
-        const [oldKey, oldItem] = dataArray.splice(e.oldIndex, 1)[0];
-        dataArray.splice(
-          e.newIndex, 0,
-          [oldKey, oldItem]
-        );
-        db[collection] = Object.fromEntries(dataArray);
-        saveDB(db);
-      }
-    });
+    if (listContainerRef) {
+      new Sortable(listContainerRef, {
+        handle: '.ri-draggable',
+        onUpdate(e: SortableEvent) {
+          if (e.oldIndex == null || e.newIndex == null) return;
+          const collection = listStore.id;
+          const db = getDB();
+          const dataArray = Object.entries(db[collection]);
+          const [oldKey, oldItem] = dataArray.splice(e.oldIndex, 1)[0];
+          dataArray.splice(
+            e.newIndex, 0,
+            [oldKey, oldItem]
+          );
+          db[collection] = Object.fromEntries(dataArray);
+          saveDB(db);
+        }
+      });
+    }
 
 
   });
@@ -41,12 +43,34 @@ export default function() {
     <div class="markBar">
       <i
         class={'ri-checkbox-multiple-fill'}
-        onclick={() => console.log(true)}
-      ></i>
-      <i class="ri-indeterminate-circle-line"></i>
-      <i class="ri-list-check-2"></i>
+        onclick={() => {
+          if (markList().length === listStore.list.length)
+            setMarkList([]);
+          else
+            setMarkList(listStore.list.map(v => v.id));
 
-    </div>
+        }}
+      ></i>
+      <i
+        class="ri-indeterminate-circle-line"
+        onclick={() => {
+          markList().forEach(id => {
+            removeFromCollection(listStore.name, id);
+          });
+        }}
+      ></i>
+      <i
+        class="ri-list-check-2"
+        onclick={() => {
+
+          const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
+
+          if (listToEnqueue.length)
+            setQueueStore('list', (list) => [...list, ...listToEnqueue])
+
+        }}
+      ></i>
+    </div >
   );
 
   return (
@@ -69,7 +93,11 @@ export default function() {
         <div class="right-group">
           <i
             class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
-            onclick={() => setMarkMode(!markMode())}
+            onclick={() => {
+              setMarkMode(!markMode());
+              if (!markMode())
+                setMarkList([]);
+            }}
           ></i>
           <i
             class="ri-close-large-line"
@@ -79,7 +107,18 @@ export default function() {
         <Dropdown />
       </header>
       <br />
-      <ListResults ref={listContainer} />
+      <ListResults
+        ref={listContainerRef}
+        mark={{
+          mode: markMode,
+          set: (id: string) => {
+            setMarkList((prev) =>
+              prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+            );
+          },
+          get: (id: string) => markList().includes(id)
+        }}
+      />
     </section>
   )
 }

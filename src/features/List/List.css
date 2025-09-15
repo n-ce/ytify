@@ -31,8 +31,21 @@
 }
 
 .markBar {
+  i {
+    font-size: var(--font-size-3);
+  }
 
   .ri-indeterminate-circle-line {
     margin: 0 var(--size-3);
   }
+}
+
+.marked {
+  backdrop-filter: invert();
+
+  i,
+  p {
+    filter: invert();
+  }
+
 }

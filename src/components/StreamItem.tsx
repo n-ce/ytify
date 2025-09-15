@@ -1,4 +1,4 @@
-import { Show, createSignal } from 'solid-js';
+import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, player } from '../lib/utils';
 import { generateImageUrl } from '../lib/utils/image';
@@ -16,7 +16,12 @@ export default function(data: {
   img?: string,
   draggable?: boolean,
   lastUpdated?: string,
-  context?: 'search' | 'collection' | 'channel' | 'playlist'
+  context?: 'search' | 'collection' | 'channel' | 'playlist',
+  mark?: {
+    mode: Accessor<boolean>,
+    set: (id: string) => void,
+    get: (id: string) => boolean
+  }
 }) {
 
   const [getImage, setImage] = createSignal('');
@@ -60,11 +65,21 @@ export default function(data: {
 
   return (
     <a
-      class={'streamItem ' + (config.loadImage ? 'ravel' : '')}
+      class='streamItem'
+      classList={{
+        'ravel': config.loadImage,
+        'marked': data.mark?.get(data.id)
+      }}
       href={data.href}
       ref={parent}
       onclick={(e) => {
         e.preventDefault();
+        console.log(data.mark);
+
+        if (data.mark?.mode()) {
+          data.mark.set(data.id);
+          return;
+        }
 
         if (!e.target.classList.contains('ri-more-2-fill')) {
           if (data.context === 'search') {
