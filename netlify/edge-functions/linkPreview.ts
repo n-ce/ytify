@@ -3,7 +3,7 @@ import { Context, Config } from '@netlify/edge-functions';
 export default async (request: Request, context: Context) => {
 
   const url = new URL(request.url);
-  const id = url.searchParams.get('s') || '';
+  const id = url.pathname.split('/').pop() || '';
 
   if (id.length < 11) return;
 
@@ -21,15 +21,14 @@ export default async (request: Request, context: Context) => {
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.channelTitle.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
-    .replace('ytify.pp.ua', `ytify.pp.ua?s=${id}`)
+    .replace('ytify.pp.ua', `ytify.pp.ua/s/${id}`)
     .replaceAll('/ytify_thumbnail_min.webp', thumbnail);
 
   return new Response(newPage, response);
 };
 
 export const config: Config = {
-  path: '/*',
-  excludedPath: '/list'
+  path: '/s/*'
 };
 
 const host = 'yt-api.p.rapidapi.com';
