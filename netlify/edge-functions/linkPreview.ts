@@ -1,14 +1,12 @@
 import { Context, Config } from '@netlify/edge-functions';
 
-export default async (request: Request, context: Context) => {
+export default async (_: Request, context: Context) => {
 
-  const url = new URL(request.url);
-  const id = url.searchParams.get('s') || '';
+  const { id } = context.params;
 
-  if (id.length < 11) return;
+  if (!id || id.length < 11) return;
 
-  const response = await context.next();
-  const page = await response.text();
+
   const keys = process.env.rkeys!.split(',');
 
   shuffle(keys);
@@ -18,18 +16,31 @@ export default async (request: Request, context: Context) => {
   if (!data) return;
   const music = data.channelTitle.endsWith(' - Topic') ? 'https://wsrv.nl?w=180&h=180&fit=cover&url=' : '';
   const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
-  const newPage = page
-    .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.channelTitle.replace(' - Topic', ''))
-    .replace('"ytify"', `"${data.title}"`)
-    .replace('ytify.pp.ua', `ytify.pp.ua?s=${id}`)
-    .replaceAll('/ytify_thumbnail_min.webp', thumbnail);
 
-  return new Response(newPage, response);
+  return new Response(`     
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description"
+    content="${data.title} by ${data.channelTitle.replace(' - Topic', '')} in ytify">
+  <meta name="author" content="n-ce">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="${data.title}">
+  <meta property="og:url" content="https://ytify.pp.ua/s/${id}">
+  <meta property="og:site_name" content="ytify">
+  <meta property="og:description" content="${data.title} by ${data.channelTitle.replace(' - Topic', '')} in ytify">
+  <meta property="og:image" content="${thumbnail}">
+  <title>${data.title} | ytify</title>
+</head>
+<script>location.replace('/?s=${id}')</script></html>
+    `, {
+    headers: { 'content-type': 'text/html' },
+  });
 };
 
 export const config: Config = {
-  path: '/*',
-  excludedPath: '/list'
+  path: '/s/:id'
 };
 
 const host = 'yt-api.p.rapidapi.com';
