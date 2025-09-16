@@ -1,10 +1,18 @@
-import { createSignal, For, onCleanup, onMount } from "solid-js";
-import { closeFeature, openFeature, setStore, store } from "../../lib/stores";
+import { createSignal, For, onMount } from "solid-js";
+import { closeFeature, openFeature, setPlayerStore, setStore, store } from "../../lib/stores";
 
 export default function() {
 
-  const [lrcMap, setLrcMap] = createSignal(['']);
+  const [lrcMap, setLrcMap] = createSignal(['Loading...']);
+  const [activeLine, setActiveLine] = createSignal(-1);
   let lyricsSection!: HTMLElement;
+
+  const pStyle = { 'margin-top': 'var(--size-3)' };
+  const activePStyle = {
+    ...pStyle,
+    'font-weight': 'var(--font-weight-5)',
+    'font-size': 'var(--font-size-3)'
+  };
 
   onMount(() => {
     openFeature('lyrics', lyricsSection);
@@ -34,44 +42,47 @@ export default function() {
             });
           setLrcMap(lrcMap);
 
-          let active = -1;
 
-          store.lrcSync = (d: number) => {
-            const p = lyricsSection.firstElementChild!.children;
-            const i = durarr.findIndex(da => Math.abs(da - d) < 1);
+          setPlayerStore({
+            lrcSync: (d: number) => {
 
-            if (i + 1 === durarr.length)
-              return lyricsSection.click();
+              const i = durarr.findIndex(da => Math.abs(da - d) < 1);
+              setActiveLine(i);
+              if (i < 0) return;
+              if (i + 1 === durarr.length)
+                return lyricsSection.click();
 
-            if (i < 0 || active === i)
-              return;
-
-            lyricsSection.querySelectorAll('.active').forEach(el => { el.className = '' });
-            p[i].scrollIntoView({
-              block: 'center',
-              behavior: 'smooth'
-            });
-            p[i].className = 'active';
-
-            active = i;
-          }
+              lyricsSection.children[i].scrollIntoView({
+                block: 'center',
+                behavior: 'smooth'
+              });
+            }
+          });
 
         }
         else {
           setStore('snackbar', JSON.stringify(data));
+          closeFeature('lyrics');
         }
 
 
       });
   });
-  onCleanup(() => {
-    store.lrcSync = () => '';
-  })
 
   return (
-    <section ref={lyricsSection} onclick={() => { closeFeature('lyrics') }}>
+    <section
+      ref={lyricsSection}
+      onclick={() => {
+        closeFeature('lyrics');
+        setPlayerStore('lrcSync', undefined);
+      }}
+    >
       <For each={lrcMap()}>
-        {(item) => (<p>{item}</p>)}
+        {(item, i) => (
+          <p style={
+            activeLine() === i() ?
+              activePStyle : pStyle
+          } >{item}</p>)}
       </For>
     </section>
   );

@@ -2,7 +2,6 @@ import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { addToCollection, config, cssVar, themer } from "../utils";
 import { navStore, params } from "./navigation";
-import { store } from "./app";
 import { queueStore } from "./queue";
 import audioErrorHandler from "../modules/audioErrorHandler";
 
@@ -28,6 +27,7 @@ type PlayerStore = {
   isMusic: boolean,
   audioURL: string,
   videoURL: string,
+  lrcSync?: (d: number) => void
   dispose: () => void
 };
 
@@ -119,8 +119,11 @@ const dispose = createRoot((dispose) => {
   playerStore.audio.ontimeupdate = () => {
     if (document.activeElement?.matches('input[type="range"]'))
       return;
-    const seconds = Math.floor(playerStore.audio.currentTime);
-    store.lrcSync(seconds);
+    const { audio, lrcSync } = playerStore;
+    const seconds = Math.floor(audio.currentTime);
+
+    if (lrcSync) lrcSync(seconds);
+
     const { ref } = navStore.player;
     if (ref) {
       const { offsetHeight, offsetWidth } = ref;

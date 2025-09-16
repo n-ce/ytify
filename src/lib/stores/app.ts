@@ -10,7 +10,6 @@ const storeInit: {
     index: Record<Services, number>
   },
   useSaavn: boolean,
-  lrcSync: (arg0: number) => {} | void,
   linkHost: string,
   searchQuery: string,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg',
@@ -33,7 +32,6 @@ const storeInit: {
     status: 'N'
   },
   useSaavn: config.jiosaavn,
-  lrcSync: () => { },
   linkHost: config.linkHost || location.origin,
   searchQuery: '',
   downloadFormat: config.dlFormat,

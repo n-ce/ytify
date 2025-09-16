@@ -13,7 +13,7 @@ export default defineConfig(({ command }) => ({
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Build: JSON.stringify(
-      ((today = new Date()) => `v8 ${today.toLocaleString('default', { month: 'short' })} ${today.toLocaleDateString('en-US', { year: '2-digit' })}`)()
+      ((today = new Date()) => `v8 ${today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.')}`)(),
     ),
   },
 

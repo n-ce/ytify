@@ -126,7 +126,7 @@
   "settings_clear_history": "This will clear $ items from your history, continue?",
   "settings_import_from_piped": "Import Playlists from Piped",
   "settings_interface": "Interface",
-  "settings_landscape_sections": "Landscape sections",
+  "settings_landscape_sections": "Maximum Landscape sections",
   "settings_load_images": "Load Images",
   "settings_roundness": "Roundness",
   "settings_roundness_none": "None",

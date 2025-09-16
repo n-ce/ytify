@@ -33,6 +33,7 @@ export default async function fetchList(
 
   const api = getApi('piped');
   const type = url.includes('channel') ? 'channel' : 'playlist';
+  const musicEnforcer = url.includes('OLAK5uy');
   const group = await fetch(api + url)
     .then(res => res.json())
     .then(data => {
@@ -54,10 +55,17 @@ export default async function fetchList(
       setListStore('isLoading', false);
     })
 
-  if (!group?.relatedStreams?.length) {
-    setListStore('isLoading', false);
+  if (!group?.relatedStreams?.length)
     return;
-  }
+
+  if (musicEnforcer)
+    group.relatedStreams = group.relatedStreams.map(
+      (item: StreamItem) => {
+        if (!item.uploaderName.endsWith(' - Topic'))
+          item.uploaderName += ' - Topic';
+        return item;
+      }
+    );
 
   const filterOutMembersOnly = (streams: StreamItem[]) =>
     (type === 'channel' && streams.length) ? // hide members-only streams
@@ -69,6 +77,48 @@ export default async function fetchList(
 
   if (location.pathname !== '/list')
     history.pushState({}, '', '/list');
+
+  const tokens = [group.nextpage];
+
+  function setObserver(callback: () => Promise<string>) {
+    new IntersectionObserver((entries, observer) =>
+      entries.forEach(async e => {
+        if (e.isIntersecting) {
+
+          const token = await callback();
+          observer.disconnect();
+          if (!token || tokens.indexOf(token) !== -1) return;
+          tokens.push(token);
+          setObserver(callback);
+        }
+      }))
+      .observe(document.querySelector('#listContainer')!.children[document.querySelector('#listContainer')!.childElementCount - 3]);
+  }
+  if (!mix && group.nextpage)
+    setObserver(async () => {
+      const data = await fetch(
+        api + '/nextpage/' +
+        url.substring(1) + '?nextpage=' + encodeURIComponent(tokens[tokens.length - 1])
+      )
+        .then(res => res.json())
+        .catch(e => console.log(e));
+      if (!data) return;
+      const existingItems: string[] = [];
+      document.querySelector('#listContainer')!.querySelectorAll('.streamItem').forEach((v) => {
+        existingItems.push((v as HTMLElement).dataset.id as string);
+      });
+
+
+      data.relatedStreams = data.relatedStreams.filter(
+        (item: StreamItem) => !existingItems.includes(
+          item.url.slice(-11))
+      );
+
+      const newListData = filterOutMembersOnly(data.relatedStreams).map(streamToCollectionItem);
+      setListStore('list', l => [...l, ...newListData]);
+      return data.nextpage || '';
+    });
+
 
   if (!useHyperpipe) {
     setListStore('name', group.name);

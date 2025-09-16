@@ -1,6 +1,7 @@
 import { config, hostResolver } from '../lib/utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
+import fetchList from '../lib/modules/fetchList';
 
 
 export default function(data: {
@@ -26,6 +27,10 @@ export default function(data: {
     <a
       class={'listItem ' + (config.loadImage ? 'ravel' : '')}
       href={hostResolver(data.url)}
+      onclick={(e) => {
+        e.preventDefault();
+        fetchList(data.url);
+      }}
     >
       <Show when={config.loadImage}>
         <img

@@ -1,6 +1,6 @@
 import { Show, createSignal } from 'solid-js';
 import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
-import { listStore, setQueueStore, t } from '../../lib/stores';
+import { listStore, resetList, setQueueStore, t } from '../../lib/stores';
 
 export default function Dropdown() {
   const db = Object(getDB());
@@ -55,16 +55,18 @@ export default function Dropdown() {
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
-        <li
-          id="subscribeListBtn"
-          onclick={subscriptionHandler}
-        >
-          <i class="ri-stack-line"></i>{isSubscribed() ? 'Subscribed' : 'Subscribe'}
-        </li>
+        <Show when={listStore.type === 'channel' || listStore.type === 'playlist'}>
+          <li
+            id="subscribeListBtn"
+            onclick={subscriptionHandler}
+          >
+            <i class="ri-stack-line"></i>{isSubscribed() ? 'Subscribed' : 'Subscribe'}
+          </li>
 
-        <li id="viewOnYTBtn">
-          <i class="ri-external-link-line"></i>{listStore.name || 'View on YouTube'}
-        </li>
+          <li id="viewOnYTBtn">
+            <i class="ri-external-link-line"></i>{listStore.name || 'View on YouTube'}
+          </li>
+        </Show>
 
         <Show when={listStore.type === 'collection' && listStore.isReversed}>
           <li id="clearListBtn">
@@ -75,7 +77,14 @@ export default function Dropdown() {
 
         <Show when={listStore.type === 'collection' && !listStore.isReversed}>
 
-          <li id="deleteCollectionBtn">
+          <li id="deleteCollectionBtn" onclick={() => {
+            if (confirm(t("list_prompt_delete", listStore.id))) {
+              const db = getDB();
+              delete db[listStore.id];
+              saveDB(db, 'delete');
+              resetList();
+            }
+          }}>
             <i class="ri-delete-bin-2-line"></i>{t("list_delete")}
           </li>
 

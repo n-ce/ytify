@@ -15,9 +15,6 @@
 	overflow: hidden;
 	cursor: pointer;
 
-	.marked {
-		background-color: lightsalmon;
-	}
 
 	div,
 	span {
@@ -73,7 +70,7 @@
 
 		.title {
 			max-height: 100%;
-			line-height: var(--size-5);
+			line-height: var(--size-4);
 			font-size: var(--font-size-1);
 			overflow: hidden;
 			text-overflow: ellipsis;
