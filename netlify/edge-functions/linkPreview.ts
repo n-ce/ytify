@@ -1,10 +1,11 @@
 import { Context, Config } from '@netlify/edge-functions';
 
-export default async (_: Request, context: Context) => {
+export default async (request: Request, context: Context) => {
 
-  const { id } = context.params;
+  const url = new URL(request.url);
+  const id = url.searchParams.get('s') || '';
 
-  if (!id || id.length < 11) return;
+  if (id.length < 11) return;
 
   const response = await context.next();
   const page = await response.text();
@@ -20,14 +21,15 @@ export default async (_: Request, context: Context) => {
   const newPage = page
     .replace('48-160kbps Opus YouTube Audio Streaming Web App.', data.channelTitle.replace(' - Topic', ''))
     .replace('"ytify"', `"${data.title}"`)
-    .replace('ytify.pp.ua', `ytify.pp.ua/s/${id}`)
+    .replace('ytify.pp.ua', `ytify.pp.ua?s=${id}`)
     .replaceAll('/ytify_thumbnail_min.webp', thumbnail);
 
   return new Response(newPage, response);
 };
 
 export const config: Config = {
-  path: '/s/:id'
+  path: '/*',
+  excludedPath: '/list'
 };
 
 const host = 'yt-api.p.rapidapi.com';
