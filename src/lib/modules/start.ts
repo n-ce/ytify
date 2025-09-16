@@ -9,6 +9,7 @@ export default async function() {
   if (pathParts.length === 3 && pathParts[1] === 's') {
     const id = pathParts[2];
     if (id) {
+      params.set('s', id);
       history.replaceState({}, '', `/?s=${id}`);
     }
   }
