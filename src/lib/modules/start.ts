@@ -4,6 +4,14 @@ import { config, setConfig, getDownloadLink, idFromURL, fetchCollection, uma, pl
 
 export default async function() {
 
+  // Handle /s/:id URLs by transforming them to /?s=id internally
+  const pathParts = location.pathname.split('/');
+  if (pathParts.length === 3 && pathParts[1] === 's') {
+    const id = pathParts[2];
+    if (id) {
+      history.replaceState({}, '', `/?s=${id}`);
+    }
+  }
 
   const { shareAction } = config;
 
