@@ -1,11 +1,10 @@
 import { Context, Config } from '@netlify/edge-functions';
 
-export default async (request: Request, context: Context) => {
+export default async (_: Request, context: Context) => {
 
-  const url = new URL(request.url);
-  const id = url.pathname.split('/').pop() || '';
+  const { id } = context.params;
 
-  if (id.length < 11) return;
+  if (!id || id.length < 11) return;
 
   const response = await context.next();
   const page = await response.text();
@@ -28,7 +27,7 @@ export default async (request: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: '/s/*'
+  path: '/s/:id'
 };
 
 const host = 'yt-api.p.rapidapi.com';
