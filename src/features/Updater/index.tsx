@@ -1,6 +1,6 @@
 import { createSignal, For, onMount } from 'solid-js';
 import './Updater.css';
-import { closeFeature, store, t } from '../../lib/stores';
+import { closeFeature, setStore, store, t } from '../../lib/stores';
 
 export default function() {
 
@@ -40,6 +40,7 @@ export default function() {
         <button
           id="laterBtn"
           onclick={() => {
+            setStore('updater', undefined);
             closeFeature('updater');
           }}
         >{t('updater_later')}</button>

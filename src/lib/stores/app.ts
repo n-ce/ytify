@@ -13,7 +13,7 @@ const storeInit: {
   linkHost: string,
   searchQuery: string,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg',
-  updater: () => void,
+  updater?: () => void,
   actionsMenu: CollectionItem,
   snackbar: string
 } = {
@@ -35,7 +35,6 @@ const storeInit: {
   linkHost: config.linkHost || location.origin,
   searchQuery: '',
   downloadFormat: config.dlFormat,
-  updater: () => { },
   actionsMenu: {
     id: '',
     title: '',

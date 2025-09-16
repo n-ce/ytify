@@ -101,7 +101,7 @@ export default async function() {
 
       const handleUpdate = pwa.registerSW({
         onNeedRefresh() {
-          setStore('updater', handleUpdate);
+          setStore({ updater: handleUpdate });
           setNavStore('updater', 'state', true)
         }
       });
