@@ -4,3 +4,19 @@ article {
     align-items: center;
   }
 }
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.hub-grid li {
+  background-color: var(--background-light);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+}
