@@ -70,27 +70,32 @@ export default async (_req: Request, context: Context) => {
     return response.json();
   })
   .then((data: any) => {
-    const musicCarouselShelfRenderer = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
-      .sectionListRenderer.contents[0].musicCarouselShelfRenderer;
+    const sectionListRendererContents = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
+      .sectionListRenderer.contents;
 
-    const header = musicCarouselShelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[0].text;
-    const playlistsData: PlaylistItemWrapper[] = musicCarouselShelfRenderer.contents;
+    const responsePayload: MoodGenreDetailsFullResponse = {};
 
-    const playlists: PlaylistItem[] = playlistsData.map((item: PlaylistItemWrapper) => {
-      const playlistRenderer = item.musicTwoRowItemRenderer;
+    sectionListRendererContents.forEach((section: any) => {
+      if (section.musicCarouselShelfRenderer) {
+        const musicCarouselShelfRenderer = section.musicCarouselShelfRenderer;
 
-      const id = playlistRenderer.navigationEndpoint.browseEndpoint.browseId;
+        const header = musicCarouselShelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[0].text;
+        const playlistsData: PlaylistItemWrapper[] = musicCarouselShelfRenderer.contents;
 
-      return {
-        title: playlistRenderer.title.runs[0].text,
-        thumbnail: playlistRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
-        id: id,
-      };
+        const playlists: PlaylistItem[] = playlistsData.map((item: PlaylistItemWrapper) => {
+          const playlistRenderer = item.musicTwoRowItemRenderer;
+
+          const id = playlistRenderer.navigationEndpoint.browseEndpoint.browseId;
+
+          return {
+            title: playlistRenderer.title.runs[0].text,
+            thumbnail: playlistRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
+            id: id,
+          };
+        });
+        responsePayload[header] = playlists;
+      }
     });
-
-    const responsePayload: MoodGenreDetailsFullResponse = {
-      [header]: playlists
-    };
 
     return new Response(JSON.stringify(responsePayload), {
       headers: { 'content-type': 'application/json' },
