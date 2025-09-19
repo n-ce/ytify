@@ -2,16 +2,6 @@ import type { Config, Context } from "@netlify/edge-functions";
 
 const YOUTUBE_MUSIC_API_URL = 'https://music.youtube.com/youtubei/v1/browse?prettyPrint=false';
 
-const REQUEST_BODY = {
-  browseId: 'FEmusic_moods_and_genres',
-  context: {
-    client: {
-      clientName: 'WEB_REMIX',
-      clientVersion: '1.20250915.03.00',
-    },
-  },
-};
-
 // Type for the individual mood/genre item in the list
 interface MusicNavigationButtonRenderer {
   buttonText: {
@@ -35,13 +25,26 @@ export interface MoodsGenresListResponse {
   genres: Record<string, string>; // e.g., { "Pop": "params_string_for_pop" }
 }
 
-export default async (_req: Request, _context: Context) => {
+export default async (_req: Request, context: Context) => {
+  const countryCode = context.geo?.country?.code || 'US'; // Default to 'US' if not available
+
+  const requestBody = {
+    browseId: 'FEmusic_moods_and_genres',
+    context: {
+      client: {
+        clientName: 'WEB_REMIX',
+        clientVersion: '1.20250915.03.00',
+        gl: countryCode, // Add geolocation parameter
+      },
+    },
+  };
+
   return fetch(YOUTUBE_MUSIC_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(REQUEST_BODY),
+    body: JSON.stringify(requestBody),
   })
   .then((response) => {
     if (!response.ok) {

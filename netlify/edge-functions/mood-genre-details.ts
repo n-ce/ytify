@@ -37,6 +37,7 @@ export type MoodGenreDetailsFullResponse = Record<string, PlaylistItem[]>;
 
 export default async (_req: Request, context: Context) => {
   const { params } = context.params;
+  const countryCode = context.geo?.country?.code || 'US'; // Default to 'US' if not available
 
   if (!params) {
     return new Response(JSON.stringify({ error: 'Missing "params" path parameter' }), {
@@ -52,6 +53,7 @@ export default async (_req: Request, context: Context) => {
       client: {
         clientName: 'WEB_REMIX',
         clientVersion: '1.20250915.03.00',
+        gl: countryCode, // Add geolocation parameter
       },
     },
   };
