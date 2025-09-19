@@ -3,6 +3,8 @@ import { getDB } from "../../lib/utils";
 import './Hub.css';
 import { MoodsGenresListResponse } from '../../../netlify/edge-functions/moods-genres-list';
 import { MoodGenreDetailsFullResponse, PlaylistItem } from '../../../netlify/edge-functions/mood-genre-details';
+import ListItem from '../../components/ListItem'; // Import ListItem
+
 
 const fetchJson = <T,>(url: string): Promise<T | undefined> => {
   return fetch(url)
@@ -16,7 +18,8 @@ const fetchJson = <T,>(url: string): Promise<T | undefined> => {
 export default function() {
   const { history } = getDB();
   const [moodsGenresData] = createResource<MoodsGenresListResponse | undefined>(() => fetchJson<MoodsGenresListResponse>('/moods-genres-list'));
-  const [selectedPlaylistDetails, setSelectedPlaylistDetails] = createSignal<MoodGenreDetailsFullResponse | undefined>(undefined);
+  const [selectedPlaylistDetails, setSelectedPlaylistDetails] = createSignal<MoodGenreDetailsFullResponse | undefined>(undefined); // Keep this to store the fetched details
+
 
   const recents = history ? Object.values(history).reverse().slice(0, 5) : [];
   console.log(recents);
@@ -60,26 +63,28 @@ export default function() {
         </Show>
       </article>
 
+      {/* Display the fetched playlist details using ListItem components */}
       <Show when={selectedPlaylistDetails()}>
-        <article>
-          <For each={Object.keys(selectedPlaylistDetails() || {})}>
-            {(header) => (
-              <>
-                <h3>{header}</h3>
-                <ul class="hub-grid">
-                  <For each={selectedPlaylistDetails()![header]}>
-                    {(playlist: PlaylistItem) => (
-                      <li>
-                        <img src={playlist.thumbnail} alt={playlist.title} />
-                        <h4>{playlist.title}</h4>
-                      </li>
-                    )}
-                  </For>
-                </ul>
-              </>
-            )}
-          </For>
-        </article>
+        <For each={Object.keys(selectedPlaylistDetails() || {})}>
+          {(header) => (
+            <article>
+              <h3>{header}</h3>
+              <ul class="hub-grid">
+                <For each={selectedPlaylistDetails()![header]}>
+                  {(playlist: PlaylistItem) => (
+                    <ListItem
+                      title={playlist.title}
+                      stats={''} // As per instruction
+                      uploader_data={''} // As per instruction
+                      thumbnail={playlist.thumbnail}
+                      url={`/playlist?list=${playlist.id}`}
+                    />
+                  )}
+                </For>
+              </ul>
+            </article>
+          )}
+        </For>
       </Show>
 
       <article>
@@ -93,7 +98,7 @@ export default function() {
 // Hub v1
       /*
       <article>
-        <h3>Recently Listened</h3>
+        <h3>Recently Listened
         <ul>
         </ul>
       </article>
