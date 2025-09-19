@@ -72,30 +72,33 @@ export default async (_req: Request, context: Context) => {
     return response.json();
   })
   .then((data: any) => {
-    const sectionListRendererContents = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content
-      .sectionListRenderer.contents;
+    const sectionListRendererContents = data.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content
+      ?.sectionListRenderer?.contents || [];
 
     const responsePayload: MoodGenreDetailsFullResponse = {};
 
     sectionListRendererContents.forEach((section: any) => {
-      if (section.musicCarouselShelfRenderer) {
-        const musicCarouselShelfRenderer = section.musicCarouselShelfRenderer;
+      const musicCarouselShelfRenderer = section.musicCarouselShelfRenderer;
 
-        const header = musicCarouselShelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[0].text;
-        const playlistsData: PlaylistItemWrapper[] = musicCarouselShelfRenderer.contents;
+      const header = musicCarouselShelfRenderer?.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs?.[0]?.text;
+      const playlistsData: PlaylistItemWrapper[] = musicCarouselShelfRenderer?.contents || [];
 
+      if (header && playlistsData.length > 0) {
         const playlists: PlaylistItem[] = playlistsData.map((item: PlaylistItemWrapper) => {
           const playlistRenderer = item.musicTwoRowItemRenderer;
 
-          const id = playlistRenderer.navigationEndpoint.browseEndpoint.browseId;
+          const id = playlistRenderer?.navigationEndpoint?.browseEndpoint?.browseId || '';
 
           return {
-            title: playlistRenderer.title.runs[0].text,
-            thumbnail: playlistRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
+            title: playlistRenderer?.title?.runs?.[0]?.text || '',
+            thumbnail: playlistRenderer?.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails?.[0]?.url || '',
             id: id,
           };
-        });
-        responsePayload[header] = playlists;
+        }).filter(p => p.id !== ''); // Filter out items with no ID
+
+        if (playlists.length > 0) {
+          responsePayload[header] = playlists;
+        }
       }
     });
 
