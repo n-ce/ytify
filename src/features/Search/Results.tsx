@@ -2,7 +2,7 @@ import { For, Show, Switch, Match } from 'solid-js';
 import { searchStore } from '../../lib/stores';
 import ListItem from '../../components/ListItem';
 import StreamItem from '../../components/StreamItem';
-import { convertSStoHHMMSS, getThumbIdFromLink, hostResolver } from '../../lib/utils';
+import { convertSStoHHMMSS, getThumbIdFromLink } from '../../lib/utils';
 
 const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
@@ -18,7 +18,6 @@ export default function SearchResults() {
             <Match when={item.type === 'stream' || item.type === 'video'}>
               <StreamItem
                 id={item.videoId || item.url.substring(9)}
-                href={hostResolver(item.url || ('/watch?v=' + item.videoId))}
                 channelUrl={item.uploaderUrl || item.authorUrl}
                 title={item.title}
                 author={item.uploaderName || item.author}

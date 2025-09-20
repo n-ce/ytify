@@ -1,6 +1,6 @@
 import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { config, player } from '../lib/utils';
+import { config, hostResolver, player } from '../lib/utils';
 import { generateImageUrl } from '../lib/utils/image';
 import { playerStore, setPlayerStore, setStore } from '../lib/stores';
 
@@ -9,14 +9,13 @@ export default function(data: {
   title: string,
   author?: string,
   duration: string,
-  href?: string,
   uploaded?: string,
   channelUrl?: string,
   views?: string,
   img?: string,
   draggable?: boolean,
   lastUpdated?: string,
-  context?: 'search' | 'collection' | 'channel' | 'playlist',
+  context?: 'search' | 'collection' | 'channel' | 'playlist' | 'hub',
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
@@ -70,7 +69,7 @@ export default function(data: {
         'ravel': config.loadImage,
         'marked': data.mark?.get(data.id)
       }}
-      href={data.href}
+      href={hostResolver('/watch?v=' + data.id)}
       ref={parent}
       onclick={(e) => {
         e.preventDefault();

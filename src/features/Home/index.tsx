@@ -1,5 +1,5 @@
-import { For, Match, Show, Switch, createSignal } from 'solid-js';
-import About from './About';
+import { For, Match, Show, Switch, createSignal, lazy } from 'solid-js';
+const About = lazy(() => import('./About'));
 import Hub from './Hub';
 import './Home.css';
 import { config, setConfig } from '../../lib/utils';

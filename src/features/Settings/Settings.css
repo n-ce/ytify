@@ -1,4 +1,4 @@
-#settingsSection {
+.settingsSection {
   border-radius: var(--roundness);
 
   header {
@@ -84,13 +84,11 @@
       margin: var(--size-1);
       letter-spacing: var(--font-letterspacing-0);
       font-weight: var(--font-weight-5);
+    }
 
-      i {
-        font-size: var(--font-size-2);
-      }
-
-      svg {
-        overflow: hidden;
+    b.hide {
+      ~* {
+        display: none;
       }
     }
 
@@ -109,22 +107,6 @@
       }
     }
 
-    a {
-      background-color: var(--onBg);
-      padding: 1vmin;
-      border: var(--border);
-      border-radius: var(--roundness);
-      display: inline-block;
-      margin-right: 2vmin;
-      margin-bottom: 4%;
-    }
-
-    button {
-      margin-left: 0;
-      margin-bottom: 4%;
-      background-color: var(--onBg) !important;
-      color: var(--text) !important;
-    }
   }
 
 }

@@ -4,11 +4,11 @@ import { config, quickSwitch, setConfig } from '../../lib/utils';
 import { t } from '../../lib/stores';
 
 export default function() {
+  let head!: HTMLElement;
   return (
     <div>
-      <b>
-        <i class="ri-play-large-line"></i>
-        <p>{t('settings_playback')}</p>
+      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
+        {t('settings_playback')}
       </b>
 
       <Selector

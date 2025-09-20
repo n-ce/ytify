@@ -16,7 +16,6 @@ export default function() {
     .filter(v => v !== 'channels' && v !== 'playlists')
     .map(v => ({ type: 'collection', name: v }));
   const reservedCollections = {
-    discover: ['ri-compass-3-line', 'library_discover'],
     history: ['ri-memories-line', 'library_history'],
     favorites: ['ri-heart-fill', 'library_favorites'],
     listenLater: ['ri-calendar-schedule-line', 'library_listen_later']
@@ -26,7 +25,7 @@ export default function() {
     const toFind = searchText().toLowerCase();
 
     return keys
-      .filter(k => !listStore.reservedCollections.includes(k))
+      .filter(k => !['channels', 'playlists'].includes(k))
       .map(key => Object.values(db[key]))
       .flat()
       .filter(v => {

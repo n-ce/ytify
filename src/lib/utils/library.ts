@@ -44,7 +44,7 @@ export function toCollection(
   else db[collection] = {};
   if ('title' in data)
     data.lastUpdated = new Date().toISOString();
-  db[collection][id] = data;
+  db[collection][id] = data as CollectionItem;
 }
 
 export function addToCollection(
@@ -158,12 +158,6 @@ function getLocalCollection(
     length: items.length
   });
 
-  if (collection === 'discover') {
-    for (const i in dataObj)
-      if (usePagination && (dataObj[i] as CollectionItem & { frequency: number }).frequency < 2)
-        delete db.discover?.[i];
-    saveDB(db);
-  }
 
   if (usePagination) {
     listData = items.slice(itemsToShow - 1, itemsToShow);;

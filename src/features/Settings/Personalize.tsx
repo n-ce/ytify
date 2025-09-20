@@ -4,11 +4,12 @@ import { setStore, t } from '../../lib/stores';
 import { config, cssVar, setConfig, themer } from '../../lib/utils';
 
 export default function() {
+  let head!: HTMLElement;
+
   return (
     <div>
-      <b>
-        <i class="ri-t-shirt-2-line"></i>
-        <p>{t('settings_interface')}</p>
+      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
+        {t('settings_interface')}
       </b>
 
       <ToggleSwitch

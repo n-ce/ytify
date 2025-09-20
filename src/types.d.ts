@@ -46,21 +46,22 @@ declare global {
     lastUpdated?: string
   }
 
-  type List = Record<'id' | 'name' | 'thumbnail', string>
+  type List = {
+    id: string,
+    name: string,
+    thumbnail: string
+  }
   type Collection = {
     [index: string]: CollectionItem | List
   }
 
   type Library = {
-    history?: Collection,
-    favorites?: Collection,
-    listenLater?: Collection,
-    discover?: {
-      [index: string]: CollectionItem & { frequency: number }
-    },
+    history?: { [index: string]: CollectionItem },
+    favorites?: { [index: string]: CollectionItem },
+    listenLater?: { [index: string]: CollectionItem },
     channels?: { [index: string]: List & { uploader: string } },
     playlists?: { [index: string]: List },
-    [index: string]: Collection
+    [index: string]: { [index: string]: CollectionItem }
   }
 
   type APAC = 'albums' | 'playlists' | 'artists' | 'channels';

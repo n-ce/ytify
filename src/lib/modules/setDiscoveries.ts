@@ -1,5 +1,6 @@
 import { playerStore } from "../stores";
-import { addListToCollection, convertSStoHHMMSS, getDB } from "../utils";
+import { convertSStoHHMMSS, getDB } from "../utils";
+import { getHub, updateHub } from "./hub";
 
 export default function(
   id: string,
@@ -7,10 +8,11 @@ export default function(
 ) {
   if (id !== playerStore.stream.id) return;
 
+  const hub = getHub();
   const db = getDB();
 
-  if (!db.hasOwnProperty('discover'))
-    db.discover = {};
+  if (!hub.discovery)
+    hub.discovery = {};
 
 
   relatedStreams?.forEach(
@@ -22,9 +24,9 @@ export default function(
       const rsId = stream.url.slice(9);
 
       // merges previous discover items with current related streams
-      db.discover?.hasOwnProperty(rsId) ?
-        (<number>db.discover[rsId].frequency)++ :
-        db.discover![rsId] = {
+      hub.discovery?.hasOwnProperty(rsId) ?
+        (hub.discovery[rsId].frequency)++ :
+        hub.discovery[rsId] = {
           id: rsId,
           title: stream.title,
           author: stream.uploaderName,
@@ -35,7 +37,7 @@ export default function(
     });
 
   // convert to array
-  let array = Object.entries(db.discover!);
+  let array = Object.entries(hub.discovery!);
 
   // Randomize Array
   for (let i = array.length - 1; i > 0; i--) {
@@ -44,7 +46,6 @@ export default function(
   }
 
   // remove if exists in history
-
   array = array.filter(e => !db.history?.hasOwnProperty(e[0]));
 
   // randomly remove items from array when limit crossed
@@ -55,9 +56,9 @@ export default function(
     len--;
   }
 
-  db.discover = {};
+  hub.discovery = Object.fromEntries(array);
 
   // insert the upgraded collection to discover;
-  addListToCollection('discover', Object.fromEntries(array), db);
+  updateHub(hub);
 
 }

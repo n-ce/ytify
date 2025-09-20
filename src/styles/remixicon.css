@@ -5,6 +5,7 @@
 * Released under the Apache License Version 2.0
 */
 
+
 @font-face {
   font-family: "remixicon";
   src: url("/remixicon.woff2") format("woff2");
@@ -20,28 +21,8 @@
 }
 
 
-.ri-sort-alphabet-asc:before {
-  content: "\f460";
-}
-
-.ri-sort-alphabet-desc:before {
-  content: "\f461";
-}
-
-.ri-sort-desc:before {
-  content: "\f160";
-}
-
-.ri-sort-asc:before {
-  content: "\f15f";
-}
-
 .ri-calendar-schedule-line:before {
   content: "\f3f3";
-}
-
-.ri-links-line:before {
-  content: "\eeb8";
 }
 
 .ri-edit-line:before {
@@ -74,10 +55,6 @@
 
 .ri-heart-fill:before {
   content: "\ee0e";
-}
-
-.ri-compass-3-line:before {
-  content: "\ebbe";
 }
 
 .ri-music-2-line:before {
@@ -140,10 +117,6 @@
   content: "\ec1e";
 }
 
-.ri-search-2-line:before {
-  content: "\f0cd";
-}
-
 .ri-external-link-line:before {
   content: "\ecaf";
 }
@@ -158,14 +131,6 @@
 
 .ri-user-3-line:before {
   content: "\f256";
-}
-
-.ri-parent-line:before {
-  content: "\efca";
-}
-
-.ri-t-shirt-2-line:before {
-  content: "\f1d5";
 }
 
 .ri-video-line:before {
@@ -192,20 +157,12 @@
   content: "\f064";
 }
 
-.ri-search-2-fill:before {
-  content: "\f0cc";
-}
-
 .ri-skip-forward-fill:before {
   content: "\f143";
 }
 
 .ri-repeat-line:before {
   content: "\f074";
-}
-
-.ri-play-large-line:before {
-  content: "\f509";
 }
 
 .ri-cloud-off-fill:before {
@@ -230,14 +187,6 @@
 
 .ri-close-large-line:before {
   content: "\f4c8";
-}
-
-.ri-sort-number-asc:before {
-  content: "\f462";
-}
-
-.ri-sort-number-desc:before {
-  content: "\f463";
 }
 
 .ri-add-circle-line:before {
@@ -268,14 +217,6 @@
   content: "\eb97";
 }
 
-.ri-gemini-line:before {
-  content: "\f540";
-}
-
-.ri-gemini-fill:before {
-  content: "\f53f";
-}
-
 .ri-youtube-fill:before {
   content: "\f2d4";
 }
@@ -294,4 +235,20 @@
 
 .ri-save-line:before {
   content: "\f0b3";
+}
+
+.ri-signpost-fill:before {
+  content: "\f48d";
+}
+
+.ri-arrow-right-s-line:before {
+  content: "\ea6e";
+}
+
+.ri-play-large-line:before {
+  content: "\f509";
+}
+
+.ri-search-2-line:before {
+  content: "\f0cd";
 }

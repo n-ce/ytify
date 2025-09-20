@@ -21,7 +21,7 @@ export default function() {
   return (
     <section
       ref={settingsSection}
-      id="settingsSection"
+      class="settingsSection"
     >
       <header>
         <p>Settings</p>

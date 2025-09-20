@@ -4,11 +4,12 @@ import { getDB, saveDB } from '../../lib/utils/library.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {
+  let head!: HTMLElement;
+
   return (
     <div>
-      <b>
-        <i class="ri-stack-line"></i>
-        <p>{t('settings_library')}</p>
+      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
+        {t('settings_library')}
       </b>
 
       <ToggleSwitch

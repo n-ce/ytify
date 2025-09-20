@@ -8,6 +8,7 @@ export default function() {
     name: string,
     callback: (arg0: Event & { target: HTMLElement }) => void
   }[]>([]);
+  let head!: HTMLElement;
 
   onMount(async () => {
     if (config.partsManagerPIN) {
@@ -18,9 +19,8 @@ export default function() {
 
   return (
     <div>
-      <b>
-        <i class="ri-parent-line"></i>
-        <p>{t('settings_parental_controls')}</p>
+      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
+        {t('settings_parental_controls')}
       </b>
 
       <ToggleSwitch

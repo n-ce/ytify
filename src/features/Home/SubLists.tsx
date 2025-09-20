@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { generateImageUrl, getDB, getThumbIdFromLink } from "../../lib/utils";
 import { t } from "../../lib/stores";
 import ListItem from "../../components/ListItem";
@@ -8,7 +8,6 @@ export default function(_: {
 }) {
 
   const db = getDB();
-  const error = `No ${_.flag} in Library`;
   let type = _.flag;
   let len = 0;
 
@@ -23,8 +22,7 @@ export default function(_: {
 
   const special = type === 'playlists' ? 'Album' : 'Artist';
 
-  if (!Object(db).hasOwnProperty(type))
-    return error;
+
 
   const array = [];
   const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
@@ -56,27 +54,29 @@ export default function(_: {
   }
 
   return (
-    <article class="apac">
-      <p>
-        <i class={icons[_.flag]}></i>&nbsp;
-        {t('library_' + _.flag as 'library_albums')}</p>
-      <div>
-        <For each={array}>
-          {(item) =>
-            <ListItem
-              stats={''}
-              title={item.name}
-              url={item.url}
-
-              thumbnail={generateImageUrl(
-                getThumbIdFromLink(
-                  item.thumbnail
-                ), '')}
-              uploader_data={item.uploaderName}
-            />
-          }
-        </For>
-      </div>
-    </article>
+    <Show when={array.length > 0}>
+      <article>
+        <p>
+          <i class={icons[_.flag]}></i>&nbsp;
+          {t('library_' + _.flag as 'library_albums')}
+        </p>
+        <div>
+          <For each={array}>
+            {(item) =>
+              <ListItem
+                stats={''}
+                title={item.name}
+                url={item.url}
+                thumbnail={generateImageUrl(
+                  getThumbIdFromLink(
+                    item.thumbnail
+                  ), '')}
+                uploader_data={item.uploaderName}
+              />
+            }
+          </For>
+        </div>
+      </article>
+    </Show>
   );
 }

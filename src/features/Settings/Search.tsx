@@ -3,11 +3,12 @@ import { config, setConfig } from '../../lib/utils/config.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {
+  let head!: HTMLElement;
+
   return (
     <div>
-      <b>
-        <i class="ri-search-2-line"></i>
-        <p>{t('nav_search')}</p>
+      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
+        {t('nav_search')}
       </b>
 
       <ToggleSwitch

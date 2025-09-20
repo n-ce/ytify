@@ -28,6 +28,15 @@ export default function Dropdown() {
       location.reload();
     }
   };
+
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+
   return (
     <details>
       <summary><i class="ri-more-2-fill"></i></summary>
@@ -46,6 +55,9 @@ export default function Dropdown() {
         </li>
         <li id="cleanLibraryBtn" onclick={cleanLibrary}>
           <i class="ri-delete-bin-2-line"></i>&nbsp;{t('library_clean')}
+        </li>
+        <li id="fullScreenBtn" onclick={toggleFullScreen}>
+          <i class="ri-fullscreen-line"></i>&nbsp;{t('settings_fullscreen')}
         </li>
         <li id="importPipedBtn" onclick={async () => {
           (await import('../../lib/modules/importPipedPlaylists')).default();

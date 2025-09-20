@@ -11,7 +11,7 @@ const initialState = () => ({
   isShared: false,
   list: [] as CollectionItem[],
   length: 0,
-  reservedCollections: ['discover', 'history', 'favorites', 'listenLater', 'channels', 'playlists'],
+  reservedCollections: ['history', 'favorites', 'listenLater', 'channels', 'playlists'],
   addToCollectionOptions: [] as string[],
   name: '',
   url: '',
