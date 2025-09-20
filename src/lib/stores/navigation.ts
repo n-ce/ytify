@@ -51,6 +51,8 @@ export function closeFeature(name: Features) {
     });
 
   const closestRef = active[0]?.[1]?.ref;
+
+  console.log(closestRef?.checkVisibility())
   if (removedIndex < 3)
     closestRef?.parentElement?.scrollTo({
       left: closestRef?.offsetWidth,
@@ -61,7 +63,8 @@ export function closeFeature(name: Features) {
 
   setTimeout(() => {
     setNavStore(name, { ref: null, state: false });
-  }, 500);
+  }, 300);
+
 }
 
 type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'si' | 'supermix';

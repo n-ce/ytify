@@ -12,6 +12,7 @@
   --text: initial;
   --surface: color-mix(in srgb, rgba(from var(--onBg) r g b / 1), var(--bg) 80%);
   --blurMix: color-mix(in srgb, rgba(from var(--onBg) r g b / 0.5), var(--bg) 70%);
+  --accent: color-mix(in srgb, oklch(from var(--bg) 60% 50% h), rgb(from var(--text) r g b / 1) 70%);
   --gap: var(--size-fluid-2);
   --radius: var(--radius-2);
   --borderColor: initial;

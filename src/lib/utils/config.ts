@@ -1,7 +1,7 @@
 export let config = {
   enforceProxy: false,
   jiosaavn: false,
-  home: 'about',
+  home: 'ytify',
   customInstance: '',
   stableVolume: false,
   prefetch: false,

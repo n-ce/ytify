@@ -9,6 +9,7 @@ section>header {
     font-weight: var(--font-weight-5);
     white-space: nowrap;
     width: calc(100% - var(--size-11));
+    user-select: none;
   }
 
   >i,

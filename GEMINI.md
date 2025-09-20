@@ -8,18 +8,13 @@ The current remaining before the refactor is complete:
 - a working list
 - all player issues resolved such as 'cannot modify Store directly'
 - efficient communication patterns
-- fully typed network responses
-- updating StreamItem ListItem and other types to be more robust
-- reduction of reliance on Type casting
 - efficient use of solidjs
-- using generics where possible, even existing code
-- using css relative color syntax to build themimg scheme instead of script
 
-
-developer has specific coding preferences and standards:
-- **High-Quality Code:** A strong preference for fully-typed, generic, and reusable code over quick fixes or the use of `any`.
-- **Functional Programming:** Prefers functional programming paradigms over class-based approaches.
-- **Async Handling:** Prefers Promise-based `.then().catch()` syntax over `async/await` with `try...catch` blocks.
-- **Methodical Approach:** Analyzes build errors and existing code thoroughly before making changes.
-- **Code Optimization:** Keen on identifying opportunities for optimization, code reduction, and file consolidation to avoid redundancy.
+tips:
+- A strong preference for fully-typed, generic, and reusable code over quick fixes. avoid the use of `any`.
+- Prefers Promise-based `.then().catch()` syntax over `async/await` with `try...catch` blocks.
+- Analyzes build errors and existing code thoroughly before making changes.
+- Keen on identifying opportunities for optimization, code reduction, and file consolidation to avoid redundancy.
+- npm run build - ignore environmental build errors, its a known issue
+- git - when the task is achieve prompt user for pushing code via asking for git status permission, form the git commit message based on the status, most of the times you need to add all files, git add , commit, push at once.
 

@@ -1,5 +1,6 @@
 import { For } from "solid-js";
 import { generateImageUrl, getDB, getThumbIdFromLink } from "../../lib/utils";
+import { t } from "../../lib/stores";
 import ListItem from "../../components/ListItem";
 
 export default function(_: {
@@ -47,21 +48,35 @@ export default function(_: {
     });
   }
 
-  return (
-    <For each={array}>
-      {(item) =>
-        <ListItem
-          stats={''}
-          title={item.name}
-          url={item.url}
+  const icons = {
+    albums: 'ri-album-fill',
+    channels: 'ri-tv-fill',
+    artists: 'ri-user-heart-fill',
+    playlists: 'ri-youtube-fill'
+  }
 
-          thumbnail={generateImageUrl(
-            getThumbIdFromLink(
-              item.thumbnail
-            ), '')}
-          uploader_data={item.uploaderName}
-        />
-      }
-    </For>
+  return (
+    <article class="apac">
+      <p>
+        <i class={icons[_.flag]}></i>&nbsp;
+        {t('library_' + _.flag as 'library_albums')}</p>
+      <div>
+        <For each={array}>
+          {(item) =>
+            <ListItem
+              stats={''}
+              title={item.name}
+              url={item.url}
+
+              thumbnail={generateImageUrl(
+                getThumbIdFromLink(
+                  item.thumbnail
+                ), '')}
+              uploader_data={item.uploaderName}
+            />
+          }
+        </For>
+      </div>
+    </article>
   );
 }

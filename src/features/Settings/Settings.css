@@ -127,25 +127,4 @@
     }
   }
 
-  >div:last-child {
-    background: none;
-    border: none;
-  }
-}
-
-#netlifyForm {
-  font-family: inherit;
-  font-size: medium;
-  background-color: var(--onBg);
-  border: var(--border);
-  border-radius: var(--roundness);
-  color: inherit;
-  padding: 1vmin;
-  width: 100%;
-  resize: none;
-
-  &::placeholder {
-    color: inherit;
-    opacity: 0.7;
-  }
 }

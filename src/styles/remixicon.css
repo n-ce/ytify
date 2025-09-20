@@ -19,6 +19,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 .ri-sort-alphabet-asc:before {
   content: "\f460";
 }
@@ -199,14 +200,6 @@
   content: "\f143";
 }
 
-.ri-stack-fill:before {
-  content: "\f180";
-}
-
-.ri-stack-line:before {
-  content: "\f181";
-}
-
 .ri-repeat-line:before {
   content: "\f074";
 }
@@ -239,20 +232,12 @@
   content: "\f4c8";
 }
 
-.ri-arrow-right-s-line:before {
-  content: "\ea6e";
-}
-
 .ri-sort-number-asc:before {
   content: "\f462";
 }
 
 .ri-sort-number-desc:before {
   content: "\f463";
-}
-
-.ri-loop-left-line:before {
-  content: "\f33d";
 }
 
 .ri-add-circle-line:before {
@@ -273,4 +258,40 @@
 
 .ri-checkbox-fill:before {
   content: "\eb82";
+}
+
+.ri-signpost-line:before {
+  content: "\f48e";
+}
+
+.ri-close-circle-line:before {
+  content: "\eb97";
+}
+
+.ri-gemini-line:before {
+  content: "\f540";
+}
+
+.ri-gemini-fill:before {
+  content: "\f53f";
+}
+
+.ri-youtube-fill:before {
+  content: "\f2d4";
+}
+
+.ri-tv-fill:before {
+  content: "\f236";
+}
+
+.ri-user-heart-fill:before {
+  content: "\f262";
+}
+
+.ri-album-fill:before {
+  content: "\ea1e";
+}
+
+.ri-save-line:before {
+  content: "\f0b3";
 }

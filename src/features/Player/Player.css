@@ -99,7 +99,7 @@
 .slider {
   input {
     width: 100%;
-    color: color-mix(in srgb, oklch(from var(--bg) 60% 50% h), rgb(from var(--text) r g b / 1) 70%);
+    color: var(--accent);
   }
 
 

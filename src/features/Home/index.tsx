@@ -1,9 +1,9 @@
-import { createSignal, For, Match, Show, Switch } from 'solid-js';
+import { For, Match, Show, Switch, createSignal } from 'solid-js';
 import About from './About';
 import Hub from './Hub';
 import './Home.css';
 import { config, setConfig } from '../../lib/utils';
-import { navStore, setNavStore, t } from '../../lib/stores';
+import { navStore, setNavStore } from '../../lib/stores';
 import Collections from './Collections';
 import SubLists from './SubLists';
 import Dropdown from './Dropdown';
@@ -11,8 +11,8 @@ import Dropdown from './Dropdown';
 
 export default function() {
 
-  const catalogue = ['about', 'hub', 'collections', 'artists', 'albums', 'channels', 'playlists'];
-  const [catalogueItem, setCatalogueItem] = createSignal(config.home);
+  const homeItems = ['ytify', 'Hub', 'Library'];
+  const [home, setHome] = createSignal(config.home);
 
 
   let syncBtn!: HTMLElement;
@@ -25,7 +25,13 @@ export default function() {
     <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
 
       <header>
-        <p>Home</p>
+        <p onclick={() => {
+          const currentHomeIndex = homeItems.indexOf(home());
+          const nextHomeIndex = (currentHomeIndex + 1) % homeItems.length;
+          const nextHome = homeItems[nextHomeIndex];
+          setHome(nextHome);
+          setConfig('home', nextHome);
+        }}>{home()}</p>
         <Show when={dbsync}>
           <i
             id="syncNow"
@@ -52,50 +58,25 @@ export default function() {
         <Dropdown />
       </header>
 
-      <div id="catalogueSelector">
-        <For each={catalogue}>
-          {(item) => (
-            <>
-              <input
-                type="radio"
-                id={'r.' + item}
-                name="superCollectionChips"
-                onclick={() => {
-                  setCatalogueItem(item);
-                  setConfig('home', item);
-                }}
-                checked={item === catalogueItem()}
-              />
-              <label
-                for={'r.' + item}
-              >{t(('library_' + item) as 'library_hub')}</label>
-            </>
-          )}
-        </For>
-
-      </div>
 
       <div id="catalogue">
 
-        <Switch fallback={
-          <About />
-        }>
-          <Match when={catalogueItem() === 'hub'}>
+        <Switch fallback={<About />}>
+          <Match when={home() === 'Hub'}>
             <Hub />
           </Match>
-          <Match when={catalogueItem() === 'about'}>
+          <Match when={home() === 'ytify'}>
             <About />
           </Match>
-          <Match when={catalogueItem() === 'collections'}>
+          <Match when={home() === 'Library'}>
             <Collections />
-          </Match>
-          <For each={['albums', 'playlists', 'channels', 'artists'] as APAC[]}>
-            {(item) =>
-              <Match when={catalogueItem() === item}>
+            <For each={['albums', 'playlists', 'channels', 'artists'] as APAC[]}>
+              {(item) =>
                 <SubLists flag={item} />
-              </Match>
-            }
-          </For>
+              }
+            </For>
+
+          </Match>
 
         </Switch>
       </div>
