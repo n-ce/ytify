@@ -7,7 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fontsource/atkinson-hyperlegible-next": "^5.2.7",
+    "@fontsource-variable/atkinson-hyperlegible-next": "^5.2.6",
     "solid-js": "1.9.9",
     "sortablejs": "^1.15.6"
   },

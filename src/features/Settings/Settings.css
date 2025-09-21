@@ -78,12 +78,11 @@
     }
 
     b {
-      display: flex;
-      align-items: center;
-      column-gap: var(--size-1);
-      margin: var(--size-1);
-      letter-spacing: var(--font-letterspacing-0);
-      font-weight: var(--font-weight-5);
+      margin-left: var(--size-2);
+      letter-spacing: var(--font-letterspacing-2);
+      font-weight: var(--font-weight-7);
+      font-size: var(--font-size-2);
+      cursor: pointer;
     }
 
     b.hide {
