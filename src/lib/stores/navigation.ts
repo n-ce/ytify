@@ -52,7 +52,6 @@ export function closeFeature(name: Features) {
 
   const closestRef = active[0]?.[1]?.ref;
 
-  console.log(closestRef?.checkVisibility())
   if (removedIndex < 3)
     closestRef?.parentElement?.scrollTo({
       left: closestRef?.offsetWidth,
@@ -61,9 +60,15 @@ export function closeFeature(name: Features) {
   else
     closestRef?.scrollIntoView({ behavior: 'smooth' });
 
-  setTimeout(() => {
+
+  const isLandscape = matchMedia('(orientation:landscape)').matches;
+
+  if (isLandscape)
     setNavStore(name, { ref: null, state: false });
-  }, 300);
+  else
+    setTimeout(() => {
+      setNavStore(name, { ref: null, state: false });
+    }, 350);
 
 }
 

@@ -1,7 +1,7 @@
 import { createStore } from "solid-js/store";
 import { config } from "../utils/config";
 
-type Services = 'piped' | 'invidious' | 'hyperpipe'
+type Services = 'piped' | 'invidious';
 const storeInit: {
   api: Record<Services, string[]> &
   Record<'jiosaavn' | 'cobalt' | 'fallback', string>
@@ -20,18 +20,16 @@ const storeInit: {
   api: {
     piped: ['https://piapi.ggtyler.dev'],
     invidious: ['https://iv.ggtyler.dev'],
-    hyperpipe: ['https://hpapi.ggtyler.dev'],
     jiosaavn: 'https://saavn.dev',
     cobalt: 'https://cobalt-api.kwiatekmiki.com',
     index: {
       piped: 0,
-      invidious: 0,
-      hyperpipe: 0
+      invidious: 0
     },
     fallback: location.origin,
     status: 'N'
   },
-  useSaavn: config.jiosaavn,
+  useSaavn: true,
   linkHost: config.linkHost || location.origin,
   searchQuery: '',
   downloadFormat: config.dlFormat,

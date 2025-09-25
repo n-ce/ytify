@@ -3,14 +3,9 @@ import { config, setConfig } from '../../lib/utils/config.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {
-  let head!: HTMLElement;
 
   return (
-    <div>
-      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
-        {t('nav_search')}
-      </b>
-
+    <>
       <ToggleSwitch
         id="LinkCaptureSwitch"
         name='settings_link_capturing'
@@ -19,7 +14,6 @@ export default function() {
           setConfig('searchBarLinkCapture', !config.searchBarLinkCapture);
         }}
       />
-
       <ToggleSwitch
         id="suggestionsSwitch"
         name='settings_display_suggestions'
@@ -29,6 +23,6 @@ export default function() {
           setStore('snackbar', t('settings_reload'));
         }}
       />
-    </div>
+    </>
   );
 }

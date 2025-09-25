@@ -23,12 +23,10 @@ export async function player(id: string | null = '') {
   });
 
 
-  if (config.jiosaavn) {
-    if (!store.useSaavn)
-      setStore('useSaavn', true);
-    else if (playerStore.stream.author.endsWith('Topic'))
-      return import('../modules/jioSaavn').then(mod => mod.default());
-  }
+  if (!store.useSaavn)
+    setStore('useSaavn', true);
+  else if (playerStore.stream.author.endsWith('Topic'))
+    return import('../modules/jioSaavn').then(mod => mod.default());
 
 
   const data = await import('../modules/getStreamData').then(mod => mod.default(id, false, playerAbortController.signal));

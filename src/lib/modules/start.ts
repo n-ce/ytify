@@ -17,10 +17,10 @@ export default async function() {
   const { shareAction } = config;
 
   await uma()
-    .then(({ piped, invidious, hyperpipe, jiosaavn, cobalt, status }) => {
+    .then(({ piped, invidious, jiosaavn, cobalt, status }) => {
       setStore('api', {
-        piped, invidious, hyperpipe, jiosaavn, cobalt, status,
-        index: { piped: 0, invidious: 0, hyperpipe: 0 }
+        piped, invidious, jiosaavn, cobalt, status,
+        index: { piped: 0, invidious: 0 }
       })
     })
     .catch(() => {

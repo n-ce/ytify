@@ -4,14 +4,9 @@ import { getDB, saveDB } from '../../lib/utils/library.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {
-  let head!: HTMLElement;
 
   return (
-    <div>
-      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
-        {t('settings_library')}
-      </b>
-
+    <>
       <ToggleSwitch
         id="dbsync"
         name='settings_library_sync'
@@ -85,6 +80,6 @@ export default function() {
           setConfig('history', configVal);
         }}
       />
-    </div>
+    </>
   );
 }

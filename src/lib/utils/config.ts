@@ -1,8 +1,6 @@
 export let config = {
   enforceProxy: false,
-  jiosaavn: false,
   home: 'ytify',
-  customInstance: '',
   stableVolume: false,
   prefetch: false,
   HLS: false,
@@ -12,7 +10,6 @@ export let config = {
   dlFormat: 'opus' as 'opus' | 'mp3' | 'wav' | 'ogg',
   theme: 'auto',
   landscapeSections: '3',
-  customColor: '',
   roundness: '0.4rem',
   searchSuggestions: true,
   searchBarLinkCapture: true,
@@ -30,20 +27,8 @@ export let config = {
   dbsync: '',
   language: '',
   codec: 'any' as 'opus' | 'aac' | 'any',
-  partsManagerPIN: '',
-  'part Reserved Collections': true,
-  'part Navigation Library': true,
-  'part Featured Playlists': true,
-  'part Subscription Feed': true,
-  'part Collections': true,
-  'part Start Radio': true,
-  'part View Author': true,
-  'part Playlists': true,
-  'part Channels': true,
-  'part Watch On': true,
-  'part For You': true,
-  'part Artists': true,
-  'part Albums': true
+
+
 }
 
 type AppConfig = typeof config;

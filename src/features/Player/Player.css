@@ -37,6 +37,16 @@
 
   }
 
+  .ri-close-large-line {
+    margin-right: 0;
+    margin-left: auto;
+  }
+
+  .ri-more-2-fill {
+    font-size: var(--font-size-3);
+  }
+
+
 }
 
 #playerSection article {

@@ -131,11 +131,8 @@
     "settings_theming_scheme_white": "সাদা",
     "settings_theming_scheme_black": "কালো",
     "settings_fullscreen": "ফুলস্ক্রিন টগল করুন",
-    "settings_parental_controls": "অভিভাবকীয় নিয়ন্ত্রণ",
-    "settings_pin_toggle": "তোইরি করুন",
-    "settings_pin_message": "প্যারেন্টাল কন্ট্রোল সেটআপ করার জন্য পিন প্রয়োজন, তারপরে পার্টস ম্যানেজারকে ইন্টিগ্রেট করতে অ্যাপটি রিলোড হবে।",
-    "settings_pin_prompt": "পিন এন্টার করুন",
-    "settings_pin_incorrect": "পিনটি ভুল!",
+
+
     "settings_feedback_placeholder": "বেনামে আপনার প্রতিক্রিয়া (বাগ, বৈশিষ্ট্য অনুরোধ) এখানে লিখুন:",
     "settings_feedback_submit": "প্রতিক্রিয়া জমা দিন",
     "settings_changelog": "চেঞ্জলগ",

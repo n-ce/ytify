@@ -141,15 +141,15 @@ function colorInjector(colorArray: number[]) {
 export function themer() {
   const initColor = '127,127,127';
   const { stream } = playerStore;
-  const { customColor, loadImage } = config;
-  if (loadImage && stream.id && !customColor)
+  const { loadImage } = config;
+  if (loadImage && stream.id)
     import('../modules/extractColorFromImage')
       .then(mod => mod.default)
       .then(e => e(generateImageUrl(stream.id, 'mq'), true))
       .then(colorInjector);
   else
     colorInjector(
-      (customColor || initColor)
+      (initColor)
         .split(',')
         .map(s => parseInt(s))
     );

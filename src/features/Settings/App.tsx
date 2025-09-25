@@ -5,17 +5,11 @@ import { setStore, setI18nStore, t, updateLang } from '../../lib/stores';
 
 export default function() {
 
-  let head!: HTMLElement;
 
   createEffect(updateLang);
 
   return (
-    <div>
-      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
-        ytify {Build}
-      </b>
-
-
+    <>
       <Selector
         label='settings_language'
         id='languageSelector'
@@ -76,7 +70,6 @@ export default function() {
         <option value='watch'>{t('settings_pwa_watch')}</option>
         <option value='dl'>{t('settings_pwa_download')}</option>
       </Selector>
-
-    </div>
+    </>
   );
 }

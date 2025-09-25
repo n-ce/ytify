@@ -147,7 +147,7 @@ export default async function fetchList(
 
 
 const getPlaylistIdFromArtist = (id: string): Promise<string> =>
-  fetch(store.api.hyperpipe + id)
+  fetch('/artists/' + id)
     .then(res => res.json())
     .then(data => {
       if (!('playlistId' in data))

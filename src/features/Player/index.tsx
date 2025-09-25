@@ -36,18 +36,15 @@ export default function() {
 
       <header class="topShelf">
         <p>from {((a = playerStore.context) => a[0].toUpperCase() + a.slice(1))()}</p>
-        <div class="right-group">
-          <i
-            onclick={() => { closeFeature('player') }}
-            class="ri-close-large-line"></i>
-        </div>
+        <i
+          onclick={() => { closeFeature('player') }}
+          class="ri-close-large-line"></i>
         <i
           aria-label={t('player_more')}
           class="ri-more-2-fill"
           id="moreBtn"
           onclick={() => setStore('actionsMenu', playerStore.stream)}
         ></i>
-
       </header>
       <article>
         <Show when={config.loadImage}><MediaArtwork /></Show>
@@ -132,6 +129,9 @@ export default function() {
             <option value="3.50">3.50x</option>
             <option value="4.00">4.00x</option>
           </select>
+
+          <i class="ri-signpost-line"></i>
+
 
           <LikeButton />
 

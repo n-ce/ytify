@@ -51,15 +51,14 @@ export default function() {
 
         <CollectionSelector close={closeDialog} />
 
-        <Show when={config['part Start Radio']}>
-
-          <li tabindex="3" onclick={async () => {
+        <li tabindex="3" onclick={async () => {
             closeDialog();
             //fetchList('/playlists/RD' + _.data.id, true);
           }}>
             <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
           </li>
-        </Show>
+
+
 
 
         <li tabindex="4" onclick={async () => {
@@ -77,10 +76,7 @@ export default function() {
           {t('actions_menu_download')}
         </li>
 
-
-        <Show when={config['part View Author']}>
-
-          <li tabindex="5" onclick={() => {
+        <li tabindex="5" onclick={() => {
             closeDialog();
             setListStore('name',
               author.endsWith('- Topic') ?
@@ -96,7 +92,9 @@ export default function() {
               'actions_menu_view_channel')
             }
           </li>
-        </Show>
+
+
+
 
         <Show when={isMusic}>
           <li tabindex="6" onclick={() => {
@@ -108,9 +106,7 @@ export default function() {
           </li>
         </Show>
 
-        <Show when={!isMusic && config['part Watch On']}>
-
-          <li tabindex="6" onclick={() => {
+        <li tabindex="6" onclick={() => {
             closeDialog();
             if (config.linkHost)
               open(hostResolver('/watch?v=' + id));
@@ -119,7 +115,8 @@ export default function() {
           }}>
             <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>
-        </Show>
+
+
 
 
         <li tabindex="7" onclick={() => {

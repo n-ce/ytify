@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "Blanc",
     "settings_theming_scheme_black": "Noir",
     "settings_fullscreen": "Basculer en plein écran",
-    "settings_parental_controls": "Contrôles parental",
-    "settings_pin_toggle": "Configurer",
-    "settings_pin_message": "Un code PIN est requis pour configurer le contrôle parental, apres quoi l'application se relancera ensuite pour intégrer le gestionnaire de composantes.",
-    "settings_pin_prompt": "Saisir le code PIN",
-    "settings_pin_incorrect": "Code PIN incorrect !",
+
+
     "settings_feedback_placeholder": "Saisissez anonymement vos commentaires (bogues, demandes de fonctionnalités) ici :",
     "settings_feedback_submit": "Envoyer les commentaires",
     "settings_changelog": "Journal des modifications",

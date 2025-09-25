@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "Branco",
     "settings_theming_scheme_black": "Preto",
     "settings_fullscreen": "Alternar Ecrã Cheio",
-    "settings_parental_controls": "Controlo Parental",
-    "settings_pin_toggle": "Configurar",
-    "settings_pin_message": "É necessário um PIN para configurar o controlo parental, após o qual a aplicação será recarregada para integrar o gestor de peças.",
-    "settings_pin_prompt": "Introduza o PIN",
-    "settings_pin_incorrect": "PIN incorreto!",
+
+
     "settings_feedback_placeholder": "Introduza anonimamente o seu feedback (bugs, pedidos de funcionalidades) aqui:",
     "settings_feedback_submit": "Enviar Feedback",
     "settings_changelog": "Registo de Alterações",

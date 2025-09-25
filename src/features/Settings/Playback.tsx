@@ -1,16 +1,10 @@
 import ToggleSwitch from './ToggleSwitch.tsx';
 import { Selector } from '../../components/Selector.tsx';
 import { config, quickSwitch, setConfig } from '../../lib/utils';
-import { t } from '../../lib/stores';
 
 export default function() {
-  let head!: HTMLElement;
   return (
-    <div>
-      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
-        {t('settings_playback')}
-      </b>
-
+    <>
       <Selector
         label='settings_audio_quality'
         id='qualityPreference'
@@ -60,25 +54,6 @@ export default function() {
       />
 
       <ToggleSwitch
-        id="enforceProxySwitch"
-        name='settings_always_proxy_streams'
-        checked={config.enforceProxy}
-        onclick={() => {
-          setConfig('enforceProxy', !config.enforceProxy);
-          quickSwitch();
-        }}
-      />
-
-      <ToggleSwitch
-        id="jioSaavnSwitch"
-        name='settings_jiosaavn'
-        checked={config.jiosaavn}
-        onclick={() => {
-          setConfig('jiosaavn', !config.jiosaavn);
-        }}
-      />
-
-      <ToggleSwitch
         id="watchModeSwitch"
         name='settings_watchmode'
         checked={Boolean(config.watchMode)}
@@ -89,6 +64,6 @@ export default function() {
           );
         }}
       />
-    </div>
+    </>
   );
 }

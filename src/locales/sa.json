@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "श्वेतम्",
     "settings_theming_scheme_black": "कृष्णम्",
     "settings_fullscreen": "पूर्णपटलं परिवर्तय",
-    "settings_parental_controls": "पितृनियन्त्रणानि",
-    "settings_pin_toggle": "व्यवस्थापय",
-    "settings_pin_message": "पितृनियन्त्रणानां व्यवस्थापनाय PIN आवश्यकः, ततः अनुप्रयोगः भागप्रबन्धकस्य एकीकरणाय पुनः आरम्भिष्यते।",
-    "settings_pin_prompt": "PIN प्रविश्यताम्",
-    "settings_pin_incorrect": "अशुद्धः PIN!",
+
+
     "settings_feedback_placeholder": "अनामिकरूपेण भवतः प्रतिक्रियां (दोषाः, वैशिष्ट्यानुरोधाः) अत्र प्रविश्यताम्:",
     "settings_feedback_submit": "प्रतिक्रियां प्रेषय",
     "settings_changelog": "परिवर्तनसूची",

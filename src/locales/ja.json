@@ -143,11 +143,8 @@
     "settings_theming_scheme_white": "ライト",
     "settings_theming_scheme_black": "ダーク",
     "settings_fullscreen": "フルスクリーン",
-    "settings_parental_controls": "保護者設定",
-    "settings_pin_toggle": "設定",
-    "settings_pin_message": "保護者設定を有効化するにはPINが必要です。入力が完了するとアプリが再読み込みされ、パーツマネージャーが統合されます。",
-    "settings_pin_prompt": "PINを入力",
-    "settings_pin_incorrect": "PINが間違っています!",
+
+
     "settings_feedback_placeholder": "匿名でフィードバック(バグ、機能のリクエスト)を送信:",
     "settings_feedback_submit": "フィードバックを送信",
     "settings_changelog": "変更ログ",

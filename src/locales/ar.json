@@ -137,11 +137,8 @@
     "settings_theming_scheme_white": "أبيض",
     "settings_theming_scheme_black": "أسود",
     "settings_fullscreen": "تبديل وضع ملء الشاشة",
-    "settings_parental_controls": "الرقابة الأبوية",
-    "settings_pin_toggle": "الإعداد",
-    "settings_pin_message": "مطلوب رمز PIN لإعداد الرقابة الأبوية، وبعد ذلك سيتم إعادة تحميل التطبيق لدمج مدير الأجزاء.",
-    "settings_pin_prompt": "أدخل رمز PIN",
-    "settings_pin_incorrect": "رمز PIN غير صحيح!",
+
+,
     "settings_feedback_placeholder": "أدخل ملاحظاتك (الأخطاء، طلبات الميزات) بشكل مجهول هنا:",
     "settings_feedback_submit": "إرسال الملاحظات",
     "settings_changelog": "سجل التغييرات",

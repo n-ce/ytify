@@ -4,14 +4,9 @@ import { setStore, t } from '../../lib/stores';
 import { config, cssVar, setConfig, themer } from '../../lib/utils';
 
 export default function() {
-  let head!: HTMLElement;
 
   return (
-    <div>
-      <b class="hide" ref={head} onclick={() => head.classList.toggle('hide')}>
-        {t('settings_interface')}
-      </b>
-
+    <>
       <ToggleSwitch
         id='imgLoadSwitch'
         name='settings_load_images'
@@ -34,7 +29,7 @@ export default function() {
       >
         <option value="1">1</option>
         <option value="2">2</option>
-        <option value="3">3</option>
+        <option value="3" selected>3</option>
         <option value="4">4</option>
       </Selector>
 
@@ -53,25 +48,6 @@ export default function() {
         <option value="0.6rem">{t('settings_roundness_heavy')}</option>
         <option value="0.9rem">{t('settings_roundness_heavier')}</option>
       </Selector>
-
-      <ToggleSwitch
-        id="custom_theme"
-        name='settings_use_custom_color'
-        checked={Boolean(config.customColor)}
-        onclick={(e) => {
-          let colorString = '';
-
-          if (!config.customColor) {
-            const rgbText = t('settings_custom_color_prompt');
-            const str = prompt(rgbText, '174,174,174');
-            if (str)
-              colorString = str;
-            else (e as Event).preventDefault();
-          }
-          setConfig('customColor', colorString);
-          themer();
-        }}
-      />
 
       <Selector
         label='settings_theming_scheme'
@@ -93,6 +69,6 @@ export default function() {
           <option value="black">{t('settings_theming_scheme_black')}</option>
         </optgroup>
       </Selector>
-    </div>
+    </>
   );
 }

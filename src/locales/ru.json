@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "Белая",
     "settings_theming_scheme_black": "Чёрная",
     "settings_fullscreen": "Переключить полноэкранный режим",
-    "settings_parental_controls": "Родительский контроль",
-    "settings_pin_toggle": "Настроить",
-    "settings_pin_message": "Для настройки родительского контроля требуется PIN-код. После этого приложение будет перезагружено для интеграции менеджера компонентов.",
-    "settings_pin_prompt": "Введите PIN-код",
-    "settings_pin_incorrect": "Неверный PIN-код!",
+
+
     "settings_feedback_placeholder": "Анонимно введите свой отзыв (ошибки, пожелания) здесь:",
     "settings_feedback_submit": "Отправить отзыв",
     "settings_changelog": "Список изменений",

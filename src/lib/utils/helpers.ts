@@ -41,7 +41,8 @@ export function proxyHandler(url: string, prefetch: boolean = false) {
 
   return useProxy ?
     (url + (host ? '' : `&host=${origin}`)) :
-    (host && !config.customInstance) ? url.replace(origin, host) : url;
+    host
+      ? url.replace(origin, host) : url;
 }
 
 

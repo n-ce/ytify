@@ -24,7 +24,7 @@
 - **Download** ⬇️ : Download any audio stream using the button on the action menu.
 - **Lyrics** 🎼 : Immersive Synced Lyrics using the button on the action menu.
 - **For You** 🎻 : Get audio tailored specifically for you based on your Favorites, generated on device without any violation of privacy.
-- **Parental Controls** 👨‍👦 : Disable Parts of the application according to your needs.
+
 
 ![1000012574](https://github.com/user-attachments/assets/450a1eed-0fb6-4fba-8d4a-c18431b935ad)
 ![1000012580](https://github.com/user-attachments/assets/4abcd09d-d2ef-4e26-8632-1a50cedfbab8)
