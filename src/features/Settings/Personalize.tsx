@@ -54,7 +54,7 @@ export default function() {
         id='themeSelector'
         onchange={(e) => {
           themer();
-          setConfig('theme', e.target.value);
+          setConfig('theme', e.target.value as 'auto' | 'light' | 'dark');
         }}
         value={config.theme}
       >
