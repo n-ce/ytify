@@ -6,7 +6,7 @@
   margin-bottom: var(--size-4);
   border: var(--border);
   border-radius: var(--roundness);
-  background-color: var(--blurMix);
+  background-color: var(--onBg);
   backdrop-filter: blur(var(--size-px-2));
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;

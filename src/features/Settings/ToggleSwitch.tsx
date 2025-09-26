@@ -1,5 +1,11 @@
 import { t } from '../../lib/stores';
 
+type ToggleSwitch = {
+  name: TranslationKeys | string,
+  id: string,
+  checked: boolean,
+  onclick: (e: MouseEvent) => void
+}
 
 export default function(_: ToggleSwitch) {
   let target!: HTMLInputElement;

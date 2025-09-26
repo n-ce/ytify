@@ -8,7 +8,7 @@ export let config = {
   loadImage: true,
   linkHost: location.origin,
   dlFormat: 'opus' as 'opus' | 'mp3' | 'wav' | 'ogg',
-  theme: 'auto',
+  theme: 'auto' as 'auto' | 'light' | 'dark',
   landscapeSections: '3',
   roundness: '0.4rem',
   searchSuggestions: true,

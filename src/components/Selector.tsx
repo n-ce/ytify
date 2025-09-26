@@ -1,4 +1,13 @@
+import type { JSXElement } from 'solid-js';
 import { t } from '../lib/stores';
+
+type Selector = {
+  label: TranslationKeys | string,
+  id: string,
+  onchange: (e: { target: HTMLSelectElement }) => void,
+  value: string,
+  children: JSXElement
+}
 
 export function Selector(_: Selector) {
   let target!: HTMLSelectElement;

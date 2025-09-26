@@ -39,7 +39,7 @@ footer {
     border-top: var(--border);
     border-top-left-radius: var(--roundness);
     border-top-right-radius: var(--roundness);
-    background: linear-gradient(var(--blurMix), var(--bg));
+    background: linear-gradient(transparent, var(--scheme));
 
     img {
       height: var(--size-8);
@@ -112,15 +112,13 @@ footer {
     background-color: transparent;
     accent-color: auto;
     appearance: none;
-    padding: var(--size-2);
 
     &::-webkit-progress-bar {
       background: transparent;
     }
 
     &::-webkit-progress-value {
-      background-color: hsla(from var(--surface) h s 60% / 0.2);
-      border-radius: calc(var(--roundness) * 0.5);
+      background: linear-gradient(transparent, var(--onBg2));
       transition: all 0.4s linear;
     }
   }

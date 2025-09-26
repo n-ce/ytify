@@ -1,4 +1,4 @@
-import { JSXElement } from 'solid-js';
+import type { JSXElement } from 'solid-js';
 import type en from './locales/en.json';
 
 declare global {
@@ -66,31 +66,6 @@ declare global {
 
   type APAC = 'albums' | 'playlists' | 'artists' | 'channels';
   type SuperCollection = 'featured' | 'collections' | APAC | 'feed' | 'for_you';
-
-  type Scheme = {
-    [index: string]: {
-      bg: (r: number, g: number, b: number) => string,
-      borderColor: (r: number, g: number, b: number) => string,
-      shadowColor: string,
-      onBg: string,
-      text: string
-    }
-  }
-
-  type ToggleSwitch = {
-    name: TranslationKeys | string,
-    id: string,
-    checked: boolean,
-    onclick: (e: EventHandler<HTMLInputElement>) => void
-  }
-
-  type Selector = {
-    label: TranslationKeys | string,
-    id: string,
-    onchange: (e: { target: HTMLSelectElement }) => void,
-    value: string,
-    children: JSXElement
-  }
 
   type AudioStream = {
     codec: string,

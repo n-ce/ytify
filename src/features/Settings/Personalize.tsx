@@ -58,16 +58,9 @@ export default function() {
         }}
         value={config.theme}
       >
-        <optgroup label={t('settings_theming_scheme_dynamic')}>
-          <option value="auto" selected>{t('settings_theming_scheme_system')}</option>
-          <option value="light">{t('settings_theming_scheme_light')}</option>
-          <option value="dark">{t('settings_theming_scheme_dark')}</option>
-        </optgroup>
-        <optgroup label={t('settings_theming_scheme_hc')}>
-          <option value="auto-hc">{t('settings_theming_scheme_hc_system')}</option>
-          <option value="white">{t('settings_theming_scheme_white')}</option>
-          <option value="black">{t('settings_theming_scheme_black')}</option>
-        </optgroup>
+        <option value="auto" selected>{t('settings_theming_scheme_system')}</option>
+        <option value="light">{t('settings_theming_scheme_light')}</option>
+        <option value="dark">{t('settings_theming_scheme_dark')}</option>
       </Selector>
     </>
   );

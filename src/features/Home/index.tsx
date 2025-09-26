@@ -70,6 +70,8 @@ export default function() {
           </Match>
           <Match when={home() === 'Library'}>
             <Collections />
+            <br />
+            <br />
             <For each={['albums', 'playlists', 'channels', 'artists'] as APAC[]}>
               {(item) =>
                 <SubLists flag={item} />

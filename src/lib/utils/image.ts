@@ -40,33 +40,6 @@ const tabColor = <HTMLMetaElement>document.head.children.namedItem('theme-color'
 const systemDark = matchMedia('(prefers-color-scheme:dark)');
 
 
-const accentLightener = (r: number, g: number, b: number) => {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  const l = Math.max(r, g, b);
-  const s = l - Math.min(r, g, b);
-  const h = s
-    ? l === r
-      ? (g - b) / s
-      : l === g
-        ? 2 + (b - r) / s
-        : 4 + (r - g) / s
-    : 0;
-
-  const hue = 60 * h < 0 ? 60 * h + 360 : 60 * h;
-  const saturation = 100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0);
-  return `hsl(
-    ${Math.floor(hue)},
-    ${Math.floor(saturation)}%,
-    80%)`;
-}
-// previous algorithm
-// `rgb(${[r, g, b].map(v => v + (204 - Math.max(r, g, b))).join(',')})`;
-
-
-
-
 function accentDarkener(r: number, g: number, b: number) {
 
   let min = Math.min(r, g, b);
@@ -79,37 +52,19 @@ function accentDarkener(r: number, g: number, b: number) {
   }
   return `rgb(${r - min}, ${g - min},${b - min})`;
 
-
 }
 
-const palette: Scheme = {
+
+const palette = {
   light: {
-    bg: accentLightener,
-    onBg: '#fff3',
-    text: '#000b',
-    borderColor: (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.2})`,
-    shadowColor: '#0002'
+    bg: '#F5F5F5',
+    text: '#000',
+    multiplier: '1.1',
   },
   dark: {
-    bg: accentDarkener,
-    onBg: '#fff1',
-    text: '#fffb',
-    borderColor: (r: number, g: number, b: number) => `rgb(${r},${g},${b},${0.4})`,
-    shadowColor: 'transparent'
-  },
-  white: {
-    bg: () => '#fff',
-    onBg: 'transparent',
-    text: '#000',
-    borderColor: accentDarkener,
-    shadowColor: '#0002'
-  },
-  black: {
-    bg: () => '#000',
-    onBg: 'transparent',
+    bg: '#000',
     text: '#fff',
-    borderColor: accentLightener,
-    shadowColor: 'transparent'
+    multiplier: '0.9'
   }
 };
 
@@ -117,29 +72,26 @@ const palette: Scheme = {
 function colorInjector(colorArray: number[]) {
   const autoDark = systemDark.matches;
   Promise.resolve()
-    .then(() => config.theme || 'auto')
-    .then(theme => {
-
+    .then(() => {
+      const { theme } = config;
       const scheme = theme === 'auto' ?
-        autoDark ? 'dark' : 'light' :
-        theme === 'auto-hc' ?
-          autoDark ? 'black' : 'white' : theme;
+        autoDark ? 'dark' : 'light' : theme;
 
       const [r, g, b] = colorArray;
 
-      cssVar('--bg', palette[scheme].bg(r, g, b));
-      cssVar('--onBg', palette[scheme].onBg);
-      cssVar('--text', palette[scheme].text);
-      cssVar('--borderColor', palette[scheme].borderColor(r, g, b));
-      cssVar('--shadowColor', palette[scheme].shadowColor);
-      tabColor.content = palette[scheme].bg(r, g, b);
+
+      cssVar('--source', accentDarkener(r, g, b));
+      cssVar('--bg', palette[scheme].bg);
+      cssVar('--schemeMultiplier', palette[scheme].multiplier);
+      cssVar('--sourceInverse', palette[scheme].text);
+      tabColor.content = palette[scheme].bg;
     });
 }
 
 
 
 export function themer() {
-  const initColor = '127,127,127';
+  const initColor = '245, 245, 220';
   const { stream } = playerStore;
   const { loadImage } = config;
   if (loadImage && stream.id)
@@ -149,7 +101,7 @@ export function themer() {
       .then(colorInjector);
   else
     colorInjector(
-      (initColor)
+      initColor
         .split(',')
         .map(s => parseInt(s))
     );

@@ -1,11 +1,10 @@
 .streamItem {
 	width: 100%;
 	user-select: none;
-	background-color: var(--onBg);
 	color: var(--text);
-	padding: var(--size-1);
 	margin-bottom: calc(var(--gap) - var(--size-2));
-	border: var(--border);
+	padding: var(--size-1);
+	background-color: var(--onBg);
 	border-radius: var(--roundness);
 	display: flex;
 	align-items: center;
@@ -23,8 +22,8 @@
 	}
 
 	&:hover {
-		box-shadow: none;
-		transform: scale(0.98);
+		background-color: var(--onBg2);
+		color: var(--text2);
 	}
 
 	&.ravel {

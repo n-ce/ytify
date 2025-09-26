@@ -1,6 +1,4 @@
 .settingsSection {
-  border-radius: var(--roundness);
-
   header {
     display: flex;
     justify-content: space-between;
@@ -11,20 +9,13 @@
     }
   }
 
-  >div {
-    padding: var(--size-1);
-  }
-
   div {
-    background-color: var(--onBg);
-    border: var(--border);
-    border-radius: var(--roundness);
     width: 100%;
     margin-bottom: var(--gap);
 
     &.toggleSwitch,
     >span {
-      width: calc(100% - 2ch);
+      width: 100%;
       margin: 1ch auto;
     }
 
@@ -33,6 +24,10 @@
       align-items: center;
       background: none;
       border: none;
+
+      &:hover {
+        background-color: var(--onBg);
+      }
 
       label {
         width: calc(100% - 2.2rem);
@@ -47,6 +42,7 @@
         width: 2.2rem;
         border: var(--border);
 
+
         &,
         &:before {
           height: 1.3rem;
@@ -58,7 +54,7 @@
           height: calc(100% - 0.5rem);
           aspect-ratio: 1;
           margin: 0.25rem;
-          background-color: var(--text);
+          background-color: var(--text2);
           border-radius: calc(var(--roundness) / 2);
         }
 
@@ -69,7 +65,7 @@
       }
 
       input:checked+span {
-        background: var(--bg);
+        background: var(--onBg2);
       }
 
       input:checked+span:before {
@@ -82,12 +78,14 @@
       justify-content: space-between;
       align-items: center;
 
-      select {
+      &:hover {
         background-color: var(--onBg);
+      }
+
+      select {
+        color: var(--text2);
         font-size: inherit;
-        border: var(--border);
-        border-radius: var(--roundness);
-        padding: var(--size-1) var(--size-2);
+        padding: 0 var(--size-2);
         max-width: 50%;
       }
     }

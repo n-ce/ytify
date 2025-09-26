@@ -30,8 +30,9 @@ export default function() {
       .flat()
       .filter(v => {
         if (!('title' in v)) return false;
-        const title = v.title.toLowerCase().includes(toFind);
-        const author = v.author.toLowerCase().includes(toFind);
+        const title = v.title?.toLowerCase().includes(toFind);
+        if (!('author' in v)) return false;
+        const author = v.author?.toLowerCase().includes(toFind);
 
         return title || author;
       }) as CollectionItem[]

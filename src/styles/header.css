@@ -2,6 +2,7 @@ section>header {
   position: relative;
   width: 100%;
   padding: var(--gap) 0;
+  color: var(--text);
 
   >p {
     font-size: var(--font-size-3);
@@ -10,11 +11,13 @@ section>header {
     white-space: nowrap;
     width: calc(100% - var(--size-11));
     user-select: none;
+    opacity: 0.8;
   }
 
   >i,
   div>i {
     font-size: var(--font-size-4);
+    opacity: 0.8;
   }
 
   .right-group {

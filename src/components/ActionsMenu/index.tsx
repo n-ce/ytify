@@ -52,11 +52,11 @@ export default function() {
         <CollectionSelector close={closeDialog} />
 
         <li tabindex="3" onclick={async () => {
-            closeDialog();
-            //fetchList('/playlists/RD' + _.data.id, true);
-          }}>
-            <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
-          </li>
+          closeDialog();
+          //fetchList('/playlists/RD' + _.data.id, true);
+        }}>
+          <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
+        </li>
 
 
 
@@ -77,21 +77,21 @@ export default function() {
         </li>
 
         <li tabindex="5" onclick={() => {
-            closeDialog();
-            setListStore('name',
-              author.endsWith('- Topic') ?
-                ('Artist - ' + author.replace('- Topic', ''))
-                : '');
+          closeDialog();
+          setListStore('name',
+            author.endsWith('- Topic') ?
+              ('Artist - ' + author.replace('- Topic', ''))
+              : '');
 
-            //fetchList(_.data.channelUrl);
-          }}>
+          //fetchList(_.data.channelUrl);
+        }}>
 
-            <i class="ri-user-3-line"></i>
-            {t(isMusic ?
-              'actions_menu_view_artist' :
-              'actions_menu_view_channel')
-            }
-          </li>
+          <i class="ri-user-3-line"></i>
+          {t(isMusic ?
+            'actions_menu_view_artist' :
+            'actions_menu_view_channel')
+          }
+        </li>
 
 
 
@@ -106,7 +106,8 @@ export default function() {
           </li>
         </Show>
 
-        <li tabindex="6" onclick={() => {
+        <Show when={!isMusic}>
+          <li tabindex="6" onclick={() => {
             closeDialog();
             if (config.linkHost)
               open(hostResolver('/watch?v=' + id));
@@ -116,6 +117,7 @@ export default function() {
             <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>
 
+        </Show>
 
 
 

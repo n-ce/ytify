@@ -32,7 +32,7 @@ export default function() {
         <Library />
         <Personalize />
       </div>
-
-    </section>
+      <br />
+    </section >
   );
 }

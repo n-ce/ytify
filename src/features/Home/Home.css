@@ -52,8 +52,7 @@ header {
 
 
   article {
-    margin-top: var(--size-5);
-    margin-bottom: var(--size-2);
+    margin-bottom: var(--size-5);
 
 
     >p {
@@ -62,7 +61,7 @@ header {
       font-weight: var(--font-weight-4);
       letter-spacing: var(--font-letterspacing-2);
       margin-left: var(--size-1);
-      color: var(--accent);
+      color: var(--text2);
       opacity: 0.7;
       width: calc(100% - var(--size-9));
     }
@@ -82,6 +81,11 @@ header {
       border: var(--border);
       border-radius: var(--roundness);
       margin-left: var(--size-2);
+
+      &:hover {
+        background: var(--onBg2);
+        color: var(--text2);
+      }
     }
 
 
@@ -116,8 +120,6 @@ header {
       flex-direction: column;
 
       .streamItem {
-
-        border: none;
         margin-bottom: 0;
         width: 100%;
         background-color: transparent;
@@ -141,6 +143,7 @@ header {
     margin-top: 0;
     margin-bottom: var(--gap);
   }
+
 
   a.clxn_item {
     display: flex;

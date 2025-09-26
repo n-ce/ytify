@@ -21,7 +21,7 @@
     backdrop-filter: blur(var(--size-px-2));
 
     &:focus-within {
-      transform: scale(1.05);
+      transform: scale(1.03);
       background-color: var(--surface);
       backdrop-filter: none;
     }
