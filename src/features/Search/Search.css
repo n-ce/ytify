@@ -22,7 +22,7 @@
 
     &:focus-within {
       transform: scale(1.03);
-      background-color: var(--surface);
+      background-color: var(--scheme);
       backdrop-filter: none;
     }
 
@@ -56,7 +56,7 @@
       padding: 0;
       top: calc(var(--size-4) * 2);
       left: var(--gap);
-      background-color: var(--surface);
+      background-color: var(--scheme);
       border-radius: 0 0 var(--roundness) var(--roundness);
       box-shadow: var(--shadow-1);
       display: block;

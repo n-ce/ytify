@@ -1,13 +1,11 @@
 #actionsMenu {
-  box-shadow: var(--shadow-3);
   padding: 0;
   width: 100%;
   margin: auto;
   margin-bottom: var(--size-4);
   border: var(--border);
   border-radius: var(--roundness);
-  background-color: var(--onBg);
-  backdrop-filter: blur(var(--size-px-2));
+  background-color: var(--scheme);
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
 
@@ -23,13 +21,15 @@
     width: max-content;
     margin: auto var(--size-fluid-1);
     margin-left: auto;
-    animation-name: fromRight;
 
+    &:open {
+      animation-name: var(--animation-slide-in-left);
+    }
   }
 
   ul {
     list-style: none;
-    padding: var(--gap);
+    padding: 0;
     width: auto;
     display: grid;
   }
@@ -43,13 +43,13 @@
     display: flex;
     align-items: center;
     gap: var(--gap);
-    padding: 0 var(--size-1);
-    border: var(--border-size-1) solid transparent;
-    border-radius: var(--roundness);
+    padding: var(--size-1) var(--size-4);
+    border: var(--border);
 
     &:hover {
       border: var(--border);
-      background: var(--onBg);
+      background: var(--onBg2);
+      color: var(--text2);
     }
 
     & i {
@@ -68,4 +68,5 @@
   appearance: none;
   background: transparent;
   padding: 0;
+  color: inherit;
 }
