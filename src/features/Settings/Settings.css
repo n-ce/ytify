@@ -83,7 +83,6 @@
       }
 
       select {
-        color: var(--text2);
         font-size: inherit;
         padding: 0 var(--size-2);
         max-width: 50%;

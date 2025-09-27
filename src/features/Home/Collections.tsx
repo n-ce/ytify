@@ -10,6 +10,12 @@ export default function() {
 
   const db = getDB();
   const keys = Object.keys(db);
+
+
+  if (keys.includes('discover'))
+    import('../../lib/modules/discoverMigration')
+      .then(m => m.runMigration());
+
   const data = (keys.length ?
 
     keys : listStore.reservedCollections)

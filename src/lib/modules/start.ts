@@ -107,6 +107,4 @@ export default async function() {
       });
     });
 
-  if (!localStorage.getItem('hub_migration_complete'))
-    import('./discoverMigration').then(m => m.runMigration());
 }

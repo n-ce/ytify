@@ -11,8 +11,11 @@ import Dropdown from './Dropdown';
 
 export default function() {
 
-  const homeItems = ['ytify', 'Hub', 'Library'];
   const [home, setHome] = createSignal(config.home);
+  function saveHome(name: 'ytify' | 'Hub' | 'Library') {
+    setHome(name);
+    setConfig('home', name);
+  }
 
 
   let syncBtn!: HTMLElement;
@@ -25,13 +28,7 @@ export default function() {
     <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
 
       <header>
-        <p onclick={() => {
-          const currentHomeIndex = homeItems.indexOf(home());
-          const nextHomeIndex = (currentHomeIndex + 1) % homeItems.length;
-          const nextHome = homeItems[nextHomeIndex];
-          setHome(nextHome);
-          setConfig('home', nextHome);
-        }}>{home()}</p>
+        <p>{home()}</p>
         <Show when={dbsync}>
           <i
             id="syncNow"
@@ -40,6 +37,18 @@ export default function() {
           ></i>
         </Show>
         <div class="right-group">
+          <Show when={home() !== 'Hub'}>
+            <i
+              class="ri-store-2-line"
+              onclick={() => saveHome('Hub')}
+            ></i>
+          </Show>
+          <Show when={home() !== 'Library'}>
+            <i
+              class="ri-archive-stack-line"
+              onclick={() => saveHome('Library')}
+            ></i>
+          </Show>
           <Show when={!navStore.search.state}>
             <i
               class="ri-search-2-line"
@@ -55,7 +64,7 @@ export default function() {
           </Show>
         </div>
 
-        <Dropdown />
+        <Dropdown setAbout={() => setHome('ytify')} />
       </header>
 
 

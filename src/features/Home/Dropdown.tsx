@@ -2,7 +2,9 @@
 import { getDB, saveDB, toCollection } from '../../lib/utils';
 import { setStore, t } from '../../lib/stores';
 
-export default function Dropdown() {
+export default function Dropdown(_: {
+  setAbout: () => void
+}) {
   async function importLibrary(e: Event) {
     const importBtn = e.target as HTMLInputElement & { files: FileList };
     const newDB = JSON.parse(await importBtn.files[0].text());
@@ -70,6 +72,10 @@ export default function Dropdown() {
             <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift
           </label>
           <input type="file" id="upload_songshift" onchange={async (e) => (await import('../../lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
+        </li>
+
+        <li onclick={_.setAbout}>
+          <i class="ri-information-line"></i>&nbsp;About ytify
         </li>
       </ul>
     </details>

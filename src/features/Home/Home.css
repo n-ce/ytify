@@ -63,31 +63,29 @@ header {
       margin-left: var(--size-1);
       color: var(--text2);
       opacity: 0.7;
-      width: calc(100% - var(--size-9));
+      width: calc(100% - var(--size-8) - var(--size-1));
     }
 
     &:first-child,
     &:last-child {
       >p {
-        width: calc(100% - calc(var(--size-11) - var(--size-2)));
+        width: calc(100% - var(--size-11) + var(--size-5));
       }
     }
 
     >i {
-      font-size: var(--font-size-4);
+      font-size: var(--font-size-3);
       cursor: pointer;
-      padding: 0 var(--size-2);
-      background: var(--onBg);
-      border: var(--border);
+      padding: var(--size-1) var(--size-2);
+      margin-right: var(--size-2);
       border-radius: var(--roundness);
-      margin-left: var(--size-2);
 
       &:hover {
         background: var(--onBg2);
         color: var(--text2);
       }
-    }
 
+    }
 
     >div {
       display: flex;
@@ -118,12 +116,15 @@ header {
     >div:has(.streamItem) {
       width: 100%;
       flex-direction: column;
+      overflow: hidden;
 
       .streamItem {
         margin-bottom: 0;
         width: 100%;
-        background-color: transparent;
+        border-radius: 0;
         flex-shrink: 0;
+
+
 
         .title {
           height: var(--size-4);
