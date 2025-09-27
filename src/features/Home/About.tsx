@@ -10,7 +10,6 @@ export default function() {
 
       ytify is a resource efficient audio streaming client for YouTube & YTMusic.
       <br />
-      Click on the Header title 'ytify' to toggle between the online Hub and your offline Library.
       <a
         class="underline"
         target="_blank" href="https://github.com/n-ce/ytify/wiki/usage">Learn
