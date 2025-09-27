@@ -56,12 +56,6 @@ export default function() {
             ></i>
           </Show>
 
-          <Show when={!navStore.settings.state}>
-            <i
-              class="ri-settings-line"
-              onclick={() => setNavStore('settings', 'state', true)}
-            ></i>
-          </Show>
         </div>
 
         <Dropdown setAbout={() => setHome('ytify')} />

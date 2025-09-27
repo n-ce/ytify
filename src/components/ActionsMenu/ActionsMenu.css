@@ -53,8 +53,8 @@
     }
 
     & i {
-      font-size: var(--font-size-4);
-      font-weight: var(--font-weight-4);
+      font-size: var(--font-size-3);
+      font-weight: var(--font-weight-3);
     }
 
   }

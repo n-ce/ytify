@@ -1,7 +1,7 @@
 {
   "nav_search": "Search",
   "nav_library": "Library",
-  "nav_settings": "Settings",
+  "nav_settings": "App Configuration",
   "nav_upcoming": "Upcoming",
   "player_audiostreams_setup": "Setting up AudioStreams…",
   "player_audiostreams_insert": "Inserting audio source into player…",
@@ -140,8 +140,6 @@
   "settings_theming_scheme_white": "White",
   "settings_theming_scheme_black": "Black",
   "settings_fullscreen": "Toggle Fullscreen",
-
-
   "settings_feedback_placeholder": "Anonymously enter your feedback (bugs, feature requests) here:",
   "settings_feedback_submit": "Submit Feedback",
   "settings_changelog": "Changelog",

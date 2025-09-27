@@ -18,6 +18,14 @@ section>header {
   div>i {
     font-size: var(--font-size-4);
     opacity: 0.8;
+    padding: 0 var(--size-2);
+    border-radius: var(--roundness);
+
+    &:hover {
+      opacity: 1;
+      background-color: var(--onBg2);
+      color: var(--text2);
+    }
   }
 
   .right-group {
@@ -30,7 +38,7 @@ section>header {
     }
 
     display:flex;
-    gap:var(--size-4);
+    gap:var(--size-2);
 
 
   }
@@ -81,16 +89,17 @@ section>header {
       background-color: var(--blurMix);
       backdrop-filter: blur(var(--size-px-2));
       color: var(--text);
-      padding: var(--size-1) var(--size-2);
+      padding: 0;
       list-style: none;
+      overflow: hidden;
       border: var(--border);
       border-radius: var(--roundness);
       box-shadow: var(--shadow-1);
 
       li {
         font-size: var(--font-size-1);
-        padding: var(--size-1);
-        border-radius: var(--roundness);
+        padding: var(--size-1) var(--size-2);
+        border: var(--border);
         display: flex;
         align-items: center;
         user-select: none;
@@ -100,6 +109,10 @@ section>header {
           margin-right: 0.5rem;
         }
 
+        &:hover {
+          background-color: var(--onBg2);
+          color: var(--text2);
+        }
       }
     }
   }

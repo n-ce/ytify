@@ -38,12 +38,14 @@
   }
 
   .ri-close-large-line {
-    margin-right: 0;
+    margin-right: var(--size-00);
     margin-left: auto;
   }
 
   .ri-more-2-fill {
     font-size: var(--font-size-3);
+    margin-right: var(--size-00);
+    margin-left: var(--size-1);
   }
 
 
@@ -95,6 +97,7 @@
     font-size: var(--size-4);
     font-weight: var(--font-weight-6);
     color: inherit;
+    text-decoration-color: inherit;
   }
 
   p {

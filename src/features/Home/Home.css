@@ -60,10 +60,9 @@ header {
       font-size: var(--font-size-3);
       font-weight: var(--font-weight-4);
       letter-spacing: var(--font-letterspacing-2);
-      margin-left: var(--size-1);
       color: var(--text2);
       opacity: 0.7;
-      width: calc(100% - var(--size-8) - var(--size-1));
+      width: calc(100% - var(--size-8));
     }
 
     &:first-child,
@@ -92,6 +91,8 @@ header {
       border-radius: var(--roundness);
       background-color: var(--onBg);
       border: var(--border);
+      margin: var(--size-2) 0;
+      overflow: hidden;
     }
 
     >div:has(.listItem) {
@@ -116,7 +117,6 @@ header {
     >div:has(.streamItem) {
       width: 100%;
       flex-direction: column;
-      overflow: hidden;
 
       .streamItem {
         margin-bottom: 0;

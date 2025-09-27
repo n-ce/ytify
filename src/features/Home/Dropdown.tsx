@@ -1,6 +1,7 @@
 
 import { getDB, saveDB, toCollection } from '../../lib/utils';
-import { setStore, t } from '../../lib/stores';
+import { navStore, setNavStore, setStore, t } from '../../lib/stores';
+import { Show } from 'solid-js';
 
 export default function Dropdown(_: {
   setAbout: () => void
@@ -73,6 +74,14 @@ export default function Dropdown(_: {
           </label>
           <input type="file" id="upload_songshift" onchange={async (e) => (await import('../../lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
         </li>
+        <Show when={!navStore.settings.state}>
+
+          <li onclick={() => setNavStore('settings', 'state', true)}>
+            <i
+              class="ri-settings-line"
+            ></i>&nbsp;{t('nav_settings')}
+          </li>
+        </Show>
 
         <li onclick={_.setAbout}>
           <i class="ri-information-line"></i>&nbsp;About ytify
