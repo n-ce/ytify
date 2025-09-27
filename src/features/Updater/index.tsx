@@ -4,11 +4,12 @@ import { closeFeature, setStore, store, t } from '../../lib/stores';
 
 export default function() {
 
-  const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/main';
+  const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/';
   const commitsLink = 'https://github.com/n-ce/ytify/commits';
+  const branch = location.origin.includes('dev') ? 'dev' : 'main';
   const [list, setList] = createSignal(['']);
   onMount(() => {
-    fetch(commitsSrc)
+    fetch(commitsSrc + branch)
       .then(res => res.json())
       .then(data => data.commit.message.split('\n-'))
       .then(setList);
