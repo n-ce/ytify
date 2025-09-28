@@ -64,6 +64,7 @@ export default function() {
               duration={item.duration || ''}
               channelUrl={item.channelUrl}
               lastUpdated={item.lastUpdated}
+              context='search'
             />
           )}
         </For>

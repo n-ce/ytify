@@ -1,4 +1,4 @@
-import { setNavStore, setStore, t, updateParam } from '../stores';
+import { navStore, setNavStore, setStore, t, updateParam } from '../stores';
 import { listStore, setListStore } from '../stores';
 
 
@@ -92,6 +92,12 @@ export async function fetchCollection(
   shared: boolean = false
 ) {
   if (!id) return;
+
+  const { ref, state } = navStore.list;
+  if (state && ref)
+    ref.scrollIntoView({
+      behavior: 'smooth'
+    });
 
   setListStore('isLoading', true);
 

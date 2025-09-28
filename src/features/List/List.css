@@ -6,8 +6,12 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background-image: linear-gradient(to right, var(--bg), transparent, var(--bg));
-  backdrop-filter: blur(var(--size-px-1));
+  background: var(--bg);
+
+  &:not(:has(details[open])) {
+    background: linear-gradient(to right, var(--bg), transparent, var(--bg));
+    backdrop-filter: blur(var(--size-px-1));
+  }
 
   >p {
     overflow: clip;

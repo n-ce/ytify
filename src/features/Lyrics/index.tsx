@@ -20,11 +20,17 @@ export default function() {
       .then(res => res.json())
       .then(data => {
 
+
+
         if (data.success) {
-          const lrc = data.data[0].syncedLyrics;
+          const { syncedLyrics, durationSeconds } = data.data[0];
+          const diff = durationSeconds - playerStore.fullDuration;
+          if (Math.abs(diff) > 5)
+            throw new Error('Duration Mismatch');
+
 
           const durarr: number[] = [];
-          const lrcMap: string[] = lrc
+          const lrcMap: string[] = syncedLyrics
             .split('\n')
             .map((line: string) => {
               const [d, l] = line.split(']');
@@ -53,13 +59,14 @@ export default function() {
           });
 
         }
-        else {
-          setStore('snackbar', data.error.reason || JSON.stringify(data));
-          closeFeature('lyrics');
-        }
+        else throw new Error(data.error.reason || 'Track Not Found');
 
 
-      });
+      }).catch(e => {
+        setStore('snackbar', e.message);
+        closeFeature('lyrics');
+
+      })
   });
 
   return (
