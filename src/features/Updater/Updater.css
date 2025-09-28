@@ -46,7 +46,7 @@
     margin-top: var(--size-3);
 
     button {
-      background-color: var(--onBg);
+      background-color: var(--onBg2);
       font-size: var(--font-size-3);
       font-weight: var(--font-weight-6);
       width: calc(50% - var(--size-4));
