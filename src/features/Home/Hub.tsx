@@ -53,6 +53,7 @@ export default function() {
                   author={item.author}
                   duration={item.duration}
                   channelUrl={item.channelUrl}
+                  context='hub'
                 />
               )}
             </For>

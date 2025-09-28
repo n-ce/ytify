@@ -3,8 +3,8 @@ import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { openFeature, listStore, resetList, setQueueStore } from '../../lib/stores';
 import { getDB, removeFromCollection, saveDB } from '../../lib/utils';
-import ListResults from './Results';
 import Dropdown from './Dropdown';
+import Results from './Results';
 
 export default function() {
   let listSection!: HTMLElement;
@@ -12,6 +12,7 @@ export default function() {
   const [markMode, setMarkMode] = createSignal(false);
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
+  const [showSortMenu, setShowSortMenu] = createSignal(false);
 
   onMount(() => {
     openFeature('list', listSection);
@@ -104,11 +105,26 @@ export default function() {
             onclick={resetList}
           ></i>
         </div>
-        <Dropdown />
+        <Dropdown toggleSort={() => setShowSortMenu(!showSortMenu())} />
       </header>
+
+      <Show when={showSortMenu()}>
+        <span>
+          <label for="sortMenu">Sort Order :</label>
+          <select id="sortMenu">
+            <option>Original</option>
+            <option>Last Updated</option>
+            <option>Name</option>
+            <option>Artist</option>
+            <option>Duration</option>
+          </select>
+        </span>
+
+      </Show>
       <br />
-      <ListResults
+      <Results
         ref={listContainerRef}
+        draggable={showSortMenu()}
         mark={{
           mode: markMode,
           set: (id: string) => {

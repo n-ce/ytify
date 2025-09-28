@@ -5,16 +5,15 @@
 
 :root {
   --source: initial;
-  --sourceInverse: initial;
   --schemeMultiplier: initial;
   --bg: initial;
-  --scheme: color-mix(in srgb, oklch(from var(--source) 50% c h), var(--bg) 80%);
-  --onBg: color-mix(in srgb, oklch(from var(--source) 50% c h), var(--bg) 90%);
-  --onBg2: color-mix(in srgb, oklch(from var(--source) 50% c h / 0.7), var(--bg) 60%);
+  --text: initial;
+  --scheme: color-mix(in srgb, oklch(from var(--source) 70% c h), var(--bg) 85%);
+  --onBg: color-mix(in srgb, oklch(from var(--source) 85% c h), var(--bg) 85%);
+  --onBg2: color-mix(in srgb, oklch(from var(--source) 80% 35% h), var(--bg) 70%);
   --surface: color-mix(in srgb, rgba(from var(--onBg) r g b / 1), var(--bg) 80%);
   --blurMix: color-mix(in srgb, rgba(from var(--onBg) r g b / 0.1), var(--bg) 40%);
-  --text: color-mix(in srgb, oklch(from var(--source) 50% 80% h), var(--sourceInverse) 95%);
-  --text2: color-mix(in srgb, oklch(from var(--source) 50% 80% h / 0.9), var(--sourceInverse) 75%);
+  --text2: color-mix(in srgb, oklch(from var(--source) 50% 80% h), var(--text) 75%);
   --gap: var(--size-fluid-2);
   --borderColor: oklch(from var(--text2) l c h / 0.1);
   --border: var(--border-size-1) solid var(--borderColor);
@@ -44,7 +43,7 @@ body {
 }
 
 main {
-  color: color-mix(in srgb, oklch(from var(--source) 50% c h), var(--sourceInverse) 80%);
+  color: color-mix(in srgb, oklch(from var(--source) 50% c h), var(--text) 80%);
   display: flex;
   height: 100%;
   overflow-x: auto;
@@ -121,6 +120,7 @@ dialog {
 select {
   font-family: inherit;
   background: none;
+  outline: none;
   color: var(--text);
 
   /* fix white on white issue on dark mode */

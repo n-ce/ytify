@@ -2,7 +2,7 @@ import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player } from '../lib/utils';
 import { generateImageUrl } from '../lib/utils/image';
-import { playerStore, setPlayerStore, setStore } from '../lib/stores';
+import { setPlayerStore, setStore } from '../lib/stores';
 
 export default function(data: {
   id: string,
@@ -15,7 +15,7 @@ export default function(data: {
   img?: string,
   draggable?: boolean,
   lastUpdated?: string,
-  context?: 'search' | 'collection' | 'channel' | 'playlist' | 'hub',
+  context?: 'search' | 'collection' | 'channel' | 'playlist' | 'hub' | 'link',
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
@@ -81,10 +81,8 @@ export default function(data: {
         }
 
         if (!e.target.classList.contains('ri-more-2-fill')) {
-          if (data.context === 'search') {
-            setPlayerStore('stream', data);
-            console.log(playerStore.stream);
-          }
+          setPlayerStore('stream', data);
+          setPlayerStore('context', data.context || 'link');
           player(data.id);
         }
         else {

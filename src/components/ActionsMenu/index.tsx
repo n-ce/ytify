@@ -96,7 +96,7 @@ export default function() {
 
 
 
-        <Show when={isMusic}>
+        <Show when={isMusic && id === playerStore.stream.id}>
           <li tabindex="6" onclick={() => {
             closeDialog();
             setNavStore('lyrics', 'state', true);

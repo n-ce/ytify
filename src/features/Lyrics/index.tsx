@@ -1,5 +1,5 @@
 import { createSignal, For, onMount } from "solid-js";
-import { closeFeature, openFeature, setPlayerStore, setStore, store } from "../../lib/stores";
+import { closeFeature, openFeature, playerStore, setPlayerStore, setStore } from "../../lib/stores";
 
 export default function() {
 
@@ -16,20 +16,13 @@ export default function() {
 
   onMount(() => {
     openFeature('lyrics', lyricsSection);
-    const { title, author } = store.actionsMenu;
-    fetch(
-      `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}`,
-      {
-        headers: {
-          'Lrclib-Client': `ytify ${Build} (https://github.com/n-ce/ytify)`
-        }
-      })
+    fetch(`https://api-lyrics.simpmusic.org/v1/${playerStore.stream.id}?limit=1`)
       .then(res => res.json())
       .then(data => {
 
-        const lrc = data.syncedLyrics;
+        if (data.success) {
+          const lrc = data.data[0].syncedLyrics;
 
-        if (lrc) {
           const durarr: number[] = [];
           const lrcMap: string[] = lrc
             .split('\n')
@@ -61,7 +54,7 @@ export default function() {
 
         }
         else {
-          setStore('snackbar', JSON.stringify(data));
+          setStore('snackbar', data.error.reason || JSON.stringify(data));
           closeFeature('lyrics');
         }
 
@@ -70,19 +63,29 @@ export default function() {
   });
 
   return (
-    <section
-      ref={lyricsSection}
-      onclick={() => {
-        closeFeature('lyrics');
-        setPlayerStore('lrcSync', undefined);
-      }}
-    >
+    <section ref={lyricsSection}>
+      <header>
+        <p style={{
+          'margin-right': 'auto'
+        }}>Lyrics</p>
+        <i
+          onclick={() => {
+            closeFeature('lyrics');
+            setPlayerStore('lrcSync', undefined);
+          }}
+          class="ri-close-large-line"
+        ></i>
+      </header>
       <For each={lrcMap()}>
         {(item, i) => (
-          <p style={
-            activeLine() === i() ?
-              activePStyle : pStyle
-          } >{item}</p>)}
+          <p
+            onclick={() => {
+              playerStore.audio.pause();
+            }}
+            style={
+              activeLine() === i() ?
+                activePStyle : pStyle
+            } >{item}</p>)}
       </For>
     </section>
   );

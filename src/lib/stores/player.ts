@@ -12,7 +12,7 @@ type PlayerStore = {
   stream: CollectionItem,
   history: string[],
   audio: HTMLAudioElement,
-  context: 'Search',
+  context: 'link' | 'search' | 'hub' | 'playlist' | 'collection' | 'channel',
   currentTime: number,
   fullDuration: number,
   playbackRate: number,
@@ -34,7 +34,7 @@ type PlayerStore = {
 const createInitialState = (): PlayerStore => ({
   audio: new Audio(),
   playbackState: 'none',
-  context: 'Search',
+  context: 'link',
   status: '',
   currentTime: 0,
   fullDuration: 0,
@@ -121,6 +121,7 @@ const dispose = createRoot((dispose) => {
       return;
     const { audio, lrcSync } = playerStore;
     const seconds = Math.floor(audio.currentTime);
+
 
     if (lrcSync) lrcSync(seconds);
 

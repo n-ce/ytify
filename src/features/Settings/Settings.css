@@ -16,7 +16,8 @@
     &.toggleSwitch,
     >span {
       width: 100%;
-      margin: 1ch auto;
+      margin: 0 auto;
+      padding: var(--size-2) 0;
     }
 
     &.toggleSwitch {
@@ -39,23 +40,24 @@
         margin: 0;
         background-color: var(--onBg);
         border-radius: var(--roundness);
-        width: 2.2rem;
+        width: var(--size-7);
         border: var(--border);
+        padding: 0;
 
 
         &,
         &:before {
-          height: 1.3rem;
+          height: var(--size-4);
           transition: 0.3s;
         }
 
         &:before {
           content: "";
-          height: calc(100% - 0.5rem);
+          height: calc(100% - var(--size-2));
           aspect-ratio: 1;
-          margin: 0.25rem;
+          margin: var(--size-1);
           background-color: var(--text2);
-          border-radius: calc(var(--roundness) / 2);
+          border-radius: calc(var(--roundness) * 0.5);
         }
 
       }
@@ -69,7 +71,7 @@
       }
 
       input:checked+span:before {
-        transform: translateX(0.85rem);
+        transform: translateX(calc(var(--size-2) + var(--size-1)));
       }
     }
 

@@ -2,7 +2,9 @@ import { Show, createSignal } from 'solid-js';
 import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
 import { listStore, resetList, setQueueStore, t } from '../../lib/stores';
 
-export default function Dropdown() {
+export default function Dropdown(_: {
+  toggleSort: () => void
+}) {
   const db = Object(getDB());
   const [isSubscribed, setSubscribed] = createSignal(
     db.hasOwnProperty(listStore.type) &&
@@ -96,22 +98,19 @@ export default function Dropdown() {
             <i class="ri-link"></i>{t("list_share")}
           </li>
 
+          <li id="exportCollectionBtn">
+            <i class="ri-export-line"></i>{t('list_export')}
+          </li>
+
           <li id="radioCollectionBtn">
             <i class="ri-radio-line"></i>{t("list_radio")}
           </li>
 
           <li
             id="sortCollectionBtn"
+            onclick={_.toggleSort}
           >
             <i class="ri-draggable"></i>{t("list_sort")}
-          </li>
-
-          <li id="sortByTitleBtn">
-            <i class="ri-sort-alphabet-asc"></i>{t("list_sort_title")}
-          </li>
-
-          <li id="sortByArtistBtn">
-            <i class="ri-sort-asc"></i>{t("list_sort_author")}
           </li>
 
         </Show>

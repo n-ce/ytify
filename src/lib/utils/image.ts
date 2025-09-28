@@ -83,7 +83,7 @@ function colorInjector(colorArray: number[]) {
       cssVar('--source', accentDarkener(r, g, b));
       cssVar('--bg', palette[scheme].bg);
       cssVar('--schemeMultiplier', palette[scheme].multiplier);
-      cssVar('--sourceInverse', palette[scheme].text);
+      cssVar('--text', palette[scheme].text);
       tabColor.content = palette[scheme].bg;
     });
 }
