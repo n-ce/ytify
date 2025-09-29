@@ -1,18 +1,18 @@
-import { For, Match, Show, Switch, createSignal, lazy, onMount } from 'solid-js';
-const About = lazy(() => import('./About'));
-import Hub from './Hub';
+import { Match, Show, Switch, createSignal, lazy, onMount } from 'solid-js';
 import './Home.css';
 import { config, setConfig } from '../../lib/utils';
-import { setNavStore, params } from '../../lib/stores'; // Import params
-import Collections from './Collections';
-import SubLists from './SubLists';
+import { setNavStore, params, setSearchStore } from '../../lib/stores';
 import Dropdown from './Dropdown';
-import Search from './Search'; // Import the Search component
+const About = lazy(() => import('./About'));
+const Hub = lazy(() => import('./Hub'));
+const Search = lazy(() => import('./Search'));
+const Library = lazy(() => import('./Library'));
+
 
 export default function() {
 
   const [home, setHome] = createSignal(config.home);
-  function saveHome(name: 'ytify' | 'Hub' | 'Library' | 'Search') { // Add 'Search'
+  function saveHome(name: '' | 'Hub' | 'Library' | 'Search') {
     setHome(name);
     setConfig('home', name);
   }
@@ -20,7 +20,12 @@ export default function() {
   onMount(() => {
     const q = params.get('q');
     if (q) {
-      saveHome('Search');
+      if (home() !== 'Search')
+        saveHome('Search');
+
+      const f = params.get('f') || 'all';
+      setConfig('searchFilter', f);
+      setSearchStore('query', q);
     }
   });
 
@@ -35,7 +40,7 @@ export default function() {
     <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
 
       <header>
-        <p>{home()}</p>
+        <p>{home() || 'ytify'}</p>
         <Show when={dbsync}>
           <i
             id="syncNow"
@@ -56,45 +61,31 @@ export default function() {
               onclick={() => saveHome('Library')}
             ></i>
           </Show>
-          <Show when={home() !== 'Search'}> {/* Change condition */}
+          <Show when={home() !== 'Search'}>
             <i
               class="ri-search-2-line"
-              onclick={() => saveHome('Search')} // Change onclick
+              onclick={() => saveHome('Search')}
             ></i>
           </Show>
 
         </div>
 
-        <Dropdown setAbout={() => setHome('ytify')} />
+        <Dropdown setAbout={() => setHome('')} />
       </header>
 
+      <Switch fallback={<About />}>
+        <Match when={home() === 'Hub'}>
+          <Hub />
+        </Match>
+        <Match when={home() === 'Library'}>
+          <Library />
+        </Match>
+        <Match when={home() === 'Search'}>
+          <Search />
+        </Match>
 
-      <div id="catalogue">
+      </Switch>
 
-        <Switch fallback={<About />}>
-          <Match when={home() === 'Hub'}>
-            <Hub />
-          </Match>
-          <Match when={home() === 'ytify'}>
-            <About />
-          </Match>
-          <Match when={home() === 'Library'}>
-            <Collections />
-            <br />
-            <br />
-            <For each={['albums', 'playlists', 'channels', 'artists'] as APAC[]}>
-              {(item) =>
-                <SubLists flag={item} />
-              }
-            </For>
-
-          </Match>
-          <Match when={home() === 'Search'}> {/* Add new Match case */}
-            <Search />
-          </Match>
-
-        </Switch>
-      </div>
     </section >
   )
 }

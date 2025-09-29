@@ -15,6 +15,8 @@ export default async function(data: CollectionItem) {
     authorText = data.author.slice(0, -8);
   }
 
+  setPlayerStore('isMusic', Boolean(music));
+
   const metadataObj: MediaMetadataInit = {
     title: data.title,
     artist: authorText,

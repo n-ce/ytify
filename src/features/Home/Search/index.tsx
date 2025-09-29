@@ -1,32 +1,20 @@
-import { onCleanup, onMount } from "solid-js"; // onMount is still needed for input focus
+import { onCleanup } from "solid-js";
 import './Search.css';
 import Results from './Results';
 import Input from "./Input";
-import { config, setConfig } from "../../../lib/utils"; // Updated path
-import { getSearchResults, resetSearch, searchStore, setSearchStore, t, updateParam } from '../../../lib/stores'; // Updated path, removed openFeature
+import { config, setConfig } from "../../../lib/utils";
+import { getSearchResults, resetSearch, searchStore, setSearchStore, t, updateParam } from '../../../lib/stores';
 
 
 
 export default function() {
-  // searchSection is no longer needed as it's not a section anymore.
 
-  onMount(() => {
-    // openFeature('search', searchSection); // Removed
-    // The input focus logic should be handled by the Input component itself.
-    // Or by the parent Home component when it switches to Search view.
-    // For now, I will remove it.
-  });
 
-  onCleanup(() => {
-    // When the Search component is unmounted (e.g., user switches to Hub/Library)
-    // we should reset the search state.
-    resetSearch();
-  });
+  onCleanup(resetSearch);
 
 
   return (
-    <> {/* Replaced <section> with a fragment */}
-      {/* Header with close button removed */}
+    <div class="search">
       <form class="superInputContainer">
 
         <Input />
@@ -70,6 +58,6 @@ export default function() {
 
       </form>
       <Results />
-    </>
+    </div>
   );
 }

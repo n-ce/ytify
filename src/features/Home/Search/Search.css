@@ -1,9 +1,4 @@
-.searchSection {
-
-  header {
-    display: flex;
-    justify-content: space-between;
-  }
+.search {
 
   .superInputContainer {
     height: auto;
@@ -22,7 +17,7 @@
 
     &:focus-within {
       transform: scale(1.03);
-      background-color: var(--scheme);
+      background-color: var(--onBg);
       backdrop-filter: none;
     }
 

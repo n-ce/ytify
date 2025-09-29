@@ -1,6 +1,6 @@
 export let config = {
   enforceProxy: false,
-  home: 'ytify',
+  home: '',
   stableVolume: false,
   prefetch: false,
   HLS: false,
@@ -14,7 +14,6 @@ export let config = {
   searchSuggestions: true,
   searchBarLinkCapture: true,
   searchFilter: 'all',
-  startupTab: '/search',
   watchMode: '',
   enqueueRelatedStreams: false,
   shuffle: false,

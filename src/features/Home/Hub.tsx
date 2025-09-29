@@ -11,7 +11,7 @@ export default function() {
   const recents = history ? Object.values(history).reverse().slice(0, 5) : [];
 
   return (
-    <>
+    <div class="hub">
       <article>
         <p>Catch Up</p>
         <i class="ri-refresh-line"></i>
@@ -156,6 +156,6 @@ export default function() {
         </div>
       </article>
 
-    </>
+    </div>
   );
 }

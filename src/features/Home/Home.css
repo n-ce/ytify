@@ -46,10 +46,11 @@ header {
 
 
 
-#catalogue {
+
+.library,
+.hub {
   overflow-y: auto;
   width: 100%;
-
 
   article {
     margin-bottom: var(--size-5);
