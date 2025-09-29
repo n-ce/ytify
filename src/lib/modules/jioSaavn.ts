@@ -1,5 +1,6 @@
 import { playerStore, setPlayerStore, setStore, store, updateParam } from "../stores";
 import { config, player } from "../utils";
+import { normalizeString } from "../utils/string";
 
 export default function() {
   setPlayerStore('status', 'Fetching Data via JioSaavn...');
@@ -17,8 +18,8 @@ export default function() {
         artists: { primary: { name: string }[] }
       }) =>
 
-        title.toLowerCase().startsWith(track.name.toLowerCase()) &&
-        track.artists.primary.some(artist => author.toLowerCase().startsWith(artist.name.toLowerCase()))
+        normalizeString(title).toLowerCase().startsWith(normalizeString(track.name).toLowerCase()) &&
+        track.artists.primary.some(artist => normalizeString(author).toLowerCase().startsWith(normalizeString(artist.name).toLowerCase()))
       );
       if (!matchingTrack) throw new Error('Music stream not found in JioSaavn results');
 
