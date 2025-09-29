@@ -1,6 +1,6 @@
 
-import { getDB, saveDB, toCollection } from '../../lib/utils';
-import { navStore, setNavStore, setStore, t } from '../../lib/stores';
+import { getDB, saveDB, toCollection } from '@lib/utils';
+import { navStore, setNavStore, setStore, t } from '@lib/stores';
 import { Show } from 'solid-js';
 
 export default function Dropdown(_: {

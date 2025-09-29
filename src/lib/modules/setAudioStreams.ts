@@ -1,5 +1,5 @@
-import { playerStore, setPlayerStore, t } from "../stores";
-import { handleXtags, preferredStream, proxyHandler } from "../utils";
+import { playerStore, setPlayerStore, t } from "@lib/stores";
+import { handleXtags, preferredStream, proxyHandler } from "@lib/utils";
 
 export default async function(
   audioStreams: AudioStream[],

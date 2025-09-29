@@ -1,7 +1,7 @@
 // import fetchList from '../../../lib/modules/fetchList';
 
-import { store, t, playerStore, setListStore, setNavStore, setQueueStore, setStore } from '../../lib/stores';
-import { config, getDownloadLink, hostResolver } from '../../lib/utils';
+import { store, t, playerStore, setListStore, setNavStore, setQueueStore, setStore } from '@lib/stores';
+import { config, getDownloadLink, hostResolver } from '@lib/utils';
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
 import { onMount, Show } from 'solid-js';

@@ -1,5 +1,5 @@
-import { params, setNavStore, t, setStore, setPlayerStore } from '../stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, uma, player } from '../utils';
+import { params, setNavStore, t, setStore, setPlayerStore } from '@lib/stores';
+import { config, getDownloadLink, idFromURL, fetchCollection, uma, player } from '@lib/utils';
 
 
 export default async function() {

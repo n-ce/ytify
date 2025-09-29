@@ -2,7 +2,7 @@
 
 import { For, lazy, onMount, Show } from 'solid-js';
 import '../styles/global.css';
-import { navStore, playerStore, store } from '../lib/stores';
+import { navStore, playerStore, store } from '@lib/stores';
 
 const MiniPlayer = lazy(() => import('../components/MiniPlayer'));
 const ActionsMenu = lazy(() => import('../components/ActionsMenu'));

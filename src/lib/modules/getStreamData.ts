@@ -1,4 +1,4 @@
-import { store } from "../stores";
+import { store } from "@lib/stores";
 
 export default async function(
   id: string,

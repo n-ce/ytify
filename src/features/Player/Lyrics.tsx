@@ -1,5 +1,5 @@
 import { createSignal, For, onMount, onCleanup } from "solid-js";
-import { playerStore, setPlayerStore, setStore } from "../../lib/stores";
+import { playerStore, setPlayerStore, setStore } from "@lib/stores";
 
 export default function(props: { onClose: () => void }) {
 
@@ -14,7 +14,7 @@ export default function(props: { onClose: () => void }) {
         if (data.success) {
           const { syncedLyrics, plainLyric, durationSeconds } = data.data[0];
           const diff = durationSeconds - playerStore.fullDuration;
-          if (Math.abs(diff) > 5)
+          if (Math.abs(diff) > 2)
             throw new Error('Duration Mismatch');
 
           if (syncedLyrics) {

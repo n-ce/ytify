@@ -1,8 +1,8 @@
 import { createSignal, For, onMount, Show } from "solid-js";
-import { config, generateImageUrl, handleXtags, preferredStream, proxyHandler, setConfig, player } from "../../lib/utils";
-import { closeFeature, openFeature, playerStore, setListStore, setPlayerStore, store } from "../../lib/stores";
-import { Selector } from "../../components/Selector";
-import { queueStore } from "../../lib/stores/queue";
+import { config, generateImageUrl, handleXtags, preferredStream, proxyHandler, setConfig, player } from "@lib/utils";
+import { closeFeature, openFeature, playerStore, setListStore, setPlayerStore, store } from "@lib/stores";
+import { Selector } from "@components/Selector";
+import { queueStore } from "@lib/stores/queue";
 
 export default function() {
 

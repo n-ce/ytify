@@ -1,6 +1,6 @@
 import { onMount } from "solid-js";
 import './Settings.css';
-import { closeFeature, openFeature } from '../../lib/stores';
+import { closeFeature, openFeature } from '@lib/stores';
 import App from "./App";
 import Playback from "./Playback";
 import Library from "./Library";
@@ -32,6 +32,7 @@ export default function() {
         <Library />
         <Personalize />
       </div>
+      <br />
       <br />
     </section >
   );

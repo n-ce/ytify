@@ -1,5 +1,5 @@
-import { setStore, t } from '../stores';
-import { addListToCollection, convertSStoHHMMSS, createCollection } from '../utils';
+import { setStore, t } from '@lib/stores';
+import { addListToCollection, convertSStoHHMMSS, createCollection } from '@lib/utils';
 
 export default async function() {
 

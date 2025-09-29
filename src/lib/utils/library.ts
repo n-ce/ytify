@@ -1,5 +1,5 @@
-import { navStore, setNavStore, setStore, t, updateParam } from '../stores';
-import { listStore, setListStore } from '../stores';
+import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
+import { listStore, setListStore } from '@lib/stores';
 
 
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');

@@ -1,9 +1,9 @@
 import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
-import { addToCollection, config, cssVar, themer } from "../utils";
+import { addToCollection, config, cssVar, themer } from "@lib/utils";
 import { navStore, params } from "./navigation";
 import { queueStore } from "./queue";
-import audioErrorHandler from "../modules/audioErrorHandler";
+import audioErrorHandler from "@lib/modules/audioErrorHandler";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 const msn = 'mediaSession' in navigator;

@@ -1,5 +1,5 @@
 import { convertSStoHHMMSS } from "./helpers";
-import { playerStore, setNavStore, setPlayerStore, setStore, store, updateParam } from "../stores";
+import { playerStore, setNavStore, setPlayerStore, setStore, store, updateParam } from "@lib/stores";
 import { config } from "./config";
 
 let playerAbortController: AbortController;

@@ -1,5 +1,5 @@
-import { setStore } from "../stores";
-import { getDB, saveDB } from "../utils";
+import { setStore } from "@lib/stores";
+import { getDB, saveDB } from "@lib/utils";
 
 export default function(dbhash: string, syncBtn: HTMLElement) {
 

@@ -1,8 +1,8 @@
 import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { config, hostResolver, player } from '../lib/utils';
-import { generateImageUrl } from '../lib/utils/image';
-import { setPlayerStore, setStore } from '../lib/stores';
+import { config, hostResolver, player } from '@lib/utils';
+import { generateImageUrl } from '@lib/utils/image';
+import { setPlayerStore, setStore } from '@lib/stores';
 
 export default function(data: {
   id: string,

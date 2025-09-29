@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { config } from "../utils/config";
+import { config } from "@lib/utils/config";
 
 type Services = 'piped' | 'invidious';
 const storeInit: {

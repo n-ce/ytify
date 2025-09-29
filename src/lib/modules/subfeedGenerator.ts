@@ -1,4 +1,4 @@
-import { setListStore, store } from "../stores";
+import { setListStore, store } from "@lib/stores";
 
 export default async function(channels: string[]) {
 

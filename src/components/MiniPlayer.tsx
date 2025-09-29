@@ -1,9 +1,9 @@
 import { lazy, Show } from "solid-js";
 import './MiniPlayer.css';
-import { config } from "../lib/utils/config";
+import { config } from "@lib/utils/config";
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "./MediaPartials";
-import { playerStore, setNavStore } from "../lib/stores";
-import { queueStore } from "../lib/stores/queue";
+import { playerStore, setNavStore } from "@lib/stores";
+import { queueStore } from "@lib/stores/queue";
 
 
 const MediaArtwork = lazy(() => import('./MediaPartials/MediaArtwork'))

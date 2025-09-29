@@ -1,7 +1,7 @@
-import { config, hostResolver } from '../lib/utils';
+import { config, hostResolver } from '@lib/utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
-import fetchList from '../lib/modules/fetchList';
+import fetchList from '@lib/modules/fetchList';
 
 
 export default function(data: {

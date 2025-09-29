@@ -1,6 +1,6 @@
 import { onMount } from 'solid-js';
-import { addToCollection, createCollection, getDB } from '../../lib/utils/library';
-import { listStore, setListStore, store, t } from '../../lib/stores';
+import { addToCollection, createCollection, getDB } from '@lib/utils/library';
+import { listStore, setListStore, store, t } from '@lib/stores';
 
 export default function(_: {
   close: () => void

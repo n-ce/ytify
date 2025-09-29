@@ -1,8 +1,8 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { openFeature, listStore, resetList, setQueueStore } from '../../lib/stores';
-import { getDB, removeFromCollection, saveDB } from '../../lib/utils';
+import { openFeature, listStore, resetList, setQueueStore } from '@lib/stores';
+import { getDB, removeFromCollection, saveDB } from '@lib/utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 

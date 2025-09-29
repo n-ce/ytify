@@ -1,9 +1,9 @@
 import { For, Show } from "solid-js";
-import { getHub } from "../../lib/modules/hub";
-import { getDB } from "../../lib/utils";
-import ListItem from "../../components/ListItem";
-import StreamItem from "../../components/StreamItem";
-import { generateImageUrl, getThumbIdFromLink } from "../../lib/utils";
+import { getHub } from "@lib/modules/hub";
+import { getDB } from "@lib/utils";
+import ListItem from "@components/ListItem";
+import StreamItem from "@components/StreamItem";
+import { generateImageUrl, getThumbIdFromLink } from "@lib/utils";
 
 export default function() {
   const hub = getHub();

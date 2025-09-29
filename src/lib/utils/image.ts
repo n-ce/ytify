@@ -1,4 +1,4 @@
-import { playerStore } from '../stores';
+import { playerStore } from '@lib/stores';
 import { config } from './config';
 
 

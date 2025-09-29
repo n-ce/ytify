@@ -2,8 +2,8 @@ import { onCleanup } from "solid-js";
 import './Search.css';
 import Results from './Results';
 import Input from "./Input";
-import { config, setConfig } from "../../../lib/utils";
-import { getSearchResults, resetSearch, searchStore, setSearchStore, t, updateParam } from '../../../lib/stores';
+import { config, setConfig } from "@lib/utils";
+import { getSearchResults, resetSearch, searchStore, setSearchStore, t, updateParam } from '@lib/stores';
 
 
 

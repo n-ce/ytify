@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from "solid-js";
-import { fetchCollection, getDB } from "../../lib/utils";
-import { listStore, t } from "../../lib/stores";
-import StreamItem from "../../components/StreamItem";
+import { fetchCollection, getDB } from "@lib/utils";
+import { listStore, t } from "@lib/stores";
+import StreamItem from "@components/StreamItem";
 
 export default function() {
 

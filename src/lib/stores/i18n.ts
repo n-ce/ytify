@@ -1,5 +1,5 @@
 import { createStore } from 'solid-js/store';
-import { config } from '../utils';
+import { config } from '@lib/utils';
 
 type TranslationStore = {
   locale: string;

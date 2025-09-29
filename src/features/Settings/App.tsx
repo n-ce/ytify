@@ -1,7 +1,7 @@
 import { createEffect, For } from 'solid-js';
-import { Selector } from '../../components/Selector.tsx';
-import { config, setConfig } from '../../lib/utils/config.ts';
-import { setStore, setI18nStore, t, updateLang } from '../../lib/stores';
+import { Selector } from '@components/Selector.tsx';
+import { config, setConfig } from '@lib/utils/config.ts';
+import { setStore, setI18nStore, t, updateLang } from '@lib/stores';
 
 export default function() {
 

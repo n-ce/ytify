@@ -1,5 +1,5 @@
-import { setListStore, store, updateParam } from "../stores";
-import { convertSStoHHMMSS } from "../utils";
+import { setListStore, store, updateParam } from "@lib/stores";
+import { convertSStoHHMMSS } from "@lib/utils";
 
 export default async function(ids: string[]) {
 

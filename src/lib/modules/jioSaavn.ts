@@ -1,13 +1,12 @@
-import { playerStore, setPlayerStore, setStore, store, updateParam } from "../stores";
-import { config, player } from "../utils";
-import { normalizeString } from "../utils/string";
+import { playerStore, setPlayerStore, setStore, store, updateParam } from "@lib/stores";
+import { config, player } from "@lib/utils";
 
 export default function() {
   setPlayerStore('status', 'Fetching Data via JioSaavn...');
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;
   const query = encodeURIComponent(`${title.replace(/\(.*?\)/g, '')} ${author.replace(' - Topic', '')}`);
-
+  const normalizeString = (str: string) => str.normalize("NFD").replace(/[̀-ͯ]/g, "");
 
   fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
     .then(res => res.json())

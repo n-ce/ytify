@@ -1,6 +1,6 @@
 import { For } from "solid-js";
-import { queueStore } from "../../lib/stores/queue";
-import StreamItem from "../../components/StreamItem";
+import { queueStore } from "@lib/stores/queue";
+import StreamItem from "@components/StreamItem";
 
 export default function() {
   return (

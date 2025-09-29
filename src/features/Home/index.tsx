@@ -1,7 +1,7 @@
 import { Match, Show, Switch, createSignal, lazy, onMount } from 'solid-js';
 import './Home.css';
-import { config, setConfig } from '../../lib/utils';
-import { setNavStore, params, setSearchStore } from '../../lib/stores';
+import { config, setConfig } from '@lib/utils';
+import { setNavStore, params, setSearchStore } from '@lib/stores';
 import Dropdown from './Dropdown';
 const About = lazy(() => import('./About'));
 const Hub = lazy(() => import('./Hub'));

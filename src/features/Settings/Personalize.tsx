@@ -1,7 +1,7 @@
 import ToggleSwitch from './ToggleSwitch.tsx';
-import { Selector } from '../../components/Selector.tsx';
-import { setStore, t } from '../../lib/stores';
-import { config, cssVar, setConfig, themer } from '../../lib/utils';
+import { Selector } from '@components/Selector.tsx';
+import { setStore, t } from '@lib/stores';
+import { config, cssVar, setConfig, themer } from '@lib/utils';
 
 export default function() {
 

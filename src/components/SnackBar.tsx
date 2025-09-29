@@ -1,5 +1,5 @@
 import { onMount } from "solid-js";
-import { setStore, store } from "../lib/stores";
+import { setStore, store } from "@lib/stores";
 
 export default function() {
   let snackbar!: HTMLParagraphElement;

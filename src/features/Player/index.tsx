@@ -1,8 +1,8 @@
 import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
 import './Player.css'
-import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "../../components/MediaPartials";
-import { config, convertSStoHHMMSS, cssVar } from "../../lib/utils";
-import { closeFeature, openFeature, playerStore, setPlayerStore, setStore, t } from "../../lib/stores";
+import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "@components/MediaPartials";
+import { config, convertSStoHHMMSS, cssVar } from "@lib/utils";
+import { closeFeature, openFeature, playerStore, setPlayerStore, setStore, t } from "@lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 const Lyrics = lazy(() => import('./Lyrics'));

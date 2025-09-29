@@ -6,9 +6,9 @@
 > we need to account for this using the trashHistory array
 */
 
-import { playerStore } from "../stores";
-import { setQueueStore } from "../stores/queue";
-import { convertSStoHHMMSS } from "../utils";
+import { playerStore } from "@lib/stores";
+import { setQueueStore } from "@lib/stores/queue";
+import { convertSStoHHMMSS } from "@lib/utils";
 
 export default function(data: StreamItem[]) {
 

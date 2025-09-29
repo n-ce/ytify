@@ -1,6 +1,6 @@
-import { setStore, t } from '../../lib/stores';
-import { config, setConfig } from '../../lib/utils/config.ts';
-import { getDB, saveDB } from '../../lib/utils/library.ts';
+import { setStore, t } from '@lib/stores';
+import { config, setConfig } from '@lib/utils/config.ts';
+import { getDB, saveDB } from '@lib/utils/library.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {

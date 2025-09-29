@@ -1,7 +1,7 @@
 // @ts-ignore
 
 import { setStore, store } from './app';
-import { config, fetchMoreSearchResultsPiped, fetchSearchResultsInvidious, fetchSearchResultsPiped, fetchSearchSuggestions } from '../utils';
+import { config, fetchMoreSearchResultsPiped, fetchSearchResultsInvidious, fetchSearchResultsPiped, fetchSearchSuggestions } from '@lib/utils';
 import { updateParam } from './navigation';
 import { createStore } from 'solid-js/store';
 

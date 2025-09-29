@@ -4,7 +4,7 @@
 //import fetchList from "../modules/fetchList";
 // import { fetchCollection, removeFromCollection } from "./libraryUtils";
 
-import { setStore, playerStore, setPlayerStore, store, t } from "../stores";
+import { setStore, playerStore, setPlayerStore, store, t } from "@lib/stores";
 import { config } from "./config";
 import { player } from "./player";
 

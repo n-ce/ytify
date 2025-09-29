@@ -1,7 +1,7 @@
 import { For, Show } from "solid-js";
-import { generateImageUrl, getDB, getThumbIdFromLink } from "../../lib/utils";
-import { t } from "../../lib/stores";
-import ListItem from "../../components/ListItem";
+import { generateImageUrl, getDB, getThumbIdFromLink } from "@lib/utils";
+import { t } from "@lib/stores";
+import ListItem from "@components/ListItem";
 
 export default function(_: {
   flag: APAC

@@ -1,5 +1,5 @@
-import { playerStore } from "../stores";
-import { convertSStoHHMMSS, getDB } from "../utils";
+import { playerStore } from "@lib/stores";
+import { convertSStoHHMMSS, getDB } from "@lib/utils";
 import { getHub, updateHub } from "./hub";
 
 export default function(

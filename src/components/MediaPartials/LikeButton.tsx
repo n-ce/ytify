@@ -1,5 +1,5 @@
-import { playerStore } from '../../lib/stores';
-import { addToCollection, getDB, removeFromCollection } from '../..//lib/utils/library';
+import { playerStore } from '@lib/stores';
+import { addToCollection, getDB, removeFromCollection } from '@lib/utils/library';
 
 export default function() {
 

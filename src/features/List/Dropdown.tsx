@@ -1,6 +1,6 @@
 import { Show, createSignal } from 'solid-js';
-import { getDB, getThumbIdFromLink, saveDB, toCollection } from '../../lib/utils';
-import { listStore, resetList, setQueueStore, t } from '../../lib/stores';
+import { getDB, getThumbIdFromLink, saveDB, toCollection } from '@lib/utils';
+import { listStore, resetList, setQueueStore, t } from '@lib/stores';
 
 export default function Dropdown(_: {
   toggleSort: () => void

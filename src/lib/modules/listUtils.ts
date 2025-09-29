@@ -1,7 +1,7 @@
 // @ts-ignore
 
-import { listStore, setListStore, setStore, t } from "../stores";
-import { addListToCollection, createCollection, getThumbIdFromLink, saveDB, toCollection } from "../utils";
+import { listStore, setListStore, setStore, t } from "@lib/stores";
+import { addListToCollection, createCollection, getThumbIdFromLink, saveDB, toCollection } from "@lib/utils";
 
 export function subscribeList(db: Library) {
   const { isSubscribed, id, type, name, thumbnail, uploader } = listStore;

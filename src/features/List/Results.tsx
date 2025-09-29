@@ -1,6 +1,6 @@
 import { Accessor, For, Show } from "solid-js";
-import { listStore } from "../../lib/stores";
-import StreamItem from "../../components/StreamItem";
+import { listStore } from "@lib/stores";
+import StreamItem from "@components/StreamItem";
 
 export default function Results(_: {
   ref?: HTMLDivElement | ((el: HTMLDivElement) => void),

@@ -6,7 +6,7 @@ import postcssJitProps from 'postcss-jit-props';
 import OpenProps from 'open-props';
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
-
+import path from 'path';
 
 
 export default defineConfig(({ command }) => ({
@@ -16,7 +16,12 @@ export default defineConfig(({ command }) => ({
       ((today = new Date()) => `v8 ${today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.')}`)(),
     ),
   },
-
+  resolve: {
+    alias: {
+      '@components': path.resolve(__dirname, './src/components'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+    },
+  },
   plugins: [
     solidPlugin(),
     injectEruda(command === 'serve'),

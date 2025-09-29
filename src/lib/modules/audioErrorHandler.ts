@@ -1,6 +1,6 @@
-import { setStore, store } from '../stores/app.ts';
-import { playerStore, setPlayerStore } from '../stores/player.ts';
-import { getDownloadLink } from '../utils/helpers.ts';
+import { setStore, store } from '@lib/stores/app.ts';
+import { playerStore, setPlayerStore } from '@lib/stores/player.ts';
+import { getDownloadLink } from '@lib/utils/helpers.ts';
 
 export default function(
   audio: HTMLAudioElement,

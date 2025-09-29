@@ -1,6 +1,6 @@
-import { getDB, saveDB } from "../utils/library";
-import { getApi } from "../utils";
-import { store, setListStore, setStore, t, listStore } from "../stores";
+import { getDB, saveDB } from "@lib/utils/library";
+import { getApi } from "@lib/utils";
+import { store, setListStore, setStore, t, listStore } from "@lib/stores";
 
 const streamToCollectionItem = (stream: StreamItem): CollectionItem => ({
   id: stream.videoId,

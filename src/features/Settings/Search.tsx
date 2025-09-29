@@ -1,5 +1,5 @@
-import { setStore, t } from '../../lib/stores';
-import { config, setConfig } from '../../lib/utils/config.ts';
+import { setStore, t } from '@lib/stores';
+import { config, setConfig } from '@lib/utils/config.ts';
 import ToggleSwitch from './ToggleSwitch.tsx';
 
 export default function() {

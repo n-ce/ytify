@@ -1,8 +1,8 @@
 import { onMount } from "solid-js";
 import './Queue.css';
-import { openFeature, setStore, t } from "../../lib/stores";
-import { config, setConfig } from "../../lib/utils";
-import { setQueueStore } from "../../lib/stores/queue";
+import { openFeature, setStore, t } from "@lib/stores";
+import { config, setConfig } from "@lib/utils";
+import { setQueueStore } from "@lib/stores/queue";
 import List from "./List";
 
 export default function() {
