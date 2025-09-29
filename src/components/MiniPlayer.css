@@ -39,7 +39,7 @@ footer {
     border-top: var(--border);
     border-top-left-radius: var(--roundness);
     border-top-right-radius: var(--roundness);
-    background: linear-gradient(transparent, var(--scheme));
+    background: linear-gradient(transparent, var(--trueBg));
 
     img {
       height: var(--size-8);

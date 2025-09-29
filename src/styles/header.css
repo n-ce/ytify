@@ -86,15 +86,14 @@ section>header {
     }
 
     ul {
-      background-color: var(--blurMix);
-      backdrop-filter: blur(var(--size-px-2));
+      background: var(--onBg);
       color: var(--text);
       padding: 0;
       list-style: none;
       overflow: hidden;
       border: var(--border);
       border-radius: var(--roundness);
-      box-shadow: var(--shadow-1);
+      box-shadow: var(--shadow-3);
 
       li {
         font-size: var(--font-size-1);

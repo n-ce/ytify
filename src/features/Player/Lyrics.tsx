@@ -12,49 +12,55 @@ export default function(props: { onClose: () => void }) {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          const { syncedLyrics, durationSeconds } = data.data[0];
+          const { syncedLyrics, plainLyric, durationSeconds } = data.data[0];
           const diff = durationSeconds - playerStore.fullDuration;
           if (Math.abs(diff) > 5)
             throw new Error('Duration Mismatch');
 
-          const durarr: number[] = [];
-          const lrcMap: string[] = syncedLyrics
-            .split('\n')
-            .map((line: string) => {
-              const [d, l] = line.split(']');
-              if (!l) return '...';
-              const [mm, ss] = d.substring(1).split(':');
-              const s = (parseInt(mm) * 60) + parseFloat(ss);
-              durarr.push(s);
-              return l;
+          if (syncedLyrics) {
+            const durarr: number[] = [];
+            const lrcMap: string[] = syncedLyrics
+              .split('\n')
+              .map((line: string) => {
+                const [d, l] = line.split(']');
+                if (!l) return '...';
+                const [mm, ss] = d.substring(1).split(':');
+                const s = (parseInt(mm) * 60) + parseFloat(ss);
+                durarr.push(s);
+                return l;
+              });
+            setLrcMap(lrcMap);
+
+            setPlayerStore({
+              lrcSync: (d: number) => {
+                let currentIndex = -1;
+                for (let i = 0; i < durarr.length; i++) {
+                  if (durarr[i] <= d) {
+                    currentIndex = i;
+                  } else {
+                    break;
+                  }
+                }
+
+                if (currentIndex !== activeLine()) {
+                  setActiveLine(currentIndex);
+
+                  if (currentIndex < 0) return;
+
+                  if (lyricsSection.children[currentIndex]) {
+                    lyricsSection.children[currentIndex].scrollIntoView({
+                      block: 'center',
+                      behavior: 'smooth'
+                    });
+                  }
+                }
+              }
             });
-          setLrcMap(lrcMap);
-
-          setPlayerStore({
-            lrcSync: (d: number) => {
-              let currentIndex = -1;
-              for (let i = 0; i < durarr.length; i++) {
-                if (durarr[i] <= d) {
-                  currentIndex = i;
-                } else {
-                  break;
-                }
-              }
-
-              if (currentIndex !== activeLine()) {
-                setActiveLine(currentIndex);
-
-                if (currentIndex < 0) return;
-
-                if (lyricsSection.children[currentIndex]) {
-                  lyricsSection.children[currentIndex].scrollIntoView({
-                    block: 'center',
-                    behavior: 'smooth'
-                  });
-                }
-              }
-            }
-          });
+          } else if (plainLyric) {
+            setLrcMap(plainLyric.split('\n'));
+          } else {
+            throw new Error('No lyrics found');
+          }
         }
         else throw new Error(data.error.reason || 'Track Not Found');
       }).catch(e => {

@@ -204,9 +204,9 @@
 
 .lyrics {
   aspect-ratio: 1;
-  background-color: var(--blurMix);
-  backdrop-filter: blur(var(--size-px-3));
+  background-color: var(--onBg);
   border-radius: var(--roundness);
+  padding: 0 var(--size-3);
   overflow-y: scroll;
 
   p {

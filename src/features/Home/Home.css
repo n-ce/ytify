@@ -158,7 +158,7 @@ header {
     }
 
     &:hover {
-      background-color: var(--surface);
+      background-color: var(--onBg);
       border-radius: var(--roundness);
     }
   }

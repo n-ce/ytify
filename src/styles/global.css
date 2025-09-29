@@ -12,7 +12,6 @@
   --scheme: color-mix(in srgb, oklch(from var(--source) 70% calc(c * var(--chroma)) h), var(--bg) 85%);
   --onBg: color-mix(in srgb, oklch(from var(--source) 85% calc(c * var(--chroma)) h), var(--bg) 85%);
   --onBg2: color-mix(in srgb, oklch(from var(--source) 80% calc(35% * var(--chroma)) h), var(--bg) 70%);
-  --surface: color-mix(in srgb, oklch(from var(--onBg) l calc(c * var(--chroma)) / 1), var(--bg) 80%);
   --blurMix: color-mix(in srgb, oklch(from var(--onBg) l calc(c * var(--chroma)) / 0.1), var(--bg) 40%);
   --text2: color-mix(in srgb, oklch(from var(--source) 50% calc(80% * var(--chroma)) h), var(--text) 75%);
   --gap: var(--size-fluid-2);
