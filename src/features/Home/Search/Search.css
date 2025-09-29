@@ -93,4 +93,11 @@
     margin-top: var(--gap);
 
   }
+
+  .listItem {
+    &:nth-child(odd) {
+      margin-right: var(--gap);
+    }
+
+  }
 }

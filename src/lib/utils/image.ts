@@ -5,13 +5,27 @@ import { config } from './config';
 // Generates both channel and stream thumbnails
 
 
-export const generateImageUrl = (
+export function generateImageUrl(
   id: string,
   res: string,
-  music: string = ''
-) => 'https://wsrv.nl?url=https://' + (id.startsWith('/') ?
-  `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj&output=webp&w=${res === 'mq' ? '180' : '360'}` :
-  `i.ytimg.com/vi_webp/${id}/${res}default.webp${music}`);
+  music?: boolean
+) {
+  const proxy = 'https://wsrv.nl?url=https://';
+  let suffix = '';
+  let prefix = '';
+  if (id.startsWith('/')) {
+    prefix = `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj`;
+    suffix = `&output=webp&w=${res === 'mq' ? '180' : '360'}`;
+  }
+  else {
+    prefix = `i.ytimg.com/vi_webp/${id}/${res}default.webp`;
+    if (music) {
+      const s = res === 'mq' ? '180' : '720';
+      suffix = `&w=${s}&h=${s}&fit=cover`;
+    }
+  }
+  return proxy + prefix + suffix;
+}
 
 
 

@@ -1,6 +1,8 @@
 import { setPlayerStore, playerStore } from "@lib/stores";
 
-export default function() {
+export default function(_: {
+  src: string
+}) {
 
   let imgRef!: HTMLImageElement;
 
@@ -16,7 +18,7 @@ export default function() {
   return (
     <img
       ref={imgRef}
-      src={playerStore.mediaArtwork}
+      src={_.src}
       crossorigin="anonymous"
       alt={"Media Artwork for " + playerStore.stream.title}
       onclick={() => {

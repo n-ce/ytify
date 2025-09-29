@@ -8,14 +8,8 @@
   text-decoration: none;
   cursor: pointer;
   background-color: var(--onBg);
-  border: var(--border-size-1) solid transparent;
   border-radius: var(--roundness);
-
   border: var(--border);
-
-  &:nth-child(odd) {
-    margin-right: var(--gap);
-  }
 
   * {
     pointer-events: none;
@@ -23,8 +17,8 @@
   }
 
   &:hover {
-    transform: scale(1.1);
-    border-color: var(--borderColor);
+    background-color: var(--onBg2);
+    color: var(--text2);
   }
 
   &.ravel {

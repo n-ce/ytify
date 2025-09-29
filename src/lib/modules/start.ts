@@ -29,8 +29,6 @@ export default async function() {
 
 
 
-
-
   const isPWA = idFromURL(params.get('url') || params.get('text'));
   const id = params.get('s') || isPWA;
 

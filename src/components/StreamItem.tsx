@@ -2,7 +2,7 @@ import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { setPlayerStore, setStore } from '@lib/stores';
+import { setNavStore, setPlayerStore, setStore } from '@lib/stores';
 
 export default function(data: {
   id: string,
@@ -83,6 +83,9 @@ export default function(data: {
         if (!e.target.classList.contains('ri-more-2-fill')) {
           setPlayerStore('stream', data);
           setPlayerStore('context', data.context || 'link');
+          const isPortrait = matchMedia('(orientation:portrait)').matches;
+          if (isPortrait || config.landscapeSections === '1')
+            setNavStore('player', 'state', false);
           player(data.id);
         }
         else {

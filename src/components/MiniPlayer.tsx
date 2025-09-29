@@ -4,6 +4,7 @@ import { config } from "@lib/utils/config";
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "./MediaPartials";
 import { playerStore, setNavStore } from "@lib/stores";
 import { queueStore } from "@lib/stores/queue";
+import { generateImageUrl } from "@lib/utils";
 
 
 const MediaArtwork = lazy(() => import('./MediaPartials/MediaArtwork'))
@@ -17,7 +18,9 @@ export default function() {
     }>
       <progress value={(playerStore.currentTime / playerStore.fullDuration) || '0'}></progress>
       <Show when={config.loadImage}>
-        <MediaArtwork />
+        <MediaArtwork src={
+          generateImageUrl(playerStore.stream.id, 'mq', playerStore.isMusic)
+        } />
       </Show>
       <MediaDetails />
       <PlayButton />

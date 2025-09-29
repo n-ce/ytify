@@ -105,8 +105,7 @@ header {
       .listItem {
         width: var(--size-11);
         flex-shrink: 0;
-        margin-right: 0;
-        margin-bottom: 0 !important;
+        margin: 0;
         background-color: transparent;
         border: none;
 
@@ -139,11 +138,6 @@ header {
   a {
     text-decoration: none;
     cursor: pointer;
-  }
-
-  a.listItem {
-    margin-top: 0;
-    margin-bottom: var(--gap);
   }
 
 

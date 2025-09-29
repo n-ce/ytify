@@ -8,14 +8,14 @@ export default async function(data: CollectionItem) {
 
   // remove ' - Topic' from author name if it exists
 
-  let music = '';
+  let music = false;
   let authorText = playerStore.stream.author;
   if (data.author.endsWith(' - Topic')) {
-    music = '&w=720&h=720&fit=cover';
+    music = true;
     authorText = data.author.slice(0, -8);
   }
 
-  setPlayerStore('isMusic', Boolean(music));
+  setPlayerStore('isMusic', music);
 
   const metadataObj: MediaMetadataInit = {
     title: data.title,
