@@ -123,7 +123,7 @@ const dispose = createRoot((dispose) => {
     const seconds = Math.floor(audio.currentTime);
 
 
-    if (lrcSync) lrcSync(seconds);
+    if (lrcSync) lrcSync(audio.currentTime);
 
     const { ref } = navStore.player;
     if (ref) {

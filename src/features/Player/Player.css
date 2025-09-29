@@ -86,6 +86,10 @@
     img {
       width: 50dvh;
     }
+
+    .lyrics {
+      text-align: center;
+    }
   }
 }
 
@@ -200,12 +204,12 @@
 
 .lyrics {
   aspect-ratio: 1;
-  background-color: var(--onBg);
+  background-color: var(--blurMix);
+  backdrop-filter: blur(var(--size-px-3));
   border-radius: var(--roundness);
-  padding: var(--size-2) var(--size-3);
   overflow-y: scroll;
 
-  .lyric-line {
+  p {
     margin: var(--size-3) 0;
 
     &.active {

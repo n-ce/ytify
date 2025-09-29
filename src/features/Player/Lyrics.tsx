@@ -32,17 +32,26 @@ export default function(props: { onClose: () => void }) {
 
           setPlayerStore({
             lrcSync: (d: number) => {
-              const i = durarr.findIndex(da => Math.abs(da - d) < 1);
-              setActiveLine(i);
-              if (i < 0) return;
-              if (i + 1 === durarr.length)
-                return lyricsSection.click();
+              let currentIndex = -1;
+              for (let i = 0; i < durarr.length; i++) {
+                if (durarr[i] <= d) {
+                  currentIndex = i;
+                } else {
+                  break;
+                }
+              }
 
-              if (lyricsSection.children[i]) {
-                lyricsSection.children[i].scrollIntoView({
-                  block: 'center',
-                  behavior: 'smooth'
-                });
+              if (currentIndex !== activeLine()) {
+                setActiveLine(currentIndex);
+
+                if (currentIndex < 0) return;
+
+                if (lyricsSection.children[currentIndex]) {
+                  lyricsSection.children[currentIndex].scrollIntoView({
+                    block: 'center',
+                    behavior: 'smooth'
+                  });
+                }
               }
             }
           });
@@ -63,7 +72,6 @@ export default function(props: { onClose: () => void }) {
       <For each={lrcMap()}>
         {(item, i) => (
           <p
-            class="lyric-line"
             classList={{ active: activeLine() === i() }}
           >{item}</p>)}
       </For>
