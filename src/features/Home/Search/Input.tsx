@@ -1,6 +1,6 @@
 import { For, onCleanup, onMount, Show } from "solid-js";
-import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "../../lib/stores";
-import { config, idFromURL, player } from "../../lib/utils";
+import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "../../../lib/stores";
+import { config, idFromURL, player } from "../../../lib/utils";
 
 export default function() {
 

@@ -1,5 +1,5 @@
-import { navStore, params, setNavStore, t, setStore, setPlayerStore, setSearchStore } from '../stores';
-import { config, setConfig, getDownloadLink, idFromURL, fetchCollection, uma, player } from '../utils';
+import { params, setNavStore, t, setStore, setPlayerStore } from '../stores';
+import { config, getDownloadLink, idFromURL, fetchCollection, uma, player } from '../utils';
 
 
 export default async function() {
@@ -28,17 +28,7 @@ export default async function() {
     });
 
 
-  const q = params.get('q');
 
-  if (q) {
-    if (!navStore.search.state)
-      setNavStore('search', 'state', true);
-    const f = params.get('f') || 'all';
-    setConfig('searchFilter', f);
-
-    setSearchStore('query', q);
-
-  }
 
 
   const isPWA = idFromURL(params.get('url') || params.get('text'));

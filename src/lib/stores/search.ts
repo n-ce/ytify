@@ -2,7 +2,7 @@
 
 import { setStore, store } from './app';
 import { config, fetchMoreSearchResultsPiped, fetchSearchResultsInvidious, fetchSearchResultsPiped, fetchSearchSuggestions } from '../utils';
-import { closeFeature, updateParam } from './navigation';
+import { updateParam } from './navigation';
 import { createStore } from 'solid-js/store';
 
 const createInitialState = () => ({
@@ -22,7 +22,6 @@ const createInitialState = () => ({
 export const [searchStore, setSearchStore] = createStore(createInitialState());
 
 export function resetSearch() {
-  closeFeature('search');
   console.log(searchStore);
   searchStore.observer.disconnect();
   setSearchStore(createInitialState());

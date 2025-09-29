@@ -1,8 +1,8 @@
 import { For, Show, Switch, Match } from 'solid-js';
-import { searchStore } from '../../lib/stores';
-import ListItem from '../../components/ListItem';
-import StreamItem from '../../components/StreamItem';
-import { convertSStoHHMMSS, getThumbIdFromLink } from '../../lib/utils';
+import { searchStore } from '../../../lib/stores';
+import ListItem from '../../../components/ListItem';
+import StreamItem from '../../../components/StreamItem';
+import { convertSStoHHMMSS, getThumbIdFromLink } from '../../../lib/utils';
 
 const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 

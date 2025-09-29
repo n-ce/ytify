@@ -4,7 +4,7 @@ const Home = lazy(() => import('../../features/Home'));
 const List = lazy(() => import('../../features/List'));
 const Queue = lazy(() => import('../../features/Queue'));
 const Player = lazy(() => import('../../features/Player'));
-const Search = lazy(() => import('../../features/Search'));
+
 const Settings = lazy(() => import('../../features/Settings'));
 const Video = lazy(() => import('../../features/Video'));
 
@@ -24,7 +24,7 @@ export const [navStore, setNavStore] = createStore<Nav>({
   player: { ref: null, state: false, component: Player },
   
   home: { ref: null, state: true, component: Home },
-  search: { ref: null, state: false, component: Search },
+
   list: { ref: null, state: false, component: List },
   video: { ref: null, state: false, component: Video },
   settings: { ref: null, state: false, component: Settings },

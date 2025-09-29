@@ -1,21 +1,28 @@
-import { For, Match, Show, Switch, createSignal, lazy } from 'solid-js';
+import { For, Match, Show, Switch, createSignal, lazy, onMount } from 'solid-js';
 const About = lazy(() => import('./About'));
 import Hub from './Hub';
 import './Home.css';
 import { config, setConfig } from '../../lib/utils';
-import { navStore, setNavStore } from '../../lib/stores';
+import { setNavStore, params } from '../../lib/stores'; // Import params
 import Collections from './Collections';
 import SubLists from './SubLists';
 import Dropdown from './Dropdown';
-
+import Search from './Search'; // Import the Search component
 
 export default function() {
 
   const [home, setHome] = createSignal(config.home);
-  function saveHome(name: 'ytify' | 'Hub' | 'Library') {
+  function saveHome(name: 'ytify' | 'Hub' | 'Library' | 'Search') { // Add 'Search'
     setHome(name);
     setConfig('home', name);
   }
+
+  onMount(() => {
+    const q = params.get('q');
+    if (q) {
+      saveHome('Search');
+    }
+  });
 
 
   let syncBtn!: HTMLElement;
@@ -49,10 +56,10 @@ export default function() {
               onclick={() => saveHome('Library')}
             ></i>
           </Show>
-          <Show when={!navStore.search.state}>
+          <Show when={home() !== 'Search'}> {/* Change condition */}
             <i
               class="ri-search-2-line"
-              onclick={() => setNavStore('search', 'state', true)}
+              onclick={() => saveHome('Search')} // Change onclick
             ></i>
           </Show>
 
@@ -81,6 +88,9 @@ export default function() {
               }
             </For>
 
+          </Match>
+          <Match when={home() === 'Search'}> {/* Add new Match case */}
+            <Search />
           </Match>
 
         </Switch>
