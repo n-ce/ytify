@@ -6,7 +6,7 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
-  type Features = 'home' | 'player' | 'list' | 'settings' | 'search' | 'queue' | 'lyrics' | 'video' | 'updater';
+  type Features = 'home' | 'player' | 'list' | 'settings' | 'search' | 'queue' | 'video' | 'updater';
 
   type StreamItem = {
     url: string,

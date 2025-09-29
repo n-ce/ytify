@@ -197,3 +197,20 @@
     text-align: right;
   }
 }
+
+.lyrics {
+  aspect-ratio: 1;
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+  padding: var(--size-2) var(--size-3);
+  overflow-y: scroll;
+
+  .lyric-line {
+    margin: var(--size-3) 0;
+
+    &.active {
+      font-weight: var(--font-weight-5);
+      font-size: var(--font-size-3);
+    }
+  }
+}

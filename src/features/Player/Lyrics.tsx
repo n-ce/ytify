@@ -1,39 +1,28 @@
-import { createSignal, For, onMount } from "solid-js";
-import { closeFeature, openFeature, playerStore, setPlayerStore, setStore } from "../../lib/stores";
+import { createSignal, For, onMount, onCleanup } from "solid-js";
+import { playerStore, setPlayerStore, setStore } from "../../lib/stores";
 
-export default function() {
+export default function(props: { onClose: () => void }) {
 
   const [lrcMap, setLrcMap] = createSignal(['Loading...']);
   const [activeLine, setActiveLine] = createSignal(-1);
-  let lyricsSection!: HTMLElement;
-
-  const pStyle = { 'margin-top': 'var(--size-3)' };
-  const activePStyle = {
-    ...pStyle,
-    'font-weight': 'var(--font-weight-5)',
-    'font-size': 'var(--font-size-3)'
-  };
+  let lyricsSection!: HTMLDivElement;
 
   onMount(() => {
-    openFeature('lyrics', lyricsSection);
     fetch(`https://api-lyrics.simpmusic.org/v1/${playerStore.stream.id}?limit=1`)
       .then(res => res.json())
       .then(data => {
-
-
-
         if (data.success) {
           const { syncedLyrics, durationSeconds } = data.data[0];
           const diff = durationSeconds - playerStore.fullDuration;
           if (Math.abs(diff) > 5)
             throw new Error('Duration Mismatch');
 
-
           const durarr: number[] = [];
           const lrcMap: string[] = syncedLyrics
             .split('\n')
             .map((line: string) => {
               const [d, l] = line.split(']');
+              if (!l) return '...';
               const [mm, ss] = d.substring(1).split(':');
               const s = (parseInt(mm) * 60) + parseFloat(ss);
               durarr.push(s);
@@ -41,60 +30,44 @@ export default function() {
             });
           setLrcMap(lrcMap);
 
-
           setPlayerStore({
             lrcSync: (d: number) => {
-
               const i = durarr.findIndex(da => Math.abs(da - d) < 1);
               setActiveLine(i);
               if (i < 0) return;
               if (i + 1 === durarr.length)
                 return lyricsSection.click();
 
-              lyricsSection.children[i].scrollIntoView({
-                block: 'center',
-                behavior: 'smooth'
-              });
+              if (lyricsSection.children[i]) {
+                lyricsSection.children[i].scrollIntoView({
+                  block: 'center',
+                  behavior: 'smooth'
+                });
+              }
             }
           });
-
         }
         else throw new Error(data.error.reason || 'Track Not Found');
-
-
       }).catch(e => {
         setStore('snackbar', e.message);
-        closeFeature('lyrics');
-
+        props.onClose();
       })
   });
 
+  onCleanup(() => {
+    setPlayerStore('lrcSync', undefined);
+  });
+
   return (
-    <section ref={lyricsSection}>
-      <header>
-        <p style={{
-          'margin-right': 'auto'
-        }}>Lyrics</p>
-        <i
-          onclick={() => {
-            closeFeature('lyrics');
-            setPlayerStore('lrcSync', undefined);
-          }}
-          class="ri-close-large-line"
-        ></i>
-      </header>
+    <div ref={lyricsSection} class="lyrics">
       <For each={lrcMap()}>
         {(item, i) => (
           <p
-            onclick={() => {
-              playerStore.audio.pause();
-            }}
-            style={
-              activeLine() === i() ?
-                activePStyle : pStyle
-            } >{item}</p>)}
+            class="lyric-line"
+            classList={{ active: activeLine() === i() }}
+          >{item}</p>)}
       </For>
-    </section>
+    </div>
   );
-
 }
+

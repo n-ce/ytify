@@ -9,7 +9,10 @@
   background: var(--bg);
 
   &:not(:has(details[open])) {
-    background: linear-gradient(to right, var(--bg), transparent, var(--bg));
+    /* --scheme required in dark mode*/
+    background: linear-gradient(to right, var(--scheme), transparent, var(--scheme));
+    /* --bg required in dark mode*/
+    background: linear-gradient(to right, var(--trueBg), transparent, var(--trueBg));
     backdrop-filter: blur(var(--size-px-1));
   }
 

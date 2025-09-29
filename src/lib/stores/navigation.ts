@@ -7,7 +7,7 @@ const Player = lazy(() => import('../../features/Player'));
 const Search = lazy(() => import('../../features/Search'));
 const Settings = lazy(() => import('../../features/Settings'));
 const Video = lazy(() => import('../../features/Video'));
-const Lyrics = lazy(() => import('../../features/Lyrics'));
+
 const Updater = lazy(() => import('../../features/Updater'));
 
 export const params = (new URL(location.href)).searchParams;
@@ -22,7 +22,7 @@ type Nav = { [key in Features]: {
 export const [navStore, setNavStore] = createStore<Nav>({
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
-  lyrics: { ref: null, state: false, component: Lyrics },
+  
   home: { ref: null, state: true, component: Home },
   search: { ref: null, state: false, component: Search },
   list: { ref: null, state: false, component: List },

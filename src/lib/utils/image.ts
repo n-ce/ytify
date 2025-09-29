@@ -78,7 +78,11 @@ function colorInjector(colorArray: number[]) {
         autoDark ? 'dark' : 'light' : theme;
 
       const [r, g, b] = colorArray;
+      // init color
+      if (r + g + b !== 710)
+        cssVar('--chroma', '1');
 
+      cssVar('--trueBg', scheme === 'light' ? 'var(--scheme)' : 'var(--bg)');
 
       cssVar('--source', accentDarkener(r, g, b));
       cssVar('--bg', palette[scheme].bg);

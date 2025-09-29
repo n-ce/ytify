@@ -1,14 +1,17 @@
-import { createEffect, lazy, onMount, Show } from "solid-js"
+import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
 import './Player.css'
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "../../components/MediaPartials";
 import { config, convertSStoHHMMSS, cssVar } from "../../lib/utils";
 import { closeFeature, openFeature, playerStore, setPlayerStore, setStore, t } from "../../lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
+const Lyrics = lazy(() => import('./Lyrics'));
 
 export default function() {
   let playerSection!: HTMLDivElement;
   let slider!: HTMLInputElement;
+
+  const [showLyrics, setShowLyrics] = createSignal(false);
 
   onMount(() => {
     openFeature('player', playerSection);
@@ -47,7 +50,12 @@ export default function() {
         ></i>
       </header>
       <article>
-        <Show when={config.loadImage}><MediaArtwork /></Show>
+
+        <Show when={showLyrics()}>
+          <Lyrics onClose={() => setShowLyrics(false)} />
+        </Show>
+
+        <Show when={config.loadImage && !showLyrics()}><MediaArtwork /></Show>
 
 
         <MediaDetails />
@@ -130,7 +138,15 @@ export default function() {
             <option value="4.00">4.00x</option>
           </select>
 
-          <i class="ri-signpost-line"></i>
+          <Show
+            when={playerStore.isMusic}
+            fallback={<i class="ri-signpost-line"></i>}
+          >
+            <i
+              class="ri-music-2-line"
+              onclick={() => setShowLyrics(!showLyrics())}
+            ></i>
+          </Show>
 
 
           <LikeButton />
