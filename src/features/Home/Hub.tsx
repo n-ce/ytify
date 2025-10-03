@@ -31,8 +31,8 @@ export default function() {
   return (
     <div class="hub">
       <article>
-        <p>Subfeed</p>
-        <i class="ri-refresh-line" onClick={handleSubfeedRefresh}></i>
+        <p>Sub Feed</p>
+        <i class="ri-refresh-line" onclick={handleSubfeedRefresh}></i>
         <i class="ri-arrow-right-s-line"></i>
         <div>
           <Show when={isSubfeedLoading()}>
@@ -108,11 +108,11 @@ export default function() {
 
       <article>
         <p>Related to your Artists</p>
-        <i class="ri-refresh-line" onClick={handleRelatedRefresh}></i>
+        <i class="ri-refresh-line" onclick={handleRelatedRefresh}></i>
         <Show when={isRelatedLoading()}>
           <i class="ri-loader-3-line"></i>
         </Show>
-        <div class="related playlists">
+        <div class="playlists">
           <Show
             when={Object.keys(hub().playlists || {}).length > 0}
           >
@@ -129,7 +129,7 @@ export default function() {
             </For>
           </Show>
         </div>
-        <div class="related artists">
+        <div class="artists">
           <Show
             when={Object.keys(hub().artists || {}).length > 0}
           >

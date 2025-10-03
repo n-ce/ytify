@@ -113,6 +113,18 @@ header {
 
     }
 
+    >.playlists {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-bottom: 0;
+    }
+
+    >.artists {
+      margin-top: 0;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
 
     >div:has(.streamItem) {
       width: 100%;
@@ -173,17 +185,4 @@ header {
     }
   }
 
-}
-
-article {
-  .featured .artists {
-    margin-top: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-
-  .featured .playlists {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-  }
 }
