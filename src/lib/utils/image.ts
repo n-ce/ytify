@@ -92,8 +92,11 @@ function colorInjector(colorArray: number[]) {
         autoDark ? 'dark' : 'light' : theme;
 
       const [r, g, b] = colorArray;
-      // init color
-      if (r + g + b !== 710)
+      console.log(r, g, b);
+
+      if (Math.abs(r - g) < 10 && Math.abs(g - b) < 10)
+        cssVar('--chroma', '0');
+      else
         cssVar('--chroma', '1');
 
       cssVar('--trueBg', scheme === 'light' ? 'var(--scheme)' : 'var(--bg)');
@@ -109,7 +112,7 @@ function colorInjector(colorArray: number[]) {
 
 
 export function themer() {
-  const initColor = '245, 245, 220';
+  const initColor = '220, 220, 220';
   const { stream } = playerStore;
   const { loadImage } = config;
   if (loadImage && stream.id)
