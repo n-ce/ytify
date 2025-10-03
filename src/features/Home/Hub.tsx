@@ -112,7 +112,7 @@ export default function() {
         <Show when={isRelatedLoading()}>
           <i class="ri-loader-3-line"></i>
         </Show>
-        <div>
+        <div class="related playlists">
           <Show
             when={Object.keys(hub().playlists || {}).length > 0}
           >
@@ -129,7 +129,7 @@ export default function() {
             </For>
           </Show>
         </div>
-        <div>
+        <div class="related artists">
           <Show
             when={Object.keys(hub().artists || {}).length > 0}
           >
