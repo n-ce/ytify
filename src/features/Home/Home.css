@@ -174,3 +174,16 @@ header {
   }
 
 }
+
+article {
+  .featured .artists {
+    margin-top: 0;
+    border-top-left-radius: none;
+    border-top-right-radius: none;
+  }
+
+  .featured .playlists {
+    border-bottom-left-radius: none;
+    border-bottom-right-radius: none;
+  }
+}

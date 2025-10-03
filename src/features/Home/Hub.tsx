@@ -116,7 +116,7 @@ export default function() {
           <Show
             when={Object.keys(hub().playlists || {}).length > 0}
           >
-            <For each={Object.values(hub().playlists || {}).slice(0, 5)}>
+            <For each={Object.values(hub().playlists || {})}>
               {(item) => (
                 <ListItem
                   stats={item.frequency ? `${item.frequency} plays` : ''}
@@ -133,7 +133,7 @@ export default function() {
           <Show
             when={Object.keys(hub().artists || {}).length > 0}
           >
-            <For each={Object.values(hub().artists || {}).slice(0, 5)}>
+            <For each={Object.values(hub().artists || {})}>
               {(item) => (
                 <ListItem
                   stats={item.frequency ? `${item.frequency} plays` : ''}
