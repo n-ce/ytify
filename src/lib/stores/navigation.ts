@@ -22,7 +22,7 @@ type Nav = { [key in Features]: {
 export const [navStore, setNavStore] = createStore<Nav>({
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
-  
+
   home: { ref: null, state: true, component: Home },
 
   list: { ref: null, state: false, component: List },
@@ -72,7 +72,7 @@ export function closeFeature(name: Features) {
 
 }
 
-type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'si' | 'supermix';
+type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'si' | 'supermix' | 't';
 
 export function updateParam(
   param: Params,

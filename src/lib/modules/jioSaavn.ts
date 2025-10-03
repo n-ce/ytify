@@ -8,18 +8,14 @@ export default function() {
   const query = encodeURIComponent(`${title.replace(/\(.*?\)/g, '')} ${author.replace(' - Topic', '')}`);
   const normalizeString = (str: string) => str.normalize("NFD").replace(/[̀-ͯ]/g, "");
 
-  fetch(`${store.api.jiosaavn}/api/search/songs?query=${query}`)
-    .then(res => res.json())
+  fetch(`https://fast-saavn.vercel.app/api/saavn?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author)}`)
     .then(res => {
-
-      const matchingTrack = res.data.results.find((track: {
-        name: string,
-        artists: { primary: { name: string }[] }
-      }) =>
-
-        normalizeString(title).toLowerCase().startsWith(normalizeString(track.name).toLowerCase()) &&
-        track.artists.primary.some(artist => normalizeString(author).toLowerCase().startsWith(normalizeString(artist.name).toLowerCase()))
-      );
+      if (!res.ok) {
+        return res.text().then(text => { throw new Error(text); });
+      }
+      return res.json();
+    })
+    .then(matchingTrack => {
       if (!matchingTrack) throw new Error('Music stream not found in JioSaavn results');
 
       setPlayerStore('data', matchingTrack);

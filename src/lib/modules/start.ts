@@ -50,6 +50,8 @@ export default async function() {
       if (params.size === 1)
         setNavStore('player', 'state', true);
       await player(id);
+      const t = params.get('t');
+      setPlayerStore('currentTime', Number(t));
     }
 
   }

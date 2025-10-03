@@ -2,7 +2,7 @@ import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
 import './Player.css'
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "@components/MediaPartials";
 import { config, convertSStoHHMMSS, cssVar } from "@lib/utils";
-import { closeFeature, openFeature, playerStore, setPlayerStore, setStore, t } from "@lib/stores";
+import { closeFeature, openFeature, params, playerStore, setPlayerStore, setStore, t, updateParam } from "@lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 const Lyrics = lazy(() => import('./Lyrics'));
@@ -12,6 +12,7 @@ export default function() {
   let slider!: HTMLInputElement;
 
   const [showLyrics, setShowLyrics] = createSignal(false);
+  const [isPointed, setPointed] = createSignal(params.has('t'));
 
   onMount(() => {
     openFeature('player', playerSection);
@@ -19,6 +20,8 @@ export default function() {
     ['touchstart', 'touchmove', 'touchend'].forEach(type => {
       slider.addEventListener(type, (e) => e.stopPropagation());
     });
+
+
   });
 
   createEffect(() => {
@@ -142,10 +145,30 @@ export default function() {
 
           <Show
             when={playerStore.isMusic}
-            fallback={<i class="ri-signpost-line"></i>}
+            fallback={
+              <i
+                class="ri-signpost-line"
+                classList={{
+                  on: isPointed()
+                }}
+                onclick={() => {
+                  if (isPointed()) {
+                    updateParam('t');
+                    setPointed(false);
+                  }
+                  else {
+                    updateParam('t', playerStore.currentTime.toString());
+                    setPointed(true);
+                  }
+                }}
+              ></i>
+            }
           >
             <i
               class="ri-music-2-line"
+              classList={{
+                on: showLyrics()
+              }}
               onclick={() => setShowLyrics(!showLyrics())}
             ></i>
           </Show>
@@ -155,8 +178,8 @@ export default function() {
 
           <i
             aria-label={t("player_loop")}
-            class={"ri-repeat-line" + (playerStore.loop ? ' on' : '')}
-            id="loopButton"
+            class="ri-repeat-line"
+            classList={{ on: playerStore.loop }}
             onclick={() => {
               setPlayerStore('loop', !playerStore.loop);
             }}

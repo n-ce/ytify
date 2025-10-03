@@ -38,14 +38,16 @@
   }
 
   .ri-close-large-line {
-    margin-right: var(--size-00);
     margin-left: auto;
+    margin-right: var(--size-1);
   }
 
   .ri-more-2-fill {
     font-size: var(--font-size-3);
-    margin-right: var(--size-00);
-    margin-left: var(--size-1);
+    margin-right: var(--size-000);
+    margin-left: var(--size-2);
+    text-align: right;
+    padding-right: 0;
   }
 
 
@@ -174,19 +176,18 @@
   justify-content: space-between;
   margin-bottom: var(--gap);
 
-  >button,
+
+
+
   i {
-    font-size: var(--font-size-3) !important
+    font-size: var(--font-size-3) !important;
+
+    &.on {
+      color: var(--text2);
+    }
   }
 
-  #favButton {
-    padding: 0;
-  }
 
-
-  input[type='checkbox'] {
-    display: none
-  }
 
   select {
     background: none;
@@ -211,10 +212,12 @@
 
   p {
     margin: var(--size-3) 0;
+    opacity: 0.7;
 
     &.active {
       font-weight: var(--font-weight-5);
       font-size: var(--font-size-3);
+      opacity: 1;
     }
   }
 }

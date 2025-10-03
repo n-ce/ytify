@@ -95,7 +95,7 @@ export async function updateRelatedToYourArtists(): Promise<void> {
   const { channels } = getDB();
   const artistIds = channels ? Object.keys(channels).filter(id => channels[id].name.includes('Artist - ')) : [];
 
-  const promises = artistIds.map(id => fetch(`/artist/${id}`).then(res => res.json() as Promise<ArtistEdgeResponse>));
+  const promises = artistIds.map(id => fetch(`https://ytm-jgmk.onrender.com/api/artist/${id}`).then(res => res.json() as Promise<ArtistEdgeResponse>));
 
   return Promise.all(promises).then(results => {
     const relatedArtists: { [index: string]: Hublist } = {};

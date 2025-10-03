@@ -1,7 +1,7 @@
 import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { addToCollection, config, cssVar, themer } from "@lib/utils";
-import { navStore, params } from "./navigation";
+import { navStore, params, updateParam } from "./navigation";
 import { queueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
 
@@ -119,21 +119,33 @@ const dispose = createRoot((dispose) => {
   playerStore.audio.ontimeupdate = () => {
     if (document.activeElement?.matches('input[type="range"]'))
       return;
-    const { audio, lrcSync } = playerStore;
+
+    const { audio, lrcSync, fullDuration, isMusic } = playerStore;
     const seconds = Math.floor(audio.currentTime);
 
+    setPlayerStore('currentTime', seconds);
 
+    // Lyrics
     if (lrcSync) lrcSync(audio.currentTime);
 
+    // Immersive Mode
     const { ref } = navStore.player;
     if (ref) {
       const { offsetHeight, offsetWidth } = ref;
-      const diff = playerStore.isMusic ? (offsetHeight - offsetWidth) : offsetWidth;
-      const scale = seconds / playerStore.fullDuration;
+      const diff = isMusic ? (offsetHeight - offsetWidth) : offsetWidth;
+      const scale = seconds / fullDuration;
       const shift = Math.floor(scale * diff);
       cssVar('--player-bp', `-${shift}px 0`);
     }
-    setPlayerStore('currentTime', seconds);
+
+    const t = params.get('t');
+
+    if (t && seconds % 5 === 0) {
+      const str = seconds.toString();
+      if (t !== str)
+        updateParam('t', str);
+    }
+
   }
 
   playerStore.audio.onloadedmetadata = () => {

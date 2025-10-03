@@ -92,7 +92,6 @@ function colorInjector(colorArray: number[]) {
         autoDark ? 'dark' : 'light' : theme;
 
       const [r, g, b] = colorArray;
-      console.log(r, g, b);
 
       if (Math.abs(r - g) < 10 && Math.abs(g - b) < 10)
         cssVar('--chroma', '0');

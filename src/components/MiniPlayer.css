@@ -48,7 +48,8 @@ footer {
   }
 
 
-  button {
+  button,
+  i {
     background: none;
     border: none;
     color: var(--text);
