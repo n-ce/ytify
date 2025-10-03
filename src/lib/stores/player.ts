@@ -81,7 +81,7 @@ const dispose = createRoot((dispose) => {
     if (config.history)
       historyTimeoutId = window.setTimeout(() => {
         if (historyID === id)
-          addToCollection('history', playerStore.stream, 'addNew');
+          addToCollection('history', { ...playerStore.stream }, 'addNew');
       }, 1e4);
   }
 

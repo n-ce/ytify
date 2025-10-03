@@ -46,12 +46,17 @@
     margin-top: var(--size-3);
 
     button {
-      background-color: var(--onBg2);
+      background-color: var(--onBg);
       font-size: var(--font-size-3);
       font-weight: var(--font-weight-6);
       width: calc(50% - var(--size-4));
       box-shadow: var(--shadow-1);
       border-radius: var(--roundness);
+
+      &:hover {
+        background-color: var(--onBg2);
+        color: var(--text2);
+      }
     }
   }
 

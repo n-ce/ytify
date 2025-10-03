@@ -178,12 +178,12 @@ header {
 article {
   .featured .artists {
     margin-top: 0;
-    border-top-left-radius: none;
-    border-top-right-radius: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 
   .featured .playlists {
-    border-bottom-left-radius: none;
-    border-bottom-right-radius: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }
