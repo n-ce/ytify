@@ -1,12 +1,10 @@
-import { playerStore, setPlayerStore, setStore, store, updateParam } from "@lib/stores";
+import { playerStore, setPlayerStore, setStore, updateParam } from "@lib/stores";
 import { config, player } from "@lib/utils";
 
 export default function() {
   setPlayerStore('status', 'Fetching Data via JioSaavn...');
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;
-  const query = encodeURIComponent(`${title.replace(/\(.*?\)/g, '')} ${author.replace(' - Topic', '')}`);
-  const normalizeString = (str: string) => str.normalize("NFD").replace(/[̀-ͯ]/g, "");
 
   fetch(`https://fast-saavn.vercel.app/api/saavn?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author)}`)
     .then(res => {
