@@ -6,7 +6,7 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const { invidious, piped, status, fallback } = store.api;
+  const { invidious, piped, status } = store.api;
 
   const fetchDataFromPiped = (
     api: string
@@ -63,8 +63,8 @@ export default async function(
     }));
 
   const emergency = (e: Error) =>
-    (!prefetch && fallback) ?
-      fetchDataFromPiped(fallback)
+    (!prefetch) ?
+      fetchDataFromPiped('')
         .catch(() => e) : e;
 
   const useInvidious = (index = 0): Promise<Piped> =>

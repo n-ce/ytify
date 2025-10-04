@@ -4,7 +4,7 @@ import { config } from "@lib/utils/config";
 type Services = 'piped' | 'invidious';
 const storeInit: {
   api: Record<Services, string[]> &
-  Record<'jiosaavn' | 'cobalt' | 'fallback', string>
+  { cobalt: string }
   & {
     status: 'N' | 'I' | 'P'
     index: Record<Services, number>
@@ -20,13 +20,11 @@ const storeInit: {
   api: {
     piped: ['https://piapi.ggtyler.dev'],
     invidious: ['https://iv.ggtyler.dev'],
-    jiosaavn: 'https://saavn.dev',
     cobalt: 'https://cobalt-api.kwiatekmiki.com',
     index: {
       piped: 0,
       invidious: 0
     },
-    fallback: location.origin,
     status: 'N'
   },
   useSaavn: true,

@@ -3,36 +3,35 @@ import { config, player } from "@lib/utils";
 
 export default function() {
   setPlayerStore('status', 'Fetching Data via JioSaavn...');
+
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;
 
-  fetch(`https://fast-saavn.vercel.app/api/saavn?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author)}`)
-    .then(res => {
+  console.log(stream);
+
+  fetch(`https://fast-saavn.vercel.app/api/find?title=${encodeURIComponent(title.replace(/\(.*?\)/g, ''))}&artist=${encodeURIComponent(author.replace(' - Topic', ''))}`)
+    .then(async res => {
       if (!res.ok) {
         return res.text().then(text => { throw new Error(text); });
       }
       return res.json();
     })
-    .then(matchingTrack => {
-      if (!matchingTrack) throw new Error('Music stream not found in JioSaavn results');
+    .then(song => {
+      if (!song) throw new Error('Music stream not found in JioSaavn results');
 
-      setPlayerStore('data', matchingTrack);
-
-      return matchingTrack.downloadUrl;
-    })
-    .then(downloadUrl => {
+      setPlayerStore('data', song);
 
       import('../modules/setMetadata')
         .then(mod => mod.default(stream));
 
-      const { url } = downloadUrl[{
-        low: 1,
-        medium: downloadUrl.length - 2,
-        high: downloadUrl.length - 1
-      }[config.quality]];
+      const desiredBitrateSuffix = ({
+        low: '_48',
+        medium: '_160',
+        high: '_320'
+      })[config.quality] || '_320';
 
-      audio.src = url.replace('http:', 'https:');
-
+      audio.src = song.downloadUrl.replace('_96', desiredBitrateSuffix);
+      console.log(audio.src);
       updateParam('s', id);
 
     })

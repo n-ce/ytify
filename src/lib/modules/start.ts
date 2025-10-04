@@ -17,9 +17,9 @@ export default async function() {
   const { shareAction } = config;
 
   await uma()
-    .then(({ piped, invidious, jiosaavn, cobalt, status }) => {
+    .then(({ piped, invidious, cobalt, status }) => {
       setStore('api', {
-        piped, invidious, jiosaavn, cobalt, status,
+        piped, invidious, cobalt, status,
         index: { piped: 0, invidious: 0 }
       })
     })

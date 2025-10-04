@@ -10,7 +10,7 @@ export default function(
   const message = 'Error 403 : Unauthenticated Stream';
   const { stream } = playerStore;
   const id = prefetch || stream.id;
-  const { index, invidious, fallback } = store.api;
+  const { index, invidious } = store.api;
   const origin = new URL(audio.src).origin;
 
   if (audio.src.endsWith('&fallback')) {
@@ -38,15 +38,13 @@ export default function(
     }
 
     // Emergency Handling
-    if (!fallback) useCobalt();
-    else
-      fetch(fallback + '/streams/' + id)
-        .then(res => res.json())
-        .then(data => {
-          import('./setAudioStreams.ts')
-            .then(mod => mod.default(data.audioStreams, data.livestream, audio));
-        })
-        .catch(useCobalt);
+    fetch('/streams/' + id)
+      .then(res => res.json())
+      .then(data => {
+        import('./setAudioStreams.ts')
+          .then(mod => mod.default(data.audioStreams, data.livestream, audio));
+      })
+      .catch(useCobalt);
 
     function useCobalt() {
       getDownloadLink(id)
