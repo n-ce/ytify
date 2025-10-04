@@ -25,9 +25,6 @@ export let config = {
   shareAction: 'play' as 'play' | 'watch' | 'download',
   dbsync: '',
   language: '',
-  codec: 'any' as 'opus' | 'aac' | 'any',
-
-
 }
 
 type AppConfig = typeof config;

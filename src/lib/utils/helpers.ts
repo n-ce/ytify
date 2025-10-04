@@ -59,7 +59,8 @@ export async function quickSwitch() {
 
 
 export async function preferredStream(audioStreams: AudioStream[]) {
-  const preferedCodec: 'opus' | 'aac' = config.codec === 'any' ? ((await playerStore.supportsOpus) ? 'opus' : 'aac') : config.codec;
+  const preferedCodec = (await playerStore.supportsOpus) ? 'opus' : 'aac';
+
   const itags = ({
     low: {
       opus: [600, 249, 251],

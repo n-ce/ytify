@@ -29,20 +29,6 @@ export default function() {
       />
 
 
-      <Selector
-        label='settings_codec_preference'
-        id='codecPreference'
-        onchange={async (e) => {
-          setConfig('codec', e.target.value as 'opus' | 'any' | 'aac');
-          quickSwitch();
-        }}
-        value={config.codec}
-      >
-        <option value="opus">Opus</option>
-        <option value="aac">AAC</option>
-        <option value="any">Any</option>
-      </Selector>
-
       <ToggleSwitch
         id="stableVolumeSwitch"
         name='settings_stable_volume'
