@@ -9,7 +9,7 @@ export default function() {
 
   console.log(stream);
 
-  fetch(`https://fast-saavn.vercel.app/api/find?title=${encodeURIComponent(title.replace(/\(.*?\)/g, ''))}&artist=${encodeURIComponent(author.replace(' - Topic', ''))}&duration=${encodeURIComponent(stream.duration)}`)
+  fetch(`https://fast-saavn.vercel.app/api/find?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author.replace(' - Topic', ''))}&duration=${encodeURIComponent(stream.duration)}`)
     .then(async res => {
       if (!res.ok) {
         return res.text().then(text => { throw new Error(text); });

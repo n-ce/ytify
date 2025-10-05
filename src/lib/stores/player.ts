@@ -2,7 +2,7 @@ import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { addToCollection, config, cssVar, themer } from "@lib/utils";
 import { navStore, params, updateParam } from "./navigation";
-import { queueStore } from "./queue";
+import { queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -80,8 +80,11 @@ const dispose = createRoot((dispose) => {
 
     if (config.history)
       historyTimeoutId = window.setTimeout(() => {
-        if (historyID === id)
+        if (historyID === id) {
+          if (playerStore.isMusic)
+            getRecommendations();
           addToCollection('history', { ...playerStore.stream }, 'addNew');
+        }
       }, 1e4);
   }
 
@@ -212,5 +215,19 @@ function updatePositionState() {
       position: Math.floor(audio.currentTime || 0),
     });
 }
+
+
+async function getRecommendations() {
+
+  const title = encodeURIComponent(playerStore.stream.title);
+  const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
+
+  const data = await fetch(`https://similar-music.vercel.app/api/tracks?title=${title}&artist=${artist}&limit=2`)
+    .then(res => res.json())
+    .catch(() => []);
+
+  setQueueStore('list', data as CollectionItem[]);
+}
+
 
 export { playerStore, setPlayerStore };
