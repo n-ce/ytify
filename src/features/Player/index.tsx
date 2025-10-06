@@ -30,6 +30,18 @@ export default function() {
       cssVar('--player-bg', `url(${mediaArtwork})`);
   });
 
+  const msn = 'mediaSession' in navigator;
+
+  function updatePositionState() {
+    const { audio } = playerStore;
+    if (msn && 'setPositionState' in navigator.mediaSession)
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration || 0,
+        playbackRate: audio.playbackRate || 1,
+        position: Math.floor(audio.currentTime || 0),
+      });
+  }
+
   return (
     <section
       id="playerSection"
@@ -84,11 +96,7 @@ export default function() {
             max={playerStore.fullDuration}
             ref={slider}
             onchange={(e) => {
-              const value = parseInt(e.target.value);
-              const { audio } = playerStore;
-              audio.pause();
-              setPlayerStore('currentTime', value);
-              audio.play();
+              playerStore.audio.currentTime = parseInt(e.target.value);
             }}
           />
           <div>
@@ -109,7 +117,7 @@ export default function() {
             class="ri-replay-15-line"
             id="seekBwdButton"
             onclick={() => {
-              setPlayerStore('currentTime', _ => _ -= 15);
+              playerStore.audio.currentTime -= 15;
             }}
           ></button>
 
@@ -120,7 +128,7 @@ export default function() {
             class="ri-forward-15-line"
             id="seekFwdButton"
             onclick={() => {
-              setPlayerStore('currentTime', _ => _ += 15);
+              playerStore.audio.currentTime += 15;
             }}
           ></button>
 
@@ -136,7 +144,9 @@ export default function() {
             onchange={e => {
               const ref = e.target;
               const speed = parseFloat(ref.value);
+              playerStore.audio.playbackRate = speed;
               setPlayerStore('playbackRate', speed);
+              updatePositionState();
               ref.blur();
             }}
           >
@@ -193,7 +203,9 @@ export default function() {
             class="ri-repeat-line"
             classList={{ on: playerStore.loop }}
             onclick={() => {
-              setPlayerStore('loop', !playerStore.loop);
+              const newLoopState = !playerStore.loop;
+              playerStore.audio.loop = newLoopState;
+              setPlayerStore('loop', newLoopState);
             }}
           ></i>
 
@@ -203,6 +215,7 @@ export default function() {
             onchange={e => {
               const ref = e.target;
               const vol = parseFloat(ref.value);
+              playerStore.audio.volume = vol;
               setPlayerStore('volume', vol);
               ref.blur();
             }}

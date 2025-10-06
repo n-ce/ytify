@@ -37,6 +37,10 @@
 
   }
 
+  header {
+    z-index: 3;
+  }
+
   .ri-more-2-fill {
     margin-left: 0;
     padding: 0;

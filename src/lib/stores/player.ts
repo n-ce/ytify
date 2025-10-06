@@ -1,4 +1,4 @@
-import { createEffect, createRoot } from "solid-js";
+import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { addToCollection, config, cssVar, themer } from "@lib/utils";
 import { navStore, params, updateParam } from "./navigation";
@@ -6,7 +6,6 @@ import { queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
-const msn = 'mediaSession' in navigator;
 
 type PlayerStore = {
   stream: CollectionItem,
@@ -181,40 +180,11 @@ const dispose = createRoot((dispose) => {
 
   playerStore.audio.onerror = () => audioErrorHandler(playerStore.audio);
 
-
-  createEffect(() => {
-    playerStore.audio.volume = playerStore.volume;
-  });
-
-  createEffect(() => {
-    playerStore.audio.loop = playerStore.loop;
-  });
-
-  createEffect(() => {
-    playerStore.audio.playbackRate = playerStore.playbackRate;
-
-    updatePositionState();
-
-  });
-  createEffect(() => {
-    playerStore.audio.currentTime = playerStore.currentTime;
-    updatePositionState();
-  });
-
   return dispose;
 });
 
 setPlayerStore('dispose', dispose);
 
-function updatePositionState() {
-  const { audio } = playerStore;
-  if (msn && 'setPositionState' in navigator.mediaSession)
-    navigator.mediaSession.setPositionState({
-      duration: audio.duration || 0,
-      playbackRate: audio.playbackRate || 1,
-      position: Math.floor(audio.currentTime || 0),
-    });
-}
 
 
 async function getRecommendations() {
