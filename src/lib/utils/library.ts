@@ -201,18 +201,15 @@ async function getSharedCollection(
   id: string
 ) {
 
-
   setListStore('isLoading', true);
   const data = await fetch(`${location.origin}/blob/${id}`)
     .then(res => res.json())
     .catch(() => '');
-  console.log(data);
-  /*
-    if (data)
-      renderCollection(data);
-    else
-      render(listContainer, html`Collection does not exist`);
-  */
+  if (data)
+    setListStore('list', data);
+  else
+    setStore('snackbar', `Collection does not exist`);
+
   setListStore('isLoading', false);
 }
 

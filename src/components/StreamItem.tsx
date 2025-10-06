@@ -73,7 +73,6 @@ export default function(data: {
       ref={parent}
       onclick={(e) => {
         e.preventDefault();
-        console.log(data.mark);
 
         if (data.mark?.mode()) {
           data.mark.set(data.id);

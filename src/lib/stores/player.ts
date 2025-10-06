@@ -27,7 +27,6 @@ type PlayerStore = {
   audioURL: string,
   videoURL: string,
   lrcSync?: (d: number) => void
-  dispose: () => void
 };
 
 const createInitialState = (): PlayerStore => ({
@@ -60,12 +59,11 @@ const createInitialState = (): PlayerStore => ({
   isMusic: true,
   audioURL: '',
   videoURL: '',
-  dispose() { }
 });
 
 const [playerStore, setPlayerStore] = createStore(createInitialState());
 
-const dispose = createRoot((dispose) => {
+createRoot(() => {
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
 
@@ -180,19 +178,14 @@ const dispose = createRoot((dispose) => {
 
   playerStore.audio.onerror = () => audioErrorHandler(playerStore.audio);
 
-  return dispose;
 });
-
-setPlayerStore('dispose', dispose);
-
-
 
 async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
   const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
 
-  const data = await fetch(`https://similar-music.vercel.app/api/tracks?title=${title}&artist=${artist}&limit=2`)
+  const data = await fetch(`https://similar-music.vercel.app/api/tracks?title=${title}&artist=${artist}`)
     .then(res => res.json())
     .catch(() => []);
 

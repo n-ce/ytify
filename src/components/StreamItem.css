@@ -75,6 +75,7 @@
 			overflow: hidden;
 			text-overflow: ellipsis;
 			font-weight: var(--font-weight-5);
+			letter-spacing: var(--font-letterspacing-1);
 			margin-bottom: auto;
 		}
 
@@ -86,8 +87,8 @@
 
 			p {
 				font-size: var(--font-size-0);
-				font-weight: var(--font-weight-5);
-				letter-spacing: var(--font-letterspacing-0);
+				font-weight: var(--font-weight-4);
+				letter-spacing: var(--font-letterspacing-1);
 				opacity: 0.9
 			}
 

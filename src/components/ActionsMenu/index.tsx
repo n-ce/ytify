@@ -36,6 +36,7 @@ export default function() {
 
           setQueueStore('list', list => [store.actionsMenu, ...list]);
 
+          closeDialog();
         }}>
           <i class="ri-skip-forward-line"></i>{t('actions_menu_play_next')}
         </li>

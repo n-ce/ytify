@@ -71,22 +71,29 @@ export default function() {
           }
 
           if (e.key === 'ArrowUp') {
-            setSearchStore('suggestions', 'index', (index <= 0) ? data.length - 1 : index - 1);
+
+            setSearchStore('suggestions', 'index', (index <= 0) ? - 1 : index - 1);
           }
 
           if (e.key === 'ArrowDown') {
-            setSearchStore('suggestions', 'index', (index >= data.length - 1) ? 0 : index + 1);
+            setSearchStore('suggestions', 'index', (index >= data.length - 1) ? -1 : index + 1);
           }
+
+          document.querySelectorAll('li.hover')[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         }}
       />
-      <Show when={config.searchSuggestions && searchStore.suggestions.data.length > 0}>
+      <Show
+        when={config.searchSuggestions && searchStore.suggestions.data.length > 0}
+      >
         <ul class="suggestions">
           <For each={searchStore.suggestions.data}>
             {(item, index) => (
 
               <li
-                class={index() === searchStore.suggestions.index ? 'hover' : ''}
+                classList={{
+                  hover: index() === searchStore.suggestions.index
+                }}
                 onclick={() => {
                   textToSearch(item);
                 }}
