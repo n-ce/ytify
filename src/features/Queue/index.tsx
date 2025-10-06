@@ -97,10 +97,7 @@ export default function() {
 
         <li onclick={
           () => {
-            setTimeout(() => {
-              setQueueStore('list', [])
-              queuelist.innerHTML = '';
-            }, 500);
+            setQueueStore('list', [])
           }
         }>
           <i class="ri-close-large-line"></i>{t('upcoming_clear')}

@@ -34,7 +34,6 @@ export default function() {
 
         <li tabindex="0" onclick={() => {
 
-          setNavStore('queue', 'state', true);
           setQueueStore('list', list => [store.actionsMenu, ...list]);
 
         }}>
@@ -42,7 +41,6 @@ export default function() {
         </li>
 
         <li tabindex="1" onclick={() => {
-          setNavStore('queue', 'state', true);
           setQueueStore('list', list => [...list, store.actionsMenu]);
           closeDialog();
         }}>

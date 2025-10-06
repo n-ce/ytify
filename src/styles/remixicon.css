@@ -262,3 +262,7 @@
 .ri-information-line:before {
   content: "\ee59";
 }
+
+.ri-order-play-fill:before {
+  content: "\efb6";
+}

@@ -27,6 +27,7 @@
     padding: var(--size-2) var(--size-1);
     border: var(--border);
     letter-spacing: var(--font-letterspacing-0);
+    background: var(--onBg);
     box-shadow: var(--shadow-1);
 
     i {

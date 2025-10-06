@@ -2,7 +2,7 @@ import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
 import './Player.css'
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "@components/MediaPartials";
 import { config, convertSStoHHMMSS, cssVar } from "@lib/utils";
-import { closeFeature, openFeature, params, playerStore, setPlayerStore, setStore, t, updateParam } from "@lib/stores";
+import { closeFeature, navStore, openFeature, params, playerStore, setNavStore, setPlayerStore, setStore, t, updateParam } from "@lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 const Lyrics = lazy(() => import('./Lyrics'));
@@ -42,9 +42,21 @@ export default function() {
 
       <header class="topShelf">
         <p>from {((a = playerStore.context) => a[0].toUpperCase() + a.slice(1))()}</p>
-        <i
-          onclick={() => { closeFeature('player') }}
-          class="ri-close-large-line"></i>
+
+        <div class="right-group">
+          <i
+            onclick={() => {
+              setNavStore('queue', 'state', !navStore.queue.state);
+            }}
+            class="ri-order-play-fill"
+            classList={{ on: navStore.queue.state }}
+          ></i>
+
+          <i
+            onclick={() => { closeFeature('player') }}
+            class="ri-close-large-line"></i>
+
+        </div>
         <i
           aria-label={t('player_more')}
           class="ri-more-2-fill"

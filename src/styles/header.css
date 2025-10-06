@@ -30,7 +30,7 @@ section>header {
 
   .right-group {
     margin-left: auto;
-    margin-right: var(--size-7);
+    margin-right: calc(var(--size-7) + var(--size-1));
     margin-top: var(--size-0);
 
     i {
@@ -67,9 +67,8 @@ section>header {
     summary {
       background: none;
       list-style: none;
-      text-align: right;
       padding: 0;
-      margin: 0 0 calc(var(--gap) - var(--size-3)) auto;
+      margin: 0 0 var(--gap) auto;
       width: var(--size-7);
       font-size: var(--font-size-3);
       aspect-ratio: 1;
@@ -82,6 +81,7 @@ section>header {
 
       i {
         margin: auto 0;
+        margin-right: var(--size-2);
       }
     }
 

@@ -4,7 +4,7 @@
     justify-content: space-between;
 
     .ri-close-large-line {
-      margin-right: var(--size-7);
+      margin-right: calc(var(--size-7) + var(--size-1));
       margin-top: var(--size-0);
     }
   }
