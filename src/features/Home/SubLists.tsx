@@ -71,7 +71,7 @@ export default function(_: {
                   getThumbIdFromLink(
                     item.thumbnail
                   ), '')}
-                uploader_data={item.uploaderName}
+                uploaderData={item.uploaderName}
               />
             }
           </For>

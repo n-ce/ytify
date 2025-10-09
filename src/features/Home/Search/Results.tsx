@@ -1,10 +1,12 @@
-import { For, Show, Switch, Match } from 'solid-js';
+import { For, Show } from 'solid-js';
 import { searchStore } from '@lib/stores';
 import ListItem from '@components/ListItem';
 import StreamItem from '@components/StreamItem';
-import { convertSStoHHMMSS, getThumbIdFromLink } from '@lib/utils';
+import { YTStreamItem, YTListItem } from '@lib/modules/fetchYTMusicSearchResults';
 
-const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
+function isStreamItem(item: YTStreamItem | YTListItem): item is YTStreamItem {
+    return item.type === 'stream' || item.type === 'video';
+}
 
 export default function SearchResults() {
   return (
@@ -14,39 +16,9 @@ export default function SearchResults() {
       </Show>
       <For each={searchStore.results}>
         {(item) => (
-          <Switch>
-            <Match when={item.type === 'stream' || item.type === 'video'}>
-              <StreamItem
-                id={item.videoId || item.url.substring(9)}
-                channelUrl={item.uploaderUrl || item.authorUrl}
-                title={item.title}
-                author={item.uploaderName || item.author}
-                duration={(item.duration || item.lengthSeconds) > 0 ? convertSStoHHMMSS(item.duration || item.lengthSeconds) : 'LIVE'}
-                views={item.viewCountText || (item.views > 0 ? numFormatter(item.views) + ' views' : '')}
-                uploaded={item.uploadedDate || item.publishedText}
-                img={getThumbIdFromLink(item.thumbnail || 'https://i.ytimg.com/vi_webp/' + item.videoId + '/mqdefault.webp?host=i.ytimg.com')}
-                context='search'
-              />
-            </Match>
-            <Match when={item.type === 'channel'}>
-              <ListItem
-                title={item.name}
-                stats={''}
-                thumbnail={item.thumbnail}
-                uploader_data={item.description}
-                url={item.url}
-              />
-            </Match>
-            <Match when={item.type === 'playlist'}>
-              <ListItem
-                title={item.name}
-                stats={item.videos + ' streams'}
-                thumbnail={item.thumbnail}
-                uploader_data={item.uploaderName}
-                url={item.url}
-              />
-            </Match>
-          </Switch>
+            <Show when={isStreamItem(item)} fallback={<ListItem {...item as YTListItem} />}>
+                <StreamItem {...item as YTStreamItem} context="search" />
+            </Show>
         )}
       </For>
     </div>

@@ -78,7 +78,7 @@ createRoot(() => {
     if (config.history)
       historyTimeoutId = window.setTimeout(() => {
         if (historyID === id) {
-          if (playerStore.isMusic)
+          if (playerStore.isMusic && queueStore.list.length < 2)
             getRecommendations();
           addToCollection('history', { ...playerStore.stream }, 'addNew');
         }
@@ -184,12 +184,11 @@ async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
   const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
-
-  const data = await fetch(`https://similar-music.vercel.app/api/tracks?title=${title}&artist=${artist}`)
+  const data = await fetch(`https://similar-music.vercel.app/api/tracks?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .catch(() => []);
 
-  setQueueStore('list', data as CollectionItem[]);
+  setQueueStore('list', list => [...list, ...data as CollectionItem[]]);
 }
 
 

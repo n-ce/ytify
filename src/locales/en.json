@@ -32,7 +32,7 @@
   "fetchlist_nonexistent": "Got error: \"The playlist does not exist.\"",
   "search_placeholder": "Search or enter YT URL [CTRL+K]",
   "search_filter_all": "All",
-  "search_filter_videos": "Videos",
+  "search_filter_videos": "Relevance",
   "search_filter_channels": "Channels",
   "search_filter_playlists": "Playlists",
   "search_filter_music_songs": "Songs",

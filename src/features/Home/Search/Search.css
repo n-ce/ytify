@@ -1,17 +1,33 @@
+.home:has(>div.search) {
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(to right, var(--trueBg), transparent, var(--trueBg));
+    backdrop-filter: blur(var(--size-px-1));
+  }
+}
+
 .search {
 
   .superInputContainer {
     height: auto;
     margin: 0;
+    margin-bottom: var(--size-4);
+    position: sticky;
+    top: calc(var(--size-9) - var(--border-size-2));
+    z-index: 5;
     padding: calc(var(--gap) / 2) var(--gap);
     border: var(--border);
-    border-radius: var(--roundness) var(--roundness) 0 0;
+    border-radius: var(--roundness);
     display: flex;
     align-items: center;
     background-color: var(--onBg);
 
     &:focus-within {
       box-shadow: var(--shadow-1);
+      border-radius: var(--roundness) var(--roundness) 0 0;
     }
 
     .superInput {
@@ -36,18 +52,18 @@
     }
 
     .suggestions {
-      max-height: var(--size-fluid-8);
-      width: calc(100% - calc(var(--gap) * 2));
+      width: calc(100dvmin - calc(var(--gap) * 2));
+      height: var(--size-fluid-8);
       position: fixed;
       z-index: 5;
       list-style-type: none;
       padding: 0;
-      top: calc(var(--size-11) - var(--size-4));
-      left: var(--gap);
+      top: calc(var(--size-10) + var(--size-4));
+      margin-left: calc(0rem - var(--gap) - calc(var(--border-size-1) / 2));
       background-color: var(--scheme);
       border: var(--border);
       border-radius: 0 0 var(--roundness) var(--roundness);
-      box-shadow: var(--shadow-2);
+      box-shadow: var(--shadow-1);
       display: block;
       user-select: none;
       overflow: hidden;
@@ -58,18 +74,22 @@
         border-bottom: var(--border);
         font-size: var(--font-size-1);
         height: var(--size-fluid-4);
+        opacity: 0.7;
 
         &:hover,
         &:focus,
         &.hover {
-          background-color: var(--text);
-          color: var(--bg);
+          background-color: var(--onBg2);
+          color: var(--text2);
+          opacity: 1;
         }
       }
     }
 
     .searchFilters {
-      font-size: medium;
+      font-size: var(--font-size-0);
+      font-weight: var(--font-weight-7);
+      letter-spacing: var(--font-letterspacing-0);
       background: none;
       max-width: var(--size-10);
       margin-left: var(--gap);
@@ -79,14 +99,8 @@
       text-align: right;
       outline: none;
       appearance: none;
+      opacity: 0.5;
     }
-  }
-
-
-
-  .searchlist {
-    overflow: hidden scroll;
-    max-height: calc(100dvh - var(--size-11) + var(--size-3));
   }
 
   .listItem {
@@ -98,7 +112,27 @@
 
   .streamItem {
     margin-bottom: 0;
-    border-radius: 0;
+    margin-top: var(--size-2);
+    border: none;
+    padding: 0;
+    background-color: initial;
+
+    &:hover {
+      background-color: var(--onBg2);
+    }
+
+    img {
+      margin: var(--size-1);
+    }
+
+    .duration {
+      bottom: var(--size-2);
+      right: var(--size-2);
+    }
+  }
+
+  .searchlist {
+    margin-bottom: var(--size-fluid-5);
   }
 
 }

@@ -26,7 +26,7 @@ export const hostResolver = (url: string) =>
   store.linkHost + (store.linkHost.includes(location.origin) ? (url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
-    ('/list?' + pathModifier(url))) : url);
+    ('?' + pathModifier(url))) : url);
 
 
 export function proxyHandler(url: string, prefetch: boolean = false) {
@@ -102,6 +102,8 @@ export function convertSStoHHMMSS(seconds: number): string {
   return (hh > 0 ?
     hh + ':' : '') + `${mmStr}:${ssStr}`;
 }
+
+export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
 export function handleXtags(audioStreams: AudioStream[]) {
   const isDRC = (url: string) => url.includes('drc%3D1');

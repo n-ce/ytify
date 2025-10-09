@@ -14,7 +14,7 @@
   "devDependencies": {
     "@netlify/blobs": "^10.0.11",
     "@netlify/edge-functions": "^2.18.2",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.7.0",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.21",
     "eruda": "^3.4.3",

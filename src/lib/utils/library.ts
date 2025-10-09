@@ -2,6 +2,74 @@ import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
 
 
+
+const getMeta = (): Meta => JSON.parse(localStorage.getItem('library_meta') || '{"version": 4}');
+
+
+export const getCollectionsKeys = () => Object.keys(getMeta()).filter(k => !['version', 'channels', 'playlists'].includes(k));
+
+export const getTracksMap = (): Tracks =>
+  JSON.parse(localStorage.getItem('library_tracks') || '{}');
+export const saveTracksMap = (tracks: Tracks) => localStorage.setItem('library_tracks', JSON.stringify(tracks));
+
+export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channels : Playlists => JSON.parse(localStorage.getItem('library_' + type) || '{}');
+
+
+export const getCollection = (name: string) => JSON.parse(localStorage.getItem('library_' + name) || '[]') as string[];
+
+export const saveCollection = (name: string, collection: string[]) => localStorage.setItem('library_' + name, JSON.stringify(collection));
+
+export function updateCollection(
+  name: string,
+  id: string,
+  data?: CollectionItem
+) {
+  const collection = getCollection(name);
+  const idx = collection.indexOf(id);
+  if (idx !== -1)
+    collection.splice(idx, 1);
+  const tracks = getTracksMap();
+
+  if (data) { // Add to Collection
+
+    if (['history', 'favorites'].includes(name))
+      collection.unshift(id);
+    else collection.push(id);
+    tracks[id] = data;
+  }
+  else { // Remove From Collection
+    const keys = getCollectionsKeys();
+    let isReferenced = false;
+
+    for (const key of keys)
+      if (getCollection(key).includes(id)) {
+        isReferenced = true;
+        break;
+      }
+
+    if (!isReferenced)
+      delete tracks[id];
+  }
+  saveCollection(name, collection);
+  saveTracksMap(tracks);
+  metaUpdater(name);
+
+}
+
+
+
+
+export const metaUpdater = (key: string) => {
+  const meta = getMeta();
+
+  meta[key] = new Date().toISOString();
+
+  localStorage.setItem('library_meta', JSON.stringify(meta));
+}
+
+
+
+
 export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
 
 export function saveDB(data: Library, change: string = '') {
@@ -29,7 +97,7 @@ export function removeFromCollection(
 
 export function toCollection(
   collection: string,
-  data: CollectionItem | List,
+  data: CollectionItem | Playlist,
   db: Library
 ) {
   if (!collection) return;

@@ -47,6 +47,7 @@ export default function() {
         }}
         oninput={async (e) => {
           const { value } = e.target;
+          setSearchStore('query', value);
 
           if (config.searchBarLinkCapture) {
             const id = idFromURL(value);

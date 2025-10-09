@@ -27,7 +27,9 @@
     padding: var(--size-2) var(--size-1);
     border: var(--border);
     letter-spacing: var(--font-letterspacing-0);
-    background: var(--onBg);
+    --liBg: var(--onBg);
+    background: color-mix(in srgb, var(--liBg), var(--onBg) 80%);
+    color: color-mix(in srgb, var(--liBg), var(--text) 80%);
     box-shadow: var(--shadow-1);
 
     i {
@@ -35,28 +37,23 @@
     }
 
     &:nth-child(5).on {
-      background: #a0a2;
-      color: #a0a;
+      --liBg: #a0a;
     }
 
     &:nth-child(4).on {
-      background: #aa02;
-      color: #aa0;
+      --liBg: #aa0;
     }
 
     &:nth-child(3).on {
-      background: #1bb2;
-      color: #1bb;
+      --liBg: #1bb;
     }
 
     &:nth-child(2).on {
-      background: #f222;
-      color: #f22;
+      --liBg: #f22;
     }
 
     &:nth-child(1).on {
-      background: #55f2;
-      color: #55f;
+      --liBg: #55f;
     }
 
     &:hover {
@@ -66,4 +63,8 @@
 
   }
 
+}
+
+#queuelist {
+  margin-bottom: var(--size-fluid-6);
 }

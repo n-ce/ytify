@@ -8,7 +8,7 @@ export default function(data: {
   title: string,
   stats: string,
   thumbnail: string,
-  uploader_data: string,
+  uploaderData: string,
   url: string,
 }) {
 
@@ -42,7 +42,7 @@ export default function(data: {
       </Show>
       <div>
         <p class="title">{data.title}</p>
-        <p class="uData">{data.uploader_data}</p>
+        <p class="uData">{data.uploaderData}</p>
         <p class="stats">{data.stats}</p>
       </div>
     </a>

@@ -123,7 +123,7 @@ export default function() {
                   title={item.name}
                   url={`/playlist/${item.id}`}
                   thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                  uploader_data={item.uploader}
+                  uploaderData={item.uploader}
                 />
               )}
             </For>
@@ -140,7 +140,7 @@ export default function() {
                   title={item.name}
                   url={`/artist/${item.id}`}
                   thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                  uploader_data={''}
+                  uploaderData={''}
                 />
               )}
             </For>

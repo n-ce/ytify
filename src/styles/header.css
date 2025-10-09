@@ -93,7 +93,7 @@ section>header {
       overflow: hidden;
       border: var(--border);
       border-radius: var(--roundness);
-      box-shadow: var(--shadow-3);
+      box-shadow: var(--shadow-2);
 
       li {
         font-size: var(--font-size-1);
@@ -105,7 +105,7 @@ section>header {
         cursor: pointer;
 
         i {
-          margin-right: 0.5rem;
+          margin-right: var(--size-1);
         }
 
         &:hover {

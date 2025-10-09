@@ -12,10 +12,9 @@ import { convertSStoHHMMSS } from "@lib/utils";
 
 export default function(data: StreamItem[]) {
 
-  const { stream, history } = playerStore;
+  const { history, isMusic } = playerStore;
   const filterYTM = (a: string) =>
-    stream.author.endsWith(' - Topic') ?
-      a.endsWith(' - Topic') : true;
+    isMusic ? a.endsWith(' - Topic') : false;
 
   data.forEach(stream => {
 

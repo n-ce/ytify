@@ -46,21 +46,35 @@ declare global {
     lastUpdated?: string
   }
 
-  type List = {
+  type List = Playlist;
+  type Collection = { [index: string]: CollectionItem };
+
+  interface Playlist {
     id: string,
     name: string,
     thumbnail: string
+  };
+  interface Channel extends Playlist { uploader: string };
+
+  interface Meta {
+    version: number,
+    [index: string]: string
   }
-  type Collection = {
-    [index: string]: CollectionItem | List
+
+  type Playlists = {
+    [index: string]: Playlist
   }
+  type Channels = {
+    [index: string]: Channel
+  }
+
+  type Tracks = { [index: string]: CollectionItem };
 
   type Library = {
     history?: { [index: string]: CollectionItem },
-    favorites?: { [index: string]: CollectionItem },
-    listenLater?: { [index: string]: CollectionItem },
-    channels?: { [index: string]: List & { uploader: string } },
-    playlists?: { [index: string]: List },
+    favorites?: { [index: string]: CollectionItem }, listenLater?: { [index: string]: CollectionItem },
+    channels?: { [index: string]: Playlist & { uploader: string } },
+    playlists?: { [index: string]: Playlist },
     [index: string]: { [index: string]: CollectionItem }
   }
 

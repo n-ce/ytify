@@ -1,5 +1,8 @@
 import { params, setNavStore, t, setStore, setPlayerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, uma, player } from '@lib/utils';
+import { config, getDownloadLink, idFromURL, fetchCollection, player } from '@lib/utils';
+
+const uma = () => fetch('https://raw.githubusercontent.com/n-ce/Uma/main/list.json')
+  .then(res => res.json());
 
 
 export default async function() {

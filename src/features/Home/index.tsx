@@ -70,7 +70,10 @@ export default function() {
 
         </div>
 
-        <Dropdown setAbout={() => setHome('')} />
+        <Dropdown
+          setAbout={() => setHome('')}
+          isLibrary={() => home() === 'Library'}
+        />
       </header>
 
       <Switch fallback={<About />}>
