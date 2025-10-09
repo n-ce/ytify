@@ -29,6 +29,18 @@ export const hostResolver = (url: string) =>
     ('?' + pathModifier(url))) : url);
 
 
+export const fetchJson = async <T>(
+  url: string,
+  signal?: AbortSignal
+): Promise<T> => fetch(url, { signal })
+  .then(res => {
+    if (!res.ok) {
+      throw new Error(`Network response was not ok: ${res.statusText}`);
+    }
+    return res.json() as Promise<T>;
+  });
+
+
 export function proxyHandler(url: string, prefetch: boolean = false) {
   const isVideo = Boolean(document.querySelector('video'));
   const useProxy = config.enforceProxy || playerStore.stream.author.endsWith('- Topic') && !isVideo && store.api.status === 'P';

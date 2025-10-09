@@ -134,3 +134,45 @@ select {
 a {
   color: var(--text);
 }
+
+.displayer {
+  white-space: pre;
+  background: var(--onBg);
+  box-shadow: var(--shadow-1);
+  border: var(--border);
+  color: var(--text);
+  border-radius: var(--roundness);
+  aspect-ratio: 1;
+
+  &::backdrop {
+    background-color: #0007;
+  }
+
+  &[open] {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+
+  input {
+    background: none;
+    border-bottom: var(--border);
+    font-weight: var(--font-weight-5);
+    height: var(--size-7);
+    font-size: var(--font-size-2);
+
+    &::placeholder {
+      color: inherit;
+    }
+
+    &:disabled {
+      opacity: 0;
+    }
+  }
+
+
+  button {
+    background: none;
+  }
+}

@@ -133,6 +133,28 @@ declare global {
     'dbchange': CustomEvent<{ db: Library, change: string }>;
   }
 
+  interface YTStreamItem {
+    id: string,
+    title: string,
+    author?: string,
+    duration: string,
+    uploaded?: string,
+    channelUrl?: string,
+    views?: string,
+    img?: string,
+    type: 'stream' | 'video',
+  }
+
+  interface YTListItem {
+    title: string,
+    stats: string,
+    thumbnail: string,
+    uploaderData: string,
+    url: string,
+    type: 'channel' | 'playlist',
+  }
+
+
 }
 
 

@@ -1,12 +1,10 @@
-// @ts-ignore
-
 import { setStore, store } from './app';
 import { config } from '@lib/utils';
 import { updateParam } from './navigation';
 import { createStore } from 'solid-js/store';
-import { fetchSearchSuggestions } from '@lib/modules/fetchSearchSuggestions';
-import { fetchYoutubeSearchResults } from '@lib/modules/fetchYoutubeSearchResults';
-import { fetchYTMusicSearchResults, YTStreamItem, YTListItem } from '@lib/modules/fetchYTMusicSearchResults';
+import fetchSearchSuggestions from '@lib/modules/fetchSearchSuggestions';
+import fetchYoutubeSearchResults from '@lib/modules/fetchYoutubeSearchResults';
+import fetchYTMusicSearchResults from '@lib/modules/fetchYTMusicSearchResults';
 
 const createInitialState = () => ({
   query: '',
@@ -69,22 +67,22 @@ export async function getSearchResults() {
     if (isMusic) {
       return fetchYTMusicSearchResults(query);
     } else {
-        let invidiousIndex = store.api.invidious.length - 1;
-        const fetcher = (): Promise<(YTStreamItem | YTListItem)[]> => 
-            fetchYoutubeSearchResults(
-                store.api.invidious[invidiousIndex],
-                query,
-                searchFilter,
-                page
-            ).catch(e => {
-                if (invidiousIndex > 0) {
-                    invidiousIndex--;
-                    return fetcher();
-                } else {
-                    throw e;
-                }
-            });
-        return fetcher();
+      let invidiousIndex = store.api.invidious.length - 1;
+      const fetcher = (): Promise<(YTStreamItem | YTListItem)[]> =>
+        fetchYoutubeSearchResults(
+          store.api.invidious[invidiousIndex],
+          query,
+          searchFilter,
+          page
+        ).catch(e => {
+          if (invidiousIndex > 0) {
+            invidiousIndex--;
+            return fetcher();
+          } else {
+            throw e;
+          }
+        });
+      return fetcher();
     }
   }
 
@@ -107,7 +105,7 @@ export async function getSearchResults() {
         };
         setSearchStore('observer', setObserver(callback));
         if (data.length < 5) {
-            callback();
+          callback();
         }
       }
     })

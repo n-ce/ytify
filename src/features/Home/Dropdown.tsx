@@ -1,6 +1,9 @@
 import { getDB, saveDB, toCollection } from '@lib/utils';
 import { navStore, setNavStore, setStore, t } from '@lib/stores';
-import { Show } from 'solid-js';
+import { lazy, Show } from 'solid-js';
+
+
+const Login = lazy(() => import('@components/Login'));
 
 export default function Dropdown(_: {
   setAbout: () => void,
@@ -73,7 +76,10 @@ export default function Dropdown(_: {
             <input type="file" id="upload_songshift" onchange={async (e) => (await import('../../lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
           </li>
 
-          <li onclick={_.setAbout}>
+          <li onclick={() => {
+            setStore('dialog', Login);
+            (document.querySelector('.displayer') as HTMLDialogElement).showModal();
+          }}>
             <i class="ri-cloud-fill"></i>&nbsp;Cloud Sync
           </li>
         </Show>

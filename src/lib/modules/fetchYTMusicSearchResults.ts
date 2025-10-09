@@ -1,5 +1,4 @@
-import { config } from '@lib/utils';
-import { generateImageUrl, getThumbIdFromLink } from '@lib/utils/image';
+import { config, fetchJson, generateImageUrl, getThumbIdFromLink } from '@lib/utils';
 
 // Response types for different search filters
 
@@ -110,40 +109,10 @@ interface YTMusicSearchResponse {
   results: YTMusicSearchResult[];
 }
 
-export interface YTStreamItem {
-  id: string,
-  title: string,
-  author?: string,
-  duration: string,
-  uploaded?: string,
-  channelUrl?: string,
-  views?: string,
-  img?: string,
-  type: 'stream' | 'video',
-}
 
-export interface YTListItem {
-  title: string,
-  stats: string,
-  thumbnail: string,
-  uploaderData: string,
-  url: string,
-  type: 'channel' | 'playlist',
-}
-
-const fetchJson = async <T>(url: string): Promise<T> => {
-  return fetch(url)
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Network response was not ok: ${res.statusText}`);
-      }
-      return res.json() as Promise<T>;
-    });
-}
-
-export const fetchYTMusicSearchResults = async (
+export default async function(
   query: string,
-): Promise<(YTStreamItem | YTListItem)[]> => {
+): Promise<(YTStreamItem | YTListItem)[]> {
   const filter = config.searchFilter.substring(6); // remove "music_"
   const url = `https://ytm-jgmk.onrender.com/api/search?q=${encodeURIComponent(query)}&filter=${filter}`;
 

@@ -9,13 +9,12 @@ import { onMount, Show } from 'solid-js';
 
 export default function() {
 
-  const { id, author } = store.actionsMenu;
-  const isMusic = author.endsWith('- Topic');
+  const isMusic = store.actionsMenu?.author.endsWith('- Topic');
   let dialog!: HTMLDialogElement;
 
   function closeDialog() {
     dialog.close();
-    setStore('actionsMenu', 'id', '');
+    setStore('actionsMenu', undefined);
   }
   onMount(() => {
     dialog.showModal();
@@ -33,8 +32,9 @@ export default function() {
       >
 
         <li tabindex="0" onclick={() => {
-
-          setQueueStore('list', list => [store.actionsMenu, ...list]);
+          const { actionsMenu } = store;
+          if (actionsMenu)
+            setQueueStore('list', list => [actionsMenu, ...list]);
 
           closeDialog();
         }}>
@@ -42,7 +42,9 @@ export default function() {
         </li>
 
         <li tabindex="1" onclick={() => {
-          setQueueStore('list', list => [...list, store.actionsMenu]);
+          const { actionsMenu } = store;
+          if (actionsMenu)
+            setQueueStore('list', list => [...list, actionsMenu]);
           closeDialog();
         }}>
           <i class="ri-list-check-2"></i>{t('actions_menu_enqueue')}
@@ -51,8 +53,8 @@ export default function() {
         <CollectionSelector close={closeDialog} />
 
         <li tabindex="3" onclick={async () => {
-          closeDialog();
           //fetchList('/playlists/RD' + _.data.id, true);
+          closeDialog();
         }}>
           <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
         </li>
@@ -61,8 +63,13 @@ export default function() {
 
 
         <li tabindex="4" onclick={async () => {
+          const id = store?.actionsMenu?.id;
 
-          closeDialog();
+
+          if (!id) {
+            setStore('snackbar', 'id not found');
+            return;
+          }
           setStore('snackbar', t('actions_menu_download_init'));
           const a = document.createElement('a');
           const l = await getDownloadLink(id);
@@ -70,18 +77,21 @@ export default function() {
             a.href = l;
             a.click();
           }
+          closeDialog();
         }}>
           <i class="ri-download-2-fill"></i>
           {t('actions_menu_download')}
         </li>
 
         <li tabindex="5" onclick={() => {
-          closeDialog();
+          const author = store.actionsMenu?.author;
+          if (!author) return;
           setListStore('name',
             author.endsWith('- Topic') ?
               ('Artist - ' + author.replace('- Topic', ''))
               : '');
 
+          closeDialog();
           //fetchList(_.data.channelUrl);
         }}>
 
@@ -95,11 +105,12 @@ export default function() {
 
         <Show when={!isMusic}>
           <li tabindex="6" onclick={() => {
-            closeDialog();
-            if (config.linkHost)
+            const id = store.actionsMenu?.id;
+            if (config.linkHost && id)
               open(hostResolver('/watch?v=' + id));
             else
               setNavStore('video', 'state', true);
+            closeDialog();
           }}>
             <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
           </li>
@@ -109,19 +120,12 @@ export default function() {
 
 
         <li tabindex="7" onclick={() => {
+
+          const output = store.actionsMenu || playerStore.data;
+          const p = <p>{JSON.stringify(output, null, 4)}</p>;
+          setStore('dialog', p);
+          (document.querySelector('.displayer') as HTMLDialogElement).showModal();
           closeDialog();
-
-          const output = location.pathname === '/' ? playerStore.data : store.actionsMenu;
-
-          const displayer = document.createElement('dialog');
-          displayer.className = 'displayer';
-          displayer.addEventListener('click', () => {
-            displayer.close();
-            displayer.remove();
-          });
-          displayer.textContent = JSON.stringify(output, null, 4);
-          document.body.appendChild(displayer);
-          displayer.showModal();
 
         }}>
           <i class="ri-braces-line"></i>{t('actions_menu_debug_info')}

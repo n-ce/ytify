@@ -2,7 +2,7 @@ import { For, Show } from 'solid-js';
 import { searchStore } from '@lib/stores';
 import ListItem from '@components/ListItem';
 import StreamItem from '@components/StreamItem';
-import { YTStreamItem, YTListItem } from '@lib/modules/fetchYTMusicSearchResults';
+
 
 function isStreamItem(item: YTStreamItem | YTListItem): item is YTStreamItem {
     return item.type === 'stream' || item.type === 'video';

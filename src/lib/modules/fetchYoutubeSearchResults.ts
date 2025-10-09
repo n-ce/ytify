@@ -1,5 +1,4 @@
-import { YTStreamItem, YTListItem } from "./fetchYTMusicSearchResults";
-import { numFormatter, convertSStoHHMMSS, getThumbIdFromLink, generateImageUrl, hostResolver } from "@lib/utils";
+import { numFormatter, convertSStoHHMMSS, getThumbIdFromLink, generateImageUrl, hostResolver, fetchJson } from "@lib/utils";
 
 // Invidious search result types
 interface InvidiousVideoResult {
@@ -45,14 +44,14 @@ interface InvidiousChannelResult {
 }
 
 interface InvidiousPlaylistItem {
-    title: string;
-    videoId: string;
-    lengthSeconds: number;
-    videoThumbnails: {
-        url: string;
-        width: number;
-        height: number;
-    }[];
+  title: string;
+  videoId: string;
+  lengthSeconds: number;
+  videoThumbnails: {
+    url: string;
+    width: number;
+    height: number;
+  }[];
 }
 
 interface InvidiousPlaylistResult {
@@ -69,22 +68,12 @@ interface InvidiousPlaylistResult {
 
 type InvidiousSearchResult = InvidiousVideoResult | InvidiousChannelResult | InvidiousPlaylistResult;
 
-const fetchJson = async <T>(url: string): Promise<T> => {
-  return fetch(url)
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Network response was not ok: ${res.statusText}`);
-      }
-      return res.json() as Promise<T>;
-    });
-}
-
-export const fetchYoutubeSearchResults = async (
+export default async function(
   api: string,
   query: string,
   filter: string,
   page: number
-): Promise<(YTStreamItem | YTListItem)[]> => {
+): Promise<(YTStreamItem | YTListItem)[]> {
   let type = filter;
   let sort = '';
 
@@ -103,7 +92,7 @@ export const fetchYoutubeSearchResults = async (
           const videoItem = item as InvidiousVideoResult;
           return videoItem.lengthSeconds > 180 && videoItem.viewCount > 1000;
         } else if (item.type === 'playlist') {
-            return !item.title.startsWith('Mix - ');
+          return !item.title.startsWith('Mix - ');
         }
         return true;
       }).map(item => {

@@ -7,7 +7,7 @@ export default function() {
   onMount(() => {
     setTimeout(() => {
       if (snackbar.textContent === store.snackbar)
-        setStore('snackbar', '');
+        setStore('snackbar', undefined);
     }, 7000);
   });
 
@@ -30,7 +30,7 @@ export default function() {
         'animation-duration': '1s'
       }}
       onclick={() => {
-        setStore('snackbar', '');
+        setStore('snackbar', undefined);
       }}
       textContent={store.snackbar}
     ></p>

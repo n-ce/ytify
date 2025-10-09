@@ -1,5 +1,6 @@
 import { createStore } from "solid-js/store";
 import { config } from "@lib/utils/config";
+import { type JSXElement } from "solid-js";
 
 type Services = 'piped' | 'invidious';
 const storeInit: {
@@ -11,11 +12,11 @@ const storeInit: {
   },
   useSaavn: boolean,
   linkHost: string,
-  searchQuery: string,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg',
   updater?: () => void,
-  actionsMenu: CollectionItem,
-  snackbar: string
+  actionsMenu?: CollectionItem,
+  snackbar?: string,
+  dialog?: JSXElement
 } = {
   api: {
     piped: ['https://piapi.ggtyler.dev'],
@@ -29,16 +30,7 @@ const storeInit: {
   },
   useSaavn: true,
   linkHost: config.linkHost || location.origin,
-  searchQuery: '',
   downloadFormat: config.dlFormat,
-  actionsMenu: {
-    id: '',
-    title: '',
-    author: '',
-    channelUrl: '',
-    duration: ''
-  },
-  snackbar: ''
 };
 
 export const [store, setStore] = createStore(storeInit);

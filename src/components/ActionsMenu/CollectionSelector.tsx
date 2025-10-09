@@ -35,8 +35,9 @@ export default function(_: {
       title = value;
     }
 
-    if (title) {
-      addToCollection(title, store.actionsMenu, isNew ? 'addNew' : '');
+    if (title && store.actionsMenu) {
+      const itemToAdd: CollectionItem = store.actionsMenu;
+      addToCollection(title, itemToAdd, isNew ? 'addNew' : '');
     }
 
     _.close();

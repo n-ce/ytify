@@ -1,24 +1,15 @@
-import { config } from '@lib/utils';
+import { config, fetchJson } from '@lib/utils';
 
 export interface SearchSuggestion {
   source: string;
   suggestions: string[];
 }
 
-const fetchJson = <T>(url: string, signal?: AbortSignal): Promise<T> => {
-  return fetch(url, { signal })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Network response was not ok: ${res.statusText}`);
-      }
-      return res.json() as Promise<T>;
-    });
-}
 
-export const fetchSearchSuggestions = (
+export default async function(
   text: string,
   signal: AbortSignal
-): Promise<string[]> => {
+): Promise<string[]> {
   const isMusic = config.searchFilter.startsWith('music_');
   let url = `https://ytm-jgmk.onrender.com/api/search/suggestions?q=${encodeURIComponent(text)}`;
   if (isMusic) {

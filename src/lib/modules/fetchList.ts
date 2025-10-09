@@ -20,7 +20,7 @@ export default async function fetchList(
 
   setListStore('isLoading', true);
 
-  const useHyperpipe = !mix && (store.actionsMenu.author.endsWith(' - Topic') || listStore.name.startsWith('Artist'));
+  const useHyperpipe = !mix && (store.actionsMenu?.author.endsWith(' - Topic') || listStore.name.startsWith('Artist'));
 
   if (useHyperpipe) {
     url = await getPlaylistIdFromArtist(url) || '';
