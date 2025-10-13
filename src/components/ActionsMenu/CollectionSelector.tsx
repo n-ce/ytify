@@ -1,21 +1,9 @@
-import { onMount } from 'solid-js';
-import { addToCollection, createCollection, getDB } from '@lib/utils/library';
-import { listStore, setListStore, store, t } from '@lib/stores';
+import { addToCollection, createCollection, getCollectionsKeys } from '@lib/utils/library';
+import { store, t } from '@lib/stores';
 
 export default function(_: {
   close: () => void
 }) {
-
-  onMount(() => {
-    const initialKeys = Object.keys(getDB());
-    setListStore('addToCollectionOptions', []);
-
-    for (const key of initialKeys) {
-      if (!listStore.reservedCollections.includes(key)) {
-        createCollection(key);
-      }
-    }
-  });
 
 
   const handleCollectionChange = (e: Event & { target: HTMLSelectElement }) => {
@@ -37,7 +25,7 @@ export default function(_: {
 
     if (title && store.actionsMenu) {
       const itemToAdd: CollectionItem = store.actionsMenu;
-      addToCollection(title, itemToAdd, isNew ? 'addNew' : '');
+      addToCollection(title, [itemToAdd]);
     }
 
     _.close();
@@ -58,7 +46,7 @@ export default function(_: {
         <option value="favorites">{t('collection_selector_favorites')}</option>
         <option value="listenLater">{t('collection_selector_listen_later')}</option>
         {
-          listStore.addToCollectionOptions.map((v) => (
+          getCollectionsKeys().filter(k => !['favorites', 'listenLater'].includes(k)).map((v) => (
             <option value={v}>{v}</option>
           ))
         }

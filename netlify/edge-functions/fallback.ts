@@ -18,7 +18,7 @@ export default async (_: Request, context: Context) => {
   const data = {
     title: streamData.title,
     uploader: streamData.channelTitle,
-    uploaderUrl: '/channel/' + streamData.channelId,
+    uploaderUrl: '/channel/' + streamData.authorId,
     duration: streamData.lengthSeconds,
     audioStreams: streamData.adaptiveFormats
       .filter(_ => _.mimeType.startsWith('audio'))
@@ -55,7 +55,7 @@ const host = 'yt-api.p.rapidapi.com';
 export const fetcher = (cgeo: string, keys: string[], id: string): Promise<{
   title: string,
   channelTitle: string,
-  channelId: string,
+  authorId: string,
   lengthSeconds: number,
   isLiveContent: boolean,
   adaptiveFormats: {

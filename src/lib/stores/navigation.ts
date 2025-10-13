@@ -52,11 +52,10 @@ export function closeFeature(name: Features) {
 
   const closestRef = active[0]?.[1]?.ref;
 
-  if (removedIndex < 3)
-    closestRef?.parentElement?.scrollTo({
-      left: closestRef?.offsetWidth,
-      behavior: 'smooth'
-    });
+  console.log('Nav: ', closestRef, removedIndex);
+
+  if (removedIndex < 3) {
+  }
   else
     closestRef?.scrollIntoView({ behavior: 'smooth' });
 
@@ -68,7 +67,7 @@ export function closeFeature(name: Features) {
   else
     setTimeout(() => {
       setNavStore(name, { ref: null, state: false });
-    }, 350);
+    }, 500);
 
 }
 
@@ -76,7 +75,7 @@ type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 's
 
 export function updateParam(
   param: Params,
-  value: string | undefined = undefined
+  value?: string
 ) {
   if (value)
     params.set(param, value);
@@ -89,6 +88,3 @@ export function updateParam(
 }
 
 
-addEventListener('popstate', () => {
-
-})

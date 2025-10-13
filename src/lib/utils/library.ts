@@ -1,47 +1,138 @@
 import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
 
+// New Library V2 utils
+
+export const getMeta = (): Meta => {
+  const meta = localStorage.getItem('library_meta');
+  if (meta) {
+    return JSON.parse(meta);
+  }
+
+  const newMeta: Meta = { version: 4, tracks: 0 };
+  const timestamp = Date.now();
+
+  const tracks = getTracksMap();
+  if (Object.keys(tracks).length > 0) {
+    newMeta.tracks = timestamp;
+  }
+
+  const collections = getCollectionsKeys();
+  for (const key of collections) {
+    newMeta[key] = timestamp;
+  }
+
+  const channels = getLists('channels');
+  if (Object.keys(channels).length > 0) {
+    newMeta.channels = timestamp;
+  }
+
+  const playlists = getLists('playlists');
+  if (Object.keys(playlists).length > 0) {
+    newMeta.playlists = timestamp;
+  }
+
+  return newMeta;
+};
 
 
-const getMeta = (): Meta => JSON.parse(localStorage.getItem('library_meta') || '{"version": 4}');
+export const getCollectionsKeys = () => Object
+  .keys(localStorage)
+  .filter(key => key.startsWith('library_'))
+  .map(key => key.slice(8))
+  .filter(key => !['channels', 'playlists', 'tracks', 'meta']
+    .includes(key));
 
-
-export const getCollectionsKeys = () => Object.keys(getMeta()).filter(k => !['version', 'channels', 'playlists'].includes(k));
-
-export const getTracksMap = (): Tracks =>
+export const getTracksMap = (): Collection =>
   JSON.parse(localStorage.getItem('library_tracks') || '{}');
-export const saveTracksMap = (tracks: Tracks) => localStorage.setItem('library_tracks', JSON.stringify(tracks));
-
-export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channels : Playlists => JSON.parse(localStorage.getItem('library_' + type) || '{}');
-
 
 export const getCollection = (name: string) => JSON.parse(localStorage.getItem('library_' + name) || '[]') as string[];
 
-export const saveCollection = (name: string, collection: string[]) => localStorage.setItem('library_' + name, JSON.stringify(collection));
+export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channels : Playlists => JSON.parse(localStorage.getItem('library_' + type) || '{}');
 
-export function updateCollection(
+export function saveTracksMap(tracks: Collection) {
+  localStorage.setItem('library_tracks', JSON.stringify(tracks))
+};
+
+export function saveCollection(
   name: string,
-  id: string,
-  data?: CollectionItem
+  collection: string[]
+) {
+  localStorage.setItem('library_' + name, JSON.stringify(collection));
+}
+
+export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T extends 'channels' ? Channels : Playlists) {
+  localStorage.setItem(`library_${type}`, JSON.stringify(data));
+};
+
+
+export function addToCollection(
+  name: string,
+  data: CollectionItem[]
 ) {
   const collection = getCollection(name);
-  const idx = collection.indexOf(id);
-  if (idx !== -1)
-    collection.splice(idx, 1);
   const tracks = getTracksMap();
+  const prepend = ['history', 'favorites'].includes(name);
 
-  if (data) { // Add to Collection
+  for (const item of data) {
+    const { id } = item;
+    const idx = collection.indexOf(id);
 
-    if (['history', 'favorites'].includes(name))
+    if (idx !== -1)
+      collection.splice(idx, 1);
+
+    if (prepend)
       collection.unshift(id);
     else collection.push(id);
-    tracks[id] = data;
-  }
-  else { // Remove From Collection
-    const keys = getCollectionsKeys();
-    let isReferenced = false;
 
-    for (const key of keys)
+    if (!(id in tracks))
+      tracks[id] = item;
+  }
+
+  saveCollection(name, collection);
+  saveTracksMap(tracks);
+  metaUpdater(name);
+}
+
+export function removeFromCollection(
+  name: string,
+  ids: string[],
+) {
+  const collection = getCollection(name);
+  const collections = getCollectionsKeys().filter(k => k !== name);;
+  const tracks = getTracksMap();
+
+  for (const id of ids) {
+    const idx = collection.indexOf(id);
+    if (idx !== -1)
+      collection.splice(idx, 1);
+
+    let isReferenced = false;
+    for (const key of collections)
+      if (getCollection(key).includes(id)) {
+        isReferenced = true;
+        break;
+      }
+
+    if (!isReferenced)
+      delete tracks[id];
+
+  }
+
+  saveCollection(name, collection);
+  saveTracksMap(tracks);
+  metaUpdater(name);
+
+}
+
+export function deleteCollection(name: string) {
+  const ids = getCollection(name);
+  const collections = getCollectionsKeys().filter(k => k !== name);;
+  const tracks = getTracksMap();
+
+  for (const id of ids) {
+    let isReferenced = false;
+    for (const key of collections)
       if (getCollection(key).includes(id)) {
         isReferenced = true;
         break;
@@ -50,108 +141,39 @@ export function updateCollection(
     if (!isReferenced)
       delete tracks[id];
   }
-  saveCollection(name, collection);
-  saveTracksMap(tracks);
-  metaUpdater(name);
 
+  localStorage.removeItem('library_' + name);
+  saveTracksMap(tracks);
+  metaUpdater(name, true);
 }
 
 
-
-
-export const metaUpdater = (key: string) => {
+export const metaUpdater = (key: string, remove?: boolean) => {
   const meta = getMeta();
+  const timestamp = Date.now();
 
-  meta[key] = new Date().toISOString();
+  // should auto-update tracks on collection changes
+  if (getCollectionsKeys().includes(key))
+    meta.tracks = timestamp;
+
+  if (remove)
+    delete meta[key];
+  else
+    meta[key] = timestamp;
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
 }
 
 
 
-
-export const getDB = (): Library => JSON.parse(localStorage.getItem('library') || '{}');
-
-export function saveDB(data: Library, change: string = '') {
-  localStorage.setItem('library', JSON.stringify(data));
-  dispatchEvent(new CustomEvent('dbchange', { detail: { db: data, change: change } }));
-}
-
-export function removeFromCollection(
-  collection: string,
-  id: string
-) {
-  if (!collection) return;
-
-  const db = getDB();
-
-  delete db[collection][id];
-  setListStore('list', (currentList) => {
-    console.log(currentList);
-    return {};
-  });
-  saveDB(db);
-}
-
-
-
-export function toCollection(
-  collection: string,
-  data: CollectionItem | Playlist,
-  db: Library
-) {
-  if (!collection) return;
-  const id = <string>data.id;
-
-  if (db.hasOwnProperty(collection)) {
-    if (db[collection].hasOwnProperty(id))
-      // delete old data if already exists
-      delete db[collection][id];
-  }
-  // create if collection does not exists
-  else db[collection] = {};
-  if ('title' in data)
-    data.lastUpdated = new Date().toISOString();
-  db[collection][id] = data as CollectionItem;
-}
-
-export function addToCollection(
-  collection: string,
-  data: CollectionItem,
-  change = ''
-) {
-
-  if (!collection) return;
-
-  const db = getDB();
-  toCollection(collection, data, db);
-  saveDB(db, change);
-}
-
-export function addListToCollection(
-  collection: string,
-  list: { [index: string]: CollectionItem },
-  db = getDB()
-) {
-
-  if (!collection) return;
-
-  for (const key in list) {
-    const data = list[key];
-    toCollection(collection, data, db);
-  }
-  saveDB(db, 'listAdded');
-}
-
 export function createCollection(title: string) {
-  const exists = listStore
-    .reservedCollections
-    .concat(listStore.addToCollectionOptions)
-    .includes(title);
-  if (exists)
-    setStore('snackbar', t('list_already_exists'))
-  else
-    setListStore('addToCollectionOptions', (prev) => [...prev, title]);
+  const exists = getCollectionsKeys().includes(title);
+  if (exists) {
+    setStore('snackbar', t('list_already_exists'));
+    return;
+  }
+
+  metaUpdater(title);
 }
 
 
@@ -184,7 +206,7 @@ export async function fetchCollection(
     updateParam('si', id);
   }
   else {
-    getLocalCollection(id, isReserved);
+    getLocalCollection(id);
     updateParam('collection', id);
   }
 
@@ -196,6 +218,8 @@ export async function fetchCollection(
 }
 
 function setObserver(callback: () => number) {
+  const ref = document.querySelector(`.listContainer > :last-child`) as HTMLElement;
+  if (!ref) return;
   new IntersectionObserver((entries, observer) =>
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -206,61 +230,49 @@ function setObserver(callback: () => number) {
 
       }
     }))
-  // .observe(listContainer.children[0]);
+    .observe(ref);
 }
 
 
 function getLocalCollection(
   collection: string,
-  isReserved: boolean
 ) {
 
-  const db = getDB();
-  //const sort = isReserved ? false : sortCollectionBtn.classList.contains('checked');
-  let dataObj = db[decodeURI(collection)];
+  let ids = getCollection(decodeURI(collection));
 
-  if (!dataObj)
+  if (ids.length === 0) {
     setStore('snackbar', 'No items found');
-
-  const items = Object.values(dataObj) as CollectionItem[];
-
-  let listData = items;
-  let itemsToShow = items.length;
-  const usePagination = isReserved && itemsToShow > 20;
-  setListStore({
-    name: collection,
-    length: items.length
-  });
-
-
-  if (usePagination) {
-    listData = items.slice(itemsToShow - 1, itemsToShow);;
+    setListStore({ list: [], length: 0, name: collection });
+    return;
   }
 
-  setListStore('list', listData);
+  const usePagination = ids.length > 20;
+  const tracks = getTracksMap();
 
+  setListStore({
+    name: collection,
+    length: ids.length
+  });
 
-  // set list
+  if (usePagination) {
+    let loadedCount = 20;
+    setListStore('list', ids.slice(0, loadedCount).map(id => tracks[id]));
 
-  if (usePagination)
-    setObserver(() => {
-      itemsToShow -= 1;
-      const next = items.slice(itemsToShow - 1, itemsToShow);
-      setListStore('list', next);
-      //  renderCollection(next, sort, frag);
+    const observerCallback = () => {
+      if (loadedCount >= ids.length) return 0;
 
-      /*
-            if (removeFromListBtn.classList.contains('delete'))
-              frag.childNodes.forEach(v => {
-                if (v instanceof HTMLElement)
-                  v.classList.add('delete');
-              });
-              
-      
-            listContainer.prepend(frag);
-      */
-      return itemsToShow;
-    });
+      const nextBatch = ids.slice(loadedCount, loadedCount + 20);
+      loadedCount += 20;
+
+      setListStore('list', (l) => [...l, ...nextBatch.map(id => tracks[id])]);
+      return ids.length - loadedCount;
+    };
+
+    setTimeout(() => setObserver(observerCallback), 0);
+
+  } else {
+    setListStore('list', ids.map(id => tracks[id]));
+  }
 
   setListStore('id', decodeURI(collection));
 }
@@ -280,6 +292,3 @@ async function getSharedCollection(
 
   setListStore('isLoading', false);
 }
-
-
-

@@ -17,7 +17,7 @@ export default function Results(_: {
       when={!listStore.isLoading}
       fallback={<i class="ri-loader-3-line"></i>}
     >
-      <div id="listContainer" ref={_.ref}>
+      <div class="listContainer" ref={_.ref}>
         <For each={listStore.list}>{
           (item) =>
             <StreamItem
@@ -25,8 +25,7 @@ export default function Results(_: {
               author={item.author}
               title={item.title || ''}
               duration={item.duration || ''}
-              channelUrl={item.channelUrl}
-              lastUpdated={item.lastUpdated}
+              authorId={item.authorId}
               draggable={_.draggable}
               context={listStore.type}
               mark={_.mark}

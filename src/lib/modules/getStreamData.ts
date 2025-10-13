@@ -6,7 +6,7 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const { invidious, piped, status } = store.api;
+  const { invidious, piped } = store.api;;
 
   const fetchDataFromPiped = (
     api: string
@@ -68,19 +68,12 @@ export default async function(
         .catch(() => e) : e;
 
   const useInvidious = (index = 0): Promise<Piped> =>
-    (status === 'N') ?
-      Promise.allSettled(invidious.map(fetchDataFromInvidious))
-        .then(res => {
-          const ff = res.find(r => r.status === 'fulfilled');
-          if (ff?.value) return ff.value;
-          return emergency(Error('No Invidious sources are available'));
-        }) :
-      fetchDataFromInvidious(invidious[index])
-        .catch(e => {
-          if (index + 1 === invidious.length)
-            return emergency(e);
-          else return useInvidious(index + 1);
-        });
+    fetchDataFromInvidious(invidious[index])
+      .catch(e => {
+        if (index + 1 === invidious.length)
+          return emergency(e);
+        else return useInvidious(index + 1);
+      });
 
 
   const usePiped = (index = 0): Promise<Piped> =>
@@ -91,12 +84,5 @@ export default async function(
         else return usePiped(index + 1);
       });
 
-  return status === 'P' ? usePiped() :
-    status === 'I' ? useInvidious() :
-      Promise.allSettled(piped.map(fetchDataFromPiped))
-        .then(res => {
-          const ff = res.find(r => r.status === 'fulfilled');
-          if (ff?.value) return ff.value;
-          return useInvidious();
-        });
+  return useInvidious();
 }

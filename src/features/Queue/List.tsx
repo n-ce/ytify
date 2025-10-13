@@ -16,8 +16,7 @@ export default function() {
             title={item.title}
             author={item.author}
             duration={item.duration}
-            channelUrl={item.channelUrl}
-            lastUpdated={item.lastUpdated}
+            authorId={item.authorId}
             draggable={true}
           />
         )

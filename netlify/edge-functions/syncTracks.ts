@@ -1,0 +1,103 @@
+// syncTracks.ts
+
+import { getStore } from "@netlify/blobs";
+import type { Config, Context } from "@netlify/edge-functions";
+
+// Define the type for a single Track Object
+interface TrackObject {
+  id: string;
+  title: string;
+  author: string;
+  channelUrl: string;
+  duration: number; // Assuming duration is a number (seconds/ms)
+  // The rest of the properties are covered by the index signature
+  [key: string]: string | number;
+}
+
+// Define the user's master track map structure (ID -> TrackObject)
+type UserTrackMap = Record<string, TrackObject>;
+
+export default async (req: Request, context: Context): Promise<Response> => {
+  // The user hash is captured by the route parameter 'hash'
+  const userIdHash = context.params.hash;
+
+  if (!userIdHash) {
+    return new Response("User ID hash not provided.", { status: 400 });
+  }
+
+  // Access the dedicated Track Store
+  const trackStore = getStore('trackStore');
+
+  // --- PUT: Track Batch Push (Client -> Server) ---
+  // Action: Client sends an array of updated/new TrackObjects.
+  if (req.method === 'PUT') {
+    try {
+      // Client always sends an array of TrackObjects
+      const tracksToUpdate = await req.json() as TrackObject[];
+
+      if (!Array.isArray(tracksToUpdate) || tracksToUpdate.length === 0) {
+        return new Response("Request body must be a non-empty array of TrackObjects.", { status: 400 });
+      }
+
+      // 1. Get the current master map
+let masterMap: UserTrackMap = await trackStore.get(userIdHash, { type: 'json' }) || {};
+
+      // 2. Merge the incoming tracks into the master map
+      for (const track of tracksToUpdate) {
+        masterMap[track.id] = track;
+      }
+
+      // 3. CRITICAL: Overwrite the entire user's track map with the merged data
+      await trackStore.setJSON(userIdHash, masterMap);
+
+      // SUCCESS: Track map is updated. The client must now update the 'meta.tracks' timestamp via the CAS endpoint.
+      return new Response(null, { status: 204 });
+
+    } catch (e) {
+      console.error(`Error during track batch push for user ${userIdHash}:`, e);
+      return new Response("Internal server error during track push.", { status: 500 });
+    }
+  }
+
+  // --- POST: Track Metadata Retrieval (Server -> Client) ---
+  // Action: Client sends an array of missing Track IDs to be hydrated from the server.
+  else if (req.method === 'POST') {
+    try {
+      // Client sends an array of string IDs in the body
+      const requestedIds = await req.json() as string[];
+
+      if (!Array.isArray(requestedIds)) {
+        return new Response("Request body must be an array of track IDs.", { status: 400 });
+      }
+
+      // 1. Get the current master map
+      let masterMap: UserTrackMap = await trackStore.get(userIdHash, { type: 'json' }) || {};
+
+      // 2. Filter and build the response array
+      const foundTracks: TrackObject[] = [];
+      for (const id of requestedIds) {
+        if (masterMap[id]) {
+          foundTracks.push(masterMap[id]);
+        }
+      }
+
+      // SUCCESS: Return only the track objects that were found.
+      return new Response(JSON.stringify(foundTracks), {
+        status: 200,
+        headers: { "Content-Type": "application/json" }
+      });
+
+    } catch (e) {
+      console.error(`Error during track metadata retrieval for user ${userIdHash}:`, e);
+      return new Response("Internal server error during track pull by IDs.", { status: 500 });
+    }
+  }
+
+  // --- Unsupported Method ---
+  return new Response(`Method ${req.method} not allowed.`, { status: 405 });
+};
+
+export const config: Config = {
+  // Defines the single endpoint: /cs/tracks/<user-hash>
+  path: ["/cs/tracks/:hash"],
+};

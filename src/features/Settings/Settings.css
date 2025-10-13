@@ -82,12 +82,15 @@
 
       &:hover {
         background-color: var(--onBg);
+        border-radius: var(--roundness);
       }
 
       select {
         font-size: inherit;
+        font-weight: var(--font-weight-5);
         padding: 0 var(--size-2);
         max-width: 50%;
+        text-align: right;
       }
     }
 

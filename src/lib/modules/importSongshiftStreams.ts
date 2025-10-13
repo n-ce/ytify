@@ -1,5 +1,5 @@
 import { setListStore, setStore, store } from "@lib/stores";
-import { convertSStoHHMMSS, getDB, saveDB } from "@lib/utils";
+import { addToCollection, convertSStoHHMMSS } from "@lib/utils";
 
 type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
 
@@ -10,7 +10,6 @@ export default async function(e: File) {
     setStore('snackbar', 'Incompatible Database!');
     return;
   }
-  const db = getDB();
   const { piped } = store.api;
   const getMetadata = async (
     seed: string,
@@ -28,7 +27,7 @@ export default async function(e: File) {
       title: metadata.title,
       author: metadata.uploaderName + ' - Topic',
       duration: convertSStoHHMMSS(metadata.duration),
-      channelUrl: metadata.uploaderUrl,
+      authorId: metadata.uploaderUrl?.slice(9),
       src
     }))
     .catch((e) => {
@@ -52,13 +51,26 @@ export default async function(e: File) {
   await Promise
     .all(promises)
     .then(d => {
-      d.forEach(v => {
-        if (v) {
-          if (!db[v.src]) db[v.src] = {};
-          db[v.src][v.id] = v as CollectionItem;
+      const imports = d.filter(Boolean).map(v => ({
+        id: v?.id,
+        title: v?.title,
+        author: v?.author,
+        duration: v?.duration,
+        authorId: v?.authorId
+      })) as (CollectionItem & { src: string })[];
+
+      const groupedBySource = imports.reduce((acc, track) => {
+        const { src, ...rest } = track;
+        if (!acc[src]) {
+          acc[src] = [];
         }
-      });
-      saveDB(db);
+        acc[src].push(rest as CollectionItem);
+        return acc;
+      }, {} as Record<string, CollectionItem[]>);
+
+      for (const src in groupedBySource)
+        addToCollection(src, groupedBySource[src]);
+
       setStore('snackbar', 'The Songshift streams have been imported')
     })
     .finally(() => {

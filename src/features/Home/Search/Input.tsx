@@ -27,6 +27,8 @@ export default function() {
   function textToSearch(text: string) {
     superInput.blur();
     setSearchStore('suggestions', 'data', []);
+    setSearchStore('page', 1);
+    setSearchStore('results', []);
     setSearchStore('query', text);
     getSearchResults();
   }
@@ -45,9 +47,23 @@ export default function() {
             setSearchStore('suggestions', 'data', []);
           }, 100);
         }}
+        onfocus={() => {
+          if (searchStore.query)
+            return;
+          const recentSearches = localStorage.getItem('searched');
+          if (recentSearches)
+            setSearchStore('suggestions', 'data', recentSearches.split(','));
+        }}
         oninput={async (e) => {
           const { value } = e.target;
           setSearchStore('query', value);
+
+          if (!value) {
+            const recentSearches = localStorage.getItem('searched');
+            if (recentSearches)
+              setSearchStore('suggestions', 'data', recentSearches.split(','));
+            return;
+          }
 
           if (config.searchBarLinkCapture) {
             const id = idFromURL(value);
@@ -73,11 +89,11 @@ export default function() {
 
           if (e.key === 'ArrowUp') {
 
-            setSearchStore('suggestions', 'index', (index <= 0) ? - 1 : index - 1);
+            setSearchStore('suggestions', 'index', (index === -1) ? data.length - 1 : index - 1);
           }
 
           if (e.key === 'ArrowDown') {
-            setSearchStore('suggestions', 'index', (index >= data.length - 1) ? -1 : index + 1);
+            setSearchStore('suggestions', 'index', (index === data.length) ? -1 : index + 1);
           }
 
           document.querySelectorAll('li.hover')[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });

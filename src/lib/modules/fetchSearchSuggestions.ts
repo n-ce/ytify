@@ -11,7 +11,8 @@ export default async function(
   signal: AbortSignal
 ): Promise<string[]> {
   const isMusic = config.searchFilter.startsWith('music_');
-  let url = `https://ytm-jgmk.onrender.com/api/search/suggestions?q=${encodeURIComponent(text)}`;
+  const api = 'https://js-ruddy-rho.vercel.app';
+  let url = api + `/api/search/suggestions?q=${encodeURIComponent(text)}`;
   if (isMusic) {
     url += '&music=1';
   }

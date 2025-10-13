@@ -1,6 +1,6 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { config, generateImageUrl, handleXtags, preferredStream, proxyHandler, setConfig, player } from "@lib/utils";
-import { closeFeature, openFeature, playerStore, setListStore, setPlayerStore, store } from "@lib/stores";
+import { closeFeature, openFeature, playerStore, setListStore, setPlayerStore, setStore, store } from "@lib/stores";
 import { Selector } from "@components/Selector";
 import { queueStore } from "@lib/stores/queue";
 
@@ -128,14 +128,16 @@ export default function() {
         onerror={() => {
           if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
+          const { invidious, index } = store.api;
 
 
-          if (store.api.index.invidious < store.api.invidious.length) {
-            const proxy = store.api.invidious[store.api.index.invidious];
+          if (index < invidious.length) {
+
+            const proxy = invidious[index];
             video.src = video.src.replace(origin, proxy);
             audio.src = audio.src.replace(origin, proxy);
 
-            store.api.index.invidious++;
+            setStore('api', 'index', index + 1);
           }
         }}
 
@@ -145,9 +147,7 @@ export default function() {
           <For each={data().subtitles}>
             {(v) =>
               <track
-                src={
-                  (store.api.status === 'P' ? '' :
-                    store.api.invidious[0]) + v.url}
+                src={store.api.invidious[0] + v.url}
                 srclang={v.name || v.label}
               >
               </track>

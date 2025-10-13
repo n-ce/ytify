@@ -5,12 +5,17 @@
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  @media(orientation: landscape) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
   list-style: none;
   padding: var(--size-1);
   gap: var(--size-1);
   margin-bottom: var(--size-3);
-  background: var(--blurMix);
-  backdrop-filter: blur(var(--size-px-2));
+  background: var(--onBg);
+  box-shadow: var(--shadow-1);
   border: var(--border);
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
@@ -25,12 +30,10 @@
     font-size: var(--font-size-1);
     font-weight: var(--font-weight-5);
     padding: var(--size-2) var(--size-1);
-    border: var(--border);
     letter-spacing: var(--font-letterspacing-0);
     --liBg: var(--onBg);
     background: color-mix(in srgb, var(--liBg), var(--onBg) 80%);
     color: color-mix(in srgb, var(--liBg), var(--text) 80%);
-    box-shadow: var(--shadow-1);
 
     i {
       margin: 0 var(--size-1);

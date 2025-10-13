@@ -11,7 +11,7 @@ type PlayerStore = {
   stream: CollectionItem,
   history: string[],
   audio: HTMLAudioElement,
-  context: 'link' | 'search' | 'hub' | 'playlist' | 'collection' | 'channel',
+  context: 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels',
   currentTime: number,
   fullDuration: number,
   playbackRate: number,
@@ -42,7 +42,7 @@ const createInitialState = (): PlayerStore => ({
   stream: {
     title: '',
     author: '',
-    channelUrl: '',
+    authorId: '',
     id: '',
     duration: ''
   },
@@ -80,7 +80,7 @@ createRoot(() => {
         if (historyID === id) {
           if (playerStore.isMusic && queueStore.list.length < 2)
             getRecommendations();
-          addToCollection('history', { ...playerStore.stream }, 'addNew');
+          addToCollection('history', [playerStore.stream]);
         }
       }, 1e4);
   }
@@ -102,6 +102,7 @@ createRoot(() => {
 
   playerStore.audio.onloadstart = () => {
     console.log('loadstart');
+    console.log(playerStore.audio.src);
     setPlayerStore('playbackState', 'paused');
     setPlayerStore('status', '');
     if (isPlayable) playerStore.audio.play();
@@ -121,12 +122,16 @@ createRoot(() => {
       return;
 
     const { audio, lrcSync, fullDuration, isMusic } = playerStore;
+
+    // Lyrics
+    if (lrcSync)
+      lrcSync(audio.currentTime + 0.2);
+
     const seconds = Math.floor(audio.currentTime);
+
 
     setPlayerStore('currentTime', seconds);
 
-    // Lyrics
-    if (lrcSync) lrcSync(audio.currentTime);
 
     // Immersive Mode
     const { ref } = navStore.player;
@@ -171,7 +176,6 @@ createRoot(() => {
           data.audioStreams
             .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
             ),
-          data.livestream,
           prefetchRef
         ));
   }

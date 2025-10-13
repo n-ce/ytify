@@ -1,38 +1,43 @@
 import { Show, createSignal } from 'solid-js';
-import { getDB, getThumbIdFromLink, saveDB, toCollection } from '@lib/utils';
+import { deleteCollection, getLists, saveLists } from '@lib/utils/library';
+import { getThumbIdFromLink } from '@lib/utils/image';
 import { listStore, resetList, setQueueStore, t } from '@lib/stores';
+import { importList } from '@lib/modules/listUtils';
 
 export default function Dropdown(_: {
   toggleSort: () => void
 }) {
-  const db = Object(getDB());
   const [isSubscribed, setSubscribed] = createSignal(
-    db.hasOwnProperty(listStore.type) &&
-    db[listStore.type].hasOwnProperty(listStore.id)
+    listStore.type !== 'collection' &&
+    listStore.id in getLists(listStore.type)
   );
 
 
   function subscriptionHandler() {
 
     const { name, type, id, uploader, thumbnail } = listStore;
-    const db = getDB();
+    if (type === 'collection') return;
+
+    const data = getLists(type);
+
+
     if (isSubscribed()) {
-      delete db[type + 's'][id];
+      delete data[id];
     }
     else {
-      const dataset: List & { uploader?: string } =
-      {
-        id, name,
-        thumbnail: getThumbIdFromLink(thumbnail)
-      };
+      const dataset =
+        {
+          id, name,
+          thumbnail: getThumbIdFromLink(thumbnail)
+        } as Playlist;
 
-      if (type === 'playlist')
+      if (type === 'playlists')
         dataset.uploader = uploader;
 
-      toCollection(type + 's', dataset, db);
+      saveLists(type, data);
     }
+
     setSubscribed(!isSubscribed());
-    saveDB(db, 'subscribe');
   }
   return (
     <details>
@@ -53,11 +58,12 @@ export default function Dropdown(_: {
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
-        <li id="importListBtn">
+        <li onclick={importList} id="importListBtn">
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
-        <Show when={listStore.type === 'channel' || listStore.type === 'playlist'}>
+        <Show when={listStore.type === 'channels' || listStore.type === 'playlists'}>
+
           <li
             id="subscribeListBtn"
             onclick={subscriptionHandler}
@@ -80,10 +86,9 @@ export default function Dropdown(_: {
         <Show when={listStore.type === 'collection' && !listStore.isReversed}>
 
           <li id="deleteCollectionBtn" onclick={() => {
-            if (confirm(t("list_prompt_delete", listStore.id))) {
-              const db = getDB();
-              delete db[listStore.id];
-              saveDB(db, 'delete');
+            const { id } = listStore;
+            if (confirm(t("list_prompt_delete", id))) {
+              deleteCollection(id);
               resetList();
             }
           }}>

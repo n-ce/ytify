@@ -1,5 +1,5 @@
 import { setStore, t } from '@lib/stores';
-import { addListToCollection, convertSStoHHMMSS, createCollection } from '@lib/utils';
+import { addToCollection, convertSStoHHMMSS, createCollection } from '@lib/utils';
 
 export default async function() {
 
@@ -47,20 +47,27 @@ export default async function() {
     fetch(instance + '/playlists/' + playlist.id)
       .then(res => res.json())
       .then(data => {
-        const listTitle = data.name;
+        const { name, relatedStreams } = data;
 
-        createCollection(listTitle);
-        const list: { [index: string]: CollectionItem } = {};
-        const streams = data.relatedStreams
-        for (const i of streams)
-          list[i.title] = {
-            id: i.url.slice(9),
-            title: i.title,
-            author: i.uploaderName,
-            duration: convertSStoHHMMSS(i.duration),
-            channelUrl: i.uploaderUrl
-          }
-        addListToCollection(listTitle, list);
+        createCollection(name);
+        const collection = relatedStreams
+          .filter((
+            url: string,
+            title: string,
+            uploaderName: string,
+            duration: number,
+            uploaderUrl: string
+          ) => url.length === 20 && title && uploaderName && duration > 0 && uploaderUrl)
+          .map((s: StreamItem) => ({
+            id: s.url.slice(9),
+            title: s.title,
+            author: s.uploaderName,
+            duration: convertSStoHHMMSS(s.duration),
+            channelUrl: s.uploaderUrl
+          }));
+
+        addToCollection(name, collection);
+
       })
   )).then(() => {
     setStore('snackbar', t('piped_success_imported'));

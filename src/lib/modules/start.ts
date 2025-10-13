@@ -1,8 +1,6 @@
 import { params, setNavStore, t, setStore, setPlayerStore } from '@lib/stores';
 import { config, getDownloadLink, idFromURL, fetchCollection, player } from '@lib/utils';
 
-const uma = () => fetch('https://raw.githubusercontent.com/n-ce/Uma/main/list.json')
-  .then(res => res.json());
 
 
 export default async function() {
@@ -19,12 +17,16 @@ export default async function() {
 
   const { shareAction } = config;
 
-  await uma()
-    .then(({ piped, invidious, cobalt, status }) => {
+  await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/list.json')
+    .then(res => res.json())
+    .then(data => {
       setStore('api', {
-        piped, invidious, cobalt, status,
-        index: { piped: 0, invidious: 0 }
+        piped: data.pi,
+        invidious: data.iv,
+        index: 0
       })
+      if (data.cb)
+        setStore('api', { cobalt: data.cb });
     })
     .catch(() => {
       setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');

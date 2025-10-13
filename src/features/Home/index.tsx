@@ -34,7 +34,7 @@ export default function() {
 
   const { dbsync } = config;
 
-  if (dbsync) import('../../lib/modules/cloudSync').then(mod => mod.default(dbsync, syncBtn));
+  //  if (dbsync) import('../../lib/modules/cloudSync').then(mod => mod.default(dbsync, syncBtn));
 
   return (
     <section class="home" ref={(e) => setNavStore('home', { ref: e })}>

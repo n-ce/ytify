@@ -1,5 +1,4 @@
-import { getDB, saveDB } from "@lib/utils/library";
-import { getApi } from "@lib/utils";
+import { getApi, getLists, saveLists } from "@lib/utils";
 import { store, setListStore, setStore, t, listStore } from "@lib/stores";
 
 const streamToCollectionItem = (stream: StreamItem): CollectionItem => ({
@@ -7,7 +6,7 @@ const streamToCollectionItem = (stream: StreamItem): CollectionItem => ({
   title: stream.title,
   author: stream.uploaderName,
   duration: stream.duration.toString(),
-  channelUrl: stream.uploaderUrl,
+  authorId: stream.uploaderUrl.slice(9),
 });
 
 export default async function fetchList(
@@ -31,8 +30,8 @@ export default async function fetchList(
     }
   }
 
-  const api = getApi('piped');
-  const type = url.includes('channel') ? 'channel' : 'playlist';
+  const api = getApi(store.api.invidious.length - 1);
+  const type = url.includes('channel') ? 'channels' : 'playlists';
   const musicEnforcer = url.includes('OLAK5uy');
   const group = await fetch(api + url)
     .then(res => res.json())
@@ -46,10 +45,10 @@ export default async function fetchList(
         setStore('snackbar', t('fetchlist_error'));
       else if (err.message === 'Got error: "The playlist does not exist."') {
         setStore('snackbar', t('fetchlist_nonexistent'));
-        const db = getDB();
-        if (db.playlists)
-          delete db.playlists[url.slice(11)];
-        saveDB(db);
+        const db = getLists('playlists');
+        if (db)
+          delete db[url.slice(11)];
+        saveLists('playlists', db);
       }
       else setStore('snackbar', mix ? 'No Mixes Found' : err.message)
       setListStore('isLoading', false);
@@ -68,7 +67,7 @@ export default async function fetchList(
     );
 
   const filterOutMembersOnly = (streams: StreamItem[]) =>
-    (type === 'channel' && streams.length) ? // hide members-only streams
+    (type === 'channels' && streams.length) ? // hide members-only streams
       streams.filter((s: StreamItem) => s.views !== -1) :
       streams;
 
@@ -123,7 +122,7 @@ export default async function fetchList(
   if (!useHyperpipe) {
     setListStore('name', group.name);
     setListStore('url', url);
-    setListStore('id', url.slice(type === 'playlist' ? 11 : 9));
+    setListStore('id', url.slice(type === 'playlists' ? 11 : 9));
     setListStore('thumbnail', listStore.thumbnail || group.avatarUrl || group.thumbnail || group.relatedStreams[0].thumbnail);
     setListStore('type', type);
   }
@@ -153,7 +152,7 @@ const getPlaylistIdFromArtist = (id: string): Promise<string> =>
       if (!('playlistId' in data))
         throw new Error('No Playlist Id found.');
       setListStore('id', id.slice(9));
-      setListStore('type', 'channel');
+      setListStore('type', 'channels');
       setListStore('thumbnail', listStore.thumbnail || '/a-' + data.thumbnails[0]?.url?.split('/a-')[1]?.split('=')[0]);
       return '/playlists/' + data.playlistId;
     })

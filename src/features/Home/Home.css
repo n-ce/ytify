@@ -186,3 +186,9 @@ header {
   }
 
 }
+
+.empty-library-message {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--text-color-secondary);
+}

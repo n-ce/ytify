@@ -47,7 +47,7 @@ const host = 'yt-api.p.rapidapi.com';
 export const fetcher = (keys: string[], id: string): Promise<{
   title: string,
   channelTitle: string,
-  channelId: string,
+  authorId: string,
   lengthSeconds: number,
   isLiveContent: boolean,
   adaptiveFormats: {

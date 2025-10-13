@@ -1,14 +1,18 @@
 import { For, Show, createSignal } from "solid-js";
 import { getHub, updateSubfeed, updateRelatedToYourArtists } from "@lib/modules/hub";
-import { getDB } from "@lib/utils";
+import { getCollection, getTracksMap } from "@lib/utils";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
 import { generateImageUrl, getThumbIdFromLink } from "@lib/utils";
 
 export default function() {
   const [hub, setHub] = createSignal(getHub());
-  const { history } = getDB();
-  const recents = history ? Object.values(history).reverse().slice(0, 5) : [];
+  const tracksMap = getTracksMap(); // Get all tracks
+  // Get the first 5 IDs, then map to items
+  const recents = getCollection('history')
+    .slice(0, 5)
+    .map(id => tracksMap[id])
+    .filter(Boolean) as CollectionItem[];
   const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);
   const [isRelatedLoading, setIsRelatedLoading] = createSignal(false);
 
@@ -49,7 +53,7 @@ export default function() {
                   title={item.title}
                   author={item.author}
                   duration={item.duration}
-                  channelUrl={item.channelUrl}
+                  authorId={item.authorId}
                   context='hub'
                 />
               )}
@@ -73,7 +77,7 @@ export default function() {
                   title={item.title}
                   author={item.author}
                   duration={item.duration}
-                  channelUrl={item.channelUrl}
+                  authorId={item.authorId}
                   context='hub'
                 />
               )}
@@ -97,7 +101,7 @@ export default function() {
                   title={item.title}
                   author={item.author}
                   duration={item.duration}
-                  channelUrl={item.channelUrl}
+                  authorId={item.authorId}
                   context='hub'
                 />
               )}
@@ -119,7 +123,7 @@ export default function() {
             <For each={Object.values(hub().playlists || {})}>
               {(item) => (
                 <ListItem
-                  stats={item.frequency ? `${item.frequency} plays` : ''}
+                  stats={''}
                   title={item.name}
                   url={`/playlist/${item.id}`}
                   thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
@@ -136,7 +140,7 @@ export default function() {
             <For each={Object.values(hub().artists || {})}>
               {(item) => (
                 <ListItem
-                  stats={item.frequency ? `${item.frequency} plays` : ''}
+                  stats={''}
                   title={item.name}
                   url={`/artist/${item.id}`}
                   thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
@@ -164,7 +168,7 @@ export default function() {
                   title={item.title}
                   author={item.author}
                   duration={item.duration}
-                  channelUrl={item.channelUrl}
+                  authorId={item.authorId}
                   context='hub'
                 />
               )}

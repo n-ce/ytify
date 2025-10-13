@@ -34,7 +34,8 @@ export default function(props: { onClose: () => void }) {
             setPlayerStore({
               lrcSync: (d: number) => {
                 let currentIndex = -1;
-                for (let i = 0; i < durarr.length; i++) {
+                const { length } = durarr;
+                for (let i = 0; i < length; i++) {
                   if (durarr[i] <= d) {
                     currentIndex = i;
                   } else {

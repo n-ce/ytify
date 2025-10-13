@@ -1,4 +1,4 @@
-import { getDB, saveDB, toCollection } from '@lib/utils';
+import { getTracksMap } from '@lib/utils/library';
 import { navStore, setNavStore, setStore, t } from '@lib/stores';
 import { lazy, Show } from 'solid-js';
 
@@ -11,25 +11,54 @@ export default function Dropdown(_: {
 }) {
   async function importLibrary(e: Event) {
     const importBtn = e.target as HTMLInputElement & { files: FileList };
-    const newDB = JSON.parse(await importBtn.files[0].text());
-    const oldDB = getDB();
-    if (!confirm(t('library_import_prompt'))) return;
-    for (const collection in newDB) for (const item in newDB[collection])
-      toCollection(collection, newDB[collection][item], oldDB)
-    saveDB(oldDB);
-    setStore('snackbar', t('library_imported'));
+    const importedData = JSON.parse(await importBtn.files[0].text());
+
+    if (importedData.meta) { // Check for V2 library
+      // Deconsolidate V2 library
+      for (const key in importedData) {
+        if (importedData.hasOwnProperty(key)) {
+          localStorage.setItem('library_' + key, JSON.stringify(importedData[key]));
+        }
+      }
+      setStore('snackbar', t('library_imported')); // Reusing existing translation key
+    } else { // Assume V1 library
+      localStorage.setItem('library', JSON.stringify(importedData));
+      setStore('snackbar', 'Migrating Library v1 to v2...'); // New translation key needed
+      location.reload(); // Trigger migration
+    }
   };
 
   function exportLibrary() {
     const link = document.createElement('a');
     link.download = 'ytify_library.json';
-    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(getDB(), undefined, 2))}`;
+
+    const exportedData: { [key: string]: any } = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('library_')) {
+        exportedData[key.slice(8)] = JSON.parse(localStorage.getItem(key)!);
+      }
+    }
+
+    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(exportedData, undefined, 2))}`;
     link.click();
   };
 
   function cleanLibrary() {
-    const count = Object.values(getDB()).reduce((acc, collection) => acc + Object.keys(collection).length, 0);
+    // Count items in V2 library
+    let count = 0;
+    const tracksMap = getTracksMap();
+    count = Object.keys(tracksMap).length;
+
     if (confirm(t('library_clean_prompt', count.toString()))) {
+      // Remove all V2 library_ keys
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('library_')) {
+          localStorage.removeItem(key);
+        }
+      }
+      // Also remove the old V1 library key if it still exists
       localStorage.removeItem('library');
       location.reload();
     }

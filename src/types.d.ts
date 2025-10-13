@@ -42,23 +42,23 @@ declare global {
     title: string,
     author: string,
     duration: string
-    channelUrl: string,
-    lastUpdated?: string
+    authorId: string,
   }
 
   type List = Playlist;
   type Collection = { [index: string]: CollectionItem };
 
-  interface Playlist {
+  interface Channel {
     id: string,
     name: string,
     thumbnail: string
   };
-  interface Channel extends Playlist { uploader: string };
+  interface Playlist extends Channel { uploader: string };
 
   interface Meta {
     version: number,
-    [index: string]: string
+    tracks: number,
+    [index: string]: number
   }
 
   type Playlists = {
@@ -66,16 +66,6 @@ declare global {
   }
   type Channels = {
     [index: string]: Channel
-  }
-
-  type Tracks = { [index: string]: CollectionItem };
-
-  type Library = {
-    history?: { [index: string]: CollectionItem },
-    favorites?: { [index: string]: CollectionItem }, listenLater?: { [index: string]: CollectionItem },
-    channels?: { [index: string]: Playlist & { uploader: string } },
-    playlists?: { [index: string]: Playlist },
-    [index: string]: { [index: string]: CollectionItem }
   }
 
   type APAC = 'albums' | 'playlists' | 'artists' | 'channels';
@@ -142,6 +132,7 @@ declare global {
     channelUrl?: string,
     views?: string,
     img?: string,
+    albumId?: string,
     type: 'stream' | 'video',
   }
 

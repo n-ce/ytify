@@ -1,21 +1,17 @@
 
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
-import { getDB } from "../utils";
+import { getLists } from "../utils";
 
-type Hublist = List & {
-  frequency?: number;
-}
 
 type Hub = {
-  discovery: { [index: string]: CollectionItem & { frequency: number } };
-  playlists: { [index: string]: Hublist & { uploader: string } };
-  artists: { [index: string]: Hublist };
+  discovery?: { [index: string]: CollectionItem & { frequency: number } };
+  playlists: Playlists;
+  artists: Channels;
   foryou: { [index: string]: CollectionItem & { frequency: number } };
   subfeed: { [index: string]: CollectionItem };
 };
 
-const HUB_STORAGE_KEY = 'hub';
 
 const initialHub: Hub = {
   discovery: {},
@@ -26,12 +22,12 @@ const initialHub: Hub = {
 };
 
 export function getHub(): Hub {
-  const hubData = localStorage.getItem(HUB_STORAGE_KEY);
+  const hubData = localStorage.getItem('hub');
   return hubData ? JSON.parse(hubData) : initialHub;
 }
 
-export function updateHub(data: Hub): void {
-  localStorage.setItem(HUB_STORAGE_KEY, JSON.stringify(data));
+export function updateHub(data: Hub) {
+  localStorage.setItem('hub', JSON.stringify(data));
 }
 
 export function getHubSection<K extends keyof Hub>(sectionName: K): Hub[K] {
@@ -58,18 +54,15 @@ export function clearHubSection(sectionName: keyof Hub): void {
 
 
 export async function updateSubfeed(): Promise<void> {
-  const { channels } = getDB();
-  const channelIds = channels ? Object.keys(channels) : [];
-  return subfeedGenerator(channelIds).then((items) => {
+  return subfeedGenerator('?preview=1').then((items) => {
     const subfeed: { [index: string]: CollectionItem } = {};
-    items.forEach((item) => {
-      const videoId = item.url.slice(-11);
-      subfeed[videoId] = {
-        id: videoId,
+    items.forEach((item: CollectionItem) => {
+      subfeed[item.id] = {
+        id: item.id,
         title: item.title,
-        author: item.uploaderName,
-        duration: convertSStoHHMMSS(item.duration),
-        channelUrl: item.uploaderUrl,
+        author: item.author,
+        duration: convertSStoHHMMSS(item.duration as unknown as number),
+        authorId: item.authorId,
       };
     });
     updateHubSection('subfeed', subfeed);
@@ -92,14 +85,14 @@ type ArtistEdgeResponse = {
 };
 
 export async function updateRelatedToYourArtists(): Promise<void> {
-  const { channels } = getDB();
+  const channels = getLists('channels');
   const artistIds = channels ? Object.keys(channels).filter(id => channels[id].name.includes('Artist - ')) : [];
 
   const promises = artistIds.map(id => fetch(`https://ytm-jgmk.onrender.com/api/artist/${id}`).then(res => res.json() as Promise<ArtistEdgeResponse>));
 
   return Promise.all(promises).then(results => {
-    const relatedArtists: { [index: string]: Hublist } = {};
-    const featuredPlaylists: { [index: string]: Hublist & { uploader: string } } = {};
+    const relatedArtists = {} as Channels;
+    const featuredPlaylists = {} as Playlists;
 
     results.forEach(result => {
       if (!result) return;

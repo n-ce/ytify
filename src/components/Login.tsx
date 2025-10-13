@@ -20,7 +20,7 @@ export default function() {
       <span>
         <button onclick={() => {
 
-          fetch("/cloudsync", {
+          fetch("/cs/hash", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

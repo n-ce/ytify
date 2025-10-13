@@ -2,7 +2,7 @@ import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { setNavStore, setPlayerStore, setStore } from '@lib/stores';
+import { setNavStore, setPlayerStore, setStore, store } from '@lib/stores';
 
 export default function(data: {
   id: string,
@@ -10,12 +10,12 @@ export default function(data: {
   author?: string,
   duration: string,
   uploaded?: string,
-  channelUrl?: string,
+  authorId?: string,
   views?: string,
   img?: string,
+  albumId?: string,
   draggable?: boolean,
-  lastUpdated?: string,
-  context?: 'search' | 'collection' | 'channel' | 'playlist' | 'hub' | 'link',
+  context?: 'search' | 'collection' | 'channels' | 'playlists' | 'hub' | 'link',
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
@@ -91,11 +91,18 @@ export default function(data: {
           setStore('actionsMenu', {
             id: data.id,
             title: data.title,
-            author: data.author || '',
+            author: data.author,
             duration: data.duration,
-            channelUrl: data.channelUrl || '',
-            lastUpdated: data.lastUpdated || new Date().toISOString()
+            authorId: data.authorId,
           });
+
+
+          const { albumId } = data;
+          if (store.actionsMenu?.albumId)
+            setStore('actionsMenu', 'albumId', undefined);
+          if (albumId)
+            setStore('actionsMenu', 'albumId', albumId);
+
         }
       }}
     >

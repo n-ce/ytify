@@ -12,10 +12,9 @@ const initialState = () => ({
   list: [] as CollectionItem[],
   length: 0,
   reservedCollections: ['history', 'favorites', 'listenLater', 'channels', 'playlists'],
-  addToCollectionOptions: [] as string[],
   name: '',
   url: '',
-  type: 'collection' as 'channel' | 'playlist' | 'collection',
+  type: 'collection' as 'channels' | 'playlists' | 'collection',
   id: '',
   uploader: '',
   thumbnail: '',
@@ -28,7 +27,7 @@ export const [listStore, setListStore] = createStore(initialState());
 export async function getList(url: string) {
   const { api } = store;
   const { piped, index } = api;
-  console.log(piped[index.piped], url)
+  console.log(piped[index], url)
 
 }
 

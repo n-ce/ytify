@@ -1,5 +1,5 @@
 import { playerStore } from "@lib/stores";
-import { convertSStoHHMMSS, getDB } from "@lib/utils";
+import { convertSStoHHMMSS, getCollection } from "@lib/utils";
 import { getHub, updateHub } from "./hub";
 
 export default function(
@@ -9,7 +9,6 @@ export default function(
   if (id !== playerStore.stream.id) return;
 
   const hub = getHub();
-  const db = getDB();
 
   if (!hub.discovery)
     hub.discovery = {};
@@ -24,14 +23,17 @@ export default function(
       const rsId = stream.url.slice(9);
 
       // merges previous discover items with current related streams
+      if (!hub.discovery) return;
+
       hub.discovery?.hasOwnProperty(rsId) ?
         (hub.discovery[rsId].frequency)++ :
         hub.discovery[rsId] = {
+
           id: rsId,
           title: stream.title,
           author: stream.uploaderName,
           duration: convertSStoHHMMSS(stream.duration),
-          channelUrl: stream.uploaderUrl,
+          authorId: stream.uploaderUrl.slice(9),
           frequency: 1
         }
     });
@@ -46,7 +48,8 @@ export default function(
   }
 
   // remove if exists in history
-  array = array.filter(e => !db.history?.hasOwnProperty(e[0]));
+  const history = getCollection('history');
+  array = array.filter(e => history.includes(e[0]));
 
   // randomly remove items from array when limit crossed
   let len = array.length;

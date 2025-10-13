@@ -3,8 +3,7 @@ import { handleXtags, preferredStream, proxyHandler } from "@lib/utils";
 
 export default async function(
   audioStreams: AudioStream[],
-  isLive = false,
-  prefetchNode: HTMLAudioElement | undefined = undefined
+  prefetchNode?: HTMLAudioElement
 ) {
   if (!prefetchNode)
     setPlayerStore('status', t('player_audiostreams_setup'));
@@ -12,11 +11,7 @@ export default async function(
   const noOfBitrates = audioStreams.length;
 
   if (!noOfBitrates) {
-    setPlayerStore('status', t(
-      isLive ?
-        'player_livestreams_hls' :
-        'player_audiostreams_null'
-    ));
+    setPlayerStore('status', t('player_audiostreams_null'));
     setPlayerStore('playbackState', 'none');
     return;
   }

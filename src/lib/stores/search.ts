@@ -12,7 +12,7 @@ const createInitialState = () => ({
   isLoading: false,
   page: 1,
   suggestions: {
-    data: [] as string[],
+    data: localStorage.getItem('searched')?.split(',') || [],
     index: -1,
     controller: new AbortController()
   },
@@ -33,6 +33,9 @@ export function getSearchSuggestions(text: string) {
     setSearchStore('suggestions', 'data', []);
     return;
   }
+
+  setSearchStore('page', 1);
+  setSearchStore('suggestions', 'index', -1);
 
   searchStore.suggestions.controller.abort();
   const newController = new AbortController();
@@ -61,12 +64,24 @@ export async function getSearchResults() {
   setSearchStore('suggestions', 'data', []);
   observer.disconnect();
 
+  const recentSearches = localStorage.getItem('searched')?.split(',') || [];
+
+  if (recentSearches.length === 5)
+    recentSearches.shift();
+
+  if (!recentSearches.includes(query))
+    recentSearches.push(query);
+
+  localStorage.setItem('searched', recentSearches.join(','));
+
+
+
   const isMusic = searchFilter.startsWith('music_');
 
   const getData = (): Promise<(YTStreamItem | YTListItem)[]> => {
-    if (isMusic) {
+    if (isMusic)
       return fetchYTMusicSearchResults(query);
-    } else {
+    else {
       let invidiousIndex = store.api.invidious.length - 1;
       const fetcher = (): Promise<(YTStreamItem | YTListItem)[]> =>
         fetchYoutubeSearchResults(
@@ -78,9 +93,8 @@ export async function getSearchResults() {
           if (invidiousIndex > 0) {
             invidiousIndex--;
             return fetcher();
-          } else {
-            throw e;
-          }
+          } else throw e;
+
         });
       return fetcher();
     }
@@ -93,13 +107,15 @@ export async function getSearchResults() {
         setSearchStore('page', page + 1);
         const callback = async () => {
           const moreData = await fetchYoutubeSearchResults(
-            api.invidious[api.index.invidious],
+            api.invidious[api.invidious.length - 1],
             query,
             searchFilter,
             searchStore.page
           );
           if (moreData) {
-            setSearchStore('results', [...searchStore.results, ...moreData]);
+            const existingIds = new Set(searchStore.results.map(item => 'id' in item ? item.id : item.url));
+            const uniqueMoreData = moreData.filter(item => !existingIds.has('id' in item ? item.id : item.url));
+            setSearchStore('results', [...searchStore.results, ...uniqueMoreData]);
             setSearchStore('page', searchStore.page + 1);
           }
         };

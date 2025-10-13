@@ -1,30 +1,32 @@
-import { setListStore, store } from "@lib/stores";
+import { setListStore, setStore } from "@lib/stores";
+import { getLists } from "@lib/utils";
 
-export default async function(channels: string[]) {
+export default async function(preview?: string) {
 
   setListStore('isLoading', true);
-  const { piped } = store.api;
-  const current = Date.now();
-  const twoWeeksMs = 2 * 7 * 24 * 60 * 60 * 1000;
-  const items: StreamItem[] = [];
-  const fetcher = (apis: string) => fetch(apis + '/feed/unauthenticated?channels=' + channels.join(','))
-    .then(res => res.json())
-    .then((data: StreamItem[]) => {
-      if (data?.length) {
-        const isLong = data.filter(i => i.duration > 90);
-        isLong
-          .filter(i => !items.find(v => i.url === v.url))
-          .forEach(i => items.push(i));
-      }
-    })
-    .catch(() => []);
+  const api = 'https://js-ruddy-rho.vercel.app';
+  const endpoint = '/api/feed/channels=';
+  const channels = getLists('channels');
+  const list = [];
 
-  return Promise
-    .all(piped.map(fetcher))
-    .then(() => items
-      .filter(i => (current - i.uploaded) < twoWeeksMs)
-      .sort((a, b) => b.uploaded - a.uploaded)
-    )
+  for (const id in channels) {
+    if (!channels[id].name.startsWith('Artist'))
+      list.push(id);
+  }
+
+
+  return fetch(api + endpoint + list.join(',') + preview)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.length)
+        throw new Error(data.message);
+      return data?.filter((i: { duration: number }) => i.duration > 90);
+
+    })
+    .catch(e => {
+      setStore('snackbar', e.message || 'Error');
+      return [];
+    })
     .finally(() => {
       setListStore('isLoading', true);
     });

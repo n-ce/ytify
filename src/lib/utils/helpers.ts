@@ -13,10 +13,9 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 
 export const getApi = (
-  type: 'piped' | 'invidious',
-  index: number = store.api.index.piped
+  index: number = store.api.index
 ) =>
-  store.api[type][index];
+  store.api.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -34,27 +33,30 @@ export const fetchJson = async <T>(
   signal?: AbortSignal
 ): Promise<T> => fetch(url, { signal })
   .then(res => {
-    if (!res.ok) {
+    if (!res.ok)
       throw new Error(`Network response was not ok: ${res.statusText}`);
-    }
     return res.json() as Promise<T>;
   });
 
 
-export function proxyHandler(url: string, prefetch: boolean = false) {
+export function proxyHandler(
+  url: string,
+  prefetch: boolean = false
+) {
   const isVideo = Boolean(document.querySelector('video'));
-  const useProxy = config.enforceProxy || playerStore.stream.author.endsWith('- Topic') && !isVideo && store.api.status === 'P';
-  store.api.index.piped = 0;
+  console.log(playerStore.stream.author);
+  const useProxy = playerStore.stream.author.endsWith('- Topic') && !isVideo;
+
+
   if (!prefetch)
     setPlayerStore('status', t('player_audiostreams_insert'));
+
   const link = new URL(url);
-  const origin = link.origin.slice(8);
-  const host = link.searchParams.get('host');
+  const origin = link.origin;
+  const proxy = getApi(0);
 
   return useProxy ?
-    (url + (host ? '' : `&host=${origin}`)) :
-    host
-      ? url.replace(origin, host) : url;
+    url.replace(origin, proxy) : url;
 }
 
 
@@ -130,7 +132,9 @@ export function handleXtags(audioStreams: AudioStream[]) {
 export async function getDownloadLink(id: string): Promise<string | null> {
   const streamUrl = 'https://youtu.be/' + id;
   let dl = '';
-  dl = await fetch(store.api.cobalt, {
+  const api = store.api.cobalt;
+  if (!api) return '';
+  dl = await fetch(api, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({

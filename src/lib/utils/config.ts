@@ -1,5 +1,4 @@
 export let config = {
-  enforceProxy: false,
   home: '',
   stableVolume: false,
   prefetch: false,

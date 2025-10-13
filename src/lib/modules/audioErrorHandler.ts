@@ -1,6 +1,5 @@
 import { setStore, store } from '@lib/stores/app.ts';
 import { playerStore, setPlayerStore } from '@lib/stores/player.ts';
-import { getDownloadLink } from '@lib/utils/helpers.ts';
 
 export default function(
   audio: HTMLAudioElement,
@@ -20,17 +19,17 @@ export default function(
     }
     return;
   }
-  console.log(audio.src);
+  console.log('ErrorHandler: ' + audio.src);
 
-  if (index.invidious < invidious.length) {
-    const proxy = invidious[index.invidious];
+  if (index < invidious.length) {
+    const proxy = invidious[index];
     if (!prefetch)
       setPlayerStore('status', `Switching proxy to ${proxy.slice(8)}`);
     audio.src = audio.src.replace(origin, proxy);
-    setStore('api', 'index', 'invidious', index.invidious + 1)
+    setStore('api', 'index', index + 1)
   }
   else {
-    setStore('api', 'index', 'invidious', 0);
+    setStore('api', 'index', 0);
 
     if (!prefetch) {
       setStore('snackbar', message);
@@ -42,21 +41,12 @@ export default function(
       .then(res => res.json())
       .then(data => {
         import('./setAudioStreams.ts')
-          .then(mod => mod.default(data.audioStreams, data.livestream, audio));
+          .then(mod => mod.default(data.audioStreams, audio));
       })
-      .catch(useCobalt);
-
-    function useCobalt() {
-      getDownloadLink(id)
-        .then(_ => {
-          if (_) audio.src = _;
-          else throw new Error();
-        })
-        .catch(() => {
-          if (!prefetch)
-            setPlayerStore('playbackState', 'none');
-        })
-    }
+      .catch(() => {
+        if (!prefetch)
+          setPlayerStore('playbackState', 'none');
+      })
 
   }
 }

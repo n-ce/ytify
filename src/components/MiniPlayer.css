@@ -71,7 +71,8 @@ footer {
     margin-right: var(--size-2);
   }
 
-  .ri-heart-line {
+  .ri-heart-line,
+  .ri-heart-fill {
     font-size: var(--size-6);
   }
 

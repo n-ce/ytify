@@ -1,5 +1,5 @@
 import { For, Show } from "solid-js";
-import { generateImageUrl, getDB, getThumbIdFromLink } from "@lib/utils";
+import { generateImageUrl, getLists, getThumbIdFromLink } from "@lib/utils";
 import { t } from "@lib/stores";
 import ListItem from "@components/ListItem";
 
@@ -7,7 +7,6 @@ export default function(_: {
   flag: APAC
 }) {
 
-  const db = getDB();
   let type = _.flag;
   let len = 0;
 
@@ -25,7 +24,7 @@ export default function(_: {
 
 
   const array = [];
-  const pls = db[type] as { [index: string]: Record<'name' | 'uploader' | 'thumbnail' | 'id', string> };
+  const pls = getLists(type as 'channels' | 'playlists'); // Removed redundant cast
 
   for (const pl in pls) {
     const name = pls[pl].name;
@@ -40,10 +39,11 @@ export default function(_: {
     array.push({
       type: type.slice(0, -1),
       name: name.slice(len),
-      uploaderName: pls[pl].uploader,
+      uploaderName: (pls[pl] as Playlist).uploader,
       url: `/${type === 'channels' ? type.slice(0, -1) : type}/` + pls[pl].id,
       thumbnail: pls[pl].thumbnail
     });
+
   }
 
   const icons = {

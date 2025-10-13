@@ -1,8 +1,8 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { openFeature, listStore, resetList, setQueueStore } from '@lib/stores';
-import { getDB, removeFromCollection, saveDB } from '@lib/utils';
+import { openFeature, listStore, resetList, setQueueStore, setListStore } from '@lib/stores';
+import { getCollection, getTracksMap, metaUpdater, removeFromCollection } from '@lib/utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 
@@ -24,15 +24,14 @@ export default function() {
         onUpdate(e: SortableEvent) {
           if (e.oldIndex == null || e.newIndex == null) return;
           const collection = listStore.id;
-          const db = getDB();
-          const dataArray = Object.entries(db[collection]);
-          const [oldKey, oldItem] = dataArray.splice(e.oldIndex, 1)[0];
-          dataArray.splice(
-            e.newIndex, 0,
-            [oldKey, oldItem]
-          );
-          db[collection] = Object.fromEntries(dataArray);
-          saveDB(db);
+          const dataArray = getCollection(collection);
+          const [removedId] = dataArray.splice(e.oldIndex, 1);
+          dataArray.splice(e.newIndex, 0, removedId);
+          localStorage.setItem('library_' + collection, JSON.stringify(dataArray));
+          metaUpdater(collection);
+          const tracks = getTracksMap();
+          setListStore('list', dataArray.map(id => tracks[id]));
+
         }
       });
     }
@@ -55,9 +54,7 @@ export default function() {
       <i
         class="ri-indeterminate-circle-line"
         onclick={() => {
-          markList().forEach(id => {
-            removeFromCollection(listStore.name, id);
-          });
+          removeFromCollection(listStore.name, markList());
         }}
       ></i>
       <i

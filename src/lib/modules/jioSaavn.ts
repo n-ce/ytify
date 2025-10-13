@@ -31,7 +31,6 @@ export default function() {
       })[config.quality] || '_320';
 
       audio.src = song.downloadUrl.replace('_96', desiredBitrateSuffix);
-      console.log(audio.src);
       updateParam('s', id);
 
     })

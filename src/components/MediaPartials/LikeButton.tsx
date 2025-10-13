@@ -1,19 +1,30 @@
 import { playerStore } from '@lib/stores';
-import { addToCollection, getDB, removeFromCollection } from '@lib/utils/library';
+import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
+import { createEffect, createSignal } from 'solid-js';
 
 export default function() {
 
-  const favState = () => getDB().favorites?.hasOwnProperty(playerStore.stream.id);
+  const [isFav, setFav] = createSignal(false);
+
+  createEffect(() => {
+    const { id } = playerStore.stream;
+
+    setFav(getCollection('favorites').includes(id));
+
+  })
 
   return (
     <i
       aria-label="player_like"
-      class={`ri-heart-${favState() ? 'fill' : 'line'}`}
-      onclick={async () => {
-        if (favState())
-          addToCollection('favorites', playerStore.stream)
+      class={`ri-heart-${isFav() ? 'fill' : 'line'}`}
+      onclick={async (e) => {
+        e.stopPropagation();
+        if (isFav())
+          removeFromCollection('favorites', [playerStore.stream.id]);
         else
-          removeFromCollection('favorites', playerStore.stream.id);
+          addToCollection('favorites', [playerStore.stream]);
+
+        setFav(!isFav());
       }}
     ></i>
 

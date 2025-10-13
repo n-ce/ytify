@@ -3,7 +3,7 @@ import { playerStore, setNavStore, setPlayerStore, setStore, store, updateParam 
 import { config } from "./config";
 
 let playerAbortController: AbortController;
-export async function player(id: string | null = '') {
+export async function player(id?: string) {
 
   if (playerAbortController)
     playerAbortController.abort();
@@ -28,12 +28,14 @@ export async function player(id: string | null = '') {
   else if (playerStore.stream.author.endsWith('Topic'))
     return import('../modules/jioSaavn').then(mod => mod.default());
 
+  if (!store.api.invidious.length)
+    setStore('snackbar', 'No Instances are Available');
 
   const data = await import('../modules/getStreamData').then(mod => mod.default(id, false, playerAbortController.signal));
 
   if (data && 'audioStreams' in data)
     setPlayerStore({
-      data: data,
+      data,
       fullDuration: data.duration
     });
   else {
@@ -46,21 +48,20 @@ export async function player(id: string | null = '') {
   }
 
 
-  import('../modules/setMetadata')
+  await import('../modules/setMetadata')
     .then(mod => mod.default({
       id: id,
       title: data.title,
       author: data.uploader,
       duration: convertSStoHHMMSS(data.duration),
-      channelUrl: data.uploaderUrl
+      authorId: data.uploaderUrl.slice(9)
     }));
 
   import('../modules/setAudioStreams')
     .then(mod => mod.default(
       data.audioStreams
         .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-        ),
-      data.livestream
+        )
     ));
 
 

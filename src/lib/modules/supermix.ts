@@ -37,7 +37,7 @@ export default async function(ids: string[]) {
       id: s.url.substring(9),
       title: s.title,
       author: s.uploaderName,
-      channelUrl: s.uploaderUrl,
+      authorId: s.uploaderUrl.slice(9),
       duration: convertSStoHHMMSS(s.duration)
     }))
     .forEach(obj => {

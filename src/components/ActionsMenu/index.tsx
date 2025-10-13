@@ -61,27 +61,28 @@ export default function() {
 
 
 
+        <Show when={store.api.cobalt}>
+          <li tabindex="4" onclick={async () => {
+            const id = store?.actionsMenu?.id;
 
-        <li tabindex="4" onclick={async () => {
-          const id = store?.actionsMenu?.id;
 
-
-          if (!id) {
-            setStore('snackbar', 'id not found');
-            return;
-          }
-          setStore('snackbar', t('actions_menu_download_init'));
-          const a = document.createElement('a');
-          const l = await getDownloadLink(id);
-          if (l) {
-            a.href = l;
-            a.click();
-          }
-          closeDialog();
-        }}>
-          <i class="ri-download-2-fill"></i>
-          {t('actions_menu_download')}
-        </li>
+            if (!id) {
+              setStore('snackbar', 'id not found');
+              return;
+            }
+            setStore('snackbar', t('actions_menu_download_init'));
+            const a = document.createElement('a');
+            const l = await getDownloadLink(id);
+            if (l) {
+              a.href = l;
+              a.click();
+            }
+            closeDialog();
+          }}>
+            <i class="ri-download-2-fill"></i>
+            {t('actions_menu_download')}
+          </li>
+        </Show>
 
         <li tabindex="5" onclick={() => {
           const author = store.actionsMenu?.author;
@@ -101,6 +102,16 @@ export default function() {
             'actions_menu_view_channel')
           }
         </li>
+
+        <Show when={store.actionsMenu?.albumId}>
+
+          <li tabindex="6" onclick={() => {
+          }}>
+            <i class="ri-album-fill"></i>View Album
+          </li>
+
+        </Show>
+
 
 
         <Show when={!isMusic}>
