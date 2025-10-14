@@ -30,7 +30,7 @@ export default async function fetchList(
     }
   }
 
-  const api = getApi(store.api.invidious.length - 1);
+  const api = getApi(store.invidious.length - 1);
   const type = url.includes('channel') ? 'channels' : 'playlists';
   const musicEnforcer = url.includes('OLAK5uy');
   const group = await fetch(api + url)

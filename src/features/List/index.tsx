@@ -1,10 +1,14 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { openFeature, listStore, resetList, setQueueStore, setListStore } from '@lib/stores';
-import { getCollection, getTracksMap, metaUpdater, removeFromCollection } from '@lib/utils';
+import { addToQueue, openFeature, listStore, resetList, setListStore, setNavStore, closeFeature } from '@lib/stores';
+import { metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
+import { setConfig, config } from '@lib/utils/config';
 import Dropdown from './Dropdown';
 import Results from './Results';
+import { useSortedList } from './useSortedList';
+
+type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
 
 export default function() {
   let listSection!: HTMLElement;
@@ -13,31 +17,39 @@ export default function() {
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
   const [showSortMenu, setShowSortMenu] = createSignal(false);
+  const [localSortOrder, setLocalSortOrder] = createSignal<SortOrder>(config.sortOrder);
+
+  const sortedList = useSortedList(localSortOrder);
 
   onMount(() => {
     openFeature('list', listSection);
     listSection.scrollTo(0, 0);
+    closeFeature('home');
 
     if (listContainerRef) {
       new Sortable(listContainerRef, {
         handle: '.ri-draggable',
         onUpdate(e: SortableEvent) {
           if (e.oldIndex == null || e.newIndex == null) return;
-          const collection = listStore.id;
-          const dataArray = getCollection(collection);
-          const [removedId] = dataArray.splice(e.oldIndex, 1);
-          dataArray.splice(e.newIndex, 0, removedId);
-          localStorage.setItem('library_' + collection, JSON.stringify(dataArray));
-          metaUpdater(collection);
-          const tracks = getTracksMap();
-          setListStore('list', dataArray.map(id => tracks[id]));
 
+          setListStore('list', (currentList) => {
+            const newList = [...currentList];
+            const [removedItem] = newList.splice(e.oldIndex!, 1);
+            newList.splice(e.newIndex!, 0, removedItem);
+
+            const collection = listStore.id;
+            const dataArray = newList.map(item => item.id);
+            saveCollection(collection, dataArray);
+            metaUpdater(collection);
+
+            return [...newList];
+          });
         }
       });
     }
 
-
   });
+
 
   const MarkBar = () => (
     <div class="markBar">
@@ -55,6 +67,7 @@ export default function() {
         class="ri-indeterminate-circle-line"
         onclick={() => {
           removeFromCollection(listStore.name, markList());
+          setListStore('list', l => l.filter(item => !markList().includes(item.id)));
         }}
       ></i>
       <i
@@ -63,8 +76,10 @@ export default function() {
 
           const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
 
-          if (listToEnqueue.length)
-            setQueueStore('list', (list) => [...list, ...listToEnqueue])
+          if (listToEnqueue.length) {
+            addToQueue(listToEnqueue);
+            setNavStore('queue', 'state', true);
+          }
 
         }}
       ></i>
@@ -108,12 +123,15 @@ export default function() {
       <Show when={showSortMenu()}>
         <span>
           <label for="sortMenu">Sort Order :</label>
-          <select id="sortMenu">
-            <option>Original</option>
-            <option>Last Updated</option>
-            <option>Name</option>
-            <option>Artist</option>
-            <option>Duration</option>
+          <select id="sortMenu" onchange={(e) => {
+            const newSortOrder = e.target.value as SortOrder;
+            setLocalSortOrder(newSortOrder);
+            setConfig('sortOrder', newSortOrder);
+          }} value={localSortOrder()}>
+            <option value="modified">Modified</option>
+            <option value="name">Name</option>
+            <option value="artist">Artist</option>
+            <option value="duration">Duration</option>
           </select>
         </span>
 
@@ -121,7 +139,8 @@ export default function() {
       <br />
       <Results
         ref={listContainerRef}
-        draggable={showSortMenu()}
+        draggable={localSortOrder() === 'modified' && showSortMenu()}
+        list={sortedList()}
         mark={{
           mode: markMode,
           set: (id: string) => {

@@ -1,8 +1,8 @@
 import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { config, hostResolver, player } from '@lib/utils';
+import { config, hostResolver, player, removeFromCollection } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { setNavStore, setPlayerStore, setStore, store } from '@lib/stores';
+import { setNavStore, setPlayerStore, setStore, store, setQueueStore } from '@lib/stores';
 
 export default function(data: {
   id: string,
@@ -15,12 +15,16 @@ export default function(data: {
   img?: string,
   albumId?: string,
   draggable?: boolean,
-  context?: 'search' | 'collection' | 'channels' | 'playlists' | 'hub' | 'link',
+  context?: {
+    src: Context,
+    id: string
+  },
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
     get: (id: string) => boolean
-  }
+  },
+  removeMode?: boolean
 }) {
 
   const [getImage, setImage] = createSignal('');
@@ -38,9 +42,10 @@ export default function(data: {
     }
     if (src.includes('webp'))
       setImage(src.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
-    else { // most likely been removed from yt so remove it 
-      parent.classList.add('delete');
-      parent.click();
+    else {
+      // most likely been removed from yt so remove it
+      if (data.context)
+        removeFromCollection(data.context?.id, [data.id])
     }
   }
 
@@ -67,12 +72,18 @@ export default function(data: {
       class='streamItem'
       classList={{
         'ravel': config.loadImage,
-        'marked': data.mark?.get(data.id)
+        'marked': data.mark?.get(data.id),
+        'delete': data.removeMode
       }}
       href={hostResolver('/watch?v=' + data.id)}
       ref={parent}
       onclick={(e) => {
         e.preventDefault();
+
+        if (data.removeMode) {
+          setQueueStore('list', (list) => list.filter((item) => item.id !== data.id));
+          return;
+        }
 
         if (data.mark?.mode()) {
           data.mark.set(data.id);
@@ -81,11 +92,21 @@ export default function(data: {
 
         if (!e.target.classList.contains('ri-more-2-fill')) {
           setPlayerStore('stream', data);
-          setPlayerStore('context', data.context || 'link');
+          if (data.context)
+            setPlayerStore('context', {
+              id: data.context.id,
+              src: data.context.src
+            });
           const isPortrait = matchMedia('(orientation:portrait)').matches;
           if (isPortrait || config.landscapeSections === '1')
             setNavStore('player', 'state', false);
           player(data.id);
+          if (data.context?.src === 'queue') {
+            const indexToRemove = parseInt(data.context.id, 10);
+            setQueueStore('list', (list) =>
+              list.splice(indexToRemove, 1)
+            );
+          }
         }
         else {
           setStore('actionsMenu', {

@@ -13,9 +13,9 @@ export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((w
 
 
 export const getApi = (
-  index: number = store.api.index
+  index: number = store.index
 ) =>
-  store.api.invidious[index];
+  store.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -129,12 +129,52 @@ export function handleXtags(audioStreams: AudioStream[]) {
     .filter(isOriginal);
 }
 
-export async function getDownloadLink(id: string): Promise<string | null> {
+interface CobaltSuccessResponse {
+  status: 'success';
+  url: string;
+}
+
+interface CobaltTunnelResponse {
+  audio: object;
+  bitrate: string;
+  copy: boolean;
+  cover: boolean;
+  cropCover: boolean;
+  format: string;
+  isHLS: boolean;
+  output: {
+    filename: string;
+    metadata: {
+      album: string;
+      artist: string;
+      copyright: string;
+      date: string;
+      title: string;
+    };
+    type: string;
+  };
+  service: string;
+  status: string;
+  tunnel: string[];
+  type: 'audio';
+}
+
+interface CobaltErrorResponse {
+  status: 'error';
+  error: {
+    code: string;
+  };
+}
+
+type CobaltResponse = CobaltSuccessResponse | CobaltTunnelResponse | CobaltErrorResponse;
+
+export function getDownloadLink(id: string): void {
+  setStore('snackbar', t('actions_menu_download_init'));
   const streamUrl = 'https://youtu.be/' + id;
-  let dl = '';
-  const api = store.api.cobalt;
-  if (!api) return '';
-  dl = await fetch(api, {
+  const api = 'https://cobalt-api.meowing.de';
+  if (!api) return;
+
+  fetch(api, {
     method: 'POST',
     headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -144,17 +184,35 @@ export async function getDownloadLink(id: string): Promise<string | null> {
       filenameStyle: 'basic'
     })
   })
-    .then(_ => _.json())
-    .then(_ => {
-      if ('url' in _)
-        return _.url;
-      else throw new Error(_.error.code);
+    .then(response => response.json() as Promise<CobaltResponse>)
+    .then(async data => {
+      let url: string | undefined;
+      let filename = '';
+
+      if ('tunnel' in data && data.tunnel.length > 0) {
+        url = data.tunnel[0];
+        filename = data.output.filename;
+        await navigator?.clipboard?.writeText(filename);
+        setStore('snackbar', 'Filename copied to clipboard');
+
+      } else if ('url' in data) {
+        url = data.url;
+      } else if ('error' in data) {
+        throw new Error(data.error?.code || 'Invalid response from download server');
+      }
+
+      if (url) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+      } else {
+        throw new Error('No download link found');
+      }
     })
     .catch(e => {
       setStore('snackbar', e.message);
-    })
-
-  return dl || '';
+    });
 }
 
 

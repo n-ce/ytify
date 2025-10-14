@@ -58,13 +58,13 @@
     }
 
     .suggestions {
-      width: calc(100dvmin - calc(var(--gap) * 2));
+      width: calc(100% + var(--border-size-1));
       max-height: var(--size-fluid-8);
-      position: fixed;
+      position: absolute;
       z-index: 5;
       list-style-type: none;
       padding: 0;
-      top: calc(var(--size-10) + var(--size-4));
+      top: calc(var(--size-7) + var(--size-1));
       margin-left: calc(0rem - var(--gap) - calc(var(--border-size-1) / 2));
       background-color: var(--scheme);
       border: var(--border);

@@ -2,7 +2,7 @@ import { createEffect, createSignal, lazy, onMount, Show } from "solid-js"
 import './Player.css'
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "@components/MediaPartials";
 import { config, convertSStoHHMMSS, cssVar } from "@lib/utils";
-import { closeFeature, navStore, openFeature, params, playerStore, setNavStore, setPlayerStore, setStore, t, updateParam } from "@lib/stores";
+import { closeFeature, navStore, openFeature, params, playerStore, playPrev, queueStore, setNavStore, setPlayerStore, setStore, t, updateParam } from "@lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 const Lyrics = lazy(() => import('./Lyrics'));
@@ -30,6 +30,7 @@ export default function() {
       cssVar('--player-bg', `url(${mediaArtwork})`);
   });
 
+
   const msn = 'mediaSession' in navigator;
 
   function updatePositionState() {
@@ -42,6 +43,18 @@ export default function() {
       });
   }
 
+
+  function getContext() {
+    const { id, src } = playerStore.context;
+
+    if (src === 'collection')
+      return id;
+    else
+      return src[0].toUpperCase() + src.slice(1);
+
+  }
+
+
   return (
     <section
       id="playerSection"
@@ -53,7 +66,7 @@ export default function() {
       </Show>
 
       <header class="topShelf">
-        <p>from {((a = playerStore.context) => a[0].toUpperCase() + a.slice(1))()}</p>
+        <p>from {getContext()}</p>
 
         <div class="right-group">
           <i
@@ -106,11 +119,15 @@ export default function() {
         </span>
 
         <div class="mainShelf">
-          <button
-            aria-label={t('player_play_previous')}
-            class="ri-skip-back-line"
-            id="playPrevButton"
-          ></button>
+
+          <Show when={playerStore.history.length}>
+            <button
+              aria-label={t('player_play_previous')}
+              class="ri-skip-back-line"
+              id="playPrevButton"
+              onclick={playPrev}
+            ></button>
+          </Show>
 
           <button
             aria-label={t('player_seek_backward')}
@@ -131,8 +148,9 @@ export default function() {
               playerStore.audio.currentTime += 15;
             }}
           ></button>
-
-          <PlayNextButton />
+          <Show when={queueStore.list.length}>
+            <PlayNextButton />
+          </Show>
 
         </div>
 

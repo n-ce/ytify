@@ -1,6 +1,6 @@
-import { onMount } from "solid-js";
+import { createSignal, onMount } from 'solid-js';
 import './Queue.css';
-import { openFeature, setStore, t } from "@lib/stores";
+import { openFeature, setStore, t, addToQueue, queueStore } from "@lib/stores";
 import { config, setConfig } from "@lib/utils";
 import { setQueueStore } from "@lib/stores/queue";
 import List from "./List";
@@ -8,15 +8,11 @@ import List from "./List";
 export default function() {
 
   let queueSection!: HTMLDivElement;
-  let queuelist!: HTMLDivElement;
-  let allowDuplicatesBtn!: HTMLLIElement;
-  let shuffleBtn!: HTMLLIElement;
-  let filterLT10Btn!: HTMLLIElement;
-  let removeQBtn!: HTMLLIElement;
   let enqueueRelatedStreamsBtn!:
     HTMLLIElement;
+  const [removeMode, setRemoveMode] = createSignal(false);
 
-  onMount(() => { openFeature('queue', queueSection) });
+  onMount(() => { openFeature('queue', queueSection); });
 
   return (
     <section
@@ -26,47 +22,57 @@ export default function() {
 
       <ul id="queuetools">
         <li
-          class={config.shuffle ? 'on' : ''}
-          ref={shuffleBtn}
-          onclick={() => ''}>
+          classList={{
+            on: config.shuffle
+          }}
+          onclick={() => {
+            setQueueStore('list', (list) => {
+              const shuffled = [...list];
+              for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+              }
+              return shuffled;
+            });
+          }}>
           <i onclick={() => {
-            shuffleBtn.classList.toggle('on');
-            setConfig('shuffle', shuffleBtn.classList.contains('on'));
+
+            setConfig('shuffle', !config.shuffle);
+            addToQueue(queueStore.list);
           }}
             class="ri-shuffle-line"></i>{t('upcoming_shuffle')}
         </li>
 
         <li
-          ref={removeQBtn}
-          onclick={(e) => {
-            e.currentTarget.classList.toggle('on');
-            queuelist.querySelectorAll('.streamItem')
-              .forEach(el => {
-                el.classList.toggle('delete');
-              });
+          classList={{
+            on: removeMode()
+          }}
+          onclick={() => {
+            setRemoveMode(!removeMode());
           }}
         >
           <i class="ri-indeterminate-circle-line"></i>{t('upcoming_remove')}
         </li>
 
         <li
-          class={config.filterLT10 ? 'on' : ''}
-          ref={filterLT10Btn}
+          classList={{
+            on: config.filterLT10
+          }}
           onclick={(e) => {
             const btn = e.currentTarget as HTMLElement;
 
             btn.classList.toggle('on');
             setConfig('filterLT10', btn.classList.contains('on'));
-
-            //filterLT10();
+            addToQueue(queueStore.list);
           }}
         >
           <i class="ri-filter-2-line"></i>{t('upcoming_filter_lt10')}
         </li>
 
         <li
-          class={config.allowDuplicates ? 'on' : ''}
-          ref={allowDuplicatesBtn}
+          classList={{
+            on: config.allowDuplicates
+          }}
           onclick={(e) => {
             const btn = e.currentTarget as HTMLElement;
             btn.classList.toggle('on');
@@ -80,7 +86,9 @@ export default function() {
         </li >
 
         <li
-          class={config.enqueueRelatedStreams ? 'on' : ''}
+          classList={{
+            on: config.enqueueRelatedStreams
+          }}
           ref={enqueueRelatedStreamsBtn}
           onclick={(e) => {
             const btn = e.currentTarget as HTMLElement;
@@ -104,7 +112,7 @@ export default function() {
         </li >
 
       </ul >
-      <List />
+      <List removeMode={removeMode()} />
     </section >
   );
 }

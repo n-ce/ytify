@@ -70,4 +70,9 @@
 
 #queuelist {
   margin-bottom: var(--size-fluid-6);
+
+  a.delete {
+    background-color: color-mix(in srgb, #f22, var(--onBg) 80%);
+    color: color-mix(in srgb, #f22, var(--text) 80%);
+  }
 }

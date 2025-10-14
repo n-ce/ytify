@@ -1,10 +1,10 @@
-import { setListStore, store, updateParam } from "@lib/stores";
+import { setListStore, updateParam } from "@lib/stores";
 import { convertSStoHHMMSS } from "@lib/utils";
 
 export default async function(ids: string[]) {
 
   let index = 0;
-  const { piped } = store.api;
+  const piped = 'https://api.piped.private.coffee';
   function instance() {
     if (index < piped.length - 1)
       index++;

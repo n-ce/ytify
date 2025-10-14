@@ -1,4 +1,4 @@
-import { params, setNavStore, t, setStore, setPlayerStore } from '@lib/stores';
+import { params, setNavStore, setStore, setPlayerStore } from '@lib/stores';
 import { config, getDownloadLink, idFromURL, fetchCollection, player } from '@lib/utils';
 
 
@@ -17,16 +17,13 @@ export default async function() {
 
   const { shareAction } = config;
 
-  await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/list.json')
-    .then(res => res.json())
+  await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/iv.txt')
+    .then(res => res.text())
     .then(data => {
-      setStore('api', {
-        piped: data.pi,
-        invidious: data.iv,
+      setStore({
+        invidious: data.split(',').map(i => `https://${i}`),
         index: 0
       })
-      if (data.cb)
-        setStore('api', { cobalt: data.cb });
     })
     .catch(() => {
       setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');
@@ -44,13 +41,7 @@ export default async function() {
 
 
     } else if (isPWA && shareAction === 'download') {
-      setStore('snackbar', t('actions_menu_download_init'))
-      const a = document.createElement('a');
-      const l = await getDownloadLink(id);
-      if (l) {
-        a.href = l;
-        a.click();
-      }
+      getDownloadLink(id);
     } else {
       if (params.size === 1)
         setNavStore('player', 'state', true);

@@ -20,7 +20,7 @@ export default async function(data: CollectionItem) {
   const metadataObj: MediaMetadataInit = {
     title: data.title,
     artist: authorText,
-    album: playerStore.context
+    album: playerStore.context.src
   };
 
   const img = generateImageUrl(data.id, 'maxres', music);

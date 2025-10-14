@@ -128,7 +128,7 @@ export default function() {
         onerror={() => {
           if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
-          const { invidious, index } = store.api;
+          const { invidious, index } = store;
 
 
           if (index < invidious.length) {
@@ -137,7 +137,7 @@ export default function() {
             video.src = video.src.replace(origin, proxy);
             audio.src = audio.src.replace(origin, proxy);
 
-            setStore('api', 'index', index + 1);
+            setStore('index', index + 1);
           }
         }}
 
@@ -147,7 +147,7 @@ export default function() {
           <For each={data().subtitles}>
             {(v) =>
               <track
-                src={store.api.invidious[0] + v.url}
+                src={store.invidious[0] + v.url}
                 srclang={v.name || v.label}
               >
               </track>

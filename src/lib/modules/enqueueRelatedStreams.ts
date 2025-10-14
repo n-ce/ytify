@@ -25,7 +25,7 @@ export default function(data: StreamItem[]) {
       stream.type === 'stream' &&
       stream.duration > 45 &&
       !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
-      !history.includes(id) &&
+      !history.some(item => item.id === id) &&
       filterYTM(stream.uploaderName)
     )
       setQueueStore('list', l => [...l, ({

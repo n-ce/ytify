@@ -8,7 +8,7 @@ export let config = {
   linkHost: location.origin,
   dlFormat: 'opus' as 'opus' | 'mp3' | 'wav' | 'ogg',
   theme: 'auto' as 'auto' | 'light' | 'dark',
-  landscapeSections: '3',
+  landscapeSections: '2',
   roundness: '0.4rem',
   searchSuggestions: true,
   searchBarLinkCapture: true,
@@ -24,6 +24,7 @@ export let config = {
   shareAction: 'play' as 'play' | 'watch' | 'download',
   dbsync: '',
   language: '',
+  sortOrder: 'modified' as 'modified' | 'name' | 'artist' | 'duration'
 }
 
 type AppConfig = typeof config;

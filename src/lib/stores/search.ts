@@ -53,7 +53,6 @@ export function getSearchSuggestions(text: string) {
 }
 
 export async function getSearchResults() {
-  const { api } = store;
   const { query, page, observer } = searchStore;
   const { searchFilter } = config;
 
@@ -82,10 +81,10 @@ export async function getSearchResults() {
     if (isMusic)
       return fetchYTMusicSearchResults(query);
     else {
-      let invidiousIndex = store.api.invidious.length - 1;
+      let invidiousIndex = store.invidious.length - 1;
       const fetcher = (): Promise<(YTStreamItem | YTListItem)[]> =>
         fetchYoutubeSearchResults(
-          store.api.invidious[invidiousIndex],
+          store.invidious[invidiousIndex],
           query,
           searchFilter,
           page
@@ -107,7 +106,7 @@ export async function getSearchResults() {
         setSearchStore('page', page + 1);
         const callback = async () => {
           const moreData = await fetchYoutubeSearchResults(
-            api.invidious[api.invidious.length - 1],
+            store.invidious[store.invidious.length - 1],
             query,
             searchFilter,
             searchStore.page

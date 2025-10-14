@@ -1,8 +1,9 @@
 import { Show, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists } from '@lib/utils/library';
+import { deleteCollection, getLists, saveLists, getCollection, getTracksMap } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
-import { listStore, resetList, setQueueStore, t } from '@lib/stores';
+import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore } from '@lib/stores';
 import { importList } from '@lib/modules/listUtils';
+import { player } from '@lib/utils';
 
 export default function Dropdown(_: {
   toggleSort: () => void
@@ -49,12 +50,18 @@ export default function Dropdown(_: {
           id="playAllBtn"
           onclick={() => {
             setQueueStore('list', []);
+            addToQueue(listStore.list);
+            setPlayerStore('stream', listStore.list[0]);
+            player(listStore.list[0].id);
+            setNavStore('queue', 'state', true);
           }}
         >
           <i class="ri-play-large-line"></i>{t("list_play")}
         </li>
 
-        <li id="enqueueAllBtn">
+        <li id="enqueueAllBtn" onclick={() => {
+          addToQueue(listStore.list);
+                      setNavStore('queue', 'state', true);        }}>
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
@@ -103,7 +110,19 @@ export default function Dropdown(_: {
             <i class="ri-link"></i>{t("list_share")}
           </li>
 
-          <li id="exportCollectionBtn">
+          <li id="exportCollectionBtn" onclick={() => {
+            const collectionIds = getCollection(listStore.id);
+            const tracksMap = getTracksMap();
+            const collectionData: CollectionItem[] = collectionIds.map((id: string) => tracksMap[id]);
+            const jsonString = JSON.stringify(collectionData, null, 2);
+            navigator.clipboard.writeText(jsonString)
+              .then(() => {
+                setStore('snackbar', t('list_export_success'));
+              })
+              .catch((err) => {
+                setStore('snackbar', t('list_export_error') + err);
+              });
+          }}>
             <i class="ri-export-line"></i>{t('list_export')}
           </li>
 

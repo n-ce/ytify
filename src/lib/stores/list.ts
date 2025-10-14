@@ -1,6 +1,5 @@
 import { createStore } from "solid-js/store";
-import { store } from "./app";
-import { closeFeature, updateParam } from "./navigation";
+import { closeFeature, setNavStore, updateParam } from "./navigation";
 
 
 const initialState = () => ({
@@ -25,13 +24,11 @@ export const [listStore, setListStore] = createStore(initialState());
 
 
 export async function getList(url: string) {
-  const { api } = store;
-  const { piped, index } = api;
-  console.log(piped[index], url)
-
+  console.log(url);
 }
 
 export function resetList() {
+  setNavStore('home', 'state', true);
   closeFeature('list');
   listStore.observer.disconnect();
 

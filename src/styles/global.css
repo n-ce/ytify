@@ -20,7 +20,7 @@
   --blur: blur(var(--size-px-3));
   --player-bg: none;
   --player-bp: 0 0;
-  --landscape-sections: 3;
+  --landscape-sections: 2;
   --trueBg: var(--bg);
 }
 
@@ -37,7 +37,7 @@ html {
 
 body {
   height: 100dvh;
-  font-family: ui-rounded, 'Segoe UI', source-sans-pro, 'Inter', 'Noto Sans', Oxygen, Calibri, Cantarell, Ubuntu, Roboto, system-ui, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: ui-rounded, Segoe UI, source-sans-pro, Inter, Noto Sans, Oxygen, Calibri, Cantarell, Ubuntu, Roboto, system-ui, Open Sans, Helvetica Neue, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -49,6 +49,9 @@ main {
   flex-direction: row;
   scroll-snap-type: x mandatory;
 
+  @media (orientation: landscape) {
+    margin: 0 var(--size-fluid-4);
+  }
 
   section {
     height: 100%;
@@ -59,14 +62,6 @@ main {
     scroll-snap-align: start;
     min-width: calc(100dvw / var(--landscape-sections));
     flex-shrink: 0;
-
-    &:first-child {
-      padding-left: var(--gap);
-    }
-
-    &:last-child {
-      padding-right: var(--gap);
-    }
   }
 
 

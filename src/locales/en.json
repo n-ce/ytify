@@ -74,6 +74,8 @@
   "list_share": "Share Collection",
   "list_radio": "Start Radio",
   "list_export": "Quick Export",
+  "list_export_success": "Collection copied to clipboard!",
+  "list_export_error": "Failed to copy collection to clipboard.",
   "list_sort": "Sort Menu Toggle",
   "list_info": "Playlist, channel or your collection items show here",
   "list_prompt_delete": "Are you sure you want to delete the collection $ ?",

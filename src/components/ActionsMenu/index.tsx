@@ -61,28 +61,20 @@ export default function() {
 
 
 
-        <Show when={store.api.cobalt}>
-          <li tabindex="4" onclick={async () => {
-            const id = store?.actionsMenu?.id;
+        <li tabindex="4" onclick={() => {
+          const id = store?.actionsMenu?.id;
 
 
-            if (!id) {
-              setStore('snackbar', 'id not found');
-              return;
-            }
-            setStore('snackbar', t('actions_menu_download_init'));
-            const a = document.createElement('a');
-            const l = await getDownloadLink(id);
-            if (l) {
-              a.href = l;
-              a.click();
-            }
-            closeDialog();
-          }}>
-            <i class="ri-download-2-fill"></i>
-            {t('actions_menu_download')}
-          </li>
-        </Show>
+          if (!id) {
+            setStore('snackbar', 'id not found');
+            return;
+          }
+          getDownloadLink(id);
+          closeDialog();
+        }}>
+          <i class="ri-download-2-fill"></i>
+          {t('actions_menu_download')}
+        </li>
 
         <li tabindex="5" onclick={() => {
           const author = store.actionsMenu?.author;

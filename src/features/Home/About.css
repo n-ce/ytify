@@ -9,7 +9,6 @@
 
   a {
     color: var(--text);
-
   }
 
   a.underline {
@@ -17,10 +16,9 @@
   }
 
   >p {
-    font-size: var(--font-size-0);
+    font-size: var(--font-size-1);
 
-    +a {
-      font-size: var(font-size-1);
+    a {
       padding: 0;
     }
 

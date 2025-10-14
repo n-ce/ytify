@@ -1,4 +1,4 @@
-import { setListStore, setStore, store } from "@lib/stores";
+import { setListStore, setStore } from "@lib/stores";
 import { addToCollection, convertSStoHHMMSS } from "@lib/utils";
 
 type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
@@ -10,7 +10,7 @@ export default async function(e: File) {
     setStore('snackbar', 'Incompatible Database!');
     return;
   }
-  const { piped } = store.api;
+  const piped = 'https://api.piped.private.coffee';
   const getMetadata = async (
     seed: string,
     src = 'songshift',

@@ -22,8 +22,9 @@ export default function() {
     setSearchText(searchBar.value);
   };
 
-      if (localStorage.getItem('library')) {    import('@lib/modules/libraryMigrator')
-      .then(m => m.default());
+  if (localStorage.getItem('library')) {
+    import('@lib/modules/libraryMigrator')
+    .then(m => m.default());
     return 'Library Migration In Place...';
   }
 
@@ -57,7 +58,10 @@ export default function() {
               author={item.author}
               duration={item.duration}
               authorId={item.authorId}
-              context='search'
+              context={{
+                src: 'search',
+                id: searchText()
+              }}
             />
           )}
         </For>
@@ -76,7 +80,7 @@ export default function() {
                   e.preventDefault();
                   fetchCollection(item);
                 }}
-              >{              <Show
+              >{<Show
                 when={item in reservedCollections}
                 fallback={<><i class='ri-play-list-2-fill'></i>{item}</>
                 }
@@ -84,7 +88,7 @@ export default function() {
                 <i class={reservedCollections[item as 'history'][0]}></i>
                 {t(reservedCollections[item as 'history'][1] as 'library_history')}
               </Show>
-              }</a>
+                }</a>
             )}
 
           </For>

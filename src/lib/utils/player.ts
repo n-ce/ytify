@@ -28,7 +28,7 @@ export async function player(id?: string) {
   else if (playerStore.stream.author.endsWith('Topic'))
     return import('../modules/jioSaavn').then(mod => mod.default());
 
-  if (!store.api.invidious.length)
+  if (!store.invidious.length)
     setStore('snackbar', 'No Instances are Available');
 
   const data = await import('../modules/getStreamData').then(mod => mod.default(id, false, playerAbortController.signal));
@@ -50,7 +50,7 @@ export async function player(id?: string) {
 
   await import('../modules/setMetadata')
     .then(mod => mod.default({
-      id: id,
+      id,
       title: data.title,
       author: data.uploader,
       duration: convertSStoHHMMSS(data.duration),

@@ -5,6 +5,7 @@ import StreamItem from "@components/StreamItem";
 export default function Results(_: {
   ref?: HTMLDivElement | ((el: HTMLDivElement) => void),
   draggable: boolean,
+  list: CollectionItem[], // Added list prop
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
@@ -18,7 +19,7 @@ export default function Results(_: {
       fallback={<i class="ri-loader-3-line"></i>}
     >
       <div class="listContainer" ref={_.ref}>
-        <For each={listStore.list}>{
+        <For each={_.list}>{
           (item) =>
             <StreamItem
               id={item.id || ''}
@@ -27,7 +28,9 @@ export default function Results(_: {
               duration={item.duration || ''}
               authorId={item.authorId}
               draggable={_.draggable}
-              context={listStore.type}
+              context={
+                { id: listStore.id, src: listStore.type }
+              }
               mark={_.mark}
             />
         }

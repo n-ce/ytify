@@ -3,12 +3,8 @@ import { config } from "@lib/utils/config";
 import { type JSXElement } from "solid-js";
 
 const storeInit: {
-  api: {
-    cobalt?: string,
-    piped: string[],
-    invidious: string[],
-    index: number
-  },
+  invidious: string[],
+  index: number
   useSaavn: boolean,
   linkHost: string,
   downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg',
@@ -17,11 +13,8 @@ const storeInit: {
   snackbar?: string,
   dialog?: JSXElement
 } = {
-  api: {
-    piped: [],
-    invidious: [],
-    index: 0,
-  },
+  invidious: [],
+  index: 0,
   useSaavn: true,
   linkHost: config.linkHost || location.origin,
   downloadFormat: config.dlFormat,

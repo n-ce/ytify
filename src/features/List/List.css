@@ -7,7 +7,7 @@
   top: 0;
   z-index: 20;
   background: linear-gradient(to right, var(--trueBg), transparent, var(--trueBg));
-  backdrop-filter: blur(var(--size-px-1));
+  backdrop-filter: blur(var(--size-px-3));
 
   >p {
     overflow: clip;
@@ -34,6 +34,12 @@
 .markBar {
   i {
     font-size: var(--font-size-3);
+    padding: var(--size-1);
+
+    &:hover {
+      background-color: var(--onBg2);
+      color: var(--text2);
+    }
   }
 
   .ri-indeterminate-circle-line {

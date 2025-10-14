@@ -9,7 +9,7 @@ export default function(
   const message = 'Error 403 : Unauthenticated Stream';
   const { stream } = playerStore;
   const id = prefetch || stream.id;
-  const { index, invidious } = store.api;
+  const { index, invidious } = store;
   const origin = new URL(audio.src).origin;
 
   if (audio.src.endsWith('&fallback')) {
@@ -26,10 +26,10 @@ export default function(
     if (!prefetch)
       setPlayerStore('status', `Switching proxy to ${proxy.slice(8)}`);
     audio.src = audio.src.replace(origin, proxy);
-    setStore('api', 'index', index + 1)
+    setStore('index', index + 1)
   }
   else {
-    setStore('api', 'index', 0);
+    setStore('index', 0);
 
     if (!prefetch) {
       setStore('snackbar', message);

@@ -13,7 +13,7 @@
   "devDependencies": {
     "@netlify/blobs": "^10.1.0",
     "@netlify/edge-functions": "^2.19.0",
-    "@netlify/functions": "^4.3.0",
+    "@netlify/functions": "^5.0.0",
     "@types/node": "^24.7.2",
     "@types/sortablejs": "^1.15.8",
     "autoprefixer": "^10.4.21",
@@ -21,8 +21,8 @@
     "open-props": "1.7.16",
     "postcss-jit-props": "1.0.16",
     "typescript": "^5.9.3",
-    "vite": "^7.1.9",
-    "vite-plugin-pwa": "^1.0.3",
+    "vite": "^7.1.10",
+    "vite-plugin-pwa": "^1.1.0",
     "vite-plugin-solid": "^2.11.9"
   },
   "browserslist": [

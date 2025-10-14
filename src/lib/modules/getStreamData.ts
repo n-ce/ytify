@@ -6,7 +6,7 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Piped | Record<'error' | 'message', string>> {
 
-  const { invidious, piped } = store.api;;
+  const { invidious } = store;
 
   const fetchDataFromPiped = (
     api: string
@@ -75,14 +75,14 @@ export default async function(
         else return useInvidious(index + 1);
       });
 
-
-  const usePiped = (index = 0): Promise<Piped> =>
-    fetchDataFromPiped(piped[index])
-      .catch(() => {
-        if (index + 1 === piped.length)
-          return useInvidious();
-        else return usePiped(index + 1);
-      });
-
+  /*
+    const usePiped = (index = 0): Promise<Piped> =>
+      fetchDataFromPiped(piped[index])
+        .catch(() => {
+          if (index + 1 === piped.length)
+            return useInvidious();
+          else return usePiped(index + 1);
+        });
+  */
   return useInvidious();
 }

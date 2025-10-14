@@ -5,7 +5,7 @@ import StreamItem from '@components/StreamItem';
 
 
 function isStreamItem(item: YTStreamItem | YTListItem): item is YTStreamItem {
-    return item.type === 'stream' || item.type === 'video';
+  return item.type === 'stream' || item.type === 'video';
 }
 
 export default function SearchResults() {
@@ -16,9 +16,15 @@ export default function SearchResults() {
       </Show>
       <For each={searchStore.results}>
         {(item) => (
-            <Show when={isStreamItem(item)} fallback={<ListItem {...item as YTListItem} />}>
-                <StreamItem {...item as YTStreamItem} context="search" />
-            </Show>
+          <Show when={isStreamItem(item)} fallback={<ListItem {...item as YTListItem} />}>
+            <StreamItem
+              {...item as YTStreamItem}
+              context={{
+                src: 'search',
+                id: searchStore.query
+              }}
+            />
+          </Show>
         )}
       </For>
     </div>

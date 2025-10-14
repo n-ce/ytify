@@ -1,7 +1,7 @@
-import { createRoot } from "solid-js";
+import { createEffect, createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
-import { addToCollection, config, cssVar, themer } from "@lib/utils";
-import { navStore, params, updateParam } from "./navigation";
+import { addToCollection, config, cssVar, player, themer } from "@lib/utils";
+import { navStore, params, setNavStore, updateParam } from "./navigation";
 import { queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
 
@@ -9,9 +9,12 @@ const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAA
 
 type PlayerStore = {
   stream: CollectionItem,
-  history: string[],
+  history: CollectionItem[],
   audio: HTMLAudioElement,
-  context: 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels',
+  context: {
+    src: Context,
+    id: string
+  }
   currentTime: number,
   fullDuration: number,
   playbackRate: number,
@@ -32,7 +35,7 @@ type PlayerStore = {
 const createInitialState = (): PlayerStore => ({
   audio: new Audio(),
   playbackState: 'none',
-  context: 'link',
+  context: { id: '', src: 'link' },
   status: '',
   currentTime: 0,
   fullDuration: 0,
@@ -63,17 +66,46 @@ const createInitialState = (): PlayerStore => ({
 
 const [playerStore, setPlayerStore] = createStore(createInitialState());
 
+export function playNext() {
+  const { stream } = playerStore;
+  const { list } = queueStore;
+  const nextStream = list[0];
+  setPlayerStore('history', h => [{ ...stream }, ...h]);
+  setPlayerStore('stream', nextStream);
+  setQueueStore('list', l => l.slice(1));
+  player(nextStream.id);
+
+}
+
+export function playPrev() {
+  const { history, stream } = playerStore;
+
+  const prevStream = history[0];
+  setPlayerStore('history', h => h.slice(1));
+  setQueueStore('list', l => [{ ...stream }, ...l]);
+
+  setPlayerStore('stream', prevStream);
+  player(prevStream.id);
+}
+
 createRoot(() => {
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
 
+  createEffect(() => {
+    if (!navStore.player.state)
+      if (queueStore.list.length)
+        if (!navStore.queue.state)
+          setNavStore('queue', 'state', true);
+
+  })
+
+  playerStore.audio.onended = playNext;
+
   playerStore.audio.onplaying = () => {
     setPlayerStore('playbackState', 'playing');
-    const { stream, history } = playerStore;
+    const { stream } = playerStore;
     const { id } = stream;
-
-    if (!history.includes(id))
-      setPlayerStore('history', h => [...h, id])
 
     if (config.history)
       historyTimeoutId = window.setTimeout(() => {
@@ -163,7 +195,7 @@ createRoot(() => {
 
   playerStore.audio.oncanplaythrough = async function() {
     console.log('canplaythrough');
-    const nextItem = config.prefetch && queueStore.list[0].id;
+    const nextItem = config.prefetch && queueStore.list[0]?.id;
 
     if (!nextItem) return;
 

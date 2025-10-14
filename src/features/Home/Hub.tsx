@@ -54,7 +54,10 @@ export default function() {
                   author={item.author}
                   duration={item.duration}
                   authorId={item.authorId}
-                  context='hub'
+                  context={{
+                    id: 'Sub Feed',
+                    src: 'hub'
+                  }}
                 />
               )}
             </For>
@@ -78,7 +81,10 @@ export default function() {
                   author={item.author}
                   duration={item.duration}
                   authorId={item.authorId}
-                  context='hub'
+                  context={{
+                    id: 'Recently Played',
+                    src: 'hub'
+                  }}
                 />
               )}
             </For>
@@ -102,7 +108,10 @@ export default function() {
                   author={item.author}
                   duration={item.duration}
                   authorId={item.authorId}
-                  context='hub'
+                  context={{
+                    id: 'Discover',
+                    src: 'hub'
+                  }}
                 />
               )}
             </For>
@@ -169,7 +178,10 @@ export default function() {
                   author={item.author}
                   duration={item.duration}
                   authorId={item.authorId}
-                  context='hub'
+                  context={{
+                    id: 'For you',
+                    src: 'hub'
+                  }}
                 />
               )}
             </For>
