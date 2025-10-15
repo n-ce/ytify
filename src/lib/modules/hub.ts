@@ -2,6 +2,7 @@
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
 import { getLists } from "../utils";
+import fetchArtist from "./fetchArtist";
 
 
 type Hub = {
@@ -69,26 +70,11 @@ export async function updateSubfeed(): Promise<void> {
   });
 }
 
-type ArtistEdgeResponse = {
-  artistName: string;
-  playlistId: string;
-  recommendedArtists: {
-    name: string;
-    browseId: string;
-    thumbnail: string;
-  }[];
-  featuredOnPlaylists: {
-    title: string;
-    browseId: string;
-    thumbnail: string;
-  }[];
-};
-
 export async function updateRelatedToYourArtists(): Promise<void> {
   const channels = getLists('channels');
   const artistIds = channels ? Object.keys(channels).filter(id => channels[id].name.includes('Artist - ')) : [];
 
-  const promises = artistIds.map(id => fetch(`https://ytm-jgmk.onrender.com/api/artist/${id}`).then(res => res.json() as Promise<ArtistEdgeResponse>));
+  const promises = artistIds.map(fetchArtist);
 
   return Promise.all(promises).then(results => {
     const relatedArtists = {} as Channels;

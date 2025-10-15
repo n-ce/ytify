@@ -1,4 +1,4 @@
-import { params, setNavStore, setStore, setPlayerStore } from '@lib/stores';
+import { params, setNavStore, setStore, setPlayerStore, getList } from '@lib/stores';
 import { config, getDownloadLink, idFromURL, fetchCollection, player } from '@lib/utils';
 
 
@@ -17,8 +17,28 @@ export default async function() {
 
   const { shareAction } = config;
 
+
+
+  function decode(compressedString: string): string {
+    let decompressedString = compressedString;
+    const decodePairs = {
+      '$': 'invidious',
+      '&': 'inv',
+      '#': 'iv',
+      '~': 'com'
+    }
+
+    for (const code in decodePairs) {
+      const safeCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(safeCode, 'g');
+      decompressedString = decompressedString.replace(regex, decodePairs[code as keyof typeof decodePairs]);
+    }
+    return decompressedString;
+  }
+
   await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/iv.txt')
     .then(res => res.text())
+    .then(decode)
     .then(data => {
       setStore({
         invidious: data.split(',').map(i => `https://${i}`),
@@ -56,22 +76,18 @@ export default async function() {
   const collection = params.get('collection');
   const shared = params.get('si');
   const supermix = params.get('supermix');
+  const channel = params.get('channel');
+  const playlist = params.get('playlist');
 
-  fetchCollection(collection || shared, Boolean(shared));
-  if (supermix)
+  if (collection || shared)
+    fetchCollection(collection || shared, Boolean(shared));
+  else if (channel)
+    getList(channel, 'channel')
+  else if (playlist)
+    getList(playlist, 'playlist')
+  else if (supermix)
     import('./supermix')
       .then(_ => _.default(supermix.split(' ')));
-
-  // list loading
-  /*
-    if (params.has('channel') || params.has('playlists'))
-      fetchList('/' +
-        location.search
-          .substring(1)
-          .split('=')
-          .join('/')
-      );
-    */
 
 
   document.addEventListener('click', (e) => {

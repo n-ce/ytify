@@ -1,7 +1,6 @@
 // import { audio, settingsContainer, title } from "./dom";
 // import { getThumbIdFromLink } from "./visualUtils";
 // import player from "./player";
-//import fetchList from "../modules/fetchList";
 // import { fetchCollection, removeFromCollection } from "./libraryUtils";
 
 import { setStore, playerStore, setPlayerStore, store, t } from "@lib/stores";
@@ -41,12 +40,10 @@ export const fetchJson = async <T>(
 
 export function proxyHandler(
   url: string,
-  prefetch: boolean = false
+  prefetch?: boolean
 ) {
   const isVideo = Boolean(document.querySelector('video'));
-  console.log(playerStore.stream.author);
   const useProxy = playerStore.stream.author.endsWith('- Topic') && !isVideo;
-
 
   if (!prefetch)
     setPlayerStore('status', t('player_audiostreams_insert'));
@@ -128,6 +125,28 @@ export function handleXtags(audioStreams: AudioStream[]) {
     .filter(a => useDRC ? isDRC(a.url) : !isDRC(a.url))
     .filter(isOriginal);
 }
+
+export const getPlaylistIdFromAlbum = (albumId: string): Promise<string> => {
+  const API_BASE_URL = "https://hyperpipeapi.ducks.party";
+  return fetch(`${API_BASE_URL}/album/${albumId}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data && data.id) {
+        return data.id;
+      } else {
+        throw new Error("Invalid data received from API");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching playlist ID from album:", error);
+      throw error;
+    });
+};
 
 interface CobaltSuccessResponse {
   status: 'success';
@@ -283,7 +302,6 @@ export async function superClick(e: Event) {
 
     store.list.thumbnail = eld.thumbnail ? getThumbIdFromLink(eld.thumbnail) : '';
 
-    fetchList(url);
   }
 }
 */

@@ -13,7 +13,7 @@ export default function Dropdown() {
   function exportSettings() {
     const link = document.createElement('a');
     link.download = 'ytify_settings.json';
-    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(localStorage.getItem('store') || '{}')}`;
+    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(localStorage.getItem('config') || '{}')}`;
     link.click();
   }
 
@@ -24,7 +24,7 @@ export default function Dropdown() {
     )[0].text();
 
     if (confirm('This will overwrite your current settings with the imported settings, continue?'))
-      localStorage.setItem('store', newSettings);
+      localStorage.setItem('config', newSettings);
   }
 
   return (
@@ -35,7 +35,7 @@ export default function Dropdown() {
           <i class="ri-delete-bin-2-line"></i>&nbsp;{t('settings_clear_cache')}
         </li>
         <li onclick={() => {
-          localStorage.removeItem('store');
+          localStorage.removeItem('config');
           location.reload();
         }}>
           <i class="ri-refresh-line"></i>&nbsp;{t('settings_restore')}

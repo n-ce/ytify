@@ -7,8 +7,6 @@ export default function() {
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;
 
-  console.log(stream);
-
   fetch(`https://fast-saavn.vercel.app/api/find?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author.replace(' - Topic', ''))}&duration=${encodeURIComponent(stream.duration)}`)
     .then(async res => {
       if (!res.ok) {

@@ -1,8 +1,7 @@
 import { config, hostResolver } from '@lib/utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
-import fetchList from '@lib/modules/fetchList';
-
+import { getList } from '@lib/stores';
 
 export default function(data: {
   title: string,
@@ -29,7 +28,12 @@ export default function(data: {
       href={hostResolver(data.url)}
       onclick={(e) => {
         e.preventDefault();
-        fetchList(data.url);
+        console.log(data.url);
+        if (data.url.startsWith('/channel'))
+          getList(data.url.slice(9), 'channel');
+        else if (data.url.startsWith('/playlist'))
+          getList(data.url.slice(10), 'playlist')
+        else getList(data.url.slice(8), 'artist');
       }}
     >
       <Show when={config.loadImage}>
@@ -45,6 +49,6 @@ export default function(data: {
         <p class="uData">{data.uploaderData}</p>
         <p class="stats">{data.stats}</p>
       </div>
-    </a>
+    </a >
   );
 }

@@ -1,4 +1,4 @@
-import { store } from "@lib/stores";
+import { setStore, store } from "@lib/stores";
 
 export default async function(
   id: string,
@@ -70,9 +70,14 @@ export default async function(
   const useInvidious = (index = 0): Promise<Piped> =>
     fetchDataFromInvidious(invidious[index])
       .catch(e => {
-        if (index + 1 === invidious.length)
+        if (index + 1 === invidious.length) {
+          setStore('index', 0);
           return emergency(e);
-        else return useInvidious(index + 1);
+        }
+        else {
+          setStore('index', index + 1);
+          return useInvidious(index + 1);
+        }
       });
 
   /*

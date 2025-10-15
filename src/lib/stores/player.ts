@@ -133,7 +133,6 @@ createRoot(() => {
   }, 500);
 
   playerStore.audio.onloadstart = () => {
-    console.log('loadstart');
     console.log(playerStore.audio.src);
     setPlayerStore('playbackState', 'paused');
     setPlayerStore('status', '');
@@ -145,7 +144,6 @@ createRoot(() => {
   }
 
   playerStore.audio.onwaiting = () => {
-    console.log('waiting');
     setPlayerStore('playbackState', 'loading')
   };
 
@@ -186,7 +184,6 @@ createRoot(() => {
   }
 
   playerStore.audio.onloadedmetadata = () => {
-    console.log('loadedmetadata');
     setPlayerStore({
       currentTime: 0,
       fullDuration: Math.floor(playerStore.audio.duration)
@@ -194,7 +191,6 @@ createRoot(() => {
   }
 
   playerStore.audio.oncanplaythrough = async function() {
-    console.log('canplaythrough');
     const nextItem = config.prefetch && queueStore.list[0]?.id;
 
     if (!nextItem) return;

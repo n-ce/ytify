@@ -52,8 +52,6 @@ export function closeFeature(name: Features) {
 
   const closestRef = active[0]?.[1]?.ref;
 
-  console.log('Nav: ', closestRef, removedIndex);
-
   if (removedIndex < 3) {
   }
   else

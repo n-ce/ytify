@@ -1,6 +1,4 @@
-// import fetchList from '../../../lib/modules/fetchList';
-
-import { store, t, playerStore, setListStore, setNavStore, setQueueStore, setStore } from '@lib/stores';
+import { store, t, playerStore, setListStore, setNavStore, setQueueStore, setStore, getList } from '@lib/stores';
 import { config, getDownloadLink, hostResolver } from '@lib/utils';
 import './ActionsMenu.css';
 import CollectionSelector from "./CollectionSelector";
@@ -53,7 +51,7 @@ export default function() {
         <CollectionSelector close={closeDialog} />
 
         <li tabindex="3" onclick={async () => {
-          //fetchList('/playlists/RD' + _.data.id, true);
+          getList('RD' + store?.actionsMenu?.id, 'mix');
           closeDialog();
         }}>
           <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
@@ -77,15 +75,18 @@ export default function() {
         </li>
 
         <li tabindex="5" onclick={() => {
-          const author = store.actionsMenu?.author;
-          if (!author) return;
-          setListStore('name',
-            author.endsWith('- Topic') ?
-              ('Artist - ' + author.replace('- Topic', ''))
-              : '');
+          const { author, authorId } = store.actionsMenu as CollectionItem;
+
+          if (author)
+            setListStore('name',
+              author.endsWith('- Topic') ?
+                ('Artist - ' + author.replace('- Topic', ''))
+                : '');
+
+          if (authorId)
+            getList(authorId, 'channel');
 
           closeDialog();
-          //fetchList(_.data.channelUrl);
         }}>
 
           <i class="ri-user-3-line"></i>

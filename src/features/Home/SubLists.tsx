@@ -21,8 +21,6 @@ export default function(_: {
 
   const special = type === 'playlists' ? 'Album' : 'Artist';
 
-
-
   const array = [];
   const pls = getLists(type as 'channels' | 'playlists'); // Removed redundant cast
 
@@ -40,7 +38,7 @@ export default function(_: {
       type: type.slice(0, -1),
       name: name.slice(len),
       uploaderName: (pls[pl] as Playlist).uploader,
-      url: `/${type === 'channels' ? type.slice(0, -1) : type}/` + pls[pl].id,
+      url: `/${_.flag === 'artists' ? 'artist' : type === 'channels' ? 'channel' : 'playlist'}/` + pls[pl].id,
       thumbnail: pls[pl].thumbnail
     });
 
