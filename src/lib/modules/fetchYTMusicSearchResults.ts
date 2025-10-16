@@ -114,7 +114,7 @@ export default async function(
   query: string,
 ): Promise<(YTStreamItem | YTListItem)[]> {
   const filter = config.searchFilter.substring(6); // remove "music_"
-  const api = 'https://js-ruddy-rho.vercel.app';
+  const api = 'https://ytify-backend.vercel.app';
   const url = api + `/api/search?q=${encodeURIComponent(query)}&filter=${filter}`;
 
   return fetchJson<YTMusicSearchResponse>(url)
@@ -143,14 +143,24 @@ export default async function(
             img: item.resultType === 'video' ? item.videoId : getThumbIdFromLink(videoItem.thumbnails[0].url || 'https://i.ytimg.com/vi_webp/' + videoItem.videoId + '/mqdefault.webp?host=i.ytimg.com'),
             type: item.resultType === 'song' ? 'stream' : 'video',
           } as YTStreamItem;
-        } else {
-          const listItem = item as YTMusicArtistResult | YTMusicAlbumResult | YTMusicPlaylistResult;
+        } else if (item.resultType === 'album') {
+          const albumItem = item as YTMusicAlbumResult;
           return {
-            title: 'title' in listItem ? listItem.title : listItem.artist,
-            stats: 'itemCount' in listItem ? listItem.itemCount + ' Plays' : ('year' in listItem ? listItem.year : ''),
+            title: albumItem.title,
+            stats: albumItem.year,
+            thumbnail: generateImageUrl(getThumbIdFromLink(albumItem.thumbnails[0].url), ''),
+            uploaderData: albumItem.artists.find(a => a.id)?.name,
+            url: `/album/${albumItem.browseId}`,
+            type: 'playlist',
+          } as YTListItem;
+        } else {
+          const listItem = item as YTMusicArtistResult | YTMusicPlaylistResult;
+          return {
+            title: 'title' in listItem ? listItem.title : (listItem as YTMusicArtistResult).artist,
+            stats: 'itemCount' in listItem ? (listItem as YTMusicPlaylistResult).itemCount + ' Plays' : '',
             thumbnail: generateImageUrl(getThumbIdFromLink(listItem.thumbnails[0].url), ''),
-            uploaderData: 'author' in listItem ? listItem.author : ('artists' in listItem ? listItem.artists.find(a => a.id)?.name : ''),
-            url: `/${item.resultType === 'artist' ? 'artist' : 'playlists'}/${listItem.resultType === 'album' ? listItem.playlistId : listItem.browseId}`,
+            uploaderData: 'author' in listItem ? (listItem as YTMusicPlaylistResult).author : '',
+            url: `/${item.resultType === 'artist' ? 'artist' : 'playlists'}/${listItem.browseId}`,
             type: item.resultType === 'artist' ? 'channel' : 'playlist',
           } as YTListItem;
         }

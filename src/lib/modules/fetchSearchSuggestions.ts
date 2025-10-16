@@ -11,7 +11,7 @@ export default async function(
   signal: AbortSignal
 ): Promise<string[]> {
   const isMusic = config.searchFilter.startsWith('music_');
-  const api = 'https://js-ruddy-rho.vercel.app';
+  const api = 'https://ytify-backend.vercel.app';
   let url = api + `/api/search/suggestions?q=${encodeURIComponent(text)}`;
   if (isMusic) {
     url += '&music=1';

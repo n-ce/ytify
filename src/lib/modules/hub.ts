@@ -1,16 +1,17 @@
 
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
-import { getLists } from "../utils";
+import { getLists, getCollection } from "../utils";
 import fetchArtist from "./fetchArtist";
+import supermix from "./supermix";
 
 
 type Hub = {
   discovery?: { [index: string]: CollectionItem & { frequency: number } };
   playlists: Playlists;
   artists: Channels;
-  foryou: { [index: string]: CollectionItem & { frequency: number } };
-  subfeed: { [index: string]: CollectionItem };
+  foryou: CollectionItem[];
+  subfeed: CollectionItem[];
 };
 
 
@@ -18,8 +19,8 @@ const initialHub: Hub = {
   discovery: {},
   playlists: {},
   artists: {},
-  foryou: {},
-  subfeed: {},
+  foryou: [],
+  subfeed: [],
 };
 
 export function getHub(): Hub {
@@ -54,18 +55,12 @@ export function clearHubSection(sectionName: keyof Hub): void {
 
 
 
-export async function updateSubfeed(): Promise<void> {
-  return subfeedGenerator('?preview=1').then((items) => {
-    const subfeed: { [index: string]: CollectionItem } = {};
-    items.forEach((item: CollectionItem) => {
-      subfeed[item.id] = {
-        id: item.id,
-        title: item.title,
-        author: item.author,
-        duration: convertSStoHHMMSS(item.duration as unknown as number),
-        authorId: item.authorId,
-      };
-    });
+export async function updateSubfeed(preview?: string): Promise<void> {
+  return subfeedGenerator(preview).then((items: CollectionItem[]) => {
+    const subfeed: CollectionItem[] = items.map((item: CollectionItem) => ({
+      ...item,
+      duration: convertSStoHHMMSS(item.duration as unknown as number),
+    }));
     updateHubSection('subfeed', subfeed);
   });
 }
@@ -106,4 +101,12 @@ export async function updateRelatedToYourArtists(): Promise<void> {
     updateHubSection('artists', relatedArtists);
     updateHubSection('playlists', featuredPlaylists);
   });
+}
+
+export async function updateForYou(): Promise<void> {
+  const favorites = getCollection('favorites');
+  if (favorites.length === 0) return;
+
+  const mixArray = await supermix(favorites);
+  updateHubSection('foryou', mixArray);
 }

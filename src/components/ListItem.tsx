@@ -31,6 +31,8 @@ export default function(data: {
         console.log(data.url);
         if (data.url.startsWith('/channel'))
           getList(data.url.slice(9), 'channel');
+        else if (data.url.includes('MPREb'))
+          getList(data.url.split('/').pop()!, 'album')
         else if (data.url.startsWith('/playlist'))
           getList(data.url.slice(10), 'playlist')
         else getList(data.url.slice(8), 'artist');

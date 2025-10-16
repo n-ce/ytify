@@ -20,6 +20,9 @@
   }
 }
 
+.listContainer {
+  margin-bottom: var(--size-fluid-6);
+}
 
 #viewOnYTBtn,
 #subscribeListBtn {

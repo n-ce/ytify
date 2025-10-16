@@ -126,27 +126,7 @@ export function handleXtags(audioStreams: AudioStream[]) {
     .filter(isOriginal);
 }
 
-export const getPlaylistIdFromAlbum = (albumId: string): Promise<string> => {
-  const API_BASE_URL = "https://hyperpipeapi.ducks.party";
-  return fetch(`${API_BASE_URL}/album/${albumId}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      if (data && data.id) {
-        return data.id;
-      } else {
-        throw new Error("Invalid data received from API");
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching playlist ID from album:", error);
-      throw error;
-    });
-};
+
 
 interface CobaltSuccessResponse {
   status: 'success';

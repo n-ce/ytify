@@ -7,6 +7,7 @@ import fetchPlaylist, { PlaylistResponse } from "@lib/modules/fetchPlaylist";
 import fetchChannel from "@lib/modules/fetchChannel";
 import { convertSStoHHMMSS, getApi } from "@lib/utils";
 import { setQueueStore } from "./queue";
+import fetchAlbum from "@lib/modules/fetchAlbum";
 
 
 const initialState = () => ({
@@ -14,7 +15,7 @@ const initialState = () => ({
   isSubscribed: false,
   isSortable: false,
   isReversed: false,
-  isShared: false,
+isShared: false,
   list: [] as CollectionItem[],
   length: 0,
   reservedCollections: ['history', 'favorites', 'listenLater', 'channels', 'playlists'],
@@ -113,6 +114,25 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
         author: v.author,
         authorId: v.authorId,
         duration: convertSStoHHMMSS(v.lengthSeconds)
+      }) as CollectionItem)
+    })
+  }
+
+  if (type === 'album') {
+    const { title, thumbnail, tracks } = await fetchAlbum(url);
+    setListStore({
+      name: title,
+      thumbnail: thumbnail,
+      id: url,
+      uploader: tracks[0].artist,
+      type: 'playlists',
+      url: url,
+      list: tracks.map(v => ({
+        id: v.videoId,
+        title: v.title,
+        author: v.artist,
+        authorId: '',
+        duration: v.duration
       }) as CollectionItem)
     })
   }

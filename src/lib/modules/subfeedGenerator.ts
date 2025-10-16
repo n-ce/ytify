@@ -4,7 +4,7 @@ import { getLists } from "@lib/utils";
 export default async function(preview?: string) {
 
   setListStore('isLoading', true);
-  const api = 'https://js-ruddy-rho.vercel.app';
+  const api = 'https://ytify-backend.vercel.app';
   const endpoint = '/api/feed/channels=';
   const channels = getLists('channels');
   const list = [];

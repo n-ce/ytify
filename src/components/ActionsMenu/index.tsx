@@ -99,6 +99,11 @@ export default function() {
         <Show when={store.actionsMenu?.albumId}>
 
           <li tabindex="6" onclick={() => {
+            const albumId = store.actionsMenu?.albumId;
+            if (albumId) {
+              getList(albumId, 'album');
+            }
+            closeDialog();
           }}>
             <i class="ri-album-fill"></i>View Album
           </li>

@@ -17,3 +17,4 @@
 - [Six.beta](https://deploy-preview-124--ytify.netlify.app/)
 - [Six.lite](https://lite--ytify.netlify.app)
 - [Seven](https://deploy-preview-187--ytify.netlify.app)
+- [SevenXEight](https://68bd4765e217420008188710--ytify.netlify.app)

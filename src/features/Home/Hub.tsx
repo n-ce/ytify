@@ -1,9 +1,10 @@
 import { For, Show, createSignal } from "solid-js";
-import { getHub, updateSubfeed, updateRelatedToYourArtists } from "@lib/modules/hub";
-import { getCollection, getTracksMap } from "@lib/utils";
+import { getHub, updateSubfeed, updateRelatedToYourArtists, updateForYou } from "@lib/modules/hub";
+import { fetchCollection, getCollection, getTracksMap } from "@lib/utils";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
 import { generateImageUrl, getThumbIdFromLink } from "@lib/utils";
+import { setListStore, setNavStore } from "@lib/stores";
 
 export default function() {
   const [hub, setHub] = createSignal(getHub());
@@ -15,10 +16,11 @@ export default function() {
     .filter(Boolean) as CollectionItem[];
   const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);
   const [isRelatedLoading, setIsRelatedLoading] = createSignal(false);
+  const [isForYouLoading, setIsForYouLoading] = createSignal(false);
 
   const handleSubfeedRefresh = () => {
     setIsSubfeedLoading(true);
-    updateSubfeed().then(() => {
+    updateSubfeed('?preview=1').then(() => {
       setHub(getHub());
       setIsSubfeedLoading(false);
     });
@@ -32,12 +34,28 @@ export default function() {
     });
   };
 
+  const handleForYouRefresh = () => {
+    setIsForYouLoading(true);
+    updateForYou().then(() => {
+      setHub(getHub());
+      setIsForYouLoading(false);
+    });
+  };
+
   return (
     <div class="hub">
       <article>
         <p>Sub Feed</p>
         <i class="ri-refresh-line" onclick={handleSubfeedRefresh}></i>
-        <i class="ri-arrow-right-s-line"></i>
+        <i class="ri-arrow-right-s-line" onclick={() => {
+          updateSubfeed();
+          const subfeedItems = getHub().subfeed || [];
+          setListStore({
+            name: 'Sub Feed',
+            list: subfeedItems as CollectionItem[],
+          });
+          setNavStore('list', 'state', true);
+        }}></i>
         <div>
           <Show when={isSubfeedLoading()}>
             <i class="ri-loader-3-line"></i>
@@ -67,7 +85,12 @@ export default function() {
 
       <article>
         <p>Recently Listened To</p>
-        <i class="ri-arrow-right-s-line"></i>
+        <i
+          class="ri-arrow-right-s-line"
+          onclick={() => {
+            fetchCollection('history');
+          }}
+        ></i>
         <div>
           <Show
             when={recents.length > 0}
@@ -94,8 +117,17 @@ export default function() {
 
       <article>
         <p>Discovery</p>
-        <i class="ri-arrow-right-s-line"></i>
-        <div>
+        <i
+          class="ri-arrow-right-s-line"
+          onclick={() => {
+            const discoveryItems = Object.values(getHub().discovery || {});
+            setListStore({
+              name: 'Discovery',
+              list: discoveryItems as CollectionItem[],
+            });
+            setNavStore('list', 'state', true);
+          }}
+        ></i>        <div>
           <Show
             when={Object.keys(hub().discovery || {}).length > 0}
             fallback={'Discoveries related to what you listen to will show up here.'}
@@ -163,14 +195,24 @@ export default function() {
 
       <article>
         <p>Streams For You</p>
-        <i class="ri-refresh-line"></i>
-        <i class="ri-arrow-right-s-line"></i>
+        <i class="ri-refresh-line" onclick={handleForYouRefresh}></i>
+        <i class="ri-arrow-right-s-line" onclick={() => {
+          const forYouItems = getHub().foryou || [];
+          setListStore({
+            name: 'For You',
+            list: forYouItems as CollectionItem[],
+          });
+          setNavStore('list', 'state', true);
+        }}></i>
         <div>
+          <Show when={isForYouLoading()}>
+            <i class="ri-loader-3-line"></i>
+          </Show>
           <Show
-            when={Object.keys(hub().foryou || {}).length > 0}
+            when={hub().foryou?.length > 0}
             fallback={'A locally run algorithm finds similar streams to your favorites here.'}
           >
-            <For each={Object.values(hub().foryou || {}).slice(0, 5)}>
+            <For each={hub().foryou.slice(0, 5)}>
               {(item) => (
                 <StreamItem
                   id={item.id}
@@ -189,6 +231,6 @@ export default function() {
         </div>
       </article>
 
-    </div>
+    </div >
   );
 }
