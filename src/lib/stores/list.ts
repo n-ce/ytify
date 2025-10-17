@@ -15,7 +15,7 @@ const initialState = () => ({
   isSubscribed: false,
   isSortable: false,
   isReversed: false,
-isShared: false,
+  isShared: false,
   list: [] as CollectionItem[],
   length: 0,
   reservedCollections: ['history', 'favorites', 'listenLater', 'channels', 'playlists'],
@@ -38,7 +38,7 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
   let index = store.invidious.length - 1;
 
   if (type === 'mix') {
-    const list = await fetchMix(url);
+    const list = await fetchMix(url, getApi(index));
     setQueueStore('list', [...list]);
     return;
   }
@@ -80,7 +80,17 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
 
   if (type === 'channel') {
 
-    const { author, thumbnail, videos } = await fetchChannel(url, getApi(index), listStore.page);
+    const { author, thumbnail, videos } = await fetchChannel(url, getApi(index), listStore.page)
+      .catch(e => {
+        if (index === 0) {
+          setStore('snackbar', e.message);
+          index = store.invidious.length;
+          return { author: '', thumbnail: '', videos: [] };
+        }
+        else {
+          return fetchChannel(url, getApi(index--), listStore.page);
+        }
+      });
     setListStore({
       name: author,
       thumbnail: thumbnail,
@@ -100,7 +110,17 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
 
   if (type === 'artist') {
     const { playlistId, artistName } = (await fetchArtist(url));
-    const { videos, thumbnail } = await fetchPlaylist(playlistId, getApi(index), listStore.page);
+    const { videos, thumbnail } = await fetchPlaylist(playlistId, getApi(index), listStore.page)
+      .catch(e => {
+        if (index === 0) {
+          setStore('snackbar', e.message);
+          index = store.invidious.length;
+          return { author: '', title: '', thumbnail: '', videos: [] };
+        }
+        else {
+          return fetchPlaylist(playlistId, getApi(index--), listStore.page);
+        }
+      });
     setListStore({
       name: artistName,
       thumbnail: thumbnail,
@@ -119,7 +139,17 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
   }
 
   if (type === 'album') {
-    const { title, thumbnail, tracks } = await fetchAlbum(url);
+    const { title, thumbnail, tracks } = await fetchAlbum(url)
+      .catch(e => {
+        if (index === 0) {
+          setStore('snackbar', e.message);
+          index = store.invidious.length;
+          return { id: '', playlistId: '', title: '', artist: '', year: '', thumbnail: '', tracks: [] };
+        }
+        else {
+          return fetchAlbum(url);
+        }
+      });
     setListStore({
       name: title,
       thumbnail: thumbnail,

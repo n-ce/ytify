@@ -175,11 +175,17 @@ createRoot(() => {
 
     const t = params.get('t');
 
-    if (t && seconds % 5 === 0) {
-      const str = seconds.toString();
-      if (t !== str)
-        updateParam('t', str);
+    if (t) {
+      if (isMusic) updateParam('t');
+      else {
+        if (seconds % 5 === 0) {
+          const str = seconds.toString();
+          if (t !== str)
+            updateParam('t', str);
+        }
+      }
     }
+
 
   }
 

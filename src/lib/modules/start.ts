@@ -1,5 +1,5 @@
-import { params, setNavStore, setStore, setPlayerStore, getList } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player } from '@lib/utils';
+import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig } from '@lib/utils';
 
 
 
@@ -49,6 +49,24 @@ export default async function() {
       setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');
     });
 
+  const collection = params.get('collection');
+  const shared = params.get('si');
+  const channel = params.get('channel');
+  const playlist = params.get('playlist');
+
+  if (collection || shared)
+    fetchCollection(collection || shared, Boolean(shared));
+  else if (channel)
+    getList(channel, 'channel')
+  else if (playlist)
+    getList(playlist, 'playlist')
+
+  const q = params.get('q');
+  if (q) {
+    const f = params.get('f') || 'all';
+    setConfig('searchFilter', f);
+    setSearchStore('query', q);
+  }
 
 
   const isPWA = idFromURL(params.get('url') || params.get('text'));
@@ -67,27 +85,14 @@ export default async function() {
         setNavStore('player', 'state', true);
       await player(id);
       const t = params.get('t');
-      setPlayerStore('currentTime', Number(t));
+      if (t) {
+        playerStore.audio.currentTime = Number(t);
+        setPlayerStore('currentTime', Number(t));
+      }
     }
 
   }
 
-
-  const collection = params.get('collection');
-  const shared = params.get('si');
-  const supermix = params.get('supermix');
-  const channel = params.get('channel');
-  const playlist = params.get('playlist');
-
-  if (collection || shared)
-    fetchCollection(collection || shared, Boolean(shared));
-  else if (channel)
-    getList(channel, 'channel')
-  else if (playlist)
-    getList(playlist, 'playlist')
-  else if (supermix)
-    import('./supermix')
-      .then(_ => _.default(supermix.split(' ')));
 
 
   document.addEventListener('click', (e) => {

@@ -42,6 +42,31 @@ export default function() {
         ref={superInput}
         class="superInput"
         autocomplete="off"
+        onpaste={async (e) => {
+          const pastedText = e.clipboardData?.getData('text');
+          const { value } = e.target as HTMLInputElement;
+          const separators = ['\n', ' ', ','];
+          const isBulk = separators.find(separator => pastedText?.includes(separator));
+
+          if (!config.searchBarLinkCapture)
+            return;
+
+          if (isBulk) {
+            const array = pastedText?.split('\n').map(idFromURL).filter(s => s?.length === 11);
+            superInput.value = '';
+            if (array?.length)
+              await import('@lib/modules/bulkCapture')
+                .then(mod => mod.default(array as string[]));
+            return;
+          }
+
+          const id = idFromURL(value);
+          if (id && id !== playerStore.stream.id) {
+            player(id);
+            return;
+          }
+
+        }}
         onblur={() => {
           setTimeout(() => {
             setSearchStore('suggestions', 'data', []);
@@ -63,14 +88,6 @@ export default function() {
             if (recentSearches)
               setSearchStore('suggestions', 'data', recentSearches.split(','));
             return;
-          }
-
-          if (config.searchBarLinkCapture) {
-            const id = idFromURL(value);
-            if (id && id !== playerStore.stream.id) {
-              player(id);
-              return;
-            }
           }
 
           getSearchSuggestions(value);

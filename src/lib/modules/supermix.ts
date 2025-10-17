@@ -1,7 +1,12 @@
 import fetchMix from "./fetchMix";
+import { store } from "@lib/stores";
 
 export default async function(ids: string[]): Promise<CollectionItem[]> {
-  const data = await Promise.all(ids.map(id => fetchMix('RD' + id)));
+
+  const idx = () => Math.floor(Math.random() * store.invidious.length);
+
+
+  const data = await Promise.all(ids.map(id => fetchMix('RD' + id, store.invidious[idx()])));
   const map: {
     [index: string]: CollectionItem & { count?: number }
   } = {};

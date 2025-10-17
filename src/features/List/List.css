@@ -48,6 +48,10 @@
   .ri-indeterminate-circle-line {
     margin: 0 var(--size-3);
   }
+
+  .ri-play-list-2-fill {
+    margin-left: var(--size-3);
+  }
 }
 
 .marked {

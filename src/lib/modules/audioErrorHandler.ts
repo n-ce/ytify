@@ -25,7 +25,10 @@ export default function(
     const proxy = invidious[index];
     if (!prefetch)
       setPlayerStore('status', `Switching proxy to ${proxy.slice(8)}`);
-    audio.src = audio.src.replace(origin, proxy);
+    if (audio.src.includes(proxy))
+      audio.src = audio.src.replace(proxy, origin);
+    else
+      audio.src = audio.src.replace(origin, proxy);
     setStore('index', index + 1)
   }
   else {

@@ -72,31 +72,68 @@ export async function updateRelatedToYourArtists(): Promise<void> {
   const promises = artistIds.map(fetchArtist);
 
   return Promise.all(promises).then(results => {
-    const relatedArtists = {} as Channels;
-    const featuredPlaylists = {} as Playlists;
+
+    const ArtistMap: {
+      [index: string]: Channel & { count?: number }
+    } = {};
+    const PlaylistMap: {
+      [index: string]: Playlist & { count?: number }
+    } = {};
 
     results.forEach(result => {
-      if (!result) return;
-      if (result.recommendedArtists) {
+
+      if (result?.recommendedArtists) {
         result.recommendedArtists.forEach(artist => {
-          relatedArtists[artist.browseId] = {
-            id: artist.browseId,
-            name: artist.name,
-            thumbnail: artist.thumbnail,
-          };
+
+          const key = artist.browseId;
+          if (!artistIds.includes(key))
+            key in ArtistMap ?
+              ArtistMap[key].count!++ :
+              ArtistMap[key] = {
+                id: artist.browseId,
+                name: artist.name,
+                thumbnail: artist.thumbnail,
+                count: 1
+              };
+
         });
       }
-      if (result.featuredOnPlaylists) {
+
+      if (result?.featuredOnPlaylists) {
         result.featuredOnPlaylists.forEach(playlist => {
-          featuredPlaylists[playlist.browseId] = {
-            id: playlist.browseId,
-            name: playlist.title,
-            thumbnail: playlist.thumbnail,
-            uploader: result.artistName,
-          };
+          const key = playlist.browseId;
+
+          key in PlaylistMap ?
+            PlaylistMap[key].count!++ :
+            PlaylistMap[key] = {
+              id: playlist.browseId,
+              name: playlist.title,
+              thumbnail: playlist.thumbnail,
+              uploader: result.artistName,
+              count: 1
+            };
         });
       }
     });
+
+
+    const featuredPlaylists = Object.fromEntries(Object
+      .values(PlaylistMap)
+      .sort((a, b) => b.count! - a.count!)
+      .map(s => {
+        delete s.count;
+        return [s.id, s];
+      }));
+
+    const relatedArtists = Object.fromEntries(Object
+      .values(ArtistMap)
+      .sort((a, b) => b.count! - a.count!)
+      .map(s => {
+        delete s.count;
+        return [s.id, s];
+      }))
+
+
 
     updateHubSection('artists', relatedArtists);
     updateHubSection('playlists', featuredPlaylists);

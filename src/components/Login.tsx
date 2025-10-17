@@ -10,13 +10,13 @@ export default function() {
 
   return (
     <>
-      <h2>Sync your library to the cloud</h2>
+      <h4>Sync your library to the cloud</h4>
       <input
         oninput={(e) => setEmail(e.target.value)}
         type="email" placeholder="Enter Email" required autofocus />
       <input
         oninput={(e) => setPw(e.target.value)}
-        type="password" placeholder="Enter Password" required disabled={Boolean(email())} />
+        type="password" placeholder="Enter Password" required disabled={!Boolean(email())} />
       <span>
         <button onclick={() => {
 
@@ -42,7 +42,7 @@ export default function() {
             });
         }}>Get Access</button>
         <button onclick={(e) => {
-          (e.target.parentElement as HTMLDialogElement).close();
+          (e.target.parentElement?.parentElement as HTMLDialogElement).close();
           setStore('dialog', undefined);
         }} class="ri-close-large-line">
         </button>

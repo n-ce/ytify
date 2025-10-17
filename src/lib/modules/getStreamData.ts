@@ -67,6 +67,8 @@ export default async function(
       fetchDataFromPiped('')
         .catch(() => e) : e;
 
+  setStore('index', 0);
+
   const useInvidious = (index = 0): Promise<Piped> =>
     fetchDataFromInvidious(invidious[index])
       .catch(e => {

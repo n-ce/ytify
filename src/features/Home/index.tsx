@@ -1,7 +1,7 @@
-import { Match, Show, Switch, createSignal, lazy, onMount } from 'solid-js';
+import { Match, Show, Switch, createSignal, lazy } from 'solid-js';
 import './Home.css';
 import { config, setConfig } from '@lib/utils';
-import { setNavStore, params, setSearchStore } from '@lib/stores';
+import { setNavStore } from '@lib/stores';
 import Dropdown from './Dropdown';
 const About = lazy(() => import('./About'));
 const Hub = lazy(() => import('./Hub'));
@@ -16,19 +16,6 @@ export default function() {
     setHome(name);
     setConfig('home', name);
   }
-
-  onMount(() => {
-    const q = params.get('q');
-    if (q) {
-      if (home() !== 'Search')
-        saveHome('Search');
-
-      const f = params.get('f') || 'all';
-      setConfig('searchFilter', f);
-      setSearchStore('query', q);
-    }
-  });
-
 
   let syncBtn!: HTMLElement;
 

@@ -10,6 +10,9 @@ import path from 'path';
 
 
 export default defineConfig(({ command }) => ({
+  build: {
+    minify: false,
+  },
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Build: JSON.stringify(

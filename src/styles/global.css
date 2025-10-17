@@ -49,10 +49,6 @@ main {
   flex-direction: row;
   scroll-snap-type: x mandatory;
 
-  @media (orientation: landscape) {
-    margin: 0 var(--size-fluid-4);
-  }
-
   section {
     height: 100%;
     flex: 1 0 0;
@@ -165,8 +161,24 @@ a {
     }
   }
 
+  span {
+    width: 100%;
+    display: flex;
+    margin-top: var(--size-2);
 
-  button {
-    background: none;
+    button {
+      background-color: var(--text);
+      color: var(--onBg);
+      border-radius: var(--roundness);
+    }
+
+    button.ri-close-large-line {
+      margin-left: auto;
+    }
   }
+
+  h4 {
+    margin-bottom: var(--size-4);
+  }
+
 }

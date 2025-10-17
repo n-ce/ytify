@@ -83,6 +83,8 @@ export default function() {
 
         }}
       ></i>
+      <i class="ri-play-list-2-fill"
+      ></i>
     </div >
   );
 

@@ -46,7 +46,7 @@
   p.title {
     font-size: var(--font-size-1);
     font-weight: var(--font-weight-6);
-    max-height: var(--size-8);
+    max-height: var(--size-12);
     line-height: var(--size-4);
     overflow: hidden;
     text-overflow: ellipsis;
