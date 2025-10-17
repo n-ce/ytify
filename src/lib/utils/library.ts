@@ -50,6 +50,12 @@ export const getCollection = (name: string) => JSON.parse(localStorage.getItem('
 
 export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channels : Playlists => JSON.parse(localStorage.getItem('library_' + type) || '{}');
 
+export function getCollectionItems(collectionId: string): CollectionItem[] {
+  const collectionIds = getCollection(collectionId);
+  const tracksMap = getTracksMap();
+  return collectionIds.map((id: string) => tracksMap[id]).filter(Boolean) as CollectionItem[];
+}
+
 export function saveTracksMap(tracks: Collection) {
   localStorage.setItem('library_tracks', JSON.stringify(tracks))
 };
@@ -220,7 +226,7 @@ export async function fetchCollection(
 function setObserver(callback: () => number) {
   const ref = document.querySelector(`.listContainer > :last-child`) as HTMLElement;
   if (!ref) return;
-  new IntersectionObserver((entries, observer) =>
+  const obs = new IntersectionObserver((entries, observer) =>
     entries.forEach(e => {
       if (e.isIntersecting) {
         observer.disconnect();
@@ -229,8 +235,9 @@ function setObserver(callback: () => number) {
           setObserver(callback);
 
       }
-    }))
-    .observe(ref);
+    }));
+  obs.observe(ref);
+  setListStore('observer', obs);
 }
 
 
@@ -268,7 +275,7 @@ function getLocalCollection(
       return ids.length - loadedCount;
     };
 
-    setTimeout(() => setObserver(observerCallback), 0);
+    setTimeout(() => setObserver(observerCallback), 100);
 
   } else {
     setListStore('list', ids.map(id => tracks[id]));

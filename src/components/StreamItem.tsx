@@ -104,7 +104,7 @@ export default function(data: {
           if (data.context?.src === 'queue') {
             const indexToRemove = parseInt(data.context.id, 10);
             setQueueStore('list', (list) =>
-              list.splice(indexToRemove, 1)
+              list.filter((_, idx) => idx !== indexToRemove)
             );
           }
         }

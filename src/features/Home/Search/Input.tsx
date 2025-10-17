@@ -52,7 +52,7 @@ export default function() {
             return;
 
           if (isBulk) {
-            const array = pastedText?.split('\n').map(idFromURL).filter(s => s?.length === 11);
+            const array = pastedText?.split(isBulk).map(idFromURL).filter(s => s?.length === 11);
             superInput.value = '';
             if (array?.length)
               await import('@lib/modules/bulkCapture')

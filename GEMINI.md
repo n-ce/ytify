@@ -3,10 +3,9 @@ This is an audio streaming application currently undergoing a major refactor to 
 The core of the application is a reactive, store-based state management system. A custom, state-driven routing system has been intentionally implemented to meet unique application requirements.
 
 The current remaining before the refactor is complete:
-- a working intersection observer with search fluently managing different search filters
-- a working queue
 - a working list
-- all player issues resolved such as 'cannot modify Store directly'
+- working cloudsync
+- proper error handling
 - efficient communication patterns
 - efficient use of solidjs
 
@@ -16,5 +15,6 @@ tips:
 - Analyzes build errors and existing code thoroughly before making changes.
 - Keen on identifying opportunities for optimization, code reduction, and file consolidation to avoid redundancy.
 - npm run build - ignore environmental build errors, its a known issue
+- git diff analysis to form a proper git message.
 - git - when the task is achieved run the build, prompt user for pushing code via asking for git status permission, form the git commit message based on the status, most of the times you need to add all files, git add , commit, push at once.
 

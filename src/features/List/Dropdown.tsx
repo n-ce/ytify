@@ -1,5 +1,5 @@
 import { Show, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollection, getTracksMap } from '@lib/utils/library';
+import { deleteCollection, getLists, saveLists, getCollectionItems } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
 import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore } from '@lib/stores';
 import { importList } from '@lib/modules/listUtils';
@@ -50,9 +50,10 @@ export default function Dropdown(_: {
           id="playAllBtn"
           onclick={() => {
             setQueueStore('list', []);
-            addToQueue(listStore.list);
-            setPlayerStore('stream', listStore.list[0]);
-            player(listStore.list[0].id);
+            const fullList = getCollectionItems(listStore.id);
+            addToQueue(fullList);
+            setPlayerStore('stream', fullList[0]);
+            player(fullList[0].id);
             setNavStore('queue', 'state', true);
           }}
         >
@@ -60,8 +61,9 @@ export default function Dropdown(_: {
         </li>
 
         <li id="enqueueAllBtn" onclick={() => {
-          addToQueue(listStore.list);
-                      setNavStore('queue', 'state', true);        }}>
+          const fullList = getCollectionItems(listStore.id);
+          addToQueue(fullList);
+          setNavStore('queue', 'state', true);        }}>
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
@@ -111,9 +113,7 @@ export default function Dropdown(_: {
           </li>
 
           <li id="exportCollectionBtn" onclick={() => {
-            const collectionIds = getCollection(listStore.id);
-            const tracksMap = getTracksMap();
-            const collectionData: CollectionItem[] = collectionIds.map((id: string) => tracksMap[id]);
+            const collectionData: CollectionItem[] = getCollectionItems(listStore.id);
             const jsonString = JSON.stringify(collectionData, null, 2);
             navigator.clipboard.writeText(jsonString)
               .then(() => {

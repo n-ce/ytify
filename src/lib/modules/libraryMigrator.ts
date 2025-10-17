@@ -84,7 +84,9 @@ export default function migrateLibrary() {
                 id: item.id,
                 title: item.title,
                 author: item.author || 'Unknown',
-                duration: typeof item.duration === 'number' ? convertSStoHHMMSS(item.duration) : item.duration || 'NULL',
+                duration: (typeof item.duration === 'number') ? convertSStoHHMMSS(item.duration) :
+                  (!item.duration.includes(':')) ? convertSStoHHMMSS(parseInt(item.duration)) :
+                    (item.duration || 'NULL'),
                 authorId: item.channelUrl?.slice(9) || '',
               };
               newCollectionIds.push(id);
