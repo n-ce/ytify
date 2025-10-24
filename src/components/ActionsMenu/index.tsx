@@ -1,8 +1,11 @@
-import { store, t, playerStore, setListStore, setNavStore, setQueueStore, setStore, getList } from '@lib/stores';
-import { config, getDownloadLink, hostResolver } from '@lib/utils';
+import { store, t, playerStore, setListStore, setStore, getList, addToQueue } from '@lib/stores';
+import { getDownloadLink } from '@lib/utils';
+import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
 import './ActionsMenu.css';
-import CollectionSelector from "./CollectionSelector";
-import { onMount, Show } from 'solid-js';
+import { onMount, Show, createEffect, createSignal } from 'solid-js';
+import { render } from 'solid-js/web';
+import { LikeButton } from '@components/MediaPartials';
+import CollectionSelector from './CollectionSelector';
 
 
 export default function() {
@@ -18,6 +21,14 @@ export default function() {
     dialog.showModal();
   });
 
+  const [isListenLater, setIsListenLater] = createSignal(false);
+  createEffect(() => {
+    const { id } = store.actionsMenu as CollectionItem;
+    if (id)
+      setIsListenLater(getCollection('listenLater').includes(id));
+  })
+
+
   return (
     <dialog
       id="actionsMenu"
@@ -28,11 +39,32 @@ export default function() {
       <ul
         onclick={(e: Event) => e.stopPropagation()}
       >
+        <li class="clxnShelf" tabindex="-1">
+          <LikeButton />
+          <i
+            aria-label='Listen Later'
+            class={`ri-calendar-schedule-${isListenLater() ? 'fill' : 'line'}`}
+            onclick={() => {
+              const { actionsMenu } = store;
+              if (actionsMenu) {
+                if (isListenLater())
+                  removeFromCollection('listenLater', [actionsMenu.id]);
+                else
+                  addToCollection('listenLater', [actionsMenu]);
+
+                setIsListenLater(!isListenLater());
+              }
+            }}
+          ></i>
+          <i aria-label="Add to Collection">
+            <CollectionSelector close={closeDialog} data={[store.actionsMenu as CollectionItem]} />
+          </i>
+        </li>
 
         <li tabindex="0" onclick={() => {
           const { actionsMenu } = store;
           if (actionsMenu)
-            setQueueStore('list', list => [actionsMenu, ...list]);
+            addToQueue([actionsMenu], { prepend: true });
 
           closeDialog();
         }}>
@@ -42,13 +74,11 @@ export default function() {
         <li tabindex="1" onclick={() => {
           const { actionsMenu } = store;
           if (actionsMenu)
-            setQueueStore('list', list => [...list, actionsMenu]);
+            addToQueue([actionsMenu]);
           closeDialog();
         }}>
           <i class="ri-list-check-2"></i>{t('actions_menu_enqueue')}
         </li>
-
-        <CollectionSelector close={closeDialog} />
 
         <li tabindex="3" onclick={async () => {
           getList('RD' + store?.actionsMenu?.id, 'mix');
@@ -84,7 +114,7 @@ export default function() {
                 : '');
 
           if (authorId)
-            getList(authorId, 'channel');
+            getList(authorId, isMusic ? 'artist' : 'channel');
 
           closeDialog();
         }}>
@@ -112,35 +142,38 @@ export default function() {
 
 
 
-        <Show when={!isMusic}>
-          <li tabindex="6" onclick={() => {
-            const id = store.actionsMenu?.id;
-            if (config.linkHost && id)
-              open(hostResolver('/watch?v=' + id));
-            else
-              setNavStore('video', 'state', true);
-            closeDialog();
-          }}>
-            <i class="ri-video-line"></i>{t('actions_menu_watch_on', store.linkHost.slice(8))}
-          </li>
 
-        </Show>
 
 
 
         <li tabindex="7" onclick={() => {
 
           const output = store.actionsMenu || playerStore.data;
-          const p = <p>{JSON.stringify(output, null, 4)}</p>;
-          setStore('dialog', p);
-          (document.querySelector('.displayer') as HTMLDialogElement).showModal();
+          const P = () => {
+            let z!: HTMLDialogElement;
+            onMount(() => {
+              z.showModal();
+            })
+            return (
+              <dialog
+                onclick={() => {
+                  z.close();
+                  z.remove();
+                }}
+                ref={z} class="displayer">
+                <p>{JSON.stringify(output, null, 4)}</p>
+              </dialog>
+            );
+          }
+          render(() => <P />, document.body);
+
           closeDialog();
 
         }}>
           <i class="ri-braces-line"></i>{t('actions_menu_debug_info')}
         </li>
-      </ul>
-    </dialog>
+      </ul >
+    </dialog >
   );
 
 

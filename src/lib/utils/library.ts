@@ -23,12 +23,12 @@ export const getMeta = (): Meta => {
   }
 
   const channels = getLists('channels');
-  if (Object.keys(channels).length > 0) {
+  if (channels.length > 0) {
     newMeta.channels = timestamp;
   }
 
   const playlists = getLists('playlists');
-  if (Object.keys(playlists).length > 0) {
+  if (playlists.length > 0) {
     newMeta.playlists = timestamp;
   }
 
@@ -48,7 +48,7 @@ export const getTracksMap = (): Collection =>
 
 export const getCollection = (name: string) => JSON.parse(localStorage.getItem('library_' + name) || '[]') as string[];
 
-export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channels : Playlists => JSON.parse(localStorage.getItem('library_' + type) || '{}');
+export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channel[] : Playlist[] => JSON.parse(localStorage.getItem('library_' + type) || '[]');
 
 export function getCollectionItems(collectionId: string): CollectionItem[] {
   const collectionIds = getCollection(collectionId);
@@ -67,7 +67,7 @@ export function saveCollection(
   localStorage.setItem('library_' + name, JSON.stringify(collection));
 }
 
-export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T extends 'channels' ? Channels : Playlists) {
+export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T extends 'channels' ? Channel[] : Playlist[]) {
   localStorage.setItem(`library_${type}`, JSON.stringify(data));
 };
 
@@ -102,7 +102,7 @@ export function addToCollection(
 
 export function removeFromCollection(
   name: string,
-  ids: string[],
+  ids: string[]
 ) {
   const collection = getCollection(name);
   const collections = getCollectionsKeys().filter(k => k !== name);;
@@ -128,6 +128,10 @@ export function removeFromCollection(
   saveCollection(name, collection);
   saveTracksMap(tracks);
   metaUpdater(name);
+
+
+  if (listStore.type === 'collection')
+    setListStore('list', l => l.filter(item => !ids.includes(item.id)));
 
 }
 
@@ -155,6 +159,7 @@ export function deleteCollection(name: string) {
 
 
 export const metaUpdater = (key: string, remove?: boolean) => {
+  setListStore('isLoading', true);
   const meta = getMeta();
   const timestamp = Date.now();
 
@@ -168,6 +173,7 @@ export const metaUpdater = (key: string, remove?: boolean) => {
     meta[key] = timestamp;
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
+  setListStore('isLoading', false);
 }
 
 
@@ -180,6 +186,22 @@ export function createCollection(title: string) {
   }
 
   metaUpdater(title);
+}
+
+export function renameCollection(oldName: string, newName: string) {
+  if (oldName === newName) return;
+
+  const collections = getCollectionsKeys();
+  if (collections.includes(newName)) {
+    setStore('snackbar', t('list_already_exists'));
+    return;
+  }
+
+  const collectionItems = getCollection(oldName);
+  saveCollection(newName, collectionItems);
+  localStorage.removeItem('library_' + oldName);
+  metaUpdater(oldName, true);
+  metaUpdater(newName);
 }
 
 

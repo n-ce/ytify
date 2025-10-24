@@ -1,3 +1,5 @@
+import { fetchJson } from "@lib/utils";
+
 interface Thumbnail {
   quality: string;
   url: string;
@@ -47,7 +49,8 @@ export interface PlaylistResponse {
   thumbnail: string,
   videos: Video[],
   author: string,
-  title: string
+  title: string,
+  subtitle: string
 }
 
 export default async function(
@@ -56,21 +59,13 @@ export default async function(
   page: number
 ): Promise<PlaylistResponse> {
 
-  const isYTM = id.startsWith('VL');
-  if (isYTM)
-    id = id.slice(2);
 
-  return fetch(`${api}/api/v1/playlists/${id}?page=${page}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then((data: Playlist) => ({
+  return fetchJson<Playlist>(`${api}/api/v1/playlists/${id}?page=${page}`)
+    .then((data) => ({
       author: data?.author,
       title: data.title,
-      thumbnail: data?.authorThumbnails?.[0]?.url,
-      videos: data.videos
+      thumbnail: data.playlistThumbnail || data?.authorThumbnails?.[0]?.url,
+      videos: data.videos,
+      subtitle: data.subtitle
     }));
 }

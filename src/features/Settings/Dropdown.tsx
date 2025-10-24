@@ -29,7 +29,10 @@ export default function Dropdown() {
 
   return (
     <details>
-      <summary><i class="ri-more-2-fill"></i></summary>
+      <summary><i
+        aria-label="More Options"
+        class="ri-more-2-fill"
+      ></i></summary>
       <ul>
         <li onclick={clearCache}>
           <i class="ri-delete-bin-2-line"></i>&nbsp;{t('settings_clear_cache')}

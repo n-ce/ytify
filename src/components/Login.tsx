@@ -1,15 +1,16 @@
-
-import { setStore } from "@lib/stores";
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { setConfig } from "@lib/utils/config";
 
 export default function() {
 
   const [email, setEmail] = createSignal('');
   const [pw, setPw] = createSignal('');
-
+  let z!: HTMLDialogElement;
+  onMount(() => {
+    z.showModal();
+  })
   return (
-    <>
+    <dialog ref={z} class="displayer">
       <h4>Sync your library to the cloud</h4>
       <input
         oninput={(e) => setEmail(e.target.value)}
@@ -41,12 +42,12 @@ export default function() {
               console.error("Email validation failed:", error);
             });
         }}>Get Access</button>
-        <button onclick={(e) => {
-          (e.target.parentElement?.parentElement as HTMLDialogElement).close();
-          setStore('dialog', undefined);
+        <button onclick={() => {
+          z.close();
+          z.remove();
         }} class="ri-close-large-line">
         </button>
       </span>
-    </>
+    </dialog>
   );
 }

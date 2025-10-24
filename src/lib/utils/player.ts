@@ -1,5 +1,5 @@
 import { convertSStoHHMMSS } from "./helpers";
-import { playerStore, setNavStore, setPlayerStore, setStore, store, updateParam } from "@lib/stores";
+import { playerStore, setPlayerStore, setStore, store } from "@lib/stores";
 import { config } from "./config";
 
 let playerAbortController: AbortController;
@@ -12,15 +12,13 @@ export async function player(id?: string) {
 
   if (!id) return;
 
-  if (config.watchMode) {
-    setNavStore('video', 'state', true);
-    return;
-  }
+  const enforceVideo = !playerStore.isMusic && playerStore.isWatching;
 
-  setPlayerStore({
-    playbackState: 'loading',
-    status: 'Fetching Data...'
-  });
+  if (!enforceVideo)
+    setPlayerStore({
+      playbackState: 'loading',
+      status: 'Loading Audio...'
+    });
 
 
   if (!store.useSaavn)
@@ -41,7 +39,7 @@ export async function player(id?: string) {
   else {
     setPlayerStore({
       playbackState: 'none',
-      status: data.message || data.error || 'Fetching Data Failed'
+      status: data.message || data.error || 'Loading Audio Failed'
     });
     setStore('snackbar', playerStore.status);
     return;
@@ -65,9 +63,9 @@ export async function player(id?: string) {
     ));
 
 
-  updateParam('s', id);
 
-  if (config.enqueueRelatedStreams)
+
+  if (config.enqueueRelatedStreams && !enforceVideo)
     import('../modules/enqueueRelatedStreams')
       .then(mod => mod.default(data.relatedStreams as StreamItem[]));
 

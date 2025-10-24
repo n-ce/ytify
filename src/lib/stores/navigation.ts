@@ -6,7 +6,7 @@ const Queue = lazy(() => import('../../features/Queue'));
 const Player = lazy(() => import('../../features/Player'));
 
 const Settings = lazy(() => import('../../features/Settings'));
-const Video = lazy(() => import('../../features/Video'));
+
 
 const Updater = lazy(() => import('../../features/Updater'));
 
@@ -26,7 +26,7 @@ export const [navStore, setNavStore] = createStore<Nav>({
   home: { ref: null, state: true, component: Home },
 
   list: { ref: null, state: false, component: List },
-  video: { ref: null, state: false, component: Video },
+
   settings: { ref: null, state: false, component: Settings },
   updater: { ref: null, state: false, component: Updater }
 });
@@ -58,15 +58,7 @@ export function closeFeature(name: Features) {
     closestRef?.scrollIntoView({ behavior: 'smooth' });
 
 
-  const isLandscape = matchMedia('(orientation:landscape)').matches;
-
-  if (isLandscape)
-    setNavStore(name, { ref: null, state: false });
-  else
-    setTimeout(() => {
-      setNavStore(name, { ref: null, state: false });
-    }, 500);
-
+  setNavStore(name, { ref: null, state: false });
 }
 
 type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'si' | 'supermix' | 't';

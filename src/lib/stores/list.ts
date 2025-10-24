@@ -1,13 +1,13 @@
 import { createStore } from "solid-js/store";
 import { closeFeature, setNavStore, updateParam } from "./navigation";
 import { setStore, store } from "./app";
-import fetchArtist from "@lib/modules/fetchArtist";
+import fetchArtist, { ArtistResponse } from "@lib/modules/fetchArtist";
 import fetchMix from "@lib/modules/fetchMix";
 import fetchPlaylist, { PlaylistResponse } from "@lib/modules/fetchPlaylist";
 import fetchChannel from "@lib/modules/fetchChannel";
 import { convertSStoHHMMSS, getApi } from "@lib/utils";
 import { setQueueStore } from "./queue";
-import fetchAlbum from "@lib/modules/fetchAlbum";
+import fetchAlbum, { AlbumResponse } from "@lib/modules/fetchAlbum";
 
 
 const initialState = () => ({
@@ -32,10 +32,12 @@ const initialState = () => ({
 export const [listStore, setListStore] = createStore(initialState());
 
 
-export async function getList(url: string, type: 'playlist' | 'channel' | 'album' | 'mix' | 'artist') {
+export async function getList(
+  url: string,
+  type: 'playlist' | 'channel' | 'album' | 'mix' | 'artist',
+  index = store.invidious.length - 1
+) {
 
-
-  let index = store.invidious.length - 1;
 
   if (type === 'mix') {
     const list = await fetchMix(url, getApi(index));
@@ -47,22 +49,24 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
   setNavStore('list', 'state', true);
 
   if (type === 'playlist') {
-    const { author, title, thumbnail, videos } = await fetchPlaylist(url, getApi(index), listStore.page)
+    const data = await fetchPlaylist(url, getApi(index), listStore.page)
+
       .catch(e => {
         if (index === 0) {
           setStore('snackbar', e.message);
           index = store.invidious.length;
+          resetList();
           return {} as PlaylistResponse;
         }
-        else {
-          return fetchPlaylist(url, getApi(index--), listStore.page);
-        }
+        else getList(url, type, index - 1);
 
       });
+    if (!data) return;
+    const { author, title, thumbnail, videos } = data;
 
     setListStore({
       name: title,
-      thumbnail: thumbnail,
+      thumbnail,
       id: url,
       uploader: author,
       type: 'playlists',
@@ -80,17 +84,19 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
 
   if (type === 'channel') {
 
-    const { author, thumbnail, videos } = await fetchChannel(url, getApi(index), listStore.page)
+    const data = await fetchChannel(url, getApi(index), listStore.page)
       .catch(e => {
         if (index === 0) {
           setStore('snackbar', e.message);
           index = store.invidious.length;
+          resetList();
           return { author: '', thumbnail: '', videos: [] };
         }
-        else {
-          return fetchChannel(url, getApi(index--), listStore.page);
-        }
+        else getList(url, type, index - 1);
       });
+    if (!data) return;
+
+    const { author, thumbnail, videos } = data;
     setListStore({
       name: author,
       thumbnail: thumbnail,
@@ -109,24 +115,38 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
   }
 
   if (type === 'artist') {
-    const { playlistId, artistName } = (await fetchArtist(url));
-    const { videos, thumbnail } = await fetchPlaylist(playlistId, getApi(index), listStore.page)
+    const artistData = await fetchArtist(url)
       .catch(e => {
         if (index === 0) {
           setStore('snackbar', e.message);
           index = store.invidious.length;
-          return { author: '', title: '', thumbnail: '', videos: [] };
+          resetList();
+          return {} as ArtistResponse;
         }
-        else {
-          return fetchPlaylist(playlistId, getApi(index--), listStore.page);
-        }
+        else getList(url, type, index - 1);
       });
+    if (!artistData) return;
+    const { playlistId, artistName } = artistData;
+
+    const playlistData = await fetchPlaylist(playlistId, getApi(index), listStore.page)
+      .catch(e => {
+        if (index === 0) {
+          setStore('snackbar', e.message);
+          index = store.invidious.length;
+          resetList();
+          return {} as PlaylistResponse;
+        }
+        else getList(url, type, index - 1);
+      });
+
+    if (!playlistData) return;
+
+    const { videos } = playlistData;
+
     setListStore({
-      name: artistName,
-      thumbnail: thumbnail,
-      id: playlistId,
-      uploader: '',
-      type: 'playlists',
+      name: 'Artist - ' + artistName,
+      id: url,
+      type: 'channels',
       url: url,
       list: videos.map(v => ({
         id: v.videoId,
@@ -139,32 +159,48 @@ export async function getList(url: string, type: 'playlist' | 'channel' | 'album
   }
 
   if (type === 'album') {
-    const { title, thumbnail, tracks } = await fetchAlbum(url)
+    const albumData = await fetchAlbum(url)
       .catch(e => {
         if (index === 0) {
           setStore('snackbar', e.message);
           index = store.invidious.length;
-          return { id: '', playlistId: '', title: '', artist: '', year: '', thumbnail: '', tracks: [] };
+          resetList();
+          return {} as AlbumResponse;
         }
-        else {
-          return fetchAlbum(url);
-        }
+        else getList(url, type, index - 1);
       });
+    if (!albumData) return;
+    const { thumbnail, playlistId } = albumData;
+
+    const playlistData = await fetchPlaylist(playlistId, getApi(index), listStore.page)
+      .catch(e => {
+        if (index === 0) {
+          setStore('snackbar', e.message);
+          index = store.invidious.length;
+          resetList();
+          return {} as PlaylistResponse;
+        }
+        else getList(url, type, index - 1);
+      });
+    if (!playlistData) return;
+    const { title, videos, subtitle } = playlistData;
+
     setListStore({
-      name: title,
       thumbnail: thumbnail,
-      id: url,
-      uploader: tracks[0].artist,
-      type: 'playlists',
+      id: playlistId,
       url: url,
-      list: tracks.map(v => ({
+      type: 'playlists',
+      name: title,
+      uploader: subtitle.replace(' • Album', ''),
+      list: videos.map(v => ({
         id: v.videoId,
         title: v.title,
-        author: v.artist,
-        authorId: '',
-        duration: v.duration
+        author: v.author,
+        authorId: v.authorId,
+        duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as CollectionItem)
     })
+
   }
 
   setListStore('isLoading', false);

@@ -24,15 +24,22 @@ export default function() {
 
   if (localStorage.getItem('library')) {
     import('@lib/modules/libraryMigrator')
-    .then(m => m.default());
+      .then(m => m.default());
     return 'Library Migration In Place...';
   }
 
   const reservedCollections = {
     history: ['ri-memories-line', 'library_history'],
     favorites: ['ri-heart-fill', 'library_favorites'],
-    listenLater: ['ri-calendar-schedule-line', 'library_listen_later']
+    listenLater: ['ri-calendar-schedule-fill', 'library_listen_later'],
+    liked: ['ri-thumb-up-fill', 'library_liked']
   };
+
+  if (getCollectionsKeys().length === 0) {
+    for (const collection in reservedCollections) {
+      localStorage.setItem('library_' + collection, '[]');
+    }
+  }
 
   const searchResults = createMemo(() => {
     const { results, isTruncated } = searchTracks(debouncedSearchText(), tracksMap());

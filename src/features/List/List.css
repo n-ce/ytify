@@ -18,6 +18,12 @@
     display: flex;
     flex-direction: column-reverse;
   }
+
+  &~li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 .listContainer {

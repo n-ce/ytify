@@ -45,7 +45,10 @@ The journey began with a frustration. As a regular user of NewPipe in 2021, I re
 > This project is actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
 
 ## Donations
-- **XMR:** `monero:87JGn7LSSwEB6ZHLFRh8UdYHaqm6BkdxY4fVYdSyp8SY1FyUTT9pDCeJ1jHWJ9j4mY49tMWF2Z9GXSpY7fHPat1P3faMdTv`
+- **XMR:** `87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH`
+- **LTC:** `ltc1qvrvu50lz9e4cgjc9lf59td53xzu08zref2rxkf`
+- **BTC:** `bc1qtaxauv2mzc52ulmenlmejetluxnz5ly4ucg97k`
+- **ETH:** `0x8c0028c8C4EC2ee508C9A9DdDf15Fe00b4960ED3`
 - **UPI:** `animesh.5383@waicici`
 
 ## Development 🔧

@@ -101,17 +101,25 @@
 		font-size: var(--font-size-3);
 		z-index: 2;
 		position: absolute;
-		right: calc(var(--size-2) - var(--size-8));
-		bottom: calc(var(--size-1) - var(--size-7));
+		right: calc(var(--size-2) - var(--size-6));
+		bottom: calc(var(--size-1) - var(--size-4));
 		border-radius: 50%;
+		opacity: 0.5;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		cursor: pointer;
+		transition: all 0.3s;
 
 		&:hover {
-			background-color: var(--onBg);
+			opacity: 1;
+			background-image: radial-gradient(var(--onBg), var(--onBg2) 80%);
 		}
+
 	}
 
 }
+
 
 #queuelist>a {
 	transition: initial;

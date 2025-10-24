@@ -13,7 +13,7 @@ export default function(
   const origin = new URL(audio.src).origin;
 
   if (audio.src.endsWith('&fallback')) {
-    if (audio.parentNode) {
+    if (!playerStore.isWatching) {
       setStore('snackbar', message);
       setPlayerStore('playbackState', 'none');
     }

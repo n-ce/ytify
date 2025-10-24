@@ -1,6 +1,7 @@
 import { getTracksMap } from '@lib/utils/library';
 import { navStore, setNavStore, setStore, t } from '@lib/stores';
 import { lazy, Show } from 'solid-js';
+import { render } from 'solid-js/web';
 
 
 const Login = lazy(() => import('@components/Login'));
@@ -74,7 +75,10 @@ export default function Dropdown(_: {
 
   return (
     <details>
-      <summary><i class="ri-more-2-fill"></i></summary>
+      <summary><i
+        aria-label="More Options"
+        class="ri-more-2-fill"
+      ></i></summary>
       <ul>
         <Show when={_.isLibrary()}>
 
@@ -106,8 +110,7 @@ export default function Dropdown(_: {
           </li>
 
           <li onclick={() => {
-            setStore('dialog', Login);
-            (document.querySelector('.displayer') as HTMLDialogElement).showModal();
+            render(() => <Login />, document.body);
           }}>
             <i class="ri-cloud-fill"></i>&nbsp;Cloud Sync
           </li>

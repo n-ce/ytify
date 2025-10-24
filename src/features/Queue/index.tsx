@@ -1,6 +1,6 @@
 import { createSignal, onMount } from 'solid-js';
 import './Queue.css';
-import { openFeature, setStore, t, addToQueue, queueStore } from "@lib/stores";
+import { openFeature, setStore, t, addToQueue, queueStore, closeFeature } from "@lib/stores";
 import { config, setConfig } from "@lib/utils";
 import { setQueueStore } from "@lib/stores/queue";
 import List from "./List";
@@ -22,24 +22,28 @@ export default function() {
 
       <ul id="queuetools">
         <li
-          classList={{
-            on: config.shuffle
+          onclick={(e) => {
+            const target = e.target as HTMLElement;
+            if (target.tagName === 'I') {
+              // Clicked on icon
+              const btn = target as HTMLElement;
+              btn.classList.toggle('on');
+              setConfig('shuffle', btn.classList.contains('on'));
+            } else {
+              // Clicked on li
+              setQueueStore('list', (list) => {
+                const shuffled = [...list];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                  const j = Math.floor(Math.random() * (i + 1));
+                  [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+              });
+            }
           }}
-          onclick={() => {
-            setQueueStore('list', (list) => {
-              const shuffled = [...list];
-              for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-              }
-              return shuffled;
-            });
-          }}>
-          <i onclick={() => {
-
-            setConfig('shuffle', !config.shuffle);
-            addToQueue(queueStore.list);
-          }}
+        >
+          <i
+            classList={{ on: config.shuffle }}
             class="ri-shuffle-line"></i>{t('upcoming_shuffle')}
         </li>
 
@@ -60,10 +64,9 @@ export default function() {
           }}
           onclick={(e) => {
             const btn = e.currentTarget as HTMLElement;
-
             btn.classList.toggle('on');
             setConfig('filterLT10', btn.classList.contains('on'));
-            addToQueue(queueStore.list);
+            addToQueue(queueStore.list, { replace: true });
           }}
         >
           <i class="ri-filter-2-line"></i>{t('upcoming_filter_lt10')}
@@ -76,11 +79,23 @@ export default function() {
           onclick={(e) => {
             const btn = e.currentTarget as HTMLElement;
             btn.classList.toggle('on');
-            setConfig('allowDuplicates', btn.classList.contains('on'));
+            const allowDuplicates = btn.classList.contains('on');
+            setConfig('allowDuplicates', allowDuplicates);
 
-            setStore('snackbar', t('upcoming_change'));
-          }
-          }
+            if (!allowDuplicates) {
+              setQueueStore('list', (list) => {
+                const uniqueIds = new Set<string>();
+                return list.filter(item => {
+                  if (uniqueIds.has(item.id)) {
+                    return false;
+                  } else {
+                    uniqueIds.add(item.id);
+                    return true;
+                  }
+                });
+              });
+            }
+          }}
         >
           <i class="ri-file-copy-line"></i>{t('upcoming_allow_duplicates')}
         </li >
@@ -113,6 +128,12 @@ export default function() {
 
       </ul >
       <List removeMode={removeMode()} />
+
+      <i
+        aria-label="close"
+        onclick={() => { closeFeature('queue') }}
+        class="ri-close-large-line"></i>
+
     </section >
   );
 }

@@ -29,7 +29,7 @@ export default function Results(_: {
               authorId={item.authorId}
               draggable={_.draggable}
               context={
-                { id: listStore.id, src: listStore.type }
+                { id: listStore.name || listStore.id, src: listStore.type }
               }
               mark={_.mark}
             />

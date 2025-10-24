@@ -1,25 +1,21 @@
 
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
-import { getLists, getCollection } from "../utils";
+import { getLists } from "../utils";
 import fetchArtist from "./fetchArtist";
-import supermix from "./supermix";
-
 
 type Hub = {
-  discovery?: { [index: string]: CollectionItem & { frequency: number } };
-  playlists: Playlists;
-  artists: Channels;
-  foryou: CollectionItem[];
+  discovery?: (CollectionItem & { frequency: number })[];
+  playlists: Playlist[];
+  artists: Channel[];
   subfeed: CollectionItem[];
 };
 
 
 const initialHub: Hub = {
-  discovery: {},
-  playlists: {},
-  artists: {},
-  foryou: [],
+  discovery: [],
+  playlists: [],
+  artists: [],
   subfeed: [],
 };
 
@@ -67,7 +63,7 @@ export async function updateSubfeed(preview?: string): Promise<void> {
 
 export async function updateRelatedToYourArtists(): Promise<void> {
   const channels = getLists('channels');
-  const artistIds = channels ? Object.keys(channels).filter(id => channels[id].name.includes('Artist - ')) : [];
+  const artistIds = channels ? channels.filter(channel => channel.name.includes('Artist - ')).map(channel => channel.id) : [];
 
   const promises = artistIds.map(fetchArtist);
 
@@ -117,21 +113,21 @@ export async function updateRelatedToYourArtists(): Promise<void> {
     });
 
 
-    const featuredPlaylists = Object.fromEntries(Object
+    const featuredPlaylists = Object
       .values(PlaylistMap)
       .sort((a, b) => b.count! - a.count!)
       .map(s => {
         delete s.count;
-        return [s.id, s];
-      }));
+        return s;
+      });
 
-    const relatedArtists = Object.fromEntries(Object
+    const relatedArtists = Object
       .values(ArtistMap)
       .sort((a, b) => b.count! - a.count!)
       .map(s => {
         delete s.count;
-        return [s.id, s];
-      }))
+        return s;
+      });
 
 
 
@@ -140,10 +136,3 @@ export async function updateRelatedToYourArtists(): Promise<void> {
   });
 }
 
-export async function updateForYou(): Promise<void> {
-  const favorites = getCollection('favorites');
-  if (favorites.length === 0) return;
-
-  const mixArray = await supermix(favorites);
-  updateHubSection('foryou', mixArray);
-}

@@ -1,7 +1,7 @@
 import { config, hostResolver } from '@lib/utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
-import { getList } from '@lib/stores';
+import { getList, setListStore } from '@lib/stores';
 
 export default function(data: {
   title: string,
@@ -28,13 +28,18 @@ export default function(data: {
       href={hostResolver(data.url)}
       onclick={(e) => {
         e.preventDefault();
+        setListStore('thumbnail', data.thumbnail);
+
         console.log(data.url);
+
         if (data.url.startsWith('/channel'))
           getList(data.url.slice(9), 'channel');
         else if (data.url.includes('MPREb'))
           getList(data.url.split('/').pop()!, 'album')
-        else if (data.url.startsWith('/playlist'))
+        else if (data.url.startsWith('/playlist')) {
+          console.log(data.url);
           getList(data.url.slice(10), 'playlist')
+        }
         else getList(data.url.slice(8), 'artist');
       }}
     >

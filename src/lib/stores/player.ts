@@ -29,13 +29,14 @@ type PlayerStore = {
   isMusic: boolean,
   audioURL: string,
   videoURL: string,
+  isWatching: boolean,
   lrcSync?: (d: number) => void
 };
 
 const createInitialState = (): PlayerStore => ({
   audio: new Audio(),
   playbackState: 'none',
-  context: { id: '', src: 'link' },
+  context: { id: 'query', src: 'link' },
   status: '',
   currentTime: 0,
   fullDuration: 0,
@@ -62,6 +63,7 @@ const createInitialState = (): PlayerStore => ({
   isMusic: true,
   audioURL: '',
   videoURL: '',
+  isWatching: Boolean(config.watchMode)
 });
 
 const [playerStore, setPlayerStore] = createStore(createInitialState());

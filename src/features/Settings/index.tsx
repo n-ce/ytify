@@ -22,7 +22,9 @@ export default function() {
     >
       <header>
         <p>ytify {Build}</p>
-        <i class="ri-close-large-line" onclick={() => closeFeature('settings')}></i>
+        <i
+          aria-label="close"
+          class="ri-close-large-line" onclick={() => closeFeature('settings')}></i>
         <Dropdown />
       </header>
       <div>

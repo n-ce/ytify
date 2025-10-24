@@ -16,13 +16,28 @@ export default function() {
         more about how to use it effectively.</a>
       <br />
       <p>
-        Support the ytify project:  UPI&nbsp;
+        Support the ytify project: Through UPI&nbsp;
 
         <svg xmlns="http://www.w3.org/2000/svg" x="0" y="0px" width="2px" height="2px" viewBox="0 0 50 50">
           <path fill="currentColor" d="M40.91,24.586l-10-22c-0.174-0.385-0.573-0.618-0.991-0.583c-0.42,0.034-0.774,0.329-0.884,0.736l-2.627,9.717 l-4.477-9.869c-0.174-0.384-0.562-0.615-0.99-0.584c-0.42,0.034-0.774,0.327-0.885,0.733l-12.02,44 c-0.119,0.438,0.07,0.901,0.463,1.128C8.654,47.956,8.828,48,9,48c0.259,0,0.515-0.1,0.708-0.293l9.828-9.828l-2.395,8.86 c-0.118,0.438,0.073,0.9,0.465,1.127c0.156,0.09,0.329,0.134,0.5,0.134c0.26,0,0.517-0.101,0.709-0.294l21.895-22 C41.002,25.411,41.083,24.965,40.91,24.586z M21.254,5.937l8.549,18.846L10.958,43.628L21.254,5.937z M20.053,43.625l2.321-8.585 l9.333-9.333c0.294-0.294,0.376-0.741,0.204-1.12l-4.236-9.339l0.047,0.013l2.519-9.316l8.564,18.84L20.053,43.625z"></path>
         </svg>
         <b>animesh.5383@waicici</b>&nbsp;
       </p>
+      <details>
+        <summary>or, via Crypto</summary>
+        <p>
+          <b>XMR:</b> 87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH
+        </p>
+        <p>
+          <b>LTC:</b> ltc1qvrvu50lz9e4cgjc9lf59td53xzu08zref2rxkf
+        </p>
+        <p>
+          <b>BTC:</b> bc1qtaxauv2mzc52ulmenlmejetluxnz5ly4ucg97k
+        </p>
+        <p>
+          <b>ETH:</b> 0x8c0028c8C4EC2ee508C9A9DdDf15Fe00b4960ED3
+        </p>
+      </details>
       <p>Support our Earth:&nbsp;
         <a
           href='https://en.m.wikipedia.org/wiki/Individual_action_on_climate_change' target='_blank'><b>Lifestyle Changes to tackle Climate Change</b></a>

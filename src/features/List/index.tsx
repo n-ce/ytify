@@ -7,6 +7,7 @@ import { setConfig, config } from '@lib/utils/config';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import { useSortedList } from './useSortedList';
+import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
 
 type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
 
@@ -17,6 +18,7 @@ export default function() {
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
   const [showSortMenu, setShowSortMenu] = createSignal(false);
+  const [showCollectionSelector, setShowCollectionSelector] = createSignal<CollectionItem[]>([]);
   const [localSortOrder, setLocalSortOrder] = createSignal<SortOrder>(config.sortOrder);
 
   const sortedList = useSortedList(localSortOrder);
@@ -54,6 +56,7 @@ export default function() {
   const MarkBar = () => (
     <div class="markBar">
       <i
+        aria-label="Mark or Unmark All"
         class={'ri-checkbox-multiple-fill'}
         onclick={() => {
           if (markList().length === listStore.list.length)
@@ -61,16 +64,18 @@ export default function() {
           else
             setMarkList(listStore.list.map(v => v.id));
 
+          setShowCollectionSelector([]);
         }}
       ></i>
       <i
+        aria-label="Remove Marked"
         class="ri-indeterminate-circle-line"
         onclick={() => {
           removeFromCollection(listStore.name, markList());
-          setListStore('list', l => l.filter(item => !markList().includes(item.id)));
         }}
       ></i>
       <i
+        aria-label="Enqueue Marked"
         class="ri-list-check-2"
         onclick={() => {
 
@@ -83,7 +88,17 @@ export default function() {
 
         }}
       ></i>
-      <i class="ri-play-list-2-fill"
+      <i
+        aria-label="Create New Collection from Marked"
+        class="ri-play-list-2-fill"
+        onclick={() => {
+
+          const list = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
+
+          if (list.length) {
+            setShowCollectionSelector(list);
+          }
+        }}
       ></i>
     </div >
   );
@@ -107,6 +122,8 @@ export default function() {
 
         <div class="right-group">
           <i
+            aria-label="Mark Mode"
+            aria-checked={markMode()}
             class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
             onclick={() => {
               setMarkMode(!markMode());
@@ -115,6 +132,7 @@ export default function() {
             }}
           ></i>
           <i
+            aria-label="close"
             class="ri-close-large-line"
             onclick={resetList}
           ></i>
@@ -122,6 +140,10 @@ export default function() {
         <Dropdown toggleSort={() => setShowSortMenu(!showSortMenu())} />
       </header>
 
+
+      <Show when={showCollectionSelector().length}>
+        <CollectionSelector data={showCollectionSelector()} />
+      </Show>
       <Show when={showSortMenu()}>
         <span>
           <label for="sortMenu">Sort Order :</label>

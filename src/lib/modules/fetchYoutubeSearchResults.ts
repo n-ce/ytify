@@ -1,4 +1,4 @@
-import { numFormatter, convertSStoHHMMSS, getThumbIdFromLink, generateImageUrl, hostResolver, fetchJson } from "@lib/utils";
+import { numFormatter, convertSStoHHMMSS, getThumbIdFromLink, generateImageUrl, fetchJson } from "@lib/utils";
 
 // Invidious search result types
 interface InvidiousVideoResult {
@@ -103,7 +103,7 @@ export default async function(
             title: videoItem.title,
             author: videoItem.author,
             duration: convertSStoHHMMSS(videoItem.lengthSeconds),
-            channelUrl: videoItem.authorUrl,
+            authorId: videoItem.authorId,
             views: videoItem.viewCountText,
             img: videoItem.videoId,
             uploaded: videoItem.publishedText,
@@ -125,9 +125,8 @@ export default async function(
             title: playlistItem.title,
             stats: `${playlistItem.videoCount} streams`,
             thumbnail: playlistItem.playlistThumbnail,
-
             uploaderData: playlistItem.author,
-            url: hostResolver(`/playlist?list=${playlistItem.playlistId}`),
+            url: `/playlist/${playlistItem.playlistId}`,
             type: 'playlist',
           } as YTListItem;
         }

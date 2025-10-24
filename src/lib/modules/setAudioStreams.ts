@@ -5,6 +5,7 @@ export default async function(
   audioStreams: AudioStream[],
   prefetchNode?: HTMLAudioElement
 ) {
+
   if (!prefetchNode)
     setPlayerStore('status', t('player_audiostreams_setup'));
 

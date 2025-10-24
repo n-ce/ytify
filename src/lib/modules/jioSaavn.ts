@@ -2,7 +2,7 @@ import { playerStore, setPlayerStore, setStore, updateParam } from "@lib/stores"
 import { config, player } from "@lib/utils";
 
 export default function() {
-  setPlayerStore('status', 'Fetching Data via JioSaavn...');
+  setPlayerStore('status', 'Loading music information...');
 
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;

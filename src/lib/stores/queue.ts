@@ -6,7 +6,7 @@ export const [queueStore, setQueueStore] = createStore({
 });
 
 
-export function addToQueue(items: CollectionItem[]) {
+export function addToQueue(items: CollectionItem[], options: { replace?: boolean, prepend?: boolean } = {}) {
   let itemsToAdd = config.allowDuplicates
     ? items
     : items.filter(item => !queueStore.list.some(existingItem => existingItem.id === item.id));
@@ -31,5 +31,11 @@ export function addToQueue(items: CollectionItem[]) {
     }
   }
 
-  setQueueStore('list', list => [...list, ...itemsToAdd]);
+  if (options.replace) {
+    setQueueStore('list', itemsToAdd);
+  } else if (options.prepend) {
+    setQueueStore('list', list => [...itemsToAdd, ...list]);
+  } else {
+    setQueueStore('list', list => [...list, ...itemsToAdd]);
+  }
 }

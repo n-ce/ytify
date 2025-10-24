@@ -1,10 +1,11 @@
-import { addToCollection, createCollection, getCollectionsKeys } from '@lib/utils/library';
-import { store, t } from '@lib/stores';
+import { addToCollection, createCollection, getCollection, getCollectionsKeys, removeFromCollection } from '@lib/utils/library';
+import { t } from '@lib/stores';
+import { For, Show } from 'solid-js';
 
 export default function(_: {
-  close: () => void
+  close?: () => void,
+  data: CollectionItem[]
 }) {
-
 
   const handleCollectionChange = (e: Event & { target: HTMLSelectElement }) => {
     const { value } = e.target;
@@ -19,38 +20,61 @@ export default function(_: {
       if (title) {
         createCollection(title);
       }
-    } else {
-      title = value;
+    } else title = value;
+
+
+    if (title && _.data) {
+      if (title.startsWith('-cl'))
+        removeFromCollection(value.slice(3), _.data.map(_ => _.id));
+      else
+        addToCollection(title, _.data);
     }
 
-    if (title && store.actionsMenu) {
-      const itemToAdd: CollectionItem = store.actionsMenu;
-      addToCollection(title, [itemToAdd]);
-    }
-
-    _.close();
+    if (_.close)
+      _.close();
     e.target.selectedIndex = 0;
   };
 
 
+  const getKeys = (add: boolean) => getCollectionsKeys()
+    .filter(k => {
+
+      if ([
+        'favorites',
+        'listenLater',
+        'liked'
+      ].includes(k)) return false;
+
+      const itemIsIncluded = getCollection(k).includes(_.data[0].id);
+
+      return add ? !itemIsIncluded : itemIsIncluded;
+    });
+
   return (
-    <li>
-      <i class="ri-play-list-add-line"></i>
-      <select
-        tabindex="2"
-        id="collectionSelector"
-        onchange={handleCollectionChange}
-      >
-        <option value="">{t('collection_selector_add_to')}</option>
-        <option value="+cl">{t('collection_selector_create_new')}</option>
-        <option value="favorites">{t('collection_selector_favorites')}</option>
-        <option value="listenLater">{t('collection_selector_listen_later')}</option>
-        {
-          getCollectionsKeys().filter(k => !['favorites', 'listenLater'].includes(k)).map((v) => (
-            <option value={v}>{v}</option>
-          ))
-        }
-      </select>
-    </li>
+    <select
+      class="ri-play-list-add-line"
+      id="collectionSelector"
+      onchange={handleCollectionChange}
+      aria-label={t('collection_selector_add_to')}
+    >
+      <option value="" selected disabled>&#xf00f</option>
+      <option value="+cl">{t('collection_selector_create_new')}</option>
+      <Show when={getKeys(true).length}>
+        <optgroup label="Add to Collection">
+          <For each={getKeys(true)}>
+            {(v) => <option value={v}>{v}</option>}
+          </For>
+        </optgroup>
+      </Show>
+      <Show when={getKeys(false).length}>
+        <optgroup label="Remove from Collection">
+
+          <For each={getKeys(false)}>
+            {(v) => <option value={'-cl' + v}>{v}</option>}
+          </For>
+        </optgroup>
+      </Show>
+    </select>
+
   );
 }

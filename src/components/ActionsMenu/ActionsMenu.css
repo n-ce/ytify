@@ -21,6 +21,7 @@
     width: max-content;
     margin: auto var(--size-fluid-1);
     margin-left: auto;
+    animation: var(--animation-slide-out-right) forwards;
 
     &:open {
       animation-name: var(--animation-slide-in-left);
@@ -59,12 +60,26 @@
 
   }
 
+  .clxnShelf {
+    display: flex;
+    justify-content: space-between;
+    cursor: initial;
+
+    i {
+      text-align: center;
+      flex: 1;
+      font-style: inherit;
+    }
+
+  }
+
+
 }
 
 #collectionSelector {
   font-weight: inherit;
   font-size: inherit;
-  margin-left: 0;
+  margin: 0;
   appearance: none;
   background: transparent;
   padding: 0;

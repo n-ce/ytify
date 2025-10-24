@@ -11,7 +11,7 @@ export default function(
   const hub = getHub();
 
   if (!hub.discovery)
-    hub.discovery = {};
+    hub.discovery = [];
 
 
   relatedStreams?.forEach(
@@ -22,44 +22,39 @@ export default function(
 
       const rsId = stream.url.slice(9);
 
-      // merges previous discover items with current related streams
-      if (!hub.discovery) return;
+      const existingItem = hub.discovery!.find(item => item.id === rsId);
 
-      hub.discovery?.hasOwnProperty(rsId) ?
-        (hub.discovery[rsId].frequency)++ :
-        hub.discovery[rsId] = {
-
+      if (existingItem) {
+        existingItem.frequency++;
+      } else {
+        hub.discovery!.push({
           id: rsId,
           title: stream.title,
           author: stream.uploaderName,
           duration: convertSStoHHMMSS(stream.duration),
           authorId: stream.uploaderUrl.slice(9),
           frequency: 1
-        }
+        });
+      }
     });
 
-  // convert to array
-  let array = Object.entries(hub.discovery!);
-
   // Randomize Array
-  for (let i = array.length - 1; i > 0; i--) {
+  for (let i = hub.discovery!.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [hub.discovery![i], hub.discovery![j]] = [hub.discovery![j], hub.discovery![i]];
   }
 
   // remove if exists in history
   const history = getCollection('history');
-  array = array.filter(e => history.includes(e[0]));
+  hub.discovery = hub.discovery!.filter(e => !history.includes(e.id));
 
   // randomly remove items from array when limit crossed
-  let len = array.length;
+  let len = hub.discovery.length;
   while (len > 256) {
     const i = Math.floor(Math.random() * len)
-    array.splice(i, 1);
+    hub.discovery.splice(i, 1);
     len--;
   }
-
-  hub.discovery = Object.fromEntries(array);
 
   // insert the upgraded collection to discover;
   updateHub(hub);

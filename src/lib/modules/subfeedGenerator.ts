@@ -7,12 +7,9 @@ export default async function(preview?: string) {
   const api = 'https://ytify-backend.vercel.app';
   const endpoint = '/api/feed/channels=';
   const channels = getLists('channels');
-  const list = [];
-
-  for (const id in channels) {
-    if (!channels[id].name.startsWith('Artist'))
-      list.push(id);
-  }
+  const list = channels
+    .filter(channel => !channel.name.startsWith('Artist'))
+    .map(channel => channel.id);
 
 
   return fetch(api + endpoint + list.join(',') + preview)

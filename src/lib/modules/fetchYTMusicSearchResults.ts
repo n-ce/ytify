@@ -121,7 +121,7 @@ export default async function(
     .then(data => {
       return data.results.filter(item => {
         if (item.resultType === 'artist') {
-          return (item as YTMusicArtistResult).radioId;
+          return (item as YTMusicArtistResult).thumbnails[0].url.includes('googleusercontent');
         }
         if (item.resultType === 'song') {
           const videoItem = item as YTMusicSongResult;
@@ -131,14 +131,15 @@ export default async function(
       }).map(item => {
         if (item.resultType === 'song' || item.resultType === 'video') {
           const videoItem = item as YTMusicSongResult | YTMusicVideoResult;
-          const artistName = item.resultType === 'song' ? videoItem.artists?.find(a => a.id)?.name : videoItem.artists?.[0]?.name;
+          const artist = videoItem.artists?.find(a => a.id);
+          const artistName = item.resultType === 'song' ? artist?.name : videoItem.artists?.[0]?.name;
           return {
             id: videoItem.videoId,
             title: videoItem.title,
             author: artistName ? (item.resultType === 'song' ? artistName + ' - Topic' : artistName) : 'Unknown',
             duration: videoItem.duration,
-            channelUrl: videoItem.artists.length > 0 ? `/channel/${videoItem.artists[0].id}` : '',
-            views: 'views' in videoItem ? videoItem.views + ' Plays' : videoItem.album?.name !== videoItem.title ? videoItem.album?.name : '',
+            authorId: videoItem.artists.length > 0 ? videoItem.artists[0].id : artist?.id,
+            views: 'views' in videoItem ? videoItem.views + ' Plays' : videoItem.album?.name,
             albumId: 'album' in videoItem ? videoItem.album.id : '',
             img: item.resultType === 'video' ? item.videoId : getThumbIdFromLink(videoItem.thumbnails[0].url || 'https://i.ytimg.com/vi_webp/' + videoItem.videoId + '/mqdefault.webp?host=i.ytimg.com'),
             type: item.resultType === 'song' ? 'stream' : 'video',
@@ -149,7 +150,7 @@ export default async function(
             title: albumItem.title,
             stats: albumItem.year,
             thumbnail: generateImageUrl(getThumbIdFromLink(albumItem.thumbnails[0].url), ''),
-            uploaderData: albumItem.artists.find(a => a.id)?.name,
+            uploaderData: albumItem.artists?.find(a => a.id)?.name,
             url: `/album/${albumItem.browseId}`,
             type: 'playlist',
           } as YTListItem;

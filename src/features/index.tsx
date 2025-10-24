@@ -2,7 +2,7 @@
 
 import { For, lazy, onMount, Show } from 'solid-js';
 import '../styles/global.css';
-import { navStore, playerStore, setStore, store } from '@lib/stores';
+import { navStore, playerStore, store } from '@lib/stores';
 
 const MiniPlayer = lazy(() => import('../components/MiniPlayer'));
 const ActionsMenu = lazy(() => import('../components/ActionsMenu'));
@@ -33,19 +33,6 @@ export default function() {
       <Show when={store.snackbar}>
         <SnackBar />
       </Show>
-      <dialog
-        class="displayer"
-        onclick={(e) => {
-          const { currentTarget } = e;
-          if (!currentTarget.matches('p'))
-            return;
-          currentTarget.close();
-          setStore('dialog', undefined);
-        }}
-      >
-        {store.dialog}
-      </dialog>
-
     </>
   );
 }

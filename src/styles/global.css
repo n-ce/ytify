@@ -52,12 +52,22 @@ main {
   section {
     height: 100%;
     flex: 1 0 0;
-    padding: var(--gap) var(--size-fluid-4);
+    padding: var(--gap) var(--size-fluid-3);
     padding-top: 0;
     overflow-y: auto;
     scroll-snap-align: start;
     min-width: calc(100dvw / var(--landscape-sections));
     flex-shrink: 0;
+
+    @media(orientation:landscape) {
+      &:first-child {
+        padding-left: var(--size-fluid-5);
+      }
+
+      &:last-child {
+        padding-right: var(--size-fluid-5);
+      }
+    }
   }
 
 
@@ -132,6 +142,7 @@ a {
   border: var(--border);
   color: var(--text);
   border-radius: var(--roundness);
+  width: calc(100dvmin - calc(var(--gap) - var(--border-size-1)) * 2);
   aspect-ratio: 1;
 
   &::backdrop {
@@ -181,4 +192,25 @@ a {
     margin-bottom: var(--size-4);
   }
 
+}
+
+i {
+  cursor: pointer;
+  position: relative;
+}
+
+/* button hover info */
+i[aria-label]:hover::after {
+  pointer-events: none;
+  position: absolute;
+  content: attr(aria-label);
+  font-size: var(--font-size-0);
+  font-family: inherit;
+  font-weight: var(--font-weight-5);
+  background: var(--text);
+  color: var(--bg);
+  right: var(--size-8);
+  z-index: 101;
+  padding: var(--size-px-1) var(--size-px-2) !important;
+  border-radius: var(--roundness);
 }

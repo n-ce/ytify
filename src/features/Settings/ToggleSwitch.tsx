@@ -19,6 +19,7 @@ export default function(_: ToggleSwitch) {
         ref={target}
         type='checkbox'
         id={_.id}
+        aria-checked={_.checked}
         checked={_.checked}
         onclick={_.onclick}
       />

@@ -75,7 +75,7 @@ export default async function() {
   if (id) {
     if (isPWA && shareAction === 'watch') {
       setPlayerStore('stream', 'id', id);
-      setNavStore('video', 'state', true);
+      setPlayerStore('isWatching', true);
 
 
     } else if (isPWA && shareAction === 'download') {

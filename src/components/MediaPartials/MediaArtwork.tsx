@@ -20,7 +20,10 @@ export default function() {
       crossorigin="anonymous"
       alt={"Media Artwork for " + playerStore.stream.title}
       onclick={() => {
-        setPlayerStore('immersive', !playerStore.immersive);
+        if (playerStore.isMusic)
+          setPlayerStore('immersive', !playerStore.immersive);
+        else
+          setPlayerStore('isWatching', !playerStore.isWatching);
       }}
       onload={() => {
         if (imgRef.naturalWidth === 120)

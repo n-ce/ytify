@@ -6,7 +6,7 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
-  type Features = 'home' | 'player' | 'list' | 'settings' | 'queue' | 'video' | 'updater';
+  type Features = 'home' | 'player' | 'list' | 'settings' | 'queue' | 'updater';
   type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue';
 
   type StreamItem = {
@@ -62,12 +62,7 @@ declare global {
     [index: string]: number
   }
 
-  type Playlists = {
-    [index: string]: Playlist
-  }
-  type Channels = {
-    [index: string]: Channel
-  }
+
 
   type APAC = 'albums' | 'playlists' | 'artists' | 'channels';
   type SuperCollection = 'featured' | 'collections' | APAC | 'feed' | 'for_you';

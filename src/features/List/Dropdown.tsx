@@ -1,17 +1,22 @@
-import { Show, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems } from '@lib/utils/library';
+import { Show, createEffect, createSignal } from 'solid-js';
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
-import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore } from '@lib/stores';
+import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore, setListStore } from '@lib/stores';
 import { importList } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
 
 export default function Dropdown(_: {
   toggleSort: () => void
 }) {
-  const [isSubscribed, setSubscribed] = createSignal(
-    listStore.type !== 'collection' &&
-    listStore.id in getLists(listStore.type)
-  );
+
+  const [isSubscribed, setSubscribed] = createSignal(false);
+
+  createEffect(() => {
+
+    setSubscribed(
+      getLists(listStore.type as 'channels').some(item => item.id === listStore.id)
+    )
+  });
 
 
   function subscriptionHandler() {
@@ -19,30 +24,34 @@ export default function Dropdown(_: {
     const { name, type, id, uploader, thumbnail } = listStore;
     if (type === 'collection') return;
 
-    const data = getLists(type);
+    let data = getLists(type);
 
 
     if (isSubscribed()) {
-      delete data[id];
+      data = data.filter(item => item.id !== id);
     }
     else {
       const dataset =
         {
-          id, name,
+          id,
+          name,
           thumbnail: getThumbIdFromLink(thumbnail)
         } as Playlist;
 
       if (type === 'playlists')
         dataset.uploader = uploader;
 
-      saveLists(type, data);
+      data.push(dataset);
     }
 
+    saveLists(type, data);
     setSubscribed(!isSubscribed());
   }
   return (
     <details>
-      <summary><i class="ri-more-2-fill"></i></summary>
+      <summary><i
+        aria-label="More Options"
+        class="ri-more-2-fill"></i></summary>
       <ul id="listTools">
 
 
@@ -63,7 +72,8 @@ export default function Dropdown(_: {
         <li id="enqueueAllBtn" onclick={() => {
           const fullList = getCollectionItems(listStore.id);
           addToQueue(fullList);
-          setNavStore('queue', 'state', true);        }}>
+          setNavStore('queue', 'state', true);
+        }}>
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
@@ -77,7 +87,8 @@ export default function Dropdown(_: {
             id="subscribeListBtn"
             onclick={subscriptionHandler}
           >
-            <i class="ri-stack-line"></i>{isSubscribed() ? 'Subscribed' : 'Subscribe'}
+            <i
+              class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? 'Saved to Library' : 'Save to Library'}
           </li>
 
           <li id="viewOnYTBtn">
@@ -104,7 +115,16 @@ export default function Dropdown(_: {
             <i class="ri-delete-bin-2-line"></i>{t("list_delete")}
           </li>
 
-          <li id="renameCollectionBtn">
+          <li id="renameCollectionBtn" onclick={() => {
+            const oldName = listStore.name;
+            const newName = prompt(t('list_rename_prompt'), oldName);
+            if (newName && newName !== oldName) {
+              renameCollection(oldName, newName);
+              setListStore('name', newName);
+              setListStore('id', newName);
+              setStore('snackbar', t('list_rename_success'));
+            }
+          }}>
             <i class="ri-edit-line"></i>{t("list_rename")}
           </li>
 

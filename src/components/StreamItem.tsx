@@ -2,7 +2,7 @@ import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player, removeFromCollection } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { setNavStore, setPlayerStore, setStore, store, setQueueStore } from '@lib/stores';
+import { setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore } from '@lib/stores';
 
 export default function(data: {
   id: string,
@@ -65,7 +65,7 @@ export default function(data: {
 
 
   if (config.loadImage)
-    setImage(generateImageUrl(data.img || data.id, 'mq'));
+    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites'));
 
   return (
     <a
@@ -91,16 +91,30 @@ export default function(data: {
         }
 
         if (!e.target.classList.contains('ri-more-2-fill')) {
+
+
           setPlayerStore('stream', data);
+
+
           if (data.context)
             setPlayerStore('context', {
               id: data.context.id,
               src: data.context.src
             });
+
+
           const isPortrait = matchMedia('(orientation:portrait)').matches;
-          if (isPortrait || config.landscapeSections === '1')
-            setNavStore('player', 'state', false);
+
+          if (isPortrait || config.landscapeSections === '1') {
+            setNavStore('player', 'state', Boolean(config.watchMode));
+
+            if (config.watchMode)
+              navStore.player.ref?.scrollIntoView();
+          }
+
           player(data.id);
+
+
           if (data.context?.src === 'queue') {
             const indexToRemove = parseInt(data.context.id, 10);
             setQueueStore('list', (list) =>
@@ -146,8 +160,8 @@ export default function(data: {
         </div>
       </div>
       {data.draggable ?
-        <i class="ri-draggable"></i> :
-        <i class="ri-more-2-fill"></i>
+        <i aria-label="Drag" class="ri-draggable"></i> :
+        <i aria-label="More" class="ri-more-2-fill"></i>
       }
     </a>
   )

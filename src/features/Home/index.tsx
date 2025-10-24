@@ -21,13 +21,14 @@ export default function() {
 
   const { dbsync } = config;
 
-  //  if (dbsync) import('../../lib/modules/cloudSync').then(mod => mod.default(dbsync, syncBtn));
+  //
 
   return (
     <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
 
       <header>
-        <p>{home() || 'ytify'}</p>
+        <p>
+          {home() || 'ytify'}</p>
         <Show when={dbsync}>
           <i
             id="syncNow"
@@ -38,18 +39,21 @@ export default function() {
         <div class="right-group">
           <Show when={home() !== 'Hub'}>
             <i
+              aria-label="Hub"
               class="ri-store-2-line"
               onclick={() => saveHome('Hub')}
             ></i>
           </Show>
           <Show when={home() !== 'Library'}>
             <i
+              aria-label="Library"
               class="ri-archive-stack-line"
               onclick={() => saveHome('Library')}
             ></i>
           </Show>
           <Show when={home() !== 'Search'}>
             <i
+              aria-label="Search"
               class="ri-search-2-line"
               onclick={() => saveHome('Search')}
             ></i>

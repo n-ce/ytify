@@ -187,10 +187,6 @@
   content: "\f4c8";
 }
 
-.ri-add-circle-line:before {
-  content: "\ea11";
-}
-
 .ri-checkbox-multiple-line:before {
   content: "\eb89";
 }
@@ -231,10 +227,6 @@
   content: "\ea1e";
 }
 
-.ri-save-line:before {
-  content: "\f0b3";
-}
-
 .ri-signpost-fill:before {
   content: "\f48d";
 }
@@ -265,4 +257,28 @@
 
 .ri-order-play-fill:before {
   content: "\efb6";
+}
+
+.ri-account-circle-line:before {
+  content: "\ea09";
+}
+
+.ri-thumb-up-line:before {
+  content: "\f207";
+}
+
+.ri-thumb-up-fill:before {
+  content: "\f206";
+}
+
+.ri-star-line:before {
+  content: "\f18b";
+}
+
+.ri-star-fill:before {
+  content: "\f186";
+}
+
+.ri-calendar-schedule-fill:before {
+  content: "\f3f2";
 }

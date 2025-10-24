@@ -43,7 +43,10 @@ export function getThumbIdFromLink(url: string) {
   const l = new URL(url);
   const p = l.pathname;
 
-  return l.search.includes('ytimg') ?
+  return (
+    l.search.includes('ytimg') ||
+    l.hostname === 'i.ytimg.com'
+  ) ?
     p.split('/')[2] :
     p.split('=')[0];
 }

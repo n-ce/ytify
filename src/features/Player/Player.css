@@ -94,6 +94,12 @@
       text-align: center;
     }
   }
+
+  &:has(>div.watcher) {
+    margin: auto;
+    justify-content: center;
+  }
+
 }
 
 
@@ -143,9 +149,9 @@
   display: flex;
   justify-content: space-between;
 
-  p {
-    display: inline-block;
-    overflow: hidden
+  >p {
+    overflow: clip;
+    text-overflow: ellipsis;
   }
 
   .right-group {
@@ -220,5 +226,34 @@
       font-weight: var(--font-weight-6);
       opacity: 1;
     }
+  }
+}
+
+
+.watcher {
+
+  video {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: var(--roundness);
+  }
+
+  select {
+    font-size: var(--font-size-2) !important;
+    width: 50%;
+    text-align: center;
+    appearance: none;
+  }
+
+  button {
+    font-size: var(--font-size-2) !important;
+    width: 50%;
+  }
+
+
+  p {
+    font-size: var(--font-size-1) !important;
+    font-style: italic;
+    opacity: 0.5;
   }
 }

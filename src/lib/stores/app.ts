@@ -1,6 +1,5 @@
 import { createStore } from "solid-js/store";
 import { config } from "@lib/utils/config";
-import { type JSXElement } from "solid-js";
 
 const storeInit: {
   invidious: string[],
@@ -11,7 +10,6 @@ const storeInit: {
   updater?: () => void,
   actionsMenu?: CollectionItem & { albumId?: string },
   snackbar?: string,
-  dialog?: JSXElement
 } = {
   invidious: [],
   index: 0,
