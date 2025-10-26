@@ -19,13 +19,12 @@ export default async (req: Request, context: Context) => {
       // FIX 1: Retrieve timestamp as 'text'
       const timestamp = await hashStore.get(blob.key, { type: 'text' }); 
       
-      if (timestamp) { // Ensure timestamp exists before parsing
+      if (timestamp) { 
         const oldDate = parseInt(timestamp as string); 
         const expired = (now - oldDate) > oneWeek;
 
         if (expired) {
           await hashStore.delete(blob.key);
-          // Delete blob data using the timestamp string
           await blobStore.delete(timestamp as string); 
         }
       }
@@ -42,9 +41,10 @@ export default async (req: Request, context: Context) => {
     // FIX 2: Retrieve timestamp as 'text'
     const timestamp = await hashStore.get(hash, { type: 'text' }); 
     let data = null;
+    
     if (timestamp) {
-      // FIX 3: Use getJSON to retrieve and parse the stored JSON data
-      data = await blobStore.getJSON(timestamp as string); 
+      // FIX 3: Use get() with { type: 'json' } to retrieve and parse the stored JSON data
+      data = await blobStore.get(timestamp as string, { type: 'json' }); 
       
       if (data)
         // Convert the JSON object back to a string for the Response body
