@@ -1,4 +1,3 @@
-
 import { getStore } from "@netlify/blobs";
 import type { Config, Context } from "@netlify/edge-functions";
 
@@ -17,16 +16,20 @@ export default async (req: Request, context: Context) => {
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
 
     for await (const blob of blobs) {
-      const timestamp = await hashStore.get(blob.key);
-      const oldDate = parseInt(timestamp);
-      const expired = (now - oldDate) > oneWeek;
+      // FIX 1: Retrieve timestamp as 'text'
+      const timestamp = await hashStore.get(blob.key, { type: 'text' }); 
+      
+      if (timestamp) { // Ensure timestamp exists before parsing
+        const oldDate = parseInt(timestamp as string); 
+        const expired = (now - oldDate) > oneWeek;
 
-      if (expired) {
-        await hashStore.delete(blob.key);
-        await blobStore.delete(timestamp);
+        if (expired) {
+          await hashStore.delete(blob.key);
+          // Delete blob data using the timestamp string
+          await blobStore.delete(timestamp as string); 
+        }
       }
     }
-
 
     const timestamp = Date.now().toString();
     await hashStore.set(hash, timestamp);
@@ -36,15 +39,20 @@ export default async (req: Request, context: Context) => {
 
   } else {
 
-    const timestamp = await hashStore.get(hash);
+    // FIX 2: Retrieve timestamp as 'text'
+    const timestamp = await hashStore.get(hash, { type: 'text' }); 
     let data = null;
     if (timestamp) {
-      data = await blobStore.get(timestamp);
+      // FIX 3: Use getJSON to retrieve and parse the stored JSON data
+      data = await blobStore.getJSON(timestamp as string); 
+      
       if (data)
-        return new Response(data, { headers: { "Content-Type": "application/json" } });
+        // Convert the JSON object back to a string for the Response body
+        return new Response(JSON.stringify(data), { headers: { "Content-Type": "application/json" } });
     }
-    if (!data)
-      return new Response("Not found", { status: 404 });
+    
+    // If timestamp or data not found
+    return new Response("Not found", { status: 404 });
   }
 };
 
