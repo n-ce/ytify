@@ -8,6 +8,7 @@ import { readdirSync } from 'fs';
 
 export default defineConfig(({ command }) => ({
   define: {
+    base: '/ytify-legacy/',
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Build: JSON.stringify(((d = new Date()) => `v7x8 ${d.getFullYear().toString().slice(-2)}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getDate().toString().padStart(2, '0')}`)())
   },
@@ -15,7 +16,6 @@ export default defineConfig(({ command }) => ({
     injectEruda(command === 'serve'),
     VitePWA({
       manifest: {
-        "base": "/ytify-legacy/",
         "short_name": "Ytify",
         "name": "Listen with ytify",
         "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
@@ -68,8 +68,7 @@ export default defineConfig(({ command }) => ({
               }]
           }
         ],
-        "start_url": "/ytify-legacy/",
-        "base": "/ytify-legacy/",
+        "start_url": "/",
         "display": "standalone",
         "theme_color": "white",
         "background_color": "white",
