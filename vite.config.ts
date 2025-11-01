@@ -67,7 +67,7 @@ export default defineConfig(({ command }) => ({
               }]
           }
         ],
-        "start_url": "/",
+        "start_url": "/ytify-legacy/",
         "base": "/ytify-legacy/",
         "display": "standalone",
         "theme_color": "white",
