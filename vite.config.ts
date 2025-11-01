@@ -18,7 +18,7 @@ export default defineConfig(({ command }) => ({
         "base": "/ytify-legacy/",
         "short_name": "Ytify",
         "name": "Listen with ytify",
-        "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free.",
+        "description": "32kb/s to 128kb/s youtube audio streaming website. Copy a youtube video link and listen to it as an audio totally free." },
         "icons": [
           {
             "src": "logo192.png",
