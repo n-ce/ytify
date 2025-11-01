@@ -8,13 +8,14 @@ import { fetchCollection } from "../lib/libraryUtils";
 const nav = document.querySelector('nav') as HTMLDivElement;
 const anchors = document.querySelectorAll('nav a') as NodeListOf<HTMLAnchorElement>;
 const sections = document.querySelectorAll('section') as NodeListOf<HTMLDivElement>;
+const base = import.meta.env.BASE_URL;
 const routes = ['/', '/upcoming', '/search', '/library', '/settings', '/list'];
 
-let prevPageIdx = routes.indexOf(location.pathname);
+let prevPageIdx = routes.indexOf(location.pathname.replace(base, '/'));
 
 function showSection(id: string) {
-  const routeIdx = routes.indexOf(id);
-  miniPlayerRoutingHandler(id === '/', nav.parentElement!.classList);
+  const routeIdx = routes.indexOf(id.replace(base, '/'));
+  miniPlayerRoutingHandler(id.replace(base, '/') === '/', nav.parentElement!.classList);
 
   sections[routeIdx].classList.add('view');
   const a = anchors[routeIdx];
@@ -45,13 +46,13 @@ nav.addEventListener('click', (e: Event) => {
 
   const inHome = anchor.id === '/';
 
-  if (anchor.id !== location.pathname) {
+  if (anchor.id !== location.pathname.replace(base, '/')) {
     const sParamInHome = params.has('s') && inHome;
     const sParam = '?s=' + params.get('s');
     const otherQuery = anchor.id === '/search' ? store.searchQuery : '';
 
     history.pushState({}, '',
-      anchor.id + (
+      base + anchor.id.substring(1) + (
         sParamInHome ? sParam : otherQuery
       )
     );
@@ -101,7 +102,7 @@ if (errorParam) {
 }
 else {
 
-  route = routes.find(route => location.pathname === route) || '/';
+  route = routes.find(route => location.pathname.replace(base, '/') === route) || '/';
 
   const hasStreamQuery = params.has('s') || params.has('url') || params.has('text');
 
@@ -129,7 +130,7 @@ onpopstate = function() {
 
   if (
     !store.list.id &&
-    location.pathname === '/list'
+    location.pathname.replace(base, '/') === '/list'
   ) {
 
     const param = location.search
@@ -148,5 +149,3 @@ onpopstate = function() {
 
 
 }
-
-

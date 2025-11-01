@@ -32,10 +32,10 @@ const pathModifier = (url: string) => url.includes('=') ?
   url.slice(1).split('/').join('=');
 
 export const hostResolver = (url: string) =>
-  store.linkHost + (store.linkHost.includes(location.origin) ? (url.
+  store.linkHost + (store.linkHost.includes(location.origin) ? (import.meta.env.BASE_URL + (url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
-    ('/list?' + pathModifier(url))) : url);
+    ('list?' + pathModifier(url)))) : url);
 
 export const i18n = (
   key: TranslationKeys,

@@ -12,6 +12,7 @@ import { readdirSync } from 'fs';
 
 
 export default defineConfig(({ command }) => ({
+  base: '/ytify/',
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Version: JSON.stringify(
