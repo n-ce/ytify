@@ -2,10 +2,6 @@ import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import solidPlugin from 'vite-plugin-solid';
 import autoprefixer from 'autoprefixer';
-/*
-import postcssJitProps from 'postcss-jit-props';
-import OpenProps from 'open-props';
-*/
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
 
@@ -15,9 +11,7 @@ export default defineConfig(({ command }) => ({
   base: process.env.VITE_BASE_PATH || '/',
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
-    Version: JSON.stringify(
-      ((today = new Date()) => `${process.env.npm_package_version} (${today.getDate()} ${today.toLocaleString('default', { month: 'short' })} ${today.getFullYear()})`)()
-    ),
+    Version: 'v7.final March 2025'
   },
   plugins: [
     injectEruda(command === 'serve'),
@@ -50,7 +44,7 @@ export default defineConfig(({ command }) => ({
         "shortcuts": [
           {
             "name": "History",
-            "url": "/list?collection=history",
+            "url": "./list?collection=history",
             "icons": [
               {
                 "src": "memories-fill.png",
@@ -59,7 +53,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Favorites",
-            "url": "/list?collection=favorites",
+            "url": "./list?collection=favorites",
             "icons": [
               {
                 "src": "heart-fill.png",
@@ -68,7 +62,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Listen Later",
-            "url": "/list?collection=listenLater",
+            "url": "./list?collection=listenLater",
             "icons": [
               {
                 "src": "calendar-schedule-fill.png",
