@@ -1,3 +1,9 @@
+> [!Warning]
+> This is based on ytify's v7.8 official March 2025 source code, as such it may face issues as it is not officially maintained anymore.
+> Some changes have been made to make it work with github pages. `v7.8.7 => v7.8.8`.
+> It is not the same as v7x8 which had its last release in September 2025
+
+
 <div align="center">
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
