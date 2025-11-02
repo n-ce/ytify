@@ -1,8 +1,3 @@
-.home {
-  max-width: 100dvh;
-  margin: 0 auto;
-}
-
 header {
   display: flex;
   align-items: center;
@@ -135,8 +130,6 @@ header {
         width: 100%;
         border-radius: 0;
         flex-shrink: 0;
-
-
 
         .title {
           height: var(--size-4);

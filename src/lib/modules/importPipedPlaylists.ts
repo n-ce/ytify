@@ -63,7 +63,7 @@ export default async function() {
             title: s.title,
             author: s.uploaderName,
             duration: convertSStoHHMMSS(s.duration),
-            channelUrl: s.uploaderUrl
+            authorId: s.uploaderUrl.slice(9)
           }));
 
         addToCollection(name, collection);

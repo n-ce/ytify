@@ -98,6 +98,7 @@ export default function(_: {
           }}
         >
           <option value="0.25">0.25x</option>
+          <option value="0.33">0.33x</option>
           <option value="0.50">0.50x</option>
           <option value="0.75">0.75x</option>
           <option value="0.87">0.87x</option>
@@ -170,13 +171,13 @@ export default function(_: {
           }}
         >
           <option value="0">0%</option>
+          <option value="0.01">1%</option>
+          <option value="0.05">5%</option>
+          <option value="0.10">10%</option>
           <option value="0.15">15%</option>
           <option value="0.25">25%</option>
-          <option value="0.33">33%</option>
           <option value="0.50">50%</option>
-          <option value="0.66">66%</option>
           <option value="0.75">75%</option>
-          <option value="0.85">85%</option>
           <option value="1.00">100%</option>
         </select>
 

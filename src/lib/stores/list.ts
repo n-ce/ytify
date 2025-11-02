@@ -5,9 +5,10 @@ import fetchArtist, { ArtistResponse } from "@lib/modules/fetchArtist";
 import fetchMix from "@lib/modules/fetchMix";
 import fetchPlaylist, { PlaylistResponse } from "@lib/modules/fetchPlaylist";
 import fetchChannel from "@lib/modules/fetchChannel";
-import { convertSStoHHMMSS, getApi } from "@lib/utils";
+import { convertSStoHHMMSS, generateImageUrl, getApi, getLists, getThumbIdFromLink } from "@lib/utils";
 import { setQueueStore } from "./queue";
 import fetchAlbum, { AlbumResponse } from "@lib/modules/fetchAlbum";
+
 
 
 const initialState = () => ({
@@ -64,9 +65,12 @@ export async function getList(
     if (!data) return;
     const { author, title, thumbnail, videos } = data;
 
+    const savedThumbId = getLists('playlists').find(p => p.id === url);
+    const savedThumb = savedThumbId ? generateImageUrl(savedThumbId?.thumbnail, '720') : '';
+
     setListStore({
-      name: title,
-      thumbnail,
+      name: savedThumbId?.name || title,
+      thumbnail: savedThumb || thumbnail || generateImageUrl(videos[0].videoId, 'maxres'),
       id: url,
       uploader: author,
       type: 'playlists',
@@ -186,7 +190,7 @@ export async function getList(
     const { title, videos, subtitle } = playlistData;
 
     setListStore({
-      thumbnail: thumbnail,
+      thumbnail: generateImageUrl(getThumbIdFromLink(thumbnail), '720'),
       id: playlistId,
       url: url,
       type: 'playlists',
@@ -195,7 +199,7 @@ export async function getList(
       list: videos.map(v => ({
         id: v.videoId,
         title: v.title,
-        author: v.author,
+        author: v.author.endsWith(' - Topic') ? v.author : `${v.author} - Topic`,
         authorId: v.authorId,
         duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as CollectionItem)

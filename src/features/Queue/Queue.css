@@ -81,13 +81,18 @@
 
   >.ri-close-large-line {
     position: sticky;
-    bottom: var(--size-fluid-6);
-    margin-left: calc(50% - var(--size-3) - var(--size-1));
-    border-radius: var(--roundness);
-    background-color: var(--onBg2);
+    bottom: var(--size-10);
+    border-radius: var(--radius-round);
+    background-image: radial-gradient(var(--text), transparent);
+    color: var(--onBg);
     padding: var(--size-2);
     font-size: var(--font-size-2);
-    font-weight: var(--font-weight-6);
-    box-shadow: var(--shadow-3);
+    font-weight: var(--font-weight-9);
+    box-shadow: var(--shadow-1);
+
+    &:hover {
+      opacity: 1;
+    }
+
   }
 }

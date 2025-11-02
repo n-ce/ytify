@@ -37,27 +37,21 @@ export default function() {
           ></i>
         </Show>
         <div class="right-group">
-          <Show when={home() !== 'Hub'}>
-            <i
-              aria-label="Hub"
-              class="ri-store-2-line"
-              onclick={() => saveHome('Hub')}
-            ></i>
-          </Show>
-          <Show when={home() !== 'Library'}>
-            <i
-              aria-label="Library"
-              class="ri-archive-stack-line"
-              onclick={() => saveHome('Library')}
-            ></i>
-          </Show>
-          <Show when={home() !== 'Search'}>
-            <i
-              aria-label="Search"
-              class="ri-search-2-line"
-              onclick={() => saveHome('Search')}
-            ></i>
-          </Show>
+          <i
+            aria-label="Hub"
+            class="ri-store-2-line"
+            onclick={() => saveHome('Hub')}
+          ></i>
+          <i
+            aria-label="Library"
+            class="ri-archive-stack-line"
+            onclick={() => saveHome('Library')}
+          ></i>
+          <i
+            aria-label="Search"
+            class="ri-search-2-line"
+            onclick={() => saveHome('Search')}
+          ></i>
 
         </div>
 

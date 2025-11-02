@@ -15,7 +15,7 @@ export function generateImageUrl(
   let prefix = '';
   if (id.startsWith('/')) {
     prefix = `yt3.googleusercontent.com${id}=s720-c-k-c0x00ffffff-no-rj`;
-    suffix = `&output=webp&w=${res === 'mq' ? '180' : '360'}`;
+    suffix = `&output=webp&w=${res === 'mq' ? '180' : res || '360'}`;
   }
   else {
     prefix = `i.ytimg.com/vi_webp/${id}/${res}default.webp`;

@@ -44,9 +44,9 @@ declare global {
     author: string,
     duration: string
     authorId: string,
+    albumId?: string
   }
 
-  type List = Playlist;
   type Collection = { [index: string]: CollectionItem };
 
   interface Channel {

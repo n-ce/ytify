@@ -1,4 +1,4 @@
-import { For, onMount } from "solid-js";
+import { For, onCleanup, onMount } from "solid-js";
 import { queueStore, setQueueStore } from "@lib/stores/queue";
 import StreamItem from "@components/StreamItem";
 import Sortable, { type SortableEvent } from 'sortablejs';
@@ -6,11 +6,12 @@ import Sortable, { type SortableEvent } from 'sortablejs';
 export default function(props: { removeMode: boolean }) {
 
   let queuelist!: HTMLDivElement;
+  let sortableRef!: Sortable;
 
   onMount(() => {
 
     if (queuelist) {
-      new Sortable(queuelist, {
+      sortableRef = new Sortable(queuelist, {
         handle: '.ri-draggable',
         onUpdate(e: SortableEvent) {
           if (e.oldIndex == null || e.newIndex == null) return;
@@ -23,7 +24,13 @@ export default function(props: { removeMode: boolean }) {
         }
       });
     }
+  });
+
+  onCleanup(() => {
+    sortableRef.destroy();
+    console.log('sortable destroy');
   })
+
 
   return (
     <div

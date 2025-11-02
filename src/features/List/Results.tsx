@@ -3,9 +3,7 @@ import { listStore } from "@lib/stores";
 import StreamItem from "@components/StreamItem";
 
 export default function Results(_: {
-  ref?: HTMLDivElement | ((el: HTMLDivElement) => void),
   draggable: boolean,
-  list: CollectionItem[], // Added list prop
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
@@ -18,8 +16,8 @@ export default function Results(_: {
       when={!listStore.isLoading}
       fallback={<i class="ri-loader-3-line"></i>}
     >
-      <div class="listContainer" ref={_.ref}>
-        <For each={_.list}>{
+      <div class="listContainer">
+        <For each={listStore.list}>{
           (item) =>
             <StreamItem
               id={item.id || ''}

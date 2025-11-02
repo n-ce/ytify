@@ -1,8 +1,3 @@
-// import { audio, settingsContainer, title } from "./dom";
-// import { getThumbIdFromLink } from "./visualUtils";
-// import player from "./player";
-// import { fetchCollection, removeFromCollection } from "./libraryUtils";
-
 import { setStore, playerStore, setPlayerStore, store, t } from "@lib/stores";
 import { config } from "./config";
 import { player } from "./player";
@@ -73,15 +68,23 @@ export async function preferredStream(audioStreams: AudioStream[]) {
   const preferedCodec = (await playerStore.supportsOpus) ? 'opus' : 'aac';
 
   const itags = ({
-    low: {
+    worst: {
       opus: [600, 249, 251],
       aac: [599, 139, 140]
+    },
+    low: {
+      opus: [249, 600, 251],
+      aac: [139, 599, 140]
     },
     medium: {
       opus: [250, 249, 251],
       aac: [139, 140]
     },
     high: {
+      opus: [251],
+      aac: [140]
+    },
+    lossless: {
       opus: [251],
       aac: [140]
     }
@@ -213,75 +216,3 @@ export function getDownloadLink(id: string): void {
       setStore('snackbar', e.message);
     });
 }
-
-
-/*
-// TLDR : Stream Item Click Action
-export async function superClick(e: Event) {
-  const elem = e.target as HTMLAnchorElement & { dataset: CollectionItem };
-  if (elem.target === '_blank') return;
-  e.preventDefault();
-
-  const eld = elem.dataset;
-  const elc = elem.classList.contains.bind(elem.classList);
-
-
-  if (elc('streamItem'))
-    if (elc('delete'))
-      removeFromCollection(store.list.id, eld.id as string)
-    else {
-      if (state.jiosaavn) {
-        const sta = store.stream;
-        sta.id = eld.id as string;
-        sta.title = eld.title as string;
-        sta.author = eld.author as string;
-        sta.channelUrl = eld.channel_url as string;
-        sta.duration = eld.duration as string;
-      }
-      player(eld.id);
-    }
-
-  else if (elc('clxn_item'))
-    fetchCollection(elem.href.split('=')[1]);
-
-
-  else if (elc('ri-more-2-fill')) {
-    const elp = elem.parentElement!.dataset;
-    const sta = store.actionsMenu;
-    sta.id = elp.id as string;
-    sta.title = elp.title as string;
-    sta.author = elp.author as string;
-    sta.channelUrl = elp.channel_url as string;
-    sta.duration = elp.duration as string;
-    const dialog = document.createElement('dialog');
-    document.body.appendChild(dialog);
-    import('../components/ActionsMenu.ts')
-      .then(mod => mod.default(dialog));
-
-
-  }
-
-
-  else if (elc('listItem')) {
-
-    // to prevent conflicts
-    store.actionsMenu.author = '';
-
-    let url = eld.url as string;
-
-    if (!url.startsWith('/channel'))
-      url = url.replace('?list=', 's/');
-
-    store.list.name = (
-      (location.search.endsWith('music_artists') ||
-        (location.pathname === '/library' && state.defaultSuperCollection === 'artists')
-      )
-        ? 'Artist - ' : ''
-    ) + eld.title;
-    store.list.uploader = eld.uploader!;
-
-    store.list.thumbnail = eld.thumbnail ? getThumbIdFromLink(eld.thumbnail) : '';
-
-  }
-}
-*/

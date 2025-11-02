@@ -3,7 +3,6 @@ This is an audio streaming application currently undergoing a major refactor to 
 The core of the application is a reactive, store-based state management system. A custom, state-driven routing system has been intentionally implemented to meet unique application requirements.
 
 The current remaining before the refactor is complete:
-- a working list
 - working cloudsync
 - proper error handling
 - efficient communication patterns

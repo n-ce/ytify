@@ -7,14 +7,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "solid-js": "1.9.9",
+    "solid-js": "1.9.10",
     "sortablejs": "^1.15.6"
   },
   "devDependencies": {
-    "@netlify/blobs": "^10.2.1",
+    "@netlify/blobs": "^10.3.1",
     "@netlify/edge-functions": "^3.0.1",
     "@netlify/functions": "^5.0.1",
-    "@types/node": "^24.9.1",
+    "@types/node": "^24.9.2",
     "@types/sortablejs": "^1.15.9",
     "autoprefixer": "^10.4.21",
     "eruda": "^3.4.3",

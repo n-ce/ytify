@@ -1,55 +1,64 @@
-import { createSignal, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { addToQueue, openFeature, listStore, resetList, setListStore, setNavStore, closeFeature } from '@lib/stores';
-import { metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
+import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config } from '@lib/utils/config';
 import Dropdown from './Dropdown';
 import Results from './Results';
-import { useSortedList } from './useSortedList';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
 
 type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
 
 export default function() {
   let listSection!: HTMLElement;
-  let listContainerRef: HTMLDivElement | undefined;
+  let sortableRef: Sortable | undefined;
+
   const [markMode, setMarkMode] = createSignal(false);
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
   const [showSortMenu, setShowSortMenu] = createSignal(false);
-  const [showCollectionSelector, setShowCollectionSelector] = createSignal<CollectionItem[]>([]);
   const [localSortOrder, setLocalSortOrder] = createSignal<SortOrder>(config.sortOrder);
 
-  const sortedList = useSortedList(localSortOrder);
+  function initSortable() {
+    const listContainer = document.querySelector('.listContainer') as HTMLDivElement;
+    sortableRef = new Sortable(listContainer, {
+      handle: '.ri-draggable',
+      onUpdate(e: SortableEvent) {
+        if (e.oldIndex == null || e.newIndex == null) return;
+
+        setListStore('list', (currentList) => {
+          const newList = [...currentList];
+          const [removedItem] = newList.splice(e.oldIndex!, 1);
+          newList.splice(e.newIndex!, 0, removedItem);
+
+          const collection = listStore.id;
+          const dataArray = newList.map(item => item.id);
+          saveCollection(collection, dataArray);
+          metaUpdater(collection);
+
+          return [...newList];
+        });
+      }
+    });
+  }
 
   onMount(() => {
     openFeature('list', listSection);
     listSection.scrollTo(0, 0);
     closeFeature('home');
-
-    if (listContainerRef) {
-      new Sortable(listContainerRef, {
-        handle: '.ri-draggable',
-        onUpdate(e: SortableEvent) {
-          if (e.oldIndex == null || e.newIndex == null) return;
-
-          setListStore('list', (currentList) => {
-            const newList = [...currentList];
-            const [removedItem] = newList.splice(e.oldIndex!, 1);
-            newList.splice(e.newIndex!, 0, removedItem);
-
-            const collection = listStore.id;
-            const dataArray = newList.map(item => item.id);
-            saveCollection(collection, dataArray);
-            metaUpdater(collection);
-
-            return [...newList];
-          });
-        }
-      });
+  });
+  createEffect(() => {
+    if (localSortOrder() === 'modified' && showSortMenu()) {
+      initSortable();
+    } else {
+      sortableRef?.destroy();
+      sortableRef = undefined;
     }
-
+  });
+  onCleanup(() => {
+    sortableRef?.destroy();
+    sortableRef = undefined;
   });
 
 
@@ -63,43 +72,38 @@ export default function() {
             setMarkList([]);
           else
             setMarkList(listStore.list.map(v => v.id));
-
-          setShowCollectionSelector([]);
         }}
       ></i>
-      <i
-        aria-label="Remove Marked"
-        class="ri-indeterminate-circle-line"
-        onclick={() => {
-          removeFromCollection(listStore.name, markList());
-        }}
-      ></i>
-      <i
-        aria-label="Enqueue Marked"
-        class="ri-list-check-2"
-        onclick={() => {
+      <Show when={markList().length}>
+        <Show when={listStore.type === 'collection'}>
+          <i
+            aria-label="Remove Marked"
+            class="ri-indeterminate-circle-line"
+            onclick={() => {
+              removeFromCollection(listStore.name, markList());
+            }}
+          ></i>
+        </Show>
+        <i
+          aria-label="Enqueue Marked"
+          class="ri-list-check-2"
+          onclick={() => {
 
-          const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
+            const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
 
-          if (listToEnqueue.length) {
-            addToQueue(listToEnqueue);
-            setNavStore('queue', 'state', true);
-          }
+            if (listToEnqueue.length) {
+              addToQueue(listToEnqueue);
+              setNavStore('queue', 'state', true);
+            }
 
-        }}
-      ></i>
-      <i
-        aria-label="Create New Collection from Marked"
-        class="ri-play-list-2-fill"
-        onclick={() => {
+          }}
+        ></i>
 
-          const list = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
-
-          if (list.length) {
-            setShowCollectionSelector(list);
-          }
-        }}
-      ></i>
+        <i aria-label="Add to Collection">
+          <CollectionSelector data={markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[]
+          } />
+        </i>
+      </Show>
     </div >
   );
 
@@ -141,9 +145,6 @@ export default function() {
       </header>
 
 
-      <Show when={showCollectionSelector().length}>
-        <CollectionSelector data={showCollectionSelector()} />
-      </Show>
       <Show when={showSortMenu()}>
         <span>
           <label for="sortMenu">Sort Order :</label>
@@ -151,6 +152,7 @@ export default function() {
             const newSortOrder = e.target.value as SortOrder;
             setLocalSortOrder(newSortOrder);
             setConfig('sortOrder', newSortOrder);
+            fetchCollection(listStore.id);
           }} value={localSortOrder()}>
             <option value="modified">Modified</option>
             <option value="name">Name</option>
@@ -160,11 +162,12 @@ export default function() {
         </span>
 
       </Show>
-      <br />
+      <Show when={config.loadImage && listStore.name.startsWith('Album')}>
+        <img src={listStore.thumbnail} alt={listStore.name} class="list-thumbnail" />
+      </Show>
+
       <Results
-        ref={listContainerRef}
         draggable={localSortOrder() === 'modified' && showSortMenu()}
-        list={sortedList()}
         mark={{
           mode: markMode,
           set: (id: string) => {

@@ -1,4 +1,4 @@
-import { config, fetchJson, generateImageUrl, getThumbIdFromLink } from '@lib/utils';
+import { config, fetchJson, generateImageUrl, getThumbIdFromLink, convertSStoHHMMSS } from '@lib/utils';
 
 // Response types for different search filters
 
@@ -137,7 +137,7 @@ export default async function(
             id: videoItem.videoId,
             title: videoItem.title,
             author: artistName ? (item.resultType === 'song' ? artistName + ' - Topic' : artistName) : 'Unknown',
-            duration: videoItem.duration,
+            duration: convertSStoHHMMSS(videoItem.duration_seconds),
             authorId: videoItem.artists.length > 0 ? videoItem.artists[0].id : artist?.id,
             views: 'views' in videoItem ? videoItem.views + ' Plays' : videoItem.album?.name,
             albumId: 'album' in videoItem ? videoItem.album.id : '',

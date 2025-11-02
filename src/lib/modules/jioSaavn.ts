@@ -23,9 +23,11 @@ export default function() {
         .then(mod => mod.default(stream));
 
       const desiredBitrateSuffix = ({
+        worst: '_12',
         low: '_48',
         medium: '_160',
-        high: '_320'
+        high: '_320',
+        lossless: '_320'
       })[config.quality] || '_320';
 
       audio.src = song.downloadUrl.replace('_96', desiredBitrateSuffix);

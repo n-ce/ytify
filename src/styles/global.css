@@ -59,17 +59,74 @@ main {
     min-width: calc(100dvw / var(--landscape-sections));
     flex-shrink: 0;
 
-    @media(orientation:landscape) {
-      &:first-child {
-        padding-left: var(--size-fluid-5);
-      }
-
-      &:last-child {
-        padding-right: var(--size-fluid-5);
-      }
-    }
   }
 
+
+  @media(orientation:landscape) {
+    section:first-child {
+      padding-left: var(--size-fluid-5);
+    }
+
+    section:last-child {
+      padding-right: var(--size-fluid-5);
+    }
+
+    section:only-child {
+      .hub {
+
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--gap);
+
+      }
+
+
+      &:has(>img) {
+        overflow: initial !important;
+
+        .list-thumbnail {
+          display: inline-block;
+          height: calc(100% - var(--size-12));
+          margin: 0;
+          margin-right: var(--gap);
+          vertical-align: middle;
+        }
+
+        .listContainer {
+          height: calc(100% - var(--size-10));
+          width: calc(100% - var(--size-13));
+          display: inline-block;
+          vertical-align: top;
+          margin: 0 !important;
+          overflow-y: auto !important;
+        }
+      }
+
+
+      .searchlist,
+      .listContainer {
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--gap);
+
+        .streamItem {
+          display: inline-flex;
+          width: 100%;
+          grid-column: span 2;
+          margin: 0;
+        }
+
+        .listItem {
+          width: 100%;
+          grid-column: span 1;
+          margin: 0;
+        }
+
+      }
+    }
+
+  }
 
   @media (orientation: portrait) {
 
@@ -79,6 +136,8 @@ main {
       padding: 0 var(--gap);
     }
   }
+
+
 }
 
 
@@ -210,7 +269,20 @@ i[aria-label]:hover::after {
   background: var(--text);
   color: var(--bg);
   right: var(--size-8);
-  z-index: 101;
+  z-index: 100;
   padding: var(--size-px-1) var(--size-px-2) !important;
   border-radius: var(--roundness);
+  animation: appear 1s;
+}
+
+@keyframes appear {
+
+  from,
+  90% {
+    opacity: 0;
+  }
+
+  75% {
+    transform: translateX(var(--size-8));
+  }
 }

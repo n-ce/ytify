@@ -38,13 +38,6 @@ export default function(_: {
 
   const getKeys = (add: boolean) => getCollectionsKeys()
     .filter(k => {
-
-      if ([
-        'favorites',
-        'listenLater',
-        'liked'
-      ].includes(k)) return false;
-
       const itemIsIncluded = getCollection(k).includes(_.data[0].id);
 
       return add ? !itemIsIncluded : itemIsIncluded;

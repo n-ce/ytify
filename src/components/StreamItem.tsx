@@ -1,8 +1,8 @@
 import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { config, hostResolver, player, removeFromCollection } from '@lib/utils';
+import { config, hostResolver, player, removeFromCollection, getCollectionItems } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore } from '@lib/stores';
+import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore } from '@lib/stores';
 
 export default function(data: {
   id: string,
@@ -64,14 +64,16 @@ export default function(data: {
 
 
 
-  if (config.loadImage)
+  const isAlbum = data.context?.id.startsWith('Album');
+
+  if (config.loadImage && !isAlbum)
     setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites'));
 
   return (
     <a
       class='streamItem'
       classList={{
-        'ravel': config.loadImage,
+        'ravel': config.loadImage && !isAlbum,
         'marked': data.mark?.get(data.id),
         'delete': data.removeMode
       }}
@@ -93,7 +95,18 @@ export default function(data: {
         if (!e.target.classList.contains('ri-more-2-fill')) {
 
 
-          setPlayerStore('stream', data);
+          setPlayerStore('stream', {
+            id: data.id,
+            title: data.title,
+            author: data.author || '',
+            duration: data.duration,
+            authorId: data.authorId || '',
+          });
+
+          if (data.albumId)
+            setPlayerStore('stream', 'albumId', data.albumId);
+          else if (playerStore.stream.albumId)
+            setPlayerStore('stream', 'albumId', undefined);
 
 
           if (data.context)
@@ -110,6 +123,27 @@ export default function(data: {
 
             if (config.watchMode)
               navStore.player.ref?.scrollIntoView();
+          }
+
+          if (config.enqueueRelatedStreams && (data.context?.src === 'collection' || (data.context?.src === 'playlists' && listStore.name.startsWith('Album - ')))) {
+            const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) : listStore.list;
+            const currentIndex = collectionItems.findIndex(item => item.id === data.id);
+            if (currentIndex !== -1) {
+              const zigzagQueue: CollectionItem[] = [];
+              let left = currentIndex - 1;
+              let right = currentIndex + 1;
+              const len = collectionItems.length;
+
+              while (left >= 0 || right < len) {
+                if (right < len) {
+                  zigzagQueue.push(collectionItems[right++]);
+                }
+                if (left >= 0) {
+                  zigzagQueue.push(collectionItems[left--]);
+                }
+              }
+              setQueueStore('list', zigzagQueue);
+            }
           }
 
           player(data.id);
@@ -142,7 +176,8 @@ export default function(data: {
       }}
     >
       <span>
-        <Show when={config.loadImage} fallback={data.duration}>
+        <Show when={!isAlbum && config.loadImage} fallback={data.duration}>
+
           <img
             crossorigin='anonymous'
             onerror={handleThumbnailError}

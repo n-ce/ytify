@@ -51,12 +51,14 @@
     }
   }
 
-  .ri-indeterminate-circle-line {
-    margin: 0 var(--size-3);
+  .ri-indeterminate-circle-line,
+  .ri-list-check-2 {
+    margin-left: var(--size-3);
   }
 
-  .ri-play-list-2-fill {
+  :nth-last-of-type(1) {
     margin-left: var(--size-3);
+    font-style: normal;
   }
 }
 
@@ -67,4 +69,41 @@
     filter: invert();
   }
 
+}
+
+.list-thumbnail {
+  border-radius: var(--roundness);
+}
+
+#listSection {
+  &:has(>img) {
+
+    .listContainer {
+      border-radius: var(--roundness);
+      overflow: hidden;
+      margin-top: var(--gap);
+    }
+
+    .streamItem {
+      margin-bottom: 0;
+      width: 100%;
+      border-radius: 0;
+      flex-shrink: 0;
+
+      .title {
+        height: var(--size-4);
+        text-overflow: clip;
+      }
+    }
+  }
+}
+
+#collectionSelector {
+  font-weight: inherit;
+  font-size: inherit;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  padding: 0;
+  color: inherit;
 }

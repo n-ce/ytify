@@ -121,7 +121,7 @@ footer {
 
     &::-webkit-progress-value {
       background: linear-gradient(transparent, var(--onBg2));
-      transition: all 0.4s linear;
+      transition: all 1s linear;
     }
   }
 

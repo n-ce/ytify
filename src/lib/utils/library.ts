@@ -1,5 +1,6 @@
 import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
+import { config } from '@lib/utils/config';
 
 // New Library V2 utils
 
@@ -36,12 +37,22 @@ export const getMeta = (): Meta => {
 };
 
 
-export const getCollectionsKeys = () => Object
-  .keys(localStorage)
-  .filter(key => key.startsWith('library_'))
-  .map(key => key.slice(8))
-  .filter(key => !['channels', 'playlists', 'tracks', 'meta']
-    .includes(key));
+export const getCollectionsKeys = () => {
+  const allKeys = Object
+    .keys(localStorage)
+    .filter(key => key.startsWith('library_'))
+    .map(key => key.slice(8))
+    .filter(key => !['channels', 'playlists', 'tracks', 'meta']
+      .includes(key));
+
+  const reservedOrder = ['history', 'favorites', 'liked', 'listenLater'];
+  const meta = getMeta();
+
+  return [
+    ...reservedOrder.filter(key => allKeys.includes(key)),
+    ...allKeys.filter(key => !reservedOrder.includes(key)).sort((a, b) => (meta[a] || 0) - (meta[b] || 0))
+  ];
+};
 
 export const getTracksMap = (): Collection =>
   JSON.parse(localStorage.getItem('library_tracks') || '{}');
@@ -159,7 +170,6 @@ export function deleteCollection(name: string) {
 
 
 export const metaUpdater = (key: string, remove?: boolean) => {
-  setListStore('isLoading', true);
   const meta = getMeta();
   const timestamp = Date.now();
 
@@ -173,7 +183,6 @@ export const metaUpdater = (key: string, remove?: boolean) => {
     meta[key] = timestamp;
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
-  setListStore('isLoading', false);
 }
 
 
@@ -275,32 +284,40 @@ function getLocalCollection(
     return;
   }
 
-  const usePagination = ids.length > 20;
   const tracks = getTracksMap();
+
+  let sortedIds = ids;
+  if (config.sortOrder !== 'modified') {
+    const items = ids.map(id => tracks[id]);
+    const sortedItems = sortCollection(items, config.sortOrder);
+    sortedIds = sortedItems.map(item => item.id);
+  }
+
+  const usePagination = sortedIds.length > 20;
 
   setListStore({
     name: collection,
-    length: ids.length
+    length: sortedIds.length
   });
 
   if (usePagination) {
     let loadedCount = 20;
-    setListStore('list', ids.slice(0, loadedCount).map(id => tracks[id]));
+    setListStore('list', sortedIds.slice(0, loadedCount).map(id => tracks[id]));
 
     const observerCallback = () => {
-      if (loadedCount >= ids.length) return 0;
+      if (loadedCount >= sortedIds.length) return 0;
 
-      const nextBatch = ids.slice(loadedCount, loadedCount + 20);
+      const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
       setListStore('list', (l) => [...l, ...nextBatch.map(id => tracks[id])]);
-      return ids.length - loadedCount;
+      return sortedIds.length - loadedCount;
     };
 
     setTimeout(() => setObserver(observerCallback), 100);
 
   } else {
-    setListStore('list', ids.map(id => tracks[id]));
+    setListStore('list', sortedIds.map(id => tracks[id]));
   }
 
   setListStore('id', decodeURI(collection));
@@ -320,4 +337,35 @@ async function getSharedCollection(
     setStore('snackbar', `Collection does not exist`);
 
   setListStore('isLoading', false);
+}
+
+export type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
+
+export function sortCollection(list: CollectionItem[], sortOrder: SortOrder): CollectionItem[] {
+  if (sortOrder === 'modified') {
+    return list;
+  }
+
+  const listToSort = [...list];
+
+  listToSort.sort((a, b) => {
+    switch (sortOrder) {
+      case 'name':
+        return a.title.localeCompare(b.title);
+      case 'artist':
+        return (a.author || '').localeCompare(b.author || '');
+      case 'duration':
+        const parseDuration = (d: string) => {
+          const parts = d.split(':').map(Number);
+          if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+          if (parts.length === 2) return parts[0] * 60 + parts[1];
+          return 0;
+        };
+        return parseDuration(a.duration) - parseDuration(b.duration);
+      default:
+        return 0;
+    }
+  });
+
+  return listToSort;
 }

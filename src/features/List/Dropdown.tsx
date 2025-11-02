@@ -134,6 +134,7 @@ export default function Dropdown(_: {
 
           <li id="exportCollectionBtn" onclick={() => {
             const collectionData: CollectionItem[] = getCollectionItems(listStore.id);
+            console.log(collectionData);
             const jsonString = JSON.stringify(collectionData, null, 2);
             navigator.clipboard.writeText(jsonString)
               .then(() => {

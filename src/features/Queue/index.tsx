@@ -1,6 +1,6 @@
 import { createSignal, onMount } from 'solid-js';
 import './Queue.css';
-import { openFeature, setStore, t, addToQueue, queueStore, closeFeature } from "@lib/stores";
+import { openFeature, setStore, t, addToQueue, queueStore, setNavStore } from "@lib/stores";
 import { config, setConfig } from "@lib/utils";
 import { setQueueStore } from "@lib/stores/queue";
 import List from "./List";
@@ -131,7 +131,7 @@ export default function() {
 
       <i
         aria-label="close"
-        onclick={() => { closeFeature('queue') }}
+        onclick={() => { setNavStore('queue', 'state', false) }}
         class="ri-close-large-line"></i>
 
     </section >
