@@ -2,7 +2,7 @@ import { audio, instanceSelector } from "../lib/dom";
 import player from "../lib/player";
 import { getSaved, removeSaved, save } from "../lib/utils";
 
-const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/n-ce/ytify/unified_instances.md';
+const unifiedInstancesAPIurl = 'https://raw.githubusercontent.com/wiki/tony0sony/music/unified_instances.md';
 
 fetch(unifiedInstancesAPIurl)
   .then(res => res.text())
