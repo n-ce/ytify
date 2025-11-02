@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => ({
   base: process.env.VITE_BASE_PATH || '/',
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
-    Version: 'v7.final March 2025'
+    Version: JSON.stringify('v7.final March 2025')
   },
   plugins: [
     injectEruda(command === 'serve'),
