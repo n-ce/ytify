@@ -2,7 +2,8 @@
 
 import { For, lazy, onMount, Show } from 'solid-js';
 import '../styles/global.css';
-import { navStore, playerStore, store } from '@lib/stores';
+import { navStore, playerStore, setStore, store } from '@lib/stores';
+import { config } from '@lib/utils';
 
 const MiniPlayer = lazy(() => import('../components/MiniPlayer'));
 const ActionsMenu = lazy(() => import('../components/ActionsMenu'));
@@ -10,7 +11,19 @@ const SnackBar = lazy(() => import('../components/SnackBar'));
 
 export default function() {
 
-  onMount(async () => await import('../lib/modules/start.ts').then(mod => mod.default()));
+  onMount(async () => {
+    await import('../lib/modules/start.ts').then(mod => mod.default());
+
+    setStore('syncState', 'synced'); // Initialize syncState
+
+    // Initial sync attempt
+    if (config.dbsync) {
+      setStore('syncState', 'synced'); // Initialize syncState to synced
+      import('@lib/modules/cloudSync').then(({ runSync }) => {
+        runSync(config.dbsync);
+      });
+    }
+  });
 
   return (
     <>
