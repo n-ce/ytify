@@ -3,7 +3,7 @@ import './Home.css';
 import { config, setConfig } from '@lib/utils';
 import { setNavStore, store } from '@lib/stores';
 import Dropdown from './Dropdown';
-import { runSync } from '@lib/modules/cloudSync';
+
 const About = lazy(() => import('./About'));
 const Hub = lazy(() => import('./Hub'));
 const Search = lazy(() => import('./Search'));
@@ -42,7 +42,9 @@ export default function() {
             ref={syncBtn}
             onclick={() => {
               if (store.syncState === 'dirty' || store.syncState === 'error') {
-                runSync(dbsync);
+                import('@lib/modules/cloudSync').then(({ runSync }) => {
+                  runSync(dbsync);
+                });
               }
             }}
           ></i>

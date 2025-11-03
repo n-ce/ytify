@@ -80,8 +80,28 @@ const handler: Handler = async () => {
 
     console.log(`Retention policy applied. Deleted ${deletedUserHashes.length} inactive users.`);
 
+    // --- STEP 2: Orphaned Content Blob Cleanup (Global Content Store GC) ---
+    console.log("--- Starting Content Blob Cleanup ---");
+    const contentStore = getStore('contentStore');
+    const { blobs: contentBlobs } = await contentStore.list({ prefix: '' });
+    let deletedContentBlobsCount = 0;
 
-    // --- STEP 2: Orphaned Track Metadata Cleanup (The true GC) ---
+    for (const blob of contentBlobs) {
+      const contentBlobMeta = await contentStore.getWithMetadata(blob.key);
+      if (!contentBlobMeta) continue;
+
+      const lastModifiedTime = contentBlobMeta.metadata.lastModified as number ?? now;
+      const isOld = (now - lastModifiedTime) > INACTIVE_THRESHOLD_MS;
+
+      if (isOld) {
+        console.log(`Deleting old content blob: ${blob.key}`);
+        await contentStore.delete(blob.key);
+        deletedContentBlobsCount++;
+      }
+    }
+    console.log(`Deleted ${deletedContentBlobsCount} old content blobs.`);
+
+    // --- STEP 3: Orphaned Track Metadata Cleanup (The true GC) ---
     // This process requires knowing all tracks referenced by all active users,
     // which, in this model, is contained within the active user's track map.
 

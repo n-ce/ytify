@@ -1,7 +1,7 @@
 import { createSignal, onMount, Show } from "solid-js";
 import { setConfig } from "@lib/utils/config";
 import { setStore } from "@lib/stores";
-import { runSync } from "@lib/modules/cloudSync";
+
 
 export default function() {
 
@@ -42,12 +42,14 @@ export default function() {
               .then(hash => {
                 setConfig('dbsync', hash);
                 setStore('snackbar', 'Syncing...');
-                runSync(hash).then(result => {
-                  setStore('snackbar', result.message);
-                  if (result.success) {
-                    z.close();
-                    z.remove();
-                  }
+                import("@lib/modules/cloudSync").then(({ runSync }) => {
+                  runSync(hash).then(result => {
+                    setStore('snackbar', result.message);
+                    if (result.success) {
+                      z.close();
+                      z.remove();
+                    }
+                  });
                 });
               })
               .catch(error => {

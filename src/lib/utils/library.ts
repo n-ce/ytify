@@ -1,7 +1,7 @@
 import { navStore, setNavStore, setStore, t, updateParam, store } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
 import { config } from '@lib/utils/config';
-import { scheduleSync, addDirtyTrack, removeDirtyTrack } from '@lib/modules/cloudSync';
+
 
 // New Library V2 utils
 
@@ -105,7 +105,11 @@ export function addToCollection(
 
     if (!(id in tracks)) {
       tracks[id] = item;
-      addDirtyTrack(id); // Mark as added
+      if (config.dbsync) {
+        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
+          addDirtyTrack(id); // Mark as added
+        });
+      }
     }
   }
 
@@ -136,7 +140,11 @@ export function removeFromCollection(
 
     if (!isReferenced) {
       delete tracks[id];
-      removeDirtyTrack(id); // Mark as deleted
+      if (config.dbsync) {
+        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
+          removeDirtyTrack(id); // Mark as deleted
+        });
+      }
     }
   }
 
@@ -165,7 +173,11 @@ export function deleteCollection(name: string) {
 
     if (!isReferenced) {
       delete tracks[id];
-      removeDirtyTrack(id); // Mark as deleted
+      if (config.dbsync) {
+        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
+          removeDirtyTrack(id); // Mark as deleted
+        });
+      }
     }
   }
 
@@ -191,7 +203,11 @@ export const metaUpdater = (key: string, remove?: boolean) => {
   localStorage.setItem('library_meta', JSON.stringify(meta));
   if (store.syncState !== 'syncing') {
     setStore('syncState', 'dirty');
-    scheduleSync();
+    if (config.dbsync) {
+      import('@lib/modules/cloudSync').then(({ scheduleSync }) => {
+        scheduleSync();
+      });
+    }
   }
 }
 

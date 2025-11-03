@@ -208,108 +208,111 @@ export const clearDirtyTracks = () => {
  * Orchestrates the pull-merge-push flow.
  * @param {string} userId - The user's ID hash.
  */
-export async function runSync(userId: string) {
+export function runSync(userId: string): Promise<{ success: boolean; message: string }> {
   setStore('syncState', 'syncing');
-  try {
-    // 1. Get remote manifest and ETag
-    const { remoteMeta, ETag } = await getRemoteManifest(userId);
-    const localMeta = getMeta();
 
-    const finalMeta = { ...localMeta };
+  return getRemoteManifest(userId)
+    .then(({ remoteMeta, ETag }) => {
+      const localMeta = getMeta();
+      const finalMeta = { ...localMeta };
+      const pullPromises: Promise<void>[] = [];
 
-    // 2. PULL phase: Identify and pull newer content from remote
-    const pullPromises: Promise<void>[] = [];
-    for (const key in remoteMeta) {
-      if (key === 'version') continue;
+      for (const key in remoteMeta) {
+        if (key === 'version') continue;
+        const remoteTimestamp = remoteMeta[key] || 0;
+        const localTimestamp = localMeta[key] || 0;
 
-      const remoteTimestamp = remoteMeta[key] || 0;
-      const localTimestamp = localMeta[key] || 0;
-
-      if (remoteTimestamp > localTimestamp) {
-        console.log(`Pulling ${key}: remote is newer.`);
-        if (key !== 'tracks') {
-          pullPromises.push(pullContentByTimestamp(remoteTimestamp, key));
+        if (remoteTimestamp > localTimestamp) {
+          console.log(`Pulling ${key}: remote is newer.`);
+          if (key !== 'tracks') {
+            pullPromises.push(pullContentByTimestamp(remoteTimestamp, key));
+          }
+          finalMeta[key] = remoteTimestamp;
         }
-        finalMeta[key] = remoteTimestamp;
       }
-    }
-    await Promise.all(pullPromises);
-
-    // 3. PUSH phase: Identify and push newer local content
-    const pushPromises: Promise<void>[] = [];
-    for (const key of getCollectionsKeys()) {
-      const localTimestamp = localMeta[key] || 0;
-      const remoteTimestamp = remoteMeta[key] || 0;
-
-      if (localTimestamp > remoteTimestamp) {
-        console.log(`Pushing ${key}: local is newer.`);
-        const collectionData = getCollection(key);
-        pushPromises.push(
-          pushImmutableContent(collectionData).then(newTimestamp => {
-            finalMeta[key] = newTimestamp;
-          })
-        );
-      }
-    }
-    await Promise.all(pushPromises);
-
-    // 4. Track synchronization
-    const localTracksTimestamp = localMeta.tracks || 0;
-    const remoteTracksTimestamp = remoteMeta.tracks || 0;
-    const localTracks = getTracksMap();
-
-    const dirtyTracks = getDirtyTracks();
-
-    if (dirtyTracks.added.length > 0 || dirtyTracks.deleted.length > 0) {
-      console.log("Pushing dirty track changes.");
-      const addedTrackItems = dirtyTracks.added.map(id => localTracks[id]).filter(Boolean) as CollectionItem[];
-      await pushTrackChanges(userId, addedTrackItems, dirtyTracks.deleted);
-      clearDirtyTracks();
-      finalMeta.tracks = Date.now(); // Update timestamp after push
-    } else if (remoteTracksTimestamp > localTracksTimestamp) {
-      console.log("Pulling track changes.");
-      // We need to find out which tracks are missing.
-      const allTrackIds = new Set<string>();
+      return Promise.all(pullPromises).then(() => ({ finalMeta, ETag, remoteMeta, localMeta }));
+    })
+    .then(({ finalMeta, ETag, remoteMeta, localMeta }) => {
+      const pushPromises: Promise<void>[] = [];
       for (const key of getCollectionsKeys()) {
-        getCollection(key).forEach(id => allTrackIds.add(id));
+        const localTimestamp = localMeta[key] || 0;
+        const remoteTimestamp = remoteMeta[key] || 0;
+
+        if (localTimestamp > remoteTimestamp) {
+          console.log(`Pushing ${key}: local is newer.`);
+          const collectionData = getCollection(key);
+          pushPromises.push(
+            pushImmutableContent(collectionData).then(newTimestamp => {
+              finalMeta[key] = newTimestamp;
+            })
+          );
+        }
+      }
+      return Promise.all(pushPromises).then(() => ({ finalMeta, ETag, remoteMeta, localMeta }));
+    })
+    .then(({ finalMeta, ETag, remoteMeta, localMeta }) => {
+      const localTracksTimestamp = localMeta.tracks || 0;
+      const remoteTracksTimestamp = remoteMeta.tracks || 0;
+      const localTracks = getTracksMap();
+      const dirtyTracks = getDirtyTracks();
+
+      let trackSyncPromise: Promise<any> = Promise.resolve();
+
+      if (dirtyTracks.added.length > 0 || dirtyTracks.deleted.length > 0) {
+        console.log("Pushing dirty track changes.");
+        const addedTrackItems = dirtyTracks.added.map(id => localTracks[id]).filter(Boolean) as CollectionItem[];
+        trackSyncPromise = pushTrackChanges(userId, addedTrackItems, dirtyTracks.deleted)
+          .then(() => {
+            clearDirtyTracks();
+            finalMeta.tracks = Date.now();
+          });
+      } else if (remoteTracksTimestamp > localTracksTimestamp) {
+        console.log("Pulling track changes.");
+        const allTrackIds = new Set<string>();
+        for (const key of getCollectionsKeys()) {
+          getCollection(key).forEach((id: string) => allTrackIds.add(id));
+        }
+        const missingTrackIds = [...allTrackIds].filter(id => !localTracks[id]);
+        if (missingTrackIds.length > 0) {
+          trackSyncPromise = pullTrackMetadata(userId, missingTrackIds)
+            .then(() => {
+              finalMeta.tracks = remoteTracksTimestamp;
+            });
+        } else {
+          finalMeta.tracks = remoteTracksTimestamp;
+        }
+      } else if (localTracksTimestamp > remoteTracksTimestamp) {
+        console.log("Local tracks timestamp is newer, but no dirty tracks. Pushing all local tracks.");
+        trackSyncPromise = pushTrackChanges(userId, Object.values(localTracks), [])
+          .then(() => {
+            finalMeta.tracks = localTracksTimestamp;
+          });
+      }
+      return trackSyncPromise.then(() => ({ finalMeta, ETag }));
+    })
+    .then(({ finalMeta, ETag }) => {
+      console.log("Finalizing sync...");
+      return finalizeSync(userId, ETag, finalMeta);
+    })
+    .then(() => {
+      console.log("Sync complete.");
+      setStore('syncState', 'synced');
+      return { success: true, message: "Sync complete." };
+    })
+    .catch(error => {
+      console.error("Sync failed:", error);
+      let message;
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
       }
 
-      const missingTrackIds = [...allTrackIds].filter(id => !localTracks[id]);
-      if (missingTrackIds.length > 0) {
-        await pullTrackMetadata(userId, missingTrackIds);
+      if (message.includes("412")) {
+        setStore('syncState', 'error');
+        return { success: false, message: "Conflict detected. Please try again." };
       }
-      finalMeta.tracks = remoteTracksTimestamp;
-    } else if (localTracksTimestamp > remoteTracksTimestamp) {
-      // If local tracks are newer but no dirty tracks, it means a full sync happened
-      // or the dirty state was cleared without a push. We should still update the remote.
-      console.log("Local tracks timestamp is newer, but no dirty tracks. Pushing all local tracks.");
-      await pushTrackChanges(userId, Object.values(localTracks), []);
-      finalMeta.tracks = localTracksTimestamp;
-    }
-
-    // 5. Finalize sync
-    console.log("Finalizing sync...");
-    await finalizeSync(userId, ETag, finalMeta);
-
-    console.log("Sync complete.");
-    setStore('syncState', 'synced');
-    return { success: true, message: "Sync complete." };
-
-  } catch (error) {
-    console.error("Sync failed:", error);
-    let message;
-    if (error instanceof Error) {
-      message = error.message;
-    } else {
-      message = String(error);
-    }
-
-    if (message.includes("412")) {
-      // Retry logic can be implemented here
       setStore('syncState', 'error');
-      return { success: false, message: "Conflict detected. Please try again." };
-    }
-    setStore('syncState', 'error');
-    return { success: false, message: `Sync failed: ${message}` };
-  }
+      return { success: false, message: `Sync failed: ${message}` };
+    });
 }
