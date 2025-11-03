@@ -22,6 +22,7 @@ export default function Dropdown(_: {
         }
       }
       setStore('snackbar', t('library_imported')); // Reusing existing translation key
+      location.reload();
     } else { // Assume V1 library
       localStorage.setItem('library', JSON.stringify(importedData));
       setStore('snackbar', 'Migrating Library v1 to v2...'); // New translation key needed
@@ -52,15 +53,20 @@ export default function Dropdown(_: {
     count = Object.keys(tracksMap).length;
 
     if (confirm(t('library_clean_prompt', count.toString()))) {
-      // Remove all V2 library_ keys
+      // Get all keys to remove
+      const keysToRemove = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && key.startsWith('library_')) {
-          localStorage.removeItem(key);
+        if (key && key.startsWith('library')) {
+          keysToRemove.push(key);
         }
       }
-      // Also remove the old V1 library key if it still exists
-      localStorage.removeItem('library');
+
+      // Remove all V2 library_ keys
+      for (const key of keysToRemove) {
+        localStorage.removeItem(key);
+      }
+      
       location.reload();
     }
   };
@@ -82,10 +88,9 @@ export default function Dropdown(_: {
       <ul>
         <Show when={_.isLibrary()}>
 
-          <li>
-            <label id="importBtn" for="upload_ytify">
+          <li onclick={() => document.getElementById('upload_ytify')?.click()}>
+            <label>
               <i class="ri-import-line"></i>&nbsp;{t('library_import')}
-
             </label>
             <input type="file" id="upload_ytify" onchange={importLibrary} />
           </li>
@@ -102,8 +107,8 @@ export default function Dropdown(_: {
           }>
             <i class="ri-download-cloud-line"></i>&nbsp;{t('settings_import_from_piped')}
           </li>
-          <li>
-            <label id="importSongshiftBtn" for="upload_songshift">
+          <li onclick={() => document.getElementById('upload_songshift')?.click()}>
+            <label>
               <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift
             </label>
             <input type="file" id="upload_songshift" onchange={async (e) => (await import('../../lib/modules/importSongshiftStreams')).default(e.target.files![0])} />

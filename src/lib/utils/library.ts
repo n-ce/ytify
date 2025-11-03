@@ -1,6 +1,7 @@
-import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
+import { navStore, setNavStore, setStore, t, updateParam, store } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
 import { config } from '@lib/utils/config';
+import { scheduleSync, addDirtyTrack, removeDirtyTrack } from '@lib/modules/cloudSync';
 
 // New Library V2 utils
 
@@ -46,7 +47,7 @@ export const getCollectionsKeys = () => {
       .includes(key));
 
   const reservedOrder = ['history', 'favorites', 'liked', 'listenLater'];
-  const meta = getMeta();
+  const meta = JSON.parse(localStorage.getItem('library_meta') || '{}');
 
   return [
     ...reservedOrder.filter(key => allKeys.includes(key)),
@@ -102,8 +103,10 @@ export function addToCollection(
       collection.unshift(id);
     else collection.push(id);
 
-    if (!(id in tracks))
+    if (!(id in tracks)) {
       tracks[id] = item;
+      addDirtyTrack(id); // Mark as added
+    }
   }
 
   saveCollection(name, collection);
@@ -131,9 +134,10 @@ export function removeFromCollection(
         break;
       }
 
-    if (!isReferenced)
+    if (!isReferenced) {
       delete tracks[id];
-
+      removeDirtyTrack(id); // Mark as deleted
+    }
   }
 
   saveCollection(name, collection);
@@ -159,8 +163,10 @@ export function deleteCollection(name: string) {
         break;
       }
 
-    if (!isReferenced)
+    if (!isReferenced) {
       delete tracks[id];
+      removeDirtyTrack(id); // Mark as deleted
+    }
   }
 
   localStorage.removeItem('library_' + name);
@@ -183,6 +189,10 @@ export const metaUpdater = (key: string, remove?: boolean) => {
     meta[key] = timestamp;
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
+  if (store.syncState !== 'syncing') {
+    setStore('syncState', 'dirty');
+    scheduleSync();
+  }
 }
 
 

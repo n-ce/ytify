@@ -202,7 +202,7 @@ a {
   color: var(--text);
   border-radius: var(--roundness);
   width: calc(100dvmin - calc(var(--gap) - var(--border-size-1)) * 2);
-  aspect-ratio: 1;
+  margin: auto;
 
   &::backdrop {
     background-color: #0007;

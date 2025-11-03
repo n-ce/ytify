@@ -36,12 +36,17 @@ export default function(_: {
   };
 
 
-  const getKeys = (add: boolean) => getCollectionsKeys()
-    .filter(k => {
-      const itemIsIncluded = getCollection(k).includes(_.data[0].id);
+  const getKeys = (add: boolean) => {
+    if (!_.data || _.data.length === 0) {
+      return [];
+    }
+    return getCollectionsKeys()
+      .filter(k => {
+        const itemIsIncluded = getCollection(k).includes(_.data[0].id);
 
-      return add ? !itemIsIncluded : itemIsIncluded;
-    });
+        return add ? !itemIsIncluded : itemIsIncluded;
+      });
+  };
 
   return (
     <select

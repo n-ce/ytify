@@ -6,6 +6,8 @@ declare global {
 
   type TranslationKeys = keyof typeof en;
 
+  type SyncState = 'synced' | 'syncing' | 'dirty' | 'error';
+
   type Features = 'home' | 'player' | 'list' | 'settings' | 'queue' | 'updater';
   type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue';
 

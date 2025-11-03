@@ -1,8 +1,9 @@
 import { Match, Show, Switch, createSignal, lazy } from 'solid-js';
 import './Home.css';
 import { config, setConfig } from '@lib/utils';
-import { setNavStore } from '@lib/stores';
+import { setNavStore, store } from '@lib/stores';
 import Dropdown from './Dropdown';
+import { runSync } from '@lib/modules/cloudSync';
 const About = lazy(() => import('./About'));
 const Hub = lazy(() => import('./Hub'));
 const Search = lazy(() => import('./Search'));
@@ -32,24 +33,37 @@ export default function() {
         <Show when={dbsync}>
           <i
             id="syncNow"
-            class="ri-cloud-fill"
+            classList={{
+              'ri-cloud-fill': store.syncState === 'synced',
+              'ri-loader-3-line': store.syncState === 'syncing',
+              'ri-cloud-off-fill': store.syncState === 'dirty' || store.syncState === 'error',
+              'error': store.syncState === 'error',
+            }}
             ref={syncBtn}
+            onclick={() => {
+              if (store.syncState === 'dirty' || store.syncState === 'error') {
+                runSync(dbsync);
+              }
+            }}
           ></i>
         </Show>
         <div class="right-group">
           <i
             aria-label="Hub"
             class="ri-store-2-line"
+            classList={{ 'on': home() === 'Hub' }}
             onclick={() => saveHome('Hub')}
           ></i>
           <i
             aria-label="Library"
             class="ri-archive-stack-line"
+            classList={{ 'on': home() === 'Library' }}
             onclick={() => saveHome('Library')}
           ></i>
           <i
             aria-label="Search"
             class="ri-search-2-line"
+            classList={{ 'on': home() === 'Search' }}
             onclick={() => saveHome('Search')}
           ></i>
 

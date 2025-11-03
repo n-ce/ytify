@@ -33,21 +33,24 @@ export default async (req: Request, context: Context): Promise<Response> => {
   if (req.method === 'PUT') {
     try {
       // Client always sends an array of TrackObjects
-      const tracksToUpdate = await req.json() as TrackObject[];
+      const { added, deleted } = await req.json() as { added: TrackObject[], deleted: string[] };
 
-      if (!Array.isArray(tracksToUpdate) || tracksToUpdate.length === 0) {
-        return new Response("Request body must be a non-empty array of TrackObjects.", { status: 400 });
+      if (!Array.isArray(added) || !Array.isArray(deleted)) {
+        return new Response("Request body must be an object with 'added' (array of TrackObjects) and 'deleted' (array of strings) properties.", { status: 400 });
       }
 
-      // 1. Get the current master map
-let masterMap: UserTrackMap = await trackStore.get(userIdHash, { type: 'json' }) || {};
+      let masterMap: UserTrackMap = await trackStore.get(userIdHash, { type: 'json' }) || {};
 
-      // 2. Merge the incoming tracks into the master map
-      for (const track of tracksToUpdate) {
+      // Merge incoming added tracks into the master map
+      for (const track of added) {
         masterMap[track.id] = track;
       }
 
-      // 3. CRITICAL: Overwrite the entire user's track map with the merged data
+      // Remove deleted tracks from the master map
+      for (const id of deleted) {
+        delete masterMap[id];
+      }
+
       await trackStore.setJSON(userIdHash, masterMap);
 
       // SUCCESS: Track map is updated. The client must now update the 'meta.tracks' timestamp via the CAS endpoint.

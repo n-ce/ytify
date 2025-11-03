@@ -1,4 +1,6 @@
 import { saveCollection, getTracksMap, saveTracksMap, getMeta, getCollection, getCollectionsKeys } from "@lib/utils/library";
+import { setStore } from "@lib/stores";
+import { config } from "@lib/utils/config";
 
 // --- Type Definitions (from user prompt, to be replaced by imports if available) ---
 interface Meta { version: number, tracks: number, [key: string]: number; }
@@ -31,17 +33,17 @@ export async function getRemoteManifest(userId: string): Promise<{ remoteMeta: M
 }
 
 /**
- * Pushes a batch of track changes to the unified track endpoint.
- * Always sends an array, even for a single track update.
+ * Pushes a batch of track changes (additions and deletions) to the unified track endpoint.
  * @param {string} userId - Current user ID.
- * @param {CollectionItem[]} tracks - Array of track objects to update/create.
+ * @param {CollectionItem[]} addedTrackItems - Array of track objects to add/update.
+ * @param {string[]} deletedTrackIds - Array of track IDs to delete.
  */
-export async function pushTrackChanges(userId: string, tracks: CollectionItem[]): Promise<void> {
-  if (tracks.length === 0) return;
+export async function pushTrackChanges(userId: string, addedTrackItems: CollectionItem[], deletedTrackIds: string[]): Promise<void> {
+  if (addedTrackItems.length === 0 && deletedTrackIds.length === 0) return;
 
   const response = await fetch(`/cs/tracks/${userId}`, {
     method: 'PUT',
-    body: JSON.stringify(tracks),
+    body: JSON.stringify({ added: addedTrackItems, deleted: deletedTrackIds }),
     headers: { 'Content-Type': 'application/json' }
   });
 
@@ -150,12 +152,64 @@ export async function pullTrackMetadata(userId: string, trackIds: string[]): Pro
   }
 }
 
+let syncTimeout: NodeJS.Timeout | null = null;
+
+export function scheduleSync() {
+  if (!config.dbsync) return; // Only schedule if cloud sync is enabled
+
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+  }
+
+  syncTimeout = setTimeout(() => {
+    runSync(config.dbsync!);
+    syncTimeout = null;
+  }, 2 * 60 * 1000); // 2 minutes debounce
+}
+
+export const getDirtyTracks = (): { added: string[], deleted: string[] } => {
+  const dirty = localStorage.getItem('dbsync_dirty_tracks');
+  if (dirty) {
+    return JSON.parse(dirty);
+  }
+  return { added: [], deleted: [] };
+};
+
+export const saveDirtyTracks = (dirtyTracks: { added: string[], deleted: string[] }) => {
+  localStorage.setItem('dbsync_dirty_tracks', JSON.stringify(dirtyTracks));
+};
+
+export const addDirtyTrack = (id: string) => {
+  const dirtyTracks = getDirtyTracks();
+  if (!dirtyTracks.added.includes(id)) {
+    dirtyTracks.added.push(id);
+  }
+  // If it was marked for deletion, remove it from deletion list
+  dirtyTracks.deleted = dirtyTracks.deleted.filter(deletedId => deletedId !== id);
+  saveDirtyTracks(dirtyTracks);
+};
+
+export const removeDirtyTrack = (id: string) => {
+  const dirtyTracks = getDirtyTracks();
+  if (!dirtyTracks.deleted.includes(id)) {
+    dirtyTracks.deleted.push(id);
+  }
+  // If it was marked for addition, remove it from addition list
+  dirtyTracks.added = dirtyTracks.added.filter(addedId => addedId !== id);
+  saveDirtyTracks(dirtyTracks);
+};
+
+export const clearDirtyTracks = () => {
+  localStorage.removeItem('dbsync_dirty_tracks');
+};
+
 /**
  * Main synchronization function.
  * Orchestrates the pull-merge-push flow.
  * @param {string} userId - The user's ID hash.
  */
 export async function runSync(userId: string) {
+  setStore('syncState', 'syncing');
   try {
     // 1. Get remote manifest and ETag
     const { remoteMeta, ETag } = await getRemoteManifest(userId);
@@ -204,14 +258,14 @@ export async function runSync(userId: string) {
     const remoteTracksTimestamp = remoteMeta.tracks || 0;
     const localTracks = getTracksMap();
 
-    if (localTracksTimestamp > remoteTracksTimestamp) {
-      console.log("Pushing track changes.");
-      // This is a simplification. We should only push changed tracks.
-      // For now, pushing all local tracks.
-      await pushTrackChanges(userId, Object.values(localTracks));
-      // We need a new timestamp for tracks. The backend doesn't provide one for track pushes.
-      // The client is responsible for updating the timestamp.
-      finalMeta.tracks = localTracksTimestamp;
+    const dirtyTracks = getDirtyTracks();
+
+    if (dirtyTracks.added.length > 0 || dirtyTracks.deleted.length > 0) {
+      console.log("Pushing dirty track changes.");
+      const addedTrackItems = dirtyTracks.added.map(id => localTracks[id]).filter(Boolean) as CollectionItem[];
+      await pushTrackChanges(userId, addedTrackItems, dirtyTracks.deleted);
+      clearDirtyTracks();
+      finalMeta.tracks = Date.now(); // Update timestamp after push
     } else if (remoteTracksTimestamp > localTracksTimestamp) {
       console.log("Pulling track changes.");
       // We need to find out which tracks are missing.
@@ -225,6 +279,12 @@ export async function runSync(userId: string) {
         await pullTrackMetadata(userId, missingTrackIds);
       }
       finalMeta.tracks = remoteTracksTimestamp;
+    } else if (localTracksTimestamp > remoteTracksTimestamp) {
+      // If local tracks are newer but no dirty tracks, it means a full sync happened
+      // or the dirty state was cleared without a push. We should still update the remote.
+      console.log("Local tracks timestamp is newer, but no dirty tracks. Pushing all local tracks.");
+      await pushTrackChanges(userId, Object.values(localTracks), []);
+      finalMeta.tracks = localTracksTimestamp;
     }
 
     // 5. Finalize sync
@@ -232,6 +292,7 @@ export async function runSync(userId: string) {
     await finalizeSync(userId, ETag, finalMeta);
 
     console.log("Sync complete.");
+    setStore('syncState', 'synced');
     return { success: true, message: "Sync complete." };
 
   } catch (error) {
@@ -245,8 +306,10 @@ export async function runSync(userId: string) {
 
     if (message.includes("412")) {
       // Retry logic can be implemented here
+      setStore('syncState', 'error');
       return { success: false, message: "Conflict detected. Please try again." };
     }
+    setStore('syncState', 'error');
     return { success: false, message: `Sync failed: ${message}` };
   }
 }

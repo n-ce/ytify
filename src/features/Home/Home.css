@@ -37,6 +37,11 @@ header {
     }
   }
 
+  .on {
+    background-color: var(--text) !important;
+    color: var(--bg) !important;
+  }
+
 }
 
 
@@ -183,5 +188,4 @@ header {
 .empty-library-message {
   text-align: center;
   margin-top: 2rem;
-  color: var(--text-color-secondary);
 }

@@ -10,6 +10,7 @@ const storeInit: {
   updater?: () => void,
   actionsMenu?: CollectionItem & { albumId?: string },
   snackbar?: string,
+  syncState?: SyncState,
 } = {
   invidious: [],
   index: 0,

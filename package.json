@@ -14,7 +14,7 @@
     "@netlify/blobs": "^10.3.1",
     "@netlify/edge-functions": "^3.0.1",
     "@netlify/functions": "^5.0.1",
-    "@types/node": "^24.9.2",
+    "@types/node": "^24.10.0",
     "@types/sortablejs": "^1.15.9",
     "autoprefixer": "^10.4.21",
     "eruda": "^3.4.3",

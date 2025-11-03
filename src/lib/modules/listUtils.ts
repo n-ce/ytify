@@ -12,7 +12,7 @@ export function importList() {
   if (!listTitle) return;
 
   createCollection(listTitle);
-  addToCollection(name, list);
+  addToCollection(listTitle, list);
 
   setStore('snackbar', t('list_imported', listTitle));
 }
