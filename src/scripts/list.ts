@@ -120,7 +120,10 @@ listBtnsContainer.addEventListener('click', async e => {
     import('../components/BulkImportDialog').then(mod => 
       mod.default(dialog, id, {
         collection: templateItem,
-        close: () => dialog.close()
+        close: () => {
+          dialog.close();
+          dialog.remove();
+        }
       })
     );
   }

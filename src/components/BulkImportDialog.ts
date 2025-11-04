@@ -1,21 +1,27 @@
 import { i18n } from '../scripts/i18n';
-import { getDB, addToCollection, saveDB } from '../lib/libraryUtils';
-import { getApi } from '../lib/utils';
+import { getDB, saveDB } from '../lib/libraryUtils';
+import { getApi, convertSStoHHMMSS } from '../lib/utils';
 import { render, html } from 'uhtml';
+
 
 function showToast(message: string, type: 'success' | 'warning' | 'error' = 'success') {
   const toast = document.createElement('div');
   toast.className = `bulk-import-toast toast-${type}`;
-  toast.innerHTML = message.replace(/\n/g, '<br>');
-  
+  message.split('<br>').forEach(line => {
+    const span = document.createElement('span');
+    span.textContent = line.replace(/<strong>(.*?)<\/strong>/g, '$1'); 
+    toast.appendChild(span);
+    toast.appendChild(document.createElement('br'));
+  });
+
   document.body.appendChild(toast);
   setTimeout(() => toast.classList.add('show'), 10);
-  
+
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
   }, 5000);
-  
+
   toast.onclick = () => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
@@ -26,16 +32,14 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
     collection: CollectionItem,
     close: () => void
 }) {
-    
-    const close = options.close;
+  const close = options.close;
 
   const extractVideoId = (url: string): string | null => {
-    // Check if line contains multiple URLs (spaces or multiple youtube.com/youtu.be)
     const urlCount = (url.match(/https?:\/\//g) || []).length;
     const spaceCount = url.trim().split(/\s+/).length;
-    
+
     if (urlCount > 1 || (spaceCount > 1 && url.includes('http'))) {
-      return 'MULTIPLE_URLS'; // Special marker for multiple URLs
+      return 'MULTIPLE_URLS';
     }
 
     const patterns = [
@@ -49,32 +53,23 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
     }
     return null;
   };
-  function formatDuration(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) {
-      return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
 
-  // Fetch video information from Piped/Invidious API
   const fetchVideoInfo = async (videoId: string): Promise<CollectionItem | null> => {
     try {
       const api = getApi('piped');
       const response = await fetch(`${api}/streams/${videoId}`);
-      
+
       if (!response.ok) throw new Error('Failed to fetch video info');
-      
+
       const data = await response.json();
-      
+
       return {
         id: videoId,
         title: data.title || 'Unknown Title',
         author: data.uploader || 'Unknown Channel',
         channelUrl: data.uploaderUrl || '',
-        duration: formatDuration(data.duration || 0),
+        url: `/watch?v=${videoId}`,
+        duration: (data.duration || data.lengthSeconds) > 0 ? convertSStoHHMMSS(data.duration || data.lengthSeconds) : 'LIVE',
         lastUpdated: new Date().toISOString()
       };
     } catch (error) {
@@ -107,6 +102,9 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
     document.body.appendChild(progressToast);
     setTimeout(() => progressToast.classList.add('show'), 10);
 
+    const db = getDB();
+    if (!db[collectionName]) db[collectionName] = {};
+
     for (let i = 0; i < urls.length; i++) {
       const url = urls[i];
       const videoId = extractVideoId(url);
@@ -124,40 +122,25 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
         continue;
       }
 
-      try {
-        const db = getDB();
-        const collectionData = db[collectionName];
-
-        if (collectionData && typeof collectionData === 'object') {
-          if (videoId in collectionData) {
-            results.duplicates.push(url);
-            continue;
-          }
-        }
-
-        // Fetch actual video information from API
-        const videoInfo = await fetchVideoInfo(videoId);
-        
-        if (!videoInfo) {
-          results.failed.push(url);
-          continue;
-        }
-
-        await addToCollection(collectionName, videoInfo, '');
-        results.success.push(url);
-
-      } catch (error) {
-        console.error('Error adding to collection:', error);
-        results.failed.push(url);
+      if (videoId in db[collectionName]) {
+        results.duplicates.push(url);
+        continue;
       }
+
+      const videoInfo = await fetchVideoInfo(videoId);
+      if (!videoInfo) {
+        results.failed.push(url);
+        continue;
+      }
+
+      db[collectionName][videoInfo.id] = videoInfo;
+      results.success.push(url);
     }
 
     progressToast.classList.remove('show');
     setTimeout(() => progressToast.remove(), 300);
 
-    // Save the database after all imports
-    const finalDb = getDB();
-    saveDB(finalDb);
+    saveDB(db);
 
     const messages = [];
     let toastType: 'success' | 'warning' | 'error' = 'success';
@@ -181,7 +164,6 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
     showToast(messages.join('<br>'), toastType);
     textarea.value = '';
 
-    // Refresh the collection view
     if (results.success.length > 0) {
       setTimeout(() => location.reload(), 2000);
     }
@@ -211,7 +193,7 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
         <i class="ri-upload-line"></i>
         ${i18n('bulk_import_title')} - ${collectionName}
       </h2>
-      
+
       <form @submit=${handleSubmit}>
         <div class="form-group">
           <label for="bulkUrlInput">
@@ -388,6 +370,14 @@ export default function(dialog: HTMLDialogElement, collectionName: string, optio
       </style>
     </div>
   `);
+
+  const handlePopState = () => { if (dialog.open) close(); };
+  window.addEventListener('popstate', handlePopState, { once: true });
+  history.pushState({ dialog: 'bulkImport' }, '');
+  dialog.addEventListener('close', () => {
+    window.removeEventListener('popstate', handlePopState);
+    if (history.state?.dialog === 'bulkImport') history.back();
+  }, { once: true });
+
   dialog.showModal();
-  history.pushState({}, '', '#');
 }

@@ -41,6 +41,7 @@ declare global {
     author: string,
     duration: string
     channelUrl: string,
+    url?: string;
     lastUpdated?: string
   }
 
