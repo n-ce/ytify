@@ -172,5 +172,17 @@
   "updater_changelog_full": "Read all previous changes",
   "updater_update": "Update",
   "updater_later": "Later",
-  "pwa_share_prompt": "Click ok to Play, click cancel to Download"
+  "pwa_share_prompt": "Click ok to Play, click cancel to Download",
+  "list_bulk_import": "Bulk Import URLs",
+  "bulk_import_title": "Bulk Import to",
+  "bulk_import_urls_label": "YouTube URLs",
+  "bulk_import_placeholder": "Paste YouTube URLs (one per line)\n\nExample:\nhttps://youtu.be/JXb99k20lt0\nhttps://youtube.com/watch?v=dRy7b50JWyc\nhttps://youtu.be/Q_yZlJU4iCQ",
+  "bulk_import_help_text": "Enter one URL per line. Supports youtube.com and youtu.be links.",
+  "bulk_import_submit_button": "Import to Collection",
+  "bulk_import_no_urls": "Please enter at least one URL",
+  "bulk_import_processing": "Processing URLs...",
+  "bulk_import_added": "added successfully",
+  "bulk_import_duplicates": "already in collection",
+  "bulk_import_failed": "failed (invalid URLs)",
+  "cancel": "Cancel"
 }

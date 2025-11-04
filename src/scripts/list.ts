@@ -1,4 +1,4 @@
-import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByAuthorBtn } from '../lib/dom';
+import { clearListBtn, deleteCollectionBtn, enqueueBtn, importListBtn, listBtnsContainer, listContainer, openInYtBtn, playAllBtn, shareCollectionBtn, removeFromListBtn, renameCollectionBtn, subscribeListBtn, radioCollectionBtn, sortCollectionBtn, queuelist, sortByTitleBtn, sortByAuthorBtn, bulkImportBtn } from '../lib/dom';
 import { goTo, hostResolver } from '../lib/utils';
 import { store } from '../lib/store';
 import { importList, subscribeList, shareCollection } from '../modules/listUtils';
@@ -108,6 +108,22 @@ listBtnsContainer.addEventListener('click', async e => {
   }
   else if (btn === sortByAuthorBtn)
     sort('author');
+  
+  else if (btn === bulkImportBtn) {
+    const dialog = document.createElement('dialog');
+    document.body.appendChild(dialog);
+    
+    const db = getDB();
+    const collectionItems = Object.values(db[id]) as CollectionItem[];
+    const templateItem: CollectionItem = collectionItems[0] ?? { id: '', title: '', author: '', url: '', duration: 0, channelUrl: '' };
+    
+    import('../components/BulkImportDialog').then(mod => 
+      mod.default(dialog, id, {
+        collection: templateItem,
+        close: () => dialog.close()
+      })
+    );
+  }
 
   function sort(field: keyof CollectionItem | '' = '') {
 
@@ -139,6 +155,3 @@ listBtnsContainer.addEventListener('click', async e => {
   }
 
 });
-
-
-
