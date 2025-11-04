@@ -11,22 +11,13 @@ export const goTo = (route: Routes | 'history' | 'discover') => (<HTMLAnchorElem
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
-const TEST_API = 'https://pipedapi.in.projectsegfau.lt';
-
 export const getApi = (
   type: 'piped' | 'invidious',
   index: number = store.api.index
 ) =>
-  /*type === 'piped' ?
+  type === 'piped' ?
     store.api.piped.concat(store.player.hls.api)[index] :
-    store.api.invidious[index];*/
-    {
-        if (type === 'piped') {
-    // Always use the test API instead of the down one
-    return TEST_API;
-  }
-  return store.api.invidious[index] || 'https://invidious.projectsegfau.lt';
-    }
+    store.api.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :

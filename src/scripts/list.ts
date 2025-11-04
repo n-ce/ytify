@@ -115,7 +115,7 @@ listBtnsContainer.addEventListener('click', async e => {
     
     const db = getDB();
     const collectionItems = Object.values(db[id]) as CollectionItem[];
-    const templateItem: CollectionItem = collectionItems[0] ?? { id: '', title: '', author: '', url: '', duration: 0, channelUrl: '' };
+    const templateItem: CollectionItem = collectionItems[0] ?? { id: '', title: '', author: '', url: '', duration: '', channelUrl: '' };
     
     import('../components/BulkImportDialog').then(mod => 
       mod.default(dialog, id, {
