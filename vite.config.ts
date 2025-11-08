@@ -42,7 +42,7 @@ export default defineConfig(({ command }) => ({
         "shortcuts": [
           {
             "name": "History",
-            "url": "/list?collection=history",
+            "url": "./list?collection=history",
             "icons": [
               {
                 "src": "memories-fill.png",
@@ -51,7 +51,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Favorites",
-            "url": "/list?collection=favorites",
+            "url": "./list?collection=favorites",
             "icons": [
               {
                 "src": "heart-fill.png",
@@ -60,7 +60,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Listen Later",
-            "url": "/list?collection=listenLater",
+            "url": "./list?collection=listenLater",
             "icons": [
               {
                 "src": "calendar-schedule-fill.png",
