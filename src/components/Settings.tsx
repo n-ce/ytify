@@ -608,7 +608,7 @@ async function clearCache(_: Event | undefined = undefined) {
   await self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
   await navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
 
-  if (_?.type === 'click') location.reload();
+  if (_?.type === 'click') location.replace(location.origin + location.pathname.replace(/\/[^\/]*$/, '') || '/');
 }
 
 function restoreSettings(_: Event | undefined = undefined) {
