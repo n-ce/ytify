@@ -1,5 +1,5 @@
 import { For, Show, createSignal } from "solid-js";
-import { getHub, updateSubfeed, updateRelatedToYourArtists } from "@lib/modules/hub";
+import { getHub, updateSubfeed, updateGallery } from "@lib/modules/hub";
 import { fetchCollection, getCollection, getTracksMap } from "@lib/utils";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
@@ -15,7 +15,16 @@ export default function() {
     .map(id => tracksMap[id])
     .filter(Boolean) as CollectionItem[];
   const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);
-  const [isRelatedLoading, setIsRelatedLoading] = createSignal(false);
+  const [isGalleryLoading, setIsGalleryLoading] = createSignal(false);
+
+  const getFrequentlyPlayedTracks = (limit?: number) => {
+    const allTracks = Object.values(getTracksMap());
+    const filteredAndSorted = allTracks
+      .filter(track => track.plays && track.plays > 1)
+      .sort((a, b) => (b.plays as number) - (a.plays as number));
+
+    return filteredAndSorted.slice(0, limit || 100) as CollectionItem[];
+  };
 
   const handleSubfeedRefresh = () => {
     setIsSubfeedLoading(true);
@@ -25,17 +34,85 @@ export default function() {
     });
   };
 
-  const handleRelatedRefresh = () => {
-    setIsRelatedLoading(true);
-    updateRelatedToYourArtists().then(() => {
+  const handleGalleryRefresh = () => {
+    setIsGalleryLoading(true);
+    updateGallery().then(() => {
       setHub(getHub());
-      setIsRelatedLoading(false);
+      setIsGalleryLoading(false);
     });
   };
 
   return (
     <div class="hub">
-      <article>
+
+
+      <article class="gallery-article">
+        <p>Gallery</p>
+        <i
+          aria-label="Refresh"
+          class="ri-refresh-line"
+          onclick={handleGalleryRefresh}
+        ></i>
+        <Show when={isGalleryLoading()}>
+          <i class="ri-loader-3-line"></i>
+        </Show>
+        <div class="userArtists">
+          <Show
+            when={hub().userArtists?.length > 0}
+            fallback={'Artists from your library will show up here.'}
+          >
+            <For each={hub().userArtists}>
+              {(item) => (
+                <ListItem
+                  stats={''}
+                  title={item.name}
+                  url={`/artist/${item.id}`}
+                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
+                  uploaderData={''}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+        <div class="relatedPlaylists">
+          <Show
+            when={hub().relatedPlaylists?.length > 0}
+            fallback={'Playlists featuring artists from your library will show up here.'}
+          >
+            <For each={hub().relatedPlaylists}>
+              {(item) => (
+                <ListItem
+                  stats={''}
+                  title={item.name}
+                  url={`/playlist/${item.id}`}
+                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
+                  uploaderData={item.uploader}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+        <div class="relatedArtists">
+          <Show
+            when={hub().relatedArtists?.length > 0}
+            fallback={'Artists related to your library will show up here.'}
+          >
+            <For each={hub().relatedArtists}>
+              {(item) => (
+                <ListItem
+                  stats={''}
+                  title={item.name}
+                  url={`/artist/${item.id}`}
+                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
+                  uploaderData={''}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+      </article>
+
+      <article class="subfeed">
         <p>Sub Feed</p>
         <i
           aria-label="Refresh"
@@ -69,6 +146,45 @@ export default function() {
                   authorId={item.authorId}
                   context={{
                     id: 'Sub Feed',
+                    src: 'hub'
+                  }}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+      </article>
+
+
+      <article>
+        <p>Frequently Played</p>
+        <i
+          aria-label="Show All"
+          class="ri-arrow-right-s-line"
+          onclick={() => {
+            const frequentlyPlayedItems = getFrequentlyPlayedTracks();
+            setListStore({
+              name: 'Frequently Played',
+              list: frequentlyPlayedItems,
+            });
+            setNavStore('list', 'state', true);
+          }}
+        ></i>
+        <div>
+          <Show
+            when={getFrequentlyPlayedTracks(5).length > 0}
+            fallback={'Tracks you play often will show up here.'}
+          >
+            <For each={getFrequentlyPlayedTracks(5)}>
+              {(item) => (
+                <StreamItem
+                  id={item.id}
+                  title={item.title}
+                  author={item.author}
+                  duration={item.duration}
+                  authorId={item.authorId}
+                  context={{
+                    id: 'Frequently Played',
                     src: 'hub'
                   }}
                 />
@@ -149,51 +265,7 @@ export default function() {
         </div>
       </article>
 
-      <article>
-        <p>Related to your Artists</p>
-        <i
-          aria-label="Refresh"
-          class="ri-refresh-line"
-          onclick={handleRelatedRefresh}
-        ></i>
-        <Show when={isRelatedLoading()}>
-          <i class="ri-loader-3-line"></i>
-        </Show>
-        <div class="playlists">
-          <Show
-            when={hub().playlists?.length > 0}
-          >
-            <For each={hub().playlists}>
-              {(item) => (
-                <ListItem
-                  stats={''}
-                  title={item.name}
-                  url={`/playlist/${item.id}`}
-                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                  uploaderData={item.uploader}
-                />
-              )}
-            </For>
-          </Show>
-        </div>
-        <div class="artists">
-          <Show
-            when={hub().artists?.length > 0}
-          >
-            <For each={hub().artists}>
-              {(item) => (
-                <ListItem
-                  stats={''}
-                  title={item.name}
-                  url={`/artist/${item.id}`}
-                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                  uploaderData={''}
-                />
-              )}
-            </For>
-          </Show>
-        </div>
-      </article>
+
     </div >
   );
 }

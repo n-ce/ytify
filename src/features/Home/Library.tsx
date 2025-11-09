@@ -8,9 +8,9 @@ export default function() {
       <Collections />
       <br />
       <br />
-      <For each={['albums', 'playlists', 'channels', 'artists'] as APAC[]}>
+      <For each={['albums', 'playlists', 'channels']}>
         {(item) =>
-          <SubLists flag={item} />
+          <SubLists flag={item as 'albums' | 'playlists' | 'channels'} />
         }
       </For>
     </div>

@@ -81,7 +81,7 @@ export default function Dropdown(_: {
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
-        <Show when={listStore.type === 'channels' || listStore.type === 'playlists'}>
+        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'}>
 
           <li
             id="subscribeListBtn"

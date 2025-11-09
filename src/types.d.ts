@@ -46,7 +46,8 @@ declare global {
     author: string,
     duration: string
     authorId: string,
-    albumId?: string
+    albumId?: string,
+    plays?: number
   }
 
   type Collection = { [index: string]: CollectionItem };
@@ -64,10 +65,6 @@ declare global {
     [index: string]: number
   }
 
-
-
-  type APAC = 'albums' | 'playlists' | 'artists' | 'channels';
-  type SuperCollection = 'featured' | 'collections' | APAC | 'feed' | 'for_you';
 
   type AudioStream = {
     codec: string,

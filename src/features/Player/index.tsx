@@ -2,7 +2,7 @@ import { createEffect, createSignal, lazy, onCleanup, onMount, Show } from "soli
 import './Player.css'
 import { MediaDetails } from "@components/MediaPartials";
 import { config, cssVar } from "@lib/utils";
-import { closeFeature, navStore, openFeature, playerStore, setNavStore, setStore, t, updateParam } from "@lib/stores";
+import { closeFeature, openFeature, playerStore, setStore, t, updateParam } from "@lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 const Lyrics = lazy(() => import('./Lyrics'));
@@ -57,16 +57,6 @@ export default function() {
         <p>from {getContext()}</p>
 
         <div class="right-group">
-          <Show when={!navStore.queue.state}>
-            <i
-              aria-label="Queue"
-              onclick={() => {
-                setNavStore('queue', 'state', !navStore.queue.state);
-              }}
-              class="ri-order-play-fill"
-              classList={{ on: navStore.queue.state }}
-            ></i>
-          </Show>
 
           <i
             aria-label="close"

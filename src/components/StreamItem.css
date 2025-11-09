@@ -4,7 +4,6 @@
 	color: var(--text);
 	margin-bottom: calc(var(--gap) - var(--size-2));
 	padding: var(--size-1);
-	background-color: var(--onBg);
 	border: var(--border);
 	border-radius: var(--roundness);
 	display: flex;

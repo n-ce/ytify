@@ -11,7 +11,7 @@
 
   div {
     width: 100%;
-    margin-bottom: var(--gap);
+    margin-bottom: var(--size-8);
 
     &.toggleSwitch,
     >span {

@@ -288,11 +288,14 @@ export function runSync(userId: string): Promise<{ success: boolean; message: st
             finalMeta.tracks = localTracksTimestamp;
           });
       }
-      return trackSyncPromise.then(() => ({ finalMeta, ETag }));
+      return trackSyncPromise.then(() => ({ finalMeta, ETag, remoteMeta }));
     })
-    .then(({ finalMeta, ETag }) => {
-      console.log("Finalizing sync...");
-      return finalizeSync(userId, ETag, finalMeta);
+    .then(({ finalMeta, ETag, remoteMeta }) => {
+      // Always push meta if it's different.
+      if (JSON.stringify(finalMeta) !== JSON.stringify(remoteMeta)) {
+        console.log("Finalizing sync...");
+        return finalizeSync(userId, ETag, finalMeta);
+      }
     })
     .then(() => {
       console.log("Sync complete.");

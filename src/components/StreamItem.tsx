@@ -125,7 +125,7 @@ export default function(data: {
               navStore.player.ref?.scrollIntoView();
           }
 
-          if (config.enqueueRelatedStreams && (data.context?.src === 'collection' || (data.context?.src === 'playlists' && listStore.name.startsWith('Album - ')))) {
+          if (config.enqueueRelatedStreams && (data.context?.src === 'collection' || (data.context?.src === 'playlists' && listStore.name.startsWith('Album - '))) && data.context?.id !== 'history') {
             const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) : listStore.list;
             const currentIndex = collectionItems.findIndex(item => item.id === data.id);
             if (currentIndex !== -1) {

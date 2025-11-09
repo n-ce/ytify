@@ -1,12 +1,7 @@
 #actionsMenu {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   padding: 0;
   width: 100%;
-  margin: auto;
   margin-bottom: var(--size-4);
   border: var(--border);
   border-radius: var(--roundness);
@@ -14,24 +9,28 @@
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
 
-  &::backdrop {
-    background-color: #0004;
-  }
-
   &:open {
     animation: var(--animation-slide-in-up) forwards;
   }
 
   @media(orientation:landscape) {
-    width: max-content;
-    margin: auto var(--size-fluid-1);
+    margin: auto var(--size-fluid-2);
     margin-left: auto;
+    width: max-content;
     animation: var(--animation-slide-out-right) forwards;
 
     &:open {
-      animation-name: var(--animation-slide-in-left);
+      animation: var(--animation-slide-in-left) forwards;
     }
+
   }
+
+  &::backdrop {
+    background-color: #0004;
+    margin: 0;
+    padding: 0;
+  }
+
 
   ul {
     list-style: none;

@@ -1,9 +1,10 @@
-import { createEffect, createRoot } from "solid-js";
+import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { addToCollection, config, cssVar, player, themer } from "@lib/utils";
-import { navStore, params, setNavStore, updateParam } from "./navigation";
-import { queueStore, setQueueStore } from "./queue";
+import { navStore, params, updateParam } from "./navigation";
+import { addToQueue, queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
+import { setStore } from "./app";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -94,14 +95,6 @@ createRoot(() => {
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
 
-  createEffect(() => {
-    if (!navStore.player.state)
-      if (queueStore.list.length)
-        if (!navStore.queue.state)
-          setNavStore('queue', 'state', true);
-
-  })
-
   playerStore.audio.onended = playNext;
 
   playerStore.audio.onplaying = () => {
@@ -112,7 +105,10 @@ createRoot(() => {
     if (config.history)
       historyTimeoutId = window.setTimeout(() => {
         if (historyID === id) {
-          if (playerStore.isMusic && queueStore.list.length < 2)
+          if (
+            config.enqueueRelatedStreams
+            && playerStore.isMusic
+          )
             getRecommendations();
           addToCollection('history', [playerStore.stream]);
         }
@@ -136,6 +132,7 @@ createRoot(() => {
 
   playerStore.audio.onloadstart = () => {
     console.log(playerStore.audio.src);
+    setStore('index', 0);
     setPlayerStore('playbackState', 'paused');
     setPlayerStore('status', '');
     if (isPlayable) playerStore.audio.play();
@@ -224,11 +221,11 @@ async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
   const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
-  const data = await fetch(`https://similar-music.vercel.app/api/tracks?title=${title}&artist=${artist}&limit=10`)
+  const data = await fetch(`${Backend}/api/tracks?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .catch(() => []);
 
-  setQueueStore('list', list => [...list, ...data as CollectionItem[]]);
+  addToQueue(data as CollectionItem[]);
 }
 
 

@@ -71,7 +71,7 @@ export default function migrateLibrary() {
             if (key === 'playlists') {
               isValid = (item.id.startsWith('PL') && item.id.length === 34) || (item.id.startsWith('OLAK5uy_') && item.id.length === 41);
             } else if (key === 'channels') {
-              isValid = item.id.startsWith('UC') && item.id.length === 24;
+              isValid = item.id.startsWith('UC') && item.id.length === 24 && !item.name.startsWith('Artist');
             }
             if (!isValid) {
               console.warn(`Skipping invalid item in V1 ${key} collection:`, item);

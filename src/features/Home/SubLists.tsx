@@ -4,7 +4,7 @@ import { t } from "@lib/stores";
 import ListItem from "@components/ListItem";
 
 export default function(_: {
-  flag: APAC
+  flag: 'albums' | 'playlists' | 'channels'
 }) {
 
   let type = _.flag;
@@ -14,10 +14,7 @@ export default function(_: {
     type = 'playlists';
     len = 8;
   }
-  if (_.flag === 'artists') {
-    type = 'channels';
-    len = 9;
-  }
+
 
   const special = type === 'playlists' ? 'Album' : 'Artist';
 
@@ -38,7 +35,7 @@ export default function(_: {
       type: type.slice(0, -1),
       name: name.slice(len),
       uploaderName: (pl as Playlist).uploader,
-      url: `/${_.flag === 'artists' ? 'artist' : type === 'channels' ? 'channel' : 'playlist'}/` + pl.id,
+      url: `/${type === 'channels' ? 'channel' : 'playlist'}/` + pl.id,
       thumbnail: pl.thumbnail
     });
 

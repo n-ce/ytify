@@ -1,15 +1,13 @@
 import { getTracksMap } from '@lib/utils/library';
-import { navStore, setNavStore, setStore, t } from '@lib/stores';
+import { navStore, setNavStore, setStore, store, t } from '@lib/stores';
 import { lazy, Show } from 'solid-js';
 import { render } from 'solid-js/web';
+import { setConfig } from '@lib/utils';
 
 
 const Login = lazy(() => import('@components/Login'));
 
-export default function Dropdown(_: {
-  setAbout: () => void,
-  isLibrary: () => Boolean
-}) {
+export default function Dropdown() {
   async function importLibrary(e: Event) {
     const importBtn = e.target as HTMLInputElement & { files: FileList };
     const importedData = JSON.parse(await importBtn.files[0].text());
@@ -66,7 +64,7 @@ export default function Dropdown(_: {
       for (const key of keysToRemove) {
         localStorage.removeItem(key);
       }
-      
+
       location.reload();
     }
   };
@@ -86,7 +84,7 @@ export default function Dropdown(_: {
         class="ri-more-2-fill"
       ></i></summary>
       <ul>
-        <Show when={_.isLibrary()}>
+        <Show when={store.homeView === 'Library'}>
 
           <li onclick={() => document.getElementById('upload_ytify')?.click()}>
             <label>
@@ -134,10 +132,13 @@ export default function Dropdown(_: {
           <i class="ri-fullscreen-line"></i>&nbsp;{t('settings_fullscreen')}
         </li>
 
-        <li onclick={_.setAbout}>
+        <li onclick={() => {
+          setStore('homeView', '');
+          setConfig('home', '');
+        }}>
           <i class="ri-information-line"></i>&nbsp;About ytify
         </li>
       </ul>
-    </details>
+    </details >
   )
 }

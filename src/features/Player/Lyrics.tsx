@@ -8,66 +8,70 @@ export default function(props: { onClose: () => void }) {
   let lyricsSection!: HTMLDivElement;
 
   onMount(() => {
-    fetch(`https://api-lyrics.simpmusic.org/v1/${playerStore.stream.id}?limit=1`)
+    const { title, author } = playerStore.stream;
+    fetch(
+      `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}&duration=${playerStore.fullDuration}`,
+      {
+        headers: {
+          'Lrclib-Client': `ytify ${Build} (https://github.com/n-ce/ytify)`
+        }
+      })
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
-          const { syncedLyrics, plainLyric, durationSeconds } = data.data[0];
-          const diff = durationSeconds - playerStore.fullDuration;
-          if (Math.abs(diff) > 2)
-            throw new Error('Duration Mismatch');
 
-          if (syncedLyrics) {
-            const durarr: number[] = [];
-            const lrcMap: string[] = syncedLyrics
-              .split('\n')
-              .map((line: string) => {
-                const [d, l] = line.split(']');
-                if (!l) return '...';
-                const [mm, ss] = d.substring(1).split(':');
-                const s = (parseInt(mm) * 60) + parseFloat(ss);
-                durarr.push(s);
-                return l;
-              });
-            setLrcMap(lrcMap);
+        const lrc = data.syncedLyrics;
 
-            setPlayerStore({
-              lrcSync: (d: number) => {
-                let currentIndex = -1;
-                const { length } = durarr;
-                for (let i = 0; i < length; i++) {
-                  if (durarr[i] <= d) {
-                    currentIndex = i;
-                  } else {
-                    break;
-                  }
-                }
+        if (lrc) {
+          const durarr: number[] = [];
+          const lrcMap: string[] = lrc
+            .split('\n')
+            .map((line: string) => {
+              const [d, l] = line.split(']');
+              if (!l) return '...';
+              const [mm, ss] = d.substring(1).split(':');
+              const s = (parseInt(mm) * 60) + parseFloat(ss);
+              durarr.push(s);
+              return l;
+            });
+          setLrcMap(lrcMap);
 
-                if (currentIndex !== activeLine()) {
-                  setActiveLine(currentIndex);
 
-                  if (currentIndex < 0) return;
-
-                  if (lyricsSection.children[currentIndex]) {
-                    lyricsSection.children[currentIndex].scrollIntoView({
-                      block: 'center',
-                      behavior: 'smooth'
-                    });
-                  }
+          setPlayerStore({
+            lrcSync: (d: number) => {
+              let currentIndex = -1;
+              const { length } = durarr;
+              for (let i = 0; i < length; i++) {
+                if (durarr[i] <= d) {
+                  currentIndex = i;
+                } else {
+                  break;
                 }
               }
-            });
-          } else if (plainLyric) {
-            setLrcMap(plainLyric.split('\n'));
-          } else {
-            throw new Error('No lyrics found');
-          }
+
+              if (currentIndex !== activeLine()) {
+                setActiveLine(currentIndex);
+
+                if (currentIndex < 0) return;
+
+                if (lyricsSection.children[currentIndex]) {
+                  lyricsSection.children[currentIndex].scrollIntoView({
+                    block: 'center',
+                    behavior: 'smooth'
+                  });
+                }
+              }
+            }
+          });
+
         }
-        else throw new Error(data.error.reason || 'Track Not Found');
-      }).catch(e => {
-        setStore('snackbar', e.message);
+        else {
+          setStore('snackbar', 'No lyrics found for this track.');
+          props.onClose();
+        }
+      }).catch(() => {
+        setStore('snackbar', 'Failed to fetch lyrics.');
         props.onClose();
-      })
+      });
   });
 
   onCleanup(() => {
@@ -85,4 +89,3 @@ export default function(props: { onClose: () => void }) {
     </div>
   );
 }
-

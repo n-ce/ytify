@@ -76,23 +76,3 @@
     color: color-mix(in srgb, #f22, var(--text) 80%);
   }
 }
-
-#queue {
-
-  >.ri-close-large-line {
-    position: sticky;
-    bottom: var(--size-10);
-    border-radius: var(--radius-round);
-    background-image: radial-gradient(var(--text), transparent);
-    color: var(--onBg);
-    padding: var(--size-2);
-    font-size: var(--font-size-2);
-    font-weight: var(--font-weight-9);
-    box-shadow: var(--shadow-1);
-
-    &:hover {
-      opacity: 1;
-    }
-
-  }
-}

@@ -133,7 +133,7 @@
     color: var(--text2);
   }
 
-  margin:var(--size-4) 0;
+  margin-bottom:var(--size-2);
 
   div {
     display: flex;
@@ -186,7 +186,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: var(--size-5);
-  margin-bottom: var(--size-3);
+  margin-bottom: var(--size-9);
 
   i {
     font-size: var(--font-size-3) !important;

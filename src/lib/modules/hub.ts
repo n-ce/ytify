@@ -1,21 +1,42 @@
 
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
-import { getLists } from "../utils";
-import fetchArtist from "./fetchArtist";
+import { getTracksMap } from "../utils";
 
 type Hub = {
   discovery?: (CollectionItem & { frequency: number })[];
-  playlists: Playlist[];
-  artists: Channel[];
+  userArtists: Channel[];
+  relatedPlaylists: Playlist[];
+  relatedArtists: Channel[];
   subfeed: CollectionItem[];
+};
+
+type FullArtistResponse = {
+  artistName: string;
+  playlistId: string;
+  recommendedArtists: {
+    name: string;
+    browseId: string;
+    thumbnail: string;
+  }[];
+  featuredOnPlaylists: {
+    title: string;
+    browseId: string;
+    thumbnail: string;
+  }[];
+  albums: {
+    title: string;
+    browseId: string;
+    thumbnail: string;
+  }[];
 };
 
 
 const initialHub: Hub = {
   discovery: [],
-  playlists: [],
-  artists: [],
+  userArtists: [],
+  relatedPlaylists: [],
+  relatedArtists: [],
   subfeed: [],
 };
 
@@ -61,78 +82,115 @@ export async function updateSubfeed(preview?: string): Promise<void> {
   });
 }
 
-export async function updateRelatedToYourArtists(): Promise<void> {
-  const channels = getLists('channels');
-  const artistIds = channels ? channels.filter(channel => channel.name.includes('Artist - ')).map(channel => channel.id) : [];
+export async function updateGallery(): Promise<void> {
+  const tracks = Object.values(getTracksMap());
+  const artistCounts: { [key: string]: number } = {};
 
-  const promises = artistIds.map(fetchArtist);
+  tracks
+    .filter(track => track.author.endsWith(' - Topic'))
+    .forEach(track => {
+      artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
+    });
 
-  return Promise.all(promises).then(results => {
+  const sortedArtists = Object.entries(artistCounts).sort(([, a], [, b]) => b - a);
+  const artistIds = sortedArtists.map(([id]) => id);
 
-    const ArtistMap: {
-      [index: string]: Channel & { count?: number }
-    } = {};
-    const PlaylistMap: {
-      [index: string]: Playlist & { count?: number }
-    } = {};
 
-    results.forEach(result => {
+  if (artistIds.length === 0) {
+    updateHubSection('relatedArtists', []);
+    updateHubSection('relatedPlaylists', []);
+    updateHubSection('userArtists', []);
+    return;
+  }
 
-      if (result?.recommendedArtists) {
-        result.recommendedArtists.forEach(artist => {
-
-          const key = artist.browseId;
-          if (!artistIds.includes(key))
-            key in ArtistMap ?
-              ArtistMap[key].count!++ :
-              ArtistMap[key] = {
-                id: artist.browseId,
-                name: artist.name,
-                thumbnail: artist.thumbnail,
-                count: 1
-              };
-
-        });
+  const results: FullArtistResponse[] = await fetch(`${Backend}/api/artists`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ artistIds }),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-
-      if (result?.featuredOnPlaylists) {
-        result.featuredOnPlaylists.forEach(playlist => {
-          const key = playlist.browseId;
-
-          key in PlaylistMap ?
-            PlaylistMap[key].count!++ :
-            PlaylistMap[key] = {
-              id: playlist.browseId,
-              name: playlist.title,
-              thumbnail: playlist.thumbnail,
-              uploader: result.artistName,
-              count: 1
-            };
-        });
-      }
+      return response.json();
+    })
+    .catch(error => {
+      console.error('Error fetching multiple artists:', error);
+      return [];
     });
 
 
-    const featuredPlaylists = Object
-      .values(PlaylistMap)
-      .sort((a, b) => b.count! - a.count!)
-      .map(s => {
-        delete s.count;
-        return s;
+  const ArtistMap: {
+    [index: string]: Channel & { count?: number }
+  } = {};
+  const PlaylistMap: {
+    [index: string]: Playlist & { count?: number }
+  } = {};
+
+  results.forEach((result) => {
+
+    if (result?.recommendedArtists) {
+      result.recommendedArtists.forEach((artist) => {
+
+        const key = artist.browseId;
+        if (!artistIds.includes(key)) // Only add if not already a "user artist"
+          key in ArtistMap ?
+            ArtistMap[key].count!++ :
+            ArtistMap[key] = {
+              id: artist.browseId,
+              name: artist.name,
+              thumbnail: artist.thumbnail,
+              count: 1
+            };
+
       });
+    }
 
-    const relatedArtists = Object
-      .values(ArtistMap)
-      .sort((a, b) => b.count! - a.count!)
-      .map(s => {
-        delete s.count;
-        return s;
+    if (result?.featuredOnPlaylists) {
+      result.featuredOnPlaylists.forEach((playlist) => {
+        const key = playlist.browseId;
+
+        key in PlaylistMap ?
+          PlaylistMap[key].count!++ :
+          PlaylistMap[key] = {
+            id: playlist.browseId,
+            name: playlist.title,
+            thumbnail: playlist.thumbnail,
+            uploader: result.artistName,
+            count: 1
+          };
       });
-
-
-
-    updateHubSection('artists', relatedArtists);
-    updateHubSection('playlists', featuredPlaylists);
+    }
   });
+
+
+  const featuredPlaylists = Object
+    .values(PlaylistMap)
+    .sort((a, b) => b.count! - a.count!)
+    .map(s => {
+      delete s.count;
+      return s;
+    });
+
+  const relatedArtists = Object
+    .values(ArtistMap)
+    .sort((a, b) => b.count! - a.count!)
+    .map(s => {
+      delete s.count;
+      return s;
+    });
+
+  // userArtists are the artists whose tracks are in the user's library
+  const userArtists = artistIds.map(id => {
+    const track = tracks.find(t => t.authorId === id);
+    return track ? { id, name: track.author.replace(' - Topic', ''), thumbnail: '' } : null;
+  }).filter(Boolean) as Channel[];
+
+
+  updateHubSection('relatedArtists', relatedArtists);
+  updateHubSection('relatedPlaylists', featuredPlaylists);
+  updateHubSection('userArtists', userArtists);
 }
 

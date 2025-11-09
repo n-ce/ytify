@@ -1,7 +1,7 @@
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { addToQueue, openFeature, listStore, resetList, setListStore, setNavStore, closeFeature } from '@lib/stores';
+import { addToQueue, openFeature, listStore, resetList, setListStore, setNavStore } from '@lib/stores';
 import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config } from '@lib/utils/config';
 import Dropdown from './Dropdown';
@@ -46,7 +46,7 @@ export default function() {
   onMount(() => {
     openFeature('list', listSection);
     listSection.scrollTo(0, 0);
-    closeFeature('home');
+    setNavStore('home', 'state', false);
   });
   createEffect(() => {
     if (localSortOrder() === 'modified' && showSortMenu()) {

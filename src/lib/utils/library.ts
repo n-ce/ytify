@@ -103,7 +103,11 @@ export function addToCollection(
       collection.unshift(id);
     else collection.push(id);
 
-    if (!(id in tracks)) {
+    if (id in tracks) {
+      const track = tracks[id];
+      track.plays = (track.plays || 1) + 1;
+    }
+    else {
       tracks[id] = item;
       if (config.dbsync) {
         import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
@@ -303,7 +307,6 @@ function getLocalCollection(
 ) {
 
   let ids = getCollection(decodeURI(collection));
-
   if (ids.length === 0) {
     setStore('snackbar', 'No items found');
     setListStore({ list: [], length: 0, name: collection });
@@ -319,7 +322,7 @@ function getLocalCollection(
     sortedIds = sortedItems.map(item => item.id);
   }
 
-  const usePagination = sortedIds.length > 20;
+  const usePagination = sortedIds.length > 10;
 
   setListStore({
     name: collection,

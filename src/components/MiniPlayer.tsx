@@ -11,7 +11,7 @@ const MediaArtwork = lazy(() => import('./MediaPartials/MediaArtwork'))
 export default function() {
 
   return (
-    <footer onclick={(e) => {
+    <div class='miniplayer' onclick={(e) => {
       if (!e.target.matches('button'))
         setNavStore('player', 'state', true);
     }
@@ -25,6 +25,6 @@ export default function() {
       <Show when={queueStore.list.length} fallback={<LikeButton />}>
         <PlayNextButton />
       </Show>
-    </footer>
+    </div>
   )
 }

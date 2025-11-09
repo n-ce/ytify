@@ -1,7 +1,7 @@
-import { Match, Show, Switch, createSignal, lazy } from 'solid-js';
+import { Match, Show, Switch, lazy, onMount } from 'solid-js';
 import './Home.css';
-import { config, setConfig } from '@lib/utils';
-import { setNavStore, store } from '@lib/stores';
+import { config } from '@lib/utils';
+import { openFeature, store } from '@lib/stores';
 import Dropdown from './Dropdown';
 
 const About = lazy(() => import('./About'));
@@ -12,25 +12,20 @@ const Library = lazy(() => import('./Library'));
 
 export default function() {
 
-  const [home, setHome] = createSignal(config.home);
-  function saveHome(name: '' | 'Hub' | 'Library' | 'Search') {
-    setHome(name);
-    setConfig('home', name);
-  }
-
   let syncBtn!: HTMLElement;
+  let homeRef!: HTMLElement;
 
-  const { dbsync } = config;
-
-  //
+  onMount(() => {
+    openFeature('home', homeRef);
+  });
 
   return (
-    <section class="home" ref={(e) => setNavStore('home', { ref: e })}>
+    <section class="home" ref={homeRef}>
 
       <header>
         <p>
-          {home() || 'ytify'}</p>
-        <Show when={dbsync}>
+          {store.homeView || 'ytify'}</p>
+        <Show when={config.dbsync}>
           <i
             id="syncNow"
             classList={{
@@ -43,48 +38,24 @@ export default function() {
             onclick={() => {
               if (store.syncState === 'dirty' || store.syncState === 'error') {
                 import('@lib/modules/cloudSync').then(({ runSync }) => {
-                  runSync(dbsync);
+                  runSync(config.dbsync);
                 });
               }
             }}
           ></i>
         </Show>
-        <div class="right-group">
-          <i
-            aria-label="Hub"
-            class="ri-store-2-line"
-            classList={{ 'on': home() === 'Hub' }}
-            onclick={() => saveHome('Hub')}
-          ></i>
-          <i
-            aria-label="Library"
-            class="ri-archive-stack-line"
-            classList={{ 'on': home() === 'Library' }}
-            onclick={() => saveHome('Library')}
-          ></i>
-          <i
-            aria-label="Search"
-            class="ri-search-2-line"
-            classList={{ 'on': home() === 'Search' }}
-            onclick={() => saveHome('Search')}
-          ></i>
 
-        </div>
-
-        <Dropdown
-          setAbout={() => setHome('')}
-          isLibrary={() => home() === 'Library'}
-        />
+        <Dropdown />
       </header>
 
       <Switch fallback={<About />}>
-        <Match when={home() === 'Hub'}>
+        <Match when={store.homeView === 'Hub'}>
           <Hub />
         </Match>
-        <Match when={home() === 'Library'}>
+        <Match when={store.homeView === 'Library'}>
           <Library />
         </Match>
-        <Match when={home() === 'Search'}>
+        <Match when={store.homeView === 'Search'}>
           <Search />
         </Match>
 

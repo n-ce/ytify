@@ -4,6 +4,7 @@ import { For, lazy, onMount, Show } from 'solid-js';
 import '../styles/global.css';
 import { navStore, playerStore, setStore, store } from '@lib/stores';
 import { config } from '@lib/utils';
+import NavBar from '@components/NavBar.tsx';
 
 const MiniPlayer = lazy(() => import('../components/MiniPlayer'));
 const ActionsMenu = lazy(() => import('../components/ActionsMenu'));
@@ -36,10 +37,12 @@ export default function() {
           }
         </For>
       </main>
-
-      <Show when={!navStore.player.state && playerStore.playbackState !== 'none'}>
-        <MiniPlayer />
-      </Show >
+      <footer>
+        <Show when={!navStore.player.state && playerStore.playbackState !== 'none'}>
+          <MiniPlayer />
+        </Show >
+        <NavBar />
+      </footer>
       <Show when={store.actionsMenu?.id}>
         <ActionsMenu />
       </Show>

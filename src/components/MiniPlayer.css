@@ -1,13 +1,9 @@
-footer {
+.miniplayer {
   display: flex;
   align-items: center;
-  position: relative;
-  z-index: 2;
-  backdrop-filter: blur(var(--size-px-2));
-  width: 100dvmin;
-  padding: var(--size-1);
-  overflow: hidden;
+  width: 100%;
   height: var(--size-9);
+  padding: var(--size-1);
   animation: var(--animation-slide-in-up) forwards;
   cursor: pointer;
 
@@ -24,28 +20,6 @@ footer {
     pointer-events: none;
   }
 
-  @media(orientation:landscape) {
-    margin: 0 auto;
-    border: var(--border);
-    box-shadow: var(--shadow-2);
-    bottom: var(--size-10);
-    border-radius: var(--roundness);
-    background: var(--blurMix);
-  }
-
-  @media(orientation:portrait) {
-    bottom: var(--size-9);
-    box-shadow: var(--shadow-6);
-    border-top: var(--border);
-    border-top-left-radius: var(--roundness);
-    border-top-right-radius: var(--roundness);
-    background: linear-gradient(transparent, var(--trueBg));
-
-    img {
-      height: var(--size-8);
-      margin-left: var(--size-1);
-    }
-  }
 
 
   button,
@@ -121,6 +95,7 @@ footer {
 
     &::-webkit-progress-value {
       background: linear-gradient(transparent, var(--onBg2));
+      border-bottom: var(--border-size-1) solid var(--text2);
       transition: all 1s linear;
     }
   }

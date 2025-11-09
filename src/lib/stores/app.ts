@@ -11,12 +11,14 @@ const storeInit: {
   actionsMenu?: CollectionItem & { albumId?: string },
   snackbar?: string,
   syncState?: SyncState,
+  homeView: '' | 'Hub' | 'Library' | 'Search',
 } = {
   invidious: [],
   index: 0,
   useSaavn: true,
   linkHost: config.linkHost || location.origin,
   downloadFormat: config.dlFormat,
+  homeView: config.home as "" | "Hub" | "Library" | "Search",
 };
 
 export const [store, setStore] = createStore(storeInit);

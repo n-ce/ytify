@@ -2,12 +2,7 @@
 export type ArtistResponse = {
   artistName: string;
   playlistId: string;
-  recommendedArtists: {
-    name: string;
-    browseId: string;
-    thumbnail: string;
-  }[];
-  featuredOnPlaylists: {
+  albums: {
     title: string;
     browseId: string;
     thumbnail: string;
@@ -18,7 +13,7 @@ export type ArtistResponse = {
 
 export default async function(id: string): Promise<ArtistResponse> {
 
-  return fetch('https://ytify-backend.vercel.app/api/artist/' + id)
+  return fetch(`${Backend}/api/artists?id=${id}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');

@@ -51,6 +51,11 @@ header {
 .hub {
   overflow-y: auto;
   width: 100%;
+  margin-bottom: var(--size-10);
+
+  .gallery-article {
+    grid-column: span 2;
+  }
 
   article {
     margin-bottom: var(--size-5);
@@ -66,10 +71,10 @@ header {
       width: calc(100% - var(--size-8));
     }
 
-    &:first-child,
-    &:last-child {
+
+    &.subfeed {
       >p {
-        width: calc(100% - var(--size-11) + var(--size-5));
+        width: calc(100% - var(--size-11) + var(--size-6));
       }
     }
 
@@ -113,13 +118,18 @@ header {
 
     }
 
-    >.playlists {
+    >.userArtists {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       margin-bottom: 0;
     }
 
-    >.artists {
+    >.relatedPlaylists {
+      border-radius: 0;
+      margin: 0;
+    }
+
+    >.relatedArtists {
       margin-top: 0;
       border-top-left-radius: 0;
       border-top-right-radius: 0;
