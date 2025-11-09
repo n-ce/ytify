@@ -19,8 +19,8 @@ export default function() {
     checked: state.startupTab === '/library',
     handler: () => {
       setState('startupTab',
-        state.startupTab === '/library' ?
-          '/search' : '/library'
+        state.startupTab === './library' ?
+          './search' : './library'
       );
     }
   })}
