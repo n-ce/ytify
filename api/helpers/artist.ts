@@ -1,4 +1,4 @@
-import { createImageLinks } from './link'; // Import createImageLinks
+import { createImageLinks } from './link.js'; // Import createImageLinks
 
 export const createArtistMapPayload = (artist: any) => ({
   id: artist.id,

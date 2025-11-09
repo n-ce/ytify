@@ -1,5 +1,5 @@
-import { createDownloadLinks, createImageLinks } from './link'; // Import from link
-import { createArtistMapPayload } from './artist'; // Import from artist
+import { createDownloadLinks, createImageLinks } from './link.js'; // Import from link
+import { createArtistMapPayload } from './artist.js'; // Import from artist
 
 export const createSongPayload = (song: any) => ({
   id: song.id,

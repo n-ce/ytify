@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getArtistData } from './helpers/youtube_artist_api';
+import { getArtistData } from './helpers/youtube_artist_api.js';
 
 export default async function handler(
   request: VercelRequest,

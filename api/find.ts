@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createSongPayload } from './helpers/song'; // Import createSongPayload
+import { createSongPayload } from './helpers/song.js'; // Import createSongPayload
 
 const parseDurationToSeconds = (durationStr: string): number | null => {
   const parts = durationStr.split(':').map(Number);
