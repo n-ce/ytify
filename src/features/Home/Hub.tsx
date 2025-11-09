@@ -59,7 +59,7 @@ export default function() {
         <div class="userArtists">
           <Show
             when={hub().userArtists?.length > 0}
-            fallback={'Artists from your library will show up here.'}
+            fallback={'Listen to at least 2 different music artists to generate a gallery.'}
           >
             <For each={hub().userArtists}>
               {(item) => (
@@ -77,7 +77,6 @@ export default function() {
         <div class="relatedPlaylists">
           <Show
             when={hub().relatedPlaylists?.length > 0}
-            fallback={'Playlists featuring artists from your library will show up here.'}
           >
             <For each={hub().relatedPlaylists}>
               {(item) => (
@@ -95,7 +94,6 @@ export default function() {
         <div class="relatedArtists">
           <Show
             when={hub().relatedArtists?.length > 0}
-            fallback={'Artists related to your library will show up here.'}
           >
             <For each={hub().relatedArtists}>
               {(item) => (

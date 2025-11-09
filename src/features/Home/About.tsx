@@ -24,7 +24,10 @@ export default function() {
         <b>animesh.5383@waicici</b>&nbsp;
       </p>
       <details>
-        <summary>or, via Crypto</summary>
+        <summary>Donate with Crypto</summary>
+        <p>
+          <a href="https://trocador.app/anonpay?ticker_to=xmr&network_to=Mainnet&address=87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH&ref=sqKNYGZbRl&direct=True" target="_blank"><b>Donate Anonymously via Trocador</b></a>
+        </p>
         <p>
           <b>XMR</b> 87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH
         </p>

@@ -1,7 +1,7 @@
 
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
-import { getTracksMap } from "../utils";
+import { getTracksMap, getThumbIdFromLink } from "../utils";
 
 type Hub = {
   discovery?: (CollectionItem & { frequency: number })[];
@@ -13,6 +13,7 @@ type Hub = {
 
 type FullArtistResponse = {
   artistName: string;
+  thumbnail: string;
   playlistId: string;
   recommendedArtists: {
     name: string;
@@ -92,24 +93,21 @@ export async function updateGallery(): Promise<void> {
       artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
     });
 
-  const sortedArtists = Object.entries(artistCounts).sort(([, a], [, b]) => b - a);
+  const sortedArtists = Object.entries(artistCounts)
+    .filter(a => a[1] > 2)
+    .sort(([, a], [, b]) => b - a)
+
   const artistIds = sortedArtists.map(([id]) => id);
 
 
-  if (artistIds.length === 0) {
+  if (artistIds.length < 2) {
     updateHubSection('relatedArtists', []);
     updateHubSection('relatedPlaylists', []);
     updateHubSection('userArtists', []);
     return;
   }
 
-  const results: FullArtistResponse[] = await fetch(`${Backend}/api/artists`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ artistIds }),
-  })
+  const results: FullArtistResponse[] = await fetch(`${Backend}/api/artists?id=${artistIds.join(',')}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -182,11 +180,11 @@ export async function updateGallery(): Promise<void> {
       return s;
     });
 
-  // userArtists are the artists whose tracks are in the user's library
-  const userArtists = artistIds.map(id => {
-    const track = tracks.find(t => t.authorId === id);
-    return track ? { id, name: track.author.replace(' - Topic', ''), thumbnail: '' } : null;
-  }).filter(Boolean) as Channel[];
+  const userArtists = results.map(result => ({
+    id: artistIds[results.indexOf(result)],
+    name: result.artistName,
+    thumbnail: getThumbIdFromLink(result.thumbnail),
+  })) as Channel[];
 
 
   updateHubSection('relatedArtists', relatedArtists);

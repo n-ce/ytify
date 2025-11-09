@@ -49,6 +49,13 @@ export interface ResponseData {
   header: {
     musicImmersiveHeaderRenderer: {
       title: { runs: { text: string }[] };
+      thumbnail: {
+        musicThumbnailRenderer: {
+          thumbnail: {
+            thumbnails: { url: string }[];
+          };
+        };
+      };
     };
   };
   contents: {
@@ -95,6 +102,7 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
       const contents = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
 
       const artistName = data.header.musicImmersiveHeaderRenderer.title.runs[0].text;
+      const thumbnail = data.header.musicImmersiveHeaderRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
 
       const topSongsShelf = contents.find(
         (item): item is MusicShelfRendererContainer =>
@@ -144,6 +152,7 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
 
       return {
         artistName,
+        thumbnail,
         playlistId,
         recommendedArtists,
         featuredOnPlaylists,
