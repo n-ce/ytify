@@ -225,7 +225,9 @@ async function getRecommendations() {
     .then(res => res.json())
     .catch(() => []);
 
-  addToQueue(data as CollectionItem[]);
+  if (Array.isArray(data)) {
+    addToQueue(data as CollectionItem[]);
+  }
 }
 
 

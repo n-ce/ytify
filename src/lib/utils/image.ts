@@ -30,6 +30,7 @@ export function generateImageUrl(
 
 
 export function getThumbIdFromLink(url: string) {
+  if (!url) return '';
 
   if (url.startsWith('/vi_webp'))
     url = url.slice(9, 20);

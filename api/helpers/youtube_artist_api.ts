@@ -32,12 +32,26 @@ export interface MusicCarouselShelfRendererContainer {
     contents: {
       musicTwoRowItemRenderer: {
         title: { runs: { text: string }[] };
+        subtitle: { runs: { text: string }[] };
         navigationEndpoint: {
-          browseEndpoint: { browseId: string };
+          browseEndpoint?: { browseId: string };
+          watchEndpoint?: { playlistId: string };
         };
         thumbnailRenderer: {
           musicThumbnailRenderer: {
             thumbnail: { thumbnails: { url: string }[] };
+          };
+        };
+        menu?: {
+          menuRenderer: {
+            items: {
+              menuNavigationItemRenderer: {
+                text: { runs: { text: string }[] };
+                navigationEndpoint: {
+                  watchPlaylistEndpoint: { playlistId: string };
+                };
+              };
+            }[];
           };
         };
       };
@@ -146,11 +160,23 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
           item.musicCarouselShelfRenderer.header.musicCarouselShelfBasicHeaderRenderer.title.runs[0].text === 'Albums'
       );
       const albums = albumsShelf?.musicCarouselShelfRenderer.contents.map(
-        (item) => ({
-          title: item.musicTwoRowItemRenderer.title.runs[0].text,
-          browseId: item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId,
-          thumbnail: item.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
-        })
+        (item) => {
+          const shufflePlayItem = item.musicTwoRowItemRenderer.menu?.menuRenderer.items.find(
+            (menuItem) => menuItem.menuNavigationItemRenderer.text.runs[0].text === 'Shuffle play'
+          );
+          let playlistId = shufflePlayItem?.menuNavigationItemRenderer.navigationEndpoint.watchPlaylistEndpoint.playlistId;
+
+          if (playlistId && playlistId.startsWith('VL')) {
+            playlistId = playlistId.substring(2);
+          }
+
+          return {
+            id: playlistId,
+            subtitle: item.musicTwoRowItemRenderer.subtitle.runs.slice(-1)[0].text,
+            thumbnail: item.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
+            title: item.musicTwoRowItemRenderer.title.runs[0].text,
+          };
+        }
       );
 
       return {

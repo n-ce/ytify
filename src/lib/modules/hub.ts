@@ -61,17 +61,6 @@ export function updateHubSection<K extends keyof Hub>(sectionName: K, data: Hub[
   updateHub(hub);
 }
 
-export function clearHubSection(sectionName: keyof Hub): void {
-  const hub = getHub();
-  const newSection = initialHub[sectionName];
-  const newHub: Hub = {
-    ...hub,
-    [sectionName]: newSection,
-  };
-  updateHub(newHub);
-}
-
-
 
 export async function updateSubfeed(preview?: string): Promise<void> {
   return subfeedGenerator(preview).then((items: CollectionItem[]) => {
@@ -132,33 +121,37 @@ export async function updateGallery(): Promise<void> {
     if (result?.recommendedArtists) {
       result.recommendedArtists.forEach((artist) => {
 
-        const key = artist.browseId;
-        if (!artistIds.includes(key)) // Only add if not already a "user artist"
-          key in ArtistMap ?
-            ArtistMap[key].count!++ :
-            ArtistMap[key] = {
-              id: artist.browseId,
-              name: artist.name,
-              thumbnail: artist.thumbnail,
-              count: 1
-            };
+        if (artist.browseId && artist.name && artist.thumbnail) {
+          const key = artist.browseId;
+          if (!artistIds.includes(key)) // Only add if not already a "user artist"
+            key in ArtistMap ?
+              ArtistMap[key].count!++ :
+              ArtistMap[key] = {
+                id: artist.browseId,
+                name: artist.name,
+                thumbnail: artist.thumbnail,
+                count: 1
+              };
+        }
 
       });
     }
 
     if (result?.featuredOnPlaylists) {
       result.featuredOnPlaylists.forEach((playlist) => {
-        const key = playlist.browseId;
+        if (playlist.browseId && playlist.title && playlist.thumbnail) {
+          const key = playlist.browseId;
 
-        key in PlaylistMap ?
-          PlaylistMap[key].count!++ :
-          PlaylistMap[key] = {
-            id: playlist.browseId,
-            name: playlist.title,
-            thumbnail: playlist.thumbnail,
-            uploader: result.artistName,
-            count: 1
-          };
+          key in PlaylistMap ?
+            PlaylistMap[key].count!++ :
+            PlaylistMap[key] = {
+              id: playlist.browseId.startsWith('VL') ? playlist.browseId.substring(2) : playlist.browseId,
+              name: playlist.title,
+              thumbnail: playlist.thumbnail,
+              uploader: result.artistName,
+              count: 1
+            };
+        }
       });
     }
   });
@@ -184,7 +177,7 @@ export async function updateGallery(): Promise<void> {
     id: artistIds[results.indexOf(result)],
     name: result.artistName,
     thumbnail: getThumbIdFromLink(result.thumbnail),
-  })) as Channel[];
+  })).filter(artist => artist.id && artist.name && artist.thumbnail) as Channel[];
 
 
   updateHubSection('relatedArtists', relatedArtists);

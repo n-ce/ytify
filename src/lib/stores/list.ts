@@ -11,6 +11,13 @@ import fetchAlbum, { AlbumResponse } from "@lib/modules/fetchAlbum";
 
 
 
+type ArtistAlbum = {
+  id?: string;
+  title: string;
+  subtitle: string;
+  thumbnail: string;
+};
+
 const initialState = () => ({
   isLoading: false,
   isSubscribed: false,
@@ -27,6 +34,7 @@ const initialState = () => ({
   page: 1,
   uploader: '',
   thumbnail: '',
+  artistAlbums: [] as ArtistAlbum[],
   observer: { disconnect() { } } as IntersectionObserver
 });
 
@@ -130,7 +138,7 @@ export async function getList(
         else getList(url, type, index - 1);
       });
     if (!artistData) return;
-    const { playlistId, artistName } = artistData;
+    const { playlistId, artistName, albums } = artistData;
 
     const playlistData = await fetchPlaylist(playlistId, getApi(index), listStore.page)
       .catch(e => {
@@ -158,7 +166,8 @@ export async function getList(
         author: v.author,
         authorId: v.authorId,
         duration: convertSStoHHMMSS(v.lengthSeconds)
-      }) as CollectionItem)
+      }) as CollectionItem),
+      artistAlbums: albums.filter(album => album.id && album.title && album.thumbnail)
     })
   }
 

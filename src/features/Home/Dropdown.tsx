@@ -119,6 +119,17 @@ export default function Dropdown() {
           </li>
         </Show>
 
+        <Show when={store.homeView === 'Hub'}>
+          <li onclick={() => {
+            if (confirm(t('clear_hub_prompt'))) {
+              localStorage.removeItem('hub');
+              location.reload();
+            }
+          }}>
+            <i class="ri-delete-bin-2-line"></i>&nbsp;{t('clear_hub')}
+          </li>
+        </Show>
+
         <Show when={!navStore.settings.state}>
 
           <li onclick={() => setNavStore('settings', 'state', true)}>

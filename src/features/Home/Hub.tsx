@@ -61,7 +61,7 @@ export default function() {
             when={hub().userArtists?.length > 0}
             fallback={'Listen to at least 2 different music artists to generate a gallery.'}
           >
-            <For each={hub().userArtists}>
+            <For each={hub().userArtists.filter(item => item.id && item.name && item.thumbnail)}>
               {(item) => (
                 <ListItem
                   stats={''}

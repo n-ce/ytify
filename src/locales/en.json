@@ -167,5 +167,7 @@
   "updater_changelog_full": "Read all previous changes",
   "updater_update": "Update",
   "updater_later": "Later",
-  "pwa_share_prompt": "Click ok to Play, click cancel to Download"
+  "pwa_share_prompt": "Click ok to Play, click cancel to Download",
+  "clear_hub_prompt": "Are you sure you want to clear all hub data?",
+  "clear_hub": "Clear Hub"
 }

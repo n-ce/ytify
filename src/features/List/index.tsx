@@ -1,12 +1,14 @@
-import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { addToQueue, openFeature, listStore, resetList, setListStore, setNavStore } from '@lib/stores';
 import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config } from '@lib/utils/config';
+import { generateImageUrl, getThumbIdFromLink } from '@lib/utils'; // Added imports
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
+import ListItem from '@components/ListItem'; // Added import
 
 type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
 
@@ -162,6 +164,22 @@ export default function() {
         </span>
 
       </Show>
+      <Show when={listStore.name.startsWith('Artist') && listStore.artistAlbums?.length}>
+        <div class="albums-carousel">
+          <For each={listStore.artistAlbums}>
+            {(album) => (
+              <ListItem
+                title={album.title}
+                stats={album.subtitle}
+                thumbnail={generateImageUrl(getThumbIdFromLink(album.thumbnail), 'mq')}
+                uploaderData={listStore.name.replace('Artist - ', '')}
+                url={`/album/${album.id}`}
+              />
+            )}
+          </For>
+        </div>
+      </Show>
+
       <Show when={config.loadImage && listStore.name.startsWith('Album')}>
         <img src={listStore.thumbnail} alt={listStore.name} class="list-thumbnail" />
       </Show>

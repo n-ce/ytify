@@ -3,8 +3,9 @@ export type ArtistResponse = {
   artistName: string;
   playlistId: string;
   albums: {
+    id?: string;
     title: string;
-    browseId: string;
+    subtitle: string;
     thumbnail: string;
   }[];
 };
