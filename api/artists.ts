@@ -29,8 +29,8 @@ export default async function handler(
     } else {
       // Handle single artist with reduced response
       const artistData = await getArtistData(artistIdParam as string, countryCode);
-      const { artistName, playlistId, albums } = artistData;
-      return response.status(200).json({ artistName, playlistId, albums });
+      const { artistName, playlistId, albums, thumbnail } = artistData;
+      return response.status(200).json({ artistName, playlistId, albums, thumbnail });
     }
   } catch (error) {
     console.error('Error in API handler (GET):', error);

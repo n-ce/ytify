@@ -99,10 +99,13 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
       return response.json();
     })
     .then((data: ResponseData) => {
+      if (!data.header?.musicImmersiveHeaderRenderer) {
+        return {};
+      }
       const contents = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
 
       const artistName = data.header.musicImmersiveHeaderRenderer.title.runs[0].text;
-      const thumbnail = data.header.musicImmersiveHeaderRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails[0].url;
+      const thumbnail = data.header.musicImmersiveHeaderRenderer.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.[0]?.url || '';
 
       const topSongsShelf = contents.find(
         (item): item is MusicShelfRendererContainer =>

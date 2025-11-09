@@ -22,13 +22,14 @@ export default function() {
 
       <ul id="queuetools">
         <li
+          classList={{ on: config.shuffle }}
           onclick={(e) => {
             const target = e.target as HTMLElement;
             if (target.tagName === 'I') {
               // Clicked on icon
-              const btn = target as HTMLElement;
+              const btn = target.parentElement as HTMLElement;
               btn.classList.toggle('on');
-              setConfig('shuffle', btn.classList.contains('on'));
+              setConfig('shuffle', !config.shuffle);
             } else {
               // Clicked on li
               setQueueStore('list', (list) => {
@@ -43,7 +44,6 @@ export default function() {
           }}
         >
           <i
-            classList={{ on: config.shuffle }}
             class="ri-shuffle-line"></i>{t('upcoming_shuffle')}
         </li>
 

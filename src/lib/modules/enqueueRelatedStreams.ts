@@ -13,8 +13,7 @@ import { convertSStoHHMMSS } from "@lib/utils";
 export default function(data: StreamItem[]) {
 
   const { history, isMusic } = playerStore;
-  const filterYTM = (a: string) =>
-    isMusic ? a.endsWith(' - Topic') : false;
+
 
   data.forEach(stream => {
 
@@ -26,7 +25,7 @@ export default function(data: StreamItem[]) {
       stream.duration > 45 &&
       !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
       !history.some(item => item.id === id) &&
-      filterYTM(stream.uploaderName)
+      (!isMusic || stream.uploaderName.endsWith(' - Topic'))
     )
       setQueueStore('list', l => [...l, ({
         id: id,
