@@ -65,7 +65,7 @@ async function importSettings(e: Event) {
 if (params.has('reset')) {
   clearCache();
   localStorage.removeItem('store');
-  history.replaceState({}, '', location.pathname);
+  history.replaceState({}, '', location.origin + location.pathname);
 }
 
 
@@ -74,7 +74,7 @@ document.getElementById('exportSettingsBtn')!.addEventListener('click', exportSe
 document.getElementById('importSettingsBtn')!.addEventListener('change', importSettings);
 document.getElementById('restoreSettingsBtn')!.addEventListener('click', () => {
   localStorage.removeItem('store');
-  location.replace(location.origin + location.pathname.replace(/\/[^\/]*$/, '') || '/');
+  location.reload();
 });
 
 
