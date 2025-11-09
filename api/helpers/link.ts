@@ -3,14 +3,6 @@ import crypto from 'node-forge';
 export const createDownloadLinks = (encryptedMediaUrl: string) => {
   if (!encryptedMediaUrl) return [];
 
-  const qualities = [
-    { id: '_12', bitrate: '12kbps' },
-    { id: '_48', bitrate: '48kbps' },
-    { id: '_96', bitrate: '96kbps' },
-    { id: '_160', bitrate: '160kbps' },
-    { id: '_320', bitrate: '320kbps' }
-  ];
-
   const key = '38346591';
   const iv = '00000000';
 
