@@ -65,7 +65,7 @@ async function importSettings(e: Event) {
 if (params.has('reset')) {
   clearCache();
   localStorage.removeItem('store');
-  history.replaceState({}, '' location.pathname);
+  history.replaceState({}, '', location.pathname);
 }
 
 
