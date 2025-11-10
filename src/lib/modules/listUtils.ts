@@ -17,7 +17,7 @@ export function importList() {
   setStore('snackbar', t('list_imported', listTitle));
 }
 
-export function shareCollection(data: Collection) {
+export function shareCollection(data: CollectionItem[]) {
   setListStore('isLoading', true);
 
   fetch(location.origin + '/blob', {
@@ -25,7 +25,7 @@ export function shareCollection(data: Collection) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(Object.values(data)),
+    body: JSON.stringify(data),
   })
     .then(res => res.text())
     .then(_ => {
@@ -33,9 +33,10 @@ export function shareCollection(data: Collection) {
       const blob = new Blob([_], { type });
       const link = [new ClipboardItem({ [type]: blob })];
       navigator.clipboard.write(link);
+      setStore('snackbar', 'Collection link copied to clipboard!');
     })
     .catch(() => {
-      alert('failed');
+      setStore('snackbar', 'Failed to share collection.');
     })
     .finally(() => setListStore('isLoading', false));
 

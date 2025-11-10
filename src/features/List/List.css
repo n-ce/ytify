@@ -1,6 +1,4 @@
-#listSection {
-  width: 100%;
-}
+
 
 #listSection>header {
   position: sticky;
@@ -76,6 +74,7 @@
 }
 
 #listSection {
+  width: 100%;
   &:has(>img) {
 
     .listContainer {

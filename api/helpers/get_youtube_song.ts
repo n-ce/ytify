@@ -116,23 +116,22 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
 
       const subtitle = shelf?.subtitle?.runs;
 
-      if (subtitle?.[0].text !== 'Song') {
+      if (subtitle?.[0].text === 'Song') {
+        const id = shelf?.title?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId;
+        const title = shelf?.title?.runs?.[0]?.text;
+        const author = subtitle?.[2]?.text;
+        const duration = subtitle?.[4]?.text;
+        const channelId = shelf?.menu?.menuRenderer?.items?.[6]?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
+
+        if (channelId)
+          return {
+            id,
+            title,
+            author: author + ' - Topic',
+            duration,
+            channelUrl: 'channel/' + channelId
+          };
       }
-
-      const id = shelf?.title?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId;
-      const title = shelf?.title?.runs?.[0]?.text;
-      const author = subtitle?.[2]?.text;
-      const duration = subtitle?.[4]?.text;
-      const channelId = shelf?.menu?.menuRenderer?.items?.[6]?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint?.browseId;
-
-      if (channelId)
-        return {
-          id,
-          title,
-          author: author + ' - Topic',
-          duration,
-          channelUrl: 'channel/' + channelId
-        };
 
     }
 

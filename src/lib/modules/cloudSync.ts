@@ -19,7 +19,7 @@ export async function getRemoteManifest(userId: string): Promise<{ remoteMeta: M
   if (response.status === 404) {
     // No remote library exists, treat it as a fresh sync
     const localMeta = getMeta();
-    return { remoteMeta: { version: localMeta.version, tracks: 0 }, ETag: '' };
+    return { remoteMeta: { version: localMeta.version, tracks: 0 }, ETag: "*" };
   }
 
   if (!response.ok) {

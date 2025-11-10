@@ -19,7 +19,7 @@ export default function() {
         type="email" placeholder="Enter Email" required autofocus />
       <input
         oninput={(e) => setPw(e.target.value)}
-        type="password" placeholder="Enter Password" required disabled={!Boolean(email())}
+        type="password" placeholder="Enter Password" required disabled={!email()}
       />
       <span>
         <Show when={email() && pw()}>

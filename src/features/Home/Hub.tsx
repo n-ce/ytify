@@ -241,10 +241,10 @@ export default function() {
         ></i>
         <div>
           <Show
-            when={hub().discovery?.length! > 0}
+            when={!!hub().discovery?.length}
             fallback={'Discoveries related to what you listen to will show up here.'}
           >
-            <For each={hub().discovery!.slice(0, 5)}>
+            <For each={hub().discovery?.slice(0, 5)}>
               {(item) => (
                 <StreamItem
                   id={item.id}

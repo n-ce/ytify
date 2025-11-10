@@ -52,9 +52,7 @@ export function closeFeature(name: Features) {
 
   const closestRef = active[0]?.[1]?.ref;
 
-  if (removedIndex < 3) {
-  }
-  else
+  if (removedIndex >= 3)
     closestRef?.scrollIntoView({ behavior: 'smooth' });
 
 

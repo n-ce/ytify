@@ -19,7 +19,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
   }
 
   // Access the dedicated Meta Store
-  const metaStore = getStore('metaStore');
+  const metaStore = getStore('meta');
 
   // --- GET: Integrity Check (Read Lock) ---
   if (req.method === 'GET') {

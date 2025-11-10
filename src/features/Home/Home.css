@@ -1,6 +1,6 @@
 header {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
 
   label {
     cursor: pointer;
@@ -12,21 +12,9 @@ header {
 
   #syncNow {
     cursor: pointer;
-    font-size: var(--font-size-2);
-    margin-top: var(--size-1);
-    margin-left: var(--size-2);
-
-    &.ri-cloud-fill:hover::after {
-      position: fixed;
-      content: 'Import from cloud';
-      font-size: var(--font-size-1);
-    }
-
-    &.ri-cloud-off-fill:hover::after {
-      position: fixed;
-      content: 'Save to cloud';
-      font-size: var(--font-size-1);
-    }
+    font-size: var(--font-size-3);
+    margin-right: calc(var(--size-7) + var(--size-1));
+    margin-top: var(--size-0);
 
     &.ri-loader-3-line {
       pointer-events: none;

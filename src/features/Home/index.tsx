@@ -25,6 +25,7 @@ export default function() {
       <header>
         <p>
           {store.homeView || 'ytify'}</p>
+
         <Show when={config.dbsync}>
           <i
             id="syncNow"
@@ -34,6 +35,12 @@ export default function() {
               'ri-cloud-off-fill': store.syncState === 'dirty' || store.syncState === 'error',
               'error': store.syncState === 'error',
             }}
+            aria-label={
+              (store.syncState === 'dirty' || store.syncState === 'error') ?
+                'Save to Cloud' :
+                store.syncState === 'synced' ?
+                  'Import from Cloud' : 'Syncing'
+            }
             ref={syncBtn}
             onclick={() => {
               if (store.syncState === 'dirty' || store.syncState === 'error') {

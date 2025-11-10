@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal } from 'solid-js';
 import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
 import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore, setListStore } from '@lib/stores';
-import { importList } from '@lib/modules/listUtils';
+import { importList, shareCollection } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
 
 export default function Dropdown(_: {
@@ -128,7 +128,7 @@ export default function Dropdown(_: {
             <i class="ri-edit-line"></i>{t("list_rename")}
           </li>
 
-          <li id="shareCollectionBtn">
+          <li id="shareCollectionBtn" onclick={() => shareCollection(getCollectionItems(listStore.id))}>
             <i class="ri-link"></i>{t("list_share")}
           </li>
 
