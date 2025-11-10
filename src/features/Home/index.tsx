@@ -43,11 +43,9 @@ export default function() {
             }
             ref={syncBtn}
             onclick={() => {
-              if (store.syncState === 'dirty' || store.syncState === 'error') {
-                import('@lib/modules/cloudSync').then(({ runSync }) => {
-                  runSync(config.dbsync);
-                });
-              }
+              import('@lib/modules/cloudSync').then(({ runSync }) => {
+                runSync(config.dbsync);
+              });
             }}
           ></i>
         </Show>

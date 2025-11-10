@@ -2,7 +2,7 @@ import { getTracksMap } from '@lib/utils/library';
 import { navStore, setNavStore, setStore, store, t } from '@lib/stores';
 import { lazy, Show } from 'solid-js';
 import { render } from 'solid-js/web';
-import { setConfig } from '@lib/utils';
+import { setConfig, config } from '@lib/utils';
 
 
 const Login = lazy(() => import('@components/Login'));
@@ -112,11 +112,21 @@ export default function Dropdown() {
             <input type="file" id="upload_songshift" onchange={async (e) => (await import('../../lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
           </li>
 
-          <li onclick={() => {
-            render(() => <Login />, document.body);
-          }}>
-            <i class="ri-cloud-fill"></i>&nbsp;Cloud Sync
-          </li>
+          <Show when={config.dbsync}
+            fallback={
+              <li onclick={() => {
+                render(() => <Login />, document.body);
+              }}>
+                <i class="ri-cloud-fill"></i>&nbsp;Cloud Sync
+              </li>
+            }>
+            <li onclick={() => {
+              setConfig('dbsync', '');
+              location.reload();
+            }}>
+              <i class="ri-cloud-fill"></i>&nbsp;Logout
+            </li>
+          </Show>
         </Show>
 
         <Show when={store.homeView === 'Hub'}>
