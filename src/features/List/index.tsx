@@ -171,7 +171,7 @@ export default function() {
               <ListItem
                 title={album.title}
                 stats={album.subtitle}
-                thumbnail={generateImageUrl(getThumbIdFromLink(album.thumbnail), 'mq')}
+                thumbnail={generateImageUrl(getThumbIdFromLink(album.thumbnail), '')}
                 uploaderData={listStore.name.replace('Artist - ', '')}
                 url={`/playlist/${album.id}`}
               />
@@ -181,7 +181,7 @@ export default function() {
       </Show>
 
       <Show when={config.loadImage && listStore.name.startsWith('Album')}>
-        <img src={listStore.thumbnail} alt={listStore.name} class="list-thumbnail" />
+        <img src={listStore.thumbnail.replace('w=360', 'w=720')} alt={listStore.name} class="list-thumbnail" />
       </Show>
 
       <Results

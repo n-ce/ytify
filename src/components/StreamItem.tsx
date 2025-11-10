@@ -66,8 +66,10 @@ export default function(data: {
 
   const isAlbum = data.context?.id.startsWith('Album');
 
+  const isArtistContext = data.context?.id?.startsWith('Artist - ');
+
   if (config.loadImage && !isAlbum)
-    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites'));
+    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isArtistContext));
 
   return (
     <a

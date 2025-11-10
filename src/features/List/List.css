@@ -1,5 +1,3 @@
-
-
 #listSection>header {
   position: sticky;
   top: 0;
@@ -75,6 +73,7 @@
 
 #listSection {
   width: 100%;
+
   &:has(>img) {
 
     .listContainer {
@@ -110,6 +109,11 @@
 .albums-carousel {
   display: flex;
   overflow: auto;
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+  margin-bottom: var(--size-2);
+  padding: var(--size-1);
+  border: var(--border);
 
   .listItem {
     width: var(--size-11);

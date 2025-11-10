@@ -78,7 +78,7 @@ export async function getList(
 
     setListStore({
       name: savedThumbId?.name || title,
-      thumbnail: savedThumb || thumbnail || generateImageUrl(videos[0].videoId, 'maxres'),
+      thumbnail: savedThumb || thumbnail || listStore.thumbnail || generateImageUrl(videos[0].videoId, 'maxres'),
       id: url,
       uploader: author,
       type: 'playlists',
