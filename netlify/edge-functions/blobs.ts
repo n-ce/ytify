@@ -5,7 +5,7 @@ import type { Config, Context } from "@netlify/edge-functions";
 export default async (req: Request, context: Context) => {
 
   const { uid } = context.params;
-  const collectionBlob = getStore('clxn');
+  const collectionBlob = getStore('collections');
 
   if (uid) {
 

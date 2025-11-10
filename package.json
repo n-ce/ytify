@@ -25,7 +25,7 @@
     "open-props": "1.7.16",
     "postcss-jit-props": "1.0.16",
     "typescript": "^5.9.3",
-    "vite": "npm:rolldown-vite@7.2.2",
+    "vite": "7.2.2",
     "vite-plugin-pwa": "^1.1.0",
     "vite-plugin-solid": "^2.11.10"
   },

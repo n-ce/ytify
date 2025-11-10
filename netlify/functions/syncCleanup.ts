@@ -2,24 +2,33 @@
 import { getStore } from "@netlify/blobs";
 import type { Config, Handler } from "@netlify/functions";
 
+// Type Definitions (copied from src/types.d.ts for serverless function context)
+type CollectionItem = {
+  id: string,
+  title: string,
+  author: string,
+  duration: string
+  authorId: string,
+  albumId?: string,
+  plays?: number
+}
+
+type Collection = { [index: string]: CollectionItem };
+
 // Define constants for the retention policy
 const DATA_RETENTION_DAYS = 100;
 const INACTIVE_THRESHOLD_MS = DATA_RETENTION_DAYS * 24 * 60 * 60 * 1000;
-
-// Store names used by the system
-const META_STORE_NAME = 'metaStore';
-const TRACK_STORE_NAME = 'trackStore';
 
 const handler: Handler = async () => {
   // This function runs on a schedule and should not be invoked directly by the client.
   console.log("--- Starting Scheduled Data Cleanup ---");
 
   // Access the relevant stores
-  const metaStore = getStore(META_STORE_NAME);
-  const trackStore = getStore(TRACK_STORE_NAME);
+  const metaStore = getStore('meta');
+  const trackStore = getStore('tracks');
 
   // Array to collect track maps from active users for the GC check
-  const activeUserTrackMaps: Record<string, any>[] = [];
+  const activeUserTrackMaps: Collection[] = [];
 
   // Track users who are being deleted for final cleanup
   const deletedUserHashes: string[] = [];
@@ -51,9 +60,9 @@ const handler: Handler = async () => {
         await trackStore.delete(userIdHash);
         deletedUserHashes.push(userIdHash);
 
-        // Note: Deleting the content blobs (collections/lists) is complex 
-        // and often deferred until later, as the timestamp keys are needed 
-        // to delete from the contentStore. For simplicity, we assume the 
+        // Note: Deleting the content blobs (collections/lists) is complex
+        // and often deferred until later, as the timestamp keys are needed
+        // to delete from the contentStore. For simplicity, we assume the
         // core data structures are deleted here.
 
         continue; // Skip GC collection for deleted users
@@ -64,11 +73,11 @@ const handler: Handler = async () => {
         // Since the meta holds timestamps which point to the immutable collection blobs,
         // we would need a complex secondary lookup here to get the actual collection arrays.
         // For a successful run, we assume the client's push process guarantees
-        // that all necessary track IDs are contained within the user's master track map 
-        // *which we will check directly*. 
+        // that all necessary track IDs are contained within the user's master track map
+        // *which we will check directly*.
 
         // Fetch the user's track map for GC reference (Optimization: check against the map itself)
-        const userTrackMap = await trackStore.get(userIdHash, { type: 'json' });
+        const userTrackMap: Collection = await trackStore.get(userIdHash, { type: 'json' }) || {};
         if (userTrackMap) {
           activeUserTrackMaps.push(userTrackMap);
         }
@@ -77,12 +86,11 @@ const handler: Handler = async () => {
         console.error(`Could not process track map for active user ${userIdHash}.`, error);
       }
     }
-
     console.log(`Retention policy applied. Deleted ${deletedUserHashes.length} inactive users.`);
 
     // --- STEP 2: Orphaned Content Blob Cleanup (Global Content Store GC) ---
     console.log("--- Starting Content Blob Cleanup ---");
-    const contentStore = getStore('contentStore');
+    const contentStore = getStore('content');
     const { blobs: contentBlobs } = await contentStore.list({ prefix: '' });
     let deletedContentBlobsCount = 0;
 

@@ -53,13 +53,32 @@ export async function pushTrackChanges(userId: string, addedTrackItems: Collecti
 }
 
 /**
+ * Pushes a large batch of track items to a serverless function for bulk processing.
+ * @param {string} userId - Current user ID.
+ * @param {CollectionItem[]} addedTrackItems - Array of track objects to add/update.
+ */
+export async function pushBulkTrackChanges(userId: string, addedTrackItems: CollectionItem[]): Promise<void> {
+  if (addedTrackItems.length === 0) return;
+
+  const response = await fetch(`/.netlify/functions/syncBulkTracks/${userId}`, {
+    method: 'POST',
+    body: JSON.stringify({ addedTrackItems }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Bulk track update failed: ${response.statusText}`);
+  }
+}
+
+/**
  * Pushes the entire collection array/object to the IMMUTABLE store.
  * Returns the new timestamp key.
- * @param {any} data - The full collection array/object to send.
+ * @param {Collection | CollectionItem[]} data - The full collection array/object to send.
  * @returns {Promise<number>} The new timestamp key for the meta file.
  */
-export async function pushImmutableContent(data: any): Promise<number> {
-  const response = await fetch('/cs/content', {
+export async function pushImmutableContent(data: Collection | CollectionItem[]): Promise<number> {
+  const response = await fetch('/.netlify/functions/syncContent', {
     method: 'POST',
     body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' }
@@ -112,15 +131,18 @@ export async function finalizeSync(userId: string, ETag: string, finalMeta: Meta
  * @param {string} name - The collection name (for local storage helper).
  */
 export async function pullContentByTimestamp(timestamp: number, name: string): Promise<void> {
-  const response = await fetch(`/cs/content/${timestamp}`);
+  const response = await fetch(`/.netlify/functions/syncContent/${timestamp}`, {
+    method: 'GET', // Explicitly set method for clarity
+  });
   if (!response.ok) throw new Error(`Failed to pull content for timestamp ${timestamp}.`);
 
-  const data = await response.json() as any;
+  const data = await response.json() as Collection | CollectionItem[];
 
   if (name === 'tracks') {
     throw new Error("Do not use pullContentByTimestamp for tracks.");
   } else {
-    saveCollection(name, data);
+    const idsToSave = Array.isArray(data) ? data.map(item => item.id) : Object.keys(data);
+    saveCollection(name, idsToSave);
   }
 }
 
@@ -240,9 +262,12 @@ export function runSync(userId: string): Promise<{ success: boolean; message: st
 
         if (localTimestamp > remoteTimestamp) {
           console.log(`Pushing ${key}: local is newer.`);
-          const collectionData = getCollection(key);
+
+          const collectionIds = getCollection(key);
+          const tracksMap = getTracksMap();
+          const collectionItems = collectionIds.map(id => tracksMap[id]).filter(Boolean) as CollectionItem[];
           pushPromises.push(
-            pushImmutableContent(collectionData).then(newTimestamp => {
+            pushImmutableContent(collectionItems).then(newTimestamp => {
               finalMeta[key] = newTimestamp;
             })
           );
@@ -256,7 +281,7 @@ export function runSync(userId: string): Promise<{ success: boolean; message: st
       const localTracks = getTracksMap();
       const dirtyTracks = getDirtyTracks();
 
-      let trackSyncPromise: Promise<any> = Promise.resolve();
+      let trackSyncPromise: Promise<void> = Promise.resolve();
 
       if (dirtyTracks.added.length > 0 || dirtyTracks.deleted.length > 0) {
         console.log("Pushing dirty track changes.");
@@ -283,7 +308,7 @@ export function runSync(userId: string): Promise<{ success: boolean; message: st
         }
       } else if (localTracksTimestamp > remoteTracksTimestamp) {
         console.log("Local tracks timestamp is newer, but no dirty tracks. Pushing all local tracks.");
-        trackSyncPromise = pushTrackChanges(userId, Object.values(localTracks), [])
+        trackSyncPromise = pushBulkTrackChanges(userId, Object.values(localTracks) as CollectionItem[])
           .then(() => {
             finalMeta.tracks = localTracksTimestamp;
           });

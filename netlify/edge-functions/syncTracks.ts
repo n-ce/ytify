@@ -3,19 +3,18 @@
 import { getStore } from "@netlify/blobs";
 import type { Config, Context } from "@netlify/edge-functions";
 
-// Define the type for a single Track Object
-interface TrackObject {
-  id: string;
-  title: string;
-  author: string;
-  channelUrl: string;
-  duration: number; // Assuming duration is a number (seconds/ms)
-  // The rest of the properties are covered by the index signature
-  [key: string]: string | number;
+// Type Definitions (copied from src/types.d.ts for serverless function context)
+type CollectionItem = {
+  id: string,
+  title: string,
+  author: string,
+  duration: string
+  authorId: string,
+  albumId?: string,
+  plays?: number
 }
 
-// Define the user's master track map structure (ID -> TrackObject)
-type UserTrackMap = Record<string, TrackObject>;
+type Collection = { [index: string]: CollectionItem };
 
 export default async (req: Request, context: Context): Promise<Response> => {
   // The user hash is captured by the route parameter 'hash'
@@ -26,20 +25,20 @@ export default async (req: Request, context: Context): Promise<Response> => {
   }
 
   // Access the dedicated Track Store
-  const trackStore = getStore('trackStore');
+  const trackStore = getStore('tracks');
 
   // --- PUT: Track Batch Push (Client -> Server) ---
-  // Action: Client sends an array of updated/new TrackObjects.
+  // Action: Client sends an array of updated/new CollectionItems.
   if (req.method === 'PUT') {
     try {
-      // Client always sends an array of TrackObjects
-      const { added, deleted } = await req.json() as { added: TrackObject[], deleted: string[] };
+      // Client always sends an array of CollectionItems
+      const { added, deleted } = await req.json() as { added: CollectionItem[], deleted: string[] };
 
       if (!Array.isArray(added) || !Array.isArray(deleted)) {
-        return new Response("Request body must be an object with 'added' (array of TrackObjects) and 'deleted' (array of strings) properties.", { status: 400 });
+        return new Response("Request body must be an object with 'added' (array of CollectionItems) and 'deleted' (array of strings) properties.", { status: 400 });
       }
 
-      let masterMap: UserTrackMap = await trackStore.get(userIdHash, { type: 'json' }) || {};
+      let masterMap: Collection = await trackStore.get(userIdHash, { type: 'json' }) || {};
 
       // Merge incoming added tracks into the master map
       for (const track of added) {
@@ -74,10 +73,10 @@ export default async (req: Request, context: Context): Promise<Response> => {
       }
 
       // 1. Get the current master map
-      let masterMap: UserTrackMap = await trackStore.get(userIdHash, { type: 'json' }) || {};
+      let masterMap: Collection = await trackStore.get(userIdHash, { type: 'json' }) || {};
 
       // 2. Filter and build the response array
-      const foundTracks: TrackObject[] = [];
+      const foundTracks: CollectionItem[] = [];
       for (const id of requestedIds) {
         if (masterMap[id]) {
           foundTracks.push(masterMap[id]);
