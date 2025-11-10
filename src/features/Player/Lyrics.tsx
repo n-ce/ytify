@@ -20,6 +20,13 @@ export default function(props: { onClose: () => void }) {
       .then(data => {
 
         const lrc = data.syncedLyrics;
+        const fetchedDuration = data.duration;
+        const localDuration = playerStore.fullDuration;
+
+        let offset = 0;
+        if (fetchedDuration && localDuration) {
+          offset = (localDuration - fetchedDuration) / 2;
+        }
 
         if (lrc) {
           const durarr: number[] = [];
@@ -30,7 +37,7 @@ export default function(props: { onClose: () => void }) {
               if (!l) return '...';
               const [mm, ss] = d.substring(1).split(':');
               const s = (parseInt(mm) * 60) + parseFloat(ss);
-              durarr.push(s);
+              durarr.push(s - offset);
               return l;
             });
           setLrcMap(lrcMap);

@@ -173,7 +173,7 @@ export default function() {
                 stats={album.subtitle}
                 thumbnail={generateImageUrl(getThumbIdFromLink(album.thumbnail), 'mq')}
                 uploaderData={listStore.name.replace('Artist - ', '')}
-                url={`/album/${album.id}`}
+                url={`/playlist/${album.id}`}
               />
             )}
           </For>

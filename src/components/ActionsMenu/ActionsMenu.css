@@ -1,24 +1,28 @@
 #actionsMenu {
-  position: fixed;
   padding: 0;
   width: 100%;
-  margin-bottom: var(--size-4);
+  margin: auto;
   border: var(--border);
   border-radius: var(--roundness);
   background-color: var(--scheme);
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
 
+  &[open],
   &:open {
     animation: var(--animation-slide-in-up) forwards;
   }
 
+  @media(orientation:portrait) {
+    margin-bottom: var(--size-4);
+  }
+
   @media(orientation:landscape) {
-    margin: auto var(--size-fluid-2);
-    margin-left: auto;
+    margin-right: var(--size-fluid-2);
     width: max-content;
     animation: var(--animation-slide-out-right) forwards;
 
+    &[open],
     &:open {
       animation: var(--animation-slide-in-left) forwards;
     }
@@ -66,13 +70,18 @@
 
   .clxnShelf {
     display: flex;
-    justify-content: space-between;
     cursor: initial;
 
     i {
+      max-width: 34%;
       text-align: center;
       flex: 1;
       font-style: inherit;
+
+      select {
+        margin: 0;
+        padding: 0;
+      }
     }
 
   }

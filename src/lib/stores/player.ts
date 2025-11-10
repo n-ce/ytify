@@ -154,7 +154,7 @@ createRoot(() => {
 
     // Lyrics
     if (lrcSync)
-      lrcSync(audio.currentTime + 0.2);
+      lrcSync(audio.currentTime);
 
     const seconds = Math.floor(audio.currentTime);
 
@@ -221,13 +221,11 @@ async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
   const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
-  const data = await fetch(`${Backend}/api/tracks?title=${title}&artist=${artist}&limit=10`)
+  fetch(`${Backend}/api/tracks?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
-    .catch(() => []);
+    .then(addToQueue)
+    .catch(e => setStore('snackbar', `Could not get recommendations for the track: ${e.message}`));
 
-  if (Array.isArray(data)) {
-    addToQueue(data as CollectionItem[]);
-  }
 }
 
 

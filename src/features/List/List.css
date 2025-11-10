@@ -107,3 +107,18 @@
   padding: 0;
   color: inherit;
 }
+
+.albums-carousel {
+  display: flex;
+  overflow: auto;
+
+  .listItem {
+    width: var(--size-11);
+    flex-shrink: 0;
+    margin: 0;
+    background-color: transparent;
+    border: none;
+
+  }
+
+}
