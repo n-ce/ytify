@@ -86,7 +86,8 @@ export async function getList(
       list: videos.map(v => ({
         id: v.videoId,
         title: v.title,
-        author: v.author,
+        author: (url.startsWith('OLAK5uy')
+          && !v.author.endsWith(' - Topic')) ? `${v.author} - Topic` : v.author,
         authorId: v.authorId,
         duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as CollectionItem)
@@ -163,7 +164,7 @@ export async function getList(
       list: videos.map(v => ({
         id: v.videoId,
         title: v.title,
-        author: v.author,
+        author: v.author.endsWith(' - Topic') ? v.author : `${v.author} - Topic`,
         authorId: v.authorId,
         duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as CollectionItem),

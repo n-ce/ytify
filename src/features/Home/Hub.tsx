@@ -1,5 +1,5 @@
 import { For, Show, createSignal } from "solid-js";
-import { getHub, updateSubfeed, updateGallery } from "@lib/modules/hub";
+import { getHub, updateSubfeed, updateGallery, updateHubSection } from "@lib/modules/hub";
 import { fetchCollection, getCollection, getTracksMap } from "@lib/utils";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
@@ -42,6 +42,23 @@ export default function() {
     });
   };
 
+  const handleClearGallery = () => {
+    updateHubSection('relatedArtists', []);
+    updateHubSection('relatedPlaylists', []);
+    updateHubSection('userArtists', []);
+    setHub(getHub());
+  };
+
+  const shuffle = <T,>(array: T[]): T[] => {
+    if (!array) return [];
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
+
   return (
     <div class="hub">
 
@@ -53,6 +70,11 @@ export default function() {
           class="ri-refresh-line"
           onclick={handleGalleryRefresh}
         ></i>
+        <i
+          aria-label="Clear"
+          class="ri-delete-bin-2-line"
+          onclick={handleClearGallery}
+        ></i>
         <Show when={isGalleryLoading()}>
           <i class="ri-loader-3-line"></i>
         </Show>
@@ -61,7 +83,7 @@ export default function() {
             when={hub().userArtists?.length > 0}
             fallback={'Listen to at least 2 different music artists to generate a gallery.'}
           >
-            <For each={hub().userArtists.filter(item => item.id && item.name && item.thumbnail)}>
+            <For each={shuffle(hub().userArtists.filter(item => item.id && item.name && item.thumbnail))}>
               {(item) => (
                 <ListItem
                   stats={''}
@@ -69,23 +91,6 @@ export default function() {
                   url={`/artist/${item.id}`}
                   thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
                   uploaderData={''}
-                />
-              )}
-            </For>
-          </Show>
-        </div>
-        <div class="relatedPlaylists">
-          <Show
-            when={hub().relatedPlaylists?.length > 0}
-          >
-            <For each={hub().relatedPlaylists}>
-              {(item) => (
-                <ListItem
-                  stats={''}
-                  title={item.name}
-                  url={`/playlist/${item.id}`}
-                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                  uploaderData={item.uploader}
                 />
               )}
             </For>
@@ -95,7 +100,7 @@ export default function() {
           <Show
             when={hub().relatedArtists?.length > 0}
           >
-            <For each={hub().relatedArtists}>
+            <For each={shuffle(hub().relatedArtists)}>
               {(item) => (
                 <ListItem
                   stats={''}
@@ -108,6 +113,25 @@ export default function() {
             </For>
           </Show>
         </div>
+
+        <div class="relatedPlaylists">
+          <Show
+            when={hub().relatedPlaylists?.length > 0}
+          >
+            <For each={shuffle(hub().relatedPlaylists)}>
+              {(item) => (
+                <ListItem
+                  stats={''}
+                  title={item.name}
+                  url={`/playlist/${item.id}`}
+                  thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
+                  uploaderData={''}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+
       </article>
 
       <article class="subfeed">

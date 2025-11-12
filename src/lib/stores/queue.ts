@@ -7,7 +7,7 @@ export const [queueStore, setQueueStore] = createStore({
 
 
 export function addToQueue(items: CollectionItem[], options: { replace?: boolean, prepend?: boolean } = {}) {
-  let itemsToAdd = config.allowDuplicates
+  let itemsToAdd = (config.allowDuplicates || options.replace)
     ? items
     : items.filter(item => !queueStore.list.some(existingItem => existingItem.id === item.id));
 

@@ -65,11 +65,11 @@ export default function(data: {
 
 
   const isAlbum = data.context?.id.startsWith('Album');
-
-  const isArtistContext = data.context?.id?.startsWith('Artist - ');
+  const isFromArtist = data.context?.id?.startsWith('Artist - ');
+  const isMusic = data.author?.endsWith('- Topic');
 
   if (config.loadImage && !isAlbum)
-    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isArtistContext));
+    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isFromArtist || (data.context?.src === 'queue' && isMusic)));
 
   return (
     <a

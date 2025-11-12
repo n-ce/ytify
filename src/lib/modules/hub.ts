@@ -83,7 +83,7 @@ export async function updateGallery(): Promise<void> {
     });
 
   const sortedArtists = Object.entries(artistCounts)
-    .filter(a => a[1] > 2)
+    .filter(a => a[1] > 3)
     .sort(([, a], [, b]) => b - a)
 
   const artistIds = sortedArtists.map(([id]) => id);
@@ -109,14 +109,14 @@ export async function updateGallery(): Promise<void> {
     });
 
 
-  const ArtistMap: {
+  const recommendedArtistMap: {
     [index: string]: Channel & { count?: number }
   } = {};
-  const PlaylistMap: {
+  const relatedPlaylistMap: {
     [index: string]: Playlist & { count?: number }
   } = {};
 
-  results.forEach((result) => {
+  for (const result of results) {
 
     if (result?.recommendedArtists) {
       result.recommendedArtists.forEach((artist) => {
@@ -124,9 +124,9 @@ export async function updateGallery(): Promise<void> {
         if (artist.browseId && artist.name && artist.thumbnail) {
           const key = artist.browseId;
           if (!artistIds.includes(key)) // Only add if not already a "user artist"
-            key in ArtistMap ?
-              ArtistMap[key].count!++ :
-              ArtistMap[key] = {
+            key in recommendedArtistMap ?
+              recommendedArtistMap[key].count!++ :
+              recommendedArtistMap[key] = {
                 id: artist.browseId,
                 name: artist.name,
                 thumbnail: artist.thumbnail,
@@ -142,9 +142,9 @@ export async function updateGallery(): Promise<void> {
         if (playlist.browseId && playlist.title && playlist.thumbnail) {
           const key = playlist.browseId;
 
-          key in PlaylistMap ?
-            PlaylistMap[key].count!++ :
-            PlaylistMap[key] = {
+          key in relatedPlaylistMap ?
+            relatedPlaylistMap[key].count!++ :
+            relatedPlaylistMap[key] = {
               id: playlist.browseId.startsWith('VL') ? playlist.browseId.substring(2) : playlist.browseId,
               name: playlist.title,
               thumbnail: playlist.thumbnail,
@@ -154,11 +154,13 @@ export async function updateGallery(): Promise<void> {
         }
       });
     }
-  });
+
+  }
 
 
   const featuredPlaylists = Object
-    .values(PlaylistMap)
+    .values(relatedPlaylistMap)
+    .filter(s => s.count && s.count > 2)
     .sort((a, b) => b.count! - a.count!)
     .map(s => {
       delete s.count;
@@ -166,7 +168,8 @@ export async function updateGallery(): Promise<void> {
     });
 
   const relatedArtists = Object
-    .values(ArtistMap)
+    .values(recommendedArtistMap)
+    .filter(s => s.count && s.count > 2)
     .sort((a, b) => b.count! - a.count!)
     .map(s => {
       delete s.count;

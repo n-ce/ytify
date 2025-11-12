@@ -39,7 +39,7 @@
 		margin-right: var(--size-2);
 
 		img {
-			max-height: var(--size-10);
+			max-height: var(--size-9);
 			max-width: var(--size-11);
 			border-radius: calc(var(--roundness) * 0.8);
 			box-shadow: var(--shadow-1);

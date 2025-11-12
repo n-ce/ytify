@@ -43,6 +43,17 @@ header {
 
   .gallery-article {
     grid-column: span 2;
+
+    >div {
+      margin: 0;
+      border: 0;
+
+      .listItem {
+        p.title {
+          max-height: var(--size-4) !important;
+        }
+      }
+    }
   }
 
   article {
@@ -60,7 +71,8 @@ header {
     }
 
 
-    &.subfeed {
+    &.subfeed,
+    &.gallery-article {
       >p {
         width: calc(100% - var(--size-11) + var(--size-6));
       }
@@ -109,18 +121,22 @@ header {
     >.userArtists {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
-      margin-bottom: 0;
+      padding-bottom: 0 !important;
     }
 
     >.relatedPlaylists {
-      border-radius: 0;
-      margin: 0;
+      padding-top: 0 !important;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
     }
 
     >.relatedArtists {
-      margin-top: 0;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
+      img {
+        border-radius: var(--radius-round) !important;
+      }
+
+      border-radius: 0;
+      padding-top: 0 !important;
     }
 
 
