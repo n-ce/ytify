@@ -3,7 +3,7 @@ import { store } from '../lib/store';
 import { html } from 'uhtml';
 import { i18n } from '../scripts/i18n';
 
-export default function(_: {
+export default function (_: {
   collection: CollectionItem,
   close: () => void
 }) {
@@ -42,7 +42,7 @@ export default function(_: {
       e.target.selectedIndex = 0;
     }}
       >
-        <option>${i18n('collection_selector_add_to')}</option>
+        <option value="" disabled selected>${i18n('collection_selector_add_to')}</option>
         <option value="+cl">${i18n('collection_selector_create_new')}</option>
         <option value="favorites">${i18n('collection_selector_favorites')}</option>
         <option value="listenLater">${i18n('collection_selector_listen_later')}</option>
