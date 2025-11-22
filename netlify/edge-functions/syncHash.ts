@@ -1,4 +1,5 @@
 import type { Config, Context } from "@netlify/edge-functions";
+import { validateEmail, hashCredentials } from 'backend/utils';
 
 export default async (req: Request, _context: Context) => {
   if (req.method !== 'POST') {
@@ -18,21 +19,7 @@ export default async (req: Request, _context: Context) => {
   }
 
   // 1. Email Verification
-  const validatorUrl = `https://rapid-email-verifier.fly.dev/api/validate?email=${email}`;
-  let isEmailValid = false; 
-
-  try {
-    const emailResponse = await fetch(validatorUrl);
-    if (emailResponse.ok) {
-      const emailData = await emailResponse.json();
-      if (emailData.status === 'VALID') {
-        isEmailValid = true; 
-      }
-    }
-  } catch (error) {
-    console.error("Error during email verification:", error);
-    // Continue even if email verification fails, but mark as invalid
-  }
+  const isEmailValid = await validateEmail(email);
 
   if (!isEmailValid) {
     return new Response("Email is not valid", {
@@ -42,13 +29,7 @@ export default async (req: Request, _context: Context) => {
   }
 
   // 2. Password Hashing (hash of email + password)
-  const combinedString = email + password; // Concatenate email and password
-  const msgBuffer = new TextEncoder().encode(combinedString);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashedPassword = Array
-    .from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  const hashedPassword = await hashCredentials(email, password);
 
   return new Response(hashedPassword, {
     headers: { "content-type": "text/plain" },

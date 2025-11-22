@@ -1,5 +1,6 @@
-const YOUTUBE_MUSIC_SEARCH_URL = 'https://music.youtube.com/youtubei/v1/search';
+// backend/services/youtube_search.ts
 
+const YOUTUBE_MUSIC_SEARCH_URL = 'https://music.youtube.com/youtubei/v1/search';
 
 export interface YouTubeSong {
   id: string,
@@ -8,7 +9,6 @@ export interface YouTubeSong {
   duration: string,
   channelUrl: string
 }
-
 
 export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
   const requestBody = {
@@ -20,7 +20,6 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
     },
     query: query,
   };
-
 
   try {
     const response = await fetch(YOUTUBE_MUSIC_SEARCH_URL, {
@@ -37,14 +36,14 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
     }
 
     const data = await response.json();
-
     const contents = data.contents?.tabbedSearchResultsRenderer?.tabs[0]?.tabRenderer?.content?.sectionListRenderer?.contents;
 
-    const isMixed = contents?.length === 2;
-    const searchList = contents?.[1]?.musicShelfRenderer?.contents || [];
+    if (!contents) return {};
+
+    const isMixed = contents.length === 2;
+    const searchList = contents[1]?.musicShelfRenderer?.contents || [];
 
     for (const item of searchList) {
-
       const flexColumns = item.musicResponsiveListItemRenderer?.flexColumns;
       if (!flexColumns || flexColumns.length < 2) continue;
 
@@ -59,14 +58,12 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
 
       if (isMixed && metadataRuns[0].text !== 'Song') continue;
 
-
       const artistRun = metadataRuns.find((run: any) => run.navigationEndpoint?.browseEndpoint?.browseId);
       const author = artistRun?.text;
       const channelId = artistRun?.navigationEndpoint?.browseEndpoint?.browseId;
+      const duration = metadataRuns.find((run: any) => run.text?.includes(':'))?.text;
 
-      const duration = metadataRuns.find((run: any) => run.text?.[run.text?.length - 3] === ':')?.text;
-
-      if (duration)
+      if (duration && channelId)
         return {
           id,
           title,
@@ -77,11 +74,11 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
     }
 
     if (isMixed) {
-      const shelf = contents?.[0]?.musicCardShelfRenderer;
+      const shelf = contents[0]?.musicCardShelfRenderer;
+      if (!shelf) return {};
 
       if ('contents' in shelf) {
         for (const key in shelf.contents) {
-
           const fcs = shelf.contents[key]?.musicResponsiveListItemRenderer?.flexColumns;
           if (!fcs) continue;
 
@@ -99,7 +96,7 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
           const author = authorRun?.text;
           const channelId = authorRun?.navigationEndpoint?.browseEndpoint?.browseId;
           const duration = details?.[4]?.text;
-          if (duration.includes(':') && channelId)
+          if (duration?.includes(':') && channelId)
             return {
               id,
               title,
@@ -107,15 +104,10 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
               duration,
               channelUrl: 'channel/' + channelId
             };
-
-
         }
-
       }
 
-
       const subtitle = shelf?.subtitle?.runs;
-
       if (subtitle?.[0].text === 'Song') {
         const id = shelf?.title?.runs?.[0]?.navigationEndpoint?.watchEndpoint?.videoId;
         const title = shelf?.title?.runs?.[0]?.text;
@@ -132,12 +124,8 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
             channelUrl: 'channel/' + channelId
           };
       }
-
     }
-
-
     return {};
-
   } catch (error) {
     console.error('Error fetching YouTube Music search results:', error);
     return {};

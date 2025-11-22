@@ -22,6 +22,7 @@
   --player-bp: 0 0;
   --landscape-sections: 2;
   --trueBg: var(--bg);
+  --font: ui-rounded, Segoe UI, source-sans-pro, Inter, Noto Sans, Oxygen, Calibri, Cantarell, Ubuntu, Roboto, system-ui, Open Sans, Helvetica Neue, sans-serif;
 }
 
 
@@ -35,7 +36,7 @@ html {
 
 body {
   height: 100dvh;
-  font-family: ui-rounded, Segoe UI, source-sans-pro, Inter, Noto Sans, Oxygen, Calibri, Cantarell, Ubuntu, Roboto, system-ui, Open Sans, Helvetica Neue, sans-serif;
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -262,8 +263,8 @@ i[aria-label]:hover::after {
   position: absolute;
   content: attr(aria-label);
   font-size: var(--font-size-0);
-  font-family: inherit;
-  font-weight: var(--font-weight-5);
+  font-family: var(--font);
+  font-weight: var(--font-weight-6);
   background: var(--text);
   color: var(--bg);
   right: var(--size-8);

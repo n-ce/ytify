@@ -52,6 +52,15 @@ declare global {
 
   type Collection = { [index: string]: CollectionItem };
 
+  type Album = {
+    name: string,
+    artist: string,
+    thumbnail: string,
+    tracks: string[]
+  };
+
+  type LibraryAlbums = { [id: string]: Album };
+
   interface Channel {
     id: string,
     name: string,

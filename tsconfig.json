@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
@@ -36,6 +37,7 @@
   },
   "include": [
     "src",
-    "netlify"
+    "netlify",
+    "backend"
   ]
 }

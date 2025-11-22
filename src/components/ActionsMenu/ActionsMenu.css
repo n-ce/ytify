@@ -47,22 +47,20 @@
     cursor: pointer;
     color: var(--text);
     user-select: none;
-    font-size: var(--font-size-1);
+    font-size: var(--font-size-2);
     font-weight: var(--font-weight-6);
     display: flex;
     align-items: center;
     gap: var(--gap);
     padding: var(--size-1) var(--size-4);
-    border: var(--border);
 
     &:hover {
-      border: var(--border);
       background: var(--onBg2);
       color: var(--text2);
     }
 
     & i {
-      font-size: var(--font-size-3);
+      font-size: var(--font-size-4);
       font-weight: var(--font-weight-3);
     }
 

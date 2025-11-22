@@ -1,17 +1,19 @@
 import { For, Show, createSignal } from "solid-js";
 import { getHub, updateSubfeed, updateGallery, updateHubSection } from "@lib/modules/hub";
-import { fetchCollection, getCollection, getTracksMap } from "@lib/utils";
+import { getCollection, getTracksMap } from "@lib/utils";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
 import { generateImageUrl, getThumbIdFromLink } from "@lib/utils";
-import { setListStore, setNavStore } from "@lib/stores";
+
 
 export default function() {
   const [hub, setHub] = createSignal(getHub());
   const tracksMap = getTracksMap(); // Get all tracks
+  const [subfeedExpanded, setSubfeedExpanded] = createSignal(false);
+  const [frequentlyPlayedExpanded, setFrequentlyPlayedExpanded] = createSignal(false);
+  const [discoveryExpanded, setDiscoveryExpanded] = createSignal(false);
   // Get the first 5 IDs, then map to items
   const recents = getCollection('history')
-    .slice(0, 5)
     .map(id => tracksMap[id])
     .filter(Boolean) as CollectionItem[];
   const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);
@@ -81,7 +83,7 @@ export default function() {
         <div class="userArtists">
           <Show
             when={hub().userArtists?.length > 0}
-            fallback={'Listen to at least 2 different music artists to generate a gallery.'}
+            fallback={'Add to your favorites music from distinct artists to generate a gallery.'}
           >
             <For each={shuffle(hub().userArtists.filter(item => item.id && item.name && item.thumbnail))}>
               {(item) => (
@@ -139,17 +141,13 @@ export default function() {
         <i
           aria-label="Refresh"
           class="ri-refresh-line" onclick={handleSubfeedRefresh}></i>
-        <i
-          aria-label="Show All"
-          class="ri-arrow-right-s-line" onclick={() => {
-            updateSubfeed();
-            const subfeedItems = getHub().subfeed || [];
-            setListStore({
-              name: 'Sub Feed',
-              list: subfeedItems as CollectionItem[],
-            });
-            setNavStore('list', 'state', true);
-          }}></i>
+        <Show when={!subfeedExpanded()}>
+          <i
+            aria-label="Show All"
+            class="ri-arrow-right-s-line"
+            onclick={() => setSubfeedExpanded(true)}
+          ></i>
+        </Show>
         <div>
           <Show when={isSubfeedLoading()}>
             <i class="ri-loader-3-line"></i>
@@ -158,7 +156,7 @@ export default function() {
             when={hub().subfeed?.length > 0}
             fallback={'Subscribe to YouTube Channels, to get recently released videos here.'}
           >
-            <For each={hub().subfeed.slice(0, 5)}>
+            <For each={subfeedExpanded() ? hub().subfeed : hub().subfeed.slice(0, 5)}>
               {(item) => (
                 <StreamItem
                   id={item.id}
@@ -180,24 +178,19 @@ export default function() {
 
       <article>
         <p>Frequently Played</p>
-        <i
-          aria-label="Show All"
-          class="ri-arrow-right-s-line"
-          onclick={() => {
-            const frequentlyPlayedItems = getFrequentlyPlayedTracks();
-            setListStore({
-              name: 'Frequently Played',
-              list: frequentlyPlayedItems,
-            });
-            setNavStore('list', 'state', true);
-          }}
-        ></i>
+        <Show when={!frequentlyPlayedExpanded()}>
+          <i
+            aria-label="Show All"
+            class="ri-arrow-right-s-line"
+            onclick={() => setFrequentlyPlayedExpanded(true)}
+          ></i>
+        </Show>
         <div>
           <Show
             when={getFrequentlyPlayedTracks(5).length > 0}
             fallback={'Tracks you play often will show up here.'}
           >
-            <For each={getFrequentlyPlayedTracks(5)}>
+            <For each={frequentlyPlayedExpanded() ? getFrequentlyPlayedTracks() : getFrequentlyPlayedTracks(5)}>
               {(item) => (
                 <StreamItem
                   id={item.id}
@@ -218,13 +211,6 @@ export default function() {
 
       <article>
         <p>Recently Listened To</p>
-        <i
-          aria-label="Show All"
-          class="ri-arrow-right-s-line"
-          onclick={() => {
-            fetchCollection('history');
-          }}
-        ></i>
         <div>
           <Show
             when={recents.length > 0}
@@ -251,24 +237,19 @@ export default function() {
 
       <article>
         <p>Discovery</p>
-        <i
-          aria-label="Show All"
-          class="ri-arrow-right-s-line"
-          onclick={() => {
-            const discoveryItems = getHub().discovery || [];
-            setListStore({
-              name: 'Discovery',
-              list: discoveryItems as CollectionItem[],
-            });
-            setNavStore('list', 'state', true);
-          }}
-        ></i>
+        <Show when={!discoveryExpanded()}>
+          <i
+            aria-label="Show All"
+            class="ri-arrow-right-s-line"
+            onclick={() => setDiscoveryExpanded(true)}
+          ></i>
+        </Show>
         <div>
           <Show
             when={!!hub().discovery?.length}
             fallback={'Discoveries related to what you listen to will show up here.'}
           >
-            <For each={hub().discovery?.slice(0, 5)}>
+            <For each={discoveryExpanded() ? hub().discovery : hub().discovery?.slice(0, 5)}>
               {(item) => (
                 <StreamItem
                   id={item.id}

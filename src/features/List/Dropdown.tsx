@@ -1,5 +1,5 @@
 import { Show, createEffect, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection } from '@lib/utils/library';
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, addAlbumToLibrary, getLibraryAlbums, getTracksMap, saveTracksMap } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
 import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore, setListStore } from '@lib/stores';
 import { importList, shareCollection } from '@lib/modules/listUtils';
@@ -10,43 +10,88 @@ export default function Dropdown(_: {
 }) {
 
   const [isSubscribed, setSubscribed] = createSignal(false);
+  const [isAlbumSaved, setIsAlbumSaved] = createSignal(false);
 
   createEffect(() => {
-
+    const isAlbum = listStore.name.startsWith('Album - ');
+    if (isAlbum) {
+      const albums = getLibraryAlbums();
+      // The album ID is in listStore.url for albums loaded via fetchAlbum
+      setIsAlbumSaved(!!albums[listStore.url]);
+    } else {
+      setIsAlbumSaved(false);
+    }
+    
+    // Check subscription status for channels/playlists
     setSubscribed(
       getLists(listStore.type as 'channels').some(item => item.id === listStore.id)
-    )
+    );
   });
 
 
   function subscriptionHandler() {
+    const isAlbum = listStore.name.startsWith('Album - ');
 
-    const { name, type, id, uploader, thumbnail } = listStore;
-    if (type === 'collection') return;
+    if (isAlbum) {
+      const albumId = listStore.url; // For albums, listStore.url holds the album ID
+      if (isAlbumSaved()) {
+        setStore('snackbar', 'Album is already saved.'); // Or implement remove album logic
+        return;
+      }
 
-    let data = getLists(type);
+      const libraryAlbum: Album = {
+        name: listStore.name,
+        artist: listStore.uploader,
+        thumbnail: listStore.thumbnail,
+        tracks: listStore.list.map(track => track.id) // Tracks in listStore.list are CollectionItems
+      };
 
+      addAlbumToLibrary(albumId, libraryAlbum);
 
-    if (isSubscribed()) {
-      data = data.filter(item => item.id !== id);
-    }
-    else {
-      const dataset =
-        {
+      const tracksMap = getTracksMap();
+      for (const track of listStore.list) {
+        // Ensure to preserve existing properties of CollectionItem
+        tracksMap[track.id] = { ...tracksMap[track.id], ...track, albumId: albumId };
+      }
+      saveTracksMap(tracksMap);
+
+      setStore('snackbar', 'Album saved to library.');
+      setIsAlbumSaved(true);
+    } else {
+      // Existing logic for playlists/channels
+      const { name, type, id, uploader, thumbnail } = listStore;
+      if (type === 'collection') return;
+
+      let data = getLists(type);
+
+      if (isSubscribed()) {
+        data = data.filter(item => item.id !== id);
+      } else {
+        const dataset = {
           id,
           name,
           thumbnail: getThumbIdFromLink(thumbnail)
         } as Playlist;
 
-      if (type === 'playlists')
-        dataset.uploader = uploader;
+        if (type === 'playlists')
+          dataset.uploader = uploader;
 
-      data.push(dataset);
+        data.push(dataset);
+      }
+
+      saveLists(type, data);
+      setSubscribed(!isSubscribed());
     }
-
-    saveLists(type, data);
-    setSubscribed(!isSubscribed());
   }
+
+  const getButtonText = () => {
+    const isAlbum = listStore.name.startsWith('Album - ');
+    if (isAlbum) {
+      return isAlbumSaved() ? 'Saved to Library' : 'Save Album to Library';
+    }
+    return isSubscribed() ? 'Saved to Library' : 'Save to Library';
+  };
+
   return (
     <details>
       <summary><i
@@ -81,14 +126,19 @@ export default function Dropdown(_: {
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
-        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'}>
+        <Show when={
+          (
+            listStore.type === 'channels' &&
+            !listStore.name.startsWith('Artist')
+          ) || listStore.type === 'playlists' || listStore.name.startsWith('Album - ')
+        }>
 
           <li
             id="subscribeListBtn"
             onclick={subscriptionHandler}
           >
             <i
-              class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? 'Saved to Library' : 'Save to Library'}
+              class={"ri-star-" + (isSubscribed() || isAlbumSaved() ? "fill" : "line")}></i>{getButtonText()}
           </li>
 
           <li id="viewOnYTBtn">

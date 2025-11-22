@@ -5,6 +5,26 @@ import { config } from '@lib/utils/config';
 
 // New Library V2 utils
 
+export const getLibraryAlbums = (): LibraryAlbums =>
+  JSON.parse(localStorage.getItem('library_albums') || '{}');
+
+export const saveLibraryAlbums = (albums: LibraryAlbums) => {
+  localStorage.setItem('library_albums', JSON.stringify(albums));
+  metaUpdater('albums');
+}
+
+export function addAlbumToLibrary(
+  albumId: string,
+  albumData: Album
+) {
+  const albums = getLibraryAlbums();
+  if (albums[albumId]) {
+    return;
+  }
+  albums[albumId] = albumData;
+  saveLibraryAlbums(albums);
+}
+
 export const getMeta = (): Meta => {
   const meta = localStorage.getItem('library_meta');
   if (meta) {
@@ -43,7 +63,7 @@ export const getCollectionsKeys = () => {
     .keys(localStorage)
     .filter(key => key.startsWith('library_'))
     .map(key => key.slice(8))
-    .filter(key => !['channels', 'playlists', 'tracks', 'meta']
+    .filter(key => !['channels', 'playlists', 'tracks', 'meta', 'albums']
       .includes(key));
 
   const reservedOrder = ['history', 'favorites', 'liked', 'listenLater'];
@@ -103,15 +123,15 @@ export function addToCollection(
       collection.unshift(id);
     else collection.push(id);
 
-          if (id in tracks) {
-            const track = tracks[id];
-            track.plays = (track.plays || 1) + 1;
-            if (config.dbsync) {
-              import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-                addDirtyTrack(id); // Mark as updated
-              });
-            }
-          }    else {
+    if (id in tracks) {
+      const track = tracks[id];
+      track.plays = (track.plays || 1) + 1;
+      if (config.dbsync) {
+        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
+          addDirtyTrack(id); // Mark as updated
+        });
+      }
+    } else {
       tracks[id] = item;
       if (config.dbsync) {
         import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
@@ -140,11 +160,21 @@ export function removeFromCollection(
       collection.splice(idx, 1);
 
     let isReferenced = false;
-    for (const key of collections)
+    for (const key of collections) {
       if (getCollection(key).includes(id)) {
         isReferenced = true;
         break;
       }
+    }
+
+    if (!isReferenced) {
+      const track = tracks[id];
+      if (
+        track.albumId &&
+        track.albumId in getLibraryAlbums()
+      )
+        isReferenced = true;
+    }
 
     if (!isReferenced) {
       delete tracks[id];
@@ -173,11 +203,22 @@ export function deleteCollection(name: string) {
 
   for (const id of ids) {
     let isReferenced = false;
-    for (const key of collections)
+    for (const key of collections) {
       if (getCollection(key).includes(id)) {
         isReferenced = true;
         break;
       }
+    }
+
+    if (!isReferenced) {
+      const track = tracks[id];
+      if (
+        track.albumId &&
+        track.albumId in getLibraryAlbums()
+      )
+        isReferenced = true;
+
+    }
 
     if (!isReferenced) {
       delete tracks[id];

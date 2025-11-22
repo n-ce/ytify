@@ -4,7 +4,6 @@
 	color: var(--text);
 	margin-bottom: calc(var(--gap) - var(--size-2));
 	padding: var(--size-1);
-	border: var(--border);
 	border-radius: var(--roundness);
 	display: flex;
 	align-items: center;
@@ -14,6 +13,10 @@
 	overflow: hidden;
 	cursor: pointer;
 
+	&.ravel {
+		border: var(--border) !important;
+		background: var(--onBg) !important;
+	}
 
 	div,
 	span {

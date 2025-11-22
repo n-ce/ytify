@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getArtistData } from './helpers/youtube_artist_api.js';
+import { getArtistsData } from 'backend/services/youtube_artist';
 
 export default async function handler(
   request: VercelRequest,
@@ -18,22 +18,13 @@ export default async function handler(
   }
 
   try {
-    if (typeof artistIdParam === 'string' && artistIdParam.includes(',')) {
-      // Handle multiple artists for the Hub
-      const artistIds = artistIdParam.split(',');
-      const artistDataPromises = artistIds.map(id => getArtistData(id, countryCode));
-      const results = await Promise.all(artistDataPromises);
-      // Use destructuring to exclude albums from the results before sending to the hub
-      const resultsWithoutAlbums = results.map(({ albums, ...rest }) => rest);
-      return response.status(200).json(resultsWithoutAlbums);
-    } else {
-      // Handle single artist with reduced response
-      const artistData = await getArtistData(artistIdParam as string, countryCode);
-      const { artistName, playlistId, albums, thumbnail } = artistData;
-      return response.status(200).json({ artistName, playlistId, albums, thumbnail });
-    }
+    const result = await getArtistsData(artistIdParam, countryCode);
+    return response.status(200).json(result);
   } catch (error) {
     console.error('Error in API handler (GET):', error);
+    if (error instanceof Error && error.message === 'Artist not found') {
+        return response.status(404).json({ error: 'Artist not found' });
+    }
     return response.status(500).json({ error: 'Something went wrong' });
   }
 }

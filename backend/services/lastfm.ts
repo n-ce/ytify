@@ -1,3 +1,5 @@
+// backend/services/lastfm.ts
+
 export interface LastFmTrack {
   name: string;
   artist: { name: string };
@@ -15,7 +17,6 @@ export interface LastFmSimilarTracksResponse {
   };
 }
 
-// New interface for the simplified output
 export interface SimplifiedTrack {
   title: string;
   artist: string;
@@ -37,13 +38,9 @@ export async function getSimilarTracks(
       return { error: data.message };
     }
 
-    // Cast the data to the expected Last.fm type for reliable access
     const lastFmData = data as LastFmSimilarTracksResponse;
-
-    // Check if similar tracks exist
     const tracks = lastFmData.similartracks?.track || [];
 
-    // Map the complex LastFmTrack array to the simple SimplifiedTrack array
     const simplifiedTracks: SimplifiedTrack[] = tracks.map(track => ({
       title: track.name,
       artist: track.artist.name

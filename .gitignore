@@ -2,3 +2,6 @@
 .idea
 package-lock.json
 dist
+
+# Local Netlify folder
+.netlify

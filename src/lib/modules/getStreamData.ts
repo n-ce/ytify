@@ -8,17 +8,6 @@ export default async function(
 
   const { invidious } = store;
 
-  const fetchDataFromPiped = (
-    api: string
-  ) =>
-    fetch(`${api}/streams/${id}`, { signal })
-      .then(res => res.json())
-      .then(data => {
-        if (data.audioStreams.length)
-          return data;
-        else throw new Error(data.message);
-      });
-
   const fetchDataFromInvidious = (
     api: string
   ) => fetch(`${api}/api/v1/videos/${id}`, { signal })
@@ -64,7 +53,13 @@ export default async function(
 
   const emergency = (e: Error) =>
     (!prefetch) ?
-      fetchDataFromPiped('')
+      fetch(`/streams/${id}`, { signal })
+        .then(res => res.json())
+        .then(data => {
+          if (data.audioStreams.length)
+            return data;
+          else throw new Error(data.message);
+        })
         .catch(() => e) : e;
 
   setStore('index', 0);
@@ -82,14 +77,5 @@ export default async function(
         }
       });
 
-  /*
-    const usePiped = (index = 0): Promise<Piped> =>
-      fetchDataFromPiped(piped[index])
-        .catch(() => {
-          if (index + 1 === piped.length)
-            return useInvidious();
-          else return usePiped(index + 1);
-        });
-  */
   return useInvidious();
 }

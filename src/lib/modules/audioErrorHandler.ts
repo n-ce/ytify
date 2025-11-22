@@ -22,17 +22,17 @@ export default function(
   console.log('ErrorHandler: ' + audio.src);
 
   if (index < invidious.length) {
+    setStore('index', index + 1);
     const proxy = invidious[index];
+
     if (!prefetch)
       setPlayerStore('status', `Switching proxy to ${proxy.slice(8)}`);
     if (audio.src.includes(proxy))
       audio.src = audio.src.replace(proxy, origin);
     else
       audio.src = audio.src.replace(origin, proxy);
-    setStore('index', index + 1)
   }
   else {
-    setStore('index', 0);
 
     if (!prefetch) {
       setStore('snackbar', message);

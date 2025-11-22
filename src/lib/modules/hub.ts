@@ -1,7 +1,7 @@
 
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
-import { getTracksMap, getThumbIdFromLink } from "../utils";
+import { getTracksMap, getThumbIdFromLink, getCollection } from "../utils";
 
 type Hub = {
   discovery?: (CollectionItem & { frequency: number })[];
@@ -73,7 +73,10 @@ export async function updateSubfeed(preview?: string): Promise<void> {
 }
 
 export async function updateGallery(): Promise<void> {
-  const tracks = Object.values(getTracksMap());
+  const tracksMap = getTracksMap();
+  const tracks = getCollection('favorites')
+    .map(id => tracksMap[id])
+    .filter(Boolean);
   const artistCounts: { [key: string]: number } = {};
 
   tracks
@@ -83,7 +86,7 @@ export async function updateGallery(): Promise<void> {
     });
 
   const sortedArtists = Object.entries(artistCounts)
-    .filter(a => a[1] > 3)
+    .filter(a => a[1] > 1)
     .sort(([, a], [, b]) => b - a)
 
   const artistIds = sortedArtists.map(([id]) => id);
@@ -160,7 +163,7 @@ export async function updateGallery(): Promise<void> {
 
   const featuredPlaylists = Object
     .values(relatedPlaylistMap)
-    .filter(s => s.count && s.count > 2)
+    .filter(s => s.count && s.count > 1)
     .sort((a, b) => b.count! - a.count!)
     .map(s => {
       delete s.count;
@@ -169,7 +172,7 @@ export async function updateGallery(): Promise<void> {
 
   const relatedArtists = Object
     .values(recommendedArtistMap)
-    .filter(s => s.count && s.count > 2)
+    .filter(s => s.count && s.count > 1)
     .sort((a, b) => b.count! - a.count!)
     .map(s => {
       delete s.count;
