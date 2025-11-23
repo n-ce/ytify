@@ -1,5 +1,5 @@
 import type { Config, Context } from "@netlify/edge-functions";
-import { getArtistData } from 'backend/services/youtube_artist';
+import { getArtistData } from '../../backend/services/youtube_artist';
 
 export default async (_req: Request, context: Context) => {
   const artistId = context.params.id;
