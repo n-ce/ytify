@@ -4,7 +4,9 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: linear-gradient(to right, var(--trueBg), transparent, var(--trueBg));
+    background:
+      linear-gradient(to right, var(--trueBg), transparent, var(--trueBg)),
+      linear-gradient(var(--trueBg), transparent);
     backdrop-filter: blur(var(--size-px-3));
   }
 }

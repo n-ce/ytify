@@ -8,7 +8,7 @@ export default async function handler(
   response: VercelResponse,
 ) {
   const { title, artist, limit } = request.query;
-  const apiKey = process.env.LASTFM_API_KEY;
+  const apiKey = '0867bcb6f36c879398969db682a7b69b';
 
   if (!apiKey) {
     // For Vercel/serverless environments, use 500 status code for internal configuration errors
@@ -29,23 +29,23 @@ export default async function handler(
 
 
     // Function to format the duration string
-const formatDuration = (duration: string): string => {
-  // Split the duration into minutes and seconds
-  const parts = duration.split(':');
+    const formatDuration = (duration: string): string => {
+      // Split the duration into minutes and seconds
+      const parts = duration.split(':');
 
-  if (parts.length === 2) {
-    const [minutesStr, secondsStr] = parts;
+      if (parts.length === 2) {
+        const [minutesStr, secondsStr] = parts;
 
-    // Pad the minutes part with a leading zero if it's a single digit
-    const paddedMinutes = minutesStr.padStart(2, '0');
+        // Pad the minutes part with a leading zero if it's a single digit
+        const paddedMinutes = minutesStr.padStart(2, '0');
 
-    // Combine them back
-    return `${paddedMinutes}:${secondsStr}`;
-  }
+        // Combine them back
+        return `${paddedMinutes}:${secondsStr}`;
+      }
 
-  // Return the original string if it's not in the expected 'm:ss' or 'mm:ss' format
-  return duration;
-};
+      // Return the original string if it's not in the expected 'm:ss' or 'mm:ss' format
+      return duration;
+    };
     // --- CONCURRENT FETCHING START ---
 
     // 2. Map the tracks to an array of Promises for concurrent execution.
@@ -64,10 +64,10 @@ const formatDuration = (duration: string): string => {
     // 4. Filter the results to only include successfully matched songs.
     const matchedYouTubeSongs: YouTubeSong[] = allYoutubeResults
       .filter((result): result is YouTubeSong => 'id' in result)
-    .map(song => ({
-    ...song,
-    duration: formatDuration(song.duration)
-  }));
+      .map(song => ({
+        ...song,
+        duration: formatDuration(song.duration)
+      }));
 
     return response.status(200).json(matchedYouTubeSongs);
   } catch (error) {

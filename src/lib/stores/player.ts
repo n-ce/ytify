@@ -132,7 +132,6 @@ createRoot(() => {
 
   playerStore.audio.onloadstart = () => {
     console.log(playerStore.audio.src);
-    setStore('index', 0);
     setPlayerStore('playbackState', 'paused');
     setPlayerStore('status', '');
     if (isPlayable) playerStore.audio.play();
