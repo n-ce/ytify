@@ -40,8 +40,8 @@ jobs:
           REPO_FULL_NAME="${{ github.repository }}"
           REPO_NAME="${REPO_FULL_NAME#*/}"
           echo "REPOSITORY_NAME=$REPO_NAME" >> $GITHUB_ENV
-      - name: Build
-        run: npm run build
+      - name: Dev
+        run: npm run dev
         env:
           VITE_BASE_PATH: /${{ env.REPOSITORY_NAME }}/
       - name: Setup Pages
