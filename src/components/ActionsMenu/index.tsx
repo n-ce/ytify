@@ -41,7 +41,10 @@ export default function() {
         title={store.actionsMenu?.title || ''}
         author={store.actionsMenu?.author}
         duration={store.actionsMenu?.duration || ''}
-
+        context={{
+          src: 'queue', /* only for invoking  humbnail  cropping*/
+          id: '1'
+        }}
       />
 
       <ul

@@ -19,7 +19,7 @@
 	}
 
 	&:hover {
-		background: linear-gradient(to bottom right, transparent 10%, var(--onBg));
+		background: var(--onBg);
 		color: var(--text2);
 		border: var(--border);
 	}

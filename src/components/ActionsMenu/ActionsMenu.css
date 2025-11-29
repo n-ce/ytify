@@ -4,8 +4,8 @@
   margin: auto;
   border: var(--border);
   border-radius: var(--roundness);
-  background: rgb(from var(--onBg) r g b / 0.9);
-  backdrop-filter: blur(var(--size-px-1));
+  background: rgb(from var(--onBg) r g b / 0.8);
+  backdrop-filter: blur(var(--size-px-2));
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
 
