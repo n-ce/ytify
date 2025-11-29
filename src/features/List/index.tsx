@@ -46,6 +46,7 @@ export default function() {
   }
 
   onMount(() => {
+    setNavStore('list', 'ref', listSection);
     listSection.scrollIntoView();
     listSection.scrollTo(0, 0);
     setNavStore('home', 'state', false);

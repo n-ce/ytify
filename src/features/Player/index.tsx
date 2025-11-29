@@ -2,7 +2,7 @@ import { createEffect, createSignal, lazy, onCleanup, onMount, Show } from "soli
 import './Player.css'
 import { MediaDetails } from "@components/MediaPartials";
 import { config, cssVar } from "@lib/utils";
-import { closeFeature, playerStore, setStore, t, updateParam } from "@lib/stores";
+import { closeFeature, playerStore, setNavStore, setStore, t, updateParam } from "@lib/stores";
 
 const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
 const Lyrics = lazy(() => import('./Lyrics'));
@@ -16,6 +16,7 @@ export default function() {
   const [showLyrics, setShowLyrics] = createSignal(false);
 
   onMount(() => {
+    setNavStore('player', 'ref', playerSection);
     playerSection.scrollIntoView();
   });
 

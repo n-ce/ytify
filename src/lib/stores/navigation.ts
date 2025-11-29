@@ -19,7 +19,7 @@ type Nav = { [key in Features]: {
 export const [navStore, setNavStore] = createStore<Nav>({
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
-  home: { ref: null, state: true, component: Home },
+  home: { ref: null, state: false, component: Home },
   list: { ref: null, state: false, component: List },
   settings: { ref: null, state: false, component: Settings },
   updater: { ref: null, state: false, component: Updater }
@@ -42,7 +42,7 @@ export function closeFeature(name: Features) {
   const closestRef = active[0]?.[1]?.ref;
 
   if (removedIndex >= 3)
-    closestRef?.scrollIntoView({ behavior: 'smooth' });
+    closestRef?.scrollIntoView();
 
 
   setNavStore(name, { ref: null, state: false });
@@ -61,7 +61,7 @@ export function updateParam(
 
   const str = params.toString();
 
-  history.replaceState({}, '', location.origin + (str && '?') + params.toString());
+  history.replaceState({}, '', location.origin + location.pathname + (str && '?') + params.toString());
 }
 
 

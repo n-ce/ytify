@@ -1,6 +1,6 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import './Queue.css';
-import { setStore, t, addToQueue, queueStore } from "@lib/stores";
+import { setStore, t, addToQueue, queueStore, setNavStore } from "@lib/stores";
 import { config, setConfig } from "@lib/utils";
 import { setQueueStore } from "@lib/stores/queue";
 import List from "./List";
@@ -13,6 +13,7 @@ export default function() {
   const [removeMode, setRemoveMode] = createSignal(false);
 
   onMount(() => {
+    setNavStore('queue', 'ref', queueSection);
     queueSection.scrollIntoView();
   });
 

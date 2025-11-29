@@ -92,7 +92,8 @@ section>header {
     }
 
     ul {
-      background: var(--onBg);
+      background: rgb(from var(--onBg) r g b / 0.8);
+      backdrop-filter: blur(var(--size-px-2));
       color: var(--text);
       padding: 0;
       list-style: none;

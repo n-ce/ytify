@@ -93,6 +93,10 @@ export default async function() {
 
   }
 
+  if (!params.size)
+    setNavStore('home', 'state', true);
+
+
 
 
   document.addEventListener('click', (e) => {

@@ -23,6 +23,7 @@ footer {
 
       img {
         height: var(--size-8);
+        margin-left: var(--size-1);
       }
     }
   }

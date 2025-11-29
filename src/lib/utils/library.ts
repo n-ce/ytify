@@ -103,15 +103,15 @@ export function addToCollection(
       collection.unshift(id);
     else collection.push(id);
 
-          if (id in tracks) {
-            const track = tracks[id];
-            track.plays = (track.plays || 1) + 1;
-            if (config.dbsync) {
-              import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-                addDirtyTrack(id); // Mark as updated
-              });
-            }
-          }    else {
+    if (id in tracks) {
+      const track = tracks[id];
+      track.plays = (track.plays || 1) + 1;
+      if (config.dbsync) {
+        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
+          addDirtyTrack(id); // Mark as updated
+        });
+      }
+    } else {
       tracks[id] = item;
       if (config.dbsync) {
         import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
@@ -256,9 +256,7 @@ export async function fetchCollection(
 
   const { ref, state } = navStore.list;
   if (state && ref)
-    ref.scrollIntoView({
-      behavior: 'smooth'
-    });
+    ref.scrollIntoView();
 
   setListStore('isLoading', true);
 

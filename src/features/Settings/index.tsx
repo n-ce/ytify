@@ -1,6 +1,6 @@
 import { onMount } from "solid-js";
 import './Settings.css';
-import { closeFeature } from '@lib/stores';
+import { closeFeature, setNavStore } from '@lib/stores';
 import App from "./App";
 import Playback from "./Playback";
 import Library from "./Library";
@@ -12,6 +12,7 @@ export default function() {
   let settingsSection!: HTMLDivElement;
 
   onMount(() => {
+    setNavStore('settings', 'ref', settingsSection);
     settingsSection.scrollIntoView();
   });
 

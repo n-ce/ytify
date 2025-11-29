@@ -14,7 +14,6 @@
 
   img {
     height: calc(var(--size-8) + var(--size-2));
-    margin-left: var(--size-1);
     object-fit: cover;
     border: var(--border);
     border-radius: calc(var(--roundness) * 0.5);
