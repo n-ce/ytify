@@ -1,10 +1,10 @@
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { addToQueue, openFeature, listStore, resetList, setListStore, setNavStore } from '@lib/stores';
+import { addToQueue, listStore, resetList, setListStore, setNavStore } from '@lib/stores';
 import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config } from '@lib/utils/config';
-import { generateImageUrl, getThumbIdFromLink } from '@lib/utils'; // Added imports
+import { generateImageUrl, getThumbIdFromLink } from '@lib/utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
@@ -46,7 +46,7 @@ export default function() {
   }
 
   onMount(() => {
-    openFeature('list', listSection);
+    listSection.scrollIntoView();
     listSection.scrollTo(0, 0);
     setNavStore('home', 'state', false);
   });

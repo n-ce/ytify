@@ -48,6 +48,7 @@ main {
   overflow-x: auto;
   flex-direction: row;
   scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
 
   section {
     height: 100%;

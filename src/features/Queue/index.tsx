@@ -1,6 +1,6 @@
 import { createSignal, onMount, Show } from 'solid-js';
 import './Queue.css';
-import { openFeature, setStore, t, addToQueue, queueStore } from "@lib/stores";
+import { setStore, t, addToQueue, queueStore } from "@lib/stores";
 import { config, setConfig } from "@lib/utils";
 import { setQueueStore } from "@lib/stores/queue";
 import List from "./List";
@@ -12,7 +12,9 @@ export default function() {
     HTMLLIElement;
   const [removeMode, setRemoveMode] = createSignal(false);
 
-  onMount(() => { openFeature('queue', queueSection); });
+  onMount(() => {
+    queueSection.scrollIntoView();
+  });
 
   return (
     <section

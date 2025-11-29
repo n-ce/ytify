@@ -1,7 +1,7 @@
 import { Match, Show, Switch, lazy, onMount } from 'solid-js';
 import './Home.css';
 import { config } from '@lib/utils';
-import { openFeature, store } from '@lib/stores';
+import { setNavStore, store } from '@lib/stores';
 import Dropdown from './Dropdown';
 
 const About = lazy(() => import('./About'));
@@ -16,7 +16,8 @@ export default function() {
   let homeRef!: HTMLElement;
 
   onMount(() => {
-    openFeature('home', homeRef);
+    homeRef.scrollIntoView();
+    setNavStore('home', 'ref', homeRef);
   });
 
   return (

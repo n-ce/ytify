@@ -4,10 +4,7 @@ const Home = lazy(() => import('../../features/Home'));
 const List = lazy(() => import('../../features/List'));
 const Queue = lazy(() => import('../../features/Queue'));
 const Player = lazy(() => import('../../features/Player'));
-
 const Settings = lazy(() => import('../../features/Settings'));
-
-
 const Updater = lazy(() => import('../../features/Updater'));
 
 export const params = (new URL(location.href)).searchParams;
@@ -22,20 +19,12 @@ type Nav = { [key in Features]: {
 export const [navStore, setNavStore] = createStore<Nav>({
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
-
   home: { ref: null, state: true, component: Home },
-
   list: { ref: null, state: false, component: List },
-
   settings: { ref: null, state: false, component: Settings },
   updater: { ref: null, state: false, component: Updater }
 });
 
-
-export function openFeature(name: Features, ref: HTMLElement) {
-  ref.scrollIntoView({ behavior: 'smooth' });
-  setNavStore(name, { ref, state: true });
-}
 
 
 export function closeFeature(name: Features) {

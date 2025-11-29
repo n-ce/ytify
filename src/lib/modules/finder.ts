@@ -1,7 +1,10 @@
 const SEARCH_RESULT_LIMIT = 50;
 
+const removeDiacritics = (str: string) =>
+  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
 export default (searchTerm: string, tracksMap: Collection) => {
-  const toFind = searchTerm.toLowerCase();
+  const toFind = removeDiacritics(searchTerm.toLowerCase());
   const results: CollectionItem[] = [];
   let isTruncated = false;
 
@@ -17,9 +20,9 @@ export default (searchTerm: string, tracksMap: Collection) => {
       break;
     }
     if (!('title' in v && typeof v.title === 'string')) continue;
-    const title = v.title.toLowerCase().includes(toFind);
+    const title = removeDiacritics(v.title.toLowerCase()).includes(toFind);
     if (!('author' in v && typeof v.author === 'string')) continue;
-    const author = v.author.toLowerCase().includes(toFind);
+    const author = removeDiacritics(v.author.toLowerCase()).includes(toFind);
 
     if (title || author) {
       results.push(v);
@@ -27,4 +30,4 @@ export default (searchTerm: string, tracksMap: Collection) => {
   }
 
   return { results, isTruncated };
-}
+};

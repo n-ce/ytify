@@ -1,6 +1,6 @@
 import './NavBar.css';
 import { setConfig } from '@lib/utils';
-import { navStore, setNavStore, store, setStore, openFeature } from '@lib/stores';
+import { navStore, setNavStore, store, setStore } from '@lib/stores';
 
 export default function() {
 
@@ -13,8 +13,8 @@ export default function() {
     } else {
       setStore('homeView', name);
       setConfig('home', name);
-      openFeature('home', navStore.home.ref!);
-
+      setNavStore('home', 'state', true);
+      navStore.home.ref?.scrollIntoView();
     }
   }
 
