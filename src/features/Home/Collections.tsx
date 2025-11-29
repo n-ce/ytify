@@ -77,7 +77,7 @@ export default function() {
         </Show>
       </Show>
       <Show when={!searchText()}>
-        <Show when={getCollectionsKeys().length} fallback={<div class='empty-library-message'>Your library is empty</div>}>
+        <Show when={getCollectionsKeys().length} fallback={'Your library is empty'}>
           <For each={getCollectionsKeys()}>
             {(item) => (
               <a

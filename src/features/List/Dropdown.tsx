@@ -1,7 +1,7 @@
 import { Show, createEffect, createSignal } from 'solid-js';
 import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
-import { listStore, resetList, setPlayerStore, setQueueStore, setStore, t, addToQueue, setNavStore, setListStore } from '@lib/stores';
+import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavStore, setListStore, setQueueStore } from '@lib/stores';
 import { importList, shareCollection } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
 
@@ -59,7 +59,7 @@ export default function Dropdown(_: {
           id="playAllBtn"
           onclick={() => {
             setQueueStore('list', []);
-            const fullList = getCollectionItems(listStore.id);
+            const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
             addToQueue(fullList);
             setPlayerStore('stream', fullList[0]);
             player(fullList[0].id);
@@ -70,7 +70,7 @@ export default function Dropdown(_: {
         </li>
 
         <li id="enqueueAllBtn" onclick={() => {
-          const fullList = getCollectionItems(listStore.id);
+          const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
           addToQueue(fullList);
           setNavStore('queue', 'state', true);
         }}>

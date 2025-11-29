@@ -45,9 +45,6 @@ header {
     grid-column: span 2;
 
     >div {
-      margin: 0;
-      border: 0;
-
       .listItem {
         p.title {
           max-height: var(--size-4) !important;
@@ -61,13 +58,14 @@ header {
 
 
     >p {
-      display: inline-flex;
+      display: inline-block;
       font-size: var(--font-size-3);
       font-weight: var(--font-weight-4);
       letter-spacing: var(--font-letterspacing-2);
       color: var(--text2);
       opacity: 0.7;
       width: calc(100% - var(--size-8));
+
     }
 
 
@@ -75,6 +73,15 @@ header {
     &.gallery-article {
       >p {
         width: calc(100% - var(--size-11) + var(--size-6));
+      }
+
+      >.loading {
+        display: inline-block;
+        animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1) infinite !important;
+
+        &::after {
+          display: none
+        }
       }
     }
 
@@ -122,12 +129,21 @@ header {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
       padding-bottom: 0 !important;
+      border-bottom: 0;
+      margin-bottom: 0;
     }
 
     >.relatedPlaylists {
       padding-top: 0 !important;
       border-top-left-radius: 0;
       border-top-right-radius: 0;
+      border-top: 0;
+      margin: 0;
+
+      img {
+        border-top-left-radius: var(--radius-4);
+        border-bottom-right-radius: var(--radius-4);
+      }
     }
 
     >.relatedArtists {
@@ -135,7 +151,10 @@ header {
         border-radius: var(--radius-round) !important;
       }
 
+      margin: 0;
       border-radius: 0;
+      border-top: 0;
+      border-bottom: 0;
       padding-top: 0 !important;
     }
 
@@ -197,9 +216,5 @@ header {
     }
   }
 
-}
 
-.empty-library-message {
-  text-align: center;
-  margin-top: 2rem;
 }

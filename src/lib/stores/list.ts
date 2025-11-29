@@ -6,7 +6,7 @@ import fetchMix from "@lib/modules/fetchMix";
 import fetchPlaylist, { PlaylistResponse } from "@lib/modules/fetchPlaylist";
 import fetchChannel from "@lib/modules/fetchChannel";
 import { convertSStoHHMMSS, generateImageUrl, getApi, getLists, getThumbIdFromLink } from "@lib/utils";
-import { setQueueStore } from "./queue";
+import { setQueueStore, addToQueue } from "./queue";
 import fetchAlbum, { AlbumResponse } from "@lib/modules/fetchAlbum";
 
 
@@ -49,8 +49,11 @@ export async function getList(
 
 
   if (type === 'mix') {
+    setQueueStore('isLoading', true);
     const list = await fetchMix(url, getApi(index));
-    setQueueStore('list', [...list]);
+    setQueueStore('list', []);
+    addToQueue(list);
+    setQueueStore('isLoading', false);
     return;
   }
 

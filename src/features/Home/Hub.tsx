@@ -67,7 +67,8 @@ export default function() {
         <p>Gallery</p>
         <i
           aria-label="Refresh"
-          class="ri-refresh-line"
+          aria-busy={isGalleryLoading()}
+          classList={{ 'ri-refresh-line': true, 'loading': isGalleryLoading() }}
           onclick={handleGalleryRefresh}
         ></i>
         <i
@@ -75,13 +76,10 @@ export default function() {
           class="ri-delete-bin-2-line"
           onclick={handleClearGallery}
         ></i>
-        <Show when={isGalleryLoading()}>
-          <i class="ri-loader-3-line"></i>
-        </Show>
         <div class="userArtists">
           <Show
             when={hub().userArtists?.length > 0}
-            fallback={'Listen to at least 2 different music artists to generate a gallery.'}
+            fallback={'Favorite various music to generate a Gallery.'}
           >
             <For each={shuffle(hub().userArtists.filter(item => item.id && item.name && item.thumbnail))}>
               {(item) => (
@@ -138,7 +136,9 @@ export default function() {
         <p>Sub Feed</p>
         <i
           aria-label="Refresh"
-          class="ri-refresh-line" onclick={handleSubfeedRefresh}></i>
+          aria-busy={isSubfeedLoading()}
+          classList={{ 'ri-refresh-line': true, 'loading': isSubfeedLoading() }}
+          onclick={handleSubfeedRefresh}></i>
         <i
           aria-label="Show All"
           class="ri-arrow-right-s-line" onclick={() => {
@@ -151,9 +151,6 @@ export default function() {
             setNavStore('list', 'state', true);
           }}></i>
         <div>
-          <Show when={isSubfeedLoading()}>
-            <i class="ri-loader-3-line"></i>
-          </Show>
           <Show
             when={hub().subfeed?.length > 0}
             fallback={'Subscribe to YouTube Channels, to get recently released videos here.'}

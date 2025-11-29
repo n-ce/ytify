@@ -4,9 +4,19 @@
   margin: auto;
   border: var(--border);
   border-radius: var(--roundness);
-  background-color: var(--scheme);
+  background: rgb(from var(--onBg) r g b / 0.9);
+  backdrop-filter: blur(var(--size-px-1));
   overflow: auto;
   animation: var(--animation-slide-out-down) forwards;
+
+  >.streamItem {
+    margin: 0;
+    pointer-events: none;
+
+    .ri-more-2-fill {
+      display: none;
+    }
+  }
 
   &[open],
   &:open {
@@ -30,9 +40,10 @@
   }
 
   &::backdrop {
-    background-color: #0004;
+    background-color: var(--blurMix);
     margin: 0;
     padding: 0;
+    backdrop-filter: blur(var(--size-px-1));
   }
 
 
@@ -47,13 +58,13 @@
     cursor: pointer;
     color: var(--text);
     user-select: none;
-    font-size: var(--font-size-1);
+    font-size: var(--font-size-2);
     font-weight: var(--font-weight-6);
     display: flex;
     align-items: center;
     gap: var(--gap);
-    padding: var(--size-1) var(--size-4);
-    border: var(--border);
+    padding: var(--size-1) var(--size-5);
+    border-top: var(--border);
 
     &:hover {
       border: var(--border);
@@ -71,6 +82,7 @@
   .clxnShelf {
     display: flex;
     cursor: initial;
+    border: none;
 
     i {
       max-width: 34%;

@@ -1,4 +1,4 @@
-import { store, t, playerStore, setListStore, setStore, getList, addToQueue } from '@lib/stores';
+import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore } from '@lib/stores';
 import { getDownloadLink } from '@lib/utils';
 import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
 import './ActionsMenu.css';
@@ -6,6 +6,7 @@ import { onMount, Show, createEffect, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { LikeButton } from '@components/MediaPartials';
 import CollectionSelector from './CollectionSelector';
+import StreamItem from '@components/StreamItem';
 
 
 export default function() {
@@ -35,6 +36,13 @@ export default function() {
       ref={dialog}
       onclick={closeDialog}
     >
+      <StreamItem
+        id={store.actionsMenu?.id || ''}
+        title={store.actionsMenu?.title || ''}
+        author={store.actionsMenu?.author}
+        duration={store.actionsMenu?.duration || ''}
+
+      />
 
       <ul
         onclick={(e: Event) => e.stopPropagation()}
@@ -81,6 +89,9 @@ export default function() {
         </li>
 
         <li tabindex="3" onclick={async () => {
+          if (navStore.queue.state)
+            navStore.queue.ref?.scrollIntoView();
+          else setNavStore('queue', 'state', true);
           getList('RD' + store?.actionsMenu?.id, 'mix');
           closeDialog();
         }}>
@@ -139,10 +150,6 @@ export default function() {
           </li>
 
         </Show>
-
-
-
-
 
 
 

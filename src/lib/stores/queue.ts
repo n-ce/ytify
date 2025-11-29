@@ -3,6 +3,7 @@ import { config } from "@lib/utils";
 
 export const [queueStore, setQueueStore] = createStore({
   list: [] as CollectionItem[],
+  isLoading: false,
 });
 
 

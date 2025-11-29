@@ -1,4 +1,4 @@
-import { createSignal, onMount } from 'solid-js';
+import { createSignal, onMount, Show } from 'solid-js';
 import './Queue.css';
 import { openFeature, setStore, t, addToQueue, queueStore } from "@lib/stores";
 import { config, setConfig } from "@lib/utils";
@@ -127,8 +127,12 @@ export default function() {
         </li >
 
       </ul >
-      <List removeMode={removeMode()} />
-
+      <Show
+        when={!queueStore.isLoading}
+        fallback={<i class="ri-loader-3-line"></i>}
+      >
+        <List removeMode={removeMode()} />
+      </Show>
     </section >
   );
 }

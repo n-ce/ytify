@@ -4,6 +4,7 @@
 	color: var(--text);
 	margin-bottom: calc(var(--gap) - var(--size-2));
 	padding: var(--size-1);
+	border: var(--border-size-1) solid none;
 	border-radius: var(--roundness);
 	display: flex;
 	align-items: center;
@@ -14,8 +15,13 @@
 	cursor: pointer;
 
 	&.ravel {
-		border: var(--border) !important;
 		background: var(--onBg) !important;
+	}
+
+	&:hover {
+		background: linear-gradient(to bottom right, transparent 10%, var(--onBg));
+		color: var(--text2);
+		border: var(--border);
 	}
 
 	div,
@@ -24,11 +30,6 @@
 		transition: opacity 0.4s;
 	}
 
-	&:hover {
-		border: var(--border) !important;
-		background: var(--onBg);
-		color: var(--text2);
-	}
 
 	&.ravel {
 		* {
@@ -46,6 +47,7 @@
 			max-height: var(--size-9);
 			max-width: var(--size-11);
 			border-radius: calc(var(--roundness) * 0.8);
+			border: var(--border);
 			box-shadow: var(--shadow-1);
 		}
 
