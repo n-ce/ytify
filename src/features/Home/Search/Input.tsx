@@ -44,14 +44,14 @@ export default function() {
         autocomplete="off"
         onpaste={async (e) => {
           const pastedText = e.clipboardData?.getData('text');
-          const { value } = e.target as HTMLInputElement;
+          const id = idFromURL(pastedText || '');
           const separators = ['\n', ' ', ','];
           const isBulk = separators.find(separator => pastedText?.includes(separator));
 
           if (!config.searchBarLinkCapture)
             return;
 
-          if (isBulk) {
+          if (!id && isBulk) {
             const array = pastedText?.split(isBulk).map(idFromURL).filter(s => s?.length === 11);
             superInput.value = '';
             if (array?.length)
@@ -60,8 +60,7 @@ export default function() {
             return;
           }
 
-          const id = idFromURL(value);
-          if (id && id !== playerStore.stream.id) {
+          if (id !== playerStore.stream.id) {
             player(id);
             return;
           }

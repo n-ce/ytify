@@ -1,4 +1,4 @@
-import { setStore, store } from "@lib/stores";
+import { store, setStore } from "@lib/stores";
 
 export default async function(
   id: string,
@@ -67,9 +67,8 @@ export default async function(
       fetchDataFromPiped('')
         .catch(() => e) : e;
 
-  setStore('index', 0);
 
-  const useInvidious = (index = 0): Promise<Piped> =>
+  const useInvidious = (index = store.index): Promise<Piped> =>
     fetchDataFromInvidious(invidious[index])
       .catch(e => {
         if (index + 1 === invidious.length) {

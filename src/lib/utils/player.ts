@@ -3,7 +3,7 @@ import { playerStore, setPlayerStore, setStore, store } from "@lib/stores";
 import { config } from "./config";
 
 let playerAbortController: AbortController;
-export async function player(id?: string) {
+export async function player(id?: string, isRetry = false) {
 
   if (playerAbortController)
     playerAbortController.abort();
@@ -30,6 +30,9 @@ export async function player(id?: string) {
     setStore('snackbar', 'No Instances are Available');
 
   const data = await import('../modules/getStreamData').then(mod => mod.default(id, false, playerAbortController.signal));
+
+  if (!isRetry)
+    setStore('index', 0);
 
   if (data && 'audioStreams' in data)
     setPlayerStore({

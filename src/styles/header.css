@@ -1,4 +1,4 @@
-section:has(details[open]) {
+section:has(header>details[open]) {
   >div {
     filter: blur(var(--size-px-1));
   }

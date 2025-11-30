@@ -1,5 +1,5 @@
 import { Show, createEffect, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection } from '@lib/utils/library';
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary } from '@lib/utils/library';
 import { getThumbIdFromLink } from '@lib/utils/image';
 import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavStore, setListStore, setQueueStore } from '@lib/stores';
 import { importList, shareCollection } from '@lib/modules/listUtils';
@@ -12,19 +12,46 @@ export default function Dropdown(_: {
   const [isSubscribed, setSubscribed] = createSignal(false);
 
   createEffect(() => {
+    // Determine if the current list item is an album based on listStore.id
+    const isAlbum = listStore.id.startsWith('OLAK5uy_'); // Album IDs start with OLAK5uy
 
-    setSubscribed(
-      getLists(listStore.type as 'channels').some(item => item.id === listStore.id)
-    )
+    if (isAlbum) {
+      const albums = getLibraryAlbums();
+      setSubscribed(listStore.id in albums); // Check if listStore.id (album browseId) is in saved albums
+    } else {
+      // Existing logic for channels/playlists, using listStore.id
+      setSubscribed(
+        getLists(listStore.type as 'channels' | 'playlists').some(item => item.id === listStore.id)
+      )
+    }
   });
 
 
   function subscriptionHandler() {
+    // Determine if the current list item is an album based on listStore.id
+    const isAlbum = listStore.id.startsWith('OLAK5uy_'); // Album IDs start with OLAK5uy
 
+    if (isAlbum) {
+      if (isSubscribed()) {
+        removeAlbumFromLibrary(listStore.id); // Use listStore.id (album browseId) for removal
+      } else {
+        const albumData: Album = {
+          name: listStore.name,
+          artist: listStore.uploader,
+          thumbnail: getThumbIdFromLink(listStore.thumbnail),
+          tracks: listStore.list.map(t => t.id)
+        };
+        saveAlbumToLibrary(listStore.id, albumData, listStore.list); // Use listStore.id (album browseId) for saving
+      }
+      setSubscribed(!isSubscribed());
+      return;
+    }
+
+    // Existing playlist/channel logic
     const { name, type, id, uploader, thumbnail } = listStore;
     if (type === 'collection') return;
 
-    let data = getLists(type);
+    let data = getLists(type as 'channels' | 'playlists');
 
 
     if (isSubscribed()) {
@@ -44,7 +71,7 @@ export default function Dropdown(_: {
       data.push(dataset);
     }
 
-    saveLists(type, data);
+    saveLists(type as 'channels' | 'playlists', data);
     setSubscribed(!isSubscribed());
   }
   return (
@@ -81,6 +108,15 @@ export default function Dropdown(_: {
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
+        {/* The Show condition below seems to be designed to enable the subscription button for both playlists and albums.
+            Albums have type 'playlists' and their ID starts with 'OLAK5uy_'.
+            Playlists have type 'playlists' but their ID typically starts with 'PL'.
+            Channels have type 'channels'.
+            The existing condition is:
+            (listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'
+            This correctly covers both regular playlists and albums (which are 'playlists' type)
+            and channels.
+        */}
         <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'}>
 
           <li

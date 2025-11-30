@@ -34,6 +34,11 @@ export const getMeta = (): Meta => {
     newMeta.playlists = timestamp;
   }
 
+  const albums = getLibraryAlbums();
+  if (Object.keys(albums).length > 0) {
+    newMeta.albums = timestamp;
+  }
+
   return newMeta;
 };
 
@@ -43,7 +48,7 @@ export const getCollectionsKeys = () => {
     .keys(localStorage)
     .filter(key => key.startsWith('library_'))
     .map(key => key.slice(8))
-    .filter(key => !['channels', 'playlists', 'tracks', 'meta']
+    .filter(key => !['channels', 'playlists', 'tracks', 'meta', 'albums']
       .includes(key));
 
   const reservedOrder = ['history', 'favorites', 'liked', 'listenLater'];
@@ -61,6 +66,8 @@ export const getTracksMap = (): Collection =>
 export const getCollection = (name: string) => JSON.parse(localStorage.getItem('library_' + name) || '[]') as string[];
 
 export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channel[] : Playlist[] => JSON.parse(localStorage.getItem('library_' + type) || '[]');
+
+export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '{}');
 
 export function getCollectionItems(collectionId: string): CollectionItem[] {
   const collectionIds = getCollection(collectionId);
@@ -83,6 +90,54 @@ export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T e
   localStorage.setItem(`library_${type}`, JSON.stringify(data));
 };
 
+export function saveLibraryAlbums(albums: LibraryAlbums) {
+  localStorage.setItem('library_albums', JSON.stringify(albums));
+}
+
+export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData: CollectionItem[]) {
+  const albums = getLibraryAlbums();
+  albums[albumId] = albumData;
+  saveLibraryAlbums(albums);
+
+  const tracks = getTracksMap();
+  for (const track of tracksData) {
+    if (tracks[track.id]) {
+      tracks[track.id].albumId = albumId;
+    } else {
+      tracks[track.id] = { ...track, albumId: albumId };
+    }
+  }
+  saveTracksMap(tracks);
+  metaUpdater('albums');
+}
+
+export function removeAlbumFromLibrary(albumId: string) {
+  const albums = getLibraryAlbums();
+  const tracksToRemove = albums[albumId]?.tracks || [];
+  delete albums[albumId];
+  saveLibraryAlbums(albums);
+
+  const tracks = getTracksMap();
+  const allOtherTrackIds = new Set([
+    ...getCollectionsKeys().flatMap(getCollection),
+    ...Object.values(albums).flatMap(a => a.tracks)
+  ]);
+
+  for (const trackId of tracksToRemove) {
+    if (!allOtherTrackIds.has(trackId)) {
+      delete tracks[trackId];
+    } else {
+      const track = tracks[trackId];
+      if (track?.albumId === albumId) {
+        delete track.albumId;
+      }
+    }
+  }
+
+  saveTracksMap(tracks);
+  metaUpdater('albums');
+}
+
 
 export function addToCollection(
   name: string,
@@ -93,6 +148,7 @@ export function addToCollection(
   const prepend = ['history', 'favorites'].includes(name);
 
   for (const item of data) {
+    if (!item?.id) continue;
     const { id } = item;
     const idx = collection.indexOf(id);
 
@@ -200,7 +256,7 @@ export const metaUpdater = (key: string, remove?: boolean) => {
   const timestamp = Date.now();
 
   // should auto-update tracks on collection changes
-  if (getCollectionsKeys().includes(key))
+  if (getCollectionsKeys().includes(key) || key === 'albums')
     meta.tracks = timestamp;
 
   if (remove)
@@ -254,9 +310,11 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
-  const { ref, state } = navStore.list;
-  if (state && ref)
-    ref.scrollIntoView();
+  const { state, ref } = navStore.list;
+  if (state)
+    ref?.scrollIntoView();
+  else
+    setNavStore('list', 'state', true);
 
   setListStore('isLoading', true);
 
@@ -399,4 +457,32 @@ export function sortCollection(list: CollectionItem[], sortOrder: SortOrder): Co
   });
 
   return listToSort;
+}
+
+export function cleanseLibraryData() {
+
+  // 1. Cleanse library_tracks
+  const rawTracks = JSON.parse(localStorage.getItem('library_tracks') || '{}') as Collection;
+  const cleanedTracks: Collection = {};
+  let tracksCleaned = false;
+  for (const id in rawTracks) {
+    if (id) {
+      cleanedTracks[id] = rawTracks[id];
+    } else {
+      tracksCleaned = true;
+    }
+  }
+  if (tracksCleaned)
+    saveTracksMap(cleanedTracks);
+
+  // 2. Cleanse all other collections
+  const collectionKeys = getCollectionsKeys();
+  for (const key of collectionKeys) {
+    const collection = JSON.parse(localStorage.getItem('library_' + key) || '[]') as string[];
+    const validCollection = collection.filter(id => id);
+    if (validCollection.length < collection.length) {
+      console.log(`Found and removed ${collection.length - validCollection.length} invalid entries from '${key}' collection.`);
+      saveCollection(key, validCollection);
+    }
+  }
 }

@@ -95,7 +95,11 @@ createRoot(() => {
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
 
-  playerStore.audio.onended = playNext;
+  playerStore.audio.onended = () => {
+    if (queueStore.list.length)
+      playNext();
+    else setPlayerStore('playbackState', 'none');
+  }
 
   playerStore.audio.onplaying = () => {
     setPlayerStore('playbackState', 'playing');
@@ -131,7 +135,6 @@ createRoot(() => {
   }, 500);
 
   playerStore.audio.onloadstart = () => {
-    console.log(playerStore.audio.src);
     setPlayerStore('playbackState', 'paused');
     setPlayerStore('status', '');
     if (isPlayable) playerStore.audio.play();

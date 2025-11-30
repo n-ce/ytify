@@ -134,6 +134,8 @@ export function themer() {
 
 if (config.roundness !== '0.4rem')
   cssVar('--roundness', config.roundness);
+if (config.landscapeSections !== '2')
+  cssVar('--landscapeSections', config.landscapeSections);
 
 
 

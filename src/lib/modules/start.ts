@@ -1,5 +1,5 @@
 import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig } from '@lib/utils';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData } from '@lib/utils';
 
 
 
@@ -119,4 +119,5 @@ export default async function() {
       });
     });
 
+  cleanseLibraryData();
 }

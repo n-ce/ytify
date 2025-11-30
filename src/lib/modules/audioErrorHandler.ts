@@ -1,6 +1,7 @@
 import { setStore, store } from '@lib/stores/app.ts';
 import { playerStore, setPlayerStore } from '@lib/stores/player.ts';
 
+
 export default function(
   audio: HTMLAudioElement,
   prefetch = ''
@@ -33,23 +34,9 @@ export default function(
   }
   else {
     setStore('index', 0);
-
     if (!prefetch) {
-      setStore('snackbar', message);
-      setPlayerStore('status', '');
+      setPlayerStore('status', 'Finding new source...');
     }
-
-    // Emergency Handling
-    fetch('/streams/' + id)
-      .then(res => res.json())
-      .then(data => {
-        import('./setAudioStreams.ts')
-          .then(mod => mod.default(data.audioStreams, audio));
-      })
-      .catch(() => {
-        if (!prefetch)
-          setPlayerStore('playbackState', 'none');
-      })
-
+    import('../utils/player').then(mod => mod.player(id, true));
   }
 }

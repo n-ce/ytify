@@ -5,7 +5,7 @@ import fetchArtist, { ArtistResponse } from "@lib/modules/fetchArtist";
 import fetchMix from "@lib/modules/fetchMix";
 import fetchPlaylist, { PlaylistResponse } from "@lib/modules/fetchPlaylist";
 import fetchChannel from "@lib/modules/fetchChannel";
-import { convertSStoHHMMSS, generateImageUrl, getApi, getLists, getThumbIdFromLink } from "@lib/utils";
+import { convertSStoHHMMSS, generateImageUrl, getApi, getLibraryAlbums, getLists, getThumbIdFromLink, getTracksMap } from "@lib/utils";
 import { setQueueStore, addToQueue } from "./queue";
 import fetchAlbum, { AlbumResponse } from "@lib/modules/fetchAlbum";
 
@@ -64,42 +64,71 @@ export async function getList(
     setNavStore('list', 'state', true);
 
   if (type === 'playlist') {
-    const data = await fetchPlaylist(url, getApi(index), listStore.page)
 
-      .catch(e => {
-        if (index === 0) {
-          setStore('snackbar', e.message);
-          index = store.invidious.length;
-          resetList();
-          return {} as PlaylistResponse;
+
+    const libraryAlbums = getLibraryAlbums();
+    const albumId = url;
+
+    if (
+      url.startsWith('OLAK5uy') &&
+      albumId in libraryAlbums
+    ) {
+      const savedAlbum = libraryAlbums[albumId];
+      const tracksMap = getTracksMap();
+      const albumTracks = savedAlbum.tracks.map(trackId => {
+        const track = tracksMap[trackId];
+        if (track) {
+          track.albumId = albumId;
         }
-        else getList(url, type, index - 1);
+        return track;
+      }).filter(Boolean);
 
+      setListStore({
+        thumbnail: generateImageUrl(savedAlbum.thumbnail, '720'),
+        id: albumId,
+        url: albumId,
+        type: 'playlists',
+        name: savedAlbum.name,
+        uploader: savedAlbum.artist,
+        list: albumTracks as CollectionItem[]
       });
-    if (!data) return;
-    const { author, title, thumbnail, videos } = data;
+    } else {
+      const data = await fetchPlaylist(url, getApi(index), listStore.page)
 
-    const savedThumbId = getLists('playlists').find(p => p.id === url);
-    const savedThumb = savedThumbId ? generateImageUrl(savedThumbId?.thumbnail, '720') : '';
+        .catch(e => {
+          if (index === 0) {
+            setStore('snackbar', e.message);
+            index = store.invidious.length;
+            resetList();
+            return {} as PlaylistResponse;
+          }
+          else getList(url, type, index - 1);
 
-    setListStore({
-      name: savedThumbId?.name || title,
-      thumbnail: savedThumb || thumbnail || listStore.thumbnail || generateImageUrl(videos[0].videoId, 'maxres'),
-      id: url,
-      uploader: author,
-      type: 'playlists',
-      url: url,
-      list: videos.map(v => ({
-        id: v.videoId,
-        title: v.title,
-        author: (url.startsWith('OLAK5uy')
-          && !v.author.endsWith(' - Topic')) ? `${v.author} - Topic` : v.author,
-        authorId: v.authorId,
-        duration: convertSStoHHMMSS(v.lengthSeconds)
-      }) as CollectionItem)
-    });
+        });
+      if (!data) return;
+      const { author, title, thumbnail, videos } = data;
+
+      const savedThumbId = getLists('playlists').find(p => p.id === url);
+      const savedThumb = savedThumbId ? generateImageUrl(savedThumbId?.thumbnail, '720') : '';
+
+      setListStore({
+        name: savedThumbId?.name || title,
+        thumbnail: savedThumb || thumbnail || listStore.thumbnail || generateImageUrl(videos[0].videoId, 'maxres'),
+        id: url,
+        uploader: author,
+        type: 'playlists',
+        url: url,
+        list: videos.map(v => ({
+          id: v.videoId,
+          title: v.title,
+          author: (url.startsWith('OLAK5uy')
+            && !v.author.endsWith(' - Topic')) ? `${v.author} - Topic` : v.author,
+          authorId: v.authorId,
+          duration: convertSStoHHMMSS(v.lengthSeconds)
+        }) as CollectionItem)
+      });
+    }
   }
-
 
   if (type === 'channel') {
 
@@ -220,7 +249,6 @@ export async function getList(
         duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as CollectionItem)
     })
-
   }
 
   setListStore('isLoading', false);
