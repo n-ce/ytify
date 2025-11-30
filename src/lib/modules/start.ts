@@ -5,6 +5,9 @@ import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig 
 
 export default async function() {
 
+  if (!params.size)
+    setNavStore('home', 'state', true);
+
   // Handle /s/:id URLs by transforming them to /?s=id internally
   const pathParts = location.pathname.split('/');
   if (pathParts.length === 3 && pathParts[1] === 's') {
@@ -93,8 +96,6 @@ export default async function() {
 
   }
 
-  if (!params.size)
-    setNavStore('home', 'state', true);
 
 
 

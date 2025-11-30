@@ -42,8 +42,9 @@
   }
 
   .ri-more-2-fill {
-    margin-left: 0;
-    padding: 0;
+    margin: auto 0;
+    padding: 0 var(--size-00);
+    opacity: 1;
   }
 
   & i.on {

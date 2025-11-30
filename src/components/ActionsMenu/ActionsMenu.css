@@ -21,6 +21,7 @@
   &[open],
   &:open {
     animation: var(--animation-slide-in-up) forwards;
+    animation-duration: 0.3s;
   }
 
   @media(orientation:portrait) {

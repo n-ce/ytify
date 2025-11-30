@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { closeFeature, setNavStore, updateParam } from "./navigation";
+import { closeFeature, navStore, setNavStore, updateParam } from "./navigation";
 import { setStore, store } from "./app";
 import fetchArtist, { ArtistResponse } from "@lib/modules/fetchArtist";
 import fetchMix from "@lib/modules/fetchMix";
@@ -58,7 +58,10 @@ export async function getList(
   }
 
   setListStore('isLoading', true);
-  setNavStore('list', 'state', true);
+  if (navStore.list.state)
+    navStore.list.ref?.scrollIntoView();
+  else
+    setNavStore('list', 'state', true);
 
   if (type === 'playlist') {
     const data = await fetchPlaylist(url, getApi(index), listStore.page)
