@@ -12,12 +12,12 @@ export default function() {
       if (!res.ok) {
         return res.text().then(text => { throw new Error(text); });
       }
-      return res.json();
+      return res.text();
     })
-    .then(song => {
-      if (!song) throw new Error('Music stream not found in JioSaavn results');
+    .then(downloadUrl => {
+      if (!downloadUrl) throw new Error('Music stream not found in JioSaavn results');
 
-      setPlayerStore('data', song);
+      setPlayerStore('data', { ...stream, downloadUrl: downloadUrl });
 
       import('../modules/setMetadata')
         .then(mod => mod.default(stream));
@@ -30,7 +30,7 @@ export default function() {
         lossless: '_320'
       })[config.quality] || '_320';
 
-      audio.src = song.downloadUrl.replace('_96', desiredBitrateSuffix);
+      audio.src = downloadUrl.replace('_96', desiredBitrateSuffix);
       updateParam('s', id);
 
     })

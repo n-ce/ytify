@@ -203,7 +203,7 @@ export async function getList(
         authorId: v.authorId,
         duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as CollectionItem),
-      artistAlbums: albums.filter(album => album.id && album.title && album.thumbnail)
+      artistAlbums: (albums || []).filter(album => album.id && album.title && album.thumbnail)
     })
   }
 

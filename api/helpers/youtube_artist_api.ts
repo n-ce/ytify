@@ -185,7 +185,7 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
         playlistId,
         recommendedArtists,
         featuredOnPlaylists,
-        albums,
+        albums: albums || [],
       };
     });
 }
