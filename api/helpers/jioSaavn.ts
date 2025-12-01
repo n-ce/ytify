@@ -1,20 +1,19 @@
-import { createDecipheriv } from 'crypto';
+import crypto from 'node-forge';
 
-export const createDownloadLinks = (encryptedMediaUrl: string): string => {
-  if (!encryptedMediaUrl) return '';
+export const createDownloadLinks = (encryptedMediaUrl: string) => {
+  if (!encryptedMediaUrl) return [];
 
   const key = '38346591';
-  
-  try {
-    const decipher = createDecipheriv('des-ecb', key, '');
-    let decrypted = decipher.update(encryptedMediaUrl, 'base64', 'utf8');
-    decrypted += decipher.final('utf8');
-    
-    return decrypted.replace('http:', 'https:');
-  } catch (e) {
-    console.error("Decryption failed:", e);
-    return '';
-  }
+  const iv = '00000000';
+
+  const encrypted = crypto.util.decode64(encryptedMediaUrl);
+  const decipher = crypto.cipher.createDecipher('DES-ECB', crypto.util.createBuffer(key));
+  decipher.start({ iv: crypto.util.createBuffer(iv) });
+  decipher.update(crypto.util.createBuffer(encrypted));
+  decipher.finish();
+  const decryptedLink = decipher.output.getBytes();
+
+  return decryptedLink.replace('http:', 'https:'); // Ensure https
 };
 
 export const createArtistMapPayload = (artist: any) => ({
