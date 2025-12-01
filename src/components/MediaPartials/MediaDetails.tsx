@@ -13,7 +13,7 @@ export default function() {
           playerStore.status ||
           playerStore.stream.title
         }</a>
-      <p id="author">{playerStore.stream.author.replace('- Topic', '')}</p>
+      <p id="author">{playerStore.stream.author?.replace('- Topic', '') ?? ''}</p>
     </div>
   );
 

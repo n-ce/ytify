@@ -79,9 +79,11 @@ export async function updateGallery(): Promise<void> {
   const artistCounts: { [key: string]: number } = {};
 
   tracks
-    .filter(track => track.author.endsWith(' - Topic'))
+    .filter(track => track.author?.endsWith(' - Topic'))
     .forEach(track => {
-      artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
+      if (track.authorId) {
+        artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
+      }
     });
 
   const sortedArtists = Object.entries(artistCounts)

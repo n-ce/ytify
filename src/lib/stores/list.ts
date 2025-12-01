@@ -24,7 +24,7 @@ const initialState = () => ({
   isSortable: false,
   isReversed: false,
   isShared: false,
-  list: [] as CollectionItem[],
+  list: [] as (CollectionItem | YTStreamItem)[],
   length: 0,
   reservedCollections: ['history', 'favorites', 'listenLater', 'channels', 'playlists'],
   name: '',
@@ -157,8 +157,11 @@ export async function getList(
         title: v.title,
         author: v.author,
         authorId: v.authorId,
-        duration: convertSStoHHMMSS(v.lengthSeconds)
-      }) as CollectionItem)
+        duration: convertSStoHHMMSS(v.lengthSeconds),
+        views: v.viewCountText,
+        uploaded: v.publishedText,
+        type: 'video'
+      }))
     });
   }
 

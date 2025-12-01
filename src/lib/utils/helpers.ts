@@ -38,7 +38,7 @@ export function proxyHandler(
   prefetch?: boolean
 ) {
   const isVideo = Boolean(document.querySelector('video'));
-  const useProxy = playerStore.stream.author.endsWith('- Topic') && !isVideo;
+  const useProxy = playerStore.stream.author?.endsWith('- Topic') && !isVideo;
 
   if (!prefetch)
     setPlayerStore('status', t('player_audiostreams_insert'));

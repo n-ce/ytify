@@ -23,7 +23,7 @@ export async function player(id?: string, isRetry = false) {
 
   if (!store.useSaavn)
     setStore('useSaavn', true);
-  else if (playerStore.stream.author.endsWith('Topic'))
+  else if (playerStore.stream.author?.endsWith('Topic'))
     return import('../modules/jioSaavn').then(mod => mod.default());
 
   if (!store.invidious.length)

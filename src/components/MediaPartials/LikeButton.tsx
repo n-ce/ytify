@@ -5,7 +5,7 @@ import { createEffect, createSignal } from 'solid-js';
 export default function() {
 
   const item = () => store.actionsMenu || playerStore.stream;
-  const isMusic = () => item().author.endsWith(' - Topic');
+  const isMusic = () => item().author?.endsWith(' - Topic');
   const collection = () => isMusic() ? 'favorites' : 'liked';
   const icon = () => isMusic() ? 'ri-heart' : 'ri-thumb-up';
 

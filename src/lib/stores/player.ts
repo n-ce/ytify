@@ -222,7 +222,7 @@ createRoot(() => {
 async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
-  const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
+  const artist = encodeURIComponent(playerStore.stream.author?.slice(0, -8) ?? '');
   fetch(`${Backend}/api/tracks?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .then(addToQueue)

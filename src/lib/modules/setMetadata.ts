@@ -9,8 +9,8 @@ export default async function(data: CollectionItem) {
   // remove ' - Topic' from author name if it exists
 
   let music = false;
-  let authorText = playerStore.stream.author;
-  if (data.author.endsWith(' - Topic')) {
+  let authorText = playerStore.stream.author || '';
+  if (data.author?.endsWith(' - Topic')) {
     music = true;
     authorText = data.author.slice(0, -8);
   }
