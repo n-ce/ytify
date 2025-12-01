@@ -25,7 +25,7 @@ type PlayerStore = {
   playbackState: 'none' | 'playing' | 'paused' | 'loading',
   mediaArtwork: string,
   supportsOpus: Promise<boolean>,
-  data: Piped | undefined,
+  data: {},
   immersive: boolean,
   isMusic: boolean,
   audioURL: string,
@@ -59,7 +59,7 @@ const createInitialState = (): PlayerStore => ({
       contentType: 'audio/webm;codecs=opus'
     }
   }).then(res => res.supported),
-  data: undefined,
+  data: {},
   immersive: false,
   isMusic: true,
   audioURL: '',
