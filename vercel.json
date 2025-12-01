@@ -9,6 +9,11 @@
   "regions": [
     "bom1"
   ],
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--openssl-legacy-provider"
+    }
+  },
   "outputDirectory": "dist",
   "headers": [
     {
