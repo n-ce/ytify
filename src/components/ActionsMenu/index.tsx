@@ -11,7 +11,7 @@ import StreamItem from '@components/StreamItem';
 
 export default function() {
 
-  const isMusic = store.actionsMenu?.author.endsWith('- Topic');
+  const isMusic = store.actionsMenu?.author?.endsWith('- Topic');
   let dialog!: HTMLDialogElement;
 
   function closeDialog() {

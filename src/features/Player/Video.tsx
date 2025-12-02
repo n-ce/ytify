@@ -33,7 +33,7 @@ export default function() {
       .then(result => result.supported);
 
 
-    const data = playerStore.data as unknown as Piped & {
+    const data = playerStore.data as Piped & {
       videoStreams: Record<'url' | 'codec' | 'resolution' | 'quality', string>[]
     };
 

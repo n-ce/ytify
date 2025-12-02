@@ -25,7 +25,7 @@ type PlayerStore = {
   playbackState: 'none' | 'playing' | 'paused' | 'loading',
   mediaArtwork: string,
   supportsOpus: Promise<boolean>,
-  data: Piped | undefined,
+  data: {},
   immersive: boolean,
   isMusic: boolean,
   audioURL: string,
@@ -59,7 +59,7 @@ const createInitialState = (): PlayerStore => ({
       contentType: 'audio/webm;codecs=opus'
     }
   }).then(res => res.supported),
-  data: undefined,
+  data: {},
   immersive: false,
   isMusic: true,
   audioURL: '',
@@ -222,7 +222,7 @@ createRoot(() => {
 async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
-  const artist = encodeURIComponent(playerStore.stream.author.slice(0, -8));
+  const artist = encodeURIComponent(playerStore.stream.author?.slice(0, -8) ?? '');
   fetch(`${Backend}/api/tracks?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .then(addToQueue)

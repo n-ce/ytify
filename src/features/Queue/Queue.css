@@ -18,6 +18,7 @@
   backdrop-filter: blur(var(--size-px-2));
   box-shadow: var(--shadow-1);
   border: var(--border);
+  border-top:none;
   border-bottom-left-radius: var(--roundness);
   border-bottom-right-radius: var(--roundness);
 

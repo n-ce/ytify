@@ -136,7 +136,7 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
       const recommendedArtists = recommendedArtistsShelf?.musicCarouselShelfRenderer.contents.map(
         (item) => ({
           name: item.musicTwoRowItemRenderer.title.runs[0].text,
-          browseId: item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId,
+          browseId: item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint?.browseId,
           thumbnail: item.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
         })
       );
@@ -149,7 +149,7 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
       const featuredOnPlaylists = featuredOnShelf?.musicCarouselShelfRenderer.contents.map(
         (item) => ({
           title: item.musicTwoRowItemRenderer.title.runs[0].text,
-          browseId: item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint.browseId,
+          browseId: item.musicTwoRowItemRenderer.navigationEndpoint.browseEndpoint?.browseId,
           thumbnail: item.musicTwoRowItemRenderer.thumbnailRenderer.musicThumbnailRenderer.thumbnail.thumbnails[0].url,
         })
       );
@@ -185,7 +185,7 @@ export async function getArtistData(artistId: string, countryCode: string = 'US'
         playlistId,
         recommendedArtists,
         featuredOnPlaylists,
-        albums,
+        albums: albums || [],
       };
     });
 }

@@ -1,20 +1,20 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createSongPayload } from './helpers/song.js'; // Import createSongPayload
+import { createSongPayload } from './helpers/jioSaavn.js';
 
 const parseDurationToSeconds = (durationStr: string): number | null => {
+  if (!durationStr) return null;
   const parts = durationStr.split(':').map(Number);
-  if (parts.some(isNaN)) return null; // Invalid parts
+  if (parts.some(isNaN)) return null;
 
-  if (parts.length === 2) { // mm:ss
+  if (parts.length === 2) {
     const [minutes, seconds] = parts;
     return minutes * 60 + seconds;
-  } else if (parts.length === 3) { // hh:mm:ss
+  } else if (parts.length === 3) {
     const [hours, minutes, seconds] = parts;
     return hours * 3600 + minutes * 60 + seconds;
   }
-  return null; // Invalid format
+  return null;
 };
-
 
 export default async function (req: VercelRequest, res: VercelResponse) {
   const title = req.query.title as string;
@@ -25,7 +25,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     return res.status(400).send('Missing title or artist parameters');
   }
 
-  const jioSaavnApiUrl = `https://www.jiosaavn.com/api.php?_format=json&_marker=0&api_version=4&ctx=web6dot0&__call=search.getResults&q=${encodeURIComponent(`${title.replace(/\(.*?\)/g, '')} ${artist}`)}&p=0&n=10`; // Fetch 10 results, starting from page 0
+  const jioSaavnApiUrl = `https://www.jiosaavn.com/api.php?_format=json&_marker=0&api_version=4&ctx=web6dot0&__call=search.getResults&q=${encodeURIComponent(`${title.replace(/\(.*?\)/g, '')} ${artist}`)}&p=0&n=10`;
 
   try {
     const response = await fetch(jioSaavnApiUrl, {
@@ -39,17 +39,17 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     }
     const data = await response.json();
 
-    const normalizeString = (str: string) => str.normalize("NFD").replace(/[̀-ͯ]/g, ""); // Re-introduce normalizeString
-
     if (!data.results || data.results.length === 0) {
       return res.status(404).send('Music stream not found in JioSaavn results');
     }
 
     const processedResults = data.results.map((rawSong: any) => createSongPayload(rawSong));
 
-    const matchingTrack = processedResults.find((track: any) => { // Find on processedResults
-      const primaryArtists = track.artists?.primary?.map((artist: any) => artist.name.trim()) || []; // Access processed artists structure
-      const singers = track.artists?.all?.filter((artist: any) => artist.role === 'singer').map((artist: any) => artist.name.trim()) || []; // Access processed artists structure
+    const matchingTrack = processedResults.find((track: any) => {
+      const normalizeString = (str: string) => str.normalize("NFD").replace(/[̀-ͯ]/g, "");
+      
+      const primaryArtists = track.artists?.primary?.map((artist: any) => artist.name.trim()) || [];
+      const singers = track.artists?.all?.filter((artist: any) => artist.role === 'singer').map((artist: any) => artist.name.trim()) || [];
       const allArtists = [...primaryArtists, ...singers];
 
       const artistMatches = allArtists.some((trackArtistName: string) =>
@@ -60,40 +60,24 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 
       const titleMatches = clean(track.name).startsWith(clean(title));
 
-      // Duration matching logic
       let durationMatches = true;
       if (durationParam) {
         const targetDurationSeconds = parseDurationToSeconds(durationParam);
         if (targetDurationSeconds !== null && track.duration !== null) {
-          durationMatches = Math.abs(track.duration - targetDurationSeconds) <= 2; // 2-second offset
+          durationMatches = Math.abs(track.duration - targetDurationSeconds) <= 2;
         } else {
-          durationMatches = false; // Invalid duration param or track duration
+          durationMatches = false;
         }
       }
 
       return titleMatches && artistMatches && durationMatches;
     });
 
-    if (!matchingTrack) {
+    if (!matchingTrack || !matchingTrack.downloadUrl) {
       return res.status(404).send('Music stream not found in JioSaavn results');
     }
 
-    const finalResponse = {
-      name: matchingTrack.name,
-      year: matchingTrack.year,
-      copyright: matchingTrack.copyright,
-      duration: matchingTrack.duration,
-      label: matchingTrack.label,
-      albumName: matchingTrack.album?.name || null,
-      artists: [
-        ...(matchingTrack.artists?.primary || []),
-        ...(matchingTrack.artists?.featured || []),
-        ...(matchingTrack.artists?.all || [])
-      ].map((artist: any) => ({ name: artist.name, role: artist.role })),
-      downloadUrl: matchingTrack.downloadUrl || null // Directly use the single string downloadUrl
-    };
-
-    return res.status(200).json(finalResponse);
+    return res.status(200).send(matchingTrack.downloadUrl);
 
   } catch (error: any) {
     console.error("Error in fast-saavn API:", error);

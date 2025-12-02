@@ -43,9 +43,9 @@ declare global {
   type CollectionItem = {
     id: string,
     title: string,
-    author: string,
+    author?: string,
     duration: string
-    authorId: string,
+    authorId?: string,
     albumId?: string,
     plays?: number
   }
@@ -133,6 +133,7 @@ declare global {
     author?: string,
     duration: string,
     uploaded?: string,
+    authorId?: string,
     channelUrl?: string,
     views?: string,
     img?: string,

@@ -21,7 +21,7 @@
   --blur: blur(var(--size-px-3));
   --player-bg: none;
   --player-bp: 0 0;
-  --landscape-sections: 2;
+  --landscapeSections: 2;
   --trueBg: var(--bg);
   --font: ui-rounded, Segoe UI, source-sans-pro, Inter, Noto Sans, Oxygen, Calibri, Cantarell, Ubuntu, Roboto, system-ui, Open Sans, Helvetica Neue, sans-serif;
 }
@@ -57,7 +57,7 @@ main {
     padding-top: 0;
     overflow-y: auto;
     scroll-snap-align: start;
-    min-width: calc(100dvw / var(--landscape-sections));
+    min-width: calc(100dvw / var(--landscapeSections));
     flex-shrink: 0;
 
   }

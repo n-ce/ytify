@@ -9,6 +9,11 @@ export default function(props: { onClose: () => void }) {
 
   onMount(() => {
     const { title, author } = playerStore.stream;
+    if (!author) {
+      setStore('snackbar', 'Artist name not available for lyrics.');
+      props.onClose();
+      return;
+    }
     fetch(
       `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}&duration=${playerStore.fullDuration}`,
       {

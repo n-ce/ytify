@@ -21,7 +21,7 @@ export default function() {
         label='settings_landscape_sections'
         onchange={(e) => {
           const { value } = e.target;
-          cssVar('--landscape-sections', value);
+          cssVar('--landscapeSections', value);
           setConfig('landscapeSections', e.target.value);
         }}
         id='sls'
