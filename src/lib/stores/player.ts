@@ -98,7 +98,10 @@ createRoot(() => {
   playerStore.audio.onended = () => {
     if (queueStore.list.length)
       playNext();
-    else setPlayerStore('playbackState', 'none');
+    else {
+      updateParam('s');
+      setPlayerStore('playbackState', 'none');
+    }
   }
 
   playerStore.audio.onplaying = () => {
