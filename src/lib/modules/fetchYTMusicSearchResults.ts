@@ -115,8 +115,7 @@ export default async function(
   query: string,
 ): Promise<(YTStreamItem | YTListItem)[]> {
   const filter = config.searchFilter.substring(6); // remove "music_"
-  const api = 'https://ytify-backend.vercel.app';
-  const url = api + `/api/search?q=${encodeURIComponent(normalizeString(query))}&filter=${filter}`;
+  const url = Backend + `/api/search?q=${encodeURIComponent(normalizeString(query))}&filter=${filter}`;
 
   return fetchJson<YTMusicSearchResponse>(url)
     .then(data => {
