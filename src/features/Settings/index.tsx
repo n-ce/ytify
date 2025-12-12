@@ -6,7 +6,6 @@ import Playback from "./Playback";
 import Library from "./Library";
 import Personalize from "./Personalize";
 import Search from "./Search";
-import { handleSubmit } from "@lib/modules/feedback";
 import Dropdown from "./Dropdown";
 
 export default function() {
@@ -16,6 +15,24 @@ export default function() {
     setNavStore('settings', 'ref', settingsSection);
     settingsSection.scrollIntoView();
   });
+
+  const handleFormSubmit = (event: SubmitEvent) => {
+    event.preventDefault();
+
+    const myForm = event.target as HTMLFormElement;
+    const formData = new FormData(myForm);
+
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData as any).toString(),
+    })
+      .then(() => {
+        alert("Feedback submitted successfully!");
+        (document.getElementById('feedback-dialog') as HTMLDialogElement).close();
+      })
+      .catch((error) => alert(error));
+  };
 
   return (
     <section
@@ -39,7 +56,13 @@ export default function() {
       <br />
       <br />
       <dialog id="feedback-dialog">
-        <form name="feedback" method="post" data-netlify="true" onsubmit={handleSubmit}>
+        <form
+          name="feedback"
+          method="post"
+          data-netlify="true"
+          onsubmit={handleFormSubmit}
+        >
+          <input type="hidden" name="form-name" value="feedback" />
           <p>
             <label>Feedback</label>
             <textarea name="message"></textarea>
