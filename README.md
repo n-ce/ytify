@@ -9,10 +9,11 @@
 
 _**Experience audio streaming that's built for you, not against you.**_
 
-ytify is designed to be a lean, modern, and intentional tool. By taking a pragmatic approach to design and resource use, we provide an ethical listening experience that puts you in control, free from the information overload of typical online media applications.
+[**ytify**](https://ytify.pp.ua) is designed to be a lean, modern, and intentional tool. By taking a pragmatic approach to design and resource use, we provide an ethical listening experience that puts you in control, free from the information overload of typical online media applications.
 
 The journey began with a frustration. As a regular user of NewPipe in 2021, I relied on it for background audio, but noticed its failure to stream under poor network conditions. This led to a simple support issue which, when left unresolved, became the seed for a solution. Taking the problem into my own hands, I started the ytify project in January 2022 to build an application that prioritized robust performance and efficient use of resources from the ground up.
 
+-> As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
 
 ## What else are you getting ?
 -   **High-Performance Audio Streaming:** Play audio from YouTube with minimal buffering, even on low-speed networks.

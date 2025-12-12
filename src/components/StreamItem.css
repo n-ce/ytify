@@ -15,6 +15,10 @@
 	cursor: pointer;
 
 	&.ravel {
+		* {
+			opacity: 0;
+		}
+
 		background: var(--onBg) !important;
 	}
 
@@ -28,13 +32,6 @@
 	span {
 		pointer-events: none;
 		transition: opacity 0.4s;
-	}
-
-
-	&.ravel {
-		* {
-			opacity: 0;
-		}
 	}
 
 

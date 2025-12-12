@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "solid-js": "1.9.10",
-    "sortablejs": "^1.15.6"
+    "sortablejs": "^1.15.6",
+    "hls.js": "^1.6.8",
+    "uhtml": "^4.7.1"
   },
   "devDependencies": {
     "@netlify/blobs": "^10.4.1",
