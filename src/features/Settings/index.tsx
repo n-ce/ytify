@@ -38,7 +38,7 @@ export default function() {
       <br />
       <br />
       <dialog id="feedback-dialog">
-        <form name="feedback" method="POST" data-netlify="true">
+        <form name="feedback" method="post" data-netlify="true">
           <p>
             <label>Feedback</label>
             <textarea name="message"></textarea>
