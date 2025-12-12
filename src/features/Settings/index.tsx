@@ -37,6 +37,18 @@ export default function() {
       </div>
       <br />
       <br />
+      <dialog id="feedback-dialog">
+        <form name="feedback" method="POST" data-netlify="true">
+          <p>
+            <label>Feedback</label>
+            <textarea name="message"></textarea>
+          </p>
+          <p>
+            <button type="submit">Send</button>
+            <button type="button" onclick={() => (document.getElementById('feedback-dialog') as HTMLDialogElement).close()}>Close</button>
+          </p>
+        </form>
+      </dialog>
     </section >
   );
 }

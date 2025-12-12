@@ -57,7 +57,15 @@ export default function Dropdown() {
             onchange={importSettings}
           />
         </li>
+        <li onclick={openFeedbackDialog}>
+          <i class="ri-feedback-line"></i>&nbsp;{t('settings_feedback_submit')}
+        </li>
       </ul>
     </details>
   );
+}
+
+function openFeedbackDialog() {
+  const dialog = document.getElementById('feedback-dialog') as HTMLDialogElement;
+  dialog?.showModal();
 }
