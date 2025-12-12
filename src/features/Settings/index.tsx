@@ -6,6 +6,7 @@ import Playback from "./Playback";
 import Library from "./Library";
 import Personalize from "./Personalize";
 import Search from "./Search";
+import { handleSubmit } from "@lib/modules/feedback";
 import Dropdown from "./Dropdown";
 
 export default function() {
@@ -38,7 +39,7 @@ export default function() {
       <br />
       <br />
       <dialog id="feedback-dialog">
-        <form name="feedback" method="post" data-netlify="true">
+        <form name="feedback" method="post" data-netlify="true" onsubmit={handleSubmit}>
           <p>
             <label>Feedback</label>
             <textarea name="message"></textarea>
