@@ -88,6 +88,7 @@ declare global {
     instance: string,
     title: string,
     duration: number,
+    uploader: string,
     uploaderUrl: string,
     livestream: boolean,
     hls: string
