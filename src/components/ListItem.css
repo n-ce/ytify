@@ -1,17 +1,15 @@
 .listItem {
-  width: 48%;
+  width: calc(50% - calc(var(--gap) / 2));
   height: auto;
-  background-color: var(--onBg);
-  padding: 1dvmin;
-  margin: 2% 1%;
-  border: var(--border);
-  border-radius: calc(var(--roundness) + 0.75vmin);
+  margin: var(--size-2) 0;
   transition: all 0.3s ease-out;
   display: inline-block;
-
-  @media(orientation:landscape) {
-    width: 23%;
-  }
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  background-color: var(--onBg);
+  border-radius: var(--roundness);
+  border: var(--border);
 
   * {
     pointer-events: none;
@@ -19,7 +17,8 @@
   }
 
   &:hover {
-    transform: scale(0.95);
+    background-color: var(--onBg2);
+    color: var(--text2);
   }
 
   &.ravel {
@@ -31,33 +30,39 @@
 
   img {
     height: auto;
-    width: 100%;
-    border-radius: var(--roundness);
-    margin-bottom: 2vmin;
+    width: calc(100% - var(--size-2));
+    border-radius: calc(var(--roundness) * 0.5);
+    box-shadow: var(--shadow-1);
+    margin: var(--size-1);
+    margin-bottom: var(--size-2);
   }
 
   div {
     display: flex;
     flex-direction: column;
+    text-align: center;
   }
 
   p.title {
-    font-size: medium;
-    height: 2rem;
-    line-height: 1rem;
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-6);
+    max-height: var(--size-12);
+    line-height: var(--size-4);
     overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: var(--size-1);
   }
 
   p.uData {
-    font-size: x-small;
-    line-height: 0.8rem;
+    font-size: var(--font-size-0);
+    line-height: var(--size-3);
     overflow: hidden;
   }
 
   p.stats {
-    font-size: small;
-    height: 1rem;
-    line-height: 1rem;
+    font-size: var(--font-size-0);
+    height: var(--size-3);
+    line-height: var(--size-3);
   }
 
 }

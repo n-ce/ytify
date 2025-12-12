@@ -130,11 +130,8 @@
     "settings_theming_scheme_white": "Alb",
     "settings_theming_scheme_black": "Negru",
     "settings_fullscreen": "",
-    "settings_parental_controls": "",
-    "settings_pin_toggle": "",
-    "settings_pin_message": "",
-    "settings_pin_prompt": "Întrodu PIN",
-    "settings_pin_incorrect": "Încorrect PIN!",
+
+
     "settings_feedback_placeholder": "",
     "settings_feedback_submit": "Trimite Feedback",
     "settings_changelog": "Changelog",

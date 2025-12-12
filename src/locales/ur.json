@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "سفید",
     "settings_theming_scheme_black": "سیاہ",
     "settings_fullscreen": "فل سکرین ٹوگل کریں",
-    "settings_parental_controls": "والدین کا کنٹرول",
-    "settings_pin_toggle": "سیٹ اپ کریں",
-    "settings_pin_message": "والدین کے کنٹرول کو سیٹ اپ کرنے کے لیے PIN درکار ہے، جس کے بعد ایپ پارٹس مینیجر کو مربوط کرنے کے لیے دوبارہ لوڈ ہوگی۔",
-    "settings_pin_prompt": "PIN درج کریں",
-    "settings_pin_incorrect": "غلط PIN!",
+
+
     "settings_feedback_placeholder": "گمنامی سے اپنی رائے (بگز، فیچر کی درخواستیں) یہاں درج کریں:",
     "settings_feedback_submit": "فیڈ بیک جمع کروائیں",
     "settings_changelog": "تبدیلی لاگ",
