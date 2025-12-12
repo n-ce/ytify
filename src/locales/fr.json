@@ -135,8 +135,6 @@
     "settings_theming_scheme_white": "Blanc",
     "settings_theming_scheme_black": "Noir",
     "settings_fullscreen": "Basculer en plein écran",
-
-
     "settings_feedback_placeholder": "Saisissez anonymement vos commentaires (bogues, demandes de fonctionnalités) ici :",
     "settings_feedback_submit": "Envoyer les commentaires",
     "settings_changelog": "Journal des modifications",
