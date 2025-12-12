@@ -2,49 +2,39 @@
  <a href="https://ytify.netlify.app"><img src="public/ytify_thumbnail_max.webp" width="70%"></a>
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/fbbcc532-3ef6-41fc-b61e-26cb17cfb6ba/deploy-status)](https://app.netlify.com/sites/ytify/deploys)
-
 [![Telegram Online](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fytifytg)](https://t.me/ytifytg)
+[![DeepWiki](https://img.shields.io/badge/DeepWiki-n--ce%2Fytify-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5kJggg==)](https://deepwiki.com/n-ce/ytify)
 
 </div>
 
-> [**ytify**](https://ytify.pp.ua) is the fastest and the lightest centralised audio streaming web application with simple but effective user experience.
->  Listen to **Podcasts**, **Audiobooks**, **Music**, **Livestreams** and other Audio focused YouTube Videos, even under the lowest network conditions.
+_**Experience audio streaming that's built for you, not against you.**_
 
-> As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
+[**ytify**](https://ytify.pp.ua) is designed to be a lean, modern, and intentional tool. By taking a pragmatic approach to design and resource use, we provide an ethical listening experience that puts you in control, free from the information overload of typical online media applications.
+
+The journey began with a frustration. As a regular user of NewPipe in 2021, I relied on it for background audio, but noticed its failure to stream under poor network conditions. This led to a simple support issue which, when left unresolved, became the seed for a solution. Taking the problem into my own hands, I started the ytify project in January 2022 to build an application that prioritized robust performance and efficient use of resources from the ground up.
+
+-> As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
 
 ## What else are you getting ?
-- **Queuing Features** 🚦
-- **ytify collections** 🎷: create your own playlists disconnected from YouTube, share it with the world with share link.
-- **YouTube Playlists** 🎶: View them, queue them to the player. You can also both subscribe and import it into your own collections.
-- **Theming** 🎨: Modern Autonomous themed UI based on stream thumbnail with High Contrast Mode for increased legibility.
-- **PWA** 📱: Install as an app on your device which also allows you to play YouTube links with it from your OS share menu.
-- **Radio** 📻: Fetches similar streams and creates a playlist for your stream, great for music listeners.
-- **Library** 📚: Discover feed, history, favorites, Channels, YouTube playlists, custom playlists (collections) & Subscription Feed!
-- **Download** ⬇️ : Download any audio stream using the button on the action menu.
-- **Lyrics** 🎼 : Immersive Synced Lyrics using the button on the action menu.
-- **For You** 🎻 : Get audio tailored specifically for you based on your Favorites, generated on device without any violation of privacy.
-- **Parental Controls** 👨‍👦 : Disable Parts of the application according to your needs.
+-   **High-Performance Audio Streaming:** Play audio from YouTube with minimal buffering, even on low-speed networks.
+-   **Comprehensive Queue Management:** Full control over your listening queue, including adding, removing, and reordering tracks.
+-   **Playlists and Collections:** Create and manage your own playlists (`collections`) and import YouTube playlists.
+-   **Dynamic Theming:** The UI automatically adapts its theme based on the artwork of the currently playing stream.
+-   **Progressive Web App (PWA):** Install ytify as a standalone application on your device for a native-like experience and offline support.
+-   **Radio Mode:** Automatically discover and queue similar tracks for a continuous listening experience.
+-   **Personalized Library:** Keep track of your listening history, favorites, and subscriptions.
+-   **Audio Downloads:** Download audio streams for offline playback.
+-   **Synced Lyrics:** View time-synced lyrics for your favorite songs.
+-   **"For You" Recommendations:** Get personalized audio recommendations based on your favorites, generated on-device to protect your privacy.
+-   **Search:** A powerful search functionality with suggestions and filters for both YouTube and YouTube Music.
 
 ![1000012574](https://github.com/user-attachments/assets/450a1eed-0fb6-4fba-8d4a-c18431b935ad)
 ![1000012580](https://github.com/user-attachments/assets/4abcd09d-d2ef-4e26-8632-1a50cedfbab8)
 ![1000012579](https://github.com/user-attachments/assets/adf1254a-e565-4fb7-ab51-613bbe69e677)
 
-
-
-
-
-## WHY / The story of ytify with [n-ce](https://github.com/n-ce)
-- I was an avid [NewPipe](https://github.com/TeamNewPipe/NewPipe) user back in 2021, which I used for background playback.
-- I noticed it wasn't able to stream under low network conditions.
-- So i decided to create an [issue](https://github.com/TeamNewPipe/NewPipe/issues/5838).
-- Upon finding no active resolution on the issue, I took it to myself and created this project on Jan 2022.
-
-
 ## Usage 👆
-- Instance
-  - [Official](https://ytify.pp.ua)
-  - [Secondary](https://ytify.netlify.app)
-  - [Testing](https://dev--ytify.netlify.app)
+- Official Instance - https://ytify.pp.ua
+- Testing Instance - https://dev--ytify.netlify.app
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Community [@ytifytg](https://t.me/ytifytg)
 
@@ -55,19 +45,29 @@
 ## Contributing 📋
 > This project is actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
 
+## Donations
+- **[Donate Anonymously via Trocador](https://trocador.app/anonpay?ticker_to=xmr&network_to=Mainnet&address=87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH&ref=sqKNYGZbRl&direct=True)**
+
+- **UPI:** `animesh.5383@waicici`
+
+- **XMR:** `87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH`
+- **LTC:** `ltc1qvrvu50lz9e4cgjc9lf59td53xzu08zref2rxkf`
+- **BTC:** `bc1qtaxauv2mzc52ulmenlmejetluxnz5ly4ucg97k`
+- **ETH:** `0x8c0028c8C4EC2ee508C9A9DdDf15Fe00b4960ED3`
+
 ## Development 🔧
-1. Prerequisites : Node.js , Beginner TypeScript Knowledge. 
+1. Prerequisites : Fundamental understanding of SolidJS. 
 2. Clone repository with
 ```
-git clone https://github.com/n-ce/ytify --depth 1
+git clone https://github.com/n-ce/ytify --depth 1 -b main
 ```
 or
 ```
- gh repo clone n-ce/ytify -- --depth 1
+ gh repo clone n-ce/ytify -- --depth 1 -b main
 ```
 3. Move to Directory, Install Dependencies
 ```
-cd ytify ; npm i
+cd ytify && npm i
 ```
 4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts)
 `injectEruda(false),`
@@ -85,16 +85,9 @@ npm run dev -- --open
 ytify is being translated into multiple languages using [Weblate](https://hosted.weblate.org/projects/ytify/web).
  
 ## Acknowledgements 🙏
-- [Uma](https://github.com/n-ce/Uma) - Instances Manager
-- [Piped](https://github.com/teampiped/piped) - YouTube Data API & Adaptive Streaming Proxy
+- [Solid.js](https://www.solidjs.com/) - Performant UI Library
 - [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Proxy
-- [Hyperpipe](https://codeberg.org/Hyperpipe/hyperpipe-backend) - YT Music Artist Data API
-- [Cobalt](https://github.com/wukko/cobalt) - YouTube Download API
 - [LRCLIB](https://lrclib.net) - Synced Lyrics Provider
-- [wsrv](https://wsrv.nl) - Image Proxy Provider
-- [uhtml](https://webreflection.github.io/uhtml) - Efficient HTML Templating Library
-- [HLS.js](https://github.com/video-dev/hls.js) - HLS Support Library
-- [Netlify](https://www.netlify.com) - Hosting, PR Previews, User Feedback Forms, Edge Functions
-- [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding.
-- [Autoprefixer](https://github.com/postcss/autoprefixer) - CSS Prefixes Solution.
-- [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Efficient Icon Solution.
+- [Netlify](https://www.netlify.com) - Hosting, PR Previews, Edge Functions
+- [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding
+- [Remix Icons](https://github.com/Remix-Design/RemixIcon) - Special Thanks to Remix Icons for being with us through the years

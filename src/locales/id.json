@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "Putih",
     "settings_theming_scheme_black": "Hitam",
     "settings_fullscreen": "Toggle Layar Penuh",
-    "settings_parental_controls": "Kontrol Orang Tua",
-    "settings_pin_toggle": "Siapkan",
-    "settings_pin_message": "PIN diperlukan untuk menyiapkan kontrol orang tua, setelah itu aplikasi akan dimuat ulang untuk mengintegrasikan pengelola bagian.",
-    "settings_pin_prompt": "Masukkan PIN",
-    "settings_pin_incorrect": "PIN Salah!",
+
+
     "settings_feedback_placeholder": "Masukkan masukan Anda (bug, permintaan fitur) secara anonim di sini:",
     "settings_feedback_submit": "Kirim Masukan",
     "settings_changelog": "Daftar Perubahan",

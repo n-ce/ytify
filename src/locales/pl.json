@@ -130,11 +130,8 @@
     "settings_theming_scheme_white": "Biały",
     "settings_theming_scheme_black": "Czarny",
     "settings_fullscreen": "Pełny ekran",
-    "settings_parental_controls": "Kontrola rodzicielska",
-    "settings_pin_toggle": "Ustaw PIN",
-    "settings_pin_message": "PIN jest wymagany do konfiguracji kontroli rodzicielskiej. Po wprowadzeniu aplikacja zostanie ponownie załadowana.",
-    "settings_pin_prompt": "Wprowadź PIN",
-    "settings_pin_incorrect": "Nieprawidłowy PIN!",
+
+
     "settings_feedback_placeholder": "Wprowadź anonimową opinię (błędy, sugestie) tutaj:",
     "settings_feedback_submit": "Prześlij opinię",
     "settings_changelog": "Lista zmian",

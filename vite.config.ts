@@ -1,17 +1,31 @@
 import { defineConfig, PluginOption } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import solidPlugin from 'vite-plugin-solid';
 import autoprefixer from 'autoprefixer';
+import postcssJitProps from 'postcss-jit-props';
+import OpenProps from 'open-props';
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
-
+import path from 'path';
 
 
 export default defineConfig(({ command }) => ({
+  base: process.env.VITE_BASE_PATH || '/',
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
-    Build: JSON.stringify(((d = new Date()) => `v7x8 ${d.getFullYear().toString().slice(-2)}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getDate().toString().padStart(2, '0')}`)())
+    Build: JSON.stringify(
+      ((today = new Date()) => `v8 ${today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.')}`)(),
+    ),
+    Backend: JSON.stringify('https://ytify-zeta.vercel.app'),
+  },
+  resolve: {
+    alias: {
+      '@components': path.resolve(__dirname, './src/components'),
+      '@lib': path.resolve(__dirname, './src/lib'),
+    },
   },
   plugins: [
+    solidPlugin(),
     injectEruda(command === 'serve'),
     VitePWA({
       manifest: {
@@ -32,6 +46,12 @@ export default defineConfig(({ command }) => ({
             "purpose": "any maskable"
           },
           {
+            "src": "logo512-monochrome.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "monochrome"
+          },
+          {
             "src": "logo512.png",
             "type": "image/png",
             "sizes": "44x44",
@@ -41,7 +61,7 @@ export default defineConfig(({ command }) => ({
         "shortcuts": [
           {
             "name": "History",
-            "url": "/list?collection=history",
+            "url": "/collection=history",
             "icons": [
               {
                 "src": "memories-fill.png",
@@ -50,7 +70,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Favorites",
-            "url": "/list?collection=favorites",
+            "url": "/collection=favorites",
             "icons": [
               {
                 "src": "heart-fill.png",
@@ -59,7 +79,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Listen Later",
-            "url": "/list?collection=listenLater",
+            "url": "/collection=listenLater",
             "icons": [
               {
                 "src": "calendar-schedule-fill.png",
@@ -69,8 +89,8 @@ export default defineConfig(({ command }) => ({
         ],
         "start_url": "/",
         "display": "standalone",
-        "theme_color": "white",
-        "background_color": "white",
+        "theme_color": "black",
+        "background_color": "black",
         "share_target": {
           "action": "/",
           "method": "GET",
@@ -88,7 +108,8 @@ export default defineConfig(({ command }) => ({
   css: {
     postcss: {
       plugins: [
-        autoprefixer()
+        autoprefixer(),
+        postcssJitProps(OpenProps)
       ]
     }
   }
@@ -115,6 +136,5 @@ const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
     ]
   })
 }) : [];
-
 
 

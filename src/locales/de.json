@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "Weiß",
     "settings_theming_scheme_black": "Schwarz",
     "settings_fullscreen": "Vollbildmodus umschalten",
-    "settings_parental_controls": "Kindersicherung",
-    "settings_pin_toggle": "Einrichten",
-    "settings_pin_message": "Ein PIN ist erforderlich, um die Kindersicherung einzurichten. Danach wird die App neu geladen, um den Part-Manager zu integrieren.",
-    "settings_pin_prompt": "PIN eingeben",
-    "settings_pin_incorrect": "Falscher PIN!",
+
+
     "settings_feedback_placeholder": "Geben Sie hier anonym Ihr Feedback ein (Fehler, Funktionswünsche):",
     "settings_feedback_submit": "Feedback senden",
     "settings_changelog": "Änderungsprotokoll",

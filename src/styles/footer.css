@@ -1,0 +1,37 @@
+footer {
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  bottom: var(--height);
+  z-index: 2;
+  width: 100dvmin;
+  --height: var(--size-8);
+  height: var(--height);
+  background: linear-gradient(rgb(from var(--onBg) r g b / 0.4), var(--trueBg));
+  backdrop-filter: blur(var(--size-px-4));
+  border-top-left-radius: var(--roundness);
+  border-top-right-radius: var(--roundness);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+
+  &:has(.miniplayer) {
+    --height: calc(var(--size-9) + var(--size-7));
+
+    @media(orientation:portrait) {
+      border-top: var(--border);
+
+      img {
+        height: var(--size-8);
+        margin-left: var(--size-1);
+      }
+    }
+  }
+
+  @media(orientation:landscape) {
+    margin: 0 auto;
+    border: var(--border);
+    border-bottom: none;
+  }
+
+}

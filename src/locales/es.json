@@ -135,11 +135,8 @@
     "settings_theming_scheme_white": "Blanco",
     "settings_theming_scheme_black": "Negro",
     "settings_fullscreen": "Alternar pantalla completa",
-    "settings_parental_controls": "Control parental",
-    "settings_pin_toggle": "Configurar",
-    "settings_pin_message": "Se requiere un PIN para configurar el control parental, después de lo cual la aplicación se recargará para integrar el administrador de partes.",
-    "settings_pin_prompt": "Ingresar PIN",
-    "settings_pin_incorrect": "¡PIN incorrecto!",
+
+
     "settings_feedback_placeholder": "Ingresa tus comentarios (errores, solicitudes de funciones) de forma anónima aquí:",
     "settings_feedback_submit": "Enviar comentarios",
     "settings_changelog": "Registro de cambios",

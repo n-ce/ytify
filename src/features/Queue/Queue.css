@@ -1,0 +1,80 @@
+#queuetools {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media(orientation: landscape) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  list-style: none;
+  padding: var(--size-1);
+  gap: var(--size-1);
+  margin-bottom: var(--size-3);
+  background: linear-gradient(var(--trueBg), rgb(from var(--onBg) r g b / 0.8));
+  backdrop-filter: blur(var(--size-px-2));
+  box-shadow: var(--shadow-1);
+  border: var(--border);
+  border-top:none;
+  border-bottom-left-radius: var(--roundness);
+  border-bottom-right-radius: var(--roundness);
+
+  li {
+    user-select: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: var(--roundness);
+    cursor: pointer;
+    font-size: var(--font-size-1);
+    font-weight: var(--font-weight-5);
+    padding: var(--size-2) var(--size-1);
+    letter-spacing: var(--font-letterspacing-0);
+    --liBg: var(--onBg);
+    background: color-mix(in srgb, var(--liBg), transparent 80%);
+    color: color-mix(in srgb, var(--liBg), var(--text) 80%);
+
+    i {
+      margin: 0 var(--size-1);
+    }
+
+    &:nth-child(5).on {
+      --liBg: #a0a;
+    }
+
+    &:nth-child(4).on {
+      --liBg: #aa0;
+    }
+
+    &:nth-child(3).on {
+      --liBg: #1bb;
+    }
+
+    &:nth-child(2).on {
+      --liBg: #f22;
+    }
+
+    &:nth-child(1).on {
+      --liBg: #55f;
+    }
+
+    &:hover {
+      text-decoration: underline dotted;
+    }
+
+
+  }
+
+}
+
+#queuelist {
+  margin-bottom: var(--size-fluid-6);
+
+  a.delete {
+    background-color: color-mix(in srgb, #f22, var(--onBg) 80%);
+    color: color-mix(in srgb, #f22, var(--text) 80%);
+  }
+}
