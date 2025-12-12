@@ -16,24 +16,6 @@ export default function() {
     settingsSection.scrollIntoView();
   });
 
-  const handleFormSubmit = (event: SubmitEvent) => {
-    event.preventDefault();
-
-    const myForm = event.target as HTMLFormElement;
-    const formData = new FormData(myForm);
-
-    fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData as any).toString(),
-    })
-      .then(() => {
-        alert("Feedback submitted successfully!");
-        (document.getElementById('feedback-dialog') as HTMLDialogElement).close();
-      })
-      .catch((error) => alert(error));
-  };
-
   return (
     <section
       ref={settingsSection}
@@ -55,24 +37,6 @@ export default function() {
       </div>
       <br />
       <br />
-      <dialog id="feedback-dialog">
-        <form
-          name="feedback"
-          method="post"
-          data-netlify="true"
-          onsubmit={handleFormSubmit}
-        >
-          <input type="hidden" name="form-name" value="feedback" />
-          <p>
-            <label>Feedback</label>
-            <textarea name="message"></textarea>
-          </p>
-          <p>
-            <button type="submit">Send</button>
-            <button type="button" onclick={() => (document.getElementById('feedback-dialog') as HTMLDialogElement).close()}>Close</button>
-          </p>
-        </form>
-      </dialog>
     </section >
   );
 }
