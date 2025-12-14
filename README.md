@@ -28,9 +28,8 @@ The journey began with a frustration. As a regular user of NewPipe in 2021, I re
 -   **"For You" Recommendations:** Get personalized audio recommendations based on your favorites, generated on-device to protect your privacy.
 -   **Search:** A powerful search functionality with suggestions and filters for both YouTube and YouTube Music.
 
-![1000012574](https://github.com/user-attachments/assets/450a1eed-0fb6-4fba-8d4a-c18431b935ad)
-![1000012580](https://github.com/user-attachments/assets/4abcd09d-d2ef-4e26-8632-1a50cedfbab8)
-![1000012579](https://github.com/user-attachments/assets/adf1254a-e565-4fb7-ab51-613bbe69e677)
+<img width="3000" height="3600" alt="1000067919" src="https://github.com/user-attachments/assets/14ec1a13-3e04-4ca4-a005-eb33f53cdb67" />
+
 
 ## Usage 👆
 - Official Instance - https://ytify.pp.ua
@@ -59,11 +58,11 @@ The journey began with a frustration. As a regular user of NewPipe in 2021, I re
 1. Prerequisites : Fundamental understanding of SolidJS. 
 2. Clone repository with
 ```
-git clone https://github.com/n-ce/ytify --depth 1 -b main
+git clone https://github.com/n-ce/ytify
 ```
 or
 ```
- gh repo clone n-ce/ytify -- --depth 1 -b main
+ gh repo clone n-ce/ytify
 ```
 3. Move to Directory, Install Dependencies
 ```
