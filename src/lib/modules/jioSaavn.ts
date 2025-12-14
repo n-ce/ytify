@@ -18,22 +18,22 @@ export default function() {
       if (!trimmedDownloadUrl) throw new Error('Music stream not found in JioSaavn results');
 
       const baseUrl = 'https://aac.saavncdn.com/';
-      const fullDownloadUrl = `${baseUrl}${trimmedDownloadUrl}_96.mp4`;
+      const desiredBitrateSuffix = ({
+        worst: '12',
+        low: '48',
+        medium: '160',
+        high: '320',
+        lossless: '320'
+      })[config.quality] || '320';
+      const fullDownloadUrl = `${baseUrl}${trimmedDownloadUrl}_${desiredBitrateSuffix || '96'}.mp4`;
 
       setPlayerStore('data', { ...stream, downloadUrl: fullDownloadUrl });
 
       import('../modules/setMetadata')
         .then(mod => mod.default(stream));
 
-      const desiredBitrateSuffix = ({
-        worst: '_12',
-        low: '_48',
-        medium: '_160',
-        high: '_320',
-        lossless: '_320'
-      })[config.quality] || '_320';
 
-      audio.src = downloadUrl.replace('_96', desiredBitrateSuffix);
+      audio.src = fullDownloadUrl;
       updateParam('s', id);
 
     })
