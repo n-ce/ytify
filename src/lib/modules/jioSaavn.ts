@@ -14,10 +14,13 @@ export default function() {
       }
       return res.text();
     })
-    .then(downloadUrl => {
-      if (!downloadUrl) throw new Error('Music stream not found in JioSaavn results');
+    .then(trimmedDownloadUrl => {
+      if (!trimmedDownloadUrl) throw new Error('Music stream not found in JioSaavn results');
 
-      setPlayerStore('data', { ...stream, downloadUrl: downloadUrl });
+      const baseUrl = 'https://aac.saavncdn.com/';
+      const fullDownloadUrl = `${baseUrl}${trimmedDownloadUrl}_96.mp4`;
+
+      setPlayerStore('data', { ...stream, downloadUrl: fullDownloadUrl });
 
       import('../modules/setMetadata')
         .then(mod => mod.default(stream));
