@@ -19,7 +19,7 @@ export let config = {
   allowDuplicates: false,
   history: true,
   discover: true,
-  volume: '1',
+  volume: '100',
   shareAction: 'play' as 'play' | 'watch' | 'download',
   dbsync: '',
   language: '',

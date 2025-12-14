@@ -43,7 +43,7 @@ const createInitialState = (): PlayerStore => ({
   fullDuration: 0,
   playbackRate: 1.0,
   loop: false,
-  volume: parseFloat(config.volume),
+  volume: parseInt(config.volume) / 100,
   stream: {
     title: '',
     author: '',

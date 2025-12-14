@@ -166,7 +166,7 @@ export default function(_: {
             const ref = e.target;
             const vol = parseFloat(ref.value);
             playerStore.audio.volume = vol;
-            setConfig('volume', ref.value);
+            setConfig('volume', (vol * 100).toString());
             setPlayerStore('volume', vol);
             ref.blur();
           }}
