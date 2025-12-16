@@ -43,7 +43,7 @@ const createInitialState = (): PlayerStore => ({
   fullDuration: 0,
   playbackRate: 1.0,
   loop: false,
-  volume: 1.0,
+  volume: parseInt(config.volume) / 100,
   stream: {
     title: '',
     author: '',
@@ -94,6 +94,8 @@ export function playPrev() {
 createRoot(() => {
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
+
+  playerStore.audio.volume = playerStore.volume;
 
   playerStore.audio.onended = () => {
     if (queueStore.list.length)

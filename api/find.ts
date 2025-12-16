@@ -77,7 +77,10 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       return res.status(404).send('Music stream not found in JioSaavn results');
     }
 
-    return res.status(200).send(matchingTrack.downloadUrl);
+    const fullDownloadUrl: string = matchingTrack.downloadUrl;
+    const trimmedDownloadUrl = fullDownloadUrl.replace(/^https:\/\/aac\.saavncdn\.com\/(.*?)_96\.mp4$/, '$1');
+
+    return res.status(200).send(trimmedDownloadUrl);
 
   } catch (error: any) {
     console.error("Error in fast-saavn API:", error);

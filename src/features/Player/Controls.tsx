@@ -1,6 +1,6 @@
 import { LikeButton, PlayButton, PlayNextButton } from "@components/MediaPartials";
 import { params, playerStore, playPrev, queueStore, setPlayerStore, updateParam, t } from "@lib/stores";
-import { convertSStoHHMMSS } from "@lib/utils";
+import { convertSStoHHMMSS, setConfig } from "@lib/utils";
 import { Accessor, createSignal, onMount, Setter, Show } from "solid-js";
 
 export default function(_: {
@@ -161,11 +161,12 @@ export default function(_: {
 
         <select
           id="volumeChanger"
-          value={playerStore.volume.toFixed(2)}
+          value={playerStore.volume}
           onchange={e => {
             const ref = e.target;
             const vol = parseFloat(ref.value);
             playerStore.audio.volume = vol;
+            setConfig('volume', (vol * 100).toString());
             setPlayerStore('volume', vol);
             ref.blur();
           }}
@@ -174,12 +175,12 @@ export default function(_: {
           <option value="0.01">1%</option>
           <option value="0.02">2%</option>
           <option value="0.05">5%</option>
-          <option value="0.10">10%</option>
+          <option value="0.1">10%</option>
           <option value="0.15">15%</option>
           <option value="0.25">25%</option>
-          <option value="0.50">50%</option>
+          <option value="0.5">50%</option>
           <option value="0.75">75%</option>
-          <option value="1.00">100%</option>
+          <option value="1">100%</option>
         </select>
 
       </div>
