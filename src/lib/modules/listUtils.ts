@@ -20,17 +20,18 @@ export function importList() {
 export function shareCollection(data: CollectionItem[]) {
   setListStore('isLoading', true);
 
-  fetch(location.origin + '/blob', {
+  fetch(location.origin + '/ss', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
   })
-    .then(res => res.text())
-    .then(_ => {
+    .then(res => res.json())
+    .then(res => {
+      const shareUrl = location.origin + '?si=' + res.timestamp;
       const type = "text/plain";
-      const blob = new Blob([_], { type });
+      const blob = new Blob([shareUrl], { type });
       const link = [new ClipboardItem({ [type]: blob })];
       navigator.clipboard.write(link);
       setStore('snackbar', 'Collection link copied to clipboard!');

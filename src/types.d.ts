@@ -43,8 +43,8 @@ declare global {
   type CollectionItem = {
     id: string,
     title: string,
+    duration: string,
     author?: string,
-    duration: string
     authorId?: string,
     albumId?: string,
     plays?: number

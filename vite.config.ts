@@ -13,10 +13,10 @@ export default defineConfig(({ command }) => ({
   base: process.env.VITE_BASE_PATH || '/',
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
-    Build: JSON.stringify(
-      ((today = new Date()) => `v8 ${today.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.')}`)(),
-    ),
-    Backend: JSON.stringify('https://ytify-zeta.vercel.app'),
+    Build: JSON.stringify('v' + require('./package.json').version),
+    Backend: JSON.stringify([
+      'https://ytify-zeta.vercel.app',
+    ]),
   },
   resolve: {
     alias: {
@@ -61,7 +61,7 @@ export default defineConfig(({ command }) => ({
         "shortcuts": [
           {
             "name": "History",
-            "url": "/collection=history",
+            "url": "/?collection=history",
             "icons": [
               {
                 "src": "memories-fill.png",
@@ -70,7 +70,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Favorites",
-            "url": "/collection=favorites",
+            "url": "/?collection=favorites",
             "icons": [
               {
                 "src": "heart-fill.png",
@@ -79,7 +79,7 @@ export default defineConfig(({ command }) => ({
           },
           {
             "name": "Listen Later",
-            "url": "/collection=listenLater",
+            "url": "/?collection=listenLater",
             "icons": [
               {
                 "src": "calendar-schedule-fill.png",

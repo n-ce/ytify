@@ -23,24 +23,23 @@ export default function() {
         </svg>
         <b>animesh.5383@waicici</b>&nbsp;
       </p>
-      <details>
-        <summary>Donate with Crypto</summary>
+      <span id="crypto">
         <p>
-          <a href="https://trocador.app/anonpay?ticker_to=xmr&network_to=Mainnet&address=87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH&ref=sqKNYGZbRl&direct=True" target="_blank"><b>Donate Anonymously via Trocador</b></a>
+          Monero &gt; 87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH
         </p>
         <p>
-          <b>XMR</b> 87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH
+          Litecoin &gt; ltc1qvrvu50lz9e4cgjc9lf59td53xzu08zref2rxkf
         </p>
         <p>
-          <b>LTC</b> ltc1qvrvu50lz9e4cgjc9lf59td53xzu08zref2rxkf
+          Bitcoin &gt; bc1qtaxauv2mzc52ulmenlmejetluxnz5ly4ucg97k
+        </p>
+        <p>Ethereum &gt; 0x8c0028c8C4EC2ee508C9A9DdDf15Fe00b4960ED3
         </p>
         <p>
-          <b>BTC</b> bc1qtaxauv2mzc52ulmenlmejetluxnz5ly4ucg97k
+          <a class="underline" href="https://trocador.app/anonpay?ticker_to=xmr&network_to=Mainnet&address=87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH&ref=sqKNYGZbRl&direct=True" target="_blank">or any other cryptocurrency via Trocador</a>
+
         </p>
-        <p>
-          <b>ETH</b> 0x8c0028c8C4EC2ee508C9A9DdDf15Fe00b4960ED3
-        </p>
-      </details>
+      </span>
       <br />
       <p>Support our Earth:&nbsp;
         <a
@@ -54,6 +53,9 @@ export default function() {
 
         <a href="https://github.com/n-ce/ytify" target="_blank">[Github]</a>
       </span>
+      <br />
+      <br />
+      <br />
     </div >
   );
 }

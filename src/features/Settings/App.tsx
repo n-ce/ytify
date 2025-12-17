@@ -28,23 +28,6 @@ export default function() {
       </Selector>
 
       <Selector
-        id='linkHost'
-        label='settings_links_host'
-        onchange={(e) => {
-          const configVal = e.target.selectedIndex === 0 ? '' : e.target.value;
-          setConfig('linkHost', configVal || location.origin);
-          setConfig('linkHost', configVal);
-          setStore('snackbar', t('settings_reload'));
-        }}
-        value={config.linkHost || location.origin}
-      >
-        <option value={location.origin}>ytify</option>
-        <option value="https://youtube.com">YouTube</option>
-        <option value="https://piped.video">Piped</option>
-        <option value="https://inv.nadeko.net">Invidious</option>
-      </Selector>
-
-      <Selector
         id='downloadFormatSelector'
         label='settings_download_format'
         onchange={(e) => {

@@ -78,7 +78,7 @@ export async function pushBulkTrackChanges(userId: string, addedTrackItems: Coll
  * @returns {Promise<number>} The new timestamp key for the meta file.
  */
 export async function pushImmutableContent(data: Collection | CollectionItem[]): Promise<number> {
-  const response = await fetch('/.netlify/functions/syncContent', {
+  const response = await fetch('/ss', {
     method: 'POST',
     body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' }
@@ -131,7 +131,7 @@ export async function finalizeSync(userId: string, ETag: string, finalMeta: Meta
  * @param {string} name - The collection name (for local storage helper).
  */
 export async function pullContentByTimestamp(timestamp: number, name: string): Promise<void> {
-  const response = await fetch(`/.netlify/functions/syncContent/${timestamp}`, {
+  const response = await fetch(`/ss/${timestamp}`, {
     method: 'GET', // Explicitly set method for clarity
   });
   if (!response.ok) throw new Error(`Failed to pull content for timestamp ${timestamp}.`);

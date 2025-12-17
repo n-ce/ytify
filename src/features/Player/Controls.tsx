@@ -172,6 +172,8 @@ export default function(_: {
           }}
         >
           <option value="0">0%</option>
+          <option value="0.002">0.2%</option>
+          <option value="0.005">0.5%</option>
           <option value="0.01">1%</option>
           <option value="0.02">2%</option>
           <option value="0.05">5%</option>

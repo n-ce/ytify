@@ -417,7 +417,7 @@ async function getSharedCollection(
 ) {
 
   setListStore('isLoading', true);
-  const data = await fetch(`${location.origin}/blob/${id}`)
+  const data = await fetch(`${location.origin}/ss/${id}`)
     .then(res => res.json())
     .catch(() => '');
   if (data)

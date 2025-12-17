@@ -15,8 +15,8 @@ const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
   url.slice(1).split('/').join('=');
 
-export const hostResolver = (url: string) =>
-  store.linkHost + (store.linkHost.includes(location.origin) ? (url.
+export const hostResolver = (url: string, host = location.origin) =>
+  host + (host.includes(location.origin) ? (url.
     startsWith('/watch') ?
     ('?s' + url.slice(8)) :
     ('?' + pathModifier(url))) : url);
