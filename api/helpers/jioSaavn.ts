@@ -1,22 +1,19 @@
-import crypto from 'node:crypto';
-
+import crypto from 'node-forge';
 
 export const createDownloadLinks = (encryptedMediaUrl: string) => {
-  if (!encryptedMediaUrl) return '';
+  if (!encryptedMediaUrl) return [];
 
   const key = '38346591';
-  // Node.js requires a 8-byte buffer for DES keys
-  const keyBuffer = Buffer.from(key, 'utf8');
+  const iv = '00000000';
 
-  const decipher = crypto.createDecipheriv('des-ecb', keyBuffer, null);
+  const encrypted = crypto.util.decode64(encryptedMediaUrl);
+  const decipher = crypto.cipher.createDecipher('DES-ECB', crypto.util.createBuffer(key));
+  decipher.start({ iv: crypto.util.createBuffer(iv) });
+  decipher.update(crypto.util.createBuffer(encrypted));
+  decipher.finish();
+  const decryptedLink = decipher.output.getBytes();
 
-  // Set padding to true (default) because Saavn uses PKCS7 padding
-  decipher.setAutoPadding(true);
-
-  let decrypted = decipher.update(encryptedMediaUrl, 'base64', 'utf8');
-  decrypted += decipher.final('utf8');
-
-  return decrypted.replace('http:', 'https:');
+  return decryptedLink.replace('http:', 'https:'); // Ensure https
 };
 
 export const createArtistMapPayload = (artist: any) => ({
