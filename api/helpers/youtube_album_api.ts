@@ -41,34 +41,80 @@ interface MusicShelfRenderer {
   };
 }
 
-interface ResponseData {
-  header?: {
-    musicDetailHeaderRenderer?: {
-      title: { runs: { text: string }[] };
-      subtitle: { runs: { text: string }[] };
+interface MusicDetailHeaderRenderer {
+  title: { runs: { text: string }[] };
+  subtitle: { runs: { text: string }[] };
+  thumbnail: {
+    musicThumbnailRenderer: {
       thumbnail: {
-        musicThumbnailRenderer: {
-          thumbnail: {
-            thumbnails: { url: string }[];
-          };
+        thumbnails: { url: string }[];
+      };
+    };
+  };
+}
+
+interface MusicResponsiveHeaderRenderer {
+  musicResponsiveHeaderRenderer: {
+    title: { runs: { text: string }[] };
+    subtitle: { runs: { text: string }[] };
+    straplineTextOne?: { runs: { text: string }[] };
+    thumbnail: {
+      musicThumbnailRenderer: {
+        thumbnail: {
+          thumbnails: { url: string }[];
         };
       };
     };
   };
+}
+
+interface ResponseData {
+  header?: {
+    musicDetailHeaderRenderer?: MusicDetailHeaderRenderer;
+  };
   contents: {
-    singleColumnBrowseResultsRenderer: {
+    singleColumnBrowseResultsRenderer?: {
       tabs: {
         tabRenderer: {
           content: {
             sectionListRenderer: {
-              contents: MusicShelfRenderer[];
+              contents: (MusicShelfRenderer | any)[];
+            };
+          };
+        };
+      }[];
+    };
+    twoColumnBrowseResultsRenderer?: {
+      secondaryContents: {
+        sectionListRenderer: {
+          contents: (MusicShelfRenderer | any)[];
+        };
+      };
+      tabs: {
+        tabRenderer: {
+          content: {
+            sectionListRenderer: {
+              contents: (MusicResponsiveHeaderRenderer | any)[];
             };
           };
         };
       }[];
     };
   };
+  microformat?: {
+    microformatDataRenderer: {
+      urlCanonical: string;
+      title: string;
+      description: string;
+      thumbnail: { thumbnails: { url: string }[] };
+    };
+  };
 }
+
+const formatThumbnail = (url: string) => {
+  if (!url) return '';
+  return url.includes('googleusercontent.com') ? new URL(url).pathname : url;
+};
 
 export async function getAlbumData(albumId: string, countryCode: string = 'US') {
   const requestBody = {
@@ -96,60 +142,128 @@ export async function getAlbumData(albumId: string, countryCode: string = 'US') 
       return response.json();
     })
     .then((data: ResponseData) => {
-      if (!data.header?.musicDetailHeaderRenderer) {
+      // console.log(JSON.stringify(data, null, 2));
+
+      let title = '';
+      let artist = '';
+      let year = '';
+      let thumbnail = '';
+      let tracks: any[] = [];
+
+      let playlistId = albumId;
+
+      let authorId = '';
+
+      // 1. Extract Metadata (Header)
+      if (data.header?.musicDetailHeaderRenderer) {
+        const header = data.header.musicDetailHeaderRenderer;
+        title = header.title.runs[0]?.text || '';
+        thumbnail = formatThumbnail(header.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url || '');
+        
+        const subtitleRuns = header.subtitle.runs;
+        artist = subtitleRuns[0]?.text || '';
+        authorId = subtitleRuns[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
+        year = subtitleRuns[subtitleRuns.length - 1]?.text || '';
+
+      } else if (data.contents.twoColumnBrowseResultsRenderer) {
+        // Try finding header in tabs
+        const tabs = data.contents.twoColumnBrowseResultsRenderer.tabs;
+        const headerItem = tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.find(
+          (item: any) => item.musicResponsiveHeaderRenderer
+        );
+
+        if (headerItem) {
+          const header = headerItem.musicResponsiveHeaderRenderer;
+          title = header.title.runs[0]?.text || '';
+          thumbnail = formatThumbnail(header.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url || '');
+          
+          // In this layout, artist is often in 'straplineTextOne'
+          artist = header.straplineTextOne?.runs[0]?.text || '';
+          authorId = header.straplineTextOne?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
+          
+          // Year is usually in subtitle "Album • 2021"
+          const yearRun = header.subtitle.runs.find((r: any) => /^\d{4}$/.test(r.text));
+          year = yearRun?.text || '';
+        }
+      }
+
+      // 2. Extract playlistId and Fallback Metadata
+      if (data.microformat?.microformatDataRenderer) {
+        const micro = data.microformat.microformatDataRenderer;
+        
+        // Extract OLAK... playlistId from canonical URL
+        const urlMatch = micro.urlCanonical.match(/list=([^&]+)/);
+        if (urlMatch) {
+          playlistId = urlMatch[1];
+        }
+
+        if (!title) {
+          const cleanTitle = micro.title.replace(/ - Album by .*$/, ''); 
+          title = cleanTitle || micro.title;
+          thumbnail = formatThumbnail(micro.thumbnail.thumbnails.pop()?.url || '');
+        }
+      }
+
+      if (!title) {
         throw new Error('Album data not found');
       }
 
-      const header = data.header.musicDetailHeaderRenderer;
-      const title = header.title.runs[0].text;
-      const thumbnail = header.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url || ''; // Get the largest thumbnail
-      
-      // Subtitle runs usually look like: [Artist, " • ", Album, " • ", Year] or [Artist, " • ", Year]
-      const subtitleRuns = header.subtitle.runs.map(r => r.text);
-      const artist = subtitleRuns[0];
-      const year = subtitleRuns[subtitleRuns.length - 1]; // Year is usually last
+      // 3. Extract Tracks
+      let shelf: MusicShelfRenderer | undefined;
 
-      // Get tracks
-      const contents = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
-      const shelf = contents.find(item => item.musicShelfRenderer);
-      
-      if (!shelf) {
-         return { id: albumId, playlistId: albumId, title, artist, year, thumbnail, tracks: [] };
+      if (data.contents.singleColumnBrowseResultsRenderer) {
+        const contents = data.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents;
+        shelf = contents.find((item: any) => item.musicShelfRenderer);
+      } else if (data.contents.twoColumnBrowseResultsRenderer) {
+        const secondary = data.contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer.contents;
+        shelf = secondary.find((item: any) => item.musicShelfRenderer);
       }
 
-      const tracks = shelf.musicShelfRenderer.contents.map((item) => {
-        const renderer = item.musicResponsiveListItemRenderer;
-        
-        // Flex columns usually: [Title], [Artist], [Album], [Duration] (varies)
-        // We rely on finding the videoId in the first column's navigationEndpoint
-        const titleColumn = renderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0];
-        const videoId = titleColumn.navigationEndpoint?.watchEndpoint?.videoId || '';
-        const trackTitle = titleColumn.text;
+      if (shelf) {
+        tracks = shelf.musicShelfRenderer.contents.map((item) => {
+          const renderer = item.musicResponsiveListItemRenderer;
+          if (!renderer) return null;
 
-        // Artist is usually in the second column
-        const artistName = renderer.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer.text.runs[0]?.text || artist;
+          const titleColumn = renderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0];
+          const videoId = titleColumn?.navigationEndpoint?.watchEndpoint?.videoId || '';
+          const trackTitle = titleColumn?.text || '';
 
-        // Duration is usually in the last fixed column
-        const duration = renderer.fixedColumns?.[0]?.musicResponsiveListItemFixedColumnRenderer.text.runs[0]?.text || '';
+          // If we couldn't get playlistId from microformat, try getting it from a track
+          if (playlistId === albumId && titleColumn?.navigationEndpoint?.watchEndpoint?.playlistId) {
+            playlistId = titleColumn.navigationEndpoint.watchEndpoint.playlistId;
+          }
 
-        // Track thumbnail (if present, otherwise use album thumbnail)
-        const trackThumb = renderer.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails[0].url || thumbnail;
+          // Artist is usually in the second column
+          const artistRun = renderer.flexColumns[1]?.musicResponsiveListItemFlexColumnRenderer.text.runs?.[0];
+          const artistName = artistRun?.text || artist;
+          const trackAuthorId = artistRun?.navigationEndpoint?.browseEndpoint?.browseId || authorId;
 
-        return {
-          id: videoId, // Use videoId as the unique ID for the track
-          title: trackTitle,
-          artist: artistName,
-          duration,
-          thumbnail: trackThumb,
-          videoId
-        };
-      }).filter(t => t.videoId); // Filter out items without a videoId (like headers or non-playable items)
+          // Duration is usually in the last fixed column
+          const duration = renderer.fixedColumns?.[0]?.musicResponsiveListItemFixedColumnRenderer.text.runs?.[0]?.text || '';
+
+          // Track thumbnail
+          const trackThumb = renderer.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails[0].url || thumbnail;
+
+          const author = artistName.endsWith(' - Topic') ? artistName : `${artistName} - Topic`;
+
+          return {
+            id: videoId,
+            title: trackTitle,
+            author,
+            authorId: trackAuthorId,
+            duration,
+            thumbnail: trackThumb,
+            videoId
+          };
+        }).filter((t): t is any => !!t && !!t.videoId);
+      }
 
       return {
         id: albumId,
-        playlistId: albumId, // Albums in YT Music are often playable as playlists using their browseId (or a slight variation, but browseId often works for 'list=' param)
+        playlistId,
         title,
-        artist,
+        author: artist,
+        authorId,
         year,
         thumbnail,
         tracks

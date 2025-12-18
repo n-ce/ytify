@@ -5,13 +5,15 @@ export interface AlbumResponse {
   id: string;
   playlistId: string;
   title: string;
-  artist: string;
+  author: string;
+  authorId?: string;
   year: string;
   thumbnail: string;
   tracks: {
     id: string;
     title: string;
-    artist: string;
+    author: string;
+    authorId?: string;
     duration: string;
     thumbnail: string;
     videoId: string;
