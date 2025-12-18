@@ -113,7 +113,7 @@ interface ResponseData {
 
 const formatThumbnail = (url: string) => {
   if (!url) return '';
-  return url.includes('googleusercontent.com') ? new URL(url).pathname : url;
+  return url.includes('googleusercontent.com') ? (new URL(url).pathname).split('=')[0] : url;
 };
 
 export async function getAlbumData(albumId: string, countryCode: string = 'US') {
@@ -159,7 +159,7 @@ export async function getAlbumData(albumId: string, countryCode: string = 'US') 
         const header = data.header.musicDetailHeaderRenderer;
         title = header.title.runs[0]?.text || '';
         thumbnail = formatThumbnail(header.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url || '');
-        
+
         const subtitleRuns = header.subtitle.runs;
         artist = subtitleRuns[0]?.text || '';
         authorId = subtitleRuns[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
@@ -176,11 +176,11 @@ export async function getAlbumData(albumId: string, countryCode: string = 'US') 
           const header = headerItem.musicResponsiveHeaderRenderer;
           title = header.title.runs[0]?.text || '';
           thumbnail = formatThumbnail(header.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url || '');
-          
+
           // In this layout, artist is often in 'straplineTextOne'
           artist = header.straplineTextOne?.runs[0]?.text || '';
           authorId = header.straplineTextOne?.runs[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
-          
+
           // Year is usually in subtitle "Album • 2021"
           const yearRun = header.subtitle.runs.find((r: any) => /^\d{4}$/.test(r.text));
           year = yearRun?.text || '';
@@ -190,7 +190,7 @@ export async function getAlbumData(albumId: string, countryCode: string = 'US') 
       // 2. Extract playlistId and Fallback Metadata
       if (data.microformat?.microformatDataRenderer) {
         const micro = data.microformat.microformatDataRenderer;
-        
+
         // Extract OLAK... playlistId from canonical URL
         const urlMatch = micro.urlCanonical.match(/list=([^&]+)/);
         if (urlMatch) {
@@ -198,7 +198,7 @@ export async function getAlbumData(albumId: string, countryCode: string = 'US') 
         }
 
         if (!title) {
-          const cleanTitle = micro.title.replace(/ - Album by .*$/, ''); 
+          const cleanTitle = micro.title.replace(/ - Album by .*$/, '');
           title = cleanTitle || micro.title;
           thumbnail = formatThumbnail(micro.thumbnail.thumbnails.pop()?.url || '');
         }
