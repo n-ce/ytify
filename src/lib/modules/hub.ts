@@ -1,6 +1,7 @@
 import { convertSStoHHMMSS } from "../utils/helpers";
 import subfeedGenerator from "../modules/subfeedGenerator";
 import { getTracksMap, getThumbIdFromLink, getCollection } from "../utils";
+import { store } from "@lib/stores";
 
 type Hub = {
   discovery?: (CollectionItem & { frequency: number })[];
@@ -100,7 +101,7 @@ export async function updateGallery(): Promise<void> {
     return;
   }
 
-  const results: FullArtistResponse[] = await fetch(`${Backend}/api/artists?id=${artistIds.join(',')}`)
+  const results: FullArtistResponse[] = await fetch(`${store.api}/api/artists?id=${artistIds.join(',')}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');

@@ -88,6 +88,7 @@ export function saveCollection(
 
 export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T extends 'channels' ? Channel[] : Playlist[]) {
   localStorage.setItem(`library_${type}`, JSON.stringify(data));
+  metaUpdater(type);
 };
 
 export function saveLibraryAlbums(albums: LibraryAlbums) {
@@ -105,6 +106,12 @@ export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData
       tracks[track.id].albumId = albumId;
     } else {
       tracks[track.id] = { ...track, albumId: albumId };
+    }
+    
+    if (config.dbsync) {
+      import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
+        addDirtyTrack(track.id);
+      });
     }
   }
   saveTracksMap(tracks);
@@ -126,10 +133,20 @@ export function removeAlbumFromLibrary(albumId: string) {
   for (const trackId of tracksToRemove) {
     if (!allOtherTrackIds.has(trackId)) {
       delete tracks[trackId];
+      if (config.dbsync) {
+        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
+          removeDirtyTrack(trackId);
+        });
+      }
     } else {
       const track = tracks[trackId];
       if (track?.albumId === albumId) {
         delete track.albumId;
+        if (config.dbsync) {
+          import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
+            addDirtyTrack(trackId);
+          });
+        }
       }
     }
   }

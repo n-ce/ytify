@@ -35,6 +35,9 @@
   }
 
   #crypto {
+    display: block;
+    width: 100%;
+    overflow: auto hidden;
 
     >* {
       font-size: var(--font-size-0);
@@ -43,7 +46,6 @@
 
     p {
       white-space: nowrap;
-      overflow: auto hidden;
     }
   }
 

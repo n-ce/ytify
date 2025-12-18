@@ -1,3 +1,4 @@
+import { store } from "@lib/stores";
 
 export type ArtistResponse = {
   artistName: string;
@@ -14,7 +15,7 @@ export type ArtistResponse = {
 
 export default async function(id: string): Promise<ArtistResponse> {
 
-  return fetch(`${Backend}/api/artists?id=${id}`)
+  return fetch(`${store.api}/api/artists?id=${id}`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');

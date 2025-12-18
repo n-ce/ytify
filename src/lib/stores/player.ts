@@ -4,7 +4,7 @@ import { addToCollection, config, cssVar, player, themer } from "@lib/utils";
 import { navStore, params, updateParam } from "./navigation";
 import { addToQueue, queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
-import { setStore } from "./app";
+import { setStore, store } from "./app";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -228,7 +228,7 @@ async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
   const artist = encodeURIComponent(playerStore.stream.author?.slice(0, -8) ?? '');
-  fetch(`${Backend}/api/tracks?title=${title}&artist=${artist}&limit=10`)
+  fetch(`${store.api}/api/tracks?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .then(addToQueue)
     .catch(e => setStore('snackbar', `Could not get recommendations for the track: ${e.message}`));

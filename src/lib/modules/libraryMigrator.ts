@@ -15,7 +15,7 @@ type CollectionV1 = { [index: string]: CollectionItemV1 }
 
 type Channels = { [index: string]: Channel };
 type Playlists = { [index: string]: Playlist };
-type Library = {
+type LibraryV1 = {
   history?: CollectionV1,
   favorites?: CollectionV1,
   listenLater?: CollectionV1,
@@ -37,7 +37,7 @@ export default function migrateLibrary() {
   };
 
   try {
-    const oldLibrary: Library = JSON.parse(localStorage.getItem('library')!);
+    const oldLibrary: LibraryV1 = JSON.parse(localStorage.getItem('library')!);
 
     const newTracks = getTracksMap(); // Initialize tracks map once
 

@@ -124,10 +124,6 @@ declare global {
     dashUrl: string,
   }
 
-  interface WindowEventMap {
-    'dbchange': CustomEvent<{ db: Library, change: string }>;
-  }
-
   interface YTStreamItem {
     id: string,
     title: string,
