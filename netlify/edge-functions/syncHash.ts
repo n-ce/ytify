@@ -19,14 +19,14 @@ export default async (req: Request, _context: Context) => {
 
   // 1. Email Verification
   const validatorUrl = `https://rapid-email-verifier.fly.dev/api/validate?email=${email}`;
-  let isEmailValid = false; 
+  let isEmailValid = false;
 
   try {
     const emailResponse = await fetch(validatorUrl);
     if (emailResponse.ok) {
       const emailData = await emailResponse.json();
       if (emailData.status === 'VALID') {
-        isEmailValid = true; 
+        isEmailValid = true;
       }
     }
   } catch (error) {
@@ -56,5 +56,5 @@ export default async (req: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: "/cs/hash",
+  path: "/hash",
 };

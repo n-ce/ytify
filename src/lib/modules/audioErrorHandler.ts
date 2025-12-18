@@ -1,5 +1,6 @@
 import { setStore, store } from '@lib/stores/app.ts';
 import { playerStore, setPlayerStore } from '@lib/stores/player.ts';
+import { player } from '@lib/utils';
 
 
 export default function(
@@ -37,6 +38,6 @@ export default function(
     if (!prefetch) {
       setPlayerStore('status', 'Finding new source...');
     }
-    import('../utils/player').then(mod => mod.player(id, true));
+    player(id, true);
   }
 }

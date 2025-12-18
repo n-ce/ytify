@@ -34,23 +34,18 @@
     }
   }
 
-  details,
-  summary {
-    background: none;
+  #crypto {
+    display: block;
     width: 100%;
-    overflow: scroll;
-    margin: 0;
-    padding: 0;
-    font-weight: var(--font-weight-2);
+    overflow: auto hidden;
+
+    >* {
+      font-size: var(--font-size-0);
+      font-weight: var(--font-weight-6);
+    }
 
     p {
       white-space: nowrap;
-      overflow-wrap: break-word;
-      word-wrap: break-word;
-
-      b {
-        display: block;
-      }
     }
   }
 

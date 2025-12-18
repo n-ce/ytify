@@ -1,16 +1,19 @@
+import { store } from "@lib/stores";
 import { fetchJson } from "@lib/utils";
 
 export interface AlbumResponse {
   id: string;
   playlistId: string;
   title: string;
-  artist: string;
+  author: string;
+  authorId?: string;
   year: string;
   thumbnail: string;
   tracks: {
     id: string;
     title: string;
-    artist: string;
+    author: string;
+    authorId?: string;
     duration: string;
     thumbnail: string;
     videoId: string;
@@ -18,5 +21,5 @@ export interface AlbumResponse {
 }
 
 export default async function fetchAlbum(albumId: string): Promise<AlbumResponse> {
-  return fetchJson<AlbumResponse>(`https://ytify-backend.vercel.app/api/album/${albumId}`);
+  return fetchJson<AlbumResponse>(`${store.api}/api/album?id=${albumId}`);
 }

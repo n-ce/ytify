@@ -4,7 +4,6 @@ export let config = {
   prefetch: false,
   quality: 'medium' as 'low' | 'medium' | 'high' | 'lossless' | 'worst',
   loadImage: true,
-  linkHost: location.origin,
   dlFormat: 'opus' as 'opus' | 'mp3' | 'wav' | 'ogg',
   theme: 'auto' as 'auto' | 'light' | 'dark',
   landscapeSections: '2',

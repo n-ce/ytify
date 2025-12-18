@@ -182,6 +182,14 @@ export default function() {
         }}>
           <i class="ri-braces-line"></i>{t('actions_menu_debug_info')}
         </li>
+
+
+        <li tabindex="8" onclick={() => {
+          open('https://youtu.be/' + store.actionsMenu?.id);
+        }}>
+          <i class="ri-link"></i>{t('actions_menu_yt_link')}
+        </li>
+
       </ul >
     </dialog >
   );

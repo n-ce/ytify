@@ -1,346 +1,288 @@
-import { saveCollection, getTracksMap, saveTracksMap, getMeta, getCollection, getCollectionsKeys } from "@lib/utils/library";
+import {
+  getTracksMap,
+  getMeta,
+} from "@lib/utils/library";
 import { setStore } from "@lib/stores";
 import { config } from "@lib/utils/config";
 
-// --- Type Definitions (from user prompt, to be replaced by imports if available) ---
-interface Meta { version: number, tracks: number, [key: string]: number; }
+// --- Type Definitions ---
+// interface Meta { [key: string]: number } // Meta is global
+// interface Track { [key: string]: any } // Removed to use global CollectionItem
 
-// --- Core Cloud Access ---
+interface LibrarySnapshot {
+  [key: string]: any; // Keys are e.g., 'meta', 'tracks', 'favorites' (no prefix)
+}
+
+interface DeltaPayload {
+  meta: Partial<Meta>;
+  addedOrUpdatedTracks: Collection;
+  deletedTrackIds: string[];
+  updatedCollections: { [collectionName: string]: any };
+  deletedCollectionNames: string[];
+}
+
+// --- Full Sync (Clean Slate) ---
 
 /**
- * MANDATORY READ LOCK: Fetches the Server Index (meta) and ETag.
- * This must be the first step of any sync operation.
- * @param {string} userId - Current user ID.
- * @returns {Promise<{remoteMeta: Meta, ETag: string}>}
+ * Fetches the entire library from the cloud and overwrites the local state.
  */
-export async function getRemoteManifest(userId: string): Promise<{ remoteMeta: Meta, ETag: string }> {
-  const response = await fetch(`/cs/meta/${userId}`);
-
-  if (response.status === 404) {
-    // No remote library exists, treat it as a fresh sync
-    const localMeta = getMeta();
-    return { remoteMeta: { version: localMeta.version, tracks: 0 }, ETag: "*" };
-  }
-
+export async function pullFullLibrary(userId: string): Promise<void> {
+  const response = await fetch(`/library/${userId}`);
   if (!response.ok) {
-    throw new Error(`Failed to get cloud sync manifest. Status: ${response.status}`);
+    throw new Error(`Failed to pull library: ${response.statusText}`);
   }
+  const snapshot: LibrarySnapshot = await response.json();
 
-  const ETag = response.headers.get('ETag') || '';
-  const remoteMeta = await response.json() as Meta;
-
-  return { remoteMeta, ETag };
-}
-
-/**
- * Pushes a batch of track changes (additions and deletions) to the unified track endpoint.
- * @param {string} userId - Current user ID.
- * @param {CollectionItem[]} addedTrackItems - Array of track objects to add/update.
- * @param {string[]} deletedTrackIds - Array of track IDs to delete.
- */
-export async function pushTrackChanges(userId: string, addedTrackItems: CollectionItem[], deletedTrackIds: string[]): Promise<void> {
-  if (addedTrackItems.length === 0 && deletedTrackIds.length === 0) return;
-
-  const response = await fetch(`/cs/tracks/${userId}`, {
-    method: 'PUT',
-    body: JSON.stringify({ added: addedTrackItems, deleted: deletedTrackIds }),
-    headers: { 'Content-Type': 'application/json' }
+  // Clear existing library keys before overwrite to ensure a true "clean slate"
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('library_')) localStorage.removeItem(key);
   });
 
-  if (!response.ok) {
-    throw new Error(`Track update failed: ${response.statusText}`);
+  for (const key in snapshot) {
+    localStorage.setItem(`library_${key}`, JSON.stringify(snapshot[key]));
   }
 }
 
 /**
- * Pushes a large batch of track items to a serverless function for bulk processing.
- * @param {string} userId - Current user ID.
- * @param {CollectionItem[]} addedTrackItems - Array of track objects to add/update.
+ * Gathers the entire local library and pushes it to the cloud, overwriting the remote state.
  */
-export async function pushBulkTrackChanges(userId: string, addedTrackItems: CollectionItem[]): Promise<void> {
-  if (addedTrackItems.length === 0) return;
+export async function pushFullLibrary(userId: string): Promise<void> {
+  const snapshot: LibrarySnapshot = {};
 
-  const response = await fetch(`/.netlify/functions/syncBulkTracks/${userId}`, {
-    method: 'POST',
-    body: JSON.stringify({ addedTrackItems }),
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  if (!response.ok) {
-    throw new Error(`Bulk track update failed: ${response.statusText}`);
-  }
-}
-
-/**
- * Pushes the entire collection array/object to the IMMUTABLE store.
- * Returns the new timestamp key.
- * @param {Collection | CollectionItem[]} data - The full collection array/object to send.
- * @returns {Promise<number>} The new timestamp key for the meta file.
- */
-export async function pushImmutableContent(data: Collection | CollectionItem[]): Promise<number> {
-  const response = await fetch('/.netlify/functions/syncContent', {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  if (response.status !== 201) {
-    throw new Error(`Immutable content push failed: ${response.statusText}`);
-  }
-
-  const result = await response.json() as { timestamp: number };
-  return result.timestamp;
-}
-
-
-/**
- * Final CAS WRITE: Pushes the new manifest and attempts the integrity lock.
- * This is the last step of any push operation.
- * @param {string} userId - Current user ID.
- * @param {string} ETag - The ETag read in the initial getRemoteManifest check.
- * @param {Meta} finalMeta - The final new manifest with updated timestamps.
- */
-export async function finalizeSync(userId: string, ETag: string, finalMeta: Meta): Promise<void> {
-  if (!finalMeta.tracks) {
-    finalMeta.tracks = 0;
-  }
-  const response = await fetch(`/cs/meta/${userId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'If-Match': ETag, // CRITICAL: Compare-and-Swap (CAS)
-    },
-    body: JSON.stringify(finalMeta)
-  });
-
-  if (response.status === 412) {
-    throw new Error("412 Precondition Failed. Another device made changes. Must pull and re-try.");
-  }
-  if (!response.ok) {
-    throw new Error("Failed to finalize manifest push.");
-  }
-
-  localStorage.setItem('library_meta', JSON.stringify(finalMeta));
-}
-
-// --- Delta Pull Operations (Called after integrity check detects older data) ---
-
-/**
- * PULLS a single collection array/object using its timestamp key.
- * @param {number} timestamp - The timestamp key from the remote Meta manifest.
- * @param {string} name - The collection name (for local storage helper).
- */
-export async function pullContentByTimestamp(timestamp: number, name: string): Promise<void> {
-  const response = await fetch(`/.netlify/functions/syncContent/${timestamp}`, {
-    method: 'GET', // Explicitly set method for clarity
-  });
-  if (!response.ok) throw new Error(`Failed to pull content for timestamp ${timestamp}.`);
-
-  const data = await response.json() as Collection | CollectionItem[];
-
-  if (name === 'tracks') {
-    throw new Error("Do not use pullContentByTimestamp for tracks.");
-  } else {
-    const idsToSave = Array.isArray(data) ? data.map(item => item.id) : Object.keys(data);
-    saveCollection(name, idsToSave);
-  }
-}
-
-/**
- * PULLS metadata for an array of track IDs from the server's cache.
- * This replaces the server-side delta logic.
- * @param {string} userId - Current user ID.
- * @param {string[]} trackIds - Array of IDs missing from the local cache.
- */
-export async function pullTrackMetadata(userId: string, trackIds: string[]): Promise<void> {
-  if (trackIds.length === 0) return;
-
-  const response = await fetch(`/cs/tracks/${userId}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(trackIds)
-  });
-
-  if (!response.ok) throw new Error('Failed to pull track metadata by ID.');
-
-  const tracks = await response.json() as CollectionItem[];
-
-  if (tracks.length > 0) {
-    const existingTracks = getTracksMap();
-    for (const track of tracks) {
-      existingTracks[track.id] = track;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('library_')) {
+      try {
+        const val = localStorage.getItem(key);
+        if (val) snapshot[key.slice(8)] = JSON.parse(val);
+      } catch (e) {
+        console.warn(`Failed to parse ${key} during sync push`, e);
+      }
     }
-    saveTracksMap(existingTracks);
+  }
+
+  const response = await fetch(`/library/${userId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(snapshot),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to push library: ${response.statusText}`);
   }
 }
 
+// --- Delta Sync (The main sync logic) ---
+
+export async function runSync(userId: string): Promise<{ success: boolean; message: string }> {
+  setStore("syncState", "syncing");
+
+  try {
+    // 1. Initiate Sync: Exchange Meta and Get Diff
+    const localMeta = getMeta();
+    const localTracks = getTracksMap();
+    
+    // We send our current meta to the server to ask for a diff
+    const pullResponse = await fetch(`/sync/${userId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ meta: localMeta })
+    });
+
+    if(pullResponse.status === 404){
+      console.log('No remote library found. Performing initial full push.');
+      await pushFullLibrary(userId);
+      setStore("syncState", "synced");
+      return { success: true, message: "Initial library sync complete." };
+    }
+
+    if (!pullResponse.ok) {
+      throw new Error(`Failed to initiate sync: ${pullResponse.statusText}`);
+    }
+
+    const pullResult = await pullResponse.json();
+    const remoteMeta = pullResult.serverMeta as Meta;
+    const ETag = pullResponse.headers.get("ETag") || ""; // ETag might be on the blob response, checking headers
+
+    // Apply Server Delta if provided
+    if (pullResult.delta) {
+        console.log("Applying server delta...");
+        applyDelta(pullResult.delta, pullResult.isFullTrackSync);
+    } else if (pullResult.fullSyncRequired) {
+        console.log("Server requested full sync.");
+        await pullFullLibrary(userId);
+    }
+
+    // 2. Prepare Delta Payload (Push)
+    // We re-read meta in case applying delta changed it (though usually push is based on dirty tracks)
+    const currentMeta = getMeta(); 
+    
+    const deltaPayload: DeltaPayload = {
+      meta: {},
+      addedOrUpdatedTracks: {},
+      deletedTrackIds: [],
+      updatedCollections: {},
+      deletedCollectionNames: [],
+    };
+
+    // -- Compare Tracks (using dirty log) --
+    const dirtyTracks = getDirtyTracks();
+    dirtyTracks.added.forEach(id => {
+      if(localTracks[id]) deltaPayload.addedOrUpdatedTracks[id] = localTracks[id];
+    });
+    deltaPayload.deletedTrackIds = dirtyTracks.deleted;
+    
+    if(dirtyTracks.added.length > 0 || dirtyTracks.deleted.length > 0) {
+       deltaPayload.meta.tracks = Date.now();
+    }
+    
+    // -- Compare Collections & Lists --
+    for(const key in currentMeta){
+        if(key === 'version' || key === 'tracks') continue;
+        
+        // If our local version is newer than what the server *had* (before we pulled), we push.
+        // Note: usage of remoteMeta here ensures we don't overwrite if server was already ahead, 
+        // but if we just pulled, we are up to date with server. 
+        // If we made changes *after* last sync, our timestamp should be higher.
+        if((currentMeta[key] || 0) > (remoteMeta[key] || 0)){
+            const rawData = localStorage.getItem(`library_${key}`);
+            if(rawData) {
+              deltaPayload.updatedCollections[key] = JSON.parse(rawData);
+              deltaPayload.meta[key] = currentMeta[key];
+            }
+        }
+    }
+
+    // Check for deletions (Push)
+    // If we have a key in remoteMeta that we don't have locally, and we didn't just delete it?
+    // Actually, if it's in remoteMeta but not localMeta, it might mean we deleted it.
+    // OR it might mean the server has something new we don't know about.
+    // BUT we just pulled. So if we don't have it now, it means we deleted it.
+    for(const key in remoteMeta){
+       if(key === 'version' || key === 'tracks') continue;
+       if(!currentMeta[key]){
+           deltaPayload.deletedCollectionNames.push(key);
+       }
+    }
+
+    // 3. Push Delta
+    if (Object.keys(deltaPayload.meta).length === 0 && Object.keys(deltaPayload.addedOrUpdatedTracks).length === 0 && deltaPayload.deletedTrackIds.length === 0 && deltaPayload.deletedCollectionNames.length === 0) {
+      console.log("Sync complete. No changes to push.");
+      setStore("syncState", "synced");
+      return { success: true, message: "Library is up to date." };
+    }
+    
+    const putResponse = await fetch(`/sync/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "If-Match": ETag, // Optimistic locking
+      },
+      body: JSON.stringify(deltaPayload),
+    });
+
+    if (putResponse.status === 412) {
+      throw new Error("Conflict: Library updated by another device. Please re-sync.");
+    }
+    if (!putResponse.ok) {
+      throw new Error(`Failed to push delta: ${putResponse.statusText}`);
+    }
+
+    // 4. Finalize
+    clearDirtyTracks();
+    setStore("syncState", "synced");
+    return { success: true, message: "Changes synced to cloud." };
+
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Sync failed:", message);
+    setStore("syncState", "error");
+    return { success: false, message: `Sync failed: ${message}` };
+  }
+}
+
+function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
+    let localTracks = getTracksMap();
+    
+    // 1. Apply Track Changes
+    if (isFullTrackSync) {
+        // Full Sync Mode: Replace local tracks with server's state, but re-apply local dirty changes
+        // This handles deletions from other devices correctly.
+        const newTracks = { ...delta.addedOrUpdatedTracks };
+        const dirty = getDirtyTracks();
+        
+        // Re-apply local additions/updates
+        dirty.added.forEach(id => {
+            if (localTracks[id]) newTracks[id] = localTracks[id];
+        });
+        
+        // Re-apply local deletions
+        dirty.deleted.forEach(id => {
+            delete newTracks[id];
+        });
+        
+        localTracks = newTracks;
+    } else {
+        // Delta Mode: Merge updates
+        Object.assign(localTracks, delta.addedOrUpdatedTracks);
+        delta.deletedTrackIds.forEach(id => delete localTracks[id]);
+    }
+    
+    localStorage.setItem('library_tracks', JSON.stringify(localTracks));
+
+    // 2. Apply Collection Changes
+    for (const [key, data] of Object.entries(delta.updatedCollections)) {
+        localStorage.setItem(`library_${key}`, JSON.stringify(data));
+    }
+    
+    // 3. Apply Collection Deletions
+    for (const key of delta.deletedCollectionNames) {
+        localStorage.removeItem(`library_${key}`);
+    }
+
+    // 4. Update Meta
+    const currentMeta = getMeta();
+    Object.assign(currentMeta, delta.meta);
+    localStorage.setItem('library_meta', JSON.stringify(currentMeta));
+}
+
+// --- Dirty Track Management ---
 let syncTimeout: NodeJS.Timeout | null = null;
 
 export function scheduleSync() {
-  if (!config.dbsync) return; // Only schedule if cloud sync is enabled
-
-  if (syncTimeout) {
-    clearTimeout(syncTimeout);
-  }
-
+  if (!config.dbsync) return;
+  if (syncTimeout) clearTimeout(syncTimeout);
   syncTimeout = setTimeout(() => {
     runSync(config.dbsync!);
     syncTimeout = null;
   }, 2 * 60 * 1000); // 2 minutes debounce
 }
 
-export const getDirtyTracks = (): { added: string[], deleted: string[] } => {
-  const dirty = localStorage.getItem('dbsync_dirty_tracks');
-  if (dirty) {
-    return JSON.parse(dirty);
-  }
-  return { added: [], deleted: [] };
+export const getDirtyTracks = (): { added: string[]; deleted: string[] } => {
+  const dirty = localStorage.getItem("dbsync_dirty_tracks");
+  return dirty ? JSON.parse(dirty) : { added: [], deleted: [] };
 };
 
-export const saveDirtyTracks = (dirtyTracks: { added: string[], deleted: string[] }) => {
-  localStorage.setItem('dbsync_dirty_tracks', JSON.stringify(dirtyTracks));
+export const saveDirtyTracks = (dirtyTracks: { added: string[]; deleted: string[] }) => {
+  localStorage.setItem("dbsync_dirty_tracks", JSON.stringify(dirtyTracks));
 };
 
 export const addDirtyTrack = (id: string) => {
   const dirtyTracks = getDirtyTracks();
-  if (!dirtyTracks.added.includes(id)) {
-    dirtyTracks.added.push(id);
-  }
-  // If it was marked for deletion, remove it from deletion list
-  dirtyTracks.deleted = dirtyTracks.deleted.filter(deletedId => deletedId !== id);
+  if (!dirtyTracks.added.includes(id)) dirtyTracks.added.push(id);
+  dirtyTracks.deleted = dirtyTracks.deleted.filter((deletedId) => deletedId !== id);
   saveDirtyTracks(dirtyTracks);
+  scheduleSync();
 };
 
 export const removeDirtyTrack = (id: string) => {
   const dirtyTracks = getDirtyTracks();
-  if (!dirtyTracks.deleted.includes(id)) {
-    dirtyTracks.deleted.push(id);
-  }
-  // If it was marked for addition, remove it from addition list
-  dirtyTracks.added = dirtyTracks.added.filter(addedId => addedId !== id);
+  if (!dirtyTracks.deleted.includes(id)) dirtyTracks.deleted.push(id);
+  dirtyTracks.added = dirtyTracks.added.filter((addedId) => addedId !== id);
   saveDirtyTracks(dirtyTracks);
+  scheduleSync();
 };
 
 export const clearDirtyTracks = () => {
-  localStorage.removeItem('dbsync_dirty_tracks');
+  localStorage.removeItem("dbsync_dirty_tracks");
 };
-
-/**
- * Main synchronization function.
- * Orchestrates the pull-merge-push flow.
- * @param {string} userId - The user's ID hash.
- */
-export function runSync(userId: string): Promise<{ success: boolean; message: string }> {
-  setStore('syncState', 'syncing');
-
-  return getRemoteManifest(userId)
-    .then(({ remoteMeta, ETag }) => {
-      const localMeta = getMeta();
-      const finalMeta = { ...localMeta };
-      const pullPromises: Promise<void>[] = [];
-
-      for (const key in remoteMeta) {
-        if (key === 'version') continue;
-        const remoteTimestamp = remoteMeta[key] || 0;
-        const localTimestamp = localMeta[key] || 0;
-
-        if (remoteTimestamp > localTimestamp) {
-          console.log(`Pulling ${key}: remote is newer.`);
-          if (key !== 'tracks') {
-            pullPromises.push(pullContentByTimestamp(remoteTimestamp, key));
-          }
-          finalMeta[key] = remoteTimestamp;
-        }
-      }
-      return Promise.all(pullPromises).then(() => ({ finalMeta, ETag, remoteMeta, localMeta }));
-    })
-    .then(({ finalMeta, ETag, remoteMeta, localMeta }) => {
-      const pushPromises: Promise<void>[] = [];
-      for (const key of getCollectionsKeys()) {
-        const localTimestamp = localMeta[key] || 0;
-        const remoteTimestamp = remoteMeta[key] || 0;
-
-        if (localTimestamp > remoteTimestamp) {
-          console.log(`Pushing ${key}: local is newer.`);
-
-          const collectionIds = getCollection(key);
-          const tracksMap = getTracksMap();
-          const collectionItems = collectionIds.map(id => tracksMap[id]).filter(Boolean) as CollectionItem[];
-          pushPromises.push(
-            pushImmutableContent(collectionItems).then(newTimestamp => {
-              finalMeta[key] = newTimestamp;
-            })
-          );
-        }
-      }
-      return Promise.all(pushPromises).then(() => ({ finalMeta, ETag, remoteMeta, localMeta }));
-    })
-    .then(({ finalMeta, ETag, remoteMeta, localMeta }) => {
-      const localTracksTimestamp = localMeta.tracks || 0;
-      const remoteTracksTimestamp = remoteMeta.tracks || 0;
-      const localTracks = getTracksMap();
-      const dirtyTracks = getDirtyTracks();
-
-      let trackSyncPromise: Promise<void> = Promise.resolve();
-
-      if (dirtyTracks.added.length > 0 || dirtyTracks.deleted.length > 0) {
-        console.log("Pushing dirty track changes.");
-        const addedTrackItems = dirtyTracks.added.map(id => localTracks[id]).filter(Boolean) as CollectionItem[];
-        trackSyncPromise = pushTrackChanges(userId, addedTrackItems, dirtyTracks.deleted)
-          .then(() => {
-            clearDirtyTracks();
-            finalMeta.tracks = Date.now();
-          });
-      } else if (remoteTracksTimestamp > localTracksTimestamp) {
-        console.log("Pulling track changes.");
-        const allTrackIds = new Set<string>();
-        for (const key of getCollectionsKeys()) {
-          getCollection(key).forEach((id: string) => allTrackIds.add(id));
-        }
-        const missingTrackIds = [...allTrackIds].filter(id => !localTracks[id]);
-        if (missingTrackIds.length > 0) {
-          trackSyncPromise = pullTrackMetadata(userId, missingTrackIds)
-            .then(() => {
-              finalMeta.tracks = remoteTracksTimestamp;
-            });
-        } else {
-          finalMeta.tracks = remoteTracksTimestamp;
-        }
-      } else if (localTracksTimestamp > remoteTracksTimestamp) {
-        console.log("Local tracks timestamp is newer, but no dirty tracks. Pushing all local tracks.");
-        trackSyncPromise = pushBulkTrackChanges(userId, Object.values(localTracks) as CollectionItem[])
-          .then(() => {
-            finalMeta.tracks = localTracksTimestamp;
-          });
-      }
-      return trackSyncPromise.then(() => ({ finalMeta, ETag, remoteMeta }));
-    })
-    .then(({ finalMeta, ETag, remoteMeta }) => {
-      // Always push meta if it's different.
-      if (JSON.stringify(finalMeta) !== JSON.stringify(remoteMeta)) {
-        console.log("Finalizing sync...");
-        return finalizeSync(userId, ETag, finalMeta);
-      }
-    })
-    .then(() => {
-      console.log("Sync complete.");
-      setStore('syncState', 'synced');
-      return { success: true, message: "Sync complete." };
-    })
-    .catch(error => {
-      console.error("Sync failed:", error);
-      let message;
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      if (message.includes("412")) {
-        setStore('syncState', 'error');
-        return { success: false, message: "Conflict detected. Please try again." };
-      }
-      setStore('syncState', 'error');
-      return { success: false, message: `Sync failed: ${message}` };
-    });
-}

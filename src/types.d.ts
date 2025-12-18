@@ -43,8 +43,8 @@ declare global {
   type CollectionItem = {
     id: string,
     title: string,
+    duration: string,
     author?: string,
-    duration: string
     authorId?: string,
     albumId?: string,
     plays?: number
@@ -122,10 +122,6 @@ declare global {
     liveNow: boolean,
     hlsUrl: string,
     dashUrl: string,
-  }
-
-  interface WindowEventMap {
-    'dbchange': CustomEvent<{ db: Library, change: string }>;
   }
 
   interface YTStreamItem {

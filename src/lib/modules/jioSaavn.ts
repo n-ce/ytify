@@ -1,4 +1,4 @@
-import { playerStore, setPlayerStore, setStore, updateParam } from "@lib/stores";
+import { playerStore, setPlayerStore, setStore, store, updateParam } from "@lib/stores";
 import { config, player } from "@lib/utils";
 
 export default function() {
@@ -7,7 +7,7 @@ export default function() {
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;
 
-  fetch(`${Backend}/api/find?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author?.replace(' - Topic', '') ?? '')}&duration=${encodeURIComponent(stream.duration)}`)
+  fetch(`${store.api}/api/find?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author?.replace(' - Topic', '') ?? '')}&duration=${encodeURIComponent(stream.duration)}`)
     .then(async res => {
       if (!res.ok) {
         return res.text().then(text => { throw new Error(text); });
