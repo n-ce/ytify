@@ -1,5 +1,4 @@
 import {
-  getCollectionsKeys,
   getTracksMap,
   getMeta,
 } from "@lib/utils/library";
@@ -10,21 +9,16 @@ import { config } from "@lib/utils/config";
 interface Meta { [key: string]: number }
 interface Track { [key: string]: any }
 interface LibrarySnapshot {
-  library_meta: string;
-  library_tracks: string;
-  [key: string]: string; 
+  [key: string]: any; // Keys are e.g., 'meta', 'tracks', 'favorites' (no prefix)
 }
 
 interface DeltaPayload {
   meta: Meta;
   addedOrUpdatedTracks: { [trackId: string]: Track };
   deletedTrackIds: string[];
-  updatedCollections: { [collectionName: string]: any }; // Changed to 'any' to support objects/arrays
+  updatedCollections: { [collectionName: string]: any };
   deletedCollectionNames: string[];
 }
-
-// Keys that are stored in localStorage but managed separately from standard collections
-const SPECIAL_KEYS = ['channels', 'playlists', 'albums'];
 
 // --- Full Sync (Clean Slate) ---
 
@@ -38,8 +32,13 @@ export async function pullFullLibrary(userId: string): Promise<void> {
   }
   const snapshot: LibrarySnapshot = await response.json();
 
+  // Clear existing library keys before overwrite to ensure a true "clean slate"
+  Object.keys(localStorage).forEach(key => {
+    if (key.startsWith('library_')) localStorage.removeItem(key);
+  });
+
   for (const key in snapshot) {
-    localStorage.setItem(key, snapshot[key]);
+    localStorage.setItem(`library_${key}`, JSON.stringify(snapshot[key]));
   }
 }
 
@@ -47,21 +46,19 @@ export async function pullFullLibrary(userId: string): Promise<void> {
  * Gathers the entire local library and pushes it to the cloud, overwriting the remote state.
  */
 export async function pushFullLibrary(userId: string): Promise<void> {
-  const snapshot: LibrarySnapshot = {
-    library_meta: localStorage.getItem('library_meta') || '{}',
-    library_tracks: localStorage.getItem('library_tracks') || '{}'
-  };
+  const snapshot: LibrarySnapshot = {};
 
-  // 1. Add standard collections
-  getCollectionsKeys().forEach(key => {
-     snapshot[`library_${key}`] = localStorage.getItem(`library_${key}`) || '[]';
-  });
-
-  // 2. Add special keys (channels, playlists, albums)
-  SPECIAL_KEYS.forEach(key => {
-    const item = localStorage.getItem(`library_${key}`);
-    if (item) snapshot[`library_${key}`] = item;
-  });
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('library_')) {
+      try {
+        const val = localStorage.getItem(key);
+        if (val) snapshot[key.slice(8)] = JSON.parse(val);
+      } catch (e) {
+        console.warn(`Failed to parse ${key} during sync push`, e);
+      }
+    }
+  }
 
   const response = await fetch(`/library/${userId}`, {
     method: "PUT",
@@ -105,7 +102,7 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
       meta: {},
       addedOrUpdatedTracks: {},
       deletedTrackIds: [],
-      updatedCollections: {}, // Holds both standard collections and special lists
+      updatedCollections: {},
       deletedCollectionNames: [],
     };
 
@@ -121,13 +118,10 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     }
     
     // -- Compare Collections & Lists --
-    // We check every key present in localMeta (except version/tracks)
     for(const key in localMeta){
         if(key === 'version' || key === 'tracks') continue;
         
-        // If local is newer, add to delta
         if((localMeta[key] || 0) > (remoteMeta[key] || 0)){
-            // Fetch raw JSON string and parse it to add to payload
             const rawData = localStorage.getItem(`library_${key}`);
             if(rawData) {
               deltaPayload.updatedCollections[key] = JSON.parse(rawData);
@@ -136,7 +130,7 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
         }
     }
 
-    // Check for deletions (keys in remote but not in local)
+    // Check for deletions
     for(const key in remoteMeta){
        if(key === 'version' || key === 'tracks') continue;
        if(!localMeta[key]){
@@ -147,18 +141,12 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     // -- Pull remote changes --
     let needsFullPull = false;
 
-    // Check Tracks
-    if((remoteMeta.tracks || 0) > (localMeta.tracks || 0)){
-       console.warn("Remote tracks are newer. Falling back to full library pull.");
-       needsFullPull = true;
-    }
+    if((remoteMeta.tracks || 0) > (localMeta.tracks || 0)) needsFullPull = true;
     
-    // Check Collections/Lists
     if (!needsFullPull) {
       for(const key in remoteMeta){
           if(key === 'version' || key === 'tracks') continue;
           if((remoteMeta[key] || 0) > (localMeta[key] || 0)){
-              console.warn(`Remote collection '${key}' is newer. Falling back to full library pull.`);
               needsFullPull = true;
               break;
           }
@@ -197,7 +185,6 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
 
     // 4. Finalize
     clearDirtyTracks();
-    console.log("Delta sync push successful.");
     setStore("syncState", "synced");
     return { success: true, message: "Changes synced to cloud." };
 
@@ -249,5 +236,3 @@ export const removeDirtyTrack = (id: string) => {
 export const clearDirtyTracks = () => {
   localStorage.removeItem("dbsync_dirty_tracks");
 };
-
-

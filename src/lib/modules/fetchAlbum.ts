@@ -19,5 +19,5 @@ export interface AlbumResponse {
 }
 
 export default async function fetchAlbum(albumId: string): Promise<AlbumResponse> {
-  return fetchJson<AlbumResponse>(`${store.api}/api/album/${albumId}`);
+  return fetchJson<AlbumResponse>(`${store.api}/api/album?id=${albumId}`);
 }

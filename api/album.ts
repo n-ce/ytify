@@ -1,34 +1,29 @@
-import { getAlbumData } from './helpers/youtube_album_api';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getAlbumData } from './helpers/youtube_album_api.js';
 
-export const config = {
-  runtime: 'edge',
-};
+export default async function handler(
+  request: VercelRequest,
+  response: VercelResponse,
+) {
+  const countryCode = request.headers['x-vercel-ip-country'] as string || 'US';
+  const albumId = request.query.id as string;
 
-export default async function handler(request: Request) {
-  const url = new URL(request.url);
-  const id = url.searchParams.get('id');
+  if (request.method !== 'GET') {
+    response.setHeader('Allow', ['GET']);
+    return response.status(405).end(`Method ${request.method} Not Allowed`);
+  }
 
-  if (!id) {
-    return new Response(JSON.stringify({ error: 'Missing album ID' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
+  if (!albumId) {
+    return response.status(400).json({ error: 'Missing album ID' });
   }
 
   try {
-    const data = await getAlbumData(id);
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 's-maxage=3600, stale-while-revalidate',
-      },
-    });
+    const data = await getAlbumData(albumId, countryCode);
+    
+    response.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
+    return response.status(200).json(data);
   } catch (error) {
     console.error('Error fetching album data:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch album data' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return response.status(500).json({ error: 'Failed to fetch album data' });
   }
 }
