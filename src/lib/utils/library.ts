@@ -272,10 +272,6 @@ export const metaUpdater = (key: string, remove?: boolean) => {
   const meta = getMeta();
   const timestamp = Date.now();
 
-  // should auto-update tracks on collection changes
-  if (getCollectionsKeys().includes(key) || key === 'albums')
-    meta.tracks = timestamp;
-
   if (remove)
     delete meta[key];
   else

@@ -50,6 +50,79 @@ export default async (req: Request, context: Context): Promise<Response> => {
     }
   }
 
+  // --- POST: Smart Pull (Delta Sync) ---
+  if (req.method === "POST") {
+    try {
+      const { meta: clientMeta } = await req.json();
+      const libraryBlob = await libraryStore.getWithMetadata(userIdHash, { type: "json" });
+
+      if (!libraryBlob || !libraryBlob.data) {
+        return new Response("No library found.", { status: 404 });
+      }
+
+      const snapshot = libraryBlob.data as LibrarySnapshot;
+      const serverMeta = snapshot["meta"] || { version: 4, tracks: 0 };
+      
+      const delta: DeltaPayload = {
+        meta: serverMeta, // Always send latest meta
+        addedOrUpdatedTracks: {},
+        deletedTrackIds: [],
+        updatedCollections: {},
+        deletedCollectionNames: []
+      };
+
+      let hasChanges = false;
+      let isFullTrackSync = false;
+
+      // 1. Compare Tracks
+      // If server tracks are newer, we send ALL tracks (current limitation)
+      // Optimally, we would only send changed tracks, but we don't track per-track timestamps.
+      if ((serverMeta.tracks || 0) > (clientMeta.tracks || 0)) {
+         delta.addedOrUpdatedTracks = snapshot["tracks"] || {};
+         hasChanges = true;
+         isFullTrackSync = true;
+      }
+
+      // 2. Compare Collections
+      for (const key in serverMeta) {
+         if (key === 'version' || key === 'tracks') continue;
+         
+         if ((serverMeta[key] || 0) > (clientMeta[key] || 0)) {
+            delta.updatedCollections[key] = snapshot[key];
+            hasChanges = true;
+         }
+      }
+
+      // 3. Detect Deletions (Server has it removed, Client still has it)
+      // Client sent us their meta, so we know what they have.
+      for (const key in clientMeta) {
+          if (key === 'version' || key === 'tracks') continue;
+          // If server doesn't have it, it's deleted.
+          if (!serverMeta[key]) {
+             delta.deletedCollectionNames.push(key);
+             hasChanges = true;
+          }
+      }
+
+      return new Response(JSON.stringify({
+        serverMeta,
+        delta: hasChanges ? delta : null,
+        fullSyncRequired: false,
+        isFullTrackSync
+      }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ETag: libraryBlob.etag!,
+        },
+      });
+
+    } catch (e) {
+      console.error(`Error during POST /sync for user ${userIdHash}:`, e);
+      return new Response("Internal server error.", { status: 500 });
+    }
+  }
+
   // --- PUT: Apply delta payload ---
   if (req.method === "PUT") {
     const clientETag = req.headers.get("if-match");
