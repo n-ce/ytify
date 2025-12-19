@@ -186,5 +186,6 @@
     "settings_link_capturing": "YT-links vastleggen in de zoekbalk",
     "settings_landscape_sections": "Maximale landschapssecties",
     "clear_hub_prompt": "Weet u zeker dat u alle hubgegevens wilt wissen?",
-    "clear_hub": "Hub wissen"
+    "clear_hub": "Hub wissen",
+    "actions_menu_yt_link": "Open in YouTube"
 }
