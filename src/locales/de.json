@@ -183,5 +183,6 @@
     "settings_link_capturing": "YT-Links in der Suchleiste erfassen",
     "settings_landscape_sections": "Maximale Landschaftsabschnitte",
     "clear_hub_prompt": "Möchten Sie wirklich alle Hub-Daten löschen?",
-    "clear_hub": "Nabe löschen"
+    "clear_hub": "Nabe löschen",
+    "actions_menu_yt_link": "Öffnen in YouTube"
 }
