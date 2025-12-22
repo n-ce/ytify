@@ -167,5 +167,7 @@
     "updater_later": "後で更新",
     "pwa_share_prompt": "OKを押して再生、キャンセルを押してダウンロード",
     "clear_hub_prompt": "Are you sure you want to clear all hub data?",
-    "clear_hub": "Clear Hub"
+    "clear_hub": "Clear Hub",
+    "library_liked": "",
+    "actions_menu_yt_link": ""
 }
