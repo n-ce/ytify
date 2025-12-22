@@ -169,5 +169,19 @@
     "settings_prefetch": "Предскачивание очереди",
     "settings_enforce_piped": "Приниудительно Piped для проигрывания",
     "settings_reload": "Перегрузить страницу для применения изменений",
-    "settings_jiosaavn": "Предпочитать JioSaavn для Музыки"
+    "settings_jiosaavn": "Предпочитать JioSaavn для Музыки",
+    "settings_link_capturing": "",
+    "library_liked": "",
+    "list_already_exists": "",
+    "actions_menu_download_init": "",
+    "list_rename_success": "",
+    "settings_landscape_sections": "",
+    "list_export_success": "",
+    "clear_hub_prompt": "",
+    "library_about": "",
+    "actions_menu_yt_link": "",
+    "clear_hub": "",
+    "list_export_error": "",
+    "list_rename_prompt": "",
+    "list_export": ""
 }
