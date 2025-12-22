@@ -55,12 +55,12 @@ export default function() {
       </Show>
 
       <header class="topShelf">
-        <p>from {getContext()}</p>
+        <p>{t('player_from', getContext())}</p>
 
         <div class="right-group">
 
           <i
-            aria-label="close"
+            aria-label={t('nav_close')}
             onclick={() => { closeFeature('player') }}
             class="ri-close-large-line"></i>
 

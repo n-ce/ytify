@@ -1,9 +1,9 @@
-import { playNext } from '@lib/stores';
+import { playNext, t } from '@lib/stores';
 
 export default function PlayNextButton() {
   return (
     <button
-      aria-label="player_play_next"
+      aria-label={t('player_play_next')}
       class="ri-skip-forward-line"
       id="playNextButton"
       onclick={playNext}

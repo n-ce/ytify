@@ -18,9 +18,9 @@ export default function(ids: string[]): Promise<void> {
         collectionItems.push({
           id: id,
           title: streamData.title,
-          author: streamData.uploader,
-          authorId: streamData.uploaderUrl?.slice(9) || '',
-          duration: convertSStoHHMMSS(streamData.duration),
+          author: streamData.author,
+          authorId: streamData.authorId,
+          duration: convertSStoHHMMSS(streamData.lengthSeconds),
         });
       })
       .catch(error => {

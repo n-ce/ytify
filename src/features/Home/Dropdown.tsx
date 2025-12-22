@@ -23,7 +23,7 @@ export default function Dropdown() {
       location.reload();
     } else { // Assume V1 library
       localStorage.setItem('library', JSON.stringify(importedData));
-      setStore('snackbar', 'Migrating Library v1 to v2...'); // New translation key needed
+      setStore('snackbar', t('library_migration_v1_v2'));
       location.reload(); // Trigger migration
     }
   };
@@ -99,12 +99,7 @@ export default function Dropdown() {
           <li id="cleanLibraryBtn" onclick={cleanLibrary}>
             <i class="ri-delete-bin-2-line"></i>&nbsp;{t('library_clean')}
           </li>
-          <li id="importPipedBtn" onclick={async () => {
-            (await import('../../lib/modules/importPipedPlaylists')).default();
-          }
-          }>
-            <i class="ri-download-cloud-line"></i>&nbsp;{t('settings_import_from_piped')}
-          </li>
+
           <li onclick={() => document.getElementById('upload_songshift')?.click()}>
             <label>
               <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift

@@ -25,7 +25,7 @@ export default function() {
   if (localStorage.getItem('library')) {
     import('@lib/modules/libraryMigrator')
       .then(m => m.default());
-    return 'Library Migration In Place...';
+    return t('library_migration_in_place');
   }
 
   const reservedCollections = {
@@ -53,7 +53,7 @@ export default function() {
       <input
         ref={searchBar}
         type="text"
-        placeholder="Search Local Library"
+        placeholder={t('library_search_placeholder')}
         onInput={handleInput}
       />
       <Show when={searchText()}>
@@ -73,11 +73,11 @@ export default function() {
           )}
         </For>
         <Show when={isTruncated()}>
-          <div class="truncated-message">Too many results. Please refine your search.</div>
+          <div class="truncated-message">{t('library_too_many_results')}</div>
         </Show>
       </Show>
       <Show when={!searchText()}>
-        <Show when={getCollectionsKeys().length} fallback={'Your library is empty'}>
+        <Show when={getCollectionsKeys().length} fallback={t('library_empty')}>
           <For each={getCollectionsKeys()}>
             {(item) => (
               <a

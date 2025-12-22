@@ -1,13 +1,13 @@
 import { createSignal, For, createEffect, Show } from "solid-js";
-import { config, generateImageUrl, proxyHandler, setConfig } from "@lib/utils";
-import { playerStore, playNext, setPlayerStore, setStore, store } from "@lib/stores";
+import { config, generateImageUrl, getApi, proxyHandler, setConfig } from "@lib/utils";
+import { playerStore, playNext, setPlayerStore, setStore, store, t } from "@lib/stores";
 import { queueStore } from "@lib/stores/queue";
 
 export default function() {
 
   const [data, setData] = createSignal({
     video: [] as string[][],
-    subtitles: [] as Record<'url' | 'name' | 'label', string>[]
+    captions: [] as Invidious['captions']
   });
   let video!: HTMLVideoElement;
   let selector!: HTMLSelectElement;
@@ -33,26 +33,29 @@ export default function() {
       .then(result => result.supported);
 
 
-    const data = playerStore.data as Piped & {
-      videoStreams: Record<'url' | 'codec' | 'resolution' | 'quality', string>[]
-    };
+    const data = playerStore.data as Invidious;
 
-    const hasAv1 = data.videoStreams.filter(v => v.codec?.includes('av01')).length === 4 ? data.videoStreams.find(v => v.codec?.includes('av01'))?.url : false;
-    const hasVp9 = data.videoStreams.find(v => v.codec?.includes('vp9'))?.url;
+    const hasAv1 = data.adaptiveFormats.filter(v => v.type?.includes('av01')).length === 4 ? data.adaptiveFormats.find(v => v.type?.includes('av01'))?.url : false;
+    const hasVp9 = data.adaptiveFormats.find(v => v.type?.includes('vp9'))?.url;
 
     video.currentTime = playerStore.audio.currentTime;
     setData({
-      video: data.videoStreams
+      video: data.adaptiveFormats
         .filter(f => {
-          const av1 = hasAv1 && supportsAv1 && f.codec?.includes('av01');
+          if (!f.type.startsWith('video')) return false;
+          const av1 = hasAv1 && supportsAv1 && f.type?.includes('av01');
           if (av1) return true;
-          const vp9 = !hasAv1 && f.codec?.includes('vp9');
+          const vp9 = !hasAv1 && f.type?.includes('vp9');
           if (vp9) return true;
-          const avc = !hasVp9 && f.codec?.includes('avc1');
+          const avc = !hasVp9 && f.type?.includes('avc1');
           if (avc) return true;
+          return false;
         })
         .map(f => ([f.resolution || f.quality, f.url])),
-      subtitles: data.subtitles
+      captions: data.captions.map(c => ({
+        ...c,
+        url: getApi() + c.url
+      }))
     });
 
     if (video.src) {
@@ -75,6 +78,7 @@ export default function() {
       <video
         ref={video}
         controls
+        crossorigin="anonymous"
         poster={generateImageUrl(playerStore.stream.id, 'mq')}
         onplay={() => {
           video.currentTime = playerStore.audio.currentTime;
@@ -136,13 +140,14 @@ export default function() {
         }}
 
       >
-        <Show when={data().subtitles.length}>
-          <option>Captions</option>
-          <For each={data().subtitles}>
+        <Show when={data().captions.length}>
+          <For each={data().captions}>
             {(v) =>
               <track
-                src={store.invidious[0] + v.url}
-                srclang={v.name || v.label}
+                kind="subtitles"
+                src={v.url}
+                srclang={v.language_code}
+                label={v.label}
               >
               </track>
             }
@@ -153,7 +158,7 @@ export default function() {
 
       <div>
 
-        <button onclick={close}>Close</button>
+        <button onclick={close}>{t('nav_close')}</button>
 
         <select
           ref={selector}
@@ -165,7 +170,7 @@ export default function() {
           }}
         >
 
-          <option>Resolution</option>
+          <option>{t('player_video_resolution')}</option>
           <For each={data().video}>
             {(f) =>
               <option value={f[1]} selected={f[0] === savedQ}>

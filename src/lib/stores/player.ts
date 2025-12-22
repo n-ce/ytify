@@ -210,12 +210,12 @@ createRoot(() => {
     const data = await import('../modules/getStreamData').then(mod => mod.default(nextItem, true));
     const prefetchRef = new Audio();
     prefetchRef.onerror = () => audioErrorHandler(prefetchRef, nextItem);
-    if ('audioStreams' in data)
+    if (data && 'adaptiveFormats' in data)
       import('../modules/setAudioStreams')
         .then(mod => mod.default(
-          data.audioStreams
-            .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-            ),
+          data.adaptiveFormats
+            .filter(f => f.type.startsWith('audio'))
+            .sort((a, b) => (parseInt(a.bitrate) - parseInt(b.bitrate))),
           prefetchRef
         ));
   }

@@ -49,9 +49,9 @@ export default function() {
         }}
         value={config.shareAction}
       >
-        <option value='play'>{t('settings_pwa_play')}</option>
+        <option value='play'>{t('player_play_button')}</option>
         <option value='watch'>{t('settings_pwa_watch')}</option>
-        <option value='dl'>{t('settings_pwa_download')}</option>
+        <option value='dl'>{t('actions_menu_download')}</option>
       </Selector>
     </>
   );

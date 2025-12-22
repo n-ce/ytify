@@ -34,43 +34,50 @@ export async function player(id?: string, isRetry = false) {
   if (!isRetry)
     setStore('index', 0);
 
-  if (data && 'audioStreams' in data)
+  if (data && 'adaptiveFormats' in data)
     setPlayerStore({
       data,
-      fullDuration: data.duration
+      fullDuration: data.lengthSeconds
     });
   else {
+    const errorData = data as Record<'error' | 'message', string>;
     setPlayerStore({
       playbackState: 'none',
-      status: data.message || data.error || 'Loading Audio Failed'
+      status: errorData.message || errorData.error || 'Loading Audio Failed'
     });
     setStore('snackbar', playerStore.status);
     return;
   }
 
+  const invidiousData = data as Invidious;
 
   await import('../modules/setMetadata')
     .then(mod => mod.default({
       id,
-      title: data.title,
-      author: data.uploader,
-      duration: convertSStoHHMMSS(data.duration),
-      authorId: data.uploaderUrl.slice(9)
+      title: invidiousData.title,
+      author: invidiousData.author,
+      duration: convertSStoHHMMSS(invidiousData.lengthSeconds),
+      authorId: invidiousData.authorId
     }));
 
   import('../modules/setAudioStreams')
     .then(mod => mod.default(
-      data.audioStreams
-        .sort((a: { bitrate: string }, b: { bitrate: string }) => (parseInt(a.bitrate) - parseInt(b.bitrate))
-        )
+      invidiousData.adaptiveFormats
+        .filter(f => f.type.startsWith('audio'))
+        .sort((a, b) => (parseInt(a.bitrate) - parseInt(b.bitrate)))
     ));
-
-
 
 
   if (config.enqueueRelatedStreams && !enforceVideo)
     import('../modules/enqueueRelatedStreams')
-      .then(mod => mod.default(data.relatedStreams as StreamItem[]));
+      .then(mod => mod.default(invidiousData.recommendedVideos.map(v => ({
+        url: '/watch?v=' + v.videoId,
+        title: v.title,
+        uploaderName: v.author,
+        duration: v.lengthSeconds,
+        uploaderUrl: v.authorUrl,
+        type: 'stream'
+      })) as StreamItem[]));
 
 
 
@@ -80,7 +87,14 @@ export async function player(id?: string, isRetry = false) {
     import('../modules/setDiscoveries')
       .then(mod => {
         setTimeout(() => {
-          mod.default(id, data.relatedStreams as StreamItem[]);
+          mod.default(id, invidiousData.recommendedVideos.map(v => ({
+            url: '/watch?v=' + v.videoId,
+            title: v.title,
+            uploaderName: v.author,
+            duration: v.lengthSeconds,
+            uploaderUrl: v.authorUrl,
+            type: 'stream'
+          })) as StreamItem[]);
         }, 1e5);
       });
 

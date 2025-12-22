@@ -1,7 +1,7 @@
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
-import { addToQueue, listStore, resetList, setListStore, setNavStore } from '@lib/stores';
+import { addToQueue, listStore, resetList, setListStore, setNavStore, t } from '@lib/stores';
 import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config } from '@lib/utils/config';
 import { generateImageUrl, getThumbIdFromLink } from '@lib/utils';
@@ -68,7 +68,7 @@ export default function() {
   const MarkBar = () => (
     <div class="markBar">
       <i
-        aria-label="Mark or Unmark All"
+        aria-label={t('list_mark_all')}
         class={'ri-checkbox-multiple-fill'}
         onclick={() => {
           if (markList().length === listStore.list.length)
@@ -80,7 +80,7 @@ export default function() {
       <Show when={markList().length}>
         <Show when={listStore.type === 'collection'}>
           <i
-            aria-label="Remove Marked"
+            aria-label={t('list_remove_marked')}
             class="ri-indeterminate-circle-line"
             onclick={() => {
               removeFromCollection(listStore.name, markList());
@@ -88,7 +88,7 @@ export default function() {
           ></i>
         </Show>
         <i
-          aria-label="Enqueue Marked"
+          aria-label={t('list_enqueue_marked')}
           class="ri-list-check-2"
           onclick={() => {
 
@@ -102,7 +102,7 @@ export default function() {
           }}
         ></i>
 
-        <i aria-label="Add to Collection">
+        <i aria-label={t('collection_selector_add_to')}>
           <CollectionSelector data={markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[]
           } />
         </i>
@@ -121,7 +121,7 @@ export default function() {
             id="listTitle"
           >{
               showStreamsNumber() ?
-                `${listStore.length} streams` :
+                t('list_streams_count', listStore.length.toString()) :
                 listStore.name
             }</p>
         </Show>
@@ -129,7 +129,7 @@ export default function() {
 
         <div class="right-group">
           <i
-            aria-label="Mark Mode"
+            aria-label={t('list_mark_mode')}
             aria-checked={markMode()}
             class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
             onclick={() => {
@@ -139,7 +139,7 @@ export default function() {
             }}
           ></i>
           <i
-            aria-label="close"
+            aria-label={t('nav_close')}
             class="ri-close-large-line"
             onclick={resetList}
           ></i>
@@ -150,17 +150,17 @@ export default function() {
 
       <Show when={showSortMenu()}>
         <span>
-          <label for="sortMenu">Sort Order :</label>
+          <label for="sortMenu">{t('list_sort_order')} :</label>
           <select id="sortMenu" onchange={(e) => {
             const newSortOrder = e.target.value as SortOrder;
             setLocalSortOrder(newSortOrder);
             setConfig('sortOrder', newSortOrder);
             fetchCollection(listStore.id);
           }} value={localSortOrder()}>
-            <option value="modified">Modified</option>
-            <option value="name">Name</option>
-            <option value="artist">Artist</option>
-            <option value="duration">Duration</option>
+            <option value="modified">{t('list_sort_modified')}</option>
+            <option value="name">{t('list_sort_name')}</option>
+            <option value="artist">{t('list_sort_artist')}</option>
+            <option value="duration">{t('list_sort_duration')}</option>
           </select>
         </span>
 

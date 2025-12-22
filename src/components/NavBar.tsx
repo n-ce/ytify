@@ -1,6 +1,6 @@
 import './NavBar.css';
 import { setConfig } from '@lib/utils';
-import { navStore, setNavStore, store, setStore } from '@lib/stores';
+import { navStore, setNavStore, store, setStore, t } from '@lib/stores';
 
 export default function() {
 
@@ -23,7 +23,7 @@ export default function() {
   return (
     <nav>
       <i
-        aria-label="Queue"
+        aria-label={t('nav_queue')}
         class="ri-order-play-fill"
         classList={{ on: navStore.queue.state }}
         onclick={() => {
@@ -32,19 +32,19 @@ export default function() {
       ></i>
 
       <i
-        aria-label="Hub"
+        aria-label={t('nav_hub')}
         class="ri-store-2-line"
         classList={{ 'on': navView('Hub') }}
         onclick={() => saveHome('Hub')}
       ></i>
       <i
-        aria-label="Library"
+        aria-label={t('nav_library')}
         class="ri-archive-stack-line"
         classList={{ 'on': navView('Library') }}
         onclick={() => saveHome('Library')}
       ></i>
       <i
-        aria-label="Search"
+        aria-label={t('nav_search')}
         class="ri-search-2-line"
         classList={{ 'on': navView('Search') }}
         onclick={() => saveHome('Search')}
