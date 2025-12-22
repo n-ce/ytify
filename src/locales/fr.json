@@ -183,5 +183,6 @@
     "settings_landscape_sections": "Sections de paysage maximales",
     "clear_hub_prompt": "Êtes-vous sûr de vouloir effacer toutes les données du hub ?",
     "clear_hub": "Vider le hub",
-    "library_hub": "Hub"
+    "library_hub": "Hub",
+    "actions_menu_yt_link": "Ouvrir dans YouTube"
 }
