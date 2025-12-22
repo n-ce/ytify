@@ -168,5 +168,20 @@
     "settings_enforce_piped": "Wymuś odtwarzanie przez Piped",
     "settings_jiosaavn": "Preferuj JioSaavn dla odtwarzania muzyki",
     "settings_reload": "Załaduj ponownie stronę, aby zastosować zmiany",
-    "library_imported": "Import biblioteki zakończył się sukcesem"
+    "library_imported": "Import biblioteki zakończył się sukcesem",
+    "settings_link_capturing": "",
+    "library_liked": "",
+    "list_already_exists": "",
+    "actions_menu_download_init": "",
+    "settings_prefetch": "",
+    "list_rename_success": "",
+    "settings_landscape_sections": "",
+    "list_export_success": "",
+    "clear_hub_prompt": "",
+    "library_about": "",
+    "actions_menu_yt_link": "",
+    "clear_hub": "",
+    "list_export_error": "",
+    "list_rename_prompt": "",
+    "list_export": ""
 }
