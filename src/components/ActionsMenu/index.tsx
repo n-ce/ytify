@@ -53,7 +53,7 @@ export default function() {
         <li class="clxnShelf" tabindex="-1">
           <LikeButton />
           <i
-            aria-label='Listen Later'
+            aria-label={t('library_listen_later')}
             class={`ri-calendar-schedule-${isListenLater() ? 'fill' : 'line'}`}
             onclick={() => {
               const { actionsMenu } = store;
@@ -67,7 +67,7 @@ export default function() {
               }
             }}
           ></i>
-          <i aria-label="Add to Collection">
+          <i aria-label={t('collection_selector_add_to')}>
             <CollectionSelector close={closeDialog} data={[store.actionsMenu as CollectionItem]} />
           </i>
         </li>
@@ -79,7 +79,7 @@ export default function() {
 
           closeDialog();
         }}>
-          <i class="ri-skip-forward-line"></i>{t('actions_menu_play_next')}
+          <i class="ri-skip-forward-line"></i>{t('player_play_next')}
         </li>
 
         <li tabindex="1" onclick={() => {
@@ -108,7 +108,7 @@ export default function() {
 
 
           if (!id) {
-            setStore('snackbar', 'id not found');
+            setStore('snackbar', t('actions_menu_id_not_found'));
             return;
           }
           getDownloadLink(id);
@@ -124,7 +124,7 @@ export default function() {
           if (author)
             setListStore('name',
               author.endsWith('- Topic') ?
-                ('Artist - ' + author.replace('- Topic', ''))
+                (t('actions_menu_artist_prefix') + author.replace('- Topic', ''))
                 : '');
 
           if (authorId)
@@ -149,7 +149,7 @@ export default function() {
             }
             closeDialog();
           }}>
-            <i class="ri-album-fill"></i>View Album
+            <i class="ri-album-fill"></i>{t('actions_menu_view_album')}
           </li>
 
         </Show>

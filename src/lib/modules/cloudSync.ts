@@ -2,7 +2,7 @@ import {
   getTracksMap,
   getMeta,
 } from "@lib/utils/library";
-import { setStore } from "@lib/stores";
+import { setStore, t } from "@lib/stores";
 import { config } from "@lib/utils/config";
 
 // --- Type Definitions ---
@@ -93,7 +93,7 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
       console.log('No remote library found. Performing initial full push.');
       await pushFullLibrary(userId);
       setStore("syncState", "synced");
-      return { success: true, message: "Initial library sync complete." };
+      return { success: true, message: t("sync_initial_complete") };
     }
 
     if (!pullResponse.ok) {
@@ -169,7 +169,7 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     if (Object.keys(deltaPayload.meta).length === 0 && Object.keys(deltaPayload.addedOrUpdatedTracks).length === 0 && deltaPayload.deletedTrackIds.length === 0 && deltaPayload.deletedCollectionNames.length === 0) {
       console.log("Sync complete. No changes to push.");
       setStore("syncState", "synced");
-      return { success: true, message: "Library is up to date." };
+      return { success: true, message: t("sync_up_to_date") };
     }
     
     const putResponse = await fetch(`/sync/${userId}`, {
@@ -182,7 +182,7 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     });
 
     if (putResponse.status === 412) {
-      throw new Error("Conflict: Library updated by another device. Please re-sync.");
+      throw new Error(t("sync_conflict"));
     }
     if (!putResponse.ok) {
       throw new Error(`Failed to push delta: ${putResponse.statusText}`);
@@ -191,13 +191,13 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     // 4. Finalize
     clearDirtyTracks();
     setStore("syncState", "synced");
-    return { success: true, message: "Changes synced to cloud." };
+    return { success: true, message: t("sync_changes_synced") };
 
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("Sync failed:", message);
     setStore("syncState", "error");
-    return { success: false, message: `Sync failed: ${message}` };
+    return { success: false, message: `${t("sync_failed")} ${message}` };
   }
 }
 

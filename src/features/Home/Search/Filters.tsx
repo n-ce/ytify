@@ -23,7 +23,7 @@ export default function() {
       }}
       value={config.searchFilter}
     >
-      <optgroup label="YouTube">
+      <optgroup label={t('search_filter_youtube')}>
         <option value="all">{t('search_filter_all')}</option>
         <option value="video_relevance">{t('search_filter_videos')}</option>
         <option value="video_date">{t('search_filter_date')}</option>
@@ -31,7 +31,7 @@ export default function() {
         <option value="channel">{t('search_filter_channels')}</option>
         <option value="playlist">{t('search_filter_playlists')}</option>
       </optgroup>
-      <optgroup label="YouTube Music">
+      <optgroup label={t('search_filter_youtube_music')}>
         <option value="music_songs">{t('search_filter_music_songs')}</option>
         <option value="music_artists">{t('search_filter_music_artists')}</option>
         <option value="music_videos">{t('search_filter_music_videos')}</option>

@@ -77,7 +77,7 @@ export default function Dropdown(_: {
   return (
     <details>
       <summary><i
-        aria-label="More Options"
+        aria-label={t('settings_more_options')}
         class="ri-more-2-fill"></i></summary>
       <ul id="listTools">
 
@@ -124,11 +124,11 @@ export default function Dropdown(_: {
             onclick={subscriptionHandler}
           >
             <i
-              class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? 'Saved to Library' : 'Save to Library'}
+              class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? t('list_saved_to_library') : t('list_save_to_library')}
           </li>
 
           <li id="viewOnYTBtn">
-            <i class="ri-external-link-line"></i>{listStore.name || 'View on YouTube'}
+            <i class="ri-external-link-line"></i>{listStore.name || t('list_view_on_yt')}
           </li>
         </Show>
 

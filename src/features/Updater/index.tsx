@@ -7,7 +7,7 @@ export default function() {
   const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/';
   const commitsLink = 'https://github.com/n-ce/ytify/commits';
   const branch = location.origin.includes('dev') ? 'dev' : 'main';
-  const [list, setList] = createSignal(['Loading...']);
+  const [list, setList] = createSignal([t('updater_loading')]);
   onMount(() => {
     fetch(commitsSrc + branch)
       .then(res => res.json())
@@ -20,7 +20,7 @@ export default function() {
       <ul>
         <For
           each={list()}
-          fallback={'Failed to Load Data From Github'}
+          fallback={t('updater_failed')}
         >
           {(item) => (<li>{item}</li>)}
         </For>

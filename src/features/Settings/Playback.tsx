@@ -1,6 +1,7 @@
 import ToggleSwitch from './ToggleSwitch.tsx';
 import { Selector } from '@components/Selector.tsx';
 import { config, quickSwitch, setConfig } from '@lib/utils';
+import { t } from '@lib/stores';
 
 export default function() {
   return (
@@ -14,11 +15,11 @@ export default function() {
         }}
         value={config.quality}
       >
-        <option value="worst">Worst</option>
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-        <option value="lossless" disabled>Lossless</option>
+        <option value="worst">{t('settings_quality_worst')}</option>
+        <option value="low">{t('settings_quality_low')}</option>
+        <option value="medium">{t('settings_quality_medium')}</option>
+        <option value="high">{t('settings_quality_high')}</option>
+        <option value="lossless" disabled>{t('settings_quality_lossless')}</option>
       </Selector>
 
       <ToggleSwitch

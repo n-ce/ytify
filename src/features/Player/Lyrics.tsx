@@ -1,16 +1,16 @@
 import { createSignal, For, onMount, onCleanup } from "solid-js";
-import { playerStore, setPlayerStore, setStore } from "@lib/stores";
+import { playerStore, setPlayerStore, setStore, t } from "@lib/stores";
 
 export default function(props: { onClose: () => void }) {
 
-  const [lrcMap, setLrcMap] = createSignal(['Loading...']);
+  const [lrcMap, setLrcMap] = createSignal([t('lyrics_loading')]);
   const [activeLine, setActiveLine] = createSignal(-1);
   let lyricsSection!: HTMLDivElement;
 
   onMount(() => {
     const { title, author } = playerStore.stream;
     if (!author) {
-      setStore('snackbar', 'Artist name not available for lyrics.');
+      setStore('snackbar', t('lyrics_artist_not_available'));
       props.onClose();
       return;
     }
@@ -77,11 +77,11 @@ export default function(props: { onClose: () => void }) {
 
         }
         else {
-          setStore('snackbar', 'No lyrics found for this track.');
+          setStore('snackbar', t('lyrics_no_found'));
           props.onClose();
         }
       }).catch(() => {
-        setStore('snackbar', 'Failed to fetch lyrics.');
+        setStore('snackbar', t('lyrics_failed'));
         props.onClose();
       });
   });

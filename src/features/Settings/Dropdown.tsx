@@ -23,14 +23,14 @@ export default function Dropdown() {
       (e.target as HTMLInputElement).files as FileList
     )[0].text();
 
-    if (confirm('This will overwrite your current settings with the imported settings, continue?'))
+    if (confirm(t('settings_import_prompt')))
       localStorage.setItem('config', newSettings);
   }
 
   return (
     <details>
       <summary><i
-        aria-label="More Options"
+        aria-label={t('settings_more_options')}
         class="ri-more-2-fill"
       ></i></summary>
       <ul>

@@ -1,6 +1,6 @@
 import { createSignal, onMount, Show } from "solid-js";
 import { setConfig } from "@lib/utils/config";
-import { setStore } from "@lib/stores";
+import { setStore, t } from "@lib/stores";
 
 export default function() {
   const [email, setEmail] = createSignal("");
@@ -18,7 +18,7 @@ export default function() {
     if (!email() || !pw()) return;
 
     setLoading(true);
-    setStore("snackbar", "Verifying credentials...");
+    setStore("snackbar", t("login_verifying"));
 
     fetch("/hash", {
       method: "POST",
@@ -36,7 +36,7 @@ export default function() {
       })
       .then((hash) => {
         setConfig("dbsync", hash);
-        setStore("snackbar", "Syncing library...");
+        setStore("snackbar", t("login_syncing"));
 
         import("@lib/modules/cloudSync").then(({ runSync }) => {
           runSync(hash)
@@ -53,7 +53,7 @@ export default function() {
         });
       })
       .catch((error) => {
-        setStore("snackbar", "Authentication failed: " + error.message);
+        setStore("snackbar", t("login_auth_failed") + error.message);
         setLoading(false);
       });
   };
@@ -61,11 +61,11 @@ export default function() {
   return (
     <dialog ref={dialogRef} class="displayer">
       <form onsubmit={handleSubmit}>
-        <h4>Sync your library to the cloud</h4>
+        <h4>{t("login_title")}</h4>
         <input
           oninput={(e) => setEmail(e.target.value)}
           type="email"
-          placeholder="Enter Email"
+          placeholder={t("login_email_placeholder")}
           required
           autofocus
           disabled={loading()}
@@ -73,14 +73,14 @@ export default function() {
         <input
           oninput={(e) => setPw(e.target.value)}
           type="password"
-          placeholder="Enter Password"
+          placeholder={t("login_pw_placeholder")}
           required
           disabled={!email() || loading()}
         />
         <span>
           <Show when={email() && pw()}>
             <button type="submit" disabled={loading()}>
-              {loading() ? "Syncing..." : "Enable Sync"}
+              {loading() ? t("login_syncing_btn") : t("login_enable_sync")}
             </button>
           </Show>
           <button
@@ -90,7 +90,7 @@ export default function() {
               dialogRef.remove();
             }}
             class="ri-close-large-line"
-            aria-label="Cancel"
+            aria-label={t("login_cancel")}
             disabled={loading()}
           ></button>
         </span>

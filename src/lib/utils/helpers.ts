@@ -45,9 +45,9 @@ export function proxyHandler(
 
   const link = new URL(url);
   const origin = link.origin;
-  const proxy = getApi(0);
+  const proxy = getApi();
 
-  return useProxy ?
+  return useProxy && !url.includes('&fallback') ?
     url.replace(origin, proxy) : url;
 }
 

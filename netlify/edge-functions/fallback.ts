@@ -30,29 +30,24 @@ export default async (_: Request, context: Context) => {
   const streamData = await fetcher(cgeo, keys, id);
   const data = {
     title: streamData.title,
-    uploader: streamData.channelTitle,
-    uploaderUrl: '/channel/' + streamData.authorId,
-    duration: streamData.lengthSeconds,
-    audioStreams: streamData.adaptiveFormats
-      .filter(_ => _.mimeType.startsWith('audio'))
+    author: streamData.channelTitle,
+    authorId: streamData.authorId,
+    lengthSeconds: streamData.lengthSeconds,
+    adaptiveFormats: streamData.adaptiveFormats
       .map(_ => ({
         url: _.url + '&fallback',
-        quality: `${Math.floor(_.bitrate / 1000)} kbps`,
-        mimeType: _.mimeType,
-        codec: _.mimeType.split('codecs="')[1]?.split('"')[0],
-        bitrate: _.bitrate,
-        contentLength: _.contentLength
+        quality: _.qualityLabel, // qualityLabel from RapidAPI maps to quality/resolution
+        type: _.mimeType,
+        encoding: _.mimeType.split('codecs="')[1]?.split('"')[0],
+        bitrate: _.bitrate.toString(),
+        clen: _.contentLength,
+        resolution: _.qualityLabel
       })),
-    videoStreams: streamData.adaptiveFormats
-      .filter(_ => _.mimeType.startsWith('video'))
-      .map(_ => ({
-        url: _.url + '&fallback', // fallback parameter to indicate it's source
-        resolution: _.qualityLabel,
-        codec: _.mimeType,
-      })),
-    relatedStreams: [], // empty array for compatibility
-    subtitles: [], // empty array for compatibility
-    livestream: streamData.isLiveContent
+    recommendedVideos: [], // empty array for compatibility
+    captions: [], // empty array for compatibility
+    liveNow: streamData.isLiveContent,
+    hlsUrl: '',
+    dashUrl: ''
   };
 
   return new Response(JSON.stringify(data), {
@@ -61,7 +56,7 @@ export default async (_: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: '/streams/:id',
+  path: '/api/v1/videos/:id',
 };
 
 const host = 'yt-api.p.rapidapi.com';
@@ -80,7 +75,7 @@ type VideoDetails = {
   }[]
 };
 
-export const fetcher = (cgeo: string, keys: string[], id:string): Promise<VideoDetails> => {
+export const fetcher = (cgeo: string, keys: string[], id: string): Promise<VideoDetails> => {
   const key = keys.shift();
   if (!key) {
     // no more keys → stop recursion

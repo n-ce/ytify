@@ -1,6 +1,6 @@
 import { onMount } from "solid-js";
 import './Settings.css';
-import { closeFeature, setNavStore } from '@lib/stores';
+import { closeFeature, setNavStore, t } from '@lib/stores';
 import App from "./App";
 import Playback from "./Playback";
 import Library from "./Library";
@@ -24,7 +24,7 @@ export default function() {
       <header>
         <p>ytify {Build}</p>
         <i
-          aria-label="close"
+          aria-label={t('nav_close')}
           class="ri-close-large-line" onclick={() => closeFeature('settings')}></i>
         <Dropdown />
       </header>

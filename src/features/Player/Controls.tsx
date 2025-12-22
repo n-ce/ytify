@@ -117,7 +117,7 @@ export default function(_: {
           when={playerStore.isMusic}
           fallback={
             <i
-              aria-label='Save Progress'
+              aria-label={t('player_save_progress')}
               class="ri-signpost-line"
               classList={{
                 on: isPointed()
@@ -136,7 +136,7 @@ export default function(_: {
           }
         >
           <i
-            aria-label="Lyrics"
+            aria-label={t('player_lyrics')}
             class="ri-music-2-line"
             classList={{
               on: _.showLyrics()
