@@ -12,8 +12,11 @@ export const createDownloadLinks = (encryptedMediaUrl: string) => {
   decipher.update(createBuffer(encrypted));
   decipher.finish();
   const decryptedLink = decipher.output.getBytes();
+  
+  // Remove PKCS7 padding or other control characters
+  const cleanDecryptedLink = decryptedLink.replace(/[\x00-\x1F]+$/, '');
 
-  return decryptedLink.replace('http:', 'https:'); // Ensure https
+  return cleanDecryptedLink.replace('http:', 'https:'); // Ensure https
 };
 
 export const createArtistMapPayload = (artist: any) => ({

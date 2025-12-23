@@ -1,6 +1,7 @@
 import { setStore, playerStore, setPlayerStore, store, t } from "@lib/stores";
 import { config } from "./config";
 import { player } from "./player";
+import getStreamData from "@lib/modules/getStreamData";
 
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
@@ -126,89 +127,52 @@ export function handleXtags(audioStreams: AudioStream[]) {
 }
 
 
+type ErrorResponse = Record<'error' | 'message', string>;
 
-interface CobaltSuccessResponse {
-  status: 'success';
-  url: string;
+function isErrorResponse(data: Invidious | ErrorResponse): data is ErrorResponse {
+  return 'error' in data || 'message' in data;
 }
 
-interface CobaltTunnelResponse {
-  audio: object;
-  bitrate: string;
-  copy: boolean;
-  cover: boolean;
-  cropCover: boolean;
-  format: string;
-  isHLS: boolean;
-  output: {
-    filename: string;
-    metadata: {
-      album: string;
-      artist: string;
-      copyright: string;
-      date: string;
-      title: string;
-    };
-    type: string;
-  };
-  service: string;
-  status: string;
-  tunnel: string[];
-  type: 'audio';
-}
+export async function getDownloadLink(id: string): Promise<void> {
 
-interface CobaltErrorResponse {
-  status: 'error';
-  error: {
-    code: string;
-  };
-}
+  try {
+    const data = await getStreamData(id);
 
-type CobaltResponse = CobaltSuccessResponse | CobaltTunnelResponse | CobaltErrorResponse;
+    if (isErrorResponse(data)) {
+      throw new Error(data.error || data.message || 'Unknown error');
+    }
 
-export function getDownloadLink(id: string): void {
-  setStore('snackbar', t('actions_menu_download_init'));
-  const streamUrl = 'https://youtu.be/' + id;
-  const api = 'https://cobalt-api.meowing.de';
-  if (!api) return;
+    const { adaptiveFormats, title } = data;
+    const audioStreams = adaptiveFormats.filter(s => s.type.startsWith('audio/'));
 
-  fetch(api, {
-    method: 'POST',
-    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url: streamUrl,
-      downloadMode: 'audio',
-      audioFormat: store.downloadFormat,
-      filenameStyle: 'basic'
-    })
-  })
-    .then(response => response.json() as Promise<CobaltResponse>)
-    .then(async data => {
-      let url: string | undefined;
-      let filename = '';
+    if (audioStreams.length === 0) throw new Error('No audio streams found');
 
-      if ('tunnel' in data && data.tunnel.length > 0) {
-        url = data.tunnel[0];
-        filename = data.output.filename;
-        await navigator?.clipboard?.writeText(filename);
-        setStore('snackbar', 'Filename copied to clipboard');
+    // Always prefer opus and highest bitrate (itag 251)
+    let selectedStream = audioStreams.find(s => s.url.includes('itag=251'));
+    if (!selectedStream) {
+      selectedStream = audioStreams.find(s => s.type.includes('opus')) || audioStreams[0];
+    }
 
-      } else if ('url' in data) {
-        url = data.url;
-      } else if ('error' in data) {
-        throw new Error(data.error?.code || 'Invalid response from download server');
-      }
+    const response = await fetch(selectedStream.url);
+    if (!response.ok) throw new Error('Failed to fetch stream');
 
-      if (url) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-      } else {
-        throw new Error('No download link found');
-      }
-    })
-    .catch(e => {
-      setStore('snackbar', e.message);
-    });
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const ext = (selectedStream.type.includes('webm') || selectedStream.type.includes('opus')) ? 'opus' : 'm4a';
+    const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-')}.${ext}`;
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setStore('snackbar', t('actions_menu_download_success'));
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Download failed';
+    setStore('snackbar', message);
+  }
 }

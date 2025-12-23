@@ -6,7 +6,6 @@ const storeInit: {
   index: number
   useSaavn: boolean,
   api: string,
-  downloadFormat: 'opus' | 'wav' | 'mp3' | 'ogg',
   updater?: () => void,
   actionsMenu?: CollectionItem,
   snackbar?: string,
@@ -17,7 +16,6 @@ const storeInit: {
   index: 0,
   api: Backend[Math.floor(Math.random() * Backend.length)],
   useSaavn: true,
-  downloadFormat: config.dlFormat,
   homeView: config.home as "" | "Hub" | "Library" | "Search",
 };
 
