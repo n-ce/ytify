@@ -13,7 +13,7 @@ export default function() {
   let selector!: HTMLSelectElement;
 
 
-  const savedQ = config.watchMode || { worst: '144p', low: '240', medium: '360p', high: '720p', lossless: '1080p' }[config.quality];
+  const savedQ = config.watchMode || { worst: '144p', low: '240', medium: '360p', high: '720p' }[config.quality];
 
   createEffect(async () => {
     if (!playerStore.stream.id) return;
@@ -158,7 +158,7 @@ export default function() {
 
       <div>
 
-        <button onclick={close}>{t('nav_close')}</button>
+        <button onclick={close}>{t('close')}</button>
 
         <select
           ref={selector}

@@ -124,7 +124,7 @@ export default function() {
           if (author)
             setListStore('name',
               author.endsWith('- Topic') ?
-                (t('actions_menu_artist_prefix') + author.replace('- Topic', ''))
+                ('Artist - ' + author.replace('- Topic', ''))
                 : '');
 
           if (authorId)

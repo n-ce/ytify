@@ -22,8 +22,7 @@ export default function() {
         worst: '12',
         low: '48',
         medium: '160',
-        high: '320',
-        lossless: '320'
+        high: '320'
       })[config.quality] || '320';
       const fullDownloadUrl = `${baseUrl}${trimmedDownloadUrl}_${desiredBitrateSuffix || '96'}.mp4`;
 

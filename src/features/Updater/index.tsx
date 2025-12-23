@@ -7,7 +7,7 @@ export default function() {
   const commitsSrc = 'https://api.github.com/repos/n-ce/ytify/commits/';
   const commitsLink = 'https://github.com/n-ce/ytify/commits';
   const branch = location.origin.includes('dev') ? 'dev' : 'main';
-  const [list, setList] = createSignal([t('updater_loading')]);
+  const [list, setList] = createSignal([t('loading')]);
   onMount(() => {
     fetch(commitsSrc + branch)
       .then(res => res.json())

@@ -83,10 +83,6 @@ export async function preferredStream(audioStreams: AudioStream[]) {
     high: {
       opus: [251],
       aac: [140]
-    },
-    lossless: {
-      opus: [251],
-      aac: [140]
     }
   })[config.quality || 'medium'][preferedCodec];
   let stream!: AudioStream;

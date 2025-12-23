@@ -10,7 +10,7 @@ export default function() {
         label='settings_audio_quality'
         id='qualityPreference'
         onchange={async (e) => {
-          setConfig('quality', e.target.value as 'worst' | 'low' | 'medium' | 'high' | 'lossless');
+          setConfig('quality', e.target.value as 'worst' | 'low' | 'medium' | 'high');
           quickSwitch();
         }}
         value={config.quality}
@@ -19,7 +19,6 @@ export default function() {
         <option value="low">{t('settings_quality_low')}</option>
         <option value="medium">{t('settings_quality_medium')}</option>
         <option value="high">{t('settings_quality_high')}</option>
-        <option value="lossless" disabled>{t('settings_quality_lossless')}</option>
       </Selector>
 
       <ToggleSwitch

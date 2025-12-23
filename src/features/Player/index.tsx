@@ -60,7 +60,7 @@ export default function() {
         <div class="right-group">
 
           <i
-            aria-label={t('nav_close')}
+            aria-label={t('close')}
             onclick={() => { closeFeature('player') }}
             class="ri-close-large-line"></i>
 

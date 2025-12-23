@@ -24,7 +24,7 @@ export default function() {
       <header>
         <p>ytify {Build}</p>
         <i
-          aria-label={t('nav_close')}
+          aria-label={t('close')}
           class="ri-close-large-line" onclick={() => closeFeature('settings')}></i>
         <Dropdown />
       </header>

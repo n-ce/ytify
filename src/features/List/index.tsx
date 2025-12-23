@@ -139,7 +139,7 @@ export default function() {
             }}
           ></i>
           <i
-            aria-label={t('nav_close')}
+            aria-label={t('close')}
             class="ri-close-large-line"
             onclick={resetList}
           ></i>

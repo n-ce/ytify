@@ -3,7 +3,7 @@ import { playerStore, setPlayerStore, setStore, t } from "@lib/stores";
 
 export default function(props: { onClose: () => void }) {
 
-  const [lrcMap, setLrcMap] = createSignal([t('lyrics_loading')]);
+  const [lrcMap, setLrcMap] = createSignal([t('loading')]);
   const [activeLine, setActiveLine] = createSignal(-1);
   let lyricsSection!: HTMLDivElement;
 
