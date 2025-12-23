@@ -19,7 +19,7 @@ export default async function handler(
 
   try {
     const data = await getAlbumData(albumId, countryCode);
-    
+
     response.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
     return response.status(200).json(data);
   } catch (error) {

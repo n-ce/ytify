@@ -1,6 +1,4 @@
-
-
-import { createDecipher, createBuffer, decode64 } from './forge';
+import { createDecipher, createBuffer, decode64 } from './forge.js';
 
 export const createDownloadLinks = (encryptedMediaUrl: string) => {
   if (!encryptedMediaUrl) return [];
