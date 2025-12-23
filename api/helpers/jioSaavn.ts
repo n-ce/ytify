@@ -1,4 +1,4 @@
-import crypto from 'node-forge';
+import { createDecipher, createBuffer, decode64 } from './forge.js';
 
 export const createDownloadLinks = (encryptedMediaUrl: string) => {
   if (!encryptedMediaUrl) return [];
@@ -6,14 +6,17 @@ export const createDownloadLinks = (encryptedMediaUrl: string) => {
   const key = '38346591';
   const iv = '00000000';
 
-  const encrypted = crypto.util.decode64(encryptedMediaUrl);
-  const decipher = crypto.cipher.createDecipher('DES-ECB', crypto.util.createBuffer(key));
-  decipher.start({ iv: crypto.util.createBuffer(iv) });
-  decipher.update(crypto.util.createBuffer(encrypted));
+  const encrypted = decode64(encryptedMediaUrl);
+  const decipher = createDecipher('DES-ECB', createBuffer(key));
+  decipher.start({ iv: createBuffer(iv) });
+  decipher.update(createBuffer(encrypted));
   decipher.finish();
   const decryptedLink = decipher.output.getBytes();
+  
+  // Remove PKCS7 padding or other control characters
+  const cleanDecryptedLink = decryptedLink.replace(/[\x00-\x1F]+$/, '');
 
-  return decryptedLink.replace('http:', 'https:'); // Ensure https
+  return cleanDecryptedLink.replace('http:', 'https:'); // Ensure https
 };
 
 export const createArtistMapPayload = (artist: any) => ({

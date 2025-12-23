@@ -28,20 +28,6 @@ export default function() {
       </Selector>
 
       <Selector
-        id='downloadFormatSelector'
-        label='settings_download_format'
-        onchange={(e) => {
-          setConfig('dlFormat', e.target.value as 'opus' | 'mp3' | 'wav' | 'ogg');
-        }}
-        value={config.dlFormat}
-      >
-        <option value='opus'>Opus</option>
-        <option value='mp3'>MP3</option>
-        <option value='wav'>WAV</option>
-        <option value='ogg'>OGG</option>
-      </Selector>
-
-      <Selector
         id='shareAction'
         label='settings_pwa_share_action'
         onchange={(e) => {

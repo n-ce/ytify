@@ -78,7 +78,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     }
 
     const fullDownloadUrl: string = matchingTrack.downloadUrl;
-    const trimmedDownloadUrl = fullDownloadUrl.replace(/^https:\/\/aac\.saavncdn\.com\/(.*?)_96\.mp4$/, '$1');
+    const trimmedDownloadUrl = fullDownloadUrl.replace(/^https:\/\/aac\.saavncdn\.com\/(.*?)_\d+\.mp4$/, '$1');
 
     return res.status(200).send(trimmedDownloadUrl);
 
