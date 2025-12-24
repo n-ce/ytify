@@ -112,7 +112,6 @@ declare global {
     duration: string,
     uploaded?: string,
     authorId?: string,
-    channelUrl?: string,
     views?: string,
     img?: string,
     albumId?: string,

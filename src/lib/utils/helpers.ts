@@ -134,45 +134,50 @@ function isErrorResponse(data: Invidious | ErrorResponse): data is ErrorResponse
 }
 
 export async function getDownloadLink(id: string): Promise<void> {
+  setStore('snackbar', t('actions_menu_downloading'));
 
-  try {
-    const data = await getStreamData(id);
+  return getStreamData(id)
+    .then(data => {
+      if (isErrorResponse(data)) {
+        throw new Error(data.error || data.message || 'Unknown error');
+      }
 
-    if (isErrorResponse(data)) {
-      throw new Error(data.error || data.message || 'Unknown error');
-    }
+      const { adaptiveFormats, title } = data;
+      const audioStreams = adaptiveFormats.filter(s => s.type.startsWith('audio/'));
 
-    const { adaptiveFormats, title } = data;
-    const audioStreams = adaptiveFormats.filter(s => s.type.startsWith('audio/'));
+      if (audioStreams.length === 0) throw new Error('No audio streams found');
 
-    if (audioStreams.length === 0) throw new Error('No audio streams found');
+      // Always prefer opus and highest bitrate (itag 251)
+      let selectedStream = audioStreams.find(s => s.url.includes('itag=251'));
+      if (!selectedStream) {
+        selectedStream = audioStreams.find(s => s.type.includes('opus')) || audioStreams[0];
+      }
 
-    // Always prefer opus and highest bitrate (itag 251)
-    let selectedStream = audioStreams.find(s => s.url.includes('itag=251'));
-    if (!selectedStream) {
-      selectedStream = audioStreams.find(s => s.type.includes('opus')) || audioStreams[0];
-    }
+      const downloadUrl = proxyHandler(selectedStream.url, true);
 
-    const response = await fetch(selectedStream.url);
-    if (!response.ok) throw new Error('Failed to fetch stream');
+      return fetch(downloadUrl)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch stream');
+          return res.blob();
+        })
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const ext = (selectedStream.type.includes('webm') || selectedStream.type.includes('opus')) ? 'opus' : 'm4a';
+          const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-')}.${ext}`;
 
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 100);
 
-    const ext = (selectedStream.type.includes('webm') || selectedStream.type.includes('opus')) ? 'opus' : 'm4a';
-    const filename = `${title.replace(/[/\\?%*:|"<>]/g, '-')}.${ext}`;
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    setStore('snackbar', t('actions_menu_download_success'));
-  } catch (e) {
-    const message = e instanceof Error ? e.message : 'Download failed';
-    setStore('snackbar', message);
-  }
+          setStore('snackbar', t('actions_menu_download_success'));
+        });
+    })
+    .catch(e => {
+      const message = e instanceof Error ? e.message : 'Download failed';
+      setStore('snackbar', message);
+    });
 }

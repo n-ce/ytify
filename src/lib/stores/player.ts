@@ -5,6 +5,7 @@ import { navStore, params, updateParam } from "./navigation";
 import { addToQueue, queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
 import { setStore, store } from "./app";
+import getStreamData from "../modules/getStreamData";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -207,7 +208,7 @@ createRoot(() => {
 
     if (!nextItem) return;
 
-    const data = await import('../modules/getStreamData').then(mod => mod.default(nextItem, true));
+    const data = await getStreamData(nextItem, true);
     const prefetchRef = new Audio();
     prefetchRef.onerror = () => audioErrorHandler(prefetchRef, nextItem);
     if (data && 'adaptiveFormats' in data)
