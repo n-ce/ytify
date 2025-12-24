@@ -111,9 +111,9 @@
     "settings_set_as_default_tab": "Définir comme onglet par défaut",
     "settings_library_sync": "Synchronisation cloud",
     "settings_store_discoveries": "Stocker les découvertes",
-    "settings_clear_discoveries": "Cela effacera vos $ découvertes existantes, continuer ?",
+    "settings_clear_discoveries": "Cela effacera vos découvertes de $ existantes, continuer ?",
     "settings_store_history": "Stocker l'historique",
-    "settings_clear_history": "Cela effacera $ éléments de votre historique, continuer ?",
+    "settings_clear_history": "Cela effacera $ éléments de votre historique, continuer ?",
     "settings_import_from_piped": "Importer les listes de lecture depuis Piped",
     "settings_interface": "Interface",
     "settings_load_images": "Charger les images",
@@ -218,7 +218,7 @@
     "list_saved_to_library": "Enregistrée dans la bibliothèque",
     "actions_menu_listen_later": "Écouter plus tard",
     "list_view_on_yt": "Vue sur YouTube",
-    "list_streams_count": "flux de dollars",
+    "list_streams_count": "$ streams",
     "list_mark_mode": "Mode de marquage",
     "list_mark_all": "Tout marquer ou démarquer",
     "list_remove_marked": "Supprimer les éléments marqués",
@@ -271,5 +271,10 @@
     "nav_logout": "Déconnexion",
     "player_video_resolution": "Résolution",
     "player_video_close": "Fermer",
-    "nav_hub": "Hub"
+    "nav_hub": "Hub",
+    "close": "Fermer",
+    "loading": "Chargement...",
+    "actions_menu_downloading": "Téléchargement...",
+    "actions_menu_download_success": "Téléchargement prêt !",
+    "actions_menu_share": "Partager le lien"
 }
