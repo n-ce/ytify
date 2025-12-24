@@ -43,7 +43,7 @@
   "fetchlist_url_null": "No Channel URL provided",
   "fetchlist_error": "Could not get playlistData",
   "fetchlist_nonexistent": "Got error: \"The playlist does not exist.\"",
-  "search_placeholder": "Search or enter YT URL [CTRL+K]",
+  "search_placeholder": "Search or enter YT URL(s)",
   "search_filter_all": "All",
   "search_filter_videos": "Relevance",
   "search_filter_channels": "Channels",

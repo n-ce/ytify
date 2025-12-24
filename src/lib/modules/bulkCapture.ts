@@ -7,7 +7,7 @@ export default function(ids: string[]): Promise<void> {
   setStore('snackbar', 'Processing pasted links...'); // Notify user of process start
   const collectionItems: CollectionItem[] = [];
 
-  const processId = (id: string): Promise<void> => {
+  const processId = async (id: string): Promise<void> => {
     return getStreamData(id)
       .then(streamData => {
         if ("error" in streamData) {

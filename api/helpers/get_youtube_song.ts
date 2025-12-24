@@ -6,7 +6,7 @@ export interface YouTubeSong {
   title: string,
   author: string,
   duration: string,
-  channelUrl: string
+  authorId: string
 }
 
 
@@ -72,7 +72,7 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
           title,
           author: author + ' - Topic',
           duration,
-          channelUrl: 'channel/' + channelId
+          authorId: channelId
         };
     }
 
@@ -105,7 +105,7 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
               title,
               author: author + ' - Topic',
               duration,
-              channelUrl: 'channel/' + channelId
+              authorId: channelId
             };
 
 
@@ -129,7 +129,7 @@ export async function getYouTubeSong(query: string): Promise<YouTubeSong | {}> {
             title,
             author: author + ' - Topic',
             duration,
-            channelUrl: 'channel/' + channelId
+            authorId: channelId
           };
       }
 
