@@ -29,7 +29,7 @@
     "fetchlist_url_null": "Aucune URL de chaîne fournie",
     "fetchlist_error": "Impossible d'obtenir les données de la playlist",
     "fetchlist_nonexistent": "Erreur reçue : « La playlist n'existe pas. »",
-    "search_placeholder": "Rechercher ou saisir l'URL YouTube [CTRL+K]",
+    "search_placeholder": "Rechercher ou saisir une ou plusieurs URL YouTube",
     "search_filter_all": "Tout",
     "search_filter_videos": "Pertinence",
     "search_filter_channels": "Chaînes",
