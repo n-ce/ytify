@@ -14,7 +14,7 @@ export const createDownloadLinks = (encryptedMediaUrl: string) => {
   decipher.update(crypto.util.createBuffer(encrypted));
   decipher.finish();
   const decryptedLink = decipher.output.getBytes();
-
+  console.log(decryptedLink);
   return decryptedLink.replace('http:', 'https:'); // Ensure https
 };
 

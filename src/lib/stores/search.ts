@@ -65,7 +65,7 @@ export async function getSearchResults() {
 
   const recentSearches = localStorage.getItem('searched')?.split(',') || [];
 
-  if (recentSearches.length === 5)
+  while (recentSearches.length > 4)
     recentSearches.shift();
   const lc = query.toLowerCase();
   if (!recentSearches.includes(lc))
