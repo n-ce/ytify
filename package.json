@@ -19,7 +19,7 @@
     "@types/sortablejs": "^1.15.9",
     "@vercel/node": "^5.5.16",
     "autoprefixer": "^10.4.23",
-    "crypto-es": "3.1.2",
+    "crypto-es": "^3.1.2",
     "eruda": "^3.4.3",
     "open-props": "1.7.17",
     "postcss-jit-props": "1.0.16",

@@ -1,4 +1,8 @@
-import { DES, enc, mode, pad } from 'crypto-es';
+// Importing directly from the lib files bypasses the broken index exports
+import { DES } from 'crypto-es/lib/des.js';
+import { Utf8, Base64 } from 'crypto-es/lib/core.js';
+import { ECB } from 'crypto-es/lib/mode-ecb.js';
+import { Pkcs7 } from 'crypto-es/lib/pad-pkcs7.js';
 
 // --- Interfaces ---
 
@@ -48,6 +52,7 @@ export interface SongPayload {
 
 /**
  * Decrypts Saavn's encrypted media URL using pure TypeScript (crypto-es).
+ * Uses Deep Imports to ensure compatibility with Vite/Vercel.
  */
 export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   if (!encryptedMediaUrl) return "";
@@ -55,24 +60,23 @@ export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   const key = '38346591';
 
   try {
-    // 1. Prepare the key as a WordArray using enc
-    const keyHex = enc.Utf8.parse(key);
+    // 1. Prepare the key and ciphertext
+    const keyHex = Utf8.parse(key);
+    const cipherTextWordArray = Base64.parse(encryptedMediaUrl);
 
     // 2. Decrypt using DES-ECB with PKCS7 padding
     const decrypted = DES.decrypt(
-      { 
-        // @ts-ignore - crypto-es types can be finicky with CipherParams
-        ciphertext: enc.Base64.parse(encryptedMediaUrl) 
-      },
+      // We use a manual object cast to satisfy the internal CipherParams requirement
+      { ciphertext: cipherTextWordArray } as any,
       keyHex,
       {
-        mode: mode.ECB,
-        padding: pad.Pkcs7,
+        mode: ECB,
+        padding: Pkcs7,
       }
     );
 
     // 3. Convert result to UTF-8 string
-    const decryptedText = decrypted.toString(enc.Utf8);
+    const decryptedText = decrypted.toString(Utf8);
 
     // 4. Clean and return the URL
     const cleanLink = decryptedText.trim();
@@ -80,7 +84,7 @@ export const createDownloadLinks = (encryptedMediaUrl: string): string => {
     
     return cleanLink.replace('http:', 'https:');
   } catch (error) {
-    console.error("TypeScript Decryption Error:", error);
+    console.error("Decryption Error:", error);
     return "";
   }
 };
