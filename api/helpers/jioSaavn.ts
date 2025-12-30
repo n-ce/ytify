@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-es';
+import { DES, enc, mode, pad } from 'crypto-es';
 
 // --- Interfaces ---
 
@@ -55,24 +55,24 @@ export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   const key = '38346591';
 
   try {
-    // 1. Prepare the key as a WordArray using CryptoJS.enc
-    const keyHex = CryptoJS.enc.Utf8.parse(key);
+    // 1. Prepare the key as a WordArray using enc
+    const keyHex = enc.Utf8.parse(key);
 
     // 2. Decrypt using DES-ECB with PKCS7 padding
-    const decrypted = CryptoJS.DES.decrypt(
+    const decrypted = DES.decrypt(
       { 
         // @ts-ignore - crypto-es types can be finicky with CipherParams
-        ciphertext: CryptoJS.enc.Base64.parse(encryptedMediaUrl) 
+        ciphertext: enc.Base64.parse(encryptedMediaUrl) 
       },
       keyHex,
       {
-        mode: CryptoJS.mode.ECB,
-        padding: CryptoJS.pad.Pkcs7,
+        mode: mode.ECB,
+        padding: pad.Pkcs7,
       }
     );
 
     // 3. Convert result to UTF-8 string
-    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+    const decryptedText = decrypted.toString(enc.Utf8);
 
     // 4. Clean and return the URL
     const cleanLink = decryptedText.trim();
