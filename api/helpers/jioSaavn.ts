@@ -1,8 +1,4 @@
-// Importing directly from the lib files bypasses the broken index exports
-import { DES } from 'crypto-es/lib/des.js';
-import { Utf8, Base64 } from 'crypto-es/lib/core.js';
-import { ECB } from 'crypto-es/lib/mode-ecb.js';
-import { Pkcs7 } from 'crypto-es/lib/pad-pkcs7.js';
+import * as CryptoJS from 'crypto-es';
 
 // --- Interfaces ---
 
@@ -50,39 +46,30 @@ export interface SongPayload {
 
 // --- Logic ---
 
-/**
- * Decrypts Saavn's encrypted media URL using pure TypeScript (crypto-es).
- * Uses Deep Imports to ensure compatibility with Vite/Vercel.
- */
 export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   if (!encryptedMediaUrl) return "";
 
   const key = '38346591';
 
   try {
-    // 1. Prepare the key and ciphertext
-    const keyHex = Utf8.parse(key);
-    const cipherTextWordArray = Base64.parse(encryptedMediaUrl);
+    // Access namespaces through CryptoJS
+    const keyHex = CryptoJS.enc.Utf8.parse(key);
+    const cipherText = CryptoJS.enc.Base64.parse(encryptedMediaUrl);
 
-    // 2. Decrypt using DES-ECB with PKCS7 padding
-    const decrypted = DES.decrypt(
-      // We use a manual object cast to satisfy the internal CipherParams requirement
-      { ciphertext: cipherTextWordArray } as any,
+    const decrypted = CryptoJS.DES.decrypt(
+      { ciphertext: cipherText } as any,
       keyHex,
       {
-        mode: ECB,
-        padding: Pkcs7,
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7,
       }
     );
 
-    // 3. Convert result to UTF-8 string
-    const decryptedText = decrypted.toString(Utf8);
+    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+    if (!decryptedText) return "";
 
-    // 4. Clean and return the URL
     const cleanLink = decryptedText.trim();
-    if (!cleanLink.startsWith('http')) return "";
-    
-    return cleanLink.replace('http:', 'https:');
+    return cleanLink.startsWith('http') ? cleanLink.replace('http:', 'https:') : "";
   } catch (error) {
     console.error("Decryption Error:", error);
     return "";
