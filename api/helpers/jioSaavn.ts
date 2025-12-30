@@ -1,4 +1,7 @@
-import * as CryptoJS from 'crypto-es';
+import { DES } from 'crypto-es/dist/des.mjs';
+import { Utf8, Base64 } from 'crypto-es/dist/core.mjs';
+import { ECB } from 'crypto-es/dist/mode-ecb.mjs';
+import { Pkcs7 } from 'crypto-es/dist/pad-pkcs7.mjs';
 
 // --- Interfaces ---
 
@@ -46,29 +49,39 @@ export interface SongPayload {
 
 // --- Logic ---
 
+/**
+ * Decrypts JioSaavn media URLs using pure TypeScript (crypto-es).
+ */
 export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   if (!encryptedMediaUrl) return "";
 
   const key = '38346591';
 
   try {
-    // Access namespaces through CryptoJS
-    const keyHex = CryptoJS.enc.Utf8.parse(key);
-    const cipherText = CryptoJS.enc.Base64.parse(encryptedMediaUrl);
+    // 1. Prepare key and ciphertext
+    // Using named exports directly avoids the 'Namespace' missing property error
+    const keyHex = enc.Utf8.parse(key);
+    const cipherText = enc.Base64.parse(encryptedMediaUrl);
 
-    const decrypted = CryptoJS.DES.decrypt(
+    // 2. Decrypt with DES-ECB
+    // We cast the object as 'any' here specifically because the crypto-es 
+    // internal types for CipherParams are incompatible with a simple object literal
+    const decrypted = DES.decrypt(
       { ciphertext: cipherText } as any,
       keyHex,
       {
-        mode: CryptoJS.mode.ECB,
-        padding: CryptoJS.pad.Pkcs7,
+        mode: mode.ECB,
+        padding: pad.Pkcs7,
       }
     );
 
-    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
+    // 3. Convert result to UTF-8
+    const decryptedText = decrypted.toString(enc.Utf8);
     if (!decryptedText) return "";
 
     const cleanLink = decryptedText.trim();
+    
+    // Ensure the link is served over HTTPS
     return cleanLink.startsWith('http') ? cleanLink.replace('http:', 'https:') : "";
   } catch (error) {
     console.error("Decryption Error:", error);

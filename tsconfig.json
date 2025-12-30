@@ -36,6 +36,7 @@
   },
   "include": [
     "src",
-    "netlify"
+    "netlify",
+    "api"
   ]
 }
