@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import { DES, mode, pad, enc } from 'crypto-es';
 
 // --- Interfaces ---
 
@@ -47,32 +47,38 @@ export interface SongPayload {
 // --- Logic ---
 
 /**
- * Decrypts Saavn's DES-ECB encrypted media URL.
- * NOTE: Requires NODE_OPTIONS='--openssl-legacy-provider' on Node 17+
+ * Decrypts Saavn's encrypted media URL using pure TypeScript (crypto-es).
+ * This avoids Node's native crypto and OpenSSL legacy issues.
  */
 export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   if (!encryptedMediaUrl) return "";
 
   const key = '38346591';
-  const algorithm = 'des-ecb';
 
   try {
-    // ECB mode does not use an IV; an empty buffer is used to satisfy the API.
-    const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key, 'utf8'), Buffer.alloc(0));
-    
-    decipher.setAutoPadding(true);
+    // 1. Prepare the key as a WordArray
+    const keyHex = enc.Utf8.parse(key);
 
-    let decrypted = decipher.update(encryptedMediaUrl, 'base64', 'utf8');
-    decrypted += decipher.final('utf8');
+    // 2. Decrypt using DES-ECB with PKCS7 padding (Saavn's standard)
+    const decrypted = DES.decrypt(
+      { ciphertext: enc.Base64.parse(encryptedMediaUrl) },
+      keyHex,
+      {
+        mode: mode.ECB,
+        padding: pad.Pkcs7,
+      }
+    );
 
-    // Remove null padding bytes (\0) and trim
-    const cleanLink = decrypted.replace(/\0+$/, '').trim();
+    // 3. Convert result to UTF-8 string
+    const decryptedText = decrypted.toString(enc.Utf8);
 
+    // 4. Clean and return the URL
+    const cleanLink = decryptedText.trim();
     if (!cleanLink.startsWith('http')) return "";
     
     return cleanLink.replace('http:', 'https:');
   } catch (error) {
-    console.error("Decryption Error:", error);
+    console.error("TypeScript Decryption Error:", error);
     return "";
   }
 };
