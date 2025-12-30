@@ -1,4 +1,4 @@
-import { DES, mode, pad, enc } from 'crypto-es';
+import CryptoJS from 'crypto-es';
 
 // --- Interfaces ---
 
@@ -48,7 +48,6 @@ export interface SongPayload {
 
 /**
  * Decrypts Saavn's encrypted media URL using pure TypeScript (crypto-es).
- * This avoids Node's native crypto and OpenSSL legacy issues.
  */
 export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   if (!encryptedMediaUrl) return "";
@@ -56,21 +55,24 @@ export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   const key = '38346591';
 
   try {
-    // 1. Prepare the key as a WordArray
-    const keyHex = enc.Utf8.parse(key);
+    // 1. Prepare the key as a WordArray using CryptoJS.enc
+    const keyHex = CryptoJS.enc.Utf8.parse(key);
 
-    // 2. Decrypt using DES-ECB with PKCS7 padding (Saavn's standard)
-    const decrypted = DES.decrypt(
-      { ciphertext: enc.Base64.parse(encryptedMediaUrl) },
+    // 2. Decrypt using DES-ECB with PKCS7 padding
+    const decrypted = CryptoJS.DES.decrypt(
+      { 
+        // @ts-ignore - crypto-es types can be finicky with CipherParams
+        ciphertext: CryptoJS.enc.Base64.parse(encryptedMediaUrl) 
+      },
       keyHex,
       {
-        mode: mode.ECB,
-        padding: pad.Pkcs7,
+        mode: CryptoJS.mode.ECB,
+        padding: CryptoJS.pad.Pkcs7,
       }
     );
 
     // 3. Convert result to UTF-8 string
-    const decryptedText = decrypted.toString(enc.Utf8);
+    const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
 
     // 4. Clean and return the URL
     const cleanLink = decryptedText.trim();
