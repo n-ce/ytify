@@ -46,7 +46,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       throw new Error(`JioSaavn API returned ${response.status}: ${errorText}`);
     }
 
-    const data = await response.json() as { result: SaavnSong[] };
+    const data = await response.json() as { results: SaavnSong[] };
 
     if (!data.results || data.results.length === 0) {
       return res.status(404).send('Music stream not found in JioSaavn results');

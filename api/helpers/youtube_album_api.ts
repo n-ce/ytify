@@ -19,6 +19,10 @@ interface MusicResponsiveListItemRenderer {
             navigationEndpoint?: {
               watchEndpoint?: {
                 videoId: string;
+                playlistId?: string;
+              };
+              browseEndpoint?: {
+                browseId: string;
               };
             };
           }[];
@@ -43,7 +47,16 @@ interface MusicShelfRenderer {
 
 interface MusicDetailHeaderRenderer {
   title: { runs: { text: string }[] };
-  subtitle: { runs: { text: string }[] };
+  subtitle: {
+    runs: {
+      text: string;
+      navigationEndpoint?: {
+        browseEndpoint?: {
+          browseId: string;
+        };
+      };
+    }[];
+  };
   thumbnail: {
     musicThumbnailRenderer: {
       thumbnail: {
@@ -57,7 +70,16 @@ interface MusicResponsiveHeaderRenderer {
   musicResponsiveHeaderRenderer: {
     title: { runs: { text: string }[] };
     subtitle: { runs: { text: string }[] };
-    straplineTextOne?: { runs: { text: string }[] };
+    straplineTextOne?: {
+      runs: {
+        text: string;
+        navigationEndpoint?: {
+          browseEndpoint?: {
+            browseId: string;
+          };
+        };
+      }[];
+    };
     thumbnail: {
       musicThumbnailRenderer: {
         thumbnail: {
