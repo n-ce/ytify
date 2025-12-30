@@ -1,8 +1,8 @@
-import { DES } from '../crypto/tripledes.js';
-import { Utf8 } from '../crypto/core.js';
-import { Base64 } from '../crypto/enc-base64.js';
-import { ECB } from '../crypto/mode-ecb.js';
-import { Pkcs7 } from '../crypto/cipher-core.js';
+import { DES } from './crypto/tripledes.js';
+import { Utf8 } from './crypto/core.js';
+import { Base64 } from './crypto/enc-base64.js';
+import { ECB } from './crypto/mode-ecb.js';
+import { Pkcs7 } from './crypto/cipher-core.js';
 
 // --- Interfaces ---
 
