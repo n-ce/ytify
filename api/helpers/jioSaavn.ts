@@ -1,7 +1,8 @@
-import { DES } from 'crypto-es/dist/des.mjs';
-import { Utf8, Base64 } from 'crypto-es/dist/core.mjs';
-import { ECB } from 'crypto-es/dist/mode-ecb.mjs';
-import { Pkcs7 } from 'crypto-es/dist/pad-pkcs7.mjs';
+import { DES } from '../crypto/tripledes.js';
+import { Utf8 } from '../crypto/core.js';
+import { Base64 } from '../crypto/enc-base64.js';
+import { ECB } from '../crypto/mode-ecb.js';
+import { Pkcs7 } from '../crypto/cipher-core.js';
 
 // --- Interfaces ---
 
@@ -52,6 +53,7 @@ export interface SongPayload {
 /**
  * Decrypts JioSaavn media URLs using pure TypeScript (crypto-es).
  */
+
 export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   if (!encryptedMediaUrl) return "";
 
@@ -60,8 +62,8 @@ export const createDownloadLinks = (encryptedMediaUrl: string): string => {
   try {
     // 1. Prepare key and ciphertext
     // Using named exports directly avoids the 'Namespace' missing property error
-    const keyHex = enc.Utf8.parse(key);
-    const cipherText = enc.Base64.parse(encryptedMediaUrl);
+    const keyHex = Utf8.parse(key);
+    const cipherText = Base64.parse(encryptedMediaUrl);
 
     // 2. Decrypt with DES-ECB
     // We cast the object as 'any' here specifically because the crypto-es 
@@ -70,13 +72,13 @@ export const createDownloadLinks = (encryptedMediaUrl: string): string => {
       { ciphertext: cipherText } as any,
       keyHex,
       {
-        mode: mode.ECB,
-        padding: pad.Pkcs7,
+        mode: ECB,
+        padding: Pkcs7,
       }
     );
 
     // 3. Convert result to UTF-8
-    const decryptedText = decrypted.toString(enc.Utf8);
+    const decryptedText = decrypted.toString(Utf8);
     if (!decryptedText) return "";
 
     const cleanLink = decryptedText.trim();
