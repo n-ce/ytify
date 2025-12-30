@@ -7,12 +7,12 @@ import {
   Hasher,
   HasherCfg,
   Hex,
-} from './core';
-import { Base64 } from './enc-base64';
-import { EvpKDFAlgo } from './evpkdf';
+} from './core.js';
+import { Base64 } from './enc-base64.js';
+import { EvpKDFAlgo } from './evpkdf.js';
 
 // Re-export WordArray for convenience
-export { WordArray } from './core';
+export { WordArray } from './core.js';
 
 /**
  * Configuration options for ciphers

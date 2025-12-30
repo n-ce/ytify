@@ -4,7 +4,7 @@ import {
   Hasher32,
   HashFn,
   HMACHashFn,
-} from './core';
+} from './core.js';
 
 // Constants table
 const T = /* @__PURE__ */ (() => {
