@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getAlbumData } from './helpers/youtube_album_api.js';
+import { getAlbumData } from '../src/backend/youtube_album_api.js';
 
 export default async function handler(
   request: VercelRequest,
