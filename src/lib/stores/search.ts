@@ -64,10 +64,11 @@ export async function getSearchResults() {
   observer.disconnect();
 
   const recentSearches = localStorage.getItem('searched')?.split(',') || [];
-
-  while (recentSearches.length > 4)
-    recentSearches.shift();
   const lc = query.toLowerCase();
+
+  while (recentSearches.length > 5)
+    recentSearches.shift();
+  
   if (!recentSearches.includes(lc))
     recentSearches.push(lc);
 

@@ -46,7 +46,7 @@ export default defineConfig(({ command }) => ({
             "purpose": "any maskable"
           },
           {
-            "src": "logo512-monochrome.png",
+            "src": "monochrome.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "monochrome"
