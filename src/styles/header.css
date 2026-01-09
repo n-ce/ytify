@@ -1,5 +1,8 @@
 section:has(header>details[open]) {
-  >div {
+
+  >div,
+  img,
+  article {
     filter: blur(var(--size-px-1));
     pointer-events: none;
   }

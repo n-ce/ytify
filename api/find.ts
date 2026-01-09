@@ -94,6 +94,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     const fullDownloadUrl: string = matchingTrack.downloadUrl;
     const trimmedDownloadUrl = fullDownloadUrl.replace(/^https:\/\/aac\.saavncdn\.com\/(.*?)_\d+\.mp4$/, '$1');
 
+    res.setHeader('Content-Type', 'text/plain');
     return res.status(200).send(trimmedDownloadUrl);
 
   } catch (error: unknown) {

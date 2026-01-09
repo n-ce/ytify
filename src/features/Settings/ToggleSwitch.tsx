@@ -1,4 +1,5 @@
 import { t } from '@lib/stores';
+import '../../styles/ToggleSwitch.css';
 
 type ToggleSwitch = {
   name: TranslationKeys | string,

@@ -2,7 +2,7 @@ import {
   getTracksMap,
   getMeta,
 } from "@lib/utils/library";
-import { setStore, t } from "@lib/stores";
+import { setStore, store, t } from "@lib/stores";
 import { config } from "@lib/utils/config";
 
 // --- Type Definitions ---
@@ -92,7 +92,10 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     if(pullResponse.status === 404){
       console.log('No remote library found. Performing initial full push.');
       await pushFullLibrary(userId);
-      setStore("syncState", "synced");
+      localStorage.removeItem("dbsync_dirty_tracks");
+      if (store.syncState === "syncing") {
+        setStore("syncState", "synced");
+      }
       return { success: true, message: t("sync_initial_complete") };
     }
 
@@ -189,8 +192,10 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
     }
 
     // 4. Finalize
-    clearDirtyTracks();
-    setStore("syncState", "synced");
+    clearDirtyTracks(dirtyTracks);
+    if (store.syncState === "syncing") {
+      setStore("syncState", "synced");
+    }
     return { success: true, message: t("sync_changes_synced") };
 
   } catch (error) {
@@ -243,6 +248,12 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
     // 4. Update Meta
     const currentMeta = getMeta();
     Object.assign(currentMeta, delta.meta);
+    
+    // Explicitly remove deleted collections from meta
+    for (const key of delta.deletedCollectionNames) {
+        delete currentMeta[key];
+    }
+    
     localStorage.setItem('library_meta', JSON.stringify(currentMeta));
 }
 
@@ -283,6 +294,14 @@ export const removeDirtyTrack = (id: string) => {
   scheduleSync();
 };
 
-export const clearDirtyTracks = () => {
-  localStorage.removeItem("dbsync_dirty_tracks");
+export const clearDirtyTracks = (pushed: { added: string[]; deleted: string[] }) => {
+  const current = getDirtyTracks();
+  current.added = current.added.filter(id => !pushed.added.includes(id));
+  current.deleted = current.deleted.filter(id => !pushed.deleted.includes(id));
+  
+  if (current.added.length === 0 && current.deleted.length === 0) {
+    localStorage.removeItem("dbsync_dirty_tracks");
+  } else {
+    saveDirtyTracks(current);
+  }
 };

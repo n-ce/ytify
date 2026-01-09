@@ -2,6 +2,7 @@
 @import 'remixicon.css';
 @import 'header.css';
 @import 'footer.css';
+@import 'tooltips.css';
 
 :root {
   --source: initial;
@@ -255,35 +256,9 @@ a {
 }
 
 i {
+
   cursor: pointer;
+
   position: relative;
-}
 
-/* button hover info */
-i[aria-label]:hover::after {
-  pointer-events: none;
-  position: absolute;
-  content: attr(aria-label);
-  font-size: var(--font-size-0);
-  font-family: var(--font);
-  font-weight: var(--font-weight-6);
-  background: var(--text);
-  color: var(--bg);
-  right: var(--size-8);
-  z-index: 100;
-  padding: var(--size-px-1) var(--size-px-2) !important;
-  border-radius: var(--roundness);
-  animation: appear 1s;
-}
-
-@keyframes appear {
-
-  from,
-  90% {
-    opacity: 0;
-  }
-
-  75% {
-    transform: translateX(var(--size-8));
-  }
 }

@@ -2,7 +2,7 @@ import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player, removeFromCollection, getCollectionItems } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore } from '@lib/stores';
+import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore, queueStore } from '@lib/stores';
 
 export default function(data: {
   id: string,
@@ -69,7 +69,7 @@ export default function(data: {
   const isMusic = data.author?.endsWith('- Topic');
 
   if (config.loadImage && !isAlbum)
-    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isFromArtist || (data.context?.src === 'queue' && isMusic)));
+    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isFromArtist || ((data.context?.src === 'queue' || data.context?.src === 'standby') && isMusic)));
 
   return (
     <a
@@ -127,8 +127,10 @@ export default function(data: {
               navStore.player.ref?.scrollIntoView();
           }
 
-          if (config.enqueueRelatedStreams && (data.context?.src === 'collection' || (data.context?.src === 'playlists' && listStore.name.startsWith('Album - '))) && data.context?.id !== 'history') {
-            const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) : listStore.list;
+          if (config.contextualFill && (data.context?.src === 'collection' || (data.context?.src === 'playlists') || data.context?.src === 'standby') && data.context?.id !== 'history') {
+            const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) :
+              data.context.src === 'standby' ? queueStore.standby :
+                listStore.list;
             const currentIndex = collectionItems.findIndex(item => item.id === data.id);
             if (currentIndex !== -1) {
               const zigzagQueue: CollectionItem[] = [];
@@ -196,10 +198,12 @@ export default function(data: {
           <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
         </div>
       </div>
-      {data.draggable ?
-        <i aria-label="Drag" class="ri-draggable"></i> :
+      <Show when={data.draggable}>
+        <i aria-label="Drag" class="ri-draggable"></i>
+      </Show>
+      <Show when={!data.draggable && data.context?.src !== 'queue'}>
         <i aria-label="More" class="ri-more-2-fill"></i>
-      }
+      </Show>
     </a>
   )
 }

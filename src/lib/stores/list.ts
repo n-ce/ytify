@@ -50,7 +50,7 @@ export async function getList(
 
   if (type === 'mix') {
     setQueueStore('isLoading', true);
-    const list = await fetchMix(url, getApi(index));
+    const list = await fetchMix(url);
     setQueueStore('list', []);
     addToQueue(list);
     setQueueStore('isLoading', false);

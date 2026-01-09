@@ -99,6 +99,27 @@ export async function preferredStream(audioStreams: AudioStream[]) {
 
 
 
+export async function fetchUma(): Promise<string[]> {
+  return fetch('https://raw.githubusercontent.com/n-ce/Uma/main/iv.txt')
+    .then(res => res.text())
+    .then(text => {
+      let decompressedString = text;
+      const decodePairs: Record<string, string> = {
+        '$': 'invidious',
+        '&': 'inv',
+        '#': 'iv',
+        '~': 'com'
+      }
+
+      for (const code in decodePairs) {
+        const safeCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(safeCode, 'g');
+        decompressedString = decompressedString.replace(regex, decodePairs[code]);
+      }
+      return decompressedString.split(',').map(i => `https://${i}`);
+    });
+}
+
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';
   if (seconds === Infinity) return 'Emergency Mode';

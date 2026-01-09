@@ -1,16 +1,15 @@
-import { createSignal, onMount, Show } from 'solid-js';
+import { onMount, Show, lazy } from 'solid-js';
 import './Queue.css';
-import { setStore, t, addToQueue, queueStore, setNavStore } from "@lib/stores";
-import { config, setConfig } from "@lib/utils";
-import { setQueueStore } from "@lib/stores/queue";
+import { queueStore, setNavStore, t, setQueueStore, totalQueueDuration } from "@lib/stores";
 import List from "./List";
+import Dropdown from './Dropdown';
+import { config } from '@lib/utils';
+
+const Standby = lazy(() => import('./Standby'));
 
 export default function() {
 
   let queueSection!: HTMLDivElement;
-  let enqueueRelatedStreamsBtn!:
-    HTMLLIElement;
-  const [removeMode, setRemoveMode] = createSignal(false);
 
   onMount(() => {
     setNavStore('queue', 'ref', queueSection);
@@ -19,22 +18,17 @@ export default function() {
 
   return (
     <section
-      id="queue"
+      class="queueSection"
       ref={queueSection}
     >
 
-      <ul id="queuetools">
-        <li
-          classList={{ on: config.shuffle }}
-          onclick={(e) => {
-            const target = e.target as HTMLElement;
-            if (target.tagName === 'I') {
-              // Clicked on icon
-              const btn = target.parentElement as HTMLElement;
-              btn.classList.toggle('on');
-              setConfig('shuffle', !config.shuffle);
-            } else {
-              // Clicked on li
+      <header>
+        <p>{queueStore.list.length === 0 ? t('nav_queue') : totalQueueDuration(queueStore.list)}</p>
+        <div class="right-group">
+          <i
+            class="ri-shuffle-line"
+            aria-label={t('queue_shuffle')}
+            onclick={() => {
               setQueueStore('list', (list) => {
                 const shuffled = [...list];
                 for (let i = shuffled.length - 1; i > 0; i--) {
@@ -43,98 +37,35 @@ export default function() {
                 }
                 return shuffled;
               });
-            }
-          }}
-        >
+            }}
+          ></i>
+
           <i
-            class="ri-shuffle-line"></i>{t('upcoming_shuffle')}
-        </li>
+            class="ri-indeterminate-circle-line"
+            classList={{
+              on: queueStore.removeMode,
+            }}
+            aria-label={t('queue_remove_mode')}
+            onclick={() => {
+              setQueueStore('removeMode', !queueStore.removeMode);
+            }}
+          ></i>
+        </div>
 
-        <li
-          classList={{
-            on: removeMode()
-          }}
-          onclick={() => {
-            setRemoveMode(!removeMode());
-          }}
-        >
-          <i class="ri-indeterminate-circle-line"></i>{t('upcoming_remove')}
-        </li>
+        <Dropdown
+        />
+      </header>
 
-        <li
-          classList={{
-            on: config.filterLT10
-          }}
-          onclick={(e) => {
-            const btn = e.currentTarget as HTMLElement;
-            btn.classList.toggle('on');
-            setConfig('filterLT10', btn.classList.contains('on'));
-            addToQueue(queueStore.list, { replace: true });
-          }}
-        >
-          <i class="ri-filter-2-line"></i>{t('upcoming_filter_lt10')}
-        </li>
-
-        <li
-          classList={{
-            on: config.allowDuplicates
-          }}
-          onclick={(e) => {
-            const btn = e.currentTarget as HTMLElement;
-            btn.classList.toggle('on');
-            const allowDuplicates = btn.classList.contains('on');
-            setConfig('allowDuplicates', allowDuplicates);
-
-            if (!allowDuplicates) {
-              setQueueStore('list', (list) => {
-                const uniqueIds = new Set<string>();
-                return list.filter(item => {
-                  if (uniqueIds.has(item.id)) {
-                    return false;
-                  } else {
-                    uniqueIds.add(item.id);
-                    return true;
-                  }
-                });
-              });
-            }
-          }}
-        >
-          <i class="ri-file-copy-line"></i>{t('upcoming_allow_duplicates')}
-        </li >
-
-        <li
-          classList={{
-            on: config.enqueueRelatedStreams
-          }}
-          ref={enqueueRelatedStreamsBtn}
-          onclick={(e) => {
-            const btn = e.currentTarget as HTMLElement;
-
-            btn.classList.toggle('on');
-            setConfig('enqueueRelatedStreams', btn.classList.contains('on'));
-
-            setStore('snackbar', t('upcoming_change'));
-          }
-          }
-        >
-          <i class="ri-list-check-2"></i>{t('upcoming_enqueue_related')}
-        </li >
-
-        <li onclick={
-          () => {
-            setQueueStore('list', [])
-          }
-        }>
-          <i class="ri-close-large-line"></i>{t('upcoming_clear')}
-        </li >
-
-      </ul >
       <Show
         when={!queueStore.isLoading}
         fallback={<i class="ri-loader-3-line"></i>}
       >
-        <List removeMode={removeMode()} />
+        <List />
+        <Show when={
+          queueStore.list.length === 0 &&
+          config.contextualFill && config.similarContent}>
+          <Standby />
+        </Show>
       </Show>
     </section >
   );

@@ -116,7 +116,7 @@ createRoot(() => {
       historyTimeoutId = window.setTimeout(() => {
         if (historyID === id) {
           if (
-            config.enqueueRelatedStreams
+            config.similarContent
             && playerStore.isMusic
           )
             getRecommendations();
@@ -204,7 +204,7 @@ createRoot(() => {
   }
 
   playerStore.audio.oncanplaythrough = async function() {
-    const nextItem = config.prefetch && queueStore.list[0]?.id;
+    const nextItem = config.queuePrefetch && queueStore.list[0]?.id;
 
     if (!nextItem) return;
 

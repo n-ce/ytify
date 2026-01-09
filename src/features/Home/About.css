@@ -1,6 +1,7 @@
 .about {
   display: flex;
   flex-direction: column;
+  margin-bottom: var(--size-8);
 
   svg {
     transform: scale(9);

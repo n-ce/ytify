@@ -69,16 +69,9 @@ export async function player(id?: string, isRetry = false) {
     ));
 
 
-  if (config.enqueueRelatedStreams && !enforceVideo)
-    import('../modules/enqueueRelatedStreams')
-      .then(mod => mod.default(invidiousData.recommendedVideos.map(v => ({
-        url: '/watch?v=' + v.videoId,
-        title: v.title,
-        uploaderName: v.author,
-        duration: v.lengthSeconds,
-        uploaderUrl: v.authorUrl,
-        type: 'stream'
-      })) as StreamItem[]));
+    if (config.similarContent && !enforceVideo)
+      import('../modules/enqueueRelatedStreams')
+        .then(mod => mod.default(invidiousData.recommendedVideos));
 
 
 
@@ -88,14 +81,7 @@ export async function player(id?: string, isRetry = false) {
     import('../modules/setDiscoveries')
       .then(mod => {
         setTimeout(() => {
-          mod.default(id, invidiousData.recommendedVideos.map(v => ({
-            url: '/watch?v=' + v.videoId,
-            title: v.title,
-            uploaderName: v.author,
-            duration: v.lengthSeconds,
-            uploaderUrl: v.authorUrl,
-            type: 'stream'
-          })) as StreamItem[]);
+          mod.default(id, invidiousData.recommendedVideos);
         }, 1e5);
       });
 

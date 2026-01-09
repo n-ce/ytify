@@ -1,12 +1,11 @@
 import fetchMix from "./fetchMix";
-import { store } from "@lib/stores";
 
 export default async function(ids: string[]): Promise<CollectionItem[]> {
+  const promises = ids.map(id => 
+    fetchMix('RD' + id).catch(() => [] as CollectionItem[])
+  );
 
-  const idx = () => Math.floor(Math.random() * store.invidious.length);
-
-
-  const data = await Promise.all(ids.map(id => fetchMix('RD' + id, store.invidious[idx()])));
+  const data = await Promise.all(promises);
   const map: {
     [index: string]: CollectionItem & { count?: number }
   } = {};
@@ -24,6 +23,6 @@ export default async function(ids: string[]): Promise<CollectionItem[]> {
   const mixArray = Object
     .values(map)
     .sort((a, b) => b.count! - a.count!)
-
+    
   return mixArray;
 }

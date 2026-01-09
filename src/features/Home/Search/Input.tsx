@@ -1,6 +1,6 @@
 import { For, onMount, Show } from "solid-js";
 import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "@lib/stores";
-import { config, idFromURL, player } from "@lib/utils";
+import { config, drawer, idFromURL, player } from "@lib/utils";
 
 export default function() {
 
@@ -65,18 +65,14 @@ export default function() {
         onfocus={() => {
           if (searchStore.query)
             return;
-          const recentSearches = localStorage.getItem('searched');
-          if (recentSearches)
-            setSearchStore('suggestions', 'data', recentSearches.split(','));
+          setSearchStore('suggestions', 'data', drawer.recentSearches);
         }}
         oninput={async (e) => {
           const { value } = e.target;
           setSearchStore('query', value);
 
           if (!value) {
-            const recentSearches = localStorage.getItem('searched');
-            if (recentSearches)
-              setSearchStore('suggestions', 'data', recentSearches.split(','));
+            setSearchStore('suggestions', 'data', drawer.recentSearches);
             return;
           }
 

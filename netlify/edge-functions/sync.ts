@@ -177,6 +177,7 @@ function applyDelta(current: LibrarySnapshot, delta: DeltaPayload): LibrarySnaps
   // 4. Delete Collections
   for (const name of delta.deletedCollectionNames) {
     delete next[name];
+    if (next.meta) delete next.meta[name];
   }
 
   return next;

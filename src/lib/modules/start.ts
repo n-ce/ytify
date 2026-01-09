@@ -1,5 +1,5 @@
 import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData } from '@lib/utils';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, fetchUma } from '@lib/utils';
 
 
 
@@ -22,29 +22,10 @@ export default async function() {
 
 
 
-  function decode(compressedString: string): string {
-    let decompressedString = compressedString;
-    const decodePairs = {
-      '$': 'invidious',
-      '&': 'inv',
-      '#': 'iv',
-      '~': 'com'
-    }
-
-    for (const code in decodePairs) {
-      const safeCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(safeCode, 'g');
-      decompressedString = decompressedString.replace(regex, decodePairs[code as keyof typeof decodePairs]);
-    }
-    return decompressedString;
-  }
-
-  await fetch('https://raw.githubusercontent.com/n-ce/Uma/main/iv.txt')
-    .then(res => res.text())
-    .then(decode)
+  await fetchUma()
     .then(data => {
       setStore({
-        invidious: data.split(',').map(i => `https://${i}`),
+        invidious: data,
         index: 0
       })
     })
@@ -98,14 +79,22 @@ export default async function() {
 
 
 
-
-
   document.addEventListener('click', (e) => {
-
+    const click = e.target as HTMLElement;
     const detail = document.querySelector('details:open');
-    if (!detail?.firstElementChild?.contains(e.target as HTMLElement))
+
+    if (!detail?.firstElementChild?.contains(click))
       detail?.removeAttribute('open');
   });
+
+  function toggleTooltip(event: PointerEvent) {
+    const t = event.target as HTMLElement;
+    if (t.matches('i[aria-label]'))
+      t.classList.toggle('show')
+  }
+
+  document.addEventListener('pointerover', toggleTooltip);
+  document.addEventListener('pointerout', toggleTooltip);
 
 
   if (import.meta.env.PROD)

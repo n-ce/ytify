@@ -10,28 +10,33 @@ import { playerStore } from "@lib/stores";
 import { setQueueStore } from "@lib/stores/queue";
 import { convertSStoHHMMSS } from "@lib/utils";
 
-export default function(data: StreamItem[]) {
+type RecommendedVideo = {
+  title: string;
+  author: string;
+  lengthSeconds: number;
+  videoId: string;
+};
+
+export default function(data: RecommendedVideo[]) {
 
   const { history, isMusic } = playerStore;
 
 
   data.forEach(stream => {
 
-    const id = stream.url.slice(9);
+    const id = stream.videoId;
 
     if (
-      'type' in stream &&
-      stream.type === 'stream' &&
-      stream.duration > 45 &&
+      stream.lengthSeconds > 45 &&
       !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
       !history.some(item => item.id === id) &&
-      (!isMusic || stream.uploaderName.endsWith(' - Topic'))
+      (!isMusic || stream.author.endsWith(' - Topic'))
     )
       setQueueStore('list', l => [...l, ({
         id: id,
         title: stream.title,
-        author: stream.uploaderName,
-        duration: convertSStoHHMMSS(stream.duration)
+        author: stream.author,
+        duration: convertSStoHHMMSS(stream.lengthSeconds)
       }) as CollectionItem])
   });
 

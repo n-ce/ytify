@@ -1,4 +1,5 @@
-import { convertSStoHHMMSS, fetchJson } from '@lib/utils';
+import { convertSStoHHMMSS, fetchJson, getApi } from '@lib/utils';
+import { store } from '@lib/stores';
 
 interface MixVideo {
   title: string;
@@ -22,10 +23,11 @@ export interface Mix {
   videos: MixVideo[];
 }
 
-export default async function(
+export default async function fetchMix(
   mixId: string,
-  api: string
+  index: number = store.invidious.length - 1
 ): Promise<CollectionItem[]> {
+  const api = getApi(index);
   return fetchJson<Mix>(`${api}/api/v1/mixes/${mixId}`)
     .then(data => data.videos.map(v => ({
       id: v.videoId,
@@ -33,5 +35,9 @@ export default async function(
       authorId: v.authorId,
       author: v.author,
       duration: convertSStoHHMMSS(v.lengthSeconds)
-    }) as CollectionItem));
+    }) as CollectionItem))
+    .catch(e => {
+      if (index <= 0) throw e;
+      return fetchMix(mixId, index - 1);
+    });
 };

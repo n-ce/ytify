@@ -21,6 +21,9 @@
   &[open],
   &:open {
     animation: var(--animation-slide-in-up) forwards;
+  }
+
+  &:open {
     animation-duration: 0.3s;
   }
 

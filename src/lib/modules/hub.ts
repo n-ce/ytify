@@ -1,15 +1,5 @@
-import { convertSStoHHMMSS } from "../utils/helpers";
-import subfeedGenerator from "../modules/subfeedGenerator";
-import { getTracksMap, getThumbIdFromLink, getCollection } from "../utils";
+import { getTracksMap, getThumbIdFromLink, getCollection, setDrawer, getLists } from "../utils";
 import { store } from "@lib/stores";
-
-type Hub = {
-  discovery?: (CollectionItem & { frequency: number })[];
-  userArtists: Channel[];
-  relatedPlaylists: Playlist[];
-  relatedArtists: Channel[];
-  subfeed: CollectionItem[];
-};
 
 type FullArtistResponse = {
   artistName: string;
@@ -32,44 +22,35 @@ type FullArtistResponse = {
   }[];
 };
 
-
-const initialHub: Hub = {
-  discovery: [],
-  userArtists: [],
-  relatedPlaylists: [],
-  relatedArtists: [],
-  subfeed: [],
-};
-
-export function getHub(): Hub {
-  const hubData = localStorage.getItem('hub');
-  return hubData ? JSON.parse(hubData) : initialHub;
+// Migration: Move 'hub' from localStorage to 'drawer'
+const hubData = localStorage.getItem('hub');
+if (hubData) {
+  try {
+    const parsed = JSON.parse(hubData);
+    if (parsed.discovery) setDrawer('discovery', parsed.discovery);
+    if (parsed.userArtists) setDrawer('userArtists', parsed.userArtists);
+    if (parsed.relatedPlaylists) setDrawer('relatedPlaylists', parsed.relatedPlaylists);
+    if (parsed.relatedArtists) setDrawer('relatedArtists', parsed.relatedArtists);
+    if (parsed.subfeed) setDrawer('subfeed', parsed.subfeed);
+    localStorage.removeItem('hub');
+  } catch (e) {
+    console.error("Hub to Drawer Migration failed", e);
+  }
 }
 
-export function updateHub(data: Hub) {
-  localStorage.setItem('hub', JSON.stringify(data));
-}
-
-export function getHubSection<K extends keyof Hub>(sectionName: K): Hub[K] {
-  const hub = getHub();
-  return hub[sectionName];
-}
-
-export function updateHubSection<K extends keyof Hub>(sectionName: K, data: Hub[K]): void {
-  const hub = getHub();
-  hub[sectionName] = data;
-  updateHub(hub);
-}
-
-
-export async function updateSubfeed(preview?: string): Promise<void> {
-  return subfeedGenerator(preview).then((items: CollectionItem[]) => {
-    const subfeed: CollectionItem[] = items.map((item: CollectionItem) => ({
-      ...item,
-      duration: convertSStoHHMMSS(item.duration as unknown as number),
-    }));
-    updateHubSection('subfeed', subfeed);
-  });
+export async function updateSubfeed(): Promise<void> {
+  const channels = getLists('channels');
+  if (!channels || channels.length === 0) {
+    setDrawer('subfeed', []);
+    return;
+  }
+  const channelIds = channels.map(channel => channel.id).join(',');
+  return fetch(`${store.api}/api/subfeed?ids=${channelIds}`)
+    .then(res => res.json())
+    .then((subfeed: CollectionItem[]) => {
+      setDrawer('subfeed', subfeed);
+    })
+    .catch(console.error);
 }
 
 export async function updateGallery(): Promise<void> {
@@ -95,9 +76,9 @@ export async function updateGallery(): Promise<void> {
 
 
   if (artistIds.length < 2) {
-    updateHubSection('relatedArtists', []);
-    updateHubSection('relatedPlaylists', []);
-    updateHubSection('userArtists', []);
+    setDrawer('relatedArtists', []);
+    setDrawer('relatedPlaylists', []);
+    setDrawer('userArtists', []);
     return;
   }
 
@@ -188,7 +169,7 @@ export async function updateGallery(): Promise<void> {
   })).filter(artist => artist.id && artist.name && artist.thumbnail) as Channel[];
 
 
-  updateHubSection('relatedArtists', relatedArtists);
-  updateHubSection('relatedPlaylists', featuredPlaylists);
-  updateHubSection('userArtists', userArtists);
+  setDrawer('relatedArtists', relatedArtists);
+  setDrawer('relatedPlaylists', featuredPlaylists);
+  setDrawer('userArtists', userArtists);
 }

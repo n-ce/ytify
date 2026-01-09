@@ -1,4 +1,4 @@
-import { navStore, setNavStore, setStore, t, updateParam, store } from '@lib/stores';
+import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
 import { config } from '@lib/utils/config';
 
@@ -278,13 +278,11 @@ export const metaUpdater = (key: string, remove?: boolean) => {
     meta[key] = timestamp;
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
-  if (store.syncState !== 'syncing') {
-    setStore('syncState', 'dirty');
-    if (config.dbsync) {
-      import('@lib/modules/cloudSync').then(({ scheduleSync }) => {
-        scheduleSync();
-      });
-    }
+  setStore('syncState', 'dirty');
+  if (config.dbsync) {
+    import('@lib/modules/cloudSync').then(({ scheduleSync }) => {
+      scheduleSync();
+    });
   }
 }
 

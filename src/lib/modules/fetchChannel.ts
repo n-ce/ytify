@@ -4,6 +4,7 @@ interface Video {
   videoId: string;
   viewCountText: string;
   publishedText: string;
+  published: number;
   author: string;
   lengthSeconds: number;
   authorId: string;

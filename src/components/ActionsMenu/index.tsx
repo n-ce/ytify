@@ -77,7 +77,7 @@ export default function() {
         <li tabindex="0" onclick={() => {
           const { actionsMenu } = store;
           if (actionsMenu)
-            addToQueue([actionsMenu], { prepend: true });
+            addToQueue([actionsMenu], { prepend: true, ignoreConfig: true });
 
           closeDialog();
         }}>
@@ -87,7 +87,7 @@ export default function() {
         <li tabindex="1" onclick={() => {
           const { actionsMenu } = store;
           if (actionsMenu)
-            addToQueue([actionsMenu]);
+            addToQueue([actionsMenu], { ignoreConfig: true });
           closeDialog();
         }}>
           <i class="ri-list-check-2"></i>{t('actions_menu_enqueue')}

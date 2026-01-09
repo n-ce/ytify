@@ -1,6 +1,6 @@
 import { getTracksMap, saveTracksMap, saveCollection, metaUpdater } from '@lib/utils/library';
 import { setStore } from '@lib/stores';
-import { getHub, updateHub } from '@lib/modules/hub';
+import { drawer, setDrawer } from '@lib/utils';
 import { convertSStoHHMMSS } from '@lib/utils/helpers';
 
 type CollectionItemV1 = {
@@ -47,10 +47,7 @@ export default function migrateLibrary() {
 
         if (key === 'discover') {
           // Integrate discover migration logic
-          const hub = getHub();
-          // Assert type to include frequency
-          if (!hub.discovery)
-            hub.discovery = [];
+          const discovery = [...(drawer.discovery || [])];
 
           for (const id in collectionData) {
             const { title, duration, channelUrl, author, frequency } = collectionData[id] as CollectionItemV1 & { frequency: number };
@@ -60,10 +57,10 @@ export default function migrateLibrary() {
               report.skipped++;
               continue;
             }
-            hub.discovery.push({ id, author, title, duration: typeof duration === 'number' ? convertSStoHHMMSS(duration) : duration, frequency, authorId: channelUrl.slice(9) })
+            discovery.push({ id, author, title, duration: typeof duration === 'number' ? convertSStoHHMMSS(duration) : duration, frequency, authorId: channelUrl.slice(9) })
             report.discover++;
           }
-          updateHub(hub);
+          setDrawer('discovery', discovery);
           console.log(`Migrated discover collection to hub.`);
         } else if (key === 'channels' || key === 'playlists') {
           const list = Object.values(collectionData as object).filter(item => {

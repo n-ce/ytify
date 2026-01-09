@@ -1,5 +1,5 @@
 import { setStore, store } from './app';
-import { config } from '@lib/utils';
+import { config, drawer, setDrawer } from '@lib/utils';
 import { updateParam } from './navigation';
 import { createStore } from 'solid-js/store';
 import fetchSearchSuggestions from '@lib/modules/fetchSearchSuggestions';
@@ -12,7 +12,7 @@ const createInitialState = () => ({
   isLoading: false,
   page: 1,
   suggestions: {
-    data: localStorage.getItem('searched')?.split(',') || [],
+    data: drawer.recentSearches,
     index: -1,
     controller: new AbortController()
   },
@@ -63,18 +63,18 @@ export async function getSearchResults() {
   setSearchStore('suggestions', 'data', []);
   observer.disconnect();
 
-  const recentSearches = localStorage.getItem('searched')?.split(',') || [];
-  const lc = query.toLowerCase();
+  const { recentSearches } = drawer;
+  const lc = query.trim().toLowerCase();
 
-  while (recentSearches.length > 5)
-    recentSearches.shift();
-  
-  if (!recentSearches.includes(lc))
-    recentSearches.push(lc);
+  if (config.saveRecentSearches && lc) {
+    while (recentSearches.length > 4)
+      recentSearches.shift();
 
-  localStorage.setItem('searched', recentSearches.join(','));
+    if (!recentSearches.includes(lc))
+      recentSearches.push(lc);
 
-
+    setDrawer('recentSearches', recentSearches);
+  }
 
   const isMusic = searchFilter.startsWith('music_');
 
