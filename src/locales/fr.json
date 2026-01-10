@@ -164,9 +164,9 @@
     "settings_stable_volume": "Préférer un volume stable",
     "settings_watchmode": "Mode vidéo",
     "settings_library_sync": "Synchronisation cloud",
-    "settings_store_discoveries": "Stocker les découvertes",
+    "settings_store_discoveries": "Enregistrer les flux associés dans Hub Discovery",
     "settings_clear_discoveries": "Cela effacera vos découvertes de $ existantes, continuer ?",
-    "settings_store_history": "Stocker l'historique",
+    "settings_store_history": "Sauvegarder l'historique de lecture",
     "settings_clear_history": "Cela effacera $ éléments de votre historique, continuer ?",
     "settings_landscape_sections": "Sections de paysage maximales",
     "settings_load_images": "Charger les images",
@@ -221,5 +221,6 @@
     "library_import_songshift": "Importer des playlists depuis SongShift",
     "library_about_ytify": "À propos de ytify",
     "nav_logout": "Déconnexion",
-    "player_video_resolution": "Résolution"
+    "player_video_resolution": "Résolution",
+    "queue_reload_notification": "Les changements seront visibles dès la prochaine session"
 }
