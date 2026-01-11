@@ -1,5 +1,5 @@
 import fetchChannel from '../lib/modules/fetchChannel.js';
-import { fetchUma, convertSStoHHMMSS } from '../lib/utils/helpers.js';
+import { fetchUma, convertSStoHHMMSS } from '../lib/utils/pure.js';
 
 export async function getSubfeed(channelIds: string[]): Promise<CollectionItem[]> {
   const instances = await fetchUma().catch(() => []);
