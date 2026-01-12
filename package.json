@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "8.1.1",
+  "version": "8.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,7 @@
     "@netlify/blobs": "^10.5.0",
     "@netlify/edge-functions": "^3.0.3",
     "@netlify/functions": "^5.1.2",
-    "@types/node": "^25.0.3",
+    "@types/node": "^25.0.6",
     "@types/sortablejs": "^1.15.9",
     "@vercel/node": "^5.5.16",
     "autoprefixer": "^10.4.23",

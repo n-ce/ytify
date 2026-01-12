@@ -65,7 +65,7 @@ export default async function(
       author: data?.author,
       title: data.title,
       thumbnail: data.playlistThumbnail || data?.authorThumbnails?.[0]?.url,
-      videos: data.videos,
+      videos: data.videos.filter(video => video.videoId),
       subtitle: data.subtitle
     }));
 }
