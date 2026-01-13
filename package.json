@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "8.1.2",
+  "version": "8.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,9 +15,9 @@
     "@netlify/blobs": "^10.5.0",
     "@netlify/edge-functions": "^3.0.3",
     "@netlify/functions": "^5.1.2",
-    "@types/node": "^25.0.6",
+    "@types/node": "^25.0.7",
     "@types/sortablejs": "^1.15.9",
-    "@vercel/node": "^5.5.16",
+    "@vercel/node": "^5.5.17",
     "autoprefixer": "^10.4.23",
     "eruda": "^3.4.3",
     "open-props": "1.7.17",
