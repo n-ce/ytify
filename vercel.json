@@ -6,9 +6,6 @@
       "destination": "/api"
     }
   ],
-  "regions": [
-    "bom1"
-  ],
   "outputDirectory": "dist",
   "headers": [
     {

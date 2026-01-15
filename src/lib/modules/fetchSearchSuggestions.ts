@@ -1,23 +1,26 @@
-import { config, fetchJson } from '@lib/utils';
+import { config, fetchJson, getApi } from '@lib/utils';
+import { store } from '@lib/stores';
 
-export interface SearchSuggestion {
-  source: string;
-  suggestions: string[];
-}
-
-
-export default async function(
+export default async function fetchSearchSuggestions(
   text: string,
-  signal: AbortSignal
+  signal: AbortSignal,
+  index: number = store.invidious.length - 1
 ): Promise<string[]> {
   const isMusic = config.searchFilter.startsWith('music_');
-  const api = 'https://ytify-backend.vercel.app';
-  let url = api + `/api/search/suggestions?q=${encodeURIComponent(text)}`;
+
   if (isMusic) {
-    url += '&music=1';
+    const url = `${store.api}/api/suggestions?q=${encodeURIComponent(text)}`;
+    return fetchJson<{ suggestions: string[] }>(url, signal)
+      .then(data => data.suggestions);
+  } else {
+    const api = getApi(index);
+    const url = `${api}/api/v1/search/suggestions?q=${encodeURIComponent(text)}`;
+    
+    return fetchJson<{ suggestions: string[] }>(url, signal)
+      .then(data => data.suggestions)
+      .catch(e => {
+        if (index <= 0) throw e;
+        return fetchSearchSuggestions(text, signal, index - 1);
+      });
   }
-  return fetchJson<SearchSuggestion>(url, signal)
-    .then(data => {
-      return data.suggestions;
-    });
 };
