@@ -11,12 +11,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = {Role = ["admin", "editor"]}
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
 # Security and CORS headers for Google OAuth
 [[headers]]
