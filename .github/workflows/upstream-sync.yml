@@ -1,0 +1,236 @@
+name: Upstream Sync
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync even with conflicts'
+        required: false
+        default: 'false'
+
+env:
+  UPSTREAM_REPO: n-ce/ytify
+  UPSTREAM_BRANCH: main
+  FORK_BRANCH: master
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git || true
+          git fetch upstream ${{ env.UPSTREAM_BRANCH }}
+          git fetch origin ${{ env.FORK_BRANCH }}
+
+      - name: Check for upstream changes
+        id: check
+        run: |
+          UPSTREAM_SHA=$(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }})
+          FORK_SHA=$(git rev-parse origin/${{ env.FORK_BRANCH }})
+          MERGE_BASE=$(git merge-base upstream/${{ env.UPSTREAM_BRANCH }} origin/${{ env.FORK_BRANCH }})
+
+          echo "upstream_sha=$UPSTREAM_SHA" >> $GITHUB_OUTPUT
+          echo "fork_sha=$FORK_SHA" >> $GITHUB_OUTPUT
+          echo "merge_base=$MERGE_BASE" >> $GITHUB_OUTPUT
+
+          if [ "$UPSTREAM_SHA" = "$MERGE_BASE" ]; then
+            echo "No new upstream changes"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Upstream has new commits"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+
+            # Count commits
+            COMMIT_COUNT=$(git rev-list --count $MERGE_BASE..$UPSTREAM_SHA)
+            echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+
+            # Get commit summary (first 20)
+            git log --oneline $MERGE_BASE..$UPSTREAM_SHA | head -20 > /tmp/commits.txt
+            echo "commits<<EOF" >> $GITHUB_OUTPUT
+            cat /tmp/commits.txt >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for existing sync PR
+        if: steps.check.outputs.has_changes == 'true'
+        id: existing_pr
+        run: |
+          EXISTING_PR=$(gh pr list --search "sync: Upstream" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING_PR" ]; then
+            echo "Existing sync PR found: #$EXISTING_PR"
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "pr_number=$EXISTING_PR" >> $GITHUB_OUTPUT
+          else
+            echo "No existing sync PR"
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Attempt merge (dry-run)
+        if: steps.check.outputs.has_changes == 'true' && steps.existing_pr.outputs.exists == 'false'
+        id: merge_check
+        run: |
+          SYNC_BRANCH="sync/upstream-$(date +%Y%m%d)"
+          echo "sync_branch=$SYNC_BRANCH" >> $GITHUB_OUTPUT
+
+          git checkout -b $SYNC_BRANCH
+
+          # Try merge
+          if git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-commit --no-ff 2>/dev/null; then
+            echo "merge_status=clean" >> $GITHUB_OUTPUT
+            git reset --hard HEAD
+          else
+            echo "merge_status=conflict" >> $GITHUB_OUTPUT
+
+            # Capture conflict files
+            CONFLICTS=$(git diff --name-only --diff-filter=U 2>/dev/null || echo "")
+            echo "conflicts<<EOF" >> $GITHUB_OUTPUT
+            echo "$CONFLICTS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+            # Check for ML4-Lab protected files
+            PROTECTED_CONFLICTS=""
+            for file in $CONFLICTS; do
+              case "$file" in
+                *tokens.css*|*NavBar*|*StreamItem*|*Player*|*ship.js*)
+                  PROTECTED_CONFLICTS="$PROTECTED_CONFLICTS\n- $file"
+                  ;;
+              esac
+            done
+            echo "protected_conflicts<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$PROTECTED_CONFLICTS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+            git merge --abort
+          fi
+
+          git checkout ${{ env.FORK_BRANCH }}
+          git branch -D $SYNC_BRANCH 2>/dev/null || true
+
+      - name: Create clean merge PR
+        if: |
+          steps.check.outputs.has_changes == 'true' &&
+          steps.existing_pr.outputs.exists == 'false' &&
+          steps.merge_check.outputs.merge_status == 'clean'
+        run: |
+          SYNC_BRANCH="${{ steps.merge_check.outputs.sync_branch }}"
+
+          git checkout -b $SYNC_BRANCH
+          git merge upstream/${{ env.UPSTREAM_BRANCH }} -m "chore(sync): merge upstream changes from ${{ env.UPSTREAM_REPO }}"
+          git push origin $SYNC_BRANCH
+
+          gh pr create \
+            --title "sync: Upstream merge $(date +%Y-%m-%d)" \
+            --body "## Upstream Sync - Auto-generated
+
+          ### Changes from upstream (${{ steps.check.outputs.commit_count }} commits)
+          \`\`\`
+          ${{ steps.check.outputs.commits }}
+          \`\`\`
+
+          ### Status
+          - Merge: **Clean** (no conflicts)
+          - Auto-merge: Enabled after CI passes
+
+          ### Checklist
+          - [ ] CI passes
+          - [ ] No breaking changes to ML4-Lab customizations
+
+          ---
+          *Automated sync from [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }})*
+          " \
+            --label "sync" \
+            --base ${{ env.FORK_BRANCH }}
+
+          # Enable auto-merge if available
+          gh pr merge --auto --squash || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create conflict PR
+        if: |
+          steps.check.outputs.has_changes == 'true' &&
+          steps.existing_pr.outputs.exists == 'false' &&
+          steps.merge_check.outputs.merge_status == 'conflict'
+        run: |
+          SYNC_BRANCH="sync/upstream-conflict-$(date +%Y%m%d)"
+
+          git checkout -b $SYNC_BRANCH
+
+          # Attempt merge, keeping conflict markers
+          git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-commit || true
+          git add -A
+          git commit -m "chore(sync): merge upstream (CONFLICTS - needs resolution)" --allow-empty
+          git push origin $SYNC_BRANCH
+
+          gh pr create \
+            --title "sync: Upstream merge (CONFLICTS) $(date +%Y-%m-%d)" \
+            --body "## Upstream Sync - Manual Resolution Required
+
+          ### Changes from upstream (${{ steps.check.outputs.commit_count }} commits)
+          \`\`\`
+          ${{ steps.check.outputs.commits }}
+          \`\`\`
+
+          ### Conflicting Files
+          \`\`\`
+          ${{ steps.merge_check.outputs.conflicts }}
+          \`\`\`
+
+          ### ML4-Lab Protected Files Affected
+          > These files contain ML4-Lab customizations. **Preserve our version** when resolving:
+          ${{ steps.merge_check.outputs.protected_conflicts }}
+
+          ### Resolution Steps
+          1. Checkout this branch locally:
+             \`\`\`bash
+             git fetch origin $SYNC_BRANCH
+             git checkout $SYNC_BRANCH
+             \`\`\`
+          2. Resolve conflicts (prefer ML4-Lab styling for protected files)
+          3. Run \`npm run build\` to verify
+          4. Commit and push
+
+          ---
+          *Automated sync from [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }})*
+          " \
+            --label "sync,conflicts,needs-review" \
+            --base ${{ env.FORK_BRANCH }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Upstream Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check.outputs.has_changes }}" == "false" ]; then
+            echo "No new changes from upstream." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.existing_pr.outputs.exists }}" == "true" ]; then
+            echo "Existing sync PR #${{ steps.existing_pr.outputs.pr_number }} still open." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.merge_check.outputs.merge_status }}" == "clean" ]; then
+            echo "Clean merge PR created successfully." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Conflict PR created - manual resolution required." >> $GITHUB_STEP_SUMMARY
+          fi

@@ -1,44 +1,144 @@
-# 🚀 Deployment Guide - music.ml4-lab.com
+# Deployment Guide - music.ml4-lab.com
 
-> **Simple, one-command deployment for your premium music dashboard.**
+> **Automated pipeline with intelligent versioning for ML4-Lab ytify fork.**
 
 ---
 
-## ⚡ Quick Deploy (TL;DR)
+## Quick Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run ship` | Deploy new version (build + version + tag + push) |
+| `npm run sync` | Sync with upstream (n-ce/ytify) |
+| `npm run dev` | Start development server |
+| `npm run build` | Build production |
+| `npm run typecheck` | Run TypeScript type check |
+
+---
+
+## Versioning Strategy
+
+**Format:** `UPSTREAM_VERSION-ml4.PATCH`
+
+| Version | Meaning |
+|---------|---------|
+| `8.2.1-ml4.0` | First sync with upstream v8.2.1 |
+| `8.2.1-ml4.1` | ML4-Lab bug fix |
+| `8.2.1-ml4.2` | ML4-Lab feature |
+| `8.2.2-ml4.0` | Synced with upstream v8.2.2 |
+
+This format clearly distinguishes ML4-Lab releases from upstream versions.
+
+---
+
+## Shipping (Deployment)
 
 ```bash
 npm run ship
 ```
 
-That's it! The script handles everything automatically. ✨
+The script handles everything:
+
+1. **Verifies** - Checks for uncommitted changes
+2. **Builds** - Runs `npm run build` to ensure compilation
+3. **Versions** - Offers bump options:
+   - ML4 Patch (8.2.1-ml4.0 -> 8.2.1-ml4.1)
+   - Sync with upstream (if newer version available)
+   - Patch/Minor/Major bumps
+4. **Tags** - Creates git commit and tag
+5. **Pushes** - Sends to GitHub
+
+**Your changes go live automatically** when pushed.
 
 ---
 
-## 📖 What Happens?
+## Syncing with Upstream
 
-When you run `npm run ship`, the script:
+### Automatic (GitHub Actions)
 
-1. **✅ Verifies** - Runs `npm run build` to ensure everything compiles
-2. **📦 Asks for version** - Patch, Minor, or Major bump
-3. **📝 Updates** - Modifies `package.json` with new version
-4. **🏷️ Tags** - Creates Git commit and tag (e.g., `v8.3.0`)
-5. **⬆️ Pushes** - Sends everything to GitHub
+A workflow runs daily at 03:00 UTC to check for upstream changes:
+- If changes found with no conflicts: Creates auto-mergeable PR
+- If conflicts detected: Creates PR with conflict markers for manual review
 
-**Your changes go live automatically** when pushed to the `main` branch.
+### Manual (Local)
+
+```bash
+npm run sync
+```
+
+The sync script:
+1. Stashes your uncommitted changes
+2. Fetches upstream (origin/main)
+3. Checks for conflicts
+4. Merges if you confirm
+5. Verifies build passes
+6. Restores your stashed changes
+
+**Protected ML4-Lab files** (keep our version on conflict):
+- `src/styles/tokens.css`
+- `src/components/NavBar.*`
+- `src/components/StreamItem.*`
+- `src/features/Player/*`
+- `scripts/ship.js`, `scripts/sync.js`
 
 ---
 
-## 🎯 Version Bump Guide
+## CI/CD Pipeline
 
-| Type      | When to Use                    | Example         |
-| --------- | ------------------------------ | --------------- |
-| **Patch** | Bug fixes, typos, small tweaks | `8.2.1 → 8.2.2` |
-| **Minor** | New features, UI changes       | `8.2.1 → 8.3.0` |
-| **Major** | Breaking changes, redesigns    | `8.2.1 → 9.0.0` |
+### Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `ci.yml` | Push/PR to master | Build validation, TypeScript check |
+| `upstream-sync.yml` | Daily 03:00 UTC | Auto-sync with upstream |
+| `release.yml` | Version tags (v*) | Create GitHub releases |
+
+### Branch Strategy
+
+```
+origin (n-ce/ytify)
+  main (upstream production)
+
+fork (Anarqis/ytify)
+  master (ML4-Lab production) <- auto-deploys to Netlify
+  sync/* (temporary sync branches)
+```
 
 ---
 
-## 🛠️ Manual Deployment (If Needed)
+## Troubleshooting
+
+### "Build failed"
+
+```bash
+npm run typecheck   # Check for TypeScript errors
+npm run dev         # Test locally
+```
+
+### "Merge conflicts"
+
+1. Open conflicting files
+2. Look for `<<<<<<<` markers
+3. For ML4-Lab protected files, keep our version
+4. `git add <files>` then `git commit`
+
+### "Push rejected"
+
+```bash
+git pull            # Get latest changes
+npm run ship        # Try again
+```
+
+### "Sync failed"
+
+```bash
+git merge --abort   # Cancel merge
+git stash pop       # Restore your changes
+```
+
+---
+
+## Manual Deployment
 
 If you prefer doing it manually:
 
@@ -46,13 +146,13 @@ If you prefer doing it manually:
 # 1. Build
 npm run build
 
-# 2. Update version in package.json manually
-# (change "version": "8.2.1" to "8.2.2")
+# 2. Update version in package.json
+# e.g., "version": "8.2.1-ml4.1"
 
 # 3. Commit and tag
 git add .
-git commit -m "chore: bump version to 8.2.2"
-git tag -a v8.2.2 -m "Release v8.2.2"
+git commit -m "chore: release v8.2.1-ml4.1"
+git tag -a v8.2.1-ml4.1 -m "Release v8.2.1-ml4.1"
 
 # 4. Push
 git push
@@ -61,35 +161,8 @@ git push --tags
 
 ---
 
-## ❓ Troubleshooting
+## Links
 
-### "Build failed"
-
-- Check the error message from `npm run build`
-- Fix TypeScript/compilation errors first
-- Run `npm run dev` to test locally
-
-### "Uncommitted changes"
-
-The script will warn you if you have uncommitted changes. You can:
-
-- Commit them first: `git add . && git commit -m "your message"`
-- Or continue anyway (not recommended)
-
-### "Push rejected"
-
-- Make sure you have push access to the repository
-- Pull latest changes: `git pull`
-- Try again
-
----
-
-## 🎉 That's All!
-
-For most workflows, just remember:
-
-```bash
-npm run ship
-```
-
-**Happy shipping!** 🚢
+- **Production:** https://music.ml4-lab.com/
+- **GitHub Fork:** https://github.com/Anarqis/ytify
+- **Upstream:** https://github.com/n-ce/ytify

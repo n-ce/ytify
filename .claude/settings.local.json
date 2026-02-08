@@ -6,7 +6,11 @@
       "Bash(curl:*)",
       "Bash(nslookup:*)",
       "Bash(dig:*)",
-      "WebFetch(domain:witv.team)"
+      "WebFetch(domain:witv.team)",
+      "Bash(cd:*)",
+      "Bash(find:*)",
+      "Bash(git config:*)",
+      "Bash(git fetch:*)"
     ]
   }
 }

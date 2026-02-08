@@ -1,0 +1,119 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-ml4.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production
+        run: npm run build
+
+      - name: Extract version info
+        id: version
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          # Check if ML4-Lab version
+          if [[ "$VERSION" == *"-ml4."* ]]; then
+            echo "is_ml4=true" >> $GITHUB_OUTPUT
+            UPSTREAM_VERSION="${VERSION%-ml4.*}"
+            ML4_PATCH="${VERSION##*-ml4.}"
+            echo "upstream_version=$UPSTREAM_VERSION" >> $GITHUB_OUTPUT
+            echo "ml4_patch=$ML4_PATCH" >> $GITHUB_OUTPUT
+          else
+            echo "is_ml4=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          {
+            echo "## What's Changed"
+            echo ""
+
+            if [ -n "$PREV_TAG" ]; then
+              echo "### Commits since $PREV_TAG"
+              echo ""
+
+              # Features
+              FEATURES=$(git log $PREV_TAG..${{ github.ref_name }} --oneline --grep="^feat" 2>/dev/null || true)
+              if [ -n "$FEATURES" ]; then
+                echo "#### Features"
+                echo "$FEATURES" | sed 's/^/- /'
+                echo ""
+              fi
+
+              # Fixes
+              FIXES=$(git log $PREV_TAG..${{ github.ref_name }} --oneline --grep="^fix" 2>/dev/null || true)
+              if [ -n "$FIXES" ]; then
+                echo "#### Bug Fixes"
+                echo "$FIXES" | sed 's/^/- /'
+                echo ""
+              fi
+
+              # Other commits
+              echo "#### All Changes"
+              git log $PREV_TAG..${{ github.ref_name }} --oneline | head -30 | sed 's/^/- /'
+            else
+              echo "Initial release"
+            fi
+          } > /tmp/changelog.md
+
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "ML4-Lab Music ${{ steps.version.outputs.tag }}"
+          body: |
+            # ML4-Lab Music ${{ steps.version.outputs.tag }}
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ---
+
+            **Deployment:** Auto-deployed to https://music.ml4-lab.com/
+
+            ${{ steps.version.outputs.is_ml4 == 'true' && format('**Based on upstream:** v{0}', steps.version.outputs.upstream_version) || '' }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ steps.version.outputs.version }}
+          path: dist/
+          retention-days: 30
