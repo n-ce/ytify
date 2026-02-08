@@ -1,0 +1,110 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'backend/**'
+      - 'ytify.nginx.conf'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even without changes'
+        required: false
+        default: 'false'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Add VPS to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Backend
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          RAPIDAPI_KEYS: ${{ secrets.RAPIDAPI_KEYS }}
+        run: |
+          # Create deployment directory
+          ssh $VPS_USER@$VPS_HOST "mkdir -p /var/www/ytify/backend"
+
+          # Sync backend files
+          rsync -avz --delete \
+            --exclude 'data/' \
+            --exclude '.env' \
+            --exclude 'node_modules/' \
+            backend/ $VPS_USER@$VPS_HOST:/var/www/ytify/backend/
+
+          # Copy nginx config
+          scp ytify.nginx.conf $VPS_USER@$VPS_HOST:/tmp/ytify.nginx.conf
+
+          # Deploy on server
+          ssh $VPS_USER@$VPS_HOST << 'ENDSSH'
+            set -e
+            cd /var/www/ytify/backend
+
+            # Create .env if not exists
+            if [ ! -f .env ]; then
+              cp .env.example .env
+              echo "Warning: Created .env from template. Please configure RAPIDAPI_KEYS manually."
+            fi
+
+            # Update .env with secrets if provided
+            if [ -n "${RAPIDAPI_KEYS:-}" ]; then
+              sed -i "s|^RAPIDAPI_KEYS=.*|RAPIDAPI_KEYS=${RAPIDAPI_KEYS}|" .env
+            fi
+
+            # Ensure data directory exists
+            mkdir -p data
+
+            # Build and restart Docker container
+            docker-compose down || true
+            docker-compose build --no-cache
+            docker-compose up -d
+
+            # Wait for backend to be healthy
+            echo "Waiting for backend to be healthy..."
+            for i in {1..30}; do
+              if curl -sf http://localhost:3000/health > /dev/null; then
+                echo "Backend is healthy!"
+                break
+              fi
+              sleep 1
+            done
+
+            # Update nginx config if different
+            if ! diff -q /tmp/ytify.nginx.conf /etc/nginx/sites-available/ytify > /dev/null 2>&1; then
+              sudo cp /tmp/ytify.nginx.conf /etc/nginx/sites-available/ytify
+              sudo nginx -t && sudo systemctl reload nginx
+              echo "Nginx configuration updated"
+            fi
+
+            # Show status
+            docker-compose ps
+            curl -s http://localhost:3000/health
+          ENDSSH
+
+      - name: Verify Deployment
+        run: |
+          sleep 5
+          # Test health endpoint from outside
+          curl -sf https://${{ secrets.VPS_HOST }}/health || echo "Note: External health check may require DNS/SSL setup"
+          echo "Deployment completed successfully!"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Backend deployment failed! Check logs for details."

@@ -5,3 +5,22 @@ package-lock.json
 .env
 .env.local
 .env.*.local
+
+# Local Netlify folder
+.netlify
+
+# Google OAuth secrets
+docs/client_secret*.json
+client_secret*.json
+
+# Deno
+deno.lock
+
+# Temporary files
+nul
+
+# Backend data
+backend/data/
+
+# Claude settings
+.claude/settings.local.json

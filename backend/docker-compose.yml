@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  ytify-backend:
+    build: .
+    container_name: ytify-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PORT=3000
+      - ALLOWED_ORIGINS=https://music.ml4-lab.com,http://localhost:5173
+      - RAPIDAPI_KEYS=${RAPIDAPI_KEYS:-}
+      - EMAIL_VALIDATOR_URL=https://rapid-email-verifier.fly.dev/api/validate
+      - CACHE_MAX_SIZE=500
+      - CACHE_TTL_MS=300000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    name: ytify-network

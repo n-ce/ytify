@@ -1,0 +1,17 @@
+{
+  "$schema": "https://deno.land/x/deno/cli/schemas/config-file.v1.json",
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --watch src/main.ts",
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env src/main.ts",
+    "migrate": "deno run --allow-read --allow-write --allow-env scripts/migrate.ts"
+  },
+  "imports": {
+    "hono": "jsr:@hono/hono@^4.6.0",
+    "hono/": "jsr:@hono/hono@^4.6.0/",
+    "@db/sqlite": "jsr:@db/sqlite@^0.12.0"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "lib": ["deno.window"]
+  }
+}
