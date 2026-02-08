@@ -159,20 +159,36 @@ header {
     }
 
 
-    >div:has(.streamItem) {
+
+    >div:has(.content-card) {
       width: 100%;
-      flex-direction: column;
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      padding: var(--spacing-sm);
+      gap: var(--spacing-md);
+      scroll-snap-type: x mandatory;
+      
+      /* Hide scrollbar but allow scroll */
+      scrollbar-width: none; 
+      &::-webkit-scrollbar { display: none; }
 
-      .streamItem {
-        margin-bottom: 0;
+      .content-card {
+        flex-direction: column;
+        min-width: 220px;
+        width: 220px;
+        scroll-snap-align: start;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-subtle);
+      }
+
+      .content-card .card-media {
         width: 100%;
-        border-radius: 0;
-        flex-shrink: 0;
-
-        .title {
-          height: var(--size-4);
-          text-overflow: clip;
-        }
+        aspect-ratio: 16/9;
+      }
+      
+      .content-card .card-info {
+         justify-content: flex-start;
       }
     }
 

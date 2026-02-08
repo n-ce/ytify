@@ -1,0 +1,75 @@
+/* Carousel.css */
+.carousel {
+  margin-bottom: var(--space-xl);
+}
+
+.carousel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+}
+
+.carousel-header h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.carousel-nav {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.scroll-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) var(--ease-out-quart);
+}
+
+.scroll-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  transform: scale(1.05);
+}
+
+.scroll-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-track {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: var(--space-sm) var(--space-md);
+  -webkit-overflow-scrolling: touch;
+
+  /* Hide scrollbar mais garder fonctionnalité */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-track.dragging {
+  scroll-behavior: auto;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.carousel-track > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}

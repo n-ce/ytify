@@ -75,13 +75,13 @@ function accentDarkener(r: number, g: number, b: number) {
 
 const palette = {
   light: {
-    bg: '#fff',
-    text: '#000',
+    bg: '#ffffff',
+    text: '#0f0f0f',
     multiplier: '1.1',
   },
   dark: {
-    bg: '#000',
-    text: '#fff',
+    bg: '#0f0f0f',
+    text: '#ffffff',
     multiplier: '0.9'
   }
 };

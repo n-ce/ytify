@@ -1,128 +1,152 @@
-.streamItem {
-	width: 100%;
-	user-select: none;
-	color: var(--text);
-	margin-bottom: calc(var(--gap) - var(--size-2));
-	padding: var(--size-1);
-	border: var(--border-size-1) solid none;
-	border-radius: var(--roundness);
-	display: flex;
-	align-items: center;
-	position: relative;
-	transition: transform 0.4s;
-	text-decoration: none;
-	overflow: hidden;
-	cursor: pointer;
-
-	&.ravel {
-		* {
-			opacity: 0;
-		}
-
-		background: var(--onBg) !important;
-	}
-
-	&:hover {
-		background: var(--onBg);
-		color: var(--text2);
-		border: var(--border);
-	}
-
-	div,
-	span {
-		pointer-events: none;
-		transition: opacity 0.4s;
-	}
-
-
-	span {
-		position: relative;
-		z-index: 0;
-		margin-right: var(--size-2);
-
-		img {
-			max-height: var(--size-9);
-			max-width: var(--size-11);
-			border-radius: calc(var(--roundness) * 0.8);
-			border: var(--border);
-			box-shadow: var(--shadow-1);
-		}
-
-
-		.duration {
-			position: absolute;
-			padding: 0 var(--size-1);
-			bottom: var(--size-1);
-			right: var(--size-1);
-			background-color: #000a;
-			color: #fffc;
-			border-radius: calc(var(--roundness) * 0.5);
-			font-size: var(--font-size-0);
-			font-weight: var(--font-weight-6);
-		}
-	}
-
-	div {
-		height: 100%;
-		width: auto;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-evenly;
-
-
-		.title {
-			max-height: 100%;
-			line-height: var(--size-4);
-			font-size: var(--font-size-1);
-			overflow: hidden;
-			text-overflow: ellipsis;
-			font-weight: var(--font-weight-5);
-			letter-spacing: var(--font-letterspacing-1);
-			margin-bottom: auto;
-		}
-
-		.avu {
-			height: var(--size-7);
-			overflow: hidden;
-			line-height: var(--size-3);
-			width: 100%;
-
-			p {
-				font-size: var(--font-size-0);
-				font-weight: var(--font-weight-4);
-				letter-spacing: var(--font-letterspacing-1);
-				opacity: 0.9
-			}
-
-		}
-	}
-
-	i {
-		height: var(--size-9);
-		aspect-ratio: 1;
-		font-size: var(--font-size-3);
-		z-index: 2;
-		position: absolute;
-		right: calc(var(--size-2) - var(--size-6));
-		bottom: calc(var(--size-1) - var(--size-4));
-		border-radius: 50%;
-		opacity: 0.5;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		cursor: pointer;
-		transition: all 0.3s;
-
-		&:hover {
-			opacity: 1;
-			background-image: radial-gradient(var(--onBg), var(--onBg2) 80%);
-		}
-
-	}
-
+/* content-card replaces streamItem */
+.content-card {
+  display: flex; /* Default to list/flex style, or grid item? Report says "Card Pattern" */
+  /* If it is a card in a grid, it should probably be flex-direction: column? 
+     But the CSS in report says: display: flex; gap: 12px; 
+     This looks like a "List Item" or "Horizontal Card". 
+     Witv.team has "Horizontal Carousels" of "Vertical Cards". 
+     
+     Let's look at the report CSS again:
+     .content-card { display: flex; gap: 12px; ... }
+     .card-media { width: 120px; aspect-ratio: 16/9; }
+     
+     This describes a "Horizontal Card" (Row) suitable for lists.
+     
+     BUT for the "Hub" and "Grid", we usually want Vertical Cards (Media on top).
+     
+     I will add a modifier .content-card--vertical.
+  */
+  
+  flex-direction: row;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--roundness);
+  background: transparent;
+  transition: background var(--duration-fast) var(--ease-default);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
 }
 
+.content-card:hover {
+  background: var(--bg-tertiary);
+}
 
-#queuelist>a {
-	transition: initial;
+.card-media {
+  position: relative;
+  width: 120px;
+  aspect-ratio: 16/9;
+  border-radius: calc(var(--roundness) * 0.8);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s;
+}
+
+.card-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: var(--accent-live);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.card-duration {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  min-width: 0; /* Text truncation fix */
+}
+
+.card-title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+  
+  /* Truncate 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-meta {
+  margin: 4px 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-action {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.card-action:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+/* Vertical Variant for Grids */
+.content-card--vertical {
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.content-card--vertical .card-media {
+  width: 100%;
+  aspect-ratio: 16/9;
+}
+
+.content-card--vertical .card-info {
+  justify-content: flex-start;
+}
+
+/* Draggable handle */
+.card-handle {
+  align-self: center;
+  color: var(--text-tertiary);
+  cursor: grab;
+  padding: 4px;
 }

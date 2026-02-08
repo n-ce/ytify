@@ -3,6 +3,8 @@
 @import 'header.css';
 @import 'footer.css';
 @import 'tooltips.css';
+@import 'tokens.css';
+@import 'animations.css';
 
 :root {
   --source: initial;
@@ -261,4 +263,40 @@ i {
 
   position: relative;
 
+
 }
+
+.grid-channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.grid-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.main-content {
+  container-type: inline-size;
+}
+
+@container (min-width: 640px) {
+  .grid-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container (min-width: 1024px) {
+  .grid-content {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@container (min-width: 1440px) {
+  .grid-content {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+

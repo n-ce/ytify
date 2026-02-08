@@ -28,6 +28,7 @@ export default function() {
 
   return (
     <>
+      <NavBar />
       <main>
         <For each={Object.values(navStore)}>
           {(item) =>
@@ -41,7 +42,6 @@ export default function() {
         <Show when={!navStore.player.state && playerStore.playbackState !== 'none'}>
           <MiniPlayer />
         </Show >
-        <NavBar />
       </footer>
       <Show when={store.actionsMenu?.id}>
         <ActionsMenu />

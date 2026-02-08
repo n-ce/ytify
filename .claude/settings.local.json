@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(ssh:*)",
+      "Bash(curl:*)",
+      "Bash(nslookup:*)",
+      "Bash(dig:*)",
+      "WebFetch(domain:witv.team)"
+    ]
+  }
+}

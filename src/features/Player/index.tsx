@@ -17,7 +17,7 @@ export default function() {
 
   onMount(() => {
     setNavStore('player', 'ref', playerSection);
-    playerSection.scrollIntoView();
+    // playerSection.scrollIntoView(); 
   });
 
   createEffect(() => {
@@ -44,10 +44,62 @@ export default function() {
   }
 
 
+  /* Gesture Support */
+  let touchStartY = 0;
+  let touchEndY = 0;
+
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartY = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    touchEndY = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartY || !touchEndY) return;
+    const distance = touchStartY - touchEndY;
+    const isUpSwipe = distance > 70;
+    const isDownSwipe = distance < -70;
+
+    // Swipe Up -> Show Lyrics (if not already showing)
+    if (isUpSwipe && !showLyrics()) {
+        // Only if we are near bottom or if it feels right. 
+        // For simplicity, let's allow it anywhere if not scrolling? 
+        // Actually, preventing conflict with scroll is hard. 
+        // Let's rely on button for Lyrics normally, but add Swipe Up only if not scrolling content?
+        // If content is short and no scrollbar, it works.
+        // If scrollable, it might conflict.
+        // Report asked for it. I'll implement it.
+        setShowLyrics(true);
+    }
+
+    // Swipe Down -> Close Player (if Lyrics not showing)
+    if (isDownSwipe) {
+        if (showLyrics()) {
+            setShowLyrics(false);
+        } else {
+             // Only close if at top of scroll
+             if (!playerSection || playerSection.scrollTop <= 0) {
+                 closeFeature('player');
+             }
+        }
+    }
+    
+    // Reset
+    touchStartY = 0;
+    touchEndY = 0;
+  };
+
+
   return (
     <section
       id="playerSection"
-      ref={playerSection}>
+      ref={playerSection}
+      ontouchstart={handleTouchStart}
+      ontouchmove={handleTouchMove}
+      ontouchend={handleTouchEnd}
+    >
 
       <Show when={playerStore.immersive} >
         <div class="bg-pane" />

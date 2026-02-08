@@ -1,0 +1,78 @@
+/* SkeletonLoader.css */
+.skeleton-wrapper {
+  display: contents;
+}
+
+.skeleton-card {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.skeleton-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.skeleton-list .skeleton-item {
+  flex-direction: row;
+  align-items: center;
+}
+
+.skeleton-image {
+  width: 160px;
+  height: 160px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+}
+
+.skeleton-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+}
+
+.skeleton-artwork {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+}
+
+.skeleton-controls {
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+}
+
+/* Animation shimmer */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(100% 0 0 / 5%) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
