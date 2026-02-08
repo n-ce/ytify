@@ -1,0 +1,389 @@
+# ============================================================================
+# YTFY Bundle Analysis Workflow
+# ============================================================================
+# Purpose: Track bundle size and enforce size budgets
+# Triggers: PR to main, push to main
+# ============================================================================
+
+name: Bundle Analysis
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'vite.config.optimized.ts'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'vite.config.optimized.ts'
+  workflow_dispatch:
+
+# Prevent concurrent runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Size limits in KB
+  MAX_TOTAL_SIZE: 500
+  MAX_INITIAL_JS: 150
+  MAX_INITIAL_CSS: 50
+  MAX_CHUNK_SIZE: 100
+
+jobs:
+  # ==========================================================================
+  # Bundle Size Analysis
+  # ==========================================================================
+  analyze:
+    name: Analyze Bundle Size
+    runs-on: ubuntu-latest
+    outputs:
+      total_size: ${{ steps.analyze.outputs.total_size }}
+      initial_js: ${{ steps.analyze.outputs.initial_js }}
+      initial_css: ${{ steps.analyze.outputs.initial_css }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Analyze bundle
+        id: analyze
+        run: |
+          # Calculate sizes
+          TOTAL_SIZE=$(du -sk dist/ | cut -f1)
+          TOTAL_SIZE_MB=$(echo "scale=2; $TOTAL_SIZE / 1024" | bc)
+          
+          # Find initial JS size (entry files)
+          INITIAL_JS=0
+          for file in dist/assets/index-*.js; do
+            if [ -f "$file" ]; then
+              SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+              SIZE_KB=$((SIZE / 1024))
+              INITIAL_JS=$((INITIAL_JS + SIZE_KB))
+            fi
+          done
+          
+          # Find initial CSS size
+          INITIAL_CSS=0
+          for file in dist/assets/index-*.css; do
+            if [ -f "$file" ]; then
+              SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+              SIZE_KB=$((SIZE / 1024))
+              INITIAL_CSS=$((INITIAL_CSS + SIZE_KB))
+            fi
+          done
+          
+          # Find largest chunk
+          LARGEST_CHUNK=0
+          for file in dist/assets/*.js; do
+            if [ -f "$file" ]; then
+              SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+              SIZE_KB=$((SIZE / 1024))
+              if [ $SIZE_KB -gt $LARGEST_CHUNK ]; then
+                LARGEST_CHUNK=$SIZE_KB
+              fi
+            fi
+          done
+          
+          # Output results
+          echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+          echo "total_size_mb=$TOTAL_SIZE_MB" >> $GITHUB_OUTPUT
+          echo "initial_js=$INITIAL_JS" >> $GITHUB_OUTPUT
+          echo "initial_css=$INITIAL_CSS" >> $GITHUB_OUTPUT
+          echo "largest_chunk=$LARGEST_CHUNK" >> $GITHUB_OUTPUT
+          
+          # Log results
+          echo "📦 Bundle Analysis Results:"
+          echo "  Total Size: ${TOTAL_SIZE}KB (${TOTAL_SIZE_MB}MB)"
+          echo "  Initial JS: ${INITIAL_JS}KB"
+          echo "  Initial CSS: ${INITIAL_CSS}KB"
+          echo "  Largest Chunk: ${LARGEST_CHUNK}KB"
+      
+      - name: Generate bundle report
+        run: |
+          # Create detailed report
+          cat > bundle-report.json << EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "commit": "${{ github.sha }}",
+            "branch": "${{ github.ref_name }}",
+            "totalSize": ${{ steps.analyze.outputs.total_size }},
+            "initialJs": ${{ steps.analyze.outputs.initial_js }},
+            "initialCss": ${{ steps.analyze.outputs.initial_css }},
+            "largestChunk": ${{ steps.analyze.outputs.largest_chunk }},
+            "files": $(find dist/assets -type f \( -name "*.js" -o -name "*.css" \) -exec stat --printf='{"name":"%n","size":%s},' {} \; | sed 's/,$//' | awk 'BEGIN{print "["} {print} END{print "]"}')
+          }
+          EOF
+      
+      - name: Upload bundle report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report
+          path: |
+            bundle-report.json
+            dist/
+          retention-days: 30
+
+  # ==========================================================================
+  # Compare with Base Branch
+  # ==========================================================================
+  compare:
+    name: Compare Bundle Size
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: base/package-lock.json
+      
+      - name: Install and build base
+        working-directory: base
+        run: |
+          npm ci
+          npm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Calculate base sizes
+        id: base
+        working-directory: base
+        run: |
+          TOTAL_SIZE=$(du -sk dist/ | cut -f1)
+          
+          INITIAL_JS=0
+          for file in dist/assets/index-*.js; do
+            if [ -f "$file" ]; then
+              SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+              SIZE_KB=$((SIZE / 1024))
+              INITIAL_JS=$((INITIAL_JS + SIZE_KB))
+            fi
+          done
+          
+          INITIAL_CSS=0
+          for file in dist/assets/index-*.css; do
+            if [ -f "$file" ]; then
+              SIZE=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file")
+              SIZE_KB=$((SIZE / 1024))
+              INITIAL_CSS=$((INITIAL_CSS + SIZE_KB))
+            fi
+          done
+          
+          echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+          echo "initial_js=$INITIAL_JS" >> $GITHUB_OUTPUT
+          echo "initial_css=$INITIAL_CSS" >> $GITHUB_OUTPUT
+      
+      - name: Calculate diff
+        id: diff
+        run: |
+          # Calculate differences
+          TOTAL_DIFF=$((${{ needs.analyze.outputs.total_size }} - ${{ steps.base.outputs.total_size }}))
+          JS_DIFF=$((${{ needs.analyze.outputs.initial_js }} - ${{ steps.base.outputs.initial_js }}))
+          CSS_DIFF=$((${{ needs.analyze.outputs.initial_css }} - ${{ steps.base.outputs.initial_css }}))
+          
+          # Format with + or - sign
+          format_diff() {
+            if [ $1 -gt 0 ]; then echo "+$1"; else echo "$1"; fi
+          }
+          
+          echo "total_diff=$(format_diff $TOTAL_DIFF)" >> $GITHUB_OUTPUT
+          echo "js_diff=$(format_diff $JS_DIFF)" >> $GITHUB_OUTPUT
+          echo "css_diff=$(format_diff $CSS_DIFF)" >> $GITHUB_OUTPUT
+          
+          # Determine if this is an increase
+          if [ $TOTAL_DIFF -gt 10 ]; then
+            echo "size_increased=true" >> $GITHUB_OUTPUT
+          else
+            echo "size_increased=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const currentTotal = ${{ needs.analyze.outputs.total_size }};
+            const baseTotal = ${{ steps.base.outputs.total_size }};
+            const totalDiff = currentTotal - baseTotal;
+            const currentJs = ${{ needs.analyze.outputs.initial_js }};
+            const baseJs = ${{ steps.base.outputs.initial_js }};
+            const jsDiff = currentJs - baseJs;
+            const currentCss = ${{ needs.analyze.outputs.initial_css }};
+            const baseCss = ${{ steps.base.outputs.initial_css }};
+            const cssDiff = currentCss - baseCss;
+            
+            const formatSize = (kb) => kb >= 1024 ? `${(kb/1024).toFixed(2)} MB` : `${kb} KB`;
+            const formatDiff = (diff) => {
+              const emoji = diff > 0 ? '📈' : diff < 0 ? '📉' : '➡️';
+              const sign = diff > 0 ? '+' : '';
+              return `${emoji} ${sign}${formatSize(Math.abs(diff))}`;
+            };
+            
+            const getStatus = (current, max) => current <= max ? '✅' : '❌';
+            
+            let comment = `## 📦 Bundle Size Report\n\n`;
+            comment += `### Size Comparison\n\n`;
+            comment += `| Metric | Base | Current | Diff | Budget | Status |\n`;
+            comment += `|--------|------|---------|------|--------|--------|\n`;
+            comment += `| Total Size | ${formatSize(baseTotal)} | ${formatSize(currentTotal)} | ${formatDiff(totalDiff)} | ${formatSize(${{ env.MAX_TOTAL_SIZE }})} | ${getStatus(currentTotal, ${{ env.MAX_TOTAL_SIZE }})} |\n`;
+            comment += `| Initial JS | ${formatSize(baseJs)} | ${formatSize(currentJs)} | ${formatDiff(jsDiff)} | ${formatSize(${{ env.MAX_INITIAL_JS }})} | ${getStatus(currentJs, ${{ env.MAX_INITIAL_JS }})} |\n`;
+            comment += `| Initial CSS | ${formatSize(baseCss)} | ${formatSize(currentCss)} | ${formatDiff(cssDiff)} | ${formatSize(${{ env.MAX_INITIAL_CSS }})} | ${getStatus(currentCss, ${{ env.MAX_INITIAL_CSS }})} |\n`;
+            comment += `\n`;
+            
+            if (totalDiff > 10) {
+              comment += `> ⚠️ **Warning**: Bundle size increased by ${formatSize(totalDiff)}. Consider optimizing.\n\n`;
+            } else if (totalDiff < -10) {
+              comment += `> 🎉 **Great job!** Bundle size decreased by ${formatSize(Math.abs(totalDiff))}!\n\n`;
+            }
+            
+            comment += `\n---\n`;
+            comment += `_Generated by Bundle Analysis_`;
+            
+            // Find and update existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const existingComment = comments.find(c => 
+              c.user.type === 'Bot' && c.body.includes('Bundle Size Report')
+            );
+            
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            }
+
+  # ==========================================================================
+  # Size Budget Enforcement
+  # ==========================================================================
+  budget-check:
+    name: Check Size Budgets
+    runs-on: ubuntu-latest
+    needs: analyze
+    
+    steps:
+      - name: Check budgets
+        run: |
+          FAILED=0
+          
+          echo "📊 Checking Bundle Size Budgets..."
+          echo ""
+          
+          TOTAL=${{ needs.analyze.outputs.total_size }}
+          if [ $TOTAL -gt ${{ env.MAX_TOTAL_SIZE }} ]; then
+            echo "❌ Total size (${TOTAL}KB) exceeds budget (${{ env.MAX_TOTAL_SIZE }}KB)"
+            FAILED=1
+          else
+            echo "✅ Total size (${TOTAL}KB) within budget (${{ env.MAX_TOTAL_SIZE }}KB)"
+          fi
+          
+          INITIAL_JS=${{ needs.analyze.outputs.initial_js }}
+          if [ $INITIAL_JS -gt ${{ env.MAX_INITIAL_JS }} ]; then
+            echo "❌ Initial JS (${INITIAL_JS}KB) exceeds budget (${{ env.MAX_INITIAL_JS }}KB)"
+            FAILED=1
+          else
+            echo "✅ Initial JS (${INITIAL_JS}KB) within budget (${{ env.MAX_INITIAL_JS }}KB)"
+          fi
+          
+          INITIAL_CSS=${{ needs.analyze.outputs.initial_css }}
+          if [ $INITIAL_CSS -gt ${{ env.MAX_INITIAL_CSS }} ]; then
+            echo "❌ Initial CSS (${INITIAL_CSS}KB) exceeds budget (${{ env.MAX_INITIAL_CSS }}KB)"
+            FAILED=1
+          else
+            echo "✅ Initial CSS (${INITIAL_CSS}KB) within budget (${{ env.MAX_INITIAL_CSS }}KB)"
+          fi
+          
+          echo ""
+          
+          if [ $FAILED -eq 1 ]; then
+            echo "⚠️ Some size budgets exceeded. Please optimize the bundle."
+            exit 1
+          fi
+          
+          echo "🎉 All size budgets met!"
+
+  # ==========================================================================
+  # Store Historical Data (main branch only)
+  # ==========================================================================
+  store-history:
+    name: Store Historical Data
+    runs-on: ubuntu-latest
+    needs: analyze
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download bundle report
+        uses: actions/download-artifact@v4
+        with:
+          name: bundle-report
+          path: .bundle-report/
+      
+      - name: Store metrics
+        run: |
+          # Create metrics directory
+          mkdir -p metrics
+          
+          DATE=$(date -u +%Y-%m-%d)
+          METRICS_FILE="metrics/bundle-${DATE}.json"
+          
+          # Move report to metrics
+          cp .bundle-report/bundle-report.json "$METRICS_FILE"
+          
+          echo "📊 Metrics stored: $METRICS_FILE"
+      
+      # Optional: Commit metrics to repo
+      # - name: Commit metrics
+      #   run: |
+      #     git config user.name "GitHub Actions Bot"
+      #     git config user.email "<>"
+      #     git add metrics/
+      #     git commit -m "chore: add bundle metrics for $(date -u +%Y-%m-%d)" || true
+      #     git push || true

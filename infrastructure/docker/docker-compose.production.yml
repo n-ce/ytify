@@ -1,0 +1,369 @@
+# ============================================================================
+# YTFY Production Docker Compose
+# ============================================================================
+# Services: Nginx, Backend, Redis, Prometheus, Grafana
+# Usage: docker-compose -f docker-compose.production.yml up -d
+# ============================================================================
+
+version: '3.9'
+
+# ==========================================================================
+# Networks
+# ==========================================================================
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+  monitoring:
+    driver: bridge
+
+# ==========================================================================
+# Volumes
+# ==========================================================================
+
+volumes:
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  nginx_cache:
+    driver: local
+  nginx_logs:
+    driver: local
+  certbot_certs:
+    driver: local
+  certbot_www:
+    driver: local
+
+# ==========================================================================
+# Services
+# ==========================================================================
+
+services:
+
+  # --------------------------------------------------------------------------
+  # Nginx Reverse Proxy
+  # --------------------------------------------------------------------------
+  nginx:
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/Dockerfile.optimized
+    container_name: ytfy-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - nginx_cache:/var/cache/nginx
+      - nginx_logs:/var/log/nginx
+      - certbot_certs:/etc/letsencrypt:ro
+      - certbot_www:/var/www/certbot:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    environment:
+      - TZ=${TIMEZONE:-UTC}
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # --------------------------------------------------------------------------
+  # Backend Application (Deno)
+  # --------------------------------------------------------------------------
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    container_name: ytfy-backend
+    restart: unless-stopped
+    networks:
+      - backend
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379
+      - DATA_DIR=/app/data
+      - TZ=${TIMEZONE:-UTC}
+    env_file:
+      - .env.production
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+  # --------------------------------------------------------------------------
+  # Redis Cache
+  # --------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: ytfy-redis
+    restart: unless-stopped
+    networks:
+      - backend
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+  # --------------------------------------------------------------------------
+  # Certbot (SSL Certificate Management)
+  # --------------------------------------------------------------------------
+  certbot:
+    image: certbot/certbot:latest
+    container_name: ytfy-certbot
+    volumes:
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+
+  # --------------------------------------------------------------------------
+  # Prometheus (Metrics Collection)
+  # --------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: ytfy-prometheus
+    restart: unless-stopped
+    networks:
+      - monitoring
+      - backend
+    expose:
+      - "9090"
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--storage.tsdb.retention.size=10GB'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+  # --------------------------------------------------------------------------
+  # Grafana (Metrics Visualization)
+  # --------------------------------------------------------------------------
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: ytfy-grafana
+    restart: unless-stopped
+    networks:
+      - monitoring
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=${GRAFANA_ROOT_URL:-http://localhost:3001}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-piechart-panel
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  # --------------------------------------------------------------------------
+  # Redis Exporter (for Prometheus)
+  # --------------------------------------------------------------------------
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.55.0
+    container_name: ytfy-redis-exporter
+    restart: unless-stopped
+    networks:
+      - backend
+      - monitoring
+    expose:
+      - "9121"
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+
+  # --------------------------------------------------------------------------
+  # Nginx Exporter (for Prometheus)
+  # --------------------------------------------------------------------------
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:0.11.0
+    container_name: ytfy-nginx-exporter
+    restart: unless-stopped
+    networks:
+      - frontend
+      - monitoring
+    expose:
+      - "9113"
+    command:
+      - '-nginx.scrape-uri=http://nginx/stub_status'
+    depends_on:
+      nginx:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+
+  # --------------------------------------------------------------------------
+  # Node Exporter (System Metrics)
+  # --------------------------------------------------------------------------
+  node-exporter:
+    image: prom/node-exporter:v1.7.0
+    container_name: ytfy-node-exporter
+    restart: unless-stopped
+    networks:
+      - monitoring
+    expose:
+      - "9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+
+  # --------------------------------------------------------------------------
+  # cAdvisor (Container Metrics)
+  # --------------------------------------------------------------------------
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: ytfy-cadvisor
+    restart: unless-stopped
+    networks:
+      - monitoring
+    expose:
+      - "8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    privileged: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+# ==========================================================================
+# Configuration Notes
+# ==========================================================================
+#
+# 1. Initial Setup:
+#    - Copy .env.production.example to .env.production
+#    - Set all required environment variables
+#    - Run: docker-compose -f docker-compose.production.yml up -d
+#
+# 2. SSL Certificates:
+#    - First run without SSL to get certificates:
+#      docker-compose run --rm certbot certonly --webroot -w /var/www/certbot -d music.ml4-lab.com
+#    - Then restart nginx to load certificates
+#
+# 3. Scaling:
+#    - Backend can be scaled: docker-compose up -d --scale backend=3
+#    - Update nginx upstream configuration for load balancing
+#
+# 4. Monitoring:
+#    - Grafana: http://localhost:3001 (default: admin/admin)
+#    - Import dashboard for Nginx, Redis, and custom YTFY metrics
+#
+# 5. Logs:
+#    - View logs: docker-compose logs -f [service]
+#    - Nginx logs are in nginx_logs volume
+#
+# ==========================================================================

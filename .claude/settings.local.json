@@ -10,7 +10,30 @@
       "Bash(cd:*)",
       "Bash(find:*)",
       "Bash(git config:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: Complete UX overhaul with Google OAuth and Welcome screen\n\n- Add Welcome screen for new users with feature highlights\n- Implement Google OAuth authentication \\(Continue with Google\\)\n- Add visible Sign In button in NavBar\n- Create netlify.toml with CSP headers for Google OAuth\n- Complete design tokens system \\(spacing aliases, glassmorphism\\)\n- Add comprehensive animation keyframes\n- Fix race condition in Google Identity Services loading\n- Improve Login dialog with better UX and styling\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "WebFetch(domain:ytify.ml4-lab.com)",
+      "Bash(ping:*)",
+      "WebFetch(domain:api.invidious.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Read(//c/Users/Utilisateur/Documents/**)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: OAuth button visibility + Uma fallback + Agent prompts\n\n- Fix Sign In button hidden on mobile \\(NavBar.css display: none -> flex\\)\n- Add fallback Invidious instances when Uma fetch fails\n- Add safe JSON parsing and localStorage utilities\n- Add timeout to Uma fetch \\(10s\\)\n- Create Frontend and Backend agent prompts for Gemini\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfix: Update CSP to allow required external domains\n\n- Add raw.githubusercontent.com \\(Uma\\)\n- Add *.vercel.app \\(JioSaavn\\)\n- Add fallback Invidious instances\n- Add *.zeabur.app \\(ytify backend\\)\n- Add media-src for Invidious streaming\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "WebFetch(domain:dev--ytify.netlify.app)",
+      "WebFetch(domain:ytify-zeta.vercel.app)",
+      "Bash(git commit:*)",
+      "Bash(netlify:*)",
+      "Bash(npm install:*)",
+      "Bash(dir:*)",
+      "Bash(where:*)",
+      "Bash(python scripts/deploy_backend.py:*)",
+      "Bash(powershell:*)",
+      "Bash(tailscale status:*)",
+      "Bash(tailscale up:*)",
+      "Bash(scp:*)"
     ]
   }
 }

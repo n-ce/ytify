@@ -1,0 +1,172 @@
+# ============================================================================
+# YTFY Optimized Production Dockerfile
+# ============================================================================
+# Multi-stage build for minimal production image
+# Features: Nginx with Brotli, optimal caching, security hardening
+# ============================================================================
+
+# ==========================================================================
+# Stage 1: Build Frontend
+# ==========================================================================
+
+FROM node:20-alpine AS frontend-builder
+
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
+# Copy package files first (for better caching)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --only=production=false
+
+# Copy source files
+COPY . .
+
+# Build the application
+ENV NODE_ENV=production
+RUN npm run build
+
+# Compress static assets with Brotli and Gzip
+RUN apk add --no-cache brotli gzip && \
+    find /app/dist -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" \) \
+    -exec sh -c 'brotli -k -q 11 "$1" && gzip -k -9 "$1"' _ {} \;
+
+# ==========================================================================
+# Stage 2: Build Nginx with Brotli Module
+# ==========================================================================
+
+FROM alpine:3.19 AS nginx-builder
+
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
+    git \
+    pcre-dev \
+    zlib-dev \
+    openssl-dev \
+    linux-headers \
+    perl
+
+# Download Nginx and Brotli module
+ARG NGINX_VERSION=1.25.3
+RUN wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
+    tar -xzf nginx-${NGINX_VERSION}.tar.gz && \
+    git clone --recursive https://github.com/google/ngx_brotli.git
+
+# Build Nginx with Brotli
+WORKDIR /nginx-${NGINX_VERSION}
+
+RUN ./configure \
+    --prefix=/etc/nginx \
+    --sbin-path=/usr/sbin/nginx \
+    --modules-path=/usr/lib64/nginx/modules \
+    --conf-path=/etc/nginx/nginx.conf \
+    --error-log-path=/var/log/nginx/error.log \
+    --http-log-path=/var/log/nginx/access.log \
+    --pid-path=/var/run/nginx.pid \
+    --lock-path=/var/run/nginx.lock \
+    --with-http_ssl_module \
+    --with-http_v2_module \
+    --with-http_realip_module \
+    --with-http_gzip_static_module \
+    --with-http_stub_status_module \
+    --with-http_sub_module \
+    --with-http_slice_module \
+    --with-threads \
+    --with-stream \
+    --with-stream_ssl_module \
+    --with-pcre \
+    --add-module=/ngx_brotli \
+    && make \
+    && make install
+
+# ==========================================================================
+# Stage 3: Production Runtime
+# ==========================================================================
+
+FROM alpine:3.19 AS production
+
+# Metadata
+LABEL maintainer="YTFY Team"
+LABEL description="YTFY Production Image with Nginx and Brotli"
+LABEL version="1.0.0"
+
+# Install runtime dependencies
+RUN apk add --no-cache \
+    pcre \
+    zlib \
+    openssl \
+    ca-certificates \
+    tzdata \
+    curl \
+    && rm -rf /var/cache/apk/*
+
+# Copy Nginx from builder
+COPY --from=nginx-builder /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=nginx-builder /etc/nginx /etc/nginx
+COPY --from=nginx-builder /usr/lib64/nginx /usr/lib64/nginx
+
+# Create nginx user and directories
+RUN addgroup -S nginx && \
+    adduser -S -G nginx nginx && \
+    mkdir -p /var/log/nginx && \
+    mkdir -p /var/cache/nginx/static && \
+    mkdir -p /var/cache/nginx/api && \
+    mkdir -p /var/cache/nginx/media && \
+    mkdir -p /var/cache/nginx/micro && \
+    mkdir -p /var/www/ytfy && \
+    chown -R nginx:nginx /var/log/nginx && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/www/ytfy
+
+# Copy built frontend assets
+COPY --from=frontend-builder --chown=nginx:nginx /app/dist /var/www/ytfy/current
+
+# Copy Nginx configuration
+COPY infrastructure/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY infrastructure/nginx/conf.d/ /etc/nginx/conf.d/
+
+# Create healthcheck script
+RUN printf '#!/bin/sh\ncurl -f http://localhost/health || exit 1' > /healthcheck.sh && \
+    chmod +x /healthcheck.sh
+
+# Security: Remove unnecessary files
+RUN rm -rf /etc/nginx/*.default && \
+    rm -rf /tmp/* && \
+    rm -rf /var/tmp/*
+
+# Set correct permissions
+RUN chmod 644 /etc/nginx/nginx.conf && \
+    chmod 644 /etc/nginx/conf.d/*.conf
+
+# Expose ports
+EXPOSE 80 443
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD /healthcheck.sh
+
+# Switch to non-root user
+USER nginx
+
+# Run Nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# ==========================================================================
+# Build Arguments & Environment Variables
+# ==========================================================================
+#
+# Build:
+#   docker build -f Dockerfile.optimized -t ytfy:latest .
+#
+# Run:
+#   docker run -d -p 80:80 -p 443:443 \
+#     -v /etc/letsencrypt:/etc/letsencrypt:ro \
+#     -v /var/log/nginx:/var/log/nginx \
+#     --name ytfy ytfy:latest
+#
+# ==========================================================================

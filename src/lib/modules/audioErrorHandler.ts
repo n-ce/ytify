@@ -12,7 +12,20 @@ export default function(
   const { stream } = playerStore;
   const id = prefetch || stream.id;
   const { index, invidious } = store;
-  const origin = new URL(audio.src).origin;
+
+  // Guard: if audio.src is empty or invalid, bail out
+  if (!audio.src) {
+    setPlayerStore('playbackState', 'none');
+    return;
+  }
+
+  let origin: string;
+  try {
+    origin = new URL(audio.src).origin;
+  } catch {
+    setPlayerStore('playbackState', 'none');
+    return;
+  }
 
   if (audio.src.endsWith('&fallback')) {
     if (!playerStore.isWatching) {

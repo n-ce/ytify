@@ -4,6 +4,7 @@ import {
 } from "@lib/utils/library";
 import { setStore, store, t } from "@lib/stores";
 import { config } from "@lib/utils/config";
+import { safeJsonParse } from "@lib/utils/safe";
 
 // --- Type Definitions ---
 // interface Meta { [key: string]: number } // Meta is global
@@ -52,12 +53,10 @@ export async function pushFullLibrary(userId: string): Promise<void> {
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith('library_')) {
-      try {
         const val = localStorage.getItem(key);
-        if (val) snapshot[key.slice(8)] = JSON.parse(val);
-      } catch (e) {
-        console.warn(`Failed to parse ${key} during sync push`, e);
-      }
+        // Use safe parsing
+        const parsed = safeJsonParse(val, null);
+        if (parsed) snapshot[key.slice(8)] = parsed;
     }
   }
 
@@ -149,8 +148,9 @@ export async function runSync(userId: string): Promise<{ success: boolean; messa
         // If we made changes *after* last sync, our timestamp should be higher.
         if((currentMeta[key] || 0) > (remoteMeta[key] || 0)){
             const rawData = localStorage.getItem(`library_${key}`);
-            if(rawData) {
-              deltaPayload.updatedCollections[key] = JSON.parse(rawData);
+            const parsed = safeJsonParse(rawData, null);
+            if(parsed) {
+              deltaPayload.updatedCollections[key] = parsed;
               deltaPayload.meta[key] = currentMeta[key];
             }
         }
@@ -271,7 +271,7 @@ export function scheduleSync() {
 
 export const getDirtyTracks = (): { added: string[]; deleted: string[] } => {
   const dirty = localStorage.getItem("dbsync_dirty_tracks");
-  return dirty ? JSON.parse(dirty) : { added: [], deleted: [] };
+  return safeJsonParse(dirty, { added: [], deleted: [] });
 };
 
 export const saveDirtyTracks = (dirtyTracks: { added: string[]; deleted: string[] }) => {

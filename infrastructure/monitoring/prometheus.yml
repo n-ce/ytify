@@ -1,0 +1,244 @@
+# ============================================================================
+# YTFY Prometheus Configuration
+# ============================================================================
+# Purpose: Metrics collection and monitoring
+# Targets: Nginx, Backend, Node Exporter, Redis
+# ============================================================================
+
+global:
+  # Scrape interval (how often to collect metrics)
+  scrape_interval: 15s
+  
+  # Evaluation interval for alerting rules
+  evaluation_interval: 15s
+  
+  # Scrape timeout
+  scrape_timeout: 10s
+  
+  # External labels for identification
+  external_labels:
+    environment: 'production'
+    application: 'ytfy'
+    cluster: 'primary'
+
+# ==========================================================================
+# Alerting Configuration
+# ==========================================================================
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# ==========================================================================
+# Rule Files
+# ==========================================================================
+
+rule_files:
+  - '/etc/prometheus/rules/*.yml'
+  # - '/etc/prometheus/alerts/*.yml'
+
+# ==========================================================================
+# Scrape Configurations
+# ==========================================================================
+
+scrape_configs:
+  
+  # --------------------------------------------------------------------------
+  # Prometheus Self-Monitoring
+  # --------------------------------------------------------------------------
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: /metrics
+    scheme: http
+
+  # --------------------------------------------------------------------------
+  # Nginx Metrics (via nginx-prometheus-exporter)
+  # --------------------------------------------------------------------------
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'nginx-primary'
+
+  # --------------------------------------------------------------------------
+  # Backend Application Metrics
+  # --------------------------------------------------------------------------
+  - job_name: 'ytfy-backend'
+    static_configs:
+      - targets: ['backend:3000']
+    metrics_path: /metrics
+    scheme: http
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'ytfy-backend'
+
+  # --------------------------------------------------------------------------
+  # Redis Metrics (via redis-exporter)
+  # --------------------------------------------------------------------------
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'redis-cache'
+
+  # --------------------------------------------------------------------------
+  # Node Exporter (System Metrics)
+  # --------------------------------------------------------------------------
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    metrics_path: /metrics
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'ytfy-server'
+
+  # --------------------------------------------------------------------------
+  # cAdvisor (Container Metrics)
+  # --------------------------------------------------------------------------
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    metrics_path: /metrics
+    scheme: http
+
+  # --------------------------------------------------------------------------
+  # Blackbox Exporter (Endpoint Probing)
+  # --------------------------------------------------------------------------
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - 'https://music.ml4-lab.com'
+          - 'https://music.ml4-lab.com/health'
+          - 'https://music.ml4-lab.com/api/v1/videos/test'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 'blackbox-exporter:9115'
+
+# ==========================================================================
+# Storage Configuration (for persistent metrics)
+# ==========================================================================
+
+# Note: Storage configuration is typically done via command-line flags
+# Example: --storage.tsdb.path=/prometheus/data
+#          --storage.tsdb.retention.time=15d
+#          --storage.tsdb.retention.size=10GB
+
+# ==========================================================================
+# Recording Rules Example
+# ==========================================================================
+#
+# Create /etc/prometheus/rules/ytfy.yml with:
+#
+# groups:
+#   - name: ytfy_performance
+#     rules:
+#       # Request rate
+#       - record: ytfy:http_requests:rate5m
+#         expr: sum(rate(http_requests_total[5m])) by (handler, method, status)
+#       
+#       # Error rate
+#       - record: ytfy:http_errors:rate5m
+#         expr: sum(rate(http_requests_total{status=~"5.."}[5m]))
+#       
+#       # Response time percentiles
+#       - record: ytfy:http_request_duration:p99
+#         expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, handler))
+#       
+#       # Cache hit ratio
+#       - record: ytfy:cache_hit_ratio
+#         expr: sum(rate(cache_hits_total[5m])) / sum(rate(cache_requests_total[5m]))
+
+# ==========================================================================
+# Alert Rules Example
+# ==========================================================================
+#
+# Create /etc/prometheus/alerts/ytfy.yml with:
+#
+# groups:
+#   - name: ytfy_alerts
+#     rules:
+#       # High error rate
+#       - alert: HighErrorRate
+#         expr: ytfy:http_errors:rate5m > 10
+#         for: 5m
+#         labels:
+#           severity: critical
+#         annotations:
+#           summary: "High error rate detected"
+#           description: "Error rate is {{ $value }} errors/s"
+#       
+#       # High response time
+#       - alert: SlowResponses
+#         expr: ytfy:http_request_duration:p99 > 2
+#         for: 5m
+#         labels:
+#           severity: warning
+#         annotations:
+#           summary: "Slow response times detected"
+#           description: "P99 latency is {{ $value }}s"
+#       
+#       # Low cache hit ratio
+#       - alert: LowCacheHitRatio
+#         expr: ytfy:cache_hit_ratio < 0.8
+#         for: 10m
+#         labels:
+#           severity: warning
+#         annotations:
+#           summary: "Low cache hit ratio"
+#           description: "Cache hit ratio is {{ $value }}"
+#       
+#       # Service down
+#       - alert: ServiceDown
+#         expr: up{job="ytfy-backend"} == 0
+#         for: 1m
+#         labels:
+#           severity: critical
+#         annotations:
+#           summary: "YTFY backend is down"
+#           description: "Backend service has been down for more than 1 minute"
+
+# ==========================================================================
+# Grafana Dashboard Queries
+# ==========================================================================
+#
+# Request Rate:
+#   sum(rate(http_requests_total[5m])) by (handler)
+#
+# Error Rate:
+#   sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100
+#
+# Request Duration (P99):
+#   histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))
+#
+# Active Connections:
+#   nginx_connections_active
+#
+# Memory Usage:
+#   container_memory_usage_bytes{name=~"ytfy.*"}
+#
+# CPU Usage:
+#   rate(container_cpu_usage_seconds_total{name=~"ytfy.*"}[5m]) * 100
+#
+# Redis Memory:
+#   redis_memory_used_bytes
+#
+# Cache Hit Ratio:
+#   redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total)

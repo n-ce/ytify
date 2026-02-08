@@ -31,9 +31,13 @@ export let config = {
 type AppConfig = typeof config;
 
 
+import { safeJsonParse } from "@lib/utils/safe";
+
 const savedStore = localStorage.getItem('config');
-if (savedStore)
-  config = JSON.parse(savedStore);
+if (savedStore) {
+  const parsed = safeJsonParse(savedStore, null);
+  if (parsed) config = parsed;
+}
 
 
 export function setConfig<K extends
@@ -55,8 +59,10 @@ export let drawer = {
   subfeed: [] as CollectionItem[],
 }
 const savedDrawer = localStorage.getItem('drawer');
-if (savedDrawer)
-  drawer = JSON.parse(savedDrawer);
+if (savedDrawer) {
+  const parsed = safeJsonParse(savedDrawer, null);
+  if (parsed) drawer = parsed;
+}
 
 type AppDrawer = typeof drawer;
 

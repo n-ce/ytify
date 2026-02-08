@@ -60,8 +60,12 @@ export async function loadGoogleIdentityServices(): Promise<void> {
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    script.onload = () => resolve();
+    script.onload = () => {
+      console.log('GIS script loaded');
+      resolve();
+    };
     script.onerror = () => {
+      console.error('Failed to load GIS script');
       // Reset promise on error to allow retry
       gisLoadPromise = null;
       reject(new Error('Failed to load Google Identity Services'));
@@ -79,32 +83,44 @@ export async function signInWithGoogle(): Promise<{ hash: string; user: GoogleUs
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   if (!clientId) {
+    console.error('VITE_GOOGLE_CLIENT_ID is missing');
     throw new Error('Google Client ID not configured. Set VITE_GOOGLE_CLIENT_ID in .env');
   }
 
-  await loadGoogleIdentityServices();
+  try {
+    await loadGoogleIdentityServices();
+  } catch (e) {
+    console.error('GIS load failed', e);
+    throw new Error('Could not load Google Sign-In script. Please check your ad blocker.');
+  }
 
   if (!window.google?.accounts) {
+    console.error('window.google.accounts is undefined after load');
     throw new Error('Google Identity Services not available');
   }
 
   return new Promise((resolve, reject) => {
+    console.log('Initializing TokenClient...');
     const tokenClient = window.google!.accounts.oauth2.initTokenClient({
       client_id: clientId,
       scope: 'email profile',
       callback: async (response: TokenResponse) => {
+        console.log('TokenClient callback received', response);
         if (response.error) {
+          console.error('TokenClient error:', response.error);
           reject(new Error(response.error));
           return;
         }
 
         if (!response.access_token) {
+          console.error('No access token in response');
           reject(new Error('No access token received'));
           return;
         }
 
         try {
           // Fetch user info from Google
+          console.log('Fetching user info...');
           const userInfoResponse = await fetch(
             'https://www.googleapis.com/oauth2/v3/userinfo',
             {
@@ -113,10 +129,11 @@ export async function signInWithGoogle(): Promise<{ hash: string; user: GoogleUs
           );
 
           if (!userInfoResponse.ok) {
-            throw new Error('Failed to fetch user info');
+            throw new Error(`Failed to fetch user info: ${userInfoResponse.statusText}`);
           }
 
           const user: GoogleUser = await userInfoResponse.json();
+          console.log('User info fetched:', user.email);
 
           // Create consistent hash from Google sub (user ID) + email
           const hash = await createSyncHash(user.sub, user.email);
@@ -126,11 +143,15 @@ export async function signInWithGoogle(): Promise<{ hash: string; user: GoogleUs
 
           resolve({ hash, user });
         } catch (error) {
+          console.error('Error fetching user info:', error);
           reject(error);
         }
       }
     });
 
+    console.log('Requesting Access Token...');
+    // Request access token - this triggers the popup
+    // Use prompt: 'select_account' to force account selection if needed, but standard is fine
     tokenClient.requestAccessToken();
   });
 }

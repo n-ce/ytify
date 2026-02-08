@@ -8,7 +8,7 @@ export default async function handler(
   response: VercelResponse,
 ) {
   const { title, artist, limit } = request.query;
-  const apiKey = '0867bcb6f36c879398969db682a7b69b';
+  const apiKey = process.env.LASTFM_API_KEY || '0867bcb6f36c879398969db682a7b69b';
 
   if (!apiKey) {
     // For Vercel/serverless environments, use 500 status code for internal configuration errors

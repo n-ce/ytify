@@ -1,4 +1,6 @@
 import { store, setStore } from "../stores";
+import { invidiousCircuit } from "@lib/utils/circuitBreaker";
+import { fetchWithRetry } from "@lib/utils/fetch";
 
 export default async function(
   id: string,
@@ -6,31 +8,53 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
-
-  const fetchDataFromInvidious = (
-    index: number
-  ) => fetch(`${index === -1 ? '' : store.invidious[index]}/api/v1/videos/${id}`, { signal })
-    .then(res => res.json() as Promise<Invidious | { error: string }>)
-    .then(data => {
-      if ('adaptiveFormats' in data) {
-        setStore('index', index === -1 ? 0 : index);
-        return data;
-      }
-      else throw new Error(data.error || 'Invalid response');
+  const tryFetch = async (instance: string) => {
+    const url = `${instance}/api/v1/videos/${id}`;
+    const response = await fetchWithRetry(url, { 
+      signal,
+      timeout: prefetch ? 5000 : 10000,
+      maxRetries: prefetch ? 0 : 1 
     });
+    
+    const data = await response.json() as Invidious | { error: string };
+    
+    if ('adaptiveFormats' in data) {
+      return data;
+    }
+    throw new Error((data as any).error || 'Invalid response structure');
+  };
 
+  // Guard: bail out if no instances are available
+  if (!store.invidious.length) {
+    return { error: 'No Invidious instances available', message: 'Could not fetch stream data — no instances configured' };
+  }
 
-  const useInvidious = (index = store.index): Promise<Invidious> =>
-    fetchDataFromInvidious(index)
-      .catch(e => {
-        if (index + 1 === store.invidious.length) {
-          setStore('index', 0);
-          return prefetch ? e :
-            fetchDataFromInvidious(-1)
-              .catch(() => e);
-        }
-        else return useInvidious(index + 1);
-      });
+  // 1. Try current instance first
+  const currentIndex = store.index;
+  const currentInstance = store.invidious[currentIndex];
 
-  return useInvidious();
+  try {
+     return await invidiousCircuit.execute(() => tryFetch(currentInstance));
+  } catch (e) {
+     console.warn(`Instance ${currentIndex} (${currentInstance}) failed:`, e);
+  }
+
+  // 2. Loop through others if current failed
+  for (let i = 0; i < store.invidious.length; i++) {
+    if (i === currentIndex) continue;
+
+    try {
+      const instance = store.invidious[i];
+      const data = await invidiousCircuit.execute(() => tryFetch(instance));
+      
+      // Update preferred instance on success
+      setStore('index', i);
+      return data;
+    } catch (e) {
+      console.warn(`Instance ${i} failed:`, e);
+    }
+  }
+  
+  // 3. Last resort: local proxy or error
+  return { error: 'All Invidious instances failed', message: 'Could not fetch stream data' };
 }

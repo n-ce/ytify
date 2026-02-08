@@ -6,8 +6,9 @@
     "migrate": "deno run --allow-read --allow-write --allow-env scripts/migrate.ts"
   },
   "imports": {
-    "hono": "jsr:@hono/hono@^4.6.0",
-    "hono/": "jsr:@hono/hono@^4.6.0/",
+    "hono": "npm:hono@^4.6.0",
+    "hono/cors": "npm:hono@^4.6.0/cors",
+    "hono/logger": "npm:hono@^4.6.0/logger",
     "@db/sqlite": "jsr:@db/sqlite@^0.12.0"
   },
   "compilerOptions": {

@@ -26,10 +26,11 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-# Start server with minimal permissions
+# Start server with all permissions needed for SQLite FFI
 CMD ["deno", "run", \
      "--allow-net", \
-     "--allow-read=/app", \
-     "--allow-write=/app/data", \
+     "--allow-read", \
+     "--allow-write", \
      "--allow-env", \
+     "--allow-ffi", \
      "src/main.ts"]

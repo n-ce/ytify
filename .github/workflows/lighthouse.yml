@@ -1,0 +1,333 @@
+# ============================================================================
+# YTFY Lighthouse CI Workflow
+# ============================================================================
+# Purpose: Automated performance testing with Lighthouse
+# Triggers: PR to main, manual dispatch
+# ============================================================================
+
+name: Lighthouse CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL to test (optional, defaults to preview URL)'
+        required: false
+        type: string
+
+# Prevent concurrent runs on the same PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Performance budgets
+  MIN_PERFORMANCE_SCORE: 90
+  MIN_ACCESSIBILITY_SCORE: 90
+  MIN_BEST_PRACTICES_SCORE: 90
+  MIN_SEO_SCORE: 90
+  MIN_PWA_SCORE: 90
+
+jobs:
+  # ==========================================================================
+  # Build and Deploy Preview
+  # ==========================================================================
+  build:
+    name: Build for Lighthouse
+    runs-on: ubuntu-latest
+    outputs:
+      preview_url: ${{ steps.deploy.outputs.preview_url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/
+          retention-days: 7
+
+  # ==========================================================================
+  # Lighthouse CI Testing
+  # ==========================================================================
+  lighthouse:
+    name: Run Lighthouse
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: dist/
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.13.x
+      
+      # Run Lighthouse against local server
+      - name: Run Lighthouse CI (Local)
+        run: |
+          npx serve -s dist -l 3000 &
+          sleep 5
+          lhci autorun --config=lighthouserc.js
+        env:
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload Lighthouse Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          retention-days: 30
+      
+      # Create detailed comment on PR
+      - name: Comment Lighthouse Results on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Read Lighthouse results
+            const manifestPath = '.lighthouseci/manifest.json';
+            if (!fs.existsSync(manifestPath)) {
+              console.log('No manifest found');
+              return;
+            }
+            
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            const results = manifest.map(m => {
+              const report = JSON.parse(fs.readFileSync(m.jsonPath, 'utf8'));
+              return {
+                url: m.url,
+                performance: Math.round(report.categories.performance.score * 100),
+                accessibility: Math.round(report.categories.accessibility.score * 100),
+                bestPractices: Math.round(report.categories['best-practices'].score * 100),
+                seo: Math.round(report.categories.seo.score * 100),
+                pwa: Math.round((report.categories.pwa?.score || 0) * 100),
+                fcp: report.audits['first-contentful-paint'].displayValue,
+                lcp: report.audits['largest-contentful-paint'].displayValue,
+                tbt: report.audits['total-blocking-time'].displayValue,
+                cls: report.audits['cumulative-layout-shift'].displayValue,
+              };
+            });
+            
+            // Generate emoji indicators
+            const getEmoji = (score, threshold) => {
+              if (score >= threshold) return '✅';
+              if (score >= threshold - 10) return '⚠️';
+              return '❌';
+            };
+            
+            // Build comment
+            let comment = '## 🏠 Lighthouse Report\n\n';
+            
+            for (const result of results) {
+              comment += `### ${result.url}\n\n`;
+              comment += '| Category | Score | Status |\n';
+              comment += '|----------|-------|--------|\n';
+              comment += `| Performance | ${result.performance} | ${getEmoji(result.performance, 90)} |\n`;
+              comment += `| Accessibility | ${result.accessibility} | ${getEmoji(result.accessibility, 90)} |\n`;
+              comment += `| Best Practices | ${result.bestPractices} | ${getEmoji(result.bestPractices, 90)} |\n`;
+              comment += `| SEO | ${result.seo} | ${getEmoji(result.seo, 90)} |\n`;
+              comment += `| PWA | ${result.pwa} | ${getEmoji(result.pwa, 80)} |\n\n`;
+              
+              comment += '#### Core Web Vitals\n\n';
+              comment += '| Metric | Value |\n';
+              comment += '|--------|-------|\n';
+              comment += `| First Contentful Paint | ${result.fcp} |\n`;
+              comment += `| Largest Contentful Paint | ${result.lcp} |\n`;
+              comment += `| Total Blocking Time | ${result.tbt} |\n`;
+              comment += `| Cumulative Layout Shift | ${result.cls} |\n\n`;
+            }
+            
+            comment += '\n---\n';
+            comment += '_Generated by Lighthouse CI_';
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const existingComment = comments.find(c => 
+              c.user.type === 'Bot' && c.body.includes('Lighthouse Report')
+            );
+            
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: comment,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            }
+
+  # ==========================================================================
+  # Performance Budget Check
+  # ==========================================================================
+  budget-check:
+    name: Performance Budget Check
+    runs-on: ubuntu-latest
+    needs: lighthouse
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Download Lighthouse Results
+        uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+      
+      - name: Check Performance Budgets
+        run: |
+          # Parse manifest and check budgets
+          MANIFEST=".lighthouseci/manifest.json"
+          
+          if [ ! -f "$MANIFEST" ]; then
+            echo "No manifest found"
+            exit 1
+          fi
+          
+          # Use jq to parse results (install if needed)
+          sudo apt-get install -y jq
+          
+          FAILED=0
+          
+          # Check each result
+          for json_path in $(jq -r '.[].jsonPath' "$MANIFEST"); do
+            PERF=$(jq '.categories.performance.score * 100 | floor' "$json_path")
+            A11Y=$(jq '.categories.accessibility.score * 100 | floor' "$json_path")
+            BP=$(jq '.categories["best-practices"].score * 100 | floor' "$json_path")
+            SEO=$(jq '.categories.seo.score * 100 | floor' "$json_path")
+            
+            echo "Scores: Performance=$PERF, Accessibility=$A11Y, Best Practices=$BP, SEO=$SEO"
+            
+            if [ "$PERF" -lt "$MIN_PERFORMANCE_SCORE" ]; then
+              echo "❌ Performance score ($PERF) is below minimum ($MIN_PERFORMANCE_SCORE)"
+              FAILED=1
+            fi
+            
+            if [ "$A11Y" -lt "$MIN_ACCESSIBILITY_SCORE" ]; then
+              echo "❌ Accessibility score ($A11Y) is below minimum ($MIN_ACCESSIBILITY_SCORE)"
+              FAILED=1
+            fi
+            
+            if [ "$BP" -lt "$MIN_BEST_PRACTICES_SCORE" ]; then
+              echo "❌ Best Practices score ($BP) is below minimum ($MIN_BEST_PRACTICES_SCORE)"
+              FAILED=1
+            fi
+            
+            if [ "$SEO" -lt "$MIN_SEO_SCORE" ]; then
+              echo "❌ SEO score ($SEO) is below minimum ($MIN_SEO_SCORE)"
+              FAILED=1
+            fi
+          done
+          
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "⚠️ Performance budgets not met. Please optimize before merging."
+            exit 1
+          fi
+          
+          echo "✅ All performance budgets met!"
+
+  # ==========================================================================
+  # Historical Tracking
+  # ==========================================================================
+  historical:
+    name: Track Historical Metrics
+    runs-on: ubuntu-latest
+    needs: lighthouse
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download Lighthouse Results
+        uses: actions/download-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+      
+      - name: Extract and Store Metrics
+        run: |
+          DATE=$(date -u +"%Y-%m-%d")
+          MANIFEST=".lighthouseci/manifest.json"
+          
+          if [ ! -f "$MANIFEST" ]; then
+            echo "No manifest found"
+            exit 0
+          fi
+          
+          # Create metrics directory
+          mkdir -p metrics
+          
+          # Extract metrics from each result
+          for json_path in $(jq -r '.[].jsonPath' "$MANIFEST"); do
+            METRICS=$(jq '{
+              date: "'"$DATE"'",
+              commit: "'"${{ github.sha }}"'",
+              performance: (.categories.performance.score * 100 | floor),
+              accessibility: (.categories.accessibility.score * 100 | floor),
+              bestPractices: (.categories["best-practices"].score * 100 | floor),
+              seo: (.categories.seo.score * 100 | floor),
+              fcp: .audits["first-contentful-paint"].numericValue,
+              lcp: .audits["largest-contentful-paint"].numericValue,
+              tbt: .audits["total-blocking-time"].numericValue,
+              cls: .audits["cumulative-layout-shift"].numericValue
+            }' "$json_path")
+            
+            echo "$METRICS" >> "metrics/lighthouse-$DATE.json"
+          done
+          
+          echo "Metrics saved for $DATE"
+      
+      # Optional: Upload to external service
+      # - name: Upload to Datadog/New Relic/Custom Dashboard
+      #   run: |
+      #     curl -X POST "$METRICS_API_URL" \
+      #       -H "Content-Type: application/json" \
+      #       -d @metrics/lighthouse-$(date -u +"%Y-%m-%d").json

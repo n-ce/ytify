@@ -7,13 +7,31 @@ export default function() {
   const { stream, audio } = playerStore;
   const { author, id, title } = stream;
 
-  fetch(`https://fast-saavn.vercel.app/api?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author?.replace(' - Topic', '') ?? '')}&duration=${encodeURIComponent(stream.duration)}`)
-    .then(async res => {
-      if (!res.ok) {
-        return res.text().then(text => { throw new Error(text); });
+  // Fallback APIs in case the primary one fails
+  const SAAVN_APIS = [
+    'https://fast-saavn.vercel.app/api',
+    'https://saavn.dev/api',
+    'https://saavn-api.vercel.app/api'
+  ];
+
+  const fetchStreamUrl = async () => {
+    for (const apiBase of SAAVN_APIS) {
+      try {
+        console.log(`Trying JioSaavn API: ${apiBase}`);
+        const res = await fetch(`${apiBase}?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author?.replace(' - Topic', '') ?? '')}&duration=${encodeURIComponent(stream.duration)}`);
+        
+        if (!res.ok) continue;
+        
+        const trimmedDownloadUrl = await res.text();
+        if (trimmedDownloadUrl) return trimmedDownloadUrl;
+      } catch (e) {
+        console.warn(`Failed to fetch from ${apiBase}:`, e);
       }
-      return res.text();
-    })
+    }
+    throw new Error('All JioSaavn APIs failed');
+  };
+
+  fetchStreamUrl()
     .then(trimmedDownloadUrl => {
       if (!trimmedDownloadUrl) throw new Error('Music stream not found in JioSaavn results');
 
@@ -37,6 +55,7 @@ export default function() {
 
     })
     .catch(e => {
+      console.error('JioSaavn Error:', e);
       setPlayerStore('status', e.message || e.error || 'JioSaavn Playback Failure');
       setStore('useSaavn', false);
       player(id);

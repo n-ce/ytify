@@ -20,11 +20,12 @@ export default (searchTerm: string, tracksMap: Collection) => {
       break;
     }
     if (!('title' in v && typeof v.title === 'string')) continue;
-    const title = removeDiacritics(v.title.toLowerCase()).includes(toFind);
-    if (!('author' in v && typeof v.author === 'string')) continue;
-    const author = removeDiacritics(v.author.toLowerCase()).includes(toFind);
+    const titleMatch = removeDiacritics(v.title.toLowerCase()).includes(toFind);
+    const authorMatch = ('author' in v && typeof v.author === 'string')
+      ? removeDiacritics(v.author.toLowerCase()).includes(toFind)
+      : false;
 
-    if (title || author) {
+    if (titleMatch || authorMatch) {
       results.push(v);
     }
   }

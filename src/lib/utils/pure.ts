@@ -75,31 +75,8 @@ export function convertSStoHHMMSS(seconds: number): string {
 
 export const numFormatter = (num: number): string => Intl.NumberFormat('en', { notation: 'compact' }).format(num);
 
-// === SAFE UTILITIES ===
-
-/**
- * Safely parse JSON with fallback
- */
-export const safeJsonParse = <T>(text: string, fallback: T): T => {
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    console.warn('JSON parse error:', error);
-    return fallback;
-  }
-};
-
-/**
- * Safely stringify to JSON
- */
-export const safeJsonStringify = (data: unknown): string | null => {
-  try {
-    return JSON.stringify(data);
-  } catch (error) {
-    console.warn('JSON stringify error:', error);
-    return null;
-  }
-};
+// Safe utilities re-exported from canonical location
+export { safeJsonParse, safeJsonStringify } from './safe';
 
 /**
  * Safe localStorage wrapper with quota handling

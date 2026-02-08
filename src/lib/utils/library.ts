@@ -348,7 +348,6 @@ export async function fetchCollection(
     updateParam('collection', id);
   }
 
-  setNavStore('list', 'state', true);
   setListStore('isLoading', false);
 
   document.title = display + ' - ytify';

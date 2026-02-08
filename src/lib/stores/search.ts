@@ -63,10 +63,10 @@ export async function getSearchResults() {
   setSearchStore('suggestions', 'data', []);
   observer.disconnect();
 
-  const { recentSearches } = drawer;
   const lc = query.trim().toLowerCase();
 
   if (config.saveRecentSearches && lc) {
+    const recentSearches = [...drawer.recentSearches];
     while (recentSearches.length > 4)
       recentSearches.shift();
 

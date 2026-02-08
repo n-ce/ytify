@@ -84,6 +84,8 @@ export function playNext() {
 export function playPrev() {
   const { history, stream } = playerStore;
 
+  if (!history.length) return;
+
   const prevStream = history[0];
   setPlayerStore('history', h => h.slice(1));
   setQueueStore('list', l => [{ ...stream }, ...l]);

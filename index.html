@@ -13,16 +13,48 @@
     content="ytify,yify, Ytify, Youtube, youtube, Music,music, audio,opus, 32kbps,64kbps,Free ,spotify ,streaming, music-player ,  youtube-player , free-music, ytmusic">
   <meta name="thumbnail" content="/ytify_thumbnail_min.webp">
 
-  <!-- social media preview, more info https://ogp.me -->
+  <!-- ============================================================ -->
+  <!-- Performance Optimizations - Preload Critical Resources -->
+  <!-- ============================================================ -->
+  
+  <!-- DNS Prefetch for external domains (reduces DNS lookup time) -->
+  <link rel="dns-prefetch" href="//i.ytimg.com">
+  <link rel="dns-prefetch" href="//yt3.ggpht.com">
+  <link rel="dns-prefetch" href="//ytify-zeta.vercel.app">
+  
+  <!-- Preconnect to critical origins (establishes early connection) -->
+  <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
+  <link rel="preconnect" href="https://ytify-zeta.vercel.app" crossorigin>
+  
+  <!-- Preload critical font (highest priority) -->
+  <link rel="preload" href="/remixicon.woff2" as="font" type="font/woff2" crossorigin>
+  
+  <!-- Preload critical images above the fold -->
+  <link rel="preload" href="/logo192.png" as="image" fetchpriority="high">
+  <link rel="preload" href="/ytify_lite.svg" as="image" fetchpriority="high">
+  
+  <!-- Modulepreload for entry script (faster module parsing) -->
+  <link rel="modulepreload" href="/src/index.tsx">
+  
+  <!-- Prefetch likely next navigation (load during idle time) -->
+  <link rel="prefetch" href="/ytify_banner.webp" as="image">
+
+  <!-- ============================================================ -->
+  <!-- Social Media Preview - Open Graph Protocol -->
+  <!-- ============================================================ -->
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="ytify">
-  <meta property="og:url" content="https://ytify.pp.ua">
-  <meta property="og:site_name" content="ytify">
+  <meta property="og:url" content="https://music.ml4-lab.com">
+  <meta property="og:site_name" content="ML4-Lab Music">
   <meta property="og:description" content="Efficient YouTube Audio Streaming Web App.">
   <meta property="og:image" content="/ytify_thumbnail_min.webp">
   <!-- tells google that this url is most important (e.g. not http (without s = secure))-->
-  <link rel="canonical" href="https://ytify.pp.ua">
+  <link rel="canonical" href="https://music.ml4-lab.com">
+
+  <!-- ============================================================ -->
+  <!-- Icons and App Manifest -->
+  <!-- ============================================================ -->
 
   <link rel="icon" type="image/png" href="/logo192.png" sizes="192x192">
   <link rel="icon" type="image/png" href="/logo512.png" sizes="512x512">
@@ -30,6 +62,33 @@
   <link rel="icon" type="image/svg+xml" href="/ytify_lite.svg">
 
   <title>ytify</title>
+
+  <!-- ============================================================ -->
+  <!-- Critical CSS (optional - inline critical styles) -->
+  <!-- ============================================================ -->
+  <style>
+    /* Critical CSS - Minimal styles to prevent layout shift */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-family: system-ui, -apple-system, sans-serif; }
+    body { min-height: 100vh; background: #000; color: #fff; }
+    /* Loading skeleton */
+    .loading-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #000;
+    }
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 
 <body>
