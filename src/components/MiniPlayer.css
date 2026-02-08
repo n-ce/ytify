@@ -162,4 +162,265 @@
   .miniplayer.playing img {
     animation: none !important;
   }
+  
+  .miniplayer {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ============================================
+   RESPONSIVE MINI PLAYER STYLES
+   ============================================ */
+
+/* === Mobile Default (< 640px) === */
+/* Base styles above are mobile-first */
+
+/* === sm: Small Tablet / Mobile Landscape (≥ 640px) === */
+@media (min-width: 640px) {
+  .miniplayer {
+    /* Slightly taller on larger mobile */
+    height: calc(var(--space-2xl) + 8px);
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .miniplayer img {
+    height: 48px;
+    width: 48px;
+  }
+}
+
+/* === md: Tablet Portrait (≥ 768px) === */
+@media (min-width: 768px) {
+  .miniplayer {
+    height: 60px;
+    padding: var(--space-sm) var(--space-lg);
+  }
+  
+  .miniplayer img {
+    height: 52px;
+    width: 52px;
+  }
+  
+  .miniplayer .mediaDetails a {
+    font-size: var(--font-size-md);
+  }
+}
+
+/* === lg: Desktop (≥ 1024px) === */
+@media (min-width: 1024px) {
+  .miniplayer {
+    /* Mini player at bottom of sidebar or content area */
+    height: 72px;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-lg);
+    margin: var(--space-sm);
+    background: var(--bg-elevated);
+    border: var(--border-subtle);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .miniplayer img {
+    height: 56px;
+    width: 56px;
+  }
+  
+  .miniplayer button,
+  .miniplayer i {
+    width: 44px;
+    height: 44px;
+  }
+  
+  #playButton {
+    font-size: 28px;
+  }
+}
+
+/* === TV Mode (≥ 1920px) === */
+@media (min-width: 1920px) {
+  .miniplayer {
+    height: 100px;
+    padding: var(--space-lg) var(--space-xl);
+    margin: var(--space-md);
+  }
+  
+  .miniplayer img {
+    height: 72px;
+    width: 72px;
+  }
+  
+  .miniplayer button,
+  .miniplayer i {
+    width: 64px;
+    height: 64px;
+    font-size: var(--font-size-xl);
+  }
+  
+  #playButton {
+    font-size: 36px;
+  }
+  
+  .miniplayer .mediaDetails a {
+    font-size: var(--font-size-lg);
+  }
+  
+  .miniplayer .mediaDetails p {
+    font-size: var(--font-size-md);
+  }
+  
+  /* TV Focus State */
+  .miniplayer:focus-visible {
+    outline: var(--tv-focus-ring);
+    transform: scale(1.02);
+  }
+}
+
+/* === CAR DISPLAY MODE === */
+/* Landscape with limited height - car infotainment */
+@media (orientation: landscape) and (max-height: 600px) {
+  .miniplayer {
+    height: 80px;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--bg-surface);
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .miniplayer img {
+    height: 64px;
+    width: 64px;
+    border-radius: var(--radius-md); /* Square for car */
+    animation: none; /* No spinning in car mode */
+  }
+  
+  .miniplayer button,
+  .miniplayer i {
+    /* Large touch targets for car */
+    width: 56px;
+    height: 56px;
+    min-width: var(--touch-target-car, 72px);
+    min-height: var(--touch-target-car, 72px);
+  }
+  
+  #playButton {
+    font-size: 32px;
+  }
+  
+  .ri-heart-line,
+  .ri-heart-fill {
+    display: none; /* Hide like button in car mode */
+  }
+  
+  .miniplayer .mediaDetails {
+    margin-left: var(--space-sm);
+  }
+  
+  .miniplayer .mediaDetails a {
+    font-size: var(--font-size-md);
+  }
+  
+  .miniplayer .mediaDetails p {
+    display: none; /* Hide artist in car mode */
+  }
+}
+
+/* === Wide Car Displays === */
+@media (min-aspect-ratio: 2/1) and (max-height: 800px) {
+  .miniplayer {
+    height: 90px;
+    padding: var(--space-md) var(--space-xl);
+  }
+  
+  .miniplayer img {
+    height: 72px;
+    width: 72px;
+  }
+  
+  .miniplayer button,
+  .miniplayer i {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+/* === Touch Devices (coarse pointer) === */
+@media (hover: none) and (pointer: coarse) {
+  .miniplayer button,
+  .miniplayer i {
+    /* Ensure minimum touch target */
+    min-width: var(--touch-target-min, 44px);
+    min-height: var(--touch-target-min, 44px);
+  }
+  
+  .miniplayer:hover {
+    background: var(--bg-surface); /* No hover effect on touch */
+  }
+  
+  .miniplayer:active {
+    background: var(--bg-tertiary);
+  }
+}
+
+/* === Mouse/Trackpad Devices === */
+@media (hover: hover) and (pointer: fine) {
+  .miniplayer button:hover,
+  .miniplayer i:hover {
+    background: var(--bg-elevated);
+  }
+}
+
+/* ============================================
+   DEVICE-SPECIFIC CLASS OVERRIDES
+   ============================================ */
+
+/* Mobile device */
+.device-mobile .miniplayer {
+  /* Standard mobile mini player */
+  height: var(--space-2xl);
+}
+
+/* Car devices */
+.device-car .miniplayer,
+.device-carplay .miniplayer,
+.device-android-auto .miniplayer {
+  height: 80px;
+  background: var(--bg-surface);
+}
+
+.device-car .miniplayer img,
+.device-carplay .miniplayer img,
+.device-android-auto .miniplayer img {
+  border-radius: var(--radius-md);
+  animation: none;
+}
+
+.device-car .miniplayer button,
+.device-carplay .miniplayer button,
+.device-android-auto .miniplayer button,
+.device-car .miniplayer i,
+.device-carplay .miniplayer i,
+.device-android-auto .miniplayer i {
+  min-width: var(--touch-target-car, 72px);
+  min-height: var(--touch-target-car, 72px);
+}
+
+/* Hide non-essential controls in car mode */
+.device-car .ri-heart-line,
+.device-carplay .ri-heart-line,
+.device-android-auto .ri-heart-line,
+.device-car .ri-heart-fill,
+.device-carplay .ri-heart-fill,
+.device-android-auto .ri-heart-fill {
+  display: none;
+}
+
+/* TV device */
+.device-tv .miniplayer {
+  height: 100px;
+  padding: var(--space-lg);
+}
+
+.device-tv .miniplayer:focus-visible {
+  outline: var(--tv-focus-ring);
+  transform: scale(1.02);
 }

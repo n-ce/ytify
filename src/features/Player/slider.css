@@ -159,3 +159,211 @@ input[type="range"]:disabled::-moz-range-thumb {
     padding: 8px 0;
   }
 }
+
+/* ============================================
+   ENHANCED RESPONSIVE SLIDER STYLES
+   ============================================ */
+
+/* === Tablet (≥ 768px) === */
+@media (min-width: 768px) {
+  input[type="range"] {
+    --thumb-height: 1.125em;
+    --track-height: 0.3em;
+  }
+}
+
+/* === Desktop (≥ 1024px) === */
+@media (min-width: 1024px) {
+  input[type="range"] {
+    --thumb-height: 1em;
+    --track-height: 0.25em;
+    
+    /* More refined interaction on desktop */
+    &:hover {
+      --track-height: 0.375em;
+    }
+  }
+}
+
+/* === TV Mode (≥ 1920px) === */
+@media (min-width: 1920px) {
+  input[type="range"] {
+    /* Larger controls for TV viewing distance */
+    --thumb-height: 1.5em;
+    --track-height: 0.5em;
+    padding: 16px 0;
+    
+    &:hover {
+      --track-height: 0.625em;
+    }
+  }
+  
+  input[type="range"]:focus-visible {
+    /* TV focus state */
+    outline: var(--tv-focus-ring, 0 0 0 4px var(--accent-focus));
+    outline-offset: 4px;
+    border-radius: var(--radius-full);
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    box-shadow: 
+      var(--box-fill),
+      0 0 24px var(--glow-color),
+      0 0 0 4px transparent;
+  }
+  
+  input[type="range"]:focus-visible::-webkit-slider-thumb {
+    box-shadow: 
+      var(--box-fill),
+      0 0 24px var(--glow-color),
+      0 0 0 4px var(--accent-focus);
+  }
+}
+
+/* === CAR DISPLAY MODE === */
+/* Landscape with limited height - car infotainment */
+@media (orientation: landscape) and (max-height: 600px) {
+  input[type="range"] {
+    /* Extra thick for car touch screens */
+    --thumb-height: 2em;
+    --track-height: 0.75em;
+    padding: 12px 0;
+    
+    /* Easier to grab while driving */
+    &:hover {
+      --track-height: 1em;
+    }
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    /* Larger thumb for car safety */
+    width: 2em;
+    box-shadow: 
+      var(--box-fill),
+      0 0 16px var(--glow-color);
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    width: 2em;
+  }
+}
+
+/* === Wide Car Displays (Ultra-wide aspect ratios) === */
+@media (min-aspect-ratio: 2/1) and (max-height: 800px) {
+  input[type="range"] {
+    --thumb-height: 1.75em;
+    --track-height: 0.625em;
+    padding: 16px 0;
+  }
+}
+
+/* === Touch Screens (coarse pointer) === */
+@media (hover: none) and (pointer: coarse) {
+  input[type="range"] {
+    /* Minimum dimensions for touch */
+    --thumb-height: max(1.25em, 20px);
+    --track-height: max(0.375em, 6px);
+    min-height: 44px; /* iOS minimum touch target */
+    padding: 10px 0;
+  }
+  
+  input[type="range"]:active {
+    /* Active state feedback */
+    --thumb-height: 1.5em;
+    --track-height: 0.5em;
+  }
+}
+
+/* === Mouse/Trackpad (fine pointer) === */
+@media (hover: hover) and (pointer: fine) {
+  input[type="range"] {
+    /* Finer controls for mouse */
+    --thumb-height: 0.875em;
+    --track-height: 0.1875em;
+    
+    &:hover {
+      --thumb-height: 1em;
+      --track-height: 0.25em;
+    }
+  }
+}
+
+/* ============================================
+   DEVICE-SPECIFIC CLASS OVERRIDES
+   ============================================ */
+
+/* Mobile device */
+.device-mobile input[type="range"] {
+  --thumb-height: 1.25em;
+  --track-height: 0.375em;
+  padding: 8px 0;
+}
+
+/* Tablet device */
+.device-tablet input[type="range"] {
+  --thumb-height: 1.125em;
+  --track-height: 0.3em;
+  padding: 10px 0;
+}
+
+/* Car devices - extra large for safety */
+.device-car input[type="range"],
+.device-carplay input[type="range"],
+.device-android-auto input[type="range"] {
+  --thumb-height: 2em;
+  --track-height: 0.75em;
+  padding: 16px 0;
+  min-height: 56px;
+}
+
+.device-car input[type="range"]::-webkit-slider-thumb,
+.device-carplay input[type="range"]::-webkit-slider-thumb,
+.device-android-auto input[type="range"]::-webkit-slider-thumb {
+  width: 2em;
+}
+
+.device-car input[type="range"]::-moz-range-thumb,
+.device-carplay input[type="range"]::-moz-range-thumb,
+.device-android-auto input[type="range"]::-moz-range-thumb {
+  width: 2em;
+}
+
+/* TV device - large with focus states */
+.device-tv input[type="range"] {
+  --thumb-height: 1.5em;
+  --track-height: 0.5em;
+  padding: 16px 0;
+}
+
+.device-tv input[type="range"]:focus-visible {
+  outline: var(--tv-focus-ring);
+  outline-offset: 4px;
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  input[type="range"],
+  input[type="range"]::-webkit-slider-runnable-track,
+  input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-moz-range-track,
+  input[type="range"]::-moz-range-thumb,
+  input[type="range"]::-moz-range-progress {
+    transition: none;
+  }
+}
+
+/* === High Contrast Mode === */
+@media (prefers-contrast: high) {
+  input[type="range"] {
+    --track-color: var(--text-primary);
+    --fill-color: var(--accent-primary);
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    border: 2px solid var(--text-primary);
+  }
+  
+  input[type="range"]::-moz-range-thumb {
+    border: 2px solid var(--text-primary);
+  }
+}

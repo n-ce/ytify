@@ -1,4 +1,4 @@
-/* NavBar Styles - AAA Mobile Bottom / Desktop Sidebar */
+/* NavBar Styles - AAA Multi-Device System */
 
 .main-nav {
   position: fixed;
@@ -9,131 +9,132 @@
   border: var(--glass-border);
   box-shadow: var(--glass-shadow);
   
-  /* Mobile Default */
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 64px;
-  border-left: none;
-  border-right: none;
-  border-bottom: none;
-  
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  padding-bottom: env(safe-area-inset-bottom);
-  
-  /* Staggered entrance */
-  animation: slide-in-up var(--duration-normal) var(--ease-out-expo);
+  /* Transitions */
+  transition: 
+    transform var(--duration-normal) var(--ease-out-quart),
+    opacity var(--duration-normal) var(--ease-out-quart),
+    width var(--duration-normal) var(--ease-out-expo);
 }
 
 .nav-logo {
-  display: none;
+  display: none; /* Hidden on mobile by default */
 }
 
-.nav-items {
-  display: flex;
-  flex: 1;
-  justify-content: space-evenly;
-  align-items: center;
-  height: 100%;
-  gap: 4px;
-}
+/* === MOBILE (Default) === */
+@media (max-width: 1023px) {
+  .main-nav {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 64px; /* Standard mobile nav height */
+    height: calc(64px + env(safe-area-inset-bottom, 0px));
+    border-top: var(--border-subtle);
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    
+    /* Animation */
+    animation: slide-in-up var(--duration-normal) var(--ease-out-expo);
+  }
 
-.nav-item {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  gap: 4px;
-  padding: 8px 16px;
-  cursor: pointer;
-  flex: 1;
-  height: 100%;
-  min-width: 56px; /* Touch target */
-  border-radius: var(--radius-lg);
+  .nav-items {
+    display: flex;
+    flex: 1;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100%;
+    gap: 0; 
+  }
+
+  .nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    gap: 4px;
+    padding: 4px 0;
+    cursor: pointer;
+    flex: 1;
+    height: 100%;
+    min-width: var(--touch-target-mobile); /* 44px+ */
+    
+    /* Touch Feedback */
+    transition: transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .nav-item:active {
+    transform: scale(0.92);
+  }
+
+  .nav-item i {
+    font-size: 24px;
+    margin-bottom: 2px;
+    transition: transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .nav-item.active {
+    color: var(--accent-primary);
+  }
   
-  /* Smooth transitions */
-  transition: 
-    color var(--duration-fast) var(--ease-out-quart),
-    transform var(--duration-fast) var(--ease-spring);
-  will-change: transform;
-}
-
-/* Mobile press feedback */
-.nav-item:active {
-  transform: scale(0.92);
-}
-
-/* Active indicator - morphing pill */
-.nav-item::before {
-  content: '';
-  position: absolute;
-  inset: 8px 12px;
-  border-radius: var(--radius-md);
-  background: transparent;
-  transition: 
-    background var(--duration-normal) var(--ease-out-expo),
-    box-shadow var(--duration-normal) var(--ease-out-expo),
-    transform var(--duration-normal) var(--ease-spring);
-  z-index: -1;
-}
-
-.nav-item.active {
-  color: var(--text-primary);
-}
-
-.nav-item.active::before {
-  background: var(--bg-active);
-  box-shadow: 0 0 20px oklch(from var(--accent-primary) l c h / 15%);
-}
-
-/* Hover glow on desktop */
-@media (hover: hover) {
-  .nav-item:hover:not(.active) {
-    color: var(--text-primary);
+  .nav-item.active i {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px var(--accent-glow));
   }
-  .nav-item:hover:not(.active)::before {
-    background: var(--bg-tertiary);
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    opacity: 0.8;
+  }
+  
+  .nav-item.active .nav-label {
+    opacity: 1;
+    font-weight: 700;
+  }
+  
+  /* User button on mobile - simplified */
+  .nav-user-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: var(--touch-target-mobile);
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+  }
+  
+  .nav-user-btn .nav-label {
+    font-size: 9px;
   }
 }
 
-.nav-item i {
-  font-size: 24px;
-  margin-bottom: 2px;
-  transition: transform var(--duration-fast) var(--ease-spring);
-}
-
-.nav-item.active i {
-  transform: scale(1.1);
-}
-
-.nav-label {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: opacity var(--duration-fast) var(--ease-out-quart);
-}
-
-/* Sidebar for Desktop */
+/* === DESKTOP (Sidebar) === */
 @media (min-width: 1024px) {
   .main-nav {
     top: 0;
     left: 0;
     width: 260px;
     height: 100vh;
+    border-right: var(--border-subtle);
     border-top: none;
     border-bottom: none;
-    border-right: var(--border-subtle);
+    
     flex-direction: column;
     justify-content: flex-start;
     padding: var(--space-lg) var(--space-md);
     align-items: flex-start;
+    
     animation: slide-in-left var(--duration-normal) var(--ease-out-expo);
   }
 
@@ -149,7 +150,7 @@
   .nav-logo i {
     font-size: 28px;
     color: var(--accent-primary);
-    filter: drop-shadow(0 0 8px oklch(from var(--accent-primary) l c h / 40%));
+    filter: drop-shadow(0 0 12px var(--accent-glow));
   }
 
   .nav-logo-text {
@@ -157,123 +158,81 @@
     font-weight: 700;
     letter-spacing: -0.5px;
     color: var(--text-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 100%);
+    -webkit-background-clip: text;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .nav-items {
     flex-direction: column;
     width: 100%;
     justify-content: flex-start;
-    gap: 6px;
+    gap: 8px;
     height: auto;
   }
 
   .nav-item {
+    position: relative;
     flex-direction: row;
     justify-content: flex-start;
+    align-items: center;
     width: 100%;
     height: 52px;
     padding: 0 var(--space-md);
     border-radius: var(--radius-lg);
     gap: 14px;
-    flex: unset;
-  }
-
-  .nav-item::before {
-    inset: 0;
-    border-radius: var(--radius-lg);
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    
+    /* Desktop Hover Effects */
+    transition: 
+      background var(--duration-fast) var(--ease-out-quart),
+      color var(--duration-fast) var(--ease-out-quart),
+      transform var(--duration-fast) var(--ease-spring);
   }
 
   .nav-item:hover:not(.active) {
+    background: var(--bg-tertiary);
     color: var(--text-primary);
+    transform: translateX(4px);
   }
   
   .nav-item.active {
+    background: var(--bg-active);
     color: var(--text-primary);
+    box-shadow: var(--shadow-sm); /* Subtle depth */
   }
   
+  /* Active Indicator Pill (Left) */
   .nav-item.active::before {
-    background: var(--bg-active);
-    border-left: 3px solid var(--accent-primary);
-    box-shadow: 
-      0 0 24px oklch(from var(--accent-primary) l c h / 20%),
-      inset 0 0 12px oklch(from var(--accent-primary) l c h / 5%);
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: var(--accent-primary);
+    box-shadow: 0 0 12px var(--accent-glow);
   }
 
   .nav-item i {
     font-size: 22px;
-    margin-bottom: 0;
+    min-width: 24px;
+    text-align: center;
   }
 
   .nav-label {
     font-size: 15px;
     font-weight: 600;
-    letter-spacing: 0;
   }
 
+  /* Desktop User Button */
   .nav-user-btn {
     margin-top: auto;
-  }
-}
-
-/* === USER BUTTON === */
-.nav-user-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  gap: 4px;
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: 
-    color var(--duration-fast) var(--ease-default),
-    transform var(--duration-fast) var(--ease-spring),
-    background var(--duration-fast) var(--ease-out-quart);
-  border-radius: var(--radius-lg);
-  min-width: 56px;
-  height: 100%;
-}
-
-.nav-user-btn:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.nav-user-btn:active {
-  transform: scale(0.92);
-}
-
-.nav-user-btn.signed-in {
-  color: var(--accent-primary);
-}
-
-.nav-user-btn.signed-in i {
-  filter: drop-shadow(0 0 6px var(--accent-primary));
-}
-
-.nav-user-btn i {
-  font-size: 22px;
-  transition: transform var(--duration-fast) var(--ease-spring);
-}
-
-.nav-user-btn:hover i {
-  transform: scale(1.1);
-}
-
-.nav-user-btn .nav-label {
-  font-size: 10px;
-  font-weight: 500;
-}
-
-/* Desktop: user button */
-@media (min-width: 1024px) {
-  .nav-user-btn {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -281,11 +240,263 @@
     padding: 0 var(--space-md);
     gap: 14px;
     justify-content: flex-start;
+    align-items: center;
+    border-radius: var(--radius-lg);
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out-quart);
+  }
+  
+  .nav-user-btn:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+  
+  .nav-user-btn .nav-label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+/* === TV MODE (10ft Experience) === */
+@media (min-width: 1921px) {
+  .main-nav {
+    width: 120px; /* Minimal collapsed sidebar */
+    background: var(--bg-base); /* Solid background for performance */
+    align-items: center;
+    padding: var(--tv-safe-area) 0;
+  }
+  
+  .nav-logo-text, .nav-label {
+    display: none; /* Icons only for TV to save space */
+  }
+  
+  .nav-item {
+    height: 80px;
+    width: 80px;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-md);
+  }
+  
+  .nav-item i {
+    font-size: 48px; /* Massive icons */
+  }
+  
+  /* TV Focus State */
+  .nav-item:focus-visible {
+    outline: var(--tv-focus-ring);
+    transform: scale(var(--tv-focus-scale));
+    background: var(--bg-elevated);
+    z-index: 10;
+  }
+}
+
+/* === WATCH / CAR (Simplified) === */
+@media (max-width: 320px), (max-height: 320px) {
+  /* Hide nav on watch - play controls only */
+  .main-nav {
+    display: none;
+  }
+}
+
+/* === CAR DISPLAY MODE === */
+/* Landscape with limited height - typical car infotainment */
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 640px) {
+  .main-nav {
+    /* Horizontal strip at top for car displays */
+    top: 0;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: 72px;
+    border-top: none;
+    border-bottom: var(--border-subtle);
+    padding: 0 var(--space-lg);
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+  
+  .nav-items {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-lg);
+    height: 100%;
+  }
+  
+  .nav-item {
+    /* Extra large touch targets for car safety */
+    min-width: var(--touch-target-car, 72px);
+    min-height: var(--touch-target-car, 72px);
+    flex-direction: column;
+    padding: var(--space-sm);
+  }
+  
+  .nav-item i {
+    font-size: 32px;
+  }
+  
+  .nav-label {
+    display: none; /* Icons only for car - less distraction */
+  }
+  
+  .nav-user-btn {
+    display: none; /* Hide user button in car mode */
+  }
+}
+
+/* === Wide Car Displays (Ultra-wide aspect ratios) === */
+@media (min-aspect-ratio: 2/1) and (max-height: 800px) {
+  .main-nav {
+    /* Side navigation works better on ultra-wide displays */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100px;
+    height: 100%;
+    border-right: var(--border-subtle);
+    border-bottom: none;
+    
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-lg) 0;
+  }
+  
+  .nav-items {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+  
+  .nav-item {
+    min-width: 80px;
+    min-height: 80px;
+    justify-content: center;
     border-radius: var(--radius-lg);
   }
+  
+  .nav-item i {
+    font-size: 36px;
+  }
+  
+  .nav-label {
+    display: none;
+  }
+}
 
-  .nav-user-btn .nav-label {
-    font-size: 15px;
-    font-weight: 600;
+/* === Small Mobile (< 640px) - Icons Only === */
+@media (max-width: 639px) {
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* === Tablet Portrait (≥ 768px, < 1024px) === */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .main-nav {
+    /* Slightly larger nav on tablets */
+    height: 72px;
+    height: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+  
+  .nav-item {
+    min-width: 80px;
+  }
+  
+  .nav-item i {
+    font-size: 26px;
+  }
+  
+  .nav-label {
+    font-size: 11px;
+  }
+}
+
+/* === Touch Devices (coarse pointer) === */
+@media (hover: none) and (pointer: coarse) {
+  .nav-item {
+    /* Ensure minimum touch target on all touch devices */
+    min-width: var(--touch-target-min, 44px);
+    min-height: var(--touch-target-min, 44px);
+  }
+  
+  .nav-item:hover {
+    background: transparent; /* No hover state on touch */
+  }
+  
+  .nav-item:active {
+    background: var(--bg-tertiary);
+    transform: scale(0.92);
+  }
+}
+
+/* === Mouse/Trackpad - Fine Pointer === */
+@media (hover: hover) and (pointer: fine) {
+  .nav-item {
+    /* Smaller targets OK for precise pointer */
+    min-width: var(--touch-target-desktop, 32px);
+  }
+}
+
+/* === Device-specific class overrides === */
+
+/* Mobile device class */
+.device-mobile .main-nav {
+  /* Ensure bottom nav on mobile */
+  top: auto;
+  bottom: 0;
+}
+
+/* Tablet device class */
+.device-tablet .main-nav {
+  /* Could be bottom or side depending on orientation */
+}
+
+/* Car device classes */
+.device-car .main-nav,
+.device-carplay .main-nav,
+.device-android-auto .main-nav {
+  /* Large touch targets for car safety */
+}
+
+.device-car .nav-item,
+.device-carplay .nav-item,
+.device-android-auto .nav-item {
+  min-width: var(--touch-target-car, 72px);
+  min-height: var(--touch-target-car, 72px);
+}
+
+.device-car .nav-label,
+.device-carplay .nav-label,
+.device-android-auto .nav-label {
+  display: none; /* Icons only in car mode */
+}
+
+/* TV device class */
+.device-tv .nav-item {
+  min-width: var(--touch-target-tv, 64px);
+  min-height: var(--touch-target-tv, 64px);
+}
+
+/* === Reduced Motion Support === */
+@media (prefers-reduced-motion: reduce) {
+  .main-nav {
+    animation: none;
+    transition: none;
+  }
+  
+  .nav-item {
+    transition: none;
+  }
+  
+  .nav-item i {
+    transition: none;
   }
 }

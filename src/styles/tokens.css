@@ -11,7 +11,9 @@
   --accent-primary: var(--source, var(--accent-emerald));
   --accent-secondary: var(--accent-gold);
   --accent-live: oklch(65% 0.25 25);      /* Vibrant red for live */
-  --accent-glow: oklch(from var(--accent-primary) 70% 0.25 h);
+  --accent-glow: oklch(from var(--accent-primary) l c h / 70%); /* Adjusted opacity */
+  --accent-focus: oklch(from var(--accent-primary) l c h / 100%); /* TV Focus */
+
 
   /* Backgrounds additionnels */
   --bg-secondary: oklch(10% 0.006 160);   /* Slightly elevated */
@@ -33,6 +35,12 @@
   --space-xl: 32px;
   --space-2xl: 48px;
   --space-3xl: 64px;
+  
+  /* Touch Targets */
+  --touch-target-mobile: 44px; /* Minimum accessible size */
+  --touch-target-desktop: 32px;
+  --touch-target-tv: 64px; /* Easy to hit with remote */
+
 
   /* === TYPOGRAPHY FLUID === */
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -117,4 +125,274 @@
   --color-error: oklch(62% 0.25 25);
   --color-success: var(--accent-emerald);
   --color-warning: oklch(75% 0.18 70);
+
+  /* === BREAKPOINTS === */
+  /* CSS custom properties for reference (used in media queries) */
+  --breakpoint-sm: 640px;   /* Mobile landscape / small tablet */
+  --breakpoint-md: 768px;   /* Tablet portrait */
+  --breakpoint-lg: 1024px;  /* Tablet landscape / small desktop */
+  --breakpoint-xl: 1280px;  /* Desktop */
+  --breakpoint-2xl: 1536px; /* Large desktop */
+  --breakpoint-tv: 1920px;  /* TV / 4K displays */
+  
+  /* === TOUCH TARGETS (Accessibility) === */
+  --touch-target-min: 44px;      /* iOS HIG minimum */
+  --touch-target-car: 72px;      /* Car displays - larger for safety */
+  
+  /* === TV SPECIFIC === */
+  --tv-focus-ring: 0 0 0 4px var(--accent-focus);
+  --tv-focus-scale: 1.1;
+  --tv-safe-area: 5vw; /* Overscan protection */
 }
+
+/* === MEDIA QUERIES & DEVICE SPECIFICS === */
+
+/* Mobile (Touch Primary) */
+@media (max-width: 767px) {
+  :root {
+    --space-md: 12px; /* Tighter spacing on mobile */
+    --font-size-display: 32px; /* Smaller display text */
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+     --space-lg: 20px;
+  }
+}
+
+/* TV Mode (Large Screens + Remote Interaction) */
+@media (min-width: 1921px), (hover: none) and (min-width: 1280px) {
+  :root {
+    --font-size-base: 24px; /* Larger base text for distance */
+    --font-size-sm: 18px;
+    --touch-target-mobile: 64px; /* Treat as TV target */
+    --space-md: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-instant: 0ms;
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+    --duration-slower: 0ms;
+    --ease-spring: linear;
+  }
+}
+
+/* ============================================
+   DEVICE-SPECIFIC CSS CLASSES
+   Applied via deviceDetection.ts utility
+   ============================================ */
+
+/* === Device Type Classes === */
+.device-mobile {
+  /* Mobile-specific overrides */
+  --touch-target-mobile: var(--touch-target-min);
+}
+
+.device-tablet {
+  /* Tablet-specific overrides */
+  --touch-target-mobile: var(--touch-target-min);
+}
+
+.device-desktop {
+  /* Desktop-specific overrides */
+  --touch-target-mobile: var(--touch-target-desktop);
+}
+
+.device-tv {
+  /* TV-specific overrides - apply larger sizes */
+  --touch-target-mobile: var(--touch-target-tv);
+  --font-size-base: 24px;
+  --font-size-sm: 18px;
+  --font-size-md: 20px;
+  --font-size-lg: 28px;
+  --font-size-xl: 40px;
+  --space-md: 24px;
+  --space-lg: 32px;
+}
+
+.device-car,
+.device-carplay,
+.device-android-auto {
+  /* Car display - safety-first, large touch targets */
+  --touch-target-mobile: var(--touch-target-car);
+  --font-size-base: 20px;
+  --font-size-lg: 28px;
+  --font-size-xl: 36px;
+  --space-md: 20px;
+  --space-lg: 28px;
+}
+
+/* === Screen Size Classes === */
+.screen-small {
+  /* < 640px */
+}
+
+.screen-medium {
+  /* 640px - 1024px */
+}
+
+.screen-large {
+  /* 1024px - 1440px */
+}
+
+.screen-xlarge {
+  /* > 1440px */
+}
+
+/* === Touch/Hover Capability Classes === */
+.touch-enabled {
+  /* Touch-specific styles */
+}
+
+.touch-disabled {
+  /* Non-touch devices */
+}
+
+.hover-enabled {
+  /* Devices with hover support */
+}
+
+.hover-disabled {
+  /* Devices without hover (touch primary) */
+}
+
+/* === Reduced Motion Class === */
+.reduced-motion,
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* === Car Mode Class === */
+.car-mode {
+  /* Applied in car environments - simplified UI */
+  --bg-overlay: var(--bg-base); /* Solid backgrounds for clarity */
+}
+
+/* ============================================
+   ENHANCED RESPONSIVE MEDIA QUERIES
+   Mobile-first approach with comprehensive breakpoints
+   ============================================ */
+
+/* === Small Mobile (< 640px) - Default styles === */
+/* Most styles in individual components are mobile-first */
+
+/* === sm: Small Tablet / Mobile Landscape (≥ 640px) === */
+@media (min-width: 640px) {
+  :root {
+    --space-md: 14px;
+    --space-lg: 22px;
+  }
+}
+
+/* === md: Tablet Portrait (≥ 768px) === */
+@media (min-width: 768px) {
+  :root {
+    --space-md: 16px;
+    --space-lg: 24px;
+    --font-size-display: 40px;
+  }
+}
+
+/* === lg: Tablet Landscape / Small Desktop (≥ 1024px) === */
+@media (min-width: 1024px) {
+  :root {
+    --space-md: 16px;
+    --space-lg: 24px;
+    --font-size-display: 48px;
+  }
+}
+
+/* === xl: Desktop (≥ 1280px) === */
+@media (min-width: 1280px) {
+  :root {
+    --font-size-display: 56px;
+  }
+}
+
+/* === 2xl: Large Desktop (≥ 1536px) === */
+@media (min-width: 1536px) {
+  :root {
+    --font-size-display: 64px;
+  }
+}
+
+/* === TV / 4K Displays (≥ 1920px) === */
+@media (min-width: 1920px) {
+  :root {
+    --font-size-base: 22px;
+    --font-size-sm: 18px;
+    --font-size-md: 20px;
+    --font-size-lg: 26px;
+    --font-size-xl: 36px;
+    --font-size-display: 72px;
+    --touch-target-mobile: var(--touch-target-tv);
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+  }
+}
+
+/* === Touch vs Pointer Input Detection === */
+
+/* Mouse/Trackpad - Fine pointer with hover */
+@media (hover: hover) and (pointer: fine) {
+  :root {
+    --touch-target-mobile: var(--touch-target-desktop);
+  }
+}
+
+/* Touch Screens - Coarse pointer without hover */
+@media (hover: none) and (pointer: coarse) {
+  :root {
+    --touch-target-mobile: var(--touch-target-min);
+  }
+}
+
+/* === Landscape Orientation for Car Displays === */
+/* Detect car-like displays: landscape with limited height */
+@media (orientation: landscape) and (max-height: 600px) {
+  :root {
+    /* Optimize for wide, short displays like car infotainment */
+    --touch-target-mobile: 56px;
+    --space-md: 12px;
+    --space-lg: 16px;
+  }
+}
+
+/* === Wide Car Displays (aspect ratio > 2:1) === */
+@media (min-aspect-ratio: 2/1) and (max-height: 800px) {
+  :root {
+    /* Very wide displays typical in car dashboards */
+    --touch-target-mobile: 64px;
+  }
+}
+
+/* === High Contrast / Accessibility === */
+@media (prefers-contrast: high) {
+  :root {
+    --text-secondary: var(--text-primary);
+    --border-subtle: 2px solid var(--text-primary);
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+  }
+}
+
+/* === Dark Mode (system preference) === */
+@media (prefers-color-scheme: dark) {
+  /* Already dark by default, no changes needed */
+}
+
+/* === Light Mode (system preference) === */
+@media (prefers-color-scheme: light) {
+  /* Could add light theme overrides here if needed */
+}
+

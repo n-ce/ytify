@@ -2,8 +2,8 @@
 .content-card {
   display: flex;
   flex-direction: row;
-  gap: var(--spacing-md);
-  padding: var(--spacing-sm);
+  gap: var(--space-md);
+  padding: var(--space-sm);
   border-radius: var(--radius-lg);
   background: transparent;
   cursor: pointer;
@@ -111,7 +111,7 @@
   flex-direction: column;
   justify-content: center;
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* Text truncation fix */
   gap: 4px;
 }
 
@@ -125,6 +125,7 @@
   /* Truncate 2 lines */
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -176,10 +177,22 @@
   transform: scale(0.9);
 }
 
-/* Vertical Variant for Grids */
+/* === RESPONSIVE VARIANTS === */
+
+/* Mobile: Horizontal Scroll Items */
+@media (max-width: 767px) {
+  .content-card--horizontal-list-item {
+     min-width: 280px;
+     scroll-snap-align: start;
+     background: var(--bg-surface);
+  }
+}
+
+/* Desktop: Vertical Card (Grid Item) */
 .content-card--vertical {
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: var(--space-sm);
+  height: 100%;
 }
 
 .content-card--vertical .card-media {
@@ -193,6 +206,7 @@
 
 .content-card--vertical:hover {
   transform: translateY(-4px);
+  background: var(--bg-secondary);
 }
 
 /* Draggable handle */
@@ -213,10 +227,292 @@
   cursor: grabbing;
 }
 
-/* Mobile: always show action */
+/* Mobile: always show action, optimized touch */
 @media (hover: none) {
   .card-action {
-    opacity: 0.7;
+    opacity: 1; /* Always visible on touch */
     transform: translateX(0);
+    color: var(--text-secondary);
+  }
+  
+  .content-card:hover {
+    transform: none; /* No hover lift on touch */
+  }
+}
+
+/* === TV MODE (≥ 1920px) === */
+@media (min-width: 1920px) {
+  .content-card {
+    padding: var(--space-md);
+    border: 2px solid transparent;
+    transition: transform var(--duration-fast) var(--ease-snappy);
+  }
+
+  .content-card:focus-visible {
+    outline: none;
+    border-color: var(--accent-focus);
+    background: var(--bg-elevated);
+    transform: scale(1.05);
+    z-index: 10;
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .card-media {
+    width: 180px; /* Larger thumbnails on TV */
+  }
+  
+  .card-title {
+    font-size: 24px; /* Larger text for viewing distance */
+  }
+  
+  .card-meta {
+    font-size: 18px;
+  }
+  
+  .card-action {
+    width: 56px;
+    height: 56px;
+    opacity: 1; /* Always visible on TV */
+  }
+}
+
+/* === RESPONSIVE GRID LAYOUT CONTAINER === */
+/* Grid container for content cards - apply to parent */
+.content-grid {
+  display: grid;
+  gap: var(--space-md);
+  
+  /* Mobile: 1 column */
+  grid-template-columns: 1fr;
+}
+
+/* === sm: Small Tablet / Mobile Landscape (≥ 640px) === */
+@media (min-width: 640px) {
+  .content-grid {
+    /* 2 columns */
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .content-card {
+    gap: var(--space-sm);
+  }
+  
+  .card-media {
+    width: 100px;
+  }
+}
+
+/* === md: Tablet Portrait (≥ 768px) === */
+@media (min-width: 768px) {
+  .content-grid {
+    /* 2-3 columns depending on container */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .card-media {
+    width: 120px;
+  }
+}
+
+/* === lg: Tablet Landscape / Desktop (≥ 1024px) === */
+@media (min-width: 1024px) {
+  .content-grid {
+    /* 3-4 columns */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+  }
+  
+  .card-media {
+    width: 140px;
+  }
+}
+
+/* === xl: Desktop (≥ 1280px) === */
+@media (min-width: 1280px) {
+  .content-grid {
+    /* 4+ columns */
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+  
+  .card-media {
+    width: 160px;
+  }
+}
+
+/* === TV Mode Grid (≥ 1920px) === */
+@media (min-width: 1920px) {
+  .content-grid {
+    /* 4-6 columns on TV */
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: var(--space-xl);
+  }
+}
+
+/* === CAR DISPLAY MODE === */
+/* Simplified cards for car displays - larger touch targets, key info only */
+@media (orientation: landscape) and (max-height: 600px) {
+  .content-card {
+    /* Large touch target for car safety */
+    min-height: var(--touch-target-car, 72px);
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+  
+  .card-media {
+    width: 60px;
+    aspect-ratio: 1; /* Square for car displays */
+  }
+  
+  .card-title {
+    -webkit-line-clamp: 1; /* Single line only */
+    line-clamp: 1;
+    font-size: var(--font-size-md);
+  }
+  
+  .card-meta {
+    display: none; /* Hide secondary info in car mode */
+  }
+  
+  .card-badge {
+    display: none; /* Hide badges in car mode */
+  }
+  
+  .card-duration {
+    font-size: 14px;
+    padding: 4px 8px;
+  }
+  
+  .card-action {
+    /* Large action button for car */
+    width: 56px;
+    height: 56px;
+    opacity: 1;
+  }
+  
+  .content-grid {
+    /* Single column or horizontal scroll in car mode */
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+  }
+}
+
+/* === Wide Car Displays (Ultra-wide aspect ratios) === */
+@media (min-aspect-ratio: 2/1) and (max-height: 800px) {
+  .content-card {
+    min-height: 80px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+  }
+  
+  .card-media {
+    width: 72px;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+  }
+  
+  .card-title {
+    font-size: var(--font-size-lg);
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+  
+  .content-grid {
+    /* 2 columns max for wide car displays */
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-sm);
+  }
+}
+
+/* === Touch Devices - Always Show Actions === */
+@media (hover: none) and (pointer: coarse) {
+  .card-action {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .card-handle {
+    opacity: 0.5;
+  }
+}
+
+/* === Mouse/Trackpad Devices === */
+@media (hover: hover) and (pointer: fine) {
+  .content-card:hover .card-action {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  .content-card:hover .card-handle {
+    opacity: 0.5;
+  }
+}
+
+/* === Device-specific class overrides === */
+
+/* Mobile device */
+.device-mobile .content-card {
+  min-height: var(--touch-target-min, 44px);
+}
+
+/* Car devices - simplified cards */
+.device-car .content-card,
+.device-carplay .content-card,
+.device-android-auto .content-card {
+  min-height: var(--touch-target-car, 72px);
+  gap: var(--space-sm);
+}
+
+.device-car .card-meta,
+.device-carplay .card-meta,
+.device-android-auto .card-meta {
+  display: none; /* Hide in car mode */
+}
+
+.device-car .card-title,
+.device-carplay .card-title,
+.device-android-auto .card-title {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  font-size: var(--font-size-lg);
+}
+
+.device-car .card-action,
+.device-carplay .card-action,
+.device-android-auto .card-action {
+  width: 56px;
+  height: 56px;
+  opacity: 1;
+}
+
+/* TV device - large focus states */
+.device-tv .content-card {
+  border: 2px solid transparent;
+}
+
+.device-tv .content-card:focus-visible {
+  border-color: var(--accent-focus);
+  transform: scale(1.05);
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  .content-card {
+    transition: none;
+  }
+  
+  .content-card:hover {
+    transform: none;
+  }
+  
+  .content-card:hover .card-media img {
+    transform: none;
+  }
+  
+  .card-media.loading {
+    animation: none;
+  }
+  
+  .card-action {
+    transition: none;
   }
 }
