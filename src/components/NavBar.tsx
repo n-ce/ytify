@@ -1,6 +1,7 @@
-import { For } from 'solid-js';
+import { For, Show } from 'solid-js';
+import { render } from 'solid-js/web';
 import './NavBar.css';
-import { setConfig } from '@lib/utils';
+import { config, setConfig } from '@lib/utils';
 import { navStore, setNavStore, store, setStore, t } from '@lib/stores';
 
 type NavItem = {
@@ -65,18 +66,24 @@ export default function() {
       return navStore.home.state && store.homeView === id && !navStore.settings.state;
   };
 
+  const openLogin = () => {
+    import('@components/Login').then((Login) => {
+      render(() => <Login.default />, document.body);
+    });
+  };
+
   return (
     <nav class="main-nav">
       <div class="nav-logo">
           <i class="ri-music-2-fill"></i>
           <span class="nav-logo-text">Ytify</span>
       </div>
-      
+
       <div class="nav-items">
           <For each={items}>
               {(item) => (
-                  <button 
-                    class="nav-item" 
+                  <button
+                    class="nav-item"
                     classList={{ active: isActive(item.id) }}
                     onclick={() => item.action()}
                     aria-label={t(item.labelKey)}
@@ -87,6 +94,22 @@ export default function() {
               )}
           </For>
       </div>
+
+      {/* User/Login Button */}
+      <Show
+        when={config.dbsync}
+        fallback={
+          <button type="button" class="nav-user-btn" onclick={openLogin} aria-label="Sign In">
+            <i class="ri-user-add-line"></i>
+            <span class="nav-label">Sign In</span>
+          </button>
+        }
+      >
+        <button type="button" class="nav-user-btn signed-in" aria-label="Account">
+          <i class="ri-user-fill"></i>
+          <span class="nav-label">Account</span>
+        </button>
+      </Show>
     </nav>
   );
 }

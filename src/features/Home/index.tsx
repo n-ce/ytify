@@ -5,9 +5,20 @@ import { setNavStore, store, t } from '@lib/stores';
 import Dropdown from './Dropdown';
 
 const About = lazy(() => import('./About'));
+const Welcome = lazy(() => import('./Welcome'));
 const Hub = lazy(() => import('./Hub'));
 const Search = lazy(() => import('./Search'));
 const Library = lazy(() => import('./Library'));
+
+// Détecte si c'est un nouvel utilisateur
+const isNewUser = () => {
+  const hasOnboarded = localStorage.getItem('onboarding_complete');
+  const hasConfig = localStorage.getItem('config');
+  const hasTracks = localStorage.getItem('library_tracks');
+
+  // Nouvel utilisateur si: pas d'onboarding fait ET (pas de config OU pas de tracks)
+  return !hasOnboarded && (!hasConfig || !hasTracks || hasTracks === '{}');
+};
 
 
 export default function() {
@@ -61,7 +72,7 @@ export default function() {
         <Dropdown />
       </header>
 
-      <Switch fallback={<About />}>
+      <Switch fallback={isNewUser() ? <Welcome /> : <About />}>
         <Match when={store.homeView === 'Hub'}>
           <Hub />
         </Match>
@@ -71,7 +82,6 @@ export default function() {
         <Match when={store.homeView === 'Search'}>
           <Search />
         </Match>
-
       </Switch>
 
     </section >

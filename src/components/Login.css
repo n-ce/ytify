@@ -1,0 +1,211 @@
+/* Login.css - Authentication Dialog Styles */
+
+.auth-dialog {
+  max-width: 400px;
+  width: 90vw;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-xl);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg);
+  animation: scale-in var(--duration-normal) var(--ease-spring);
+}
+
+.auth-dialog::backdrop {
+  background: var(--bg-overlay);
+  backdrop-filter: blur(4px);
+}
+
+.auth-container {
+  position: relative;
+  padding: var(--space-xl);
+}
+
+/* === HEADER === */
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.auth-header h4 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.auth-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* === AUTH METHODS === */
+.auth-methods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Google Button */
+.google-signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--bg-elevated);
+  border: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.google-signin-btn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.google-signin-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.google-signin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-signin-btn svg {
+  flex-shrink: 0;
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: oklch(from var(--text-muted) l c h / 30%);
+}
+
+/* Email Toggle */
+.email-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-sm);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+
+.email-toggle:hover {
+  color: var(--text-primary);
+}
+
+.email-toggle i {
+  font-size: 16px;
+}
+
+/* Email Form */
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: slide-in-down var(--duration-normal) var(--ease-out-expo);
+}
+
+.email-form input {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--bg-base);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  transition: border-color var(--duration-fast) var(--ease-default);
+}
+
+.email-form input::placeholder {
+  color: var(--text-muted);
+}
+
+.email-form input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.email-form input:disabled {
+  opacity: 0.6;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--accent-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--bg-base);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Close Button */
+.auth-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-default);
+}
+
+.auth-close:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.auth-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

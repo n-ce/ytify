@@ -2,3 +2,6 @@
 .idea
 dist
 package-lock.json
+.env
+.env.local
+.env.*.local

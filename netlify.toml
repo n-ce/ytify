@@ -1,0 +1,47 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Edge Functions
+[functions]
+  directory = "netlify/functions"
+
+# SPA routing - redirect all routes to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin", "editor"]}
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security and CORS headers for Google OAuth
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; connect-src 'self' https://accounts.google.com https://www.googleapis.com https://oauth2.googleapis.com https://*.googlevideo.com https://*.youtube.com https://*.ytimg.com https://*.invidious.io https://*.piped.video https://rapid-email-verifier.fly.dev https://uma.instinct.rip wss://*; frame-src 'self' https://accounts.google.com; font-src 'self' data:; media-src 'self' blob: https://*.googlevideo.com https://*.youtube.com; worker-src 'self' blob:;"
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+
+# Service Worker - no cache
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# PWA Manifest - no cache
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Static assets - long cache
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

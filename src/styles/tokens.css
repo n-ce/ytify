@@ -10,10 +10,15 @@
   --accent-secondary: oklch(from var(--accent-primary) l c calc(h + 30));
   --accent-live: oklch(60% 0.25 25);   /* Rouge live */
 
+  /* Backgrounds additionnels */
+  --bg-secondary: oklch(12% 0 0);      /* #1c1c1c - Légèrement élevé */
+  --bg-tertiary: oklch(16% 0 0);       /* #222222 - Hover states */
+
   /* Texte */
   --text-primary: oklch(95% 0 0);      /* Blanc pur */
   --text-secondary: oklch(70% 0 0);    /* Gris clair */
   --text-muted: oklch(50% 0 0);        /* Gris foncé */
+  --text-tertiary: oklch(40% 0 0);     /* Texte le moins visible */
 
   /* === SPACING SCALE (8px base) === */
   --space-xs: 4px;
@@ -36,6 +41,7 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1);
   --duration-instant: 50ms;
   --duration-fast: 150ms;
   --duration-normal: 300ms;
@@ -54,11 +60,36 @@
   --shadow-lg: 0 8px 24px oklch(0% 0 0 / 40%);
   --shadow-glow: 0 0 20px var(--accent-primary);
 
+  /* === BORDERS === */
+  --border-subtle: 1px solid oklch(20% 0 0 / 30%);
+  --border-light: 1px solid oklch(100% 0 0 / 10%);
+
   /* === Z-INDEX SCALE === */
   --z-base: 0;
   --z-dropdown: 100;
   --z-sticky: 200;
+  --z-fixed: 250;
   --z-modal: 300;
   --z-player: 400;
   --z-toast: 500;
+
+  /* === GLASSMORPHISM === */
+  --glass-bg: oklch(14% 0 0 / 80%);
+  --glass-border: oklch(100% 0 0 / 10%);
+  --glass-blur: 20px;
+  --glass-shadow: 0 8px 32px oklch(0% 0 0 / 30%);
+
+  /* === ALIAS POUR COMPATIBILITÉ === */
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+
+  --font-size-base: var(--font-size-md);
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+
+  --color-error: oklch(60% 0.25 25);
+  --color-success: oklch(65% 0.2 145);
 }

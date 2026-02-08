@@ -1,5 +1,106 @@
 /* animations.css - Micro-interactions premium */
 
+/* === KEYFRAMES GLOBAUX === */
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* === ANIMATION VARIABLES === */
+:root {
+  --animation-slide-in-up: slide-in-up var(--duration-normal) var(--ease-out-expo);
+  --animation-slide-out-down: slide-out-down var(--duration-normal) var(--ease-out-quart);
+  --animation-slide-in-right: slide-in-right var(--duration-normal) var(--ease-out-expo);
+  --animation-slide-out-right: slide-out-right var(--duration-normal) var(--ease-out-quart);
+  --animation-slide-in-left: slide-in-left var(--duration-normal) var(--ease-out-expo);
+  --animation-slide-in-down: slide-in-down var(--duration-normal) var(--ease-out-expo);
+  --animation-fade-in: fade-in var(--duration-fast) var(--ease-out-quart);
+  --animation-fade-out: fade-out var(--duration-fast) var(--ease-out-quart);
+  --animation-scale-in: scale-in var(--duration-normal) var(--ease-spring);
+}
+
 /* === TRANSITIONS DE BASE === */
 .fade-enter {
   opacity: 0;
