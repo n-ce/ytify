@@ -1,44 +1,38 @@
-/* content-card replaces streamItem */
+/* StreamItem - AAA Content Card Pattern */
 .content-card {
-  display: flex; /* Default to list/flex style, or grid item? Report says "Card Pattern" */
-  /* If it is a card in a grid, it should probably be flex-direction: column? 
-     But the CSS in report says: display: flex; gap: 12px; 
-     This looks like a "List Item" or "Horizontal Card". 
-     Witv.team has "Horizontal Carousels" of "Vertical Cards". 
-     
-     Let's look at the report CSS again:
-     .content-card { display: flex; gap: 12px; ... }
-     .card-media { width: 120px; aspect-ratio: 16/9; }
-     
-     This describes a "Horizontal Card" (Row) suitable for lists.
-     
-     BUT for the "Hub" and "Grid", we usually want Vertical Cards (Media on top).
-     
-     I will add a modifier .content-card--vertical.
-  */
-  
+  display: flex;
   flex-direction: row;
   gap: var(--spacing-md);
   padding: var(--spacing-sm);
-  border-radius: var(--roundness);
+  border-radius: var(--radius-lg);
   background: transparent;
-  transition: background var(--duration-fast) var(--ease-default);
   cursor: pointer;
   text-decoration: none;
   color: var(--text-primary);
   position: relative;
   overflow: hidden;
+  
+  /* Smooth transitions */
+  transition: 
+    background var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-spring);
+  will-change: transform;
 }
 
 .content-card:hover {
   background: var(--bg-tertiary);
+  transform: translateX(4px);
+}
+
+.content-card:active {
+  transform: scale(0.98);
 }
 
 .card-media {
   position: relative;
   width: 120px;
   aspect-ratio: 16/9;
-  border-radius: calc(var(--roundness) * 0.8);
+  border-radius: calc(var(--radius-lg) * 0.8);
   overflow: hidden;
   flex-shrink: 0;
   background: var(--bg-secondary);
@@ -48,32 +42,68 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.3s;
+  transition: 
+    opacity var(--duration-normal) var(--ease-out-quart),
+    transform var(--duration-normal) var(--ease-out-expo);
+}
+
+.content-card:hover .card-media img {
+  transform: scale(1.05);
+}
+
+/* Shimmer loading state */
+.card-media.loading {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 0%,
+    var(--bg-elevated) 50%,
+    var(--bg-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 .card-badge {
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 6px;
+  left: 6px;
   background: var(--accent-live);
   color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
   font-size: 10px;
   font-weight: 700;
   z-index: 2;
+  box-shadow: 0 2px 8px oklch(from var(--accent-live) l c h / 40%);
 }
 
 .card-duration {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: rgba(0,0,0,0.8);
+  bottom: 6px;
+  right: 6px;
+  background: oklch(0% 0 0 / 80%);
   color: white;
-  padding: 2px 4px;
-  border-radius: 2px;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Playing indicator overlay */
+.card-media .playing-overlay {
+  position: absolute;
+  inset: 0;
+  background: oklch(0% 0 0 / 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out-quart);
+}
+
+.content-card.playing .card-media .playing-overlay {
+  opacity: 1;
 }
 
 .card-info {
@@ -81,7 +111,8 @@
   flex-direction: column;
   justify-content: center;
   flex: 1;
-  min-width: 0; /* Text truncation fix */
+  min-width: 0;
+  gap: 4px;
 }
 
 .card-title {
@@ -99,7 +130,7 @@
 }
 
 .card-meta {
-  margin: 4px 0 0 0;
+  margin: 0;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   
@@ -108,24 +139,41 @@
   text-overflow: ellipsis;
 }
 
+/* Action button - revealed on hover */
 .card-action {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
   color: var(--text-tertiary);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  transition: all 0.2s;
   flex-shrink: 0;
+  align-self: center;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: 
+    opacity var(--duration-fast) var(--ease-out-quart),
+    transform var(--duration-fast) var(--ease-out-expo),
+    background var(--duration-fast) var(--ease-out-quart),
+    color var(--duration-fast) var(--ease-out-quart);
+}
+
+.content-card:hover .card-action {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .card-action:hover {
   background: var(--bg-elevated);
   color: var(--text-primary);
+}
+
+.card-action:active {
+  transform: scale(0.9);
 }
 
 /* Vertical Variant for Grids */
@@ -143,10 +191,32 @@
   justify-content: flex-start;
 }
 
+.content-card--vertical:hover {
+  transform: translateY(-4px);
+}
+
 /* Draggable handle */
 .card-handle {
   align-self: center;
   color: var(--text-tertiary);
   cursor: grab;
   padding: 4px;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out-quart);
+}
+
+.content-card:hover .card-handle {
+  opacity: 0.5;
+}
+
+.card-handle:active {
+  cursor: grabbing;
+}
+
+/* Mobile: always show action */
+@media (hover: none) {
+  .card-action {
+    opacity: 0.7;
+    transform: translateX(0);
+  }
 }

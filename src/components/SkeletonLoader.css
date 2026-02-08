@@ -1,4 +1,4 @@
-/* SkeletonLoader.css */
+/* SkeletonLoader.css - AAA Premium Loading States */
 .skeleton-wrapper {
   display: contents;
 }
@@ -22,57 +22,104 @@
 .skeleton-image {
   width: 160px;
   height: 160px;
-  border-radius: var(--radius-md);
-  background: var(--bg-elevated);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
 }
 
 .skeleton-thumb {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
   flex-shrink: 0;
 }
 
 .skeleton-text {
   height: 14px;
   border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
+  background: var(--bg-surface);
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+.skeleton-text.medium {
+  width: 80%;
 }
 
 .skeleton-artwork {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: var(--radius-lg);
-  background: var(--bg-elevated);
+  border-radius: 50%;
+  background: var(--bg-surface);
 }
 
 .skeleton-controls {
   height: 48px;
   border-radius: var(--radius-md);
-  background: var(--bg-elevated);
+  background: var(--bg-surface);
 }
 
-/* Animation shimmer */
-.shimmer {
+/* Premium shimmer animation */
+.skeleton-shimmer {
   position: relative;
   overflow: hidden;
+  background: var(--bg-surface);
 }
 
-.shimmer::after {
+.skeleton-shimmer::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    oklch(100% 0 0 / 5%) 50%,
+    oklch(from var(--accent-primary) 25% 0.02 h / 15%) 50%,
     transparent 100%
   );
-  animation: shimmer 1.5s infinite;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
 }
 
-@keyframes shimmer {
+@keyframes skeleton-shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+/* Pulse variant for loading states */
+.skeleton-pulse {
+  animation: skeleton-pulse 2s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { 
+    opacity: 0.4;
+    background: var(--bg-surface);
+  }
+  50% { 
+    opacity: 0.8;
+    background: var(--bg-elevated);
+  }
+}
+
+/* List layout */
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Grid layout */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after,
+  .skeleton-pulse {
+    animation: none !important;
+  }
 }

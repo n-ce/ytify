@@ -1,4 +1,4 @@
-/* animations.css - Micro-interactions premium */
+/* animations.css - AAA Premium Micro-interactions */
 
 /* === KEYFRAMES GLOBAUX === */
 @keyframes slide-in-up {
@@ -88,6 +88,106 @@
   }
 }
 
+/* === AAA PREMIUM KEYFRAMES === */
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes vinyl-spin-paused {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: var(--shadow-glow);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: var(--shadow-glow-intense);
+    opacity: 0.85;
+  }
+}
+
+@keyframes glow-pulse-subtle {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes progress-glow {
+  0% {
+    box-shadow: 0 0 4px var(--accent-primary);
+  }
+  50% {
+    box-shadow: 0 0 16px var(--accent-primary), 0 0 24px var(--accent-glow);
+  }
+  100% {
+    box-shadow: 0 0 4px var(--accent-primary);
+  }
+}
+
 /* === ANIMATION VARIABLES === */
 :root {
   --animation-slide-in-up: slide-in-up var(--duration-normal) var(--ease-out-expo);
@@ -99,6 +199,8 @@
   --animation-fade-in: fade-in var(--duration-fast) var(--ease-out-quart);
   --animation-fade-out: fade-out var(--duration-fast) var(--ease-out-quart);
   --animation-scale-in: scale-in var(--duration-normal) var(--ease-spring);
+  --animation-bounce-in: bounce-in var(--duration-slow) var(--ease-elastic);
+  --animation-stagger: stagger-in var(--duration-normal) var(--ease-out-expo) both;
 }
 
 /* === TRANSITIONS DE BASE === */
@@ -141,19 +243,136 @@
 /* === SCALE INTERACTIONS === */
 .pressable {
   transition: transform var(--duration-instant) var(--ease-out-quart);
+  will-change: transform;
 }
 .pressable:active {
   transform: scale(0.95);
 }
 
+/* Enhanced pressable with depth */
+.pressable-deep {
+  transition: 
+    transform var(--duration-fast) var(--ease-spring),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
+  will-change: transform, box-shadow;
+}
+.pressable-deep:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.pressable-deep:active {
+  transform: scale(0.96) translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
 .hover-lift {
-  transition: transform var(--duration-fast) var(--ease-out-quart),
-              box-shadow var(--duration-fast) var(--ease-out-quart);
+  transition: 
+    transform var(--duration-fast) var(--ease-out-expo),
+    box-shadow var(--duration-fast) var(--ease-out-quart);
+  will-change: transform;
 }
 .hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-depth);
 }
+
+/* === VINYL ROTATION === */
+.vinyl-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vinyl-disc {
+  border-radius: 50%;
+  animation: vinyl-spin 4s linear infinite;
+  animation-play-state: var(--vinyl-state, paused);
+  box-shadow: var(--shadow-lg);
+  will-change: transform;
+}
+
+.vinyl-disc.playing {
+  --vinyl-state: running;
+  box-shadow: var(--shadow-glow);
+}
+
+.vinyl-center {
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--bg-base);
+  border: 2px solid var(--border-subtle);
+  z-index: 1;
+}
+
+/* === SHIMMER LOADING === */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 0%,
+    var(--bg-elevated) 50%,
+    var(--bg-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.shimmer-emerald {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 0%,
+    oklch(from var(--accent-primary) 20% 0.05 h) 50%,
+    var(--bg-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* === GLOW EFFECTS === */
+.glow-accent {
+  box-shadow: var(--shadow-glow);
+}
+
+.glow-pulse-active {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.glow-underline {
+  position: relative;
+}
+.glow-underline::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out-quart);
+}
+.glow-underline:hover::after,
+.glow-underline.active::after {
+  opacity: 1;
+}
+
+/* === STAGGERED REVEAL === */
+.stagger-item {
+  opacity: 0;
+  animation: var(--animation-stagger);
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 50ms; }
+.stagger-item:nth-child(3) { animation-delay: 100ms; }
+.stagger-item:nth-child(4) { animation-delay: 150ms; }
+.stagger-item:nth-child(5) { animation-delay: 200ms; }
+.stagger-item:nth-child(6) { animation-delay: 250ms; }
+.stagger-item:nth-child(7) { animation-delay: 300ms; }
+.stagger-item:nth-child(8) { animation-delay: 350ms; }
 
 /* === PROGRESS BAR === */
 .progress-track {
@@ -169,6 +388,7 @@
   background: var(--accent-primary);
   transform-origin: left;
   transition: transform 100ms linear;
+  box-shadow: 0 0 8px var(--accent-primary);
 }
 
 .progress-buffer {
@@ -192,6 +412,11 @@
   animation: spin 0.8s linear infinite;
 }
 
+.spinner-emerald {
+  border-top-color: var(--accent-emerald);
+  box-shadow: 0 0 12px oklch(from var(--accent-emerald) l c h / 30%);
+}
+
 /* === PULSE ANIMATION (playing indicator) === */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -200,25 +425,27 @@
 
 .playing-indicator {
   display: flex;
-  gap: 2px;
+  gap: 3px;
   align-items: flex-end;
-  height: 16px;
+  height: 18px;
 }
 
 .playing-indicator span {
   width: 3px;
   background: var(--accent-primary);
-  border-radius: 1px;
+  border-radius: 2px;
   animation: equalizer 0.8s ease-in-out infinite;
+  box-shadow: 0 0 4px var(--accent-primary);
 }
 
 .playing-indicator span:nth-child(1) { animation-delay: 0s; }
 .playing-indicator span:nth-child(2) { animation-delay: 0.2s; }
 .playing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+.playing-indicator span:nth-child(4) { animation-delay: 0.1s; }
 
 @keyframes equalizer {
   0%, 100% { height: 4px; }
-  50% { height: 16px; }
+  50% { height: 18px; }
 }
 
 /* === TOAST NOTIFICATIONS === */
@@ -232,6 +459,7 @@
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+  border: var(--border-subtle);
   opacity: 0;
   transition: all var(--duration-normal) var(--ease-out-expo);
 }
@@ -241,11 +469,40 @@
   transform: translateX(-50%) translateY(0);
 }
 
+.toast-success {
+  border-color: var(--accent-emerald);
+  box-shadow: var(--shadow-lg), 0 0 16px oklch(from var(--accent-emerald) l c h / 20%);
+}
+
+/* === RIPPLE EFFECT === */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: oklch(from var(--accent-primary) l c h / 30%);
+  pointer-events: none;
+  animation: ripple 0.6s ease-out forwards;
+}
+
 /* === REDUCE MOTION === */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .vinyl-disc {
+    animation: none !important;
+  }
+  
+  .shimmer, .shimmer-emerald {
+    animation: none !important;
+    background: var(--bg-elevated) !important;
   }
 }

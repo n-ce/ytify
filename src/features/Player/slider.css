@@ -1,30 +1,32 @@
-/* === range theme and appearance === */
+/* === AAA Range Slider Theme === */
 input[type="range"] {
   font-size: 1.5rem;
-  --thumb-height: 0.625em;
-  --track-height: 0.125em;
-  --track-color: var(--onBg);
-  --brightness-hover: 180%;
-  --brightness-down: 80%;
+  --thumb-height: 1em;
+  --track-height: 0.25em;
+  --track-color: var(--bg-elevated);
+  --fill-color: var(--accent-primary);
+  --glow-color: oklch(from var(--accent-primary) l c h / 50%);
+  --brightness-hover: 120%;
+  --brightness-down: 90%;
   --clip-edges: 0.125em;
-  /* === range commons === */
+  
   position: relative;
-  background: #fff0;
+  background: transparent;
   overflow: hidden;
+  cursor: pointer;
+  touch-action: none;
 }
-
 
 input[type="range"]:active {
   cursor: grabbing;
 }
-
 
 /* === WebKit specific styles === */
 input[type="range"],
 input[type="range"]::-webkit-slider-runnable-track,
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  transition: all ease 100ms;
+  transition: all ease 150ms;
   height: var(--thumb-height);
 }
 
@@ -38,12 +40,14 @@ input[type="range"]::-webkit-slider-thumb {
   --clip-top: calc((var(--thumb-height) - var(--track-height)) * 0.5 - 0.5px);
   --clip-bottom: calc(var(--thumb-height) - var(--clip-top));
   --clip-further: calc(100% + 1px);
-  --box-fill: calc(-100vmax - var(--thumb-width, var(--thumb-height))) 0 0 100vmax currentColor;
+  --box-fill: calc(-100vmax - var(--thumb-width, var(--thumb-height))) 0 0 100vmax var(--fill-color);
 
   width: var(--thumb-width, var(--thumb-height));
-  background: linear-gradient(currentColor 0 0) scroll no-repeat left center / 50% calc(var(--track-height) + 1px);
-  background-color: currentColor;
-  box-shadow: var(--box-fill);
+  background: linear-gradient(var(--fill-color) 0 0) scroll no-repeat left center / 50% calc(var(--track-height) + 1px);
+  background-color: var(--fill-color);
+  box-shadow: 
+    var(--box-fill),
+    0 0 12px var(--glow-color);
   border-radius: var(--thumb-width, var(--thumb-height));
 
   filter: brightness(100%);
@@ -59,6 +63,10 @@ input[type="range"]::-webkit-slider-thumb {
 
 input[type="range"]:hover::-webkit-slider-thumb {
   filter: brightness(var(--brightness-hover));
+  box-shadow: 
+    var(--box-fill),
+    0 0 20px var(--glow-color),
+    0 0 40px oklch(from var(--accent-primary) l c h / 30%);
   cursor: grab;
 }
 
@@ -73,6 +81,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 input[type="range"]:disabled::-webkit-slider-thumb {
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* === Firefox specific styles === */
@@ -80,22 +89,23 @@ input[type="range"],
 input[type="range"]::-moz-range-track,
 input[type="range"]::-moz-range-thumb {
   appearance: none;
-  transition: all ease 100ms;
+  transition: all ease 150ms;
   height: var(--thumb-height);
 }
 
 input[type="range"]::-moz-range-track,
 input[type="range"]::-moz-range-thumb,
 input[type="range"]::-moz-range-progress {
-  background: #fff0;
+  background: transparent;
 }
 
 input[type="range"]::-moz-range-thumb {
-  background: currentColor;
+  background: var(--fill-color);
   border: 0;
   width: var(--thumb-width, var(--thumb-height));
   border-radius: var(--thumb-width, var(--thumb-height));
   cursor: grab;
+  box-shadow: 0 0 12px var(--glow-color);
 }
 
 input[type="range"]:active::-moz-range-thumb {
@@ -109,7 +119,8 @@ input[type="range"]::-moz-range-track {
 
 input[type="range"]::-moz-range-progress {
   appearance: none;
-  background: currentColor;
+  background: var(--fill-color);
+  box-shadow: 0 0 8px var(--glow-color);
   transition-delay: 30ms;
 }
 
@@ -127,6 +138,7 @@ input[type="range"]::-moz-range-progress {
 input[type="range"]:hover::-moz-range-thumb,
 input[type="range"]:hover::-moz-range-progress {
   filter: brightness(var(--brightness-hover));
+  box-shadow: 0 0 20px var(--glow-color);
 }
 
 input[type="range"]:active::-moz-range-thumb,
@@ -136,4 +148,14 @@ input[type="range"]:active::-moz-range-progress {
 
 input[type="range"]:disabled::-moz-range-thumb {
   cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Mobile: larger touch target */
+@media (hover: none) and (pointer: coarse) {
+  input[type="range"] {
+    --thumb-height: 1.25em;
+    --track-height: 0.375em;
+    padding: 8px 0;
+  }
 }
