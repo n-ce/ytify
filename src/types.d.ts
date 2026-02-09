@@ -2,7 +2,13 @@ import type { JSXElement } from 'solid-js';
 import type en from './locales/en.json';
 
 declare global {
-
+  // Environment flags
+  const __DEV__: boolean;
+  const __ENV__: 'production' | 'development';
+  const __ENABLE_EXPERIMENTAL__: boolean;
+  const __ENABLE_SPOTIFY__: boolean;
+  const __ENABLE_DEEZER__: boolean;
+  const __ENABLE_SOUNDCLOUD__: boolean;
 
   type TranslationKeys = keyof typeof en;
 

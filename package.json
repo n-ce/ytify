@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:prod": "cross-env YTIFY_ENV=production tsc && cross-env YTIFY_ENV=production vite build --mode production",
+    "build:dev": "cross-env YTIFY_ENV=development tsc && cross-env YTIFY_ENV=development vite build --mode development",
     "preview": "vite preview",
     "ship": "node scripts/ship.js",
     "sync": "node scripts/sync.js",
@@ -22,6 +24,7 @@
     "@types/sortablejs": "^1.15.9",
     "@vercel/node": "^5.5.17",
     "autoprefixer": "^10.4.23",
+    "cross-env": "^10.1.0",
     "eruda": "^3.4.3",
     "open-props": "1.7.17",
     "postcss-jit-props": "1.0.16",
