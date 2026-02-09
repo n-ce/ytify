@@ -30,7 +30,7 @@
   height: 44px;
   width: 44px;
   object-fit: cover;
-  border: var(--border-light);
+  border: var(--border-subtle);
   border-radius: 50%;
   box-shadow: var(--shadow-sm);
   pointer-events: none;

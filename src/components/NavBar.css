@@ -2,7 +2,7 @@
 
 .main-nav {
   position: fixed;
-  z-index: var(--z-fixed);
+  z-index: var(--z-nav, 100);
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));

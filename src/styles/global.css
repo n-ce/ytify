@@ -52,6 +52,20 @@ main {
   flex-direction: row;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  
+  /* === LAYOUT FIX: Account for Fixed NavBar === */
+  /* Mobile: Bottom bar (default) */
+  padding-bottom: calc(var(--nav-height, 64px) + env(safe-area-inset-bottom, 0px));
+  
+  /* Desktop: Side bar */
+  @media (min-width: 768px) {
+    margin-left: var(--nav-width, 80px);
+    padding-bottom: 0;
+  }
+  
+  @media (min-width: 1024px) {
+    margin-left: var(--nav-width, 260px);
+  }
 
   section {
     height: 100%;

@@ -1,0 +1,14 @@
+[Unit]
+Description=Ytify Music Backend (Deno)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/ytify/backend/src
+ExecStart=/root/.deno/bin/deno run --allow-net --allow-read --allow-env index.ts
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,398 +1,104 @@
+/* 
+  Emerald Vinyl Noir - Design System Tokens 
+  Based on geometric sharpness, deep blacks, and vibrant emerald accents.
+*/
+
 :root {
-  /* === EMERALD VINYL NOIR PALETTE === */
-  --bg-base: oklch(8% 0.005 160);         /* Deep noir with emerald tint */
-  --bg-surface: oklch(12% 0.008 160);     /* Cards - subtle emerald */
-  --bg-elevated: oklch(16% 0.01 160);     /* Menus, modals */
-  --bg-overlay: oklch(6% 0.005 160 / 85%); /* Overlay semi-transparent */
+  /* === PALETTE: Emerald Vinyl Noir === */
 
-  /* Premium Accent System */
-  --accent-emerald: oklch(65% 0.2 160);   /* Rich Emerald - Primary */
-  --accent-gold: oklch(78% 0.16 85);      /* Royal Gold - Secondary */
-  --accent-primary: var(--source, var(--accent-emerald));
-  --accent-secondary: var(--accent-gold);
-  --accent-live: oklch(65% 0.25 25);      /* Vibrant red for live */
-  --accent-glow: oklch(from var(--accent-primary) l c h / 70%); /* Adjusted opacity */
-  --accent-focus: oklch(from var(--accent-primary) l c h / 100%); /* TV Focus */
+  /* Base Backgrounds (Deep, not just black) */
+  --bg-base: #050505; /* Almost pure black */
+  --bg-surface: #0a0a0a; /* Slight lift */
+  --bg-elevated: #111111; /* Cards/Modals */
+  --bg-highlight: #1a1a1a; /* Hover states */
 
+  /* Accents (Vibrant Emerald) */
+  --accent-primary: #00ff9d; /* The "Emerald" Signal */
+  --accent-secondary: #00cc7a;
+  --accent-dim: rgba(0, 255, 157, 0.1);
+  --accent-glow: rgba(0, 255, 157, 0.4);
 
-  /* Backgrounds additionnels */
-  --bg-secondary: oklch(10% 0.006 160);   /* Slightly elevated */
-  --bg-tertiary: oklch(14% 0.008 160);    /* Hover states */
-  --bg-active: oklch(18% 0.02 160);       /* Active/pressed states */
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1a1;
+  --text-tertiary: #525252;
+  --text-inverse: #000000;
 
-  /* Texte with optical adjustments */
-  --text-primary: oklch(96% 0.005 160);   /* Warm white */
-  --text-secondary: oklch(72% 0.01 160);  /* Soft gray with tint */
-  --text-muted: oklch(52% 0.008 160);     /* Muted gray */
-  --text-tertiary: oklch(42% 0.005 160);  /* Least visible */
-  --text-accent: var(--accent-primary);   /* Accent text */
+  /* Status */
+  --status-error: #ff3333;
+  --status-success: #00ff9d;
+  --status-warning: #ffbd00;
 
-  /* === SPACING SCALE (8px base) === */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
-  
-  /* Touch Targets */
-  --touch-target-mobile: 44px; /* Minimum accessible size */
-  --touch-target-desktop: 32px;
-  --touch-target-tv: 64px; /* Easy to hit with remote */
+  /* === TYPOGRAPHY: Geometric & Sharp === */
+  --font-display: "Inter", system-ui, -apple-system, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
 
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 2rem; /* 32px */
+  --text-4xl: 2.5rem; /* 40px */
 
-  /* === TYPOGRAPHY FLUID === */
-  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-size-xs: clamp(10px, 1.5vw, 12px);
-  --font-size-sm: clamp(12px, 2vw, 14px);
-  --font-size-md: clamp(14px, 2.5vw, 16px);
-  --font-size-lg: clamp(18px, 3vw, 22px);
-  --font-size-xl: clamp(24px, 4vw, 32px);
-  --font-size-2xl: clamp(32px, 5vw, 48px);
-  --font-size-display: clamp(48px, 8vw, 72px);
+  /* === SPACING: Fluid Scale === */
+  --space-2xs: 0.25rem; /* 4px */
+  --space-xs: 0.5rem; /* 8px */
+  --space-sm: 0.75rem; /* 12px */
+  --space-md: 1rem; /* 16px */
+  --space-lg: 1.5rem; /* 24px */
+  --space-xl: 2rem; /* 32px */
+  --space-2xl: 3rem; /* 48px */
 
-  /* === AAA MOTION SYSTEM === */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
-  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  --ease-snappy: cubic-bezier(0.2, 0.9, 0.3, 1);
-  --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1);
-  
-  --duration-instant: 50ms;
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-  --duration-slower: 800ms;
+  /* === LAYOUT: Responsive Variables === */
+  --nav-width: 0px; /* Default (Mobile) */
+  --nav-height: 64px; /* Default (Mobile Bottom Bar) */
+  --player-height: 80px; /* Mini Player */
 
-  /* === LAYOUT === */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
+  /* === BORDERS & EFFECTS === */
+  --radius-sm: 0px; /* Sharp/Geometric */
+  --radius-md: 4px; /* Slight softening */
+  --radius-lg: 8px; /* Larger elements */
   --radius-full: 9999px;
 
-  /* === PREMIUM SHADOW SYSTEM === */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 25%);
-  --shadow-md: 0 4px 12px oklch(0% 0 0 / 35%);
-  --shadow-lg: 0 8px 24px oklch(0% 0 0 / 45%);
-  --shadow-xl: 0 16px 48px oklch(0% 0 0 / 55%);
-  --shadow-glow: 0 0 24px oklch(from var(--accent-primary) l c h / 40%);
-  --shadow-glow-intense: 0 0 40px oklch(from var(--accent-primary) l c h / 60%);
-  --shadow-glow-gold: 0 0 24px oklch(from var(--accent-gold) l c h / 35%);
-  --shadow-inset: inset 0 2px 4px oklch(0% 0 0 / 20%);
-  --shadow-depth: 
-    0 2px 4px oklch(0% 0 0 / 10%),
-    0 8px 16px oklch(0% 0 0 / 15%),
-    0 16px 32px oklch(0% 0 0 / 20%);
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+  --border-highlight: 1px solid rgba(255, 255, 255, 0.15);
 
-  /* === BORDERS === */
-  --border-subtle: 1px solid oklch(25% 0.01 160 / 40%);
-  --border-light: 1px solid oklch(100% 0 0 / 8%);
-  --border-accent: 1px solid oklch(from var(--accent-primary) l c h / 30%);
+  /* Glassmorphism (Subtle) */
+  --glass-bg: rgba(5, 5, 5, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  --glass-blur: 12px;
 
-  /* === Z-INDEX SCALE === */
+  /* Z-Index Layers */
   --z-base: 0;
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-fixed: 250;
+  --z-nav: 100;
+  --z-player: 200;
   --z-modal: 300;
-  --z-player: 400;
-  --z-toast: 500;
+  --z-toast: 400;
+  --z-max: 9999;
 
-  /* === GLASSMORPHISM (minimal use) === */
-  --glass-bg: oklch(12% 0.01 160 / 75%);
-  --glass-border: oklch(100% 0 0 / 8%);
-  --glass-blur: 24px;
-  --glass-shadow: 0 8px 32px oklch(0% 0 0 / 35%);
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
 
-  /* === ALIAS FOR COMPATIBILITY === */
-  --spacing-xs: var(--space-xs);
-  --spacing-sm: var(--space-sm);
-  --spacing-md: var(--space-md);
-  --spacing-lg: var(--space-lg);
-  --spacing-xl: var(--space-xl);
-
-  --font-size-base: var(--font-size-md);
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.7;
-
-  --color-error: oklch(62% 0.25 25);
-  --color-success: var(--accent-emerald);
-  --color-warning: oklch(75% 0.18 70);
-
-  /* === BREAKPOINTS === */
-  /* CSS custom properties for reference (used in media queries) */
-  --breakpoint-sm: 640px;   /* Mobile landscape / small tablet */
-  --breakpoint-md: 768px;   /* Tablet portrait */
-  --breakpoint-lg: 1024px;  /* Tablet landscape / small desktop */
-  --breakpoint-xl: 1280px;  /* Desktop */
-  --breakpoint-2xl: 1536px; /* Large desktop */
-  --breakpoint-tv: 1920px;  /* TV / 4K displays */
-  
-  /* === TOUCH TARGETS (Accessibility) === */
-  --touch-target-min: 44px;      /* iOS HIG minimum */
-  --touch-target-car: 72px;      /* Car displays - larger for safety */
-  
-  /* === TV SPECIFIC === */
-  --tv-focus-ring: 0 0 0 4px var(--accent-focus);
-  --tv-focus-scale: 1.1;
-  --tv-safe-area: 5vw; /* Overscan protection */
+  --duration-fast: 200ms;
+  --duration-normal: 400ms;
+  --duration-slow: 600ms;
 }
 
-/* === MEDIA QUERIES & DEVICE SPECIFICS === */
-
-/* Mobile (Touch Primary) */
-@media (max-width: 767px) {
-  :root {
-    --space-md: 12px; /* Tighter spacing on mobile */
-    --font-size-display: 32px; /* Smaller display text */
-  }
-}
-
-/* Tablet */
-@media (min-width: 768px) and (max-width: 1023px) {
-  :root {
-     --space-lg: 20px;
-  }
-}
-
-/* TV Mode (Large Screens + Remote Interaction) */
-@media (min-width: 1921px), (hover: none) and (min-width: 1280px) {
-  :root {
-    --font-size-base: 24px; /* Larger base text for distance */
-    --font-size-sm: 18px;
-    --touch-target-mobile: 64px; /* Treat as TV target */
-    --space-md: 24px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --duration-instant: 0ms;
-    --duration-fast: 0ms;
-    --duration-normal: 0ms;
-    --duration-slow: 0ms;
-    --duration-slower: 0ms;
-    --ease-spring: linear;
-  }
-}
-
-/* ============================================
-   DEVICE-SPECIFIC CSS CLASSES
-   Applied via deviceDetection.ts utility
-   ============================================ */
-
-/* === Device Type Classes === */
-.device-mobile {
-  /* Mobile-specific overrides */
-  --touch-target-mobile: var(--touch-target-min);
-}
-
-.device-tablet {
-  /* Tablet-specific overrides */
-  --touch-target-mobile: var(--touch-target-min);
-}
-
-.device-desktop {
-  /* Desktop-specific overrides */
-  --touch-target-mobile: var(--touch-target-desktop);
-}
-
-.device-tv {
-  /* TV-specific overrides - apply larger sizes */
-  --touch-target-mobile: var(--touch-target-tv);
-  --font-size-base: 24px;
-  --font-size-sm: 18px;
-  --font-size-md: 20px;
-  --font-size-lg: 28px;
-  --font-size-xl: 40px;
-  --space-md: 24px;
-  --space-lg: 32px;
-}
-
-.device-car,
-.device-carplay,
-.device-android-auto {
-  /* Car display - safety-first, large touch targets */
-  --touch-target-mobile: var(--touch-target-car);
-  --font-size-base: 20px;
-  --font-size-lg: 28px;
-  --font-size-xl: 36px;
-  --space-md: 20px;
-  --space-lg: 28px;
-}
-
-/* === Screen Size Classes === */
-.screen-small {
-  /* < 640px */
-}
-
-.screen-medium {
-  /* 640px - 1024px */
-}
-
-.screen-large {
-  /* 1024px - 1440px */
-}
-
-.screen-xlarge {
-  /* > 1440px */
-}
-
-/* === Touch/Hover Capability Classes === */
-.touch-enabled {
-  /* Touch-specific styles */
-}
-
-.touch-disabled {
-  /* Non-touch devices */
-}
-
-.hover-enabled {
-  /* Devices with hover support */
-}
-
-.hover-disabled {
-  /* Devices without hover (touch primary) */
-}
-
-/* === Reduced Motion Class === */
-.reduced-motion,
-.reduced-motion * {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-}
-
-/* === Car Mode Class === */
-.car-mode {
-  /* Applied in car environments - simplified UI */
-  --bg-overlay: var(--bg-base); /* Solid backgrounds for clarity */
-}
-
-/* ============================================
-   ENHANCED RESPONSIVE MEDIA QUERIES
-   Mobile-first approach with comprehensive breakpoints
-   ============================================ */
-
-/* === Small Mobile (< 640px) - Default styles === */
-/* Most styles in individual components are mobile-first */
-
-/* === sm: Small Tablet / Mobile Landscape (≥ 640px) === */
-@media (min-width: 640px) {
-  :root {
-    --space-md: 14px;
-    --space-lg: 22px;
-  }
-}
-
-/* === md: Tablet Portrait (≥ 768px) === */
+/* === BREAKPOINTS (Mobile-First Override) === */
 @media (min-width: 768px) {
   :root {
-    --space-md: 16px;
-    --space-lg: 24px;
-    --font-size-display: 40px;
+    --nav-height: 0px; /* Side nav takes over */
+    --nav-width: 80px; /* Tablet collapsed nav */
   }
 }
 
-/* === lg: Tablet Landscape / Small Desktop (≥ 1024px) === */
 @media (min-width: 1024px) {
   :root {
-    --space-md: 16px;
-    --space-lg: 24px;
-    --font-size-display: 48px;
+    --nav-width: 260px; /* Desktop full nav */
   }
 }
-
-/* === xl: Desktop (≥ 1280px) === */
-@media (min-width: 1280px) {
-  :root {
-    --font-size-display: 56px;
-  }
-}
-
-/* === 2xl: Large Desktop (≥ 1536px) === */
-@media (min-width: 1536px) {
-  :root {
-    --font-size-display: 64px;
-  }
-}
-
-/* === TV / 4K Displays (≥ 1920px) === */
-@media (min-width: 1920px) {
-  :root {
-    --font-size-base: 22px;
-    --font-size-sm: 18px;
-    --font-size-md: 20px;
-    --font-size-lg: 26px;
-    --font-size-xl: 36px;
-    --font-size-display: 72px;
-    --touch-target-mobile: var(--touch-target-tv);
-    --space-md: 24px;
-    --space-lg: 32px;
-    --space-xl: 48px;
-  }
-}
-
-/* === Touch vs Pointer Input Detection === */
-
-/* Mouse/Trackpad - Fine pointer with hover */
-@media (hover: hover) and (pointer: fine) {
-  :root {
-    --touch-target-mobile: var(--touch-target-desktop);
-  }
-}
-
-/* Touch Screens - Coarse pointer without hover */
-@media (hover: none) and (pointer: coarse) {
-  :root {
-    --touch-target-mobile: var(--touch-target-min);
-  }
-}
-
-/* === Landscape Orientation for Car Displays === */
-/* Detect car-like displays: landscape with limited height */
-@media (orientation: landscape) and (max-height: 600px) {
-  :root {
-    /* Optimize for wide, short displays like car infotainment */
-    --touch-target-mobile: 56px;
-    --space-md: 12px;
-    --space-lg: 16px;
-  }
-}
-
-/* === Wide Car Displays (aspect ratio > 2:1) === */
-@media (min-aspect-ratio: 2/1) and (max-height: 800px) {
-  :root {
-    /* Very wide displays typical in car dashboards */
-    --touch-target-mobile: 64px;
-  }
-}
-
-/* === High Contrast / Accessibility === */
-@media (prefers-contrast: high) {
-  :root {
-    --text-secondary: var(--text-primary);
-    --border-subtle: 2px solid var(--text-primary);
-    --shadow-sm: none;
-    --shadow-md: none;
-    --shadow-lg: none;
-  }
-}
-
-/* === Dark Mode (system preference) === */
-@media (prefers-color-scheme: dark) {
-  /* Already dark by default, no changes needed */
-}
-
-/* === Light Mode (system preference) === */
-@media (prefers-color-scheme: light) {
-  /* Could add light theme overrides here if needed */
-}
-
