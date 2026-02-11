@@ -1,5 +1,5 @@
 import { For, onMount, Show, createSignal } from "solid-js";
-import { getCollectionItems, getTracksMap } from "@lib/utils";
+import { getCollectionItems, getTracksMap, drawer } from "@lib/utils";
 import StreamItem from "@components/StreamItem";
 import { queueStore, setQueueStore, t, filterItemsByConfig } from "@lib/stores";
 import supermix from "@lib/modules/supermix";
@@ -25,9 +25,10 @@ export default function Standby() {
 
     const historyIds = getCollectionItems('history').slice(0, 5).map(i => i.id);
     const tracks = getTracksMap();
+    const { libraryPlays } = drawer;
     const mostPlayedIds = Object.values(tracks)
       .filter(t => !historyIds.includes(t.id))
-      .sort((a, b) => (b.plays || 0) - (a.plays || 0))
+      .sort((a, b) => (libraryPlays[b.id] || 0) - (libraryPlays[a.id] || 0))
       .slice(0, 5)
       .map(i => i.id);
 

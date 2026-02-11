@@ -10,7 +10,7 @@ import getStreamData from "../modules/getStreamData";
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 type PlayerStore = {
-  stream: CollectionItem,
+  stream: CollectionItem & { albumId?: string },
   history: CollectionItem[],
   audio: HTMLAudioElement,
   context: {

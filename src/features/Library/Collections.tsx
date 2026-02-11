@@ -1,6 +1,6 @@
 import { createSignal, For, Show, createMemo } from "solid-js";
-import { fetchCollection, getCollectionsKeys, getTracksMap } from "@lib/utils";
-import { t } from "@lib/stores";
+import { fetchCollection, getCollectionsKeys, getTracksMap, drawer } from "@lib/utils";
+import { t, setListStore, setNavStore } from "@lib/stores";
 import StreamItem from "@components/StreamItem";
 import searchTracks from "@lib/modules/finder";
 
@@ -29,7 +29,7 @@ export default function() {
   }
 
   const reservedCollections = {
-    history: ['ri-memories-line', 'library_history'],
+    history: ['ri-memories-fill', 'library_history'],
     favorites: ['ri-heart-fill', 'library_favorites'],
     listenLater: ['ri-calendar-schedule-fill', 'library_listen_later'],
     liked: ['ri-thumb-up-fill', 'library_liked']
@@ -100,6 +100,39 @@ export default function() {
 
           </For>
         </Show>
+        <a
+          class='clxn_item'
+          onclick={() => {
+            const { libraryPlays } = drawer;
+            const tracks = getTracksMap();
+            const frequentlyPlayedItems = Object.keys(libraryPlays)
+              .filter(id => libraryPlays[id] > 1 && tracks[id])
+              .sort((a, b) => libraryPlays[b] - libraryPlays[a])
+              .map(id => tracks[id]);
+            setListStore({
+              name: t('hub_frequently_played'),
+              list: frequentlyPlayedItems as CollectionItem[],
+            });
+            setNavStore('list', 'state', true);
+          }}
+        >
+          <i class="ri-bar-chart-2-fill"></i>
+          {t('hub_frequently_played')}
+        </a>
+        <a
+          class='clxn_item'
+          onclick={() => {
+            const discoveryItems = drawer.discovery || [];
+            setListStore({
+              name: t('hub_discovery'),
+              list: discoveryItems as CollectionItem[],
+            });
+            setNavStore('list', 'state', true);
+          }}
+        >
+          <i class="ri-compass-3-fill"></i>
+          {t('hub_discovery')}
+        </a>
       </Show>
     </>
   );

@@ -1,12 +1,13 @@
 import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, fetchUma } from '@lib/utils';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, fetchUma, drawer } from '@lib/utils';
 
 
 
 export default async function() {
 
-  if (!params.size)
-    setNavStore('home', 'state', true);
+  if (!params.size) {
+    setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', true);
+  }
 
   // Handle /s/:id URLs by transforming them to /?s=id internally
   const pathParts = location.pathname.split('/');

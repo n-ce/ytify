@@ -81,7 +81,7 @@ export default function() {
 
           closeDialog();
         }}>
-          <i class="ri-skip-forward-line"></i>{t('player_play_next')}
+          <i class="ri-skip-forward-fill"></i>{t('player_play_next')}
         </li>
 
         <li tabindex="1" onclick={() => {
@@ -107,13 +107,13 @@ export default function() {
 
         <li tabindex="4" onclick={async () => {
           if (isDownloading()) return;
-          
+
           const id = store?.actionsMenu?.id;
           if (!id) {
             setStore('snackbar', t('actions_menu_id_not_found'));
             return;
           }
-          
+
           setIsDownloading(true);
           try {
             await getDownloadLink(id);

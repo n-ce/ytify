@@ -1,6 +1,7 @@
 import { JSX, lazy } from "solid-js";
 import { createStore } from "solid-js/store";
-const Home = lazy(() => import('../../features/Home'));
+const Search = lazy(() => import('../../features/Search'));
+const Library = lazy(() => import('../../features/Library'));
 const List = lazy(() => import('../../features/List'));
 const Queue = lazy(() => import('../../features/Queue'));
 const Player = lazy(() => import('../../features/Player'));
@@ -19,7 +20,8 @@ type Nav = { [key in Features]: {
 export const [navStore, setNavStore] = createStore<Nav>({
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
-  home: { ref: null, state: false, component: Home },
+  search: { ref: null, state: false, component: Search },
+  library: { ref: null, state: false, component: Library },
   list: { ref: null, state: false, component: List },
   settings: { ref: null, state: false, component: Settings },
   updater: { ref: null, state: false, component: Updater }

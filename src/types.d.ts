@@ -8,7 +8,7 @@ declare global {
 
   type SyncState = 'synced' | 'syncing' | 'dirty' | 'error';
 
-  type Features = 'home' | 'player' | 'list' | 'settings' | 'queue' | 'updater';
+  type Features = 'search' | 'library' | 'player' | 'list' | 'settings' | 'queue' | 'updater';
   type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue' | 'standby';
 
   type StreamItem = {
@@ -47,8 +47,6 @@ declare global {
     duration: string,
     author?: string,
     authorId?: string,
-    albumId?: string,
-    plays?: number
   }
 
   type Collection = { [index: string]: CollectionItem };

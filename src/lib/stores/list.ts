@@ -5,7 +5,7 @@ import fetchArtist, { ArtistResponse } from "@lib/modules/fetchArtist";
 import fetchMix from "@lib/modules/fetchMix";
 import fetchPlaylist, { PlaylistResponse } from "@lib/modules/fetchPlaylist";
 import fetchChannel from "@lib/modules/fetchChannel";
-import { convertSStoHHMMSS, generateImageUrl, getApi, getLibraryAlbums, getLists, getThumbIdFromLink, getTracksMap } from "@lib/utils";
+import { convertSStoHHMMSS, generateImageUrl, getApi, getLibraryAlbums, getLists, getThumbIdFromLink, getTracksMap, drawer } from "@lib/utils";
 import { setQueueStore, addToQueue } from "./queue";
 import fetchAlbum, { AlbumResponse } from "@lib/modules/fetchAlbum";
 
@@ -77,9 +77,6 @@ export async function getList(
       const tracksMap = getTracksMap();
       const albumTracks = savedAlbum.tracks.map(trackId => {
         const track = tracksMap[trackId];
-        if (track) {
-          track.albumId = albumId;
-        }
         return track;
       }).filter(Boolean);
 
@@ -258,7 +255,7 @@ export async function getList(
 }
 
 export function resetList() {
-  setNavStore('home', 'state', true);
+  setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', true);
   closeFeature('list');
   listStore.observer.disconnect();
 
