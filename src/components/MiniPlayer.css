@@ -40,8 +40,9 @@
   }
 
   #playButton {
+    display: flex;
+    align-items: center;
     font-size: var(--size-7);
-    margin: 0;
     margin-left: var(--size-2);
     margin-right: var(--size-2);
   }
@@ -89,11 +90,13 @@
     background-color: transparent;
     accent-color: auto;
     appearance: none;
+    border: none;
 
     &::-webkit-progress-bar {
       background: transparent;
     }
 
+    &::-moz-progress-bar,
     &::-webkit-progress-value {
       background: linear-gradient(transparent, var(--onBg2));
       border-bottom: var(--border-size-1) solid var(--text2);

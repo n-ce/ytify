@@ -128,7 +128,7 @@ export default function Dropdown(_: {
           </li>
 
           <li id="viewOnYTBtn">
-            <i class="ri-external-link-line"></i>{listStore.name || t('list_view_on_yt')}
+            <i class="ri-youtube-fill"></i>{listStore.name || t('list_view_on_yt')}
           </li>
         </Show>
 

@@ -1,6 +1,4 @@
 header {
-  display: flex;
-  justify-content: space-between;
 
   label {
     cursor: pointer;
@@ -29,11 +27,7 @@ header {
     background-color: var(--text) !important;
     color: var(--bg) !important;
   }
-
 }
-
-
-
 
 .library,
 .hub {
@@ -210,6 +204,8 @@ header {
     margin-bottom: var(--gap);
     background: var(--onBg);
     border: var(--border);
+    padding: var(--size-1) var(--size-2);
+    color: var(--text);
 
     &::placeholder {
       color: var(--text);

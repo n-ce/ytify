@@ -9,6 +9,8 @@ section:has(header>details[open]) {
 }
 
 section>header {
+  display: flex;
+  justify-content: space-between;
   position: relative;
   width: 100%;
   padding: var(--gap) 0;
@@ -99,7 +101,7 @@ section>header {
       background: rgb(from var(--onBg) r g b / 0.8);
       backdrop-filter: blur(var(--size-px-2));
       color: var(--text);
-      padding: 0;
+      padding: var(--size-1);
       list-style: none;
       overflow: hidden;
       border: var(--border);
@@ -109,7 +111,7 @@ section>header {
       li {
         font-size: var(--font-size-1);
         padding: var(--size-1) var(--size-2);
-        border-bottom: var(--border);
+        border-radius: calc(var(--roundness) * 0.6);
         display: flex;
         align-items: center;
         user-select: none;

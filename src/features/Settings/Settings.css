@@ -1,7 +1,5 @@
 .settingsSection {
   header {
-    display: flex;
-    justify-content: space-between;
 
     .ri-close-large-line {
       margin-right: calc(var(--size-7) + var(--size-1));
@@ -9,7 +7,7 @@
     }
   }
 
-  > div {
+  >div {
     width: 100%;
     margin-bottom: var(--size-8);
 

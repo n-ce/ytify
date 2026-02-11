@@ -1,12 +1,12 @@
-import { getTracksMap } from '@lib/utils/library';
+import { getTracksMap, setConfig, config } from '@lib/utils';
 import { setStore, t } from '@lib/stores';
 import { lazy, Show } from 'solid-js';
 import { render } from 'solid-js/web';
-import { setConfig, config } from '@lib/utils';
 
 const Login = lazy(() => import('@components/Login'));
 
-export default function Actions() {
+export default function Dropdown() {
+
   async function importLibrary(e: Event) {
     const importBtn = e.target as HTMLInputElement & { files: FileList };
     const importedData = JSON.parse(await importBtn.files[0].text());
@@ -69,43 +69,49 @@ export default function Actions() {
   };
 
   return (
-    <>
-      <li onclick={() => document.getElementById('upload_ytify')?.click()}>
-        <label>
-          <i class="ri-import-line"></i>&nbsp;{t('library_import')}
-        </label>
-        <input type="file" id="upload_ytify" onchange={importLibrary} />
-      </li>
-      <li id="exportBtn" onclick={exportLibrary}>
-        <i class="ri-export-line"></i>&nbsp;{t('library_export')}
-
-      </li>
-      <li id="cleanLibraryBtn" onclick={cleanLibrary}>
-        <i class="ri-delete-bin-2-line"></i>&nbsp;{t('library_clean')}
-      </li>
-
-      <li onclick={() => document.getElementById('upload_songshift')?.click()}>
-        <label>
-          <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift
-        </label>
-        <input type="file" id="upload_songshift" onchange={async (e) => (await import('@lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
-      </li>
-
-      <Show when={config.dbsync}
-        fallback={
-          <li onclick={() => {
-            render(() => <Login />, document.body);
-          }}>
-            <i class="ri-cloud-fill"></i>&nbsp;Cloud Sync
-          </li>
-        }>
-        <li onclick={() => {
-          setConfig('dbsync', '');
-          location.reload();
-        }}>
-          <i class="ri-cloud-fill"></i>&nbsp;Logout
+    <details>
+      <summary><i
+        aria-label="More Options"
+        class="ri-more-2-fill"
+      ></i></summary>
+      <ul>
+        <li onclick={() => document.getElementById('upload_ytify')?.click()}>
+          <label>
+            <i class="ri-import-line"></i>&nbsp;{t('library_import')}
+          </label>
+          <input type="file" id="upload_ytify" onchange={importLibrary} />
         </li>
-      </Show>
-    </>
+        <li id="exportBtn" onclick={exportLibrary}>
+          <i class="ri-export-line"></i>&nbsp;{t('library_export')}
+
+        </li>
+        <li id="cleanLibraryBtn" onclick={cleanLibrary}>
+          <i class="ri-delete-bin-2-line"></i>&nbsp;{t('library_clean')}
+        </li>
+
+        <li onclick={() => document.getElementById('upload_songshift')?.click()}>
+          <label>
+            <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift
+          </label>
+          <input type="file" id="upload_songshift" onchange={async (e) => (await import('@lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
+        </li>
+
+        <Show when={config.dbsync}
+          fallback={
+            <li onclick={() => {
+              render(() => <Login />, document.body);
+            }}>
+              <i class="ri-cloud-fill"></i>&nbsp;Cloud Sync
+            </li>
+          }>
+          <li onclick={() => {
+            setConfig('dbsync', '');
+            location.reload();
+          }}>
+            <i class="ri-cloud-fill"></i>&nbsp;Logout
+          </li>
+        </Show>
+      </ul>
+    </details >
   )
 }

@@ -1,6 +1,6 @@
 import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
-import { config } from '@lib/utils/config';
+import { config, drawer, setDrawer } from '@lib/utils/config';
 
 
 // New Library V2 utils
@@ -102,10 +102,8 @@ export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData
 
   const tracks = getTracksMap();
   for (const track of tracksData) {
-    if (tracks[track.id]) {
-      tracks[track.id].albumId = albumId;
-    } else {
-      tracks[track.id] = { ...track, albumId: albumId };
+    if (!tracks[track.id]) {
+      tracks[track.id] = track;
     }
     
     if (config.dbsync) {
@@ -138,16 +136,6 @@ export function removeAlbumFromLibrary(albumId: string) {
           removeDirtyTrack(trackId);
         });
       }
-    } else {
-      const track = tracks[trackId];
-      if (track?.albumId === albumId) {
-        delete track.albumId;
-        if (config.dbsync) {
-          import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-            addDirtyTrack(trackId);
-          });
-        }
-      }
     }
   }
 
@@ -163,6 +151,7 @@ export function addToCollection(
   const collection = getCollection(name);
   const tracks = getTracksMap();
   const prepend = ['history', 'favorites'].includes(name);
+  const { libraryPlays } = drawer;
 
   for (const item of data) {
     if (!item?.id) continue;
@@ -177,8 +166,9 @@ export function addToCollection(
     else collection.push(id);
 
     if (id in tracks) {
-      const track = tracks[id];
-      track.plays = (track.plays || 1) + 1;
+      libraryPlays[id] = (libraryPlays[id] || 1) + 1;
+      setDrawer('libraryPlays', libraryPlays);
+
       if (config.dbsync) {
         import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
           addDirtyTrack(id); // Mark as updated

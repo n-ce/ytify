@@ -1,4 +1,4 @@
-.home:has(>div.search) {
+.search {
 
   header {
     position: sticky;
@@ -8,10 +8,11 @@
       linear-gradient(to right, var(--trueBg), transparent, var(--trueBg)),
       linear-gradient(var(--trueBg), transparent);
     backdrop-filter: blur(var(--size-px-3));
-  }
-}
 
-.search {
+    .right-group {
+      margin-right: 0;
+    }
+  }
 
   --inputround: var(--roundness);
 
@@ -68,7 +69,7 @@
       padding: 0;
       top: calc(var(--size-7) + var(--size-1));
       margin-left: calc(0rem - var(--gap) - calc(var(--border-size-1) / 2));
-      background-color: var(--scheme);
+      background-image: linear-gradient(var(--scheme), transparent), linear-gradient(to right, var(--onBg), transparent);
       border: var(--border);
       border-radius: 0 0 var(--roundness) var(--roundness);
       box-shadow: var(--shadow-1);
@@ -79,8 +80,6 @@
 
       li {
         padding: var(--size-1) var(--size-3);
-        background-color: var(--onBg);
-        border-bottom: var(--border);
         font-size: var(--font-size-1);
         height: var(--size-fluid-4);
         opacity: 0.7;
@@ -88,7 +87,7 @@
         &:hover,
         &:focus,
         &.hover {
-          background-color: var(--onBg2);
+          background-image: linear-gradient(to right, var(--onBg2), transparent);
           color: var(--text2);
           opacity: 1;
         }

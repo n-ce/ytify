@@ -7,12 +7,8 @@ export default function() {
   let superInput!: HTMLInputElement;
 
   onMount(() => {
-
-    setTimeout(() => {
-      superInput.focus();
-    }, 500);
-    getSearchResults();
-
+    if (searchStore.query)
+      getSearchResults();
   });
 
   function textToSearch(text: string) {

@@ -21,7 +21,6 @@ export let config = {
   contextualFill: false,
   queuePrefetch: false,
   authorGrouping: false,
-  home: '',
   searchFilter: 'all',
   volume: '100',
   dbsync: '',
@@ -53,6 +52,8 @@ export let drawer = {
   relatedPlaylists: [] as Playlist[],
   relatedArtists: [] as Channel[],
   subfeed: [] as CollectionItem[],
+  lastMainFeature: 'search' as 'search' | 'library',
+  libraryPlays: {} as Record<string, number>,
 }
 const savedDrawer = localStorage.getItem('drawer');
 if (savedDrawer)

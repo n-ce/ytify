@@ -2,8 +2,8 @@ import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { addToQueue, listStore, resetList, setListStore, setNavStore, t } from '@lib/stores';
-import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
-import { setConfig, config } from '@lib/utils/config';
+import { fetchCollection, getLists, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
+import { setConfig, config, drawer } from '@lib/utils/config';
 import { generateImageUrl, getThumbIdFromLink } from '@lib/utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
@@ -49,7 +49,7 @@ export default function() {
     setNavStore('list', 'ref', listSection);
     listSection.scrollIntoView();
     listSection.scrollTo(0, 0);
-    setNavStore('home', 'state', false);
+    setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', false);
   });
   createEffect(() => {
     if (localSortOrder() === 'modified' && showSortMenu()) {
@@ -164,6 +164,20 @@ export default function() {
           </select>
         </span>
 
+      </Show>
+      <Show when={listStore.name == 'Sub Feed'}>
+        <div class="albums-carousel">
+          <For each={getLists('channels')}>
+            {(channel) => (
+              <ListItem
+                title={channel.name}
+                stats={''}
+                thumbnail={generateImageUrl(getThumbIdFromLink(channel.thumbnail), '')}
+                uploaderData={''}
+                url={`/channel/${channel.id}`}
+              />)}
+          </For>
+        </div>
       </Show>
       <Show when={listStore.name.startsWith('Artist') && listStore.artistAlbums?.length}>
         <div class="albums-carousel">
