@@ -24,7 +24,8 @@ export let config = {
   searchFilter: 'all',
   volume: '100',
   dbsync: '',
-  sortOrder: 'modified' as 'modified' | 'name' | 'artist' | 'duration'
+  sortBy: 'modified' as 'modified' | 'name' | 'artist' | 'duration',
+  sortOrder: 'desc' as 'asc' | 'desc'
 }
 
 type AppConfig = typeof config;
@@ -47,10 +48,6 @@ export function setConfig<K extends
 export let drawer = {
   recentSearches: [] as string[],
   discovery: [] as (YTItem & { frequency: number })[],
-  userArtists: [] as Channel[],
-  relatedPlaylists: [] as Playlist[],
-  relatedArtists: [] as Channel[],
-  subfeed: [] as YTItem[],
   standby: [] as TrackItem[],
   lastMainFeature: 'search' as 'search' | 'library',
   libraryPlays: {} as Record<string, number>,

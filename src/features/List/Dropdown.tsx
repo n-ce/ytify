@@ -4,9 +4,7 @@ import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavSt
 import { importList, shareCollection } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
 
-export default function Dropdown(_: {
-  toggleSort: () => void
-}) {
+export default function Dropdown() {
 
   const [isSubscribed, setSubscribed] = createSignal(false);
 
@@ -119,15 +117,12 @@ export default function Dropdown(_: {
         */}
         <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'}>
 
-          <li
-            id="subscribeListBtn"
-            onclick={subscriptionHandler}
-          >
+          <li onclick={subscriptionHandler}>
             <i
               class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? t('list_saved_to_library') : t('list_save_to_library')}
           </li>
 
-          <li id="viewOnYTBtn">
+          <li>
             <i class="ri-youtube-fill"></i>{listStore.name || t('list_view_on_yt')}
           </li>
         </Show>
@@ -204,13 +199,6 @@ export default function Dropdown(_: {
               <i class="ri-radio-line"></i>{t("list_radio")}
             </li>
           </Show>
-
-          <li
-            id="sortCollectionBtn"
-            onclick={_.toggleSort}
-          >
-            <i class="ri-draggable"></i>{t("list_sort")}
-          </li>
 
         </Show>
       </ul>

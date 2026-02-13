@@ -105,7 +105,7 @@ export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData
     if (!tracks[track.id]) {
       tracks[track.id] = track;
     }
-    
+
     if (config.dbsync) {
       import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
         addDirtyTrack(track.id);
@@ -150,7 +150,7 @@ export function addToCollection(
 ) {
   const collection = getCollection(name);
   const tracks = getTracksMap();
-  const prepend = ['history', 'favorites'].includes(name);
+  const prepend = ['history', 'favorites', 'liked'].includes(name);
   const { libraryPlays } = drawer;
 
   for (const item of data) {
@@ -377,9 +377,10 @@ function getLocalCollection(
   const tracks = getTracksMap();
 
   let sortedIds = ids;
-  if (config.sortOrder !== 'modified') {
+  const isReserved = listStore.reservedCollections.includes(decodeURI(collection));
+  if (!isReserved && (config.sortBy !== 'modified' || config.sortOrder === 'asc')) {
     const items = ids.map(id => tracks[id]);
-    const sortedItems = sortCollection(items, config.sortOrder);
+    const sortedItems = sortCollection(items, config.sortBy, config.sortOrder);
     sortedIds = sortedItems.map(item => item.id);
   }
 
@@ -429,21 +430,29 @@ async function getSharedCollection(
   setListStore('isLoading', false);
 }
 
-export type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
+export type SortBy = 'modified' | 'name' | 'artist' | 'duration';
 
-export function sortCollection(list: TrackItem[], sortOrder: SortOrder): TrackItem[] {
-  if (sortOrder === 'modified') {
-    return list;
-  }
+export function sortCollection(list: TrackItem[], sortBy: SortBy, sortOrder: 'asc' | 'desc'): TrackItem[] {
 
   const listToSort = [...list];
 
+  if (sortBy === 'modified') {
+    // If modified and desc, we just return the list (it's already in the order we want for manual/time)
+    // Actually, if it's 'asc', we reverse it. 
+    // Manual order is usually newest first for reserved, but for non-reserved it's oldest first.
+    return sortOrder === 'asc' ? listToSort.reverse() : listToSort;
+  }
+
+
   listToSort.sort((a, b) => {
-    switch (sortOrder) {
+    let result = 0;
+    switch (sortBy) {
       case 'name':
-        return a.title.localeCompare(b.title);
+        result = a.title.localeCompare(b.title);
+        break;
       case 'artist':
-        return (a.author || '').localeCompare(b.author || '');
+        result = (a.author || '').localeCompare(b.author || '');
+        break;
       case 'duration':
         const parseDuration = (d: string) => {
           const parts = d.split(':').map(Number);
@@ -451,10 +460,10 @@ export function sortCollection(list: TrackItem[], sortOrder: SortOrder): TrackIt
           if (parts.length === 2) return parts[0] * 60 + parts[1];
           return 0;
         };
-        return parseDuration(a.duration) - parseDuration(b.duration);
-      default:
-        return 0;
+        result = parseDuration(a.duration) - parseDuration(b.duration);
+        break;
     }
+    return sortOrder === 'asc' ? result : -result;
   });
 
   return listToSort;

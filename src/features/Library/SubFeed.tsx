@@ -1,17 +1,16 @@
 import { For, Show, createSignal, onMount } from "solid-js";
-import { drawer, setDrawer, getLists } from "@lib/utils";
+import { getLists } from "@lib/utils";
 import StreamItem from "@components/StreamItem";
 import ListItem from "@components/ListItem";
 import { t, store } from "@lib/stores";
 
 export default function() {
   const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);
-  const [subfeed, setSubfeed] = createSignal<YTItem[]>(drawer.subfeed || []);
+  const [subfeed, setSubfeed] = createSignal<YTItem[]>([]);
   const channels = getLists('channels');
 
   const updateSubfeed = async () => {
     if (!channels || channels.length === 0) {
-      setDrawer('subfeed', []);
       setSubfeed([]);
       return;
     }
@@ -20,7 +19,6 @@ export default function() {
     try {
       const res = await fetch(`${store.api}/api/subfeed?id=${channelIds}`);
       const data = await res.json() as YTItem[];
-      setDrawer('subfeed', data);
       setSubfeed(data);
     } catch (e) {
       console.error(e);
@@ -37,7 +35,7 @@ export default function() {
 
   return (
     <article class="subfeed-article">
-      <div class="albums-carousel">
+      <div class="list-carousel">
         <For each={channels}>
           {(channel) => (
             <ListItem

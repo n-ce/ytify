@@ -10,7 +10,7 @@ import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
 import ListItem from '@components/ListItem'; // Added import
 
-type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
+type SortBy = 'modified' | 'name' | 'artist' | 'duration';
 
 export default function() {
   let listSection!: HTMLElement;
@@ -19,8 +19,9 @@ export default function() {
   const [markMode, setMarkMode] = createSignal(false);
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
-  const [showSortMenu, setShowSortMenu] = createSignal(false);
-  const [localSortOrder, setLocalSortOrder] = createSignal<SortOrder>(config.sortOrder);
+  const [localSortBy, setLocalSortBy] = createSignal<SortBy>(config.sortBy);
+  const [localSortOrder, setLocalSortOrder] = createSignal<'asc' | 'desc'>(config.sortOrder);
+  const [showSortable, setShowSortable] = createSignal(false);
 
   function initSortable() {
     const listContainer = document.querySelector('.listContainer') as HTMLDivElement;
@@ -52,7 +53,7 @@ export default function() {
     setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', false);
   });
   createEffect(() => {
-    if (localSortOrder() === 'modified' && showSortMenu()) {
+    if (localSortBy() === 'modified' && showSortable() && !listStore.reservedCollections.includes(listStore.id)) {
       initSortable();
     } else {
       sortableRef?.destroy();
@@ -144,30 +145,48 @@ export default function() {
             onclick={resetList}
           ></i>
         </div>
-        <Dropdown toggleSort={() => setShowSortMenu(!showSortMenu())} />
+        <Dropdown />
+
+
       </header>
 
 
-      <Show when={showSortMenu()}>
-        <span>
+      <Show when={listStore.type === 'collection' && listStore.id && !listStore.reservedCollections.includes(listStore.id)}>
+        <span class="sortBar">
           <label for="sortMenu">{t('list_sort_order')} :</label>
           <select id="sortMenu" onchange={(e) => {
-            const newSortOrder = e.target.value as SortOrder;
-            setLocalSortOrder(newSortOrder);
-            setConfig('sortOrder', newSortOrder);
+            const newSortBy = e.target.value as SortBy;
+            setLocalSortBy(newSortBy);
+            setConfig('sortBy', newSortBy);
             fetchCollection(listStore.id);
-          }} value={localSortOrder()}>
+          }} value={localSortBy()}>
             <option value="modified">{t('list_sort_modified')}</option>
             <option value="name">{t('list_sort_name')}</option>
             <option value="artist">{t('list_sort_artist')}</option>
             <option value="duration">{t('list_sort_duration')}</option>
           </select>
+          <Show when={localSortBy() === 'modified' && !listStore.reservedCollections.includes(listStore.id)}>
+            <i
+              class="ri-draggable"
+              classList={{ 'active': showSortable() }}
+              onclick={() => setShowSortable(!showSortable())}
+            ></i>
+          </Show>
+          <i
+            class={localSortOrder() === 'asc' ? 'ri-sort-asc' : 'ri-sort-desc'}
+            onclick={() => {
+              const newOrder = config.sortOrder === 'asc' ? 'desc' : 'asc';
+              setConfig('sortOrder', newOrder);
+              setLocalSortOrder(newOrder);
+              fetchCollection(listStore.id);
+            }}
+          ></i>
         </span>
 
       </Show>
 
       <Show when={listStore.name.startsWith('Artist') && listStore.artistAlbums?.length}>
-        <div class="albums-carousel">
+        <div class="list-carousel">
           <For each={listStore.artistAlbums}>
             {(album) => (
               <ListItem
@@ -188,7 +207,7 @@ export default function() {
       </Show>
 
       <Results
-        draggable={localSortOrder() === 'modified' && showSortMenu()}
+        draggable={showSortable() && localSortBy() === 'modified' && !listStore.reservedCollections.includes(listStore.id)}
         mark={{
           mode: markMode,
           set: (id: string) => {

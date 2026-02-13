@@ -11,7 +11,7 @@ const initialState = () => ({
   isShared: false,
   list: [] as YTItem[],
   length: 0,
-  reservedCollections: ['history', 'favorites', 'listenLater', 'channels', 'playlists'],
+  reservedCollections: ['history', 'favorites', 'liked', 'listenLater', 'channels', 'playlists'],
   name: '',
   url: '',
   type: 'collection' as 'channels' | 'playlists' | 'collection',

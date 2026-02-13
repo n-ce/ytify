@@ -1,5 +1,5 @@
-#listSection > header {
-  > p {
+#listSection>header {
+  >p {
     overflow: clip;
     text-overflow: ellipsis;
   }
@@ -9,7 +9,7 @@
     flex-direction: column-reverse;
   }
 
-  & ~ li {
+  &~li {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -46,7 +46,10 @@
 
 .marked {
   filter: invert();
-  img { filter: invert(); }
+
+  img {
+    filter: invert();
+  }
 }
 
 .list-thumbnail {
@@ -77,20 +80,29 @@
   }
 }
 
-.albums-carousel {
-  display: flex;
-  overflow: auto;
-  background-color: var(--onBg);
-  border-radius: var(--roundness);
-  margin-bottom: var(--size-2);
-  padding: var(--size-1);
-  border: var(--border);
 
-  .listItem {
-    width: var(--size-11);
-    flex-shrink: 0;
-    margin: 0;
-    background-color: transparent;
-    border: none;
+.sortBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.7;
+
+  i {
+    font-size: var(--font-size-4);
+    cursor: pointer;
+
+    &.active {
+      background-color: var(--onBg2);
+      color: var(--text2);
+      border-radius: var(--roundness);
+    }
+
+    &.ri-draggable {
+      margin-right: var(--size-2);
+    }
+  }
+
+  #sortMenu {
+    margin-right: auto;
   }
 }

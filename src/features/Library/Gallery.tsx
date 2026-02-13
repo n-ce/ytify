@@ -1,13 +1,13 @@
 import { For, Show, createSignal, onMount } from "solid-js";
-import { drawer, setDrawer, getTracksMap, getCollection } from "@lib/utils";
+import { getTracksMap, getCollection } from "@lib/utils";
 import ListItem from "@components/ListItem";
 import { t, store } from "@lib/stores";
 
 export default function() {
   const [gallery, setGallery] = createSignal({
-    userArtists: drawer.userArtists || [],
-    relatedArtists: drawer.relatedArtists || [],
-    relatedPlaylists: drawer.relatedPlaylists || []
+    userArtists: [] as Channel[],
+    relatedArtists: [] as Channel[],
+    relatedPlaylists: [] as Playlist[]
   });
   const [isGalleryLoading, setIsGalleryLoading] = createSignal(false);
 
@@ -33,9 +33,6 @@ export default function() {
     const artistIds = sortedArtists.map(([id]) => id);
 
     if (artistIds.length < 2) {
-      setDrawer('relatedArtists', []);
-      setDrawer('relatedPlaylists', []);
-      setDrawer('userArtists', []);
       setGallery({ userArtists: [], relatedArtists: [], relatedPlaylists: [] });
       return;
     }
@@ -44,9 +41,6 @@ export default function() {
     try {
       const res = await fetch(`${store.api}/api/gallery?id=${artistIds.join(',')}`);
       const data = await res.json() as { userArtists: Channel[], relatedArtists: Channel[], relatedPlaylists: Playlist[] };
-      setDrawer('userArtists', data.userArtists);
-      setDrawer('relatedArtists', data.relatedArtists);
-      setDrawer('relatedPlaylists', data.relatedPlaylists);
       setGallery(data);
     } catch (e) {
       console.error(e);
