@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "8.3-dev.3",
+  "version": "8.3-dev.4",
   "type": "module",
   "scripts": {
     "dev": "vite",

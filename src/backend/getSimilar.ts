@@ -1,4 +1,4 @@
-import { getClient, streamMapper } from './utils';
+import { getClient, streamMapper } from './utils.js';
 
 interface LastFmTrack {
   name: string;
@@ -15,7 +15,7 @@ interface LastFmSimilarTracksResponse {
   message?: string;
 }
 
-export default async function (params: { title: string, artist: string, limit?: string }) {
+export default async function(params: { title: string, artist: string, limit?: string }) {
   const { title, artist, limit = '5' } = params;
   const apiKey = '0867bcb6f36c879398969db682a7b69b';
   const url = `https://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(title)}&api_key=${apiKey}&limit=${limit}&format=json`;

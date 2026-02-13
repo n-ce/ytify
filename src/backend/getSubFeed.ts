@@ -1,5 +1,5 @@
 import { YTNodes } from 'youtubei.js';
-import { getClient, formatDuration } from './utils';
+import { getClient, formatDuration } from './utils.js';
 
 function parsePublished(text: string): number {
   if (!text) return 0;
@@ -20,18 +20,18 @@ function parsePublished(text: string): number {
   return now - (value * multipliers[unit]);
 }
 
-export default async function (ids: string[]) {
+export default async function(ids: string[]) {
   const yt = await getClient();
 
   const results = await Promise.all(
-    ids.map(id => 
+    ids.map(id =>
       yt.getChannel(id)
         .then(channel => channel.getVideos().then(v => ({ author: channel.metadata.title, videos: v.videos })))
         .catch(() => ({ author: '', videos: [] }))
     )
   );
 
-  const allVideos = results.flatMap(r => 
+  const allVideos = results.flatMap(r =>
     r.videos
       .filter(v => v.is(YTNodes.Video) && (v.as(YTNodes.Video).duration?.seconds || 0) > 90)
       .map(v => {

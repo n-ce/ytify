@@ -1,4 +1,4 @@
-import { getClient, streamMapper, listMapper } from './utils';
+import { getClient, streamMapper, listMapper } from './utils.js';
 
 export default async function(params: { q: string, f?: string }) {
   const { q, f } = params;

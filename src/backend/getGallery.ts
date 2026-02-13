@@ -1,5 +1,5 @@
 import { YTNodes, type Innertube } from 'youtubei.js';
-import { getClient, getThumbnail, getThumbnailId } from './utils';
+import { getClient, getThumbnail, getThumbnailId } from './utils.js';
 
 async function fetchFullArtistData(yt: Innertube, id: string) {
   try {
@@ -61,7 +61,7 @@ async function fetchFullArtistData(yt: Innertube, id: string) {
   }
 }
 
-export default async function (ids: string[]) {
+export default async function(ids: string[]) {
   const yt = await getClient();
   const results = (await Promise.all(ids.map(id => fetchFullArtistData(yt, id)))).filter((r): r is NonNullable<typeof r> => r !== null);
 

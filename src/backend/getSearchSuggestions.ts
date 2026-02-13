@@ -1,7 +1,7 @@
 import { YTNodes } from 'youtubei.js';
-import { getClient } from './utils';
+import { getClient } from './utils.js';
 
-export default async function (params: { q: string, music?: boolean }) {
+export default async function(params: { q: string, music?: boolean }) {
   const { q, music } = params;
   const yt = await getClient();
 
