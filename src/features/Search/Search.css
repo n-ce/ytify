@@ -1,16 +1,8 @@
 .search {
 
   header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background:
-      linear-gradient(to right, var(--trueBg), transparent, var(--trueBg)),
-      linear-gradient(var(--trueBg), transparent);
-    backdrop-filter: blur(var(--size-px-3));
-
     .right-group {
-      margin-right: 0;
+      margin-right: var(--size-000);
     }
   }
 
@@ -53,7 +45,6 @@
         appearance: none;
       }
 
-
       &::placeholder {
         color: inherit;
         opacity: 75%;
@@ -76,7 +67,6 @@
       display: block;
       user-select: none;
       overflow: hidden;
-
 
       li {
         padding: var(--size-1) var(--size-3);
@@ -115,27 +105,9 @@
     &:nth-child(odd) {
       margin-right: var(--gap);
     }
-
-  }
-
-  .streamItem {
-    margin-bottom: 0;
-    margin-top: var(--size-2);
-    border: none;
-    padding: 0;
-
-    img {
-      margin: var(--size-1);
-    }
-
-    .duration {
-      bottom: var(--size-2);
-      right: var(--size-2);
-    }
   }
 
   .searchlist {
     margin-bottom: var(--size-fluid-6);
   }
-
 }

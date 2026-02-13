@@ -36,6 +36,7 @@ export default function(
           author: stream.author,
           duration: convertSStoHHMMSS(stream.lengthSeconds),
           authorId: stream.authorUrl.slice(9),
+          type: 'video' as const,
           frequency: 1
         });
       }

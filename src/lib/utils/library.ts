@@ -69,10 +69,10 @@ export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends
 
 export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '{}');
 
-export function getCollectionItems(collectionId: string): CollectionItem[] {
+export function getCollectionItems(collectionId: string): TrackItem[] {
   const collectionIds = getCollection(collectionId);
   const tracksMap = getTracksMap();
-  return collectionIds.map((id: string) => tracksMap[id]).filter(Boolean) as CollectionItem[];
+  return collectionIds.map((id: string) => tracksMap[id]).filter(Boolean) as TrackItem[];
 }
 
 export function saveTracksMap(tracks: Collection) {
@@ -95,7 +95,7 @@ export function saveLibraryAlbums(albums: LibraryAlbums) {
   localStorage.setItem('library_albums', JSON.stringify(albums));
 }
 
-export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData: CollectionItem[]) {
+export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData: TrackItem[]) {
   const albums = getLibraryAlbums();
   albums[albumId] = albumData;
   saveLibraryAlbums(albums);
@@ -146,7 +146,7 @@ export function removeAlbumFromLibrary(albumId: string) {
 
 export function addToCollection(
   name: string,
-  data: CollectionItem[]
+  data: TrackItem[]
 ) {
   const collection = getCollection(name);
   const tracks = getTracksMap();
@@ -392,7 +392,7 @@ function getLocalCollection(
 
   if (usePagination) {
     let loadedCount = 20;
-    setListStore('list', sortedIds.slice(0, loadedCount).map(id => tracks[id]));
+    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({ ...tracks[id], type: 'video' as const })));
 
     const observerCallback = () => {
       if (loadedCount >= sortedIds.length) return 0;
@@ -400,14 +400,14 @@ function getLocalCollection(
       const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
-      setListStore('list', (l) => [...l, ...nextBatch.map(id => tracks[id])]);
+      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({ ...tracks[id], type: 'video' as const }))]);
       return sortedIds.length - loadedCount;
     };
 
     setTimeout(() => setObserver(observerCallback), 100);
 
   } else {
-    setListStore('list', sortedIds.map(id => tracks[id]));
+    setListStore('list', sortedIds.map(id => ({ ...tracks[id], type: 'video' as const })));
   }
 
   setListStore('id', decodeURI(collection));
@@ -431,7 +431,7 @@ async function getSharedCollection(
 
 export type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
 
-export function sortCollection(list: CollectionItem[], sortOrder: SortOrder): CollectionItem[] {
+export function sortCollection(list: TrackItem[], sortOrder: SortOrder): TrackItem[] {
   if (sortOrder === 'modified') {
     return list;
   }

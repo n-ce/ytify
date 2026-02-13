@@ -22,7 +22,7 @@ export default function() {
       ref={queueSection}
     >
 
-      <header>
+      <header class="sticky-bar">
         <p>{queueStore.list.length === 0 ? t('nav_queue') : totalQueueDuration(queueStore.list)}</p>
         <div class="right-group">
           <i
@@ -58,7 +58,7 @@ export default function() {
 
       <Show
         when={!queueStore.isLoading}
-        fallback={<i class="ri-loader-3-line"></i>}
+        fallback={<i class="ri-loader-3-line loading-spinner"></i>}
       >
         <List />
         <Show when={

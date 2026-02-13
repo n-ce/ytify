@@ -1,4 +1,4 @@
-import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore } from '@lib/stores';
+import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore, setQueueStore } from '@lib/stores';
 import { getDownloadLink } from '@lib/utils';
 import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
 import './ActionsMenu.css';
@@ -26,7 +26,7 @@ export default function() {
   const [isDownloading, setIsDownloading] = createSignal(false);
 
   createEffect(() => {
-    const { id } = store.actionsMenu as CollectionItem;
+    const { id } = store.actionsMenu as TrackItem;
     if (id)
       setIsListenLater(getCollection('listenLater').includes(id));
   })
@@ -41,8 +41,10 @@ export default function() {
       <StreamItem
         id={store.actionsMenu?.id || ''}
         title={store.actionsMenu?.title || ''}
-        author={store.actionsMenu?.author}
+        authorId={store.actionsMenu?.authorId}
+        author={store.actionsMenu?.author || ''}
         duration={store.actionsMenu?.duration || ''}
+        type="video"
         context={{
           src: 'queue', /* only for invoking  humbnail  cropping*/
           id: '1'
@@ -70,7 +72,7 @@ export default function() {
             }}
           ></i>
           <i aria-label={t('collection_selector_add_to')}>
-            <CollectionSelector close={closeDialog} data={[store.actionsMenu as CollectionItem]} />
+            <CollectionSelector close={closeDialog} data={[store.actionsMenu as TrackItem]} />
           </i>
         </li>
 
@@ -94,11 +96,26 @@ export default function() {
         </li>
 
         <li tabindex="3" onclick={async () => {
-          if (navStore.queue.state)
-            navStore.queue.ref?.scrollIntoView();
-          else setNavStore('queue', 'state', true);
-          getList('RD' + store?.actionsMenu?.id, 'mix');
+          const id = store.actionsMenu?.id;
+          if (!id) return;
+
+          setQueueStore('isLoading', true);
           closeDialog();
+          import('@lib/modules/getMixes')
+            .then(mod => mod.default([id]))
+            .then(data => {
+              setQueueStore('list', []);
+              addToQueue(data);
+              if (navStore.queue.state)
+                navStore.queue.ref?.scrollIntoView();
+              else setNavStore('queue', 'state', true);
+            })
+            .catch(e => {
+              setStore('snackbar', e instanceof Error ? e.message : 'Unknown error');
+            })
+            .finally(() => {
+              setQueueStore('isLoading', false);
+            });
         }}>
           <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
         </li>
@@ -122,12 +139,12 @@ export default function() {
             closeDialog();
           }
         }}>
-          <i class={isDownloading() ? "ri-loader-3-line" : "ri-download-2-fill"}></i>
+          <i class={isDownloading() ? "ri-loader-3-line loading-spinner" : "ri-download-2-fill"}></i>
           {t(isDownloading() ? 'actions_menu_downloading' : 'actions_menu_download')}
         </li>
 
         <li tabindex="5" onclick={() => {
-          const { author, authorId } = store.actionsMenu as CollectionItem;
+          const { author, authorId } = store.actionsMenu as TrackItem;
 
           if (author)
             setListStore('name',

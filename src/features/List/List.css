@@ -1,13 +1,5 @@
-#listSection>header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background:
-    linear-gradient(to right, var(--trueBg), transparent, var(--trueBg)),
-    linear-gradient(var(--trueBg), transparent);
-  backdrop-filter: blur(var(--size-px-3));
-
-  >p {
+#listSection > header {
+  > p {
     overflow: clip;
     text-overflow: ellipsis;
   }
@@ -17,7 +9,7 @@
     flex-direction: column-reverse;
   }
 
-  &~li {
+  & ~ li {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -28,20 +20,12 @@
   margin-bottom: var(--size-fluid-6);
 }
 
-#viewOnYTBtn,
-#subscribeListBtn {
-  i {
-    &:after {
-      content: attr(data-state);
-      font-family: inherit;
-    }
-  }
-}
-
 .markBar {
   i {
     font-size: var(--font-size-3);
     padding: var(--size-1);
+    border-radius: var(--roundness);
+    cursor: pointer;
 
     &:hover {
       background-color: var(--onBg2);
@@ -62,11 +46,7 @@
 
 .marked {
   filter: invert();
-
-  img {
-    filter: invert();
-  }
-
+  img { filter: invert(); }
 }
 
 .list-thumbnail {
@@ -77,7 +57,6 @@
   width: 100%;
 
   &:has(>img) {
-
     .listContainer {
       border-radius: var(--roundness);
       overflow: hidden;
@@ -98,16 +77,6 @@
   }
 }
 
-#collectionSelector {
-  font-weight: inherit;
-  font-size: inherit;
-  margin: 0;
-  appearance: none;
-  background: transparent;
-  padding: 0;
-  color: inherit;
-}
-
 .albums-carousel {
   display: flex;
   overflow: auto;
@@ -123,7 +92,5 @@
     margin: 0;
     background-color: transparent;
     border: none;
-
   }
-
 }

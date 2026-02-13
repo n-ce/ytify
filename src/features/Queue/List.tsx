@@ -51,6 +51,7 @@ export default function() {
             author={item.author}
             duration={item.duration}
             authorId={item.authorId}
+            type="video"
             draggable={config.manualOrdering}
             removeMode={queueStore.removeMode}
             context={{

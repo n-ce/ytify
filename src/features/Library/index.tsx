@@ -2,12 +2,13 @@ import { For, Show, lazy, onMount, createSignal } from "solid-js";
 import './Library.css';
 import Collections from "./Collections";
 import SubLists from "./SubLists";
-import { getLibraryAlbums, generateImageUrl, getThumbIdFromLink, drawer, config } from "@lib/utils";
-import { t, setListStore, setNavStore, store } from "@lib/stores";
+import { getLibraryAlbums, config } from "@lib/utils";
+import { t, setNavStore, store } from "@lib/stores";
 import ListItem from "@components/ListItem";
 import Dropdown from "./Dropdown";
 
 const Gallery = lazy(() => import('./Gallery'));
+const SubFeed = lazy(() => import('./SubFeed'));
 
 const NewAlbums = () => {
   const newAlbums = getLibraryAlbums();
@@ -18,9 +19,9 @@ const NewAlbums = () => {
     return {
       type: 'playlist',
       name: album.name,
-      uploaderName: album.artist,
-      url: `/playlist/` + albumId,
-      thumbnail: album.thumbnail
+      author: album.author,
+      id: albumId,
+      img: album.img
     };
   });
 
@@ -35,14 +36,11 @@ const NewAlbums = () => {
           <For each={array}>
             {(item) =>
               <ListItem
-                stats={''}
-                title={item.name}
-                url={item.url}
-                thumbnail={generateImageUrl(
-                  getThumbIdFromLink(
-                    item.thumbnail
-                  ), '')}
-                uploaderData={item.uploaderName}
+                name={item.name}
+                id={item.id}
+                img={item.img}
+                author={item.author}
+                type='album'
               />
             }
           </For>
@@ -55,6 +53,7 @@ const NewAlbums = () => {
 
 export default function() {
   const [showGallery, setShowGallery] = createSignal(false);
+  const [showSubFeed, setShowSubFeed] = createSignal(false);
   let libraryRef!: HTMLElement;
   let syncBtn!: HTMLElement;
 
@@ -65,7 +64,7 @@ export default function() {
 
   return (
     <section class="library" ref={libraryRef}>
-      <header>
+      <header class="sticky-bar">
         <p>{t('nav_library')}</p>
 
         <div class="right-group">
@@ -74,7 +73,7 @@ export default function() {
               id="syncNow"
               classList={{
                 'ri-cloud-fill': store.syncState === 'synced',
-                'ri-loader-3-line': store.syncState === 'syncing',
+                'ri-loader-3-line loading-spinner': store.syncState === 'syncing',
                 'ri-cloud-off-fill': store.syncState === 'dirty' || store.syncState === 'error',
                 'error': store.syncState === 'error',
               }}
@@ -95,14 +94,10 @@ export default function() {
 
           <i
             aria-label={t('hub_subfeed')}
-            class="ri-tv-fill"
+            class={`ri-tv-${showSubFeed() ? 'fill' : 'line'}`}
             onclick={() => {
-              const subfeedItems = drawer.subfeed || [];
-              setListStore({
-                name: t('hub_subfeed'),
-                list: subfeedItems as CollectionItem[],
-              });
-              setNavStore('list', 'state', true);
+              setShowSubFeed(!showSubFeed());
+              if (showSubFeed()) setShowGallery(false);
             }}
           ></i>
 
@@ -110,7 +105,10 @@ export default function() {
             aria-label={t('hub_gallery')}
             class="ri-user-heart-line"
             classList={{ 'ri-user-heart-fill': showGallery() }}
-            onclick={() => setShowGallery(!showGallery())}
+            onclick={() => {
+              setShowGallery(!showGallery());
+              if (showGallery()) setShowSubFeed(false);
+            }}
           ></i>
         </div>
 
@@ -119,6 +117,9 @@ export default function() {
 
       <Show when={showGallery()}>
         <Gallery />
+      </Show>
+      <Show when={showSubFeed()}>
+        <SubFeed />
       </Show>
       <Collections />
       <br />

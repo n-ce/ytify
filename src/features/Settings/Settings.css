@@ -1,23 +1,23 @@
 .settingsSection {
   header {
-
     .ri-close-large-line {
       margin-right: calc(var(--size-7) + var(--size-1));
       margin-top: var(--size-0);
     }
   }
 
-  >div {
+  > div {
     width: 100%;
     margin-bottom: var(--size-8);
 
-    >span {
+    > span {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
       margin: 0 auto;
       padding: var(--size-2) 0;
+      transition: background-color 0.2s;
 
       &:hover {
         background-color: var(--onBg);
@@ -32,7 +32,5 @@
         text-align: right;
       }
     }
-
   }
-
 }

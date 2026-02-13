@@ -65,6 +65,7 @@ export default function() {
               author={item.author}
               duration={item.duration}
               authorId={item.authorId}
+              type="video"
               context={{
                 src: 'search',
                 id: searchText()
@@ -111,7 +112,7 @@ export default function() {
               .map(id => tracks[id]);
             setListStore({
               name: t('hub_frequently_played'),
-              list: frequentlyPlayedItems as CollectionItem[],
+              list: frequentlyPlayedItems as YTItem[],
             });
             setNavStore('list', 'state', true);
           }}
@@ -125,7 +126,7 @@ export default function() {
             const discoveryItems = drawer.discovery || [];
             setListStore({
               name: t('hub_discovery'),
-              list: discoveryItems as CollectionItem[],
+              list: discoveryItems as YTItem[],
             });
             setNavStore('list', 'state', true);
           }}

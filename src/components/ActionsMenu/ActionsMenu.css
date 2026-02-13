@@ -7,23 +7,17 @@
   background: rgb(from var(--onBg) r g b / 0.8);
   backdrop-filter: blur(var(--size-px-2));
   overflow: auto;
-  animation: var(--animation-slide-out-down) forwards;
+  animation: var(--animation-slide-out-down);
 
-  >.streamItem {
+  > .streamItem {
     margin: 0;
     pointer-events: none;
-
-    .ri-more-2-fill {
-      display: none;
-    }
+    border: none;
+    .ri-more-2-fill { display: none; }
   }
 
-  &[open],
-  &:open {
-    animation: var(--animation-slide-in-up) forwards;
-  }
-
-  &:open {
+  &[open], &:open {
+    animation: var(--animation-slide-in-up);
     animation-duration: 0.3s;
   }
 
@@ -34,27 +28,18 @@
   @media(orientation:landscape) {
     margin-right: var(--size-fluid-2);
     width: max-content;
-    animation: var(--animation-slide-out-right) forwards;
-
-    &[open],
-    &:open {
-      animation: var(--animation-slide-in-left) forwards;
-    }
-
+    animation: var(--animation-slide-out-right);
+    &[open], &:open { animation: var(--animation-slide-in-left); }
   }
 
   &::backdrop {
     background-color: var(--blurMix);
-    margin: 0;
-    padding: 0;
     backdrop-filter: blur(var(--size-px-1));
   }
-
 
   ul {
     list-style: none;
     padding: 0;
-    width: auto;
     display: grid;
   }
 
@@ -69,9 +54,9 @@
     gap: var(--gap);
     padding: var(--size-1) var(--size-5);
     border-top: var(--border);
+    transition: background-color 0.2s;
 
     &:hover {
-      border: var(--border);
       background: var(--onBg2);
       color: var(--text2);
     }
@@ -80,7 +65,6 @@
       font-size: var(--font-size-3);
       font-weight: var(--font-weight-3);
     }
-
   }
 
   .clxnShelf {
@@ -106,8 +90,5 @@
         color: inherit !important;
       }
     }
-
   }
-
-
 }

@@ -6,7 +6,7 @@ const storeInit: {
   useSaavn: boolean,
   api: string,
   updater?: () => void,
-  actionsMenu?: CollectionItem & { albumId?: string },
+  actionsMenu?: TrackItem & { albumId?: string },
   snackbar?: string,
   syncState?: SyncState,
 } = {

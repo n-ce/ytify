@@ -1,6 +1,5 @@
 import { Show, createEffect, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary } from '@lib/utils/library';
-import { getThumbIdFromLink } from '@lib/utils/image';
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary, getCollection } from '@lib/utils/library';
 import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavStore, setListStore, setQueueStore } from '@lib/stores';
 import { importList, shareCollection } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
@@ -37,8 +36,9 @@ export default function Dropdown(_: {
       } else {
         const albumData: Album = {
           name: listStore.name,
-          artist: listStore.uploader,
-          thumbnail: getThumbIdFromLink(listStore.thumbnail),
+          author: listStore.author,
+          img: listStore.img,
+          id: listStore.id,
           tracks: listStore.list.map(t => t.id)
         };
         saveAlbumToLibrary(listStore.id, albumData, listStore.list); // Use listStore.id (album browseId) for saving
@@ -48,7 +48,7 @@ export default function Dropdown(_: {
     }
 
     // Existing playlist/channel logic
-    const { name, type, id, uploader, thumbnail } = listStore;
+    const { name, type, id, author, img } = listStore;
     if (type === 'collection') return;
 
     let data = getLists(type as 'channels' | 'playlists');
@@ -62,11 +62,11 @@ export default function Dropdown(_: {
         {
           id,
           name,
-          thumbnail: getThumbIdFromLink(thumbnail)
+          img
         } as Playlist;
 
       if (type === 'playlists')
-        dataset.uploader = uploader;
+        dataset.author = author;
 
       data.push(dataset);
     }
@@ -169,7 +169,7 @@ export default function Dropdown(_: {
           </li>
 
           <li id="exportCollectionBtn" onclick={() => {
-            const collectionData: CollectionItem[] = getCollectionItems(listStore.id);
+            const collectionData: TrackItem[] = getCollectionItems(listStore.id);
             console.log(collectionData);
             const jsonString = JSON.stringify(collectionData, null, 2);
             navigator.clipboard.writeText(jsonString)
@@ -183,9 +183,27 @@ export default function Dropdown(_: {
             <i class="ri-export-line"></i>{t('list_export')}
           </li>
 
-          <li id="radioCollectionBtn">
-            <i class="ri-radio-line"></i>{t("list_radio")}
-          </li>
+          <Show when={!listStore.reservedCollections.includes(listStore.id)}>
+            <li id="radioCollectionBtn" onclick={async () => {
+              const seedIds = getCollection(listStore.id).slice(0, 20);
+              if (seedIds.length === 0) return;
+
+              setQueueStore('isLoading', true);
+              try {
+                const getMixes = (await import('@lib/modules/getMixes')).default;
+                const data = await getMixes(seedIds);
+                setQueueStore('list', []);
+                addToQueue(data);
+                setNavStore('queue', 'state', true);
+              } catch (e) {
+                setStore('snackbar', e instanceof Error ? e.message : 'Unknown error');
+              } finally {
+                setQueueStore('isLoading', false);
+              }
+            }}>
+              <i class="ri-radio-line"></i>{t("list_radio")}
+            </li>
+          </Show>
 
           <li
             id="sortCollectionBtn"

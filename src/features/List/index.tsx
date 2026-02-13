@@ -2,7 +2,7 @@ import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid
 import './List.css';
 import Sortable, { type SortableEvent } from 'sortablejs';
 import { addToQueue, listStore, resetList, setListStore, setNavStore, t } from '@lib/stores';
-import { fetchCollection, getLists, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
+import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config, drawer } from '@lib/utils/config';
 import { generateImageUrl, getThumbIdFromLink } from '@lib/utils';
 import Dropdown from './Dropdown';
@@ -92,7 +92,7 @@ export default function() {
           class="ri-list-check-2"
           onclick={() => {
 
-            const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[];
+            const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as TrackItem[];
 
             if (listToEnqueue.length) {
               addToQueue(listToEnqueue);
@@ -103,7 +103,7 @@ export default function() {
         ></i>
 
         <i aria-label={t('collection_selector_add_to')}>
-          <CollectionSelector data={markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as CollectionItem[]
+          <CollectionSelector data={markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as TrackItem[]
           } />
         </i>
       </Show>
@@ -112,7 +112,7 @@ export default function() {
 
   return (
     <section ref={listSection} id="listSection">
-      <header>
+      <header class="sticky-bar">
         <Show
           when={!markMode()}
           fallback={<MarkBar />}>
@@ -165,30 +165,18 @@ export default function() {
         </span>
 
       </Show>
-      <Show when={listStore.name == 'Sub Feed'}>
-        <div class="albums-carousel">
-          <For each={getLists('channels')}>
-            {(channel) => (
-              <ListItem
-                title={channel.name}
-                stats={''}
-                thumbnail={generateImageUrl(getThumbIdFromLink(channel.thumbnail), '')}
-                uploaderData={''}
-                url={`/channel/${channel.id}`}
-              />)}
-          </For>
-        </div>
-      </Show>
+
       <Show when={listStore.name.startsWith('Artist') && listStore.artistAlbums?.length}>
         <div class="albums-carousel">
           <For each={listStore.artistAlbums}>
             {(album) => (
               <ListItem
-                title={album.title}
-                stats={album.subtitle}
-                thumbnail={generateImageUrl(getThumbIdFromLink(album.thumbnail), '')}
-                uploaderData={listStore.name.replace('Artist - ', '')}
-                url={`/playlist/${album.id}`}
+                name={album.name}
+                year={album.year}
+                img={generateImageUrl(getThumbIdFromLink(album.img), '')}
+                author={listStore.name.replace('Artist - ', '')}
+                id={album.id}
+                type='album'
               />
             )}
           </For>
@@ -196,7 +184,7 @@ export default function() {
       </Show>
 
       <Show when={config.loadImage && listStore.name.startsWith('Album')}>
-        <img src={listStore.thumbnail.replace('w=360', 'w=720')} alt={listStore.name} class="list-thumbnail" />
+        <img src={generateImageUrl(listStore.img, '720')} alt={listStore.name} class="list-thumbnail" />
       </Show>
 
       <Results

@@ -46,12 +46,12 @@ export function setConfig<K extends
 
 export let drawer = {
   recentSearches: [] as string[],
-  lastUsedQueueAction: '',
-  discovery: [] as (CollectionItem & { frequency: number })[],
+  discovery: [] as (YTItem & { frequency: number })[],
   userArtists: [] as Channel[],
   relatedPlaylists: [] as Playlist[],
   relatedArtists: [] as Channel[],
-  subfeed: [] as CollectionItem[],
+  subfeed: [] as YTItem[],
+  standby: [] as TrackItem[],
   lastMainFeature: 'search' as 'search' | 'library',
   libraryPlays: {} as Record<string, number>,
 }

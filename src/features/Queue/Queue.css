@@ -1,20 +1,8 @@
-.queueSection>header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background:
-    linear-gradient(to right, var(--trueBg), transparent, var(--trueBg)),
-    linear-gradient(var(--trueBg), transparent);
-  backdrop-filter: blur(var(--size-px-3));
-
-}
-
 .queuetools {
   z-index: 20;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-
   list-style: none;
   padding: var(--size-1);
   gap: var(--size-1);
@@ -46,40 +34,20 @@
     gap: var(--size-1);
     border: none;
 
-    &.on {
-      --liBg: var(--text2);
-    }
-
-    &:hover {
-      text-decoration: underline dotted;
-    }
-
-    &:last-child {
-      grid-column: span 2;
-    }
-
+    &.on { --liBg: var(--text2); }
+    &:hover { text-decoration: underline dotted; }
+    &:last-child { grid-column: span 2; }
   }
-
 }
 
 #queuelist {
   margin-bottom: var(--size-fluid-6);
-
-  a.delete {
-
-    background-color: color-mix(in srgb, #f22, var(--onBg) 80%);
-    color: color-mix(in srgb, #f22, var(--text) 80%);
-
-  }
-
 }
-
-
 
 .standby-article {
   margin-bottom: var(--size-10);
 
-  >p.standby-header {
+  > p.standby-header {
     display: inline-block;
     font-size: var(--font-size-3);
     font-weight: var(--font-weight-4);
@@ -89,7 +57,7 @@
     width: calc(100% - var(--size-8));
   }
 
-  >i {
+  > i {
     font-size: var(--font-size-3);
     cursor: pointer;
     padding: var(--size-1) var(--size-2);

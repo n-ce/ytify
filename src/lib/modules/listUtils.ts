@@ -17,7 +17,7 @@ export function importList() {
   setStore('snackbar', t('list_imported', listTitle));
 }
 
-export function shareCollection(data: CollectionItem[]) {
+export function shareCollection(data: TrackItem[]) {
   setListStore('isLoading', true);
 
   fetch(location.origin + '/ss', {

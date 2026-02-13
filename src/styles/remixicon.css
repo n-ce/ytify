@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url("./remixicon.woff2") format("woff2");
+  src: url('/remixicon.woff2');
   font-display: swap;
 }
 
@@ -18,7 +18,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 .ri-compass-3-fill:before {
   content: "\ebbd";
@@ -270,4 +269,8 @@
 
 .ri-user-3-line:before {
   content: "\f256";
+}
+
+.ri-tv-line:before {
+  content: "\f237";
 }

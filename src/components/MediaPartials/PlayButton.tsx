@@ -6,7 +6,7 @@ export default function() {
     playing: 'ri-pause-circle-fill',
     none: 'ri-stop-circle-fill',
     paused: 'ri-play-circle-fill',
-    loading: 'ri-loader-3-line'
+    loading: 'ri-loader-3-line loading-spinner'
   }
 
   return (

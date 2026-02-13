@@ -1,5 +1,5 @@
 import { For, Show } from "solid-js";
-import { generateImageUrl, getLists, getThumbIdFromLink } from "@lib/utils";
+import { getLists } from "@lib/utils";
 import { t } from "@lib/stores";
 import ListItem from "@components/ListItem";
 
@@ -34,9 +34,9 @@ export default function(_: {
     array.push({
       type: type.slice(0, -1),
       name: name.slice(len),
-      uploaderName: (pl as Playlist).uploader,
-      url: `/${type === 'channels' ? 'channel' : 'playlist'}/` + pl.id,
-      thumbnail: pl.thumbnail
+      img: pl.img,
+      author: (pl as Playlist).author,
+      id: pl.id
     });
 
   }
@@ -59,14 +59,11 @@ export default function(_: {
           <For each={array}>
             {(item) =>
               <ListItem
-                stats={''}
-                title={item.name}
-                url={item.url}
-                thumbnail={generateImageUrl(
-                  getThumbIdFromLink(
-                    item.thumbnail
-                  ), '')}
-                uploaderData={item.uploaderName}
+                name={item.name}
+                id={item.id}
+                img={item.img}
+                author={item.author}
+                type='album'
               />
             }
           </For>

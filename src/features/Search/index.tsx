@@ -27,7 +27,7 @@ export default function() {
 
   return (
     <section class="search" ref={searchRef}>
-      <header>
+      <header class="sticky-bar">
         <p>{t('nav_search')}</p>
 
         <div class="right-group">

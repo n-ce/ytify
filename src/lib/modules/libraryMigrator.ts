@@ -57,7 +57,7 @@ export default function migrateLibrary() {
               report.skipped++;
               continue;
             }
-            discovery.push({ id, author, title, duration: typeof duration === 'number' ? convertSStoHHMMSS(duration) : duration, frequency, authorId: channelUrl.slice(9) })
+            discovery.push({ id, author, title, duration: typeof duration === 'number' ? convertSStoHHMMSS(duration) : duration, frequency, authorId: channelUrl.slice(9), type: 'video' })
             report.discover++;
           }
           setDrawer('discovery', discovery);
@@ -90,7 +90,7 @@ export default function migrateLibrary() {
               const item = collectionData[id] as CollectionItemV1;
 
               if (item && typeof item.id === 'string' && typeof item.title === 'string' && item.id.length === 11) {
-                const newItem: CollectionItem = {
+                const newItem: TrackItem = {
                   id: item.id,
                   title: item.title,
                   author: item.author || 'Unknown',
@@ -128,7 +128,7 @@ export default function migrateLibrary() {
 
               // Ensure item is a valid CollectionItem and omit 'lastUpdated'
               if (item && typeof item.id === 'string' && typeof item.title === 'string' && item.id.length === 11) {
-                const newItem: CollectionItem = {
+                const newItem: TrackItem = {
                   id: item.id,
                   title: item.title,
                   author: item.author || 'Unknown',

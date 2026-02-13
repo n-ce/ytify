@@ -1,17 +1,11 @@
-import { config, hostResolver } from '@lib/utils';
+import { config, hostResolver, generateImageUrl } from '@lib/utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
 import { getList, setListStore } from '@lib/stores';
 
-export default function(data: {
-  title: string,
-  stats: string,
-  thumbnail: string,
-  uploaderData: string,
-  url: string,
-}) {
+export default function(data: YTListItem) {
 
-  const [getThumbnail, setThumbnail] = createSignal(data.thumbnail);
+  const [getThumbnail, setThumbnail] = createSignal(generateImageUrl(data.img, ''));
   let img!: HTMLImageElement;
 
   function unravel() {
@@ -22,23 +16,18 @@ export default function(data: {
     setThumbnail('/logo192.png');
   }
 
+  const url = `/${data.type}/${data.id}`;
+  const uploaderData = (data as YTPlaylistItem | YTAlbumItem).author || '';
+  const stats = (data as YTChannelItem | YTArtistItem).subscribers || (data as YTChannelItem | YTPlaylistItem).videoCount || (data as YTAlbumItem).year || '';
+
   return (
     <a
-      class={'listItem ' + (config.loadImage ? 'ravel' : '')}
-      href={hostResolver(data.url)}
+      class={'listItem card card--interactive ' + (config.loadImage ? 'ravel' : '')}
+      href={hostResolver(url)}
       onclick={(e) => {
         e.preventDefault();
-        setListStore('thumbnail', data.thumbnail);
-
-
-        if (data.url.startsWith('/channel'))
-          getList(data.url.slice(9), 'channel');
-        else if (data.url.includes('MPREb'))
-          getList(data.url.split('/').pop()!, 'album')
-        else if (data.url.startsWith('/playlist')) {
-          getList(data.url.slice(10), 'playlist')
-        }
-        else getList(data.url.slice(8), 'artist');
+        setListStore('img', data.img);
+        getList(data.id, data.type);
       }}
     >
       <Show when={config.loadImage}>
@@ -50,9 +39,9 @@ export default function(data: {
         />
       </Show>
       <div>
-        <p class="title">{data.title}</p>
-        <p class="uData">{data.uploaderData}</p>
-        <p class="stats">{data.stats}</p>
+        <p class="title truncate">{data.name}</p>
+        <p class="uData truncate">{uploaderData}</p>
+        <p class="stats truncate">{stats}</p>
       </div>
     </a >
   );

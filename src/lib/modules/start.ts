@@ -1,5 +1,5 @@
 import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, fetchUma, drawer } from '@lib/utils';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, drawer } from '@lib/utils';
 
 
 
@@ -22,17 +22,6 @@ export default async function() {
   const { shareAction } = config;
 
 
-
-  await fetchUma()
-    .then(data => {
-      setStore({
-        invidious: data,
-        index: 0
-      })
-    })
-    .catch(() => {
-      setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');
-    });
 
   const collection = params.get('collection');
   const shared = params.get('si');
@@ -57,7 +46,11 @@ export default async function() {
   const isPWA = idFromURL(params.get('url') || params.get('text'));
   const id = params.get('s') || isPWA;
 
+  if (!id) fetchUma();
+
   if (id) {
+    await fetchUma();
+
     if (isPWA && shareAction === 'watch') {
       setPlayerStore('stream', 'id', id);
       setPlayerStore('isWatching', true);
@@ -110,4 +103,37 @@ export default async function() {
     });
 
   cleanseLibraryData();
+
+
+
+  async function fetchUma(): Promise<void> {
+    return fetch('https://raw.githubusercontent.com/n-ce/Uma/main/iv.txt')
+      .then(res => res.text())
+      .then(text => {
+        let decompressedString = text;
+        const decodePairs: Record<string, string> = {
+          '$': 'invidious',
+          '&': 'inv',
+          '#': 'iv',
+          '~': 'com'
+        }
+
+        for (const code in decodePairs) {
+          const safeCode = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(safeCode, 'g');
+          decompressedString = decompressedString.replace(regex, decodePairs[code]);
+        }
+        return decompressedString.split(',').map(i => `https://${i}`);
+      })
+      .then(data => {
+        setStore({
+          invidious: data,
+          index: 0
+        });
+      })
+      .catch(() => {
+        setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');
+      });
+  }
+
 }

@@ -1,4 +1,3 @@
-import './NavBar.css';
 import { navStore, setNavStore, t } from '@lib/stores';
 import { setDrawer } from '@lib/utils';
 

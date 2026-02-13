@@ -1,38 +1,58 @@
-import { For, Show, createSignal } from "solid-js";
-import { updateGallery } from "@lib/modules/hub";
-import { drawer, setDrawer, generateImageUrl, getThumbIdFromLink } from "@lib/utils";
+import { For, Show, createSignal, onMount } from "solid-js";
+import { drawer, setDrawer, getTracksMap, getCollection } from "@lib/utils";
 import ListItem from "@components/ListItem";
-import { t } from "@lib/stores";
+import { t, store } from "@lib/stores";
 
-export default function Gallery() {
+export default function() {
   const [gallery, setGallery] = createSignal({
-    userArtists: drawer.userArtists,
-    relatedArtists: drawer.relatedArtists,
-    relatedPlaylists: drawer.relatedPlaylists
+    userArtists: drawer.userArtists || [],
+    relatedArtists: drawer.relatedArtists || [],
+    relatedPlaylists: drawer.relatedPlaylists || []
   });
   const [isGalleryLoading, setIsGalleryLoading] = createSignal(false);
 
-  const handleGalleryRefresh = () => {
-    setIsGalleryLoading(true);
-    updateGallery().then(() => {
-      setGallery({
-        userArtists: drawer.userArtists,
-        relatedArtists: drawer.relatedArtists,
-        relatedPlaylists: drawer.relatedPlaylists
-      });
-      setIsGalleryLoading(false);
-    });
-  };
+  const updateGallery = async () => {
+    const tracksMap = getTracksMap();
+    const tracks = getCollection('favorites')
+      .map(id => tracksMap[id])
+      .filter(Boolean);
+    const artistCounts: Record<string, number> = {};
 
-  const handleClearGallery = () => {
-    setDrawer('relatedArtists', []);
-    setDrawer('relatedPlaylists', []);
-    setDrawer('userArtists', []);
-    setGallery({
-      userArtists: [],
-      relatedArtists: [],
-      relatedPlaylists: []
-    });
+    tracks
+      .filter(track => track.author?.endsWith(' - Topic'))
+      .forEach(track => {
+        if (track.authorId) {
+          artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
+        }
+      });
+
+    const sortedArtists = Object.entries(artistCounts)
+      .filter(a => a[1] > 1)
+      .sort(([, a], [, b]) => b - a);
+
+    const artistIds = sortedArtists.map(([id]) => id);
+
+    if (artistIds.length < 2) {
+      setDrawer('relatedArtists', []);
+      setDrawer('relatedPlaylists', []);
+      setDrawer('userArtists', []);
+      setGallery({ userArtists: [], relatedArtists: [], relatedPlaylists: [] });
+      return;
+    }
+
+    setIsGalleryLoading(true);
+    try {
+      const res = await fetch(`${store.api}/api/gallery?id=${artistIds.join(',')}`);
+      const data = await res.json() as { userArtists: Channel[], relatedArtists: Channel[], relatedPlaylists: Playlist[] };
+      setDrawer('userArtists', data.userArtists);
+      setDrawer('relatedArtists', data.relatedArtists);
+      setDrawer('relatedPlaylists', data.relatedPlaylists);
+      setGallery(data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsGalleryLoading(false);
+    }
   };
 
   const shuffle = <T,>(array: T[]): T[] => {
@@ -45,74 +65,62 @@ export default function Gallery() {
     return newArray;
   };
 
+  onMount(() => {
+    if (gallery().userArtists.length === 0) {
+      updateGallery();
+    }
+  });
+
   return (
     <article class="gallery-article">
-      <p>{t('hub_gallery')}</p>
-      <i
-        aria-label={t('hub_refresh')}
-        aria-busy={isGalleryLoading()}
-        classList={{ 'ri-refresh-line': true, 'loading': isGalleryLoading() }}
-        onclick={handleGalleryRefresh}
-      ></i>
-      <i
-        aria-label={t('hub_clear')}
-        class="ri-delete-bin-2-line"
-        onclick={handleClearGallery}
-      ></i>
-      <div class="userArtists">
-        <Show
-          when={gallery().userArtists?.length > 0}
-          fallback={t('hub_gallery_fallback')}
-        >
-          <For each={shuffle(gallery().userArtists.filter(item => item.id && item.name && item.thumbnail))}>
-            {(item) => (
-              <ListItem
-                stats={''}
-                title={item.name}
-                url={`/artist/${item.id}`}
-                thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                uploaderData={''}
-              />
-            )}
-          </For>
-        </Show>
-      </div>
-      <div class="relatedArtists">
-        <Show
-          when={gallery().relatedArtists?.length > 0}
-        >
-          <For each={shuffle(gallery().relatedArtists)}>
-            {(item) => (
-              <ListItem
-                stats={''}
-                title={item.name}
-                url={`/artist/${item.id}`}
-                thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                uploaderData={''}
-              />
-            )}
-          </For>
-        </Show>
-      </div>
+      <Show when={!isGalleryLoading()} fallback={<div class="loading-container"><i class="ri-loader-3-line loading-spinner"></i></div>}>
+        <div class="userArtists">
+          <Show
+            when={gallery().userArtists?.length > 0}
+            fallback={<p class="fallback">{t('hub_gallery_fallback')}</p>}
+          >
+            <For each={shuffle(gallery().userArtists)}>
+              {(item) => (
+                <ListItem
+                  name={item.name}
+                  id={item.id}
+                  type='artist'
+                  img={item.img}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+        <div class="relatedArtists">
+          <Show when={gallery().relatedArtists?.length > 0}>
+            <For each={shuffle(gallery().relatedArtists)}>
+              {(item) => (
+                <ListItem
+                  name={item.name}
+                  id={item.id}
+                  img={item.img}
+                  type='artist'
+                />
+              )}
+            </For>
+          </Show>
+        </div>
 
-      <div class="relatedPlaylists">
-        <Show
-          when={gallery().relatedPlaylists?.length > 0}
-        >
-          <For each={shuffle(gallery().relatedPlaylists)}>
-            {(item) => (
-              <ListItem
-                stats={''}
-                title={item.name}
-                url={`/playlist/${item.id}`}
-                thumbnail={generateImageUrl(getThumbIdFromLink(item.thumbnail), '')}
-                uploaderData={''}
-              />
-            )}
-          </For>
-        </Show>
-      </div>
-
+        <div class="relatedPlaylists">
+          <Show when={gallery().relatedPlaylists?.length > 0}>
+            <For each={shuffle(gallery().relatedPlaylists)}>
+              {(item) => (
+                <ListItem
+                  name={item.name}
+                  id={item.id}
+                  img={item.img}
+                  type='playlist'
+                />
+              )}
+            </For>
+          </Show>
+        </div>
+      </Show>
     </article>
   );
 }

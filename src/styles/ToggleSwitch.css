@@ -6,14 +6,14 @@
   align-items: center;
   background: none;
   border: none;
+  transition: background-color 0.2s;
 
   &:hover {
     background-color: var(--onBg);
+    border-radius: var(--roundness);
   }
 
-  label {
-    width: calc(100% - 2.2rem);
-  }
+  label { width: calc(100% - 2.2rem); }
 
   span {
     cursor: pointer;
@@ -25,12 +25,7 @@
     border: var(--border);
     padding: 0;
 
-
-    &,
-    &:before {
-      height: var(--size-4);
-      transition: 0.3s;
-    }
+    &, &:before { height: var(--size-4); transition: 0.3s; }
 
     &:before {
       content: "";
@@ -41,18 +36,11 @@
       border-radius: calc(var(--roundness) * 0.5);
       display: block;
     }
-
   }
 
-  input {
-    display: none;
-  }
-
-  input:checked+span {
-    background: var(--onBg2);
-  }
-
-  input:checked+span:before {
+  input { display: none; }
+  input:checked + span { background: var(--onBg2); }
+  input:checked + span:before {
     transform: translateX(calc(var(--size-2) + var(--size-1)));
   }
 }

@@ -4,16 +4,7 @@ import { config, hostResolver, player, removeFromCollection, getCollectionItems 
 import { generateImageUrl } from '@lib/utils/image';
 import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore, queueStore } from '@lib/stores';
 
-export default function(data: {
-  id: string,
-  title: string,
-  author?: string,
-  duration: string,
-  uploaded?: string,
-  authorId?: string,
-  views?: string,
-  img?: string,
-  albumId?: string,
+export default function(data: YTItem & {
   draggable?: boolean,
   context?: {
     src: Context,
@@ -73,7 +64,7 @@ export default function(data: {
 
   return (
     <a
-      class='streamItem'
+      class='streamItem card card--interactive'
       classList={{
         'ravel': config.loadImage && !isAlbum,
         'marked': data.mark?.get(data.id),
@@ -133,7 +124,7 @@ export default function(data: {
                 listStore.list;
             const currentIndex = collectionItems.findIndex(item => item.id === data.id);
             if (currentIndex !== -1) {
-              const zigzagQueue: CollectionItem[] = [];
+              const zigzagQueue: TrackItem[] = [];
               let left = currentIndex - 1;
               let right = currentIndex + 1;
               const len = collectionItems.length;
@@ -194,8 +185,8 @@ export default function(data: {
       <div class='metadata'>
         <p class='title'>{data.title}</p>
         <div class='avu'>
-          <p class='author'>{data.author?.replace(' - Topic', '')}</p>
-          <p class='viewsXuploaded'>{(data.views || '') + (data.uploaded ? ' • ' + data.uploaded.replace('Streamed ', '') : '')}</p>
+          <p class='author truncate'>{data.author?.replace(' - Topic', '')}</p>
+          <p class='viewsXuploaded truncate'>{data.subtext}</p>
         </div>
       </div>
       <Show when={data.draggable}>

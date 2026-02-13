@@ -1,26 +1,15 @@
 import { For, onMount, Show, createSignal } from "solid-js";
-import { getCollectionItems, getTracksMap, drawer } from "@lib/utils";
+import { getCollectionItems, getTracksMap, drawer, setDrawer } from "@lib/utils";
 import StreamItem from "@components/StreamItem";
 import { queueStore, setQueueStore, t, filterItemsByConfig } from "@lib/stores";
-import supermix from "@lib/modules/supermix";
 
 export default function Standby() {
   const [isLoading, setIsLoading] = createSignal(false);
 
   const fetchStandby = (force = false) => {
-    if (!force) {
-      const saved = sessionStorage.getItem('standby');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed.length > 0) {
-            setQueueStore('standby', parsed);
-            return;
-          }
-        } catch (e) {
-          console.error('Failed to parse standby from sessionStorage', e);
-        }
-      }
+    if (!force && drawer.standby?.length > 0) {
+      setQueueStore('standby', drawer.standby);
+      return;
     }
 
     const historyIds = getCollectionItems('history').slice(0, 5).map(i => i.id);
@@ -36,26 +25,29 @@ export default function Standby() {
 
     if (seedIds.length > 0) {
       setIsLoading(true);
-      supermix(seedIds).then(mix => {
-        let filteredMix = filterItemsByConfig(mix, { ignoreList: queueStore.list });
+      import('@lib/modules/getMixes')
+        .then(mod => mod.default(seedIds))
+        .then(mix => {
+          let filteredMix = filterItemsByConfig(mix, { ignoreList: queueStore.list });
 
-        const historyItems = getCollectionItems('history');
-        if (historyItems.length > 0) {
-          const lastItem = historyItems[0];
-          const isMusic = lastItem.author?.endsWith(' - Topic');
-          if (isMusic) {
-            filteredMix = filteredMix.filter(item => item.author?.endsWith(' - Topic'));
-          } else {
-            filteredMix = filteredMix.filter(item => !item.author?.endsWith(' - Topic'));
+          const historyItems = getCollectionItems('history');
+          if (historyItems.length > 0) {
+            const lastItem = historyItems[0];
+            const isMusic = lastItem.author?.endsWith(' - Topic');
+            if (isMusic) {
+              filteredMix = filteredMix.filter(item => item.author?.endsWith(' - Topic'));
+            } else {
+              filteredMix = filteredMix.filter(item => !item.author?.endsWith(' - Topic'));
+            }
           }
-        }
 
-        setQueueStore('standby', filteredMix);
-        sessionStorage.setItem('standby', JSON.stringify(filteredMix));
-        setIsLoading(false);
-      }).catch(() => {
-        setIsLoading(false);
-      });
+          setQueueStore('standby', filteredMix);
+          setDrawer('standby', filteredMix as TrackItem[]);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+        });
     }
   };
 
@@ -90,6 +82,7 @@ export default function Standby() {
                 author={item.author}
                 duration={item.duration}
                 authorId={item.authorId}
+                type="video"
                 context={{
                   src: 'standby',
                   id: 'standby'

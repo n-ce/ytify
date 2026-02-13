@@ -37,7 +37,7 @@ export default function(data: RecommendedVideo[]) {
         title: stream.title,
         author: stream.author,
         duration: convertSStoHHMMSS(stream.lengthSeconds)
-      }) as CollectionItem])
+      }) as TrackItem])
   });
 
 }

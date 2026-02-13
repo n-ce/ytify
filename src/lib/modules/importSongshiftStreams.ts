@@ -15,14 +15,14 @@ export default async function(e: File) {
     seed: string,
     src = 'songshift',
     apiIndex = 0
-  ): Promise<CollectionItem & { src: string } | undefined> => await fetch(`${piped[apiIndex]}/search?q=${encodeURIComponent(seed)}&filter=music_songs`)
+  ): Promise<TrackItem & { src: string } | undefined> => await fetch(`${piped[apiIndex]}/search?q=${encodeURIComponent(seed)}&filter=music_songs`)
     .then(res => res.json())
     .then(data => {
       if ('items' in data && data.items.length > 0)
         return data.items[0];
       else throw new Error('insufficient data');
     })
-    .then((metadata: StreamItem) => ({
+    .then((metadata) => ({
       id: metadata.url.substring(9),
       title: metadata.title,
       author: metadata.uploaderName + ' - Topic',
@@ -57,16 +57,16 @@ export default async function(e: File) {
         author: v?.author,
         duration: v?.duration,
         authorId: v?.authorId
-      })) as (CollectionItem & { src: string })[];
+      })) as (TrackItem & { src: string })[];
 
       const groupedBySource = imports.reduce((acc, track) => {
         const { src, ...rest } = track;
         if (!acc[src]) {
           acc[src] = [];
         }
-        acc[src].push(rest as CollectionItem);
+        acc[src].push(rest as TrackItem);
         return acc;
-      }, {} as Record<string, CollectionItem[]>);
+      }, {} as Record<string, TrackItem[]>);
 
       for (const src in groupedBySource)
         addToCollection(src, groupedBySource[src]);

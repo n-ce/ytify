@@ -4,7 +4,7 @@ import { For, Show } from 'solid-js';
 
 export default function(_: {
   close?: () => void,
-  data: CollectionItem[]
+  data: TrackItem[]
 }) {
 
   const handleCollectionChange = (e: Event & { target: HTMLSelectElement }) => {
