@@ -2,13 +2,13 @@
 
 /* --- Header & Navigation --- */
 section:has(header>details[open]) {
-  > *:not(header) {
+  >*:not(header) {
     filter: blur(var(--size-px-1));
     pointer-events: none;
   }
 }
 
-section > header {
+section>header {
   display: flex;
   justify-content: space-between;
   position: relative;
@@ -16,9 +16,11 @@ section > header {
   padding: var(--gap) 0;
   color: var(--text);
 
-  input { display: none; }
+  input {
+    display: none;
+  }
 
-  > p {
+  >p {
     font-size: var(--font-size-3);
     letter-spacing: var(--font-letterspacing-1);
     font-weight: var(--font-weight-5);
@@ -28,7 +30,8 @@ section > header {
     opacity: 0.8;
   }
 
-  > i, div > i {
+  >i,
+  div>i {
     font-size: var(--font-size-4);
     opacity: 0.8;
     padding: 0 var(--size-2);
@@ -49,10 +52,12 @@ section > header {
     display: flex;
     gap: var(--size-2);
 
-    i { font-size: var(--font-size-3); }
+    i {
+      font-size: var(--font-size-3);
+    }
   }
 
-  > .ri-close-large-line {
+  >.ri-close-large-line {
     font-size: var(--font-size-3);
   }
 
@@ -88,7 +93,10 @@ section > header {
       transition: transform 0.3s ease-in;
       cursor: pointer;
 
-      i { margin: auto 0; margin-right: var(--size-2); }
+      i {
+        margin: auto 0;
+        margin-right: var(--size-2);
+      }
     }
 
     ul {
@@ -102,7 +110,9 @@ section > header {
       border-radius: calc(var(--roundness) * 1.3);
       box-shadow: var(--shadow-2);
 
-      input { display: none; }
+      input {
+        display: none;
+      }
 
       li {
         font-size: var(--font-size-1);
@@ -113,8 +123,14 @@ section > header {
         user-select: none;
         cursor: pointer;
 
-        &:last-child { border: none; }
-        i { margin-right: var(--size-1); }
+        &:last-child {
+          border: none;
+        }
+
+        i {
+          margin-right: var(--size-1);
+        }
+
         &:hover {
           background-color: var(--onBg2);
           color: var(--text2);
@@ -124,97 +140,6 @@ section > header {
   }
 }
 
-/* --- NavBar --- */
-nav {
-  display: flex;
-  width: 100%;
-  margin: auto 0;
-
-  i {
-    font-size: var(--font-size-3);
-    padding: 0 var(--size-2);
-    opacity: 0.5;
-    flex-grow: 1;
-    flex-basis: 0;
-    text-align: center;
-    color: var(--text);
-    height: var(--size-7);
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-  }
-
-  .on {
-    opacity: 1;
-    color: var(--text2);
-    font-weight: var(--font-weight-7);
-  }
-
-  @media(orientation:landscape) {
-    :root:has(#playerSection) & {
-      flex-direction: column;
-      width: auto;
-      height: auto;
-      margin: 0;
-
-      i {
-        padding: var(--size-3) var(--size-2);
-        width: 100%;
-        flex-grow: 0;
-        height: auto;
-      }
-    }
-  }
-}
-
-/* --- Footer & MiniPlayer Container --- */
-footer {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  bottom: var(--height);
-  z-index: 2;
-  width: 100dvmin;
-  --height: var(--size-8);
-  height: var(--height);
-  background: linear-gradient(rgb(from var(--onBg) r g b / 0.4), var(--trueBg));
-  backdrop-filter: blur(var(--size-px-4));
-  border-top-left-radius: var(--roundness);
-  border-top-right-radius: var(--roundness);
-  box-shadow: var(--shadow-2);
-  overflow: hidden;
-
-  &:has(.miniplayer) {
-    --height: calc(var(--size-9) + var(--size-7));
-
-    @media(orientation:portrait) {
-      border-top: var(--border);
-      img { height: var(--size-8); margin-left: var(--size-1); }
-    }
-  }
-
-  @media(orientation:landscape) {
-    margin: 0 auto;
-    border: var(--border);
-    border-bottom: none;
-
-    :root:has(#playerSection) & {
-      position: fixed;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: auto;
-      height: auto;
-      bottom: unset;
-      background: none;
-      backdrop-filter: none;
-      border: none;
-      border-radius: 0;
-      z-index: 100;
-      box-shadow: none;
-      margin: 0;
-    }
-  }
-}
 
 /* --- Main content area & Sections --- */
 main {
@@ -238,18 +163,19 @@ main {
   }
 
   @media(orientation:landscape) {
-    section:first-child { padding-left: var(--size-fluid-5); }
-    section:last-child { padding-right: var(--size-fluid-5); }
+    section:first-child {
+      padding-left: var(--size-fluid-5);
+    }
+
+    section:last-child {
+      padding-right: var(--size-fluid-5);
+    }
 
     section:only-child {
-      .hub {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--gap);
-      }
 
       &:has(>img) {
         overflow: initial !important;
+
         .list-thumbnail {
           display: inline-block;
           height: calc(100% - var(--size-12));
@@ -257,6 +183,7 @@ main {
           margin-right: var(--gap);
           vertical-align: middle;
         }
+
         .listContainer {
           height: calc(100% - var(--size-10));
           width: calc(100% - var(--size-13));
@@ -267,16 +194,19 @@ main {
         }
       }
 
-      .searchlist, .listContainer {
+      .searchlist,
+      .listContainer {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: var(--gap);
+
         .streamItem {
           display: inline-flex;
           width: 100%;
           grid-column: span 2;
           margin: 0;
         }
+
         .listItem {
           width: 100%;
           grid-column: span 1;
@@ -306,5 +236,7 @@ dialog {
     margin-left: calc(100dvw / 3);
   }
 
-  &::backdrop { background: none; }
+  &::backdrop {
+    background: none;
+  }
 }

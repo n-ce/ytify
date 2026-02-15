@@ -7,18 +7,21 @@
   background: rgb(from var(--onBg) r g b / 0.8);
   backdrop-filter: blur(var(--size-px-2));
   overflow: auto;
-  animation: var(--animation-slide-out-down);
 
-  > .streamItem {
+  >.streamItem {
     margin: 0;
     pointer-events: none;
     border: none;
-    .ri-more-2-fill { display: none; }
+    max-width: 100dvmin;
+
+    .ri-more-2-fill {
+      display: none;
+    }
   }
 
-  &[open], &:open {
+  &[open],
+  &:open {
     animation: var(--animation-slide-in-up);
-    animation-duration: 0.3s;
   }
 
   @media(orientation:portrait) {
@@ -28,8 +31,12 @@
   @media(orientation:landscape) {
     margin-right: var(--size-fluid-2);
     width: max-content;
-    animation: var(--animation-slide-out-right);
-    &[open], &:open { animation: var(--animation-slide-in-left); }
+
+    &[open],
+    &:open {
+      animation: var(--animation-slide-in-left);
+    }
+
   }
 
   &::backdrop {

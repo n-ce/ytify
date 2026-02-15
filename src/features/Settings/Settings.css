@@ -6,18 +6,23 @@
     }
   }
 
-  > div {
+  >div {
     width: 100%;
     margin-bottom: var(--size-8);
 
-    > span {
+    >span {
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
       margin: 0 auto;
-      padding: var(--size-2) 0;
+      padding: 0;
       transition: background-color 0.2s;
+      font-weight: var(--font-weight-5);
+
+      i {
+        font-size: var(--font-size-5);
+      }
 
       &:hover {
         background-color: var(--onBg);
@@ -28,6 +33,7 @@
         font-size: inherit;
         font-weight: var(--font-weight-5);
         padding: 0 var(--size-2);
+        margin: var(--size-3) 0;
         max-width: 50%;
         text-align: right;
       }

@@ -7,7 +7,7 @@
 
 @font-face {
   font-family: "remixicon";
-  src: url('/remixicon.woff2');
+  src: url("/remixicon.woff2") format("woff2");
   font-display: swap;
 }
 
@@ -273,4 +273,12 @@
 
 .ri-tv-line:before {
   content: "\f237";
+}
+
+.ri-toggle-line:before {
+  content: "\f219";
+}
+
+.ri-toggle-fill:before {
+  content: "\f218";
 }

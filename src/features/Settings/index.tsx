@@ -1,10 +1,9 @@
-import { onMount, createEffect, For } from "solid-js";
+import { onMount, createEffect, For, createSignal } from "solid-js";
 import './Settings.css';
 import { closeFeature, setNavStore, t, setStore, setI18nStore, updateLang } from '@lib/stores';
 import { Selector } from '@components/Selector.tsx';
 import { config, setConfig, drawer, setDrawer, cssVar, themer, quickSwitch, deleteCollection, getCollection } from '@lib/utils';
 import Dropdown from "./Dropdown";
-import ToggleSwitch from "./ToggleSwitch";
 
 export default function() {
   let settingsSection!: HTMLDivElement;
@@ -15,6 +14,32 @@ export default function() {
   });
 
   createEffect(updateLang);
+
+  const Toggle = (props: { name: string, checked: boolean, onclick: (e: MouseEvent) => void }) => {
+    const [checked, setChecked] = createSignal(props.checked);
+
+    return (
+      <span
+        role="checkbox"
+        aria-checked={checked()}
+        tabindex="0"
+        onclick={(e) => {
+          props.onclick(e);
+          setChecked(props.checked);
+        }}
+        onkeydown={(e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            props.onclick(e as unknown as MouseEvent);
+            setChecked(!props.checked);
+          }
+        }}
+      >
+        <label>{t(props.name as TranslationKeys)}</label>
+        <i class={checked() ? 'ri-toggle-fill' : 'ri-toggle-line'}></i>
+      </span>
+    );
+  };
 
   return (
     <section
@@ -76,8 +101,7 @@ export default function() {
           <option value="high">{t('settings_quality_high')}</option>
         </Selector>
 
-        <ToggleSwitch
-          id="stableVolumeSwitch"
+        <Toggle
           name='settings_stable_volume'
           checked={Boolean(config.stableVolume)}
           onclick={() => {
@@ -86,8 +110,7 @@ export default function() {
           }}
         />
 
-        <ToggleSwitch
-          id="watchModeSwitch"
+        <Toggle
           name='settings_watchmode'
           checked={Boolean(config.watchMode)}
           onclick={() => {
@@ -99,37 +122,35 @@ export default function() {
         />
 
         {/* Library Settings */}
-        <ToggleSwitch
-          id='discoverSwitch'
+        <Toggle
           name='settings_store_discoveries'
           checked={config.discover}
-          onclick={(e) => {
-            let configVal = (e.target as HTMLInputElement).checked;
+          onclick={() => {
+            let configVal = !config.discover;
             if (!configVal) {
               const count = drawer.discovery?.length || 0;
               if (confirm(t("settings_clear_discoveries", count.toString()))) {
                 setDrawer('discovery', []);
                 configVal = false;
               }
-              else e.preventDefault();
+              else return;
             }
             setConfig('discover', configVal);
           }}
         />
 
-        <ToggleSwitch
-          id='historySwitch'
+        <Toggle
           name='settings_store_history'
           checked={config.history}
-          onclick={(e) => {
-            let configVal = (e.target as HTMLInputElement).checked;
+          onclick={() => {
+            let configVal = !config.history;
             if (!configVal) {
               const db = getCollection('history') || [];
               const count = db.length;
               if (confirm(t("settings_clear_history", count.toString()))) {
                 deleteCollection('history');
                 configVal = false;
-              } else e.preventDefault();
+              } else return;
             }
             setConfig('history', configVal);
           }}
@@ -137,8 +158,7 @@ export default function() {
 
 
         {/* Search Settings */}
-        <ToggleSwitch
-          id="LinkCaptureSwitch"
+        <Toggle
           name='settings_link_capturing'
           checked={config.searchBarLinkCapture}
           onclick={() => {
@@ -146,8 +166,7 @@ export default function() {
           }}
         />
 
-        <ToggleSwitch
-          id="suggestionsSwitch"
+        <Toggle
           name='settings_display_suggestions'
           checked={config.searchSuggestions}
           onclick={() => {
@@ -156,8 +175,7 @@ export default function() {
           }}
         />
 
-        <ToggleSwitch
-          id="saveRecentSearchesSwitch"
+        <Toggle
           name='settings_save_recent_searches'
           checked={config.saveRecentSearches}
           onclick={() => {
@@ -166,8 +184,7 @@ export default function() {
         />
 
         {/* Personalize Settings */}
-        <ToggleSwitch
-          id='imgLoadSwitch'
+        <Toggle
           name='settings_load_images'
           checked={config.loadImage}
           onclick={() => {

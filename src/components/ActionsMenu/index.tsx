@@ -1,4 +1,4 @@
-import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore, setQueueStore } from '@lib/stores';
+import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore, setQueueStore, queueStore } from '@lib/stores';
 import { getDownloadLink } from '@lib/utils';
 import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
 import './ActionsMenu.css';
@@ -100,7 +100,6 @@ export default function() {
           if (!id) return;
 
           setQueueStore('isLoading', true);
-          closeDialog();
           import('@lib/modules/getMixes')
             .then(mod => mod.default([id]))
             .then(data => {
@@ -115,9 +114,11 @@ export default function() {
             })
             .finally(() => {
               setQueueStore('isLoading', false);
+              closeDialog();
             });
         }}>
-          <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
+          <i class={queueStore.isLoading ? "ri-loader-3-line loading-spinner" : "ri-radio-line"}>
+          </i>{t('actions_menu_start_radio')}
         </li>
 
 

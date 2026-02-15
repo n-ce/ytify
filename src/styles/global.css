@@ -1,6 +1,7 @@
 @import 'open-props/normalize.min.css';
 @import 'patterns.css';
 @import 'layout.css';
+@import 'footer.css';
 @import 'remixicon.css';
 @import 'tooltips.css';
 
@@ -51,7 +52,9 @@ select {
   }
 }
 
-a { color: var(--text); }
+a {
+  color: var(--text);
+}
 
 i {
   cursor: pointer;
