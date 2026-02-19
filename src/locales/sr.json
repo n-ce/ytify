@@ -43,7 +43,6 @@
   "queue_reload_notification": "Промене ће се појавити од следеће сесије",
   "queue_author_grouping": "Груписање аутора",
   "queue_prefetch": "Предпреузимање редова",
-  "queue_standby_header": "Предлози за вас",
   "fetchlist_url_null": "Није наведена URL адреса канала",
   "fetchlist_error": "Није могуће добити playlistData",
   "fetchlist_nonexistent": "Појавила се грешка: \"Плејлиста не постоји.\"",

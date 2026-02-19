@@ -1,4 +1,4 @@
-import { store, setStore } from "../stores";
+import { setStore } from "../stores";
 
 export default async function(
   id: string,
@@ -6,10 +6,11 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
+  const invidious = ["https://ubiquitous-rugelach-b30b3f.netlify.app"]
 
   const fetchDataFromInvidious = (
     index: number
-  ) => fetch(`${index === -1 ? '' : store.invidious[index]}/api/v1/videos/${id}`, { signal })
+  ) => fetch(`${index === -1 ? '' : invidious[index]}/api/v1/videos/${id}`, { signal })
     .then(res => res.json() as Promise<Invidious | { error: string }>)
     .then(data => {
       if ('adaptiveFormats' in data) {
@@ -20,10 +21,10 @@ export default async function(
     });
 
 
-  const useInvidious = (index = store.index): Promise<Invidious> =>
+  const useInvidious = (index = 0): Promise<Invidious> =>
     fetchDataFromInvidious(index)
       .catch(e => {
-        if (index + 1 === store.invidious.length) {
+        if (index + 1 === invidious.length) {
           setStore('index', 0);
           return prefetch ? e :
             fetchDataFromInvidious(-1)

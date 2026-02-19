@@ -1,5 +1,5 @@
 import { Show, createEffect, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary, getCollection } from '@lib/utils/library';
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary } from '@lib/utils/library';
 import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavStore, setListStore, setQueueStore } from '@lib/stores';
 import { importList, shareCollection } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
@@ -177,28 +177,6 @@ export default function Dropdown() {
           }}>
             <i class="ri-export-line"></i>{t('list_export')}
           </li>
-
-          <Show when={!listStore.reservedCollections.includes(listStore.id)}>
-            <li id="radioCollectionBtn" onclick={async () => {
-              const seedIds = getCollection(listStore.id).slice(0, 20);
-              if (seedIds.length === 0) return;
-
-              setQueueStore('isLoading', true);
-              try {
-                const getMixes = (await import('@lib/modules/getMixes')).default;
-                const data = await getMixes(seedIds);
-                setQueueStore('list', []);
-                addToQueue(data);
-                setNavStore('queue', 'state', true);
-              } catch (e) {
-                setStore('snackbar', e instanceof Error ? e.message : 'Unknown error');
-              } finally {
-                setQueueStore('isLoading', false);
-              }
-            }}>
-              <i class="ri-radio-line"></i>{t("list_radio")}
-            </li>
-          </Show>
 
         </Show>
       </ul>

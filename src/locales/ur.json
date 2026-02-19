@@ -42,7 +42,6 @@
     "queue_change_notification": "تبدیلیاں اگلے اسٹریم سے لاگو ہوں گی",
     "queue_author_grouping": "مصنف کے لحاظ سے گروپ بندی",
     "queue_prefetch": "قطار پہلے سے لوڈ کریں",
-    "queue_standby_header": "آپ کے لیے تجاویز",
     "fetchlist_url_null": "کوئی چینل URL فراہم نہیں کیا گیا",
     "fetchlist_error": "پلے لسٹ ڈیٹا نہیں مل سکا",
     "fetchlist_nonexistent": "غلطی ملی: \"پلے لسٹ موجود نہیں ہے۔\"",

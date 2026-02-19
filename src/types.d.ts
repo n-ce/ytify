@@ -6,7 +6,7 @@ declare global {
   type TranslationKeys = keyof typeof en;
   type SyncState = 'synced' | 'syncing' | 'dirty' | 'error';
   type Features = 'search' | 'library' | 'player' | 'list' | 'settings' | 'queue' | 'updater';
-  type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue' | 'standby';
+  type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue';
 
   interface YTImage {
     url: string;
@@ -26,7 +26,7 @@ declare global {
     img?: string;
     albumId?: string;
     subtext?: string;
-    type: 'video';
+    type: 'video' | 'song';
   }
 
   interface ListItem {

@@ -42,7 +42,6 @@
   "queue_change_notification": "Değişiklikler bir sonraki akıştan itibaren geçerli olacak",
   "queue_author_grouping": "Yazar Gruplandırması",
   "queue_prefetch": "Kuyruk Önceden Yükleme",
-  "queue_standby_header": "Sizin İçin Öneriler",
   "fetchlist_url_null": "Kanal URL'si sağlanmadı",
   "fetchlist_error": "PlaylistData alınamadı",
   "fetchlist_nonexistent": "Hata aldık: “Çalma listesi mevcut değil.”",

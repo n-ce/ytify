@@ -1,11 +1,8 @@
-import { onMount, Show, lazy } from 'solid-js';
+import { onMount, Show } from 'solid-js';
 import './Queue.css';
 import { queueStore, setNavStore, t, setQueueStore, totalQueueDuration } from "@lib/stores";
 import List from "./List";
 import Dropdown from './Dropdown';
-import { config } from '@lib/utils';
-
-const Standby = lazy(() => import('./Standby'));
 
 export default function() {
 
@@ -61,11 +58,6 @@ export default function() {
         fallback={<i class="ri-loader-3-line loading-spinner"></i>}
       >
         <List />
-        <Show when={
-          queueStore.list.length === 0 &&
-          config.contextualFill && config.similarContent}>
-          <Standby />
-        </Show>
       </Show>
     </section >
   );

@@ -229,7 +229,7 @@ async function getRecommendations() {
 
   const title = encodeURIComponent(playerStore.stream.title);
   const artist = encodeURIComponent(playerStore.stream.author?.slice(0, -8) ?? '');
-  fetch(`${store.api}/api/tracks?title=${title}&artist=${artist}&limit=10`)
+  fetch(`${store.api}/api/similar?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .then(addToQueue)
     .catch(e => setStore('snackbar', `Could not get recommendations for the track: ${e.message}`));

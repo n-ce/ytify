@@ -69,29 +69,27 @@
 
 	div.metadata {
 		height: 100%;
-		width: 100%;
-		overflow: hidden;
+		width: calc(100% - var(--size-11));
 		display: flex;
 		flex-direction: column;
 		justify-content: space-evenly;
+		row-gap: var(--size-1);
 
 		.title {
+			max-height: 100%;
 			line-height: var(--size-4);
 			font-size: var(--font-size-1);
+			overflow: hidden;
 			font-weight: var(--font-weight-5);
 			letter-spacing: var(--font-letterspacing-1);
-			margin-bottom: auto;
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			line-clamp: 2;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
+			margin: 0;
 		}
 
 		.avu {
 			height: var(--size-7);
 			line-height: var(--size-3);
 			width: 100%;
+			overflow: hidden;
 
 			p {
 				font-size: var(--font-size-0);

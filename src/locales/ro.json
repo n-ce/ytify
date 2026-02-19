@@ -42,7 +42,6 @@
     "queue_change_notification": "Schimbările se vor aplica începând cu următorul flux",
     "queue_author_grouping": "Gruparea autorilor",
     "queue_prefetch": "Preîncărcare coadă",
-    "queue_standby_header": "Sugestii pentru tine",
     "fetchlist_url_null": "Niciun canal URL furnizat",
     "fetchlist_error": "Nu s-a putut preluia playlistData",
     "fetchlist_nonexistent": "Eroare dat: \"Playlist-ul nu există.\"",

@@ -42,7 +42,6 @@
     "queue_change_notification": "Les modifications prendront effet à partir du prochain flux",
     "queue_author_grouping": "Groupement par auteur",
     "queue_prefetch": "Prélecture de la file d'attente",
-    "queue_standby_header": "Suggestions pour vous",
     "fetchlist_url_null": "Aucune URL de chaîne fournie",
     "fetchlist_error": "Impossible d'obtenir les données de la playlist",
     "fetchlist_nonexistent": "Erreur reçue : « La playlist n'existe pas. »",

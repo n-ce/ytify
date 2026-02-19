@@ -42,7 +42,6 @@
     "queue_change_notification": "परिवर्तन अगली स्ट्रीम से लागू होंगे",
     "queue_author_grouping": "लेखक समूहन",
     "queue_prefetch": "कतार प्रीफेच",
-    "queue_standby_header": "आपके लिए सुझाव",
     "fetchlist_url_null": "कोई चैनल URL नहीं दिया गया",
     "fetchlist_error": "प्लेलिस्ट डेटा नहीं मिल सका",
     "fetchlist_nonexistent": "त्रुटि मिली: \"प्लेलिस्ट मौजूद नहीं है।\"",

@@ -42,5 +42,7 @@ export default async function(params: { title: string, artist: string, limit?: s
     })
   );
 
-  return results.filter((item): item is NonNullable<typeof item> => item !== null);
+  return results
+    .filter((item): item is YTItem => item !== null)
+    .map(({ subtext, albumId, img, ...rest }) => rest);
 }

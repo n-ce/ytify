@@ -4,7 +4,7 @@ import Sortable, { type SortableEvent } from 'sortablejs';
 import { addToQueue, listStore, resetList, setListStore, setNavStore, t } from '@lib/stores';
 import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
 import { setConfig, config, drawer } from '@lib/utils/config';
-import { generateImageUrl, getThumbIdFromLink } from '@lib/utils';
+import { generateImageUrl } from '@lib/utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
@@ -192,8 +192,8 @@ export default function() {
               <ListItem
                 name={album.name}
                 year={album.year}
-                img={generateImageUrl(getThumbIdFromLink(album.img), '')}
-                author={listStore.name.replace('Artist - ', '')}
+                img={album.img}
+                author={album.author}
                 id={album.id}
                 type='album'
               />
@@ -202,7 +202,7 @@ export default function() {
         </div>
       </Show>
 
-      <Show when={config.loadImage && listStore.name.startsWith('Album')}>
+      <Show when={config.loadImage && listStore.id.startsWith('MPREb')}>
         <img src={generateImageUrl(listStore.img, '720')} alt={listStore.name} class="list-thumbnail" />
       </Show>
 

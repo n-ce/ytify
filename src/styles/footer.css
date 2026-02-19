@@ -16,18 +16,16 @@ footer {
   --height: var(--size-8);
   height: var(--height);
   background: linear-gradient(rgb(from var(--onBg) r g b / 0.4), var(--trueBg));
-  backdrop-filter: blur(var(--size-px-4));
+  backdrop-filter: blur(var(--size-px-3));
   border-top-left-radius: var(--roundness);
   border-top-right-radius: var(--roundness);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-1);
   overflow: hidden;
 
   &:has(.miniplayer) {
     --height: calc(var(--size-9) + var(--size-7));
 
     @media(orientation:portrait) {
-      border-top: var(--border);
-
       img {
         height: var(--size-8);
         margin-left: var(--size-1);
@@ -38,12 +36,11 @@ footer {
 
   @media(orientation:landscape) {
     margin: 0 auto;
-    border: var(--border);
-    border-bottom: none;
     align-items: center;
     flex-direction: row;
     height: var(--size-9);
-    bottom: var(--size-9);
+    bottom: var(--size-10);
+    border-radius: var(--roundness);
     --navW: calc(var(--size-8) * 3);
     width: var(--navW);
 
@@ -114,7 +111,7 @@ footer {
     height: calc(var(--size-8) + var(--size-2));
     object-fit: cover;
     border: var(--border);
-    border-radius: calc(var(--roundness) * 0.5);
+    border-radius: calc(var(--roundness) * 0.7);
     box-shadow: var(--shadow-1);
     pointer-events: none;
   }

@@ -25,23 +25,6 @@ export default function() {
         </svg>
         <b>animesh.5383@waicici</b>&nbsp;
       </p>
-      <span id="crypto">
-        <p>
-          Monero &gt; 87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH
-        </p>
-        <p>
-          Litecoin &gt; ltc1qvrvu50lz9e4cgjc9lf59td53xzu08zref2rxkf
-        </p>
-        <p>
-          Bitcoin &gt; bc1qtaxauv2mzc52ulmenlmejetluxnz5ly4ucg97k
-        </p>
-        <p>Ethereum &gt; 0x8c0028c8C4EC2ee508C9A9DdDf15Fe00b4960ED3
-        </p>
-        <p>
-          <a class="underline" href="https://trocador.app/anonpay?ticker_to=xmr&network_to=Mainnet&address=87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH&ref=sqKNYGZbRl&direct=True" target="_blank">{t('about_crypto_any')}</a>
-
-        </p>
-      </span>
       <br />
       <p>{t('about_support_earth')}&nbsp;
         <a
@@ -49,11 +32,12 @@ export default function() {
       </p>
       <br />
       <span>
-        <a href="https://t.me/ytifytg" target="_blank">[Join Our Community <i class="ri-heart-fill"></i> on Telegram]</a>
-        <a href="https://github.com/n-ce/ytify/wiki/changelog"
+        <a href="https://t.me/ytifytg" target="_blank">[Join Our Community <i class="ri-user-heart-fill"></i> on Telegram]</a>
+        <a href="https://github.com/n-ce/ytify/commits"
           target="_blank">[Changelog]</a>
 
         <a href="https://github.com/n-ce/ytify" target="_blank">[Github]</a>
+        <a href="https://github.com/n-ce/ytify#donations" target="_blank">[Crypto Donations]</a>
       </span>
       <br />
       <br />

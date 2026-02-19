@@ -42,7 +42,6 @@
     "queue_change_notification": "Änderungen werden ab dem nächsten Stream wirksam",
     "queue_author_grouping": "Autorengruppierung",
     "queue_prefetch": "Warteschlange vorladen",
-    "queue_standby_header": "Vorschläge für Sie",
     "fetchlist_url_null": "Keine Kanal-URL angegeben",
     "fetchlist_error": "Konnte Playlistdaten nicht abrufen",
     "fetchlist_nonexistent": "Fehler erhalten: \"Die Playlist existiert nicht.\"",

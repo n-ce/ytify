@@ -50,7 +50,7 @@ export function closeFeature(name: Features) {
   setNavStore(name, { ref: null, state: false });
 }
 
-type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'si' | 'supermix' | 't';
+type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'artist' | 'album' | 'si' | 'supermix' | 't';
 
 export function updateParam(
   param: Params,

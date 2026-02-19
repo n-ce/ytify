@@ -24,6 +24,8 @@ export default function() {
 
   const [isListenLater, setIsListenLater] = createSignal(false);
   const [isDownloading, setIsDownloading] = createSignal(false);
+  const [isViewingAuthor, setIsViewingAuthor] = createSignal(false);
+  const [isViewingAlbum, setIsViewingAlbum] = createSignal(false);
 
   createEffect(() => {
     const { id } = store.actionsMenu as TrackItem;
@@ -36,7 +38,7 @@ export default function() {
     <dialog
       id="actionsMenu"
       ref={dialog}
-      onclick={() => !isDownloading() && closeDialog()}
+      onclick={() => !isDownloading() && !isViewingAuthor() && !isViewingAlbum() && closeDialog()}
     >
       <StreamItem
         id={store.actionsMenu?.id || ''}
@@ -100,8 +102,8 @@ export default function() {
           if (!id) return;
 
           setQueueStore('isLoading', true);
-          import('@lib/modules/getMixes')
-            .then(mod => mod.default([id]))
+          import('@lib/modules/getRadio')
+            .then(mod => mod.default(id))
             .then(data => {
               setQueueStore('list', []);
               addToQueue(data);
@@ -144,7 +146,8 @@ export default function() {
           {t(isDownloading() ? 'actions_menu_downloading' : 'actions_menu_download')}
         </li>
 
-        <li tabindex="5" onclick={() => {
+        <li tabindex="5" onclick={async () => {
+          if (isViewingAuthor()) return;
           const { author, authorId } = store.actionsMenu as TrackItem;
 
           if (author)
@@ -153,13 +156,18 @@ export default function() {
                 ('Artist - ' + author.replace('- Topic', ''))
                 : '');
 
-          if (authorId)
-            getList(authorId, isMusic ? 'artist' : 'channel');
-
-          closeDialog();
+          if (authorId) {
+            setIsViewingAuthor(true);
+            try {
+              await getList(authorId, isMusic ? 'artist' : 'channel');
+            } finally {
+              setIsViewingAuthor(false);
+              closeDialog();
+            }
+          }
         }}>
 
-          <i class="ri-user-3-line"></i>
+          <i class={isViewingAuthor() ? "ri-loader-3-line loading-spinner" : "ri-user-3-line"}></i>
           {t(isMusic ?
             'actions_menu_view_artist' :
             'actions_menu_view_channel')
@@ -168,14 +176,20 @@ export default function() {
 
         <Show when={store.actionsMenu?.albumId}>
 
-          <li tabindex="6" onclick={() => {
+          <li tabindex="6" onclick={async () => {
+            if (isViewingAlbum()) return;
             const albumId = store.actionsMenu?.albumId;
             if (albumId) {
-              getList(albumId, 'album');
+              setIsViewingAlbum(true);
+              try {
+                await getList(albumId, 'album');
+              } finally {
+                setIsViewingAlbum(false);
+                closeDialog();
+              }
             }
-            closeDialog();
           }}>
-            <i class="ri-album-fill"></i>{t('actions_menu_view_album')}
+            <i class={isViewingAlbum() ? "ri-loader-3-line loading-spinner" : "ri-album-fill"}></i>{t('actions_menu_view_album')}
           </li>
 
         </Show>

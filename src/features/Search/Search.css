@@ -59,9 +59,10 @@
       list-style-type: none;
       padding: 0;
       top: calc(var(--size-7) + var(--size-1));
+      border: var(--border);
+      border-top: 0;
       margin-left: calc(0rem - var(--gap) - calc(var(--border-size-1) / 2));
       background-image: linear-gradient(var(--scheme), transparent), linear-gradient(to right, var(--onBg), transparent);
-      border: var(--border);
       border-radius: 0 0 var(--roundness) var(--roundness);
       box-shadow: var(--shadow-1);
       display: block;

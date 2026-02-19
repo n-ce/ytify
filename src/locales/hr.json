@@ -43,7 +43,6 @@
     "queue_reload_notification": "Promjene će se pojaviti od sljedeće sesije",
     "queue_author_grouping": "Grupiranje autora",
     "queue_prefetch": "Predmemoriranje reda",
-    "queue_standby_header": "Prijedlozi za vas",
     "fetchlist_url_null": "Nije naveden URL kanala",
     "fetchlist_error": "Nije moguće dohvatiti playlistData",
     "fetchlist_nonexistent": "Prikazana je pogreška: \"Playlista ne postoji.\"",

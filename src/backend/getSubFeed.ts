@@ -1,24 +1,5 @@
 import { YTNodes } from 'youtubei.js';
-import { getClient, formatDuration } from './utils.js';
-
-function parsePublished(text: string): number {
-  if (!text) return 0;
-  const now = Date.now();
-  const match = text.match(/(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago/);
-  if (!match) return 0;
-  const value = parseInt(match[1]);
-  const unit = match[2];
-  const multipliers: Record<string, number> = {
-    second: 1000,
-    minute: 60 * 1000,
-    hour: 60 * 60 * 1000,
-    day: 24 * 60 * 60 * 1000,
-    week: 7 * 24 * 60 * 60 * 1000,
-    month: 30 * 24 * 60 * 60 * 1000,
-    year: 365 * 24 * 60 * 60 * 1000
-  };
-  return now - (value * multipliers[unit]);
-}
+import { getClient, formatDuration, parsePublished } from './utils.js';
 
 export default async function(ids: string[]) {
   const yt = await getClient();
@@ -26,8 +7,12 @@ export default async function(ids: string[]) {
   const results = await Promise.all(
     ids.map(id =>
       yt.getChannel(id)
-        .then(channel => channel.getVideos().then(v => ({ author: channel.metadata.title, videos: v.videos })))
-        .catch(() => ({ author: '', videos: [] }))
+        .then(channel => channel.getVideos().then(v => ({ 
+          author: channel.metadata.title?.toString() || '', 
+          authorId: id,
+          videos: v.videos 
+        })))
+        .catch(() => ({ author: '', authorId: id, videos: [] }))
     )
   );
 
@@ -38,25 +23,31 @@ export default async function(ids: string[]) {
         const video = v.as(YTNodes.Video);
         return {
           video,
-          authorName: r.author
+          authorName: r.author,
+          authorId: r.authorId
         };
       })
   );
 
   return allVideos
     .sort((a, b) => {
-      const timeA = a.video.published?.text ? parsePublished(a.video.published.text) : 0;
-      const timeB = b.video.published?.text ? parsePublished(b.video.published.text) : 0;
+      const timeA = a.video.published?.toString() ? parsePublished(a.video.published.toString()) : 0;
+      const timeB = b.video.published?.toString() ? parsePublished(b.video.published.toString()) : 0;
       return timeB - timeA;
     })
-    .map(({ video, authorName }) => ({
-      id: video.id,
-      title: video.title?.toString() || '',
-      author: authorName || video.author.name || '',
-      authorId: video.author.id,
-      duration: formatDuration(video.duration?.text?.toString()),
-      views: video.short_view_count?.toString() || '',
-      published: video.published?.text || '',
-      type: 'video' as const
-    }));
+    .map(({ video, authorName, authorId }) => {
+      const views = video.short_view_count?.toString() || video.view_count?.toString();
+      const published = video.published?.toString()?.replace('Streamed ', '');
+      const subtext = (views || '') + (published ? ' • ' + published : '');
+
+      return {
+        id: video.id,
+        title: video.title?.toString() || '',
+        author: authorName || video.author.name?.toString() || '',
+        authorId: authorId || video.author.id || '',
+        duration: formatDuration(video.duration?.text?.toString()),
+        subtext,
+        type: 'video' as const
+      };
+    });
 }

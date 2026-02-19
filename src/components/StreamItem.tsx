@@ -2,7 +2,7 @@ import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player, removeFromCollection, getCollectionItems } from '@lib/utils';
 import { generateImageUrl } from '@lib/utils/image';
-import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore, queueStore } from '@lib/stores';
+import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore } from '@lib/stores';
 
 export default function(data: YTItem & {
   draggable?: boolean,
@@ -55,12 +55,13 @@ export default function(data: YTItem & {
 
 
 
-  const isAlbum = data.context?.id.startsWith('Album');
+  const isAlbum = data.context?.id.startsWith('MPREb');
+  console.log(data.context);
   const isFromArtist = data.context?.id?.startsWith('Artist - ');
   const isMusic = data.author?.endsWith('- Topic');
 
   if (config.loadImage && !isAlbum)
-    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isFromArtist || ((data.context?.src === 'queue' || data.context?.src === 'standby') && isMusic)));
+    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isFromArtist || ((data.context?.src === 'queue') && isMusic)));
 
   return (
     <a
@@ -118,10 +119,9 @@ export default function(data: YTItem & {
               navStore.player.ref?.scrollIntoView();
           }
 
-          if (config.contextualFill && (data.context?.src === 'collection' || (data.context?.src === 'playlists') || data.context?.src === 'standby') && data.context?.id !== 'history') {
+          if (config.contextualFill && (data.context?.src === 'collection' || (data.context?.src === 'playlists')) && data.context?.id !== 'history') {
             const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) :
-              data.context.src === 'standby' ? queueStore.standby :
-                listStore.list;
+              listStore.list;
             const currentIndex = collectionItems.findIndex(item => item.id === data.id);
             if (currentIndex !== -1) {
               const zigzagQueue: TrackItem[] = [];

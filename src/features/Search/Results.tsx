@@ -14,7 +14,7 @@ export default function SearchResults() {
       <For each={searchStore.results}>
         {(item) => (
           <Show
-            when={item.type === 'video'}
+            when={item.type === 'video' || item.type === 'song'}
             fallback={<ListItem {...item as YTListItem}
             />}>
             <StreamItem

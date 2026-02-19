@@ -3,7 +3,6 @@ import { config, convertSStoHHMMSS } from "@lib/utils";
 
 export const [queueStore, setQueueStore] = createStore({
   list: [] as TrackItem[],
-  standby: [] as TrackItem[],
   removeMode: false,
   isLoading: false,
 });

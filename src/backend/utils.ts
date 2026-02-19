@@ -29,6 +29,25 @@ export function formatDuration(durationText?: string): string {
   return durationText || '00:00';
 }
 
+export function parsePublished(text: string): number {
+  if (!text) return 0;
+  const now = Date.now();
+  const match = text.match(/(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago/);
+  if (!match) return 0;
+  const value = parseInt(match[1]);
+  const unit = match[2];
+  const multipliers: Record<string, number> = {
+    second: 1000,
+    minute: 60 * 1000,
+    hour: 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000,
+    week: 7 * 24 * 60 * 60 * 1000,
+    month: 30 * 24 * 60 * 60 * 1000,
+    year: 365 * 24 * 60 * 60 * 1000
+  };
+  return now - (value * multipliers[unit]);
+}
+
 export function getThumbnail(thumbnails: { url: string, width: number }[]): string {
   if (!thumbnails || thumbnails.length === 0) return '';
   return thumbnails.sort((a, b) => (b.width || 0) - (a.width || 0))[0]?.url || '';
@@ -40,7 +59,7 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
 
     if ((video.duration?.seconds || 0) < 90) return null;
 
-    const views = video.short_view_count?.toString();
+    const views = video.short_view_count?.toString() || video.view_count?.toString();
     const published = video.published?.toString()?.replace('Streamed ', '');
     const subtext = (views || '') + (published ? ' • ' + published : '');
 
@@ -61,16 +80,22 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
     const views = song.views?.toString();
     const subtext = (album || '') + (views ? (album ? ' • ' : '') + views : '');
 
+    // Try to get playlistId (OLAK...) from menu items for the albumId field
+    const playlistId = song.menu?.items?.find((i: any) => 
+      i.is(YTNodes.MenuNavigationItem) && 
+      i.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId?.startsWith('OLAK')
+    )?.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId || song.album?.id || "";
+
     return {
       id: song.id || "",
       title: song.title?.toString() || "Unknown",
       author: song.artists?.[0]?.name ? `${song.artists[0].name} - Topic` : "Unknown",
       authorId: song.artists?.[0]?.channel_id || "",
-      albumId: song.album?.id || "",
+      albumId: playlistId,
       duration: formatDuration(song.duration?.text),
       img: '/' + getThumbnailId(song.thumbnail?.contents?.[0]?.url),
       subtext,
-      type: 'video'
+      type: 'song'
     };
   }
 

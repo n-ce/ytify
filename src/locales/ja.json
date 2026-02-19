@@ -42,7 +42,6 @@
     "queue_change_notification": "変更は次の曲から適用されます",
     "queue_author_grouping": "作成者によるグループ化",
     "queue_prefetch": "キューの事前読み込み",
-    "queue_standby_header": "おすすめ",
     "fetchlist_url_null": "チャンネルのURLが見つかりませんでした",
     "fetchlist_error": "プレイリストのデータが取得できませんでした",
     "fetchlist_nonexistent": "プレイリストが存在しません",

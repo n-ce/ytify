@@ -42,7 +42,6 @@
     "queue_change_notification": "De wijzigingen worden doorgevoerd vanaf de volgende stream",
     "queue_author_grouping": "Auteursgroepering",
     "queue_prefetch": "Wachtrij-vooruitladen",
-    "queue_standby_header": "Suggesties voor u",
     "fetchlist_url_null": "Geen kanaal-URL opgegeven",
     "fetchlist_error": "Kon playlistData niet ophalen",
     "fetchlist_nonexistent": "Foutmelding: “De afspeellijst bestaat niet.”",
