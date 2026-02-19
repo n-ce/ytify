@@ -1,8 +1,6 @@
 import { createStore } from "solid-js/store";
 
 const storeInit: {
-  invidious: string[],
-  index: number
   useSaavn: boolean,
   api: string,
   updater?: () => void,
@@ -10,8 +8,6 @@ const storeInit: {
   snackbar?: string,
   syncState?: SyncState,
 } = {
-  invidious: [],
-  index: 0,
   api: Backend[Math.floor(Math.random() * Backend.length)],
   useSaavn: true,
 };

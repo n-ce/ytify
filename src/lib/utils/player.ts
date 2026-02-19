@@ -4,7 +4,7 @@ import { config } from "./config";
 import getStreamData from "../modules/getStreamData";
 
 let playerAbortController: AbortController;
-export async function player(id?: string, isRetry = false) {
+export async function player(id?: string) {
 
   if (playerAbortController)
     playerAbortController.abort();
@@ -27,13 +27,7 @@ export async function player(id?: string, isRetry = false) {
   else if (playerStore.stream.author?.endsWith('Topic'))
     return import('../modules/jioSaavn').then(mod => mod.default());
 
-  if (!store.invidious.length)
-    setStore('snackbar', 'No Instances are Available');
-
   const data = await getStreamData(id, false, playerAbortController.signal);
-
-  if (!isRetry)
-    setStore('index', 0);
 
   if (data && 'adaptiveFormats' in data)
     setPlayerStore({

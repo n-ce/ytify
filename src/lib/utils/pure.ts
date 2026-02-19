@@ -1,5 +1,12 @@
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
+export const instances = [
+  "https://www.gcx.co.in",
+  "https://ubiquitous-rugelach-b30b3f.netlify.app",
+  "https://super-duper-system.netlify.app",
+  "https://crispy-octo-waddle.netlify.app"
+];
+
 
 export function convertSStoHHMMSS(seconds: number): string {
   if (seconds < 0) return '';

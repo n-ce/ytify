@@ -1,27 +1,23 @@
-import { YTNodes } from 'youtubei.js';
+import { YTNodes, type Helpers } from 'youtubei.js';
 import { getClient, getThumbnail, formatDuration, getThumbnailId } from './utils.js';
 
-export default async function(id: string) {
+export default async function(id: string): Promise<YTPlaylistItem> {
   const yt = await getClient();
-  const playlist = await yt.getPlaylist(id) as {
-    header: YTNodes.PlaylistHeader,
-    videos: YTNodes.PlaylistVideo[]
-  } & any;
-  const header = playlist.header?.as(YTNodes.PlaylistHeader);
+  let playlist = await yt.getPlaylist(id);
 
-  return {
-    id: id,
-    name: header?.title.toString() || 'Unknown Playlist',
-    author: header?.author.name || 'Unknown',
-    img: '/' + getThumbnailId(getThumbnail(header?.thumbnails || [])),
-    type: 'playlist' as const,
-    items: playlist.videos.map((video: any) => {
-      if (video.is(YTNodes.PlaylistVideo)) {
-        const v = video.as(YTNodes.PlaylistVideo) as any;
-        const views = v.short_view_count?.toString();
-        const published = v.published?.toString();
-        const subtext = (views || '') + (published ? ' • ' + published : '');
-        return {
+  const { info } = playlist;
+  const name = info.title || 'Unknown Playlist';
+  const author = info.author.name || 'Unknown';
+  const img = '/' + getThumbnailId(getThumbnail(info.thumbnails || []));
+
+  const allItems: YTItem[] = [];
+
+  const mapItems = (items: Helpers.YTNode[]) => {
+    items.forEach((item) => {
+      if (item.is(YTNodes.PlaylistVideo)) {
+        const v = item.as(YTNodes.PlaylistVideo);
+        const subtext = v.video_info?.toString() || '';
+        allItems.push({
           id: v.id,
           title: v.title.toString(),
           author: v.author.name,
@@ -29,9 +25,26 @@ export default async function(id: string) {
           duration: formatDuration(v.duration.text),
           subtext,
           type: 'video' as const
-        };
+        });
       }
-      return null;
-    }).filter((item: any): item is NonNullable<typeof item> => item !== null)
+    });
+  };
+
+  mapItems(playlist.items);
+
+  let iterations = 0;
+  while (playlist.has_continuation && iterations < 10) {
+    playlist = await playlist.getContinuation();
+    mapItems(playlist.items);
+    iterations++;
+  }
+
+  return {
+    id: id,
+    name,
+    author,
+    img,
+    type: 'playlist' as const,
+    items: allItems
   };
 }

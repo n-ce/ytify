@@ -1,6 +1,7 @@
 import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { addToCollection, config, cssVar, player, themer } from "@lib/utils";
+import { instances } from "@lib/utils/pure";
 import { navStore, params, updateParam } from "./navigation";
 import { addToQueue, queueStore, setQueueStore } from "./queue";
 import audioErrorHandler from "@lib/modules/audioErrorHandler";
@@ -32,6 +33,7 @@ type PlayerStore = {
   audioURL: string,
   videoURL: string,
   isWatching: boolean,
+  proxy: string,
   lrcSync?: (d: number) => void
 };
 
@@ -65,7 +67,8 @@ const createInitialState = (): PlayerStore => ({
   isMusic: true,
   audioURL: '',
   videoURL: '',
-  isWatching: Boolean(config.watchMode)
+  isWatching: Boolean(config.watchMode),
+  proxy: instances[Math.floor(Math.random() * instances.length)]
 });
 
 const [playerStore, setPlayerStore] = createStore(createInitialState());

@@ -13,7 +13,7 @@ declare global {
     width: number;
     height: number;
   }
-
+  // For Library Usage
   interface TrackItem {
     id: string;
     title: string;
@@ -21,7 +21,7 @@ declare global {
     author: string;
     authorId?: string;
   }
-
+  // For Network Usage
   interface YTItem extends TrackItem {
     img?: string;
     albumId?: string;
@@ -110,8 +110,6 @@ declare global {
     lengthSeconds: number,
     authorId: string,
     liveNow: boolean,
-    hlsUrl: string,
-    dashUrl: string,
   }
 }
 

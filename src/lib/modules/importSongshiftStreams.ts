@@ -14,8 +14,7 @@ export default async function(e: File) {
   const getMetadata = async (
     seed: string,
     src = 'songshift',
-    apiIndex = 0
-  ): Promise<TrackItem & { src: string } | undefined> => await fetch(`${piped[apiIndex]}/search?q=${encodeURIComponent(seed)}&filter=music_songs`)
+  ): Promise<void | TrackItem & { src: string }> => await fetch(`${piped}/search?q=${encodeURIComponent(seed)}&filter=music_songs`)
     .then(res => res.json())
     .then(data => {
       if ('items' in data && data.items.length > 0)
@@ -31,13 +30,9 @@ export default async function(e: File) {
       src
     }))
     .catch((e) => {
-      if (apiIndex < piped.length - 1)
-        return getMetadata(seed, src, apiIndex + 1);
-      else {
-        console.error(e);
-        setStore('snackbar', 'Failed to import ' + seed);
-        return;
-      }
+      console.error(e);
+      setStore('snackbar', 'Failed to import ' + seed);
+      return;
     });
 
   const promises = songshiftData.map(

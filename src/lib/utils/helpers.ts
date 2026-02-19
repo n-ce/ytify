@@ -1,14 +1,9 @@
-import { setStore, playerStore, setPlayerStore, store, t } from "../stores";
+import { setStore, playerStore, setPlayerStore, t } from "../stores";
 import { config } from "./config";
 import { player } from "./player";
 import getStreamData from "../modules/getStreamData";
 
 export * from './pure';
-
-export const getApi = (
-  index: number = store.index
-) =>
-  store.invidious[index];
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -32,9 +27,9 @@ export function proxyHandler(
 
   const link = new URL(url);
   const origin = link.origin;
-  const proxy = getApi();
+  const proxy = playerStore.proxy;
 
-  return useProxy && !url.includes('&fallback') ?
+  return useProxy && proxy && !url.includes('&fallback') ?
     url.replace(origin, proxy) : url;
 }
 
