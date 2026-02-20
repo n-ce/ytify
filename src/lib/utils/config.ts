@@ -32,8 +32,14 @@ type AppConfig = typeof config;
 
 
 const savedStore = localStorage.getItem('config');
-if (savedStore)
-  config = JSON.parse(savedStore);
+if (savedStore) {
+  const parsed = JSON.parse(savedStore) as Record<string, unknown>;
+  (Object.keys(config) as (keyof AppConfig)[]).forEach(key => {
+    if (parsed[key] !== undefined) {
+      (config as Record<keyof AppConfig, unknown>)[key] = parsed[key];
+    }
+  });
+}
 
 
 export function setConfig<K extends
@@ -52,8 +58,14 @@ export let drawer = {
   libraryPlays: {} as Record<string, number>,
 }
 const savedDrawer = localStorage.getItem('drawer');
-if (savedDrawer)
-  drawer = JSON.parse(savedDrawer);
+if (savedDrawer) {
+  const parsed = JSON.parse(savedDrawer) as Record<string, unknown>;
+  (Object.keys(drawer) as (keyof AppDrawer)[]).forEach(key => {
+    if (parsed[key] !== undefined) {
+      (drawer as Record<keyof AppDrawer, unknown>)[key] = parsed[key];
+    }
+  });
+}
 
 type AppDrawer = typeof drawer;
 
