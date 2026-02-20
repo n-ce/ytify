@@ -1,4 +1,4 @@
-import { YTNodes, type Innertube } from 'youtubei.js';
+import { Helpers, YTNodes, type Innertube } from 'youtubei.js';
 import { getClient, getThumbnail, getThumbnailId } from './utils.js';
 
 async function fetchFullArtistData(yt: Innertube, id: string) {
@@ -18,40 +18,63 @@ async function fetchFullArtistData(yt: Innertube, id: string) {
       thumbnails = h.thumbnail || [];
     }
 
-    const playlistsSection = artist.sections?.find(s => s.is(YTNodes.MusicCarouselShelf) && s.as(YTNodes.MusicCarouselShelf).header?.is(YTNodes.MusicCarouselShelfBasicHeader) && s.as(YTNodes.MusicCarouselShelf).header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text?.toLowerCase().includes('featured'))?.as(YTNodes.MusicCarouselShelf);
-    const relatedSection = artist.sections?.find(s => s.is(YTNodes.MusicCarouselShelf) && s.as(YTNodes.MusicCarouselShelf).header?.is(YTNodes.MusicCarouselShelfBasicHeader) && s.as(YTNodes.MusicCarouselShelf).header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text?.toLowerCase().includes('fans'))?.as(YTNodes.MusicCarouselShelf);
 
-    const featuredOnPlaylists = (playlistsSection?.contents || []).map((item) => {
-      if (item.is(YTNodes.MusicResponsiveListItem)) {
-        const musicItem = item.as(YTNodes.MusicResponsiveListItem);
-        return {
-          id: musicItem.id || '',
-          name: musicItem.title || '',
-          img: getThumbnailId(getThumbnail(musicItem.thumbnail?.contents || [])),
-          author: title,
-          type: 'playlist' as const
-        };
-      }
-      return null;
-    }).filter((i): i is NonNullable<typeof i> => i !== null);
+    function findCarouselByTitle(sections: Helpers.YTNode[] | undefined, targetTitle: string): YTNodes.MusicCarouselShelf | undefined {
+      return sections?.find((section): section is YTNodes.MusicCarouselShelf => {
+        if (!section.is(YTNodes.MusicCarouselShelf)) return false;
 
-    const recommendedArtists = (relatedSection?.contents || []).map((item) => {
-      if (item.is(YTNodes.MusicResponsiveListItem)) {
-        const musicItem = item.as(YTNodes.MusicResponsiveListItem);
-        return {
-          id: musicItem.id || '',
-          name: musicItem.name || musicItem.title || '',
-          img: getThumbnailId(getThumbnail(musicItem.thumbnail?.contents || [])),
-          type: 'artist' as const
-        };
-      }
-      return null;
-    }).filter((i): i is NonNullable<typeof i> => i !== null);
+        const header = section.header;
+        if (header?.is(YTNodes.MusicCarouselShelfBasicHeader)) {
+          // Access the text property safely
+          return header.title?.toString() === targetTitle;
+        }
+
+        return false;
+      });
+    }
+
+    const playlistsSection = findCarouselByTitle(artist.sections, 'Featured on');
+    const relatedSection = findCarouselByTitle(artist.sections, 'Fans might also like');
+
+
+    const featuredOnPlaylists = (playlistsSection?.contents || [])
+      .map((item) => {
+        // Carousels use TwoRowItem, not ResponsiveListItem
+        if (item.is(YTNodes.MusicTwoRowItem)) {
+          const musicItem = item.as(YTNodes.MusicTwoRowItem);
+          return {
+            id: musicItem.id || '',
+            name: musicItem.title?.toString() || '',
+            img: '/' + getThumbnailId(getThumbnail(musicItem.thumbnail || [])),
+            author: title,
+            type: 'playlist' as const
+          };
+        }
+        return null;
+      })
+      .filter((i): i is NonNullable<typeof i> => i !== null);
+
+    const recommendedArtists = (relatedSection?.contents || [])
+      .map((item) => {
+        if (item.is(YTNodes.MusicTwoRowItem)) {
+          const musicItem = item.as(YTNodes.MusicTwoRowItem);
+          return {
+            id: musicItem.id || '',
+            name: musicItem.title?.toString() || '',
+            img: '/' + getThumbnailId(getThumbnail(musicItem.thumbnail || [])),
+            type: 'artist' as const
+          };
+        }
+        return null;
+      })
+      .filter((i): i is NonNullable<typeof i> => i !== null);
+
+
 
     return {
       id,
       title,
-      img: getThumbnailId(getThumbnail(thumbnails)),
+      img: '/' + getThumbnailId(getThumbnail(thumbnails)),
       featuredOnPlaylists,
       recommendedArtists
     };

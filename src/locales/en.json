@@ -109,6 +109,7 @@
   "list_streams_count": "$ streams",
   "list_mark_mode": "Mark Mode",
   "list_mark_all": "Mark or Unmark All",
+  "list_load_all": "Load All",
   "list_remove_marked": "Remove Marked",
   "list_enqueue_marked": "Enqueue Marked",
   "list_sort_order": "Sort Order",

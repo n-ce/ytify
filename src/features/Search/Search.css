@@ -53,7 +53,7 @@
 
     .suggestions {
       width: calc(100% + var(--border-size-1));
-      max-height: var(--size-fluid-8);
+      max-height: var(--size-fluid-9);
       position: absolute;
       z-index: 5;
       list-style-type: none;

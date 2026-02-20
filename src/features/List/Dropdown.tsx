@@ -9,8 +9,8 @@ export default function Dropdown() {
   const [isSubscribed, setSubscribed] = createSignal(false);
 
   createEffect(() => {
-    // Determine if the current list item is an album based on listStore.id
-    const isAlbum = listStore.id.startsWith('OLAK5uy_'); // Album IDs start with OLAK5uy
+    // Determine if the current list item is an album based on listStore.id or type
+    const isAlbum = listStore.id.startsWith('MPREb') || listStore.type === 'album';
 
     if (isAlbum) {
       const albums = getLibraryAlbums();
@@ -25,8 +25,8 @@ export default function Dropdown() {
 
 
   function subscriptionHandler() {
-    // Determine if the current list item is an album based on listStore.id
-    const isAlbum = listStore.id.startsWith('OLAK5uy_'); // Album IDs start with OLAK5uy
+    // Determine if the current list item is an album based on listStore.id or type
+    const isAlbum = listStore.id.startsWith('MPREb') || listStore.type === 'album';
 
     if (isAlbum) {
       if (isSubscribed()) {
@@ -36,10 +36,9 @@ export default function Dropdown() {
           name: listStore.name,
           author: listStore.author,
           img: listStore.img,
-          id: listStore.id,
-          tracks: listStore.list.map(t => t.id)
+          id: listStore.id
         };
-        saveAlbumToLibrary(listStore.id, albumData, listStore.list); // Use listStore.id (album browseId) for saving
+        saveAlbumToLibrary(listStore.id, albumData); // Use listStore.id (album browseId) for saving
       }
       setSubscribed(!isSubscribed());
       return;
@@ -115,7 +114,7 @@ export default function Dropdown() {
             This correctly covers both regular playlists and albums (which are 'playlists' type)
             and channels.
         */}
-        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'}>
+        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists' || listStore.type === 'album'}>
 
           <li onclick={subscriptionHandler}>
             <i

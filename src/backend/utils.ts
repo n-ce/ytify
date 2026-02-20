@@ -16,11 +16,38 @@ export async function getClient(): Promise<Innertube> {
 
 export function getThumbnailId(url?: string): string {
   if (!url) return "";
+
   const fullUrl = url.startsWith('//') ? `https:${url}` : url;
+
   if (fullUrl.includes('/vi/')) {
     return fullUrl.split('/vi/')[1]?.split('/')[0] || "";
   }
-  return fullUrl.split('/').pop()?.split(/[?=]/)[0] || "";
+
+  try {
+    const urlObj = new URL(fullUrl);
+    const segments = urlObj.pathname.split('/').filter(Boolean); // Remove empty strings
+
+    // 2. Handle Google "a-" style prefixes
+    // If the second to last segment starts with 'a-' or is '-a', 
+    // we need to prepend it to the ID.
+    const last = segments[segments.length - 1] || "";
+    const secondLast = segments[segments.length - 2] || "";
+
+    let id = last.split(/[=]/)[0]; // Strip sizing params (=w544 etc)
+
+    if (secondLast.startsWith('a-') || secondLast === '-a') {
+      return `${secondLast}/${id}`;
+    }
+
+    // 3. Special case for profile/picture/0 logic
+    if (secondLast === 'picture' && segments.includes('profile')) {
+      return id; // returns "0"
+    }
+
+    return id;
+  } catch (e) {
+    return fullUrl.split('/').pop()?.split('=')[0] || "";
+  }
 }
 
 export function formatDuration(durationText?: string): string {
@@ -81,8 +108,8 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
     const subtext = (album || '') + (views ? (album ? ' • ' : '') + views : '');
 
     // Try to get playlistId (OLAK...) from menu items for the albumId field
-    const playlistId = song.menu?.items?.find((i: any) => 
-      i.is(YTNodes.MenuNavigationItem) && 
+    const playlistId = song.menu?.items?.find((i: any) =>
+      i.is(YTNodes.MenuNavigationItem) &&
       i.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId?.startsWith('OLAK')
     )?.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId || song.album?.id || "";
 

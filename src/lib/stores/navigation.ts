@@ -50,14 +50,25 @@ export function closeFeature(name: Features) {
   setNavStore(name, { ref: null, state: false });
 }
 
-type Params = 'q' | 's' | 'f' | 'v' | 'collection' | 'playlist' | 'channel' | 'artist' | 'album' | 'si' | 'supermix' | 't';
+type Params = 'q' | 's' | 'f' | 'collection' | 'playlist' | 'channel' | 'artist' | 'album' | 'si' | 't';
+
+const listParams: Params[] = ['playlist', 'channel', 'artist', 'album', 'collection', 'si'];
 
 export function updateParam(
   param: Params,
   value?: string
 ) {
-  if (value)
+  if (value) {
+    if (listParams.includes(param)) {
+      listParams.forEach(p => params.delete(p));
+      params.delete('q');
+      params.delete('f');
+    }
+    if (param === 'q' || param === 'f') {
+      listParams.forEach(p => params.delete(p));
+    }
     params.set(param, value);
+  }
   else
     params.delete(param);
 

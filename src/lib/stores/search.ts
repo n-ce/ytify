@@ -67,12 +67,14 @@ export async function getSearchResults() {
   const { recentSearches } = drawer;
   const lc = query.trim().toLowerCase();
 
-  if (config.saveRecentSearches && lc) {
-    while (recentSearches.length > 4)
-      recentSearches.shift();
+  if (config.saveRecentSearches && lc && !lc.includes(' ') && !lc.includes(',')) {
+    if (recentSearches.includes(lc)) {
+      recentSearches.splice(recentSearches.indexOf(lc), 1);
+    }
+    recentSearches.push(lc);
 
-    if (!recentSearches.includes(lc))
-      recentSearches.push(lc);
+    while (recentSearches.length > 7)
+      recentSearches.shift();
 
     setDrawer('recentSearches', recentSearches);
   }

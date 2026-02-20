@@ -11,7 +11,7 @@ export const getMeta = (): Meta => {
     return JSON.parse(meta);
   }
 
-  const newMeta: Meta = { version: 4, tracks: 0 };
+  const newMeta: Meta = { version: 5, tracks: 0 };
   const timestamp = Date.now();
 
   const tracks = getTracksMap();
@@ -67,7 +67,7 @@ export const getCollection = (name: string) => JSON.parse(localStorage.getItem('
 
 export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channel[] : Playlist[] => JSON.parse(localStorage.getItem('library_' + type) || '[]');
 
-export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '{}');
+export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '[]');
 
 export function getCollectionItems(collectionId: string): TrackItem[] {
   const collectionIds = getCollection(collectionId);
@@ -95,51 +95,19 @@ export function saveLibraryAlbums(albums: LibraryAlbums) {
   localStorage.setItem('library_albums', JSON.stringify(albums));
 }
 
-export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData: TrackItem[]) {
+export function saveAlbumToLibrary(albumId: string, albumData: Album) {
   const albums = getLibraryAlbums();
-  albums[albumId] = albumData;
-  saveLibraryAlbums(albums);
-
-  const tracks = getTracksMap();
-  for (const track of tracksData) {
-    if (!tracks[track.id]) {
-      tracks[track.id] = track;
-    }
-
-    if (config.dbsync) {
-      import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-        addDirtyTrack(track.id);
-      });
-    }
+  if (!albums.find(a => a.id === albumId)) {
+    albums.push(albumData);
+    saveLibraryAlbums(albums);
   }
-  saveTracksMap(tracks);
   metaUpdater('albums');
 }
 
 export function removeAlbumFromLibrary(albumId: string) {
   const albums = getLibraryAlbums();
-  const tracksToRemove = albums[albumId]?.tracks || [];
-  delete albums[albumId];
-  saveLibraryAlbums(albums);
-
-  const tracks = getTracksMap();
-  const allOtherTrackIds = new Set([
-    ...getCollectionsKeys().flatMap(getCollection),
-    ...Object.values(albums).flatMap(a => a.tracks)
-  ]);
-
-  for (const trackId of tracksToRemove) {
-    if (!allOtherTrackIds.has(trackId)) {
-      delete tracks[trackId];
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
-          removeDirtyTrack(trackId);
-        });
-      }
-    }
-  }
-
-  saveTracksMap(tracks);
+  const newAlbums = albums.filter(a => a.id !== albumId);
+  saveLibraryAlbums(newAlbums);
   metaUpdater('albums');
 }
 
@@ -471,23 +439,35 @@ export function sortCollection(list: TrackItem[], sortBy: SortBy, sortOrder: 'as
 
 export function cleanseLibraryData() {
 
-  // 1. Cleanse library_tracks
+  // 1. Get all tracks from library_tracks
   const rawTracks = JSON.parse(localStorage.getItem('library_tracks') || '{}') as Collection;
+
+  // 2. Identify all valid track IDs by checking all collections
+  const collections = getCollectionsKeys();
+  const referencedTrackIds = new Set<string>();
+
+  collections.forEach(c => {
+    const ids = getCollection(c);
+    ids.forEach(tId => referencedTrackIds.add(tId));
+  });
+
+  // 3. Cleanse library_tracks: Only keep tracks that are referenced
   const cleanedTracks: Collection = {};
   let tracksCleaned = false;
+
   for (const id in rawTracks) {
-    if (id) {
+    if (id && referencedTrackIds.has(id)) {
       cleanedTracks[id] = rawTracks[id];
     } else {
       tracksCleaned = true;
     }
   }
+
   if (tracksCleaned)
     saveTracksMap(cleanedTracks);
 
-  // 2. Cleanse all other collections
-  const collectionKeys = getCollectionsKeys();
-  for (const key of collectionKeys) {
+  // 4. Cleanse all other collections from empty IDs
+  for (const key of collections) {
     const collection = JSON.parse(localStorage.getItem('library_' + key) || '[]') as string[];
     const validCollection = collection.filter(id => id);
     if (validCollection.length < collection.length) {

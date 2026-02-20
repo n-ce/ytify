@@ -1,7 +1,7 @@
 import { YTNodes, type Helpers } from 'youtubei.js';
 import { getClient, getThumbnail, formatDuration, getThumbnailId } from './utils.js';
 
-export default async function(id: string): Promise<YTPlaylistItem> {
+export default async function(id: string, all?: boolean): Promise<YTPlaylistItem> {
   const yt = await getClient();
   let playlist = await yt.getPlaylist(id);
 
@@ -32,11 +32,11 @@ export default async function(id: string): Promise<YTPlaylistItem> {
 
   mapItems(playlist.items);
 
-  let iterations = 0;
-  while (playlist.has_continuation && iterations < 10) {
-    playlist = await playlist.getContinuation();
-    mapItems(playlist.items);
-    iterations++;
+  if (all) {
+    while (playlist.has_continuation) {
+      playlist = await playlist.getContinuation();
+      mapItems(playlist.items);
+    }
   }
 
   return {
@@ -45,6 +45,7 @@ export default async function(id: string): Promise<YTPlaylistItem> {
     author,
     img,
     type: 'playlist' as const,
-    items: allItems
+    items: allItems,
+    hasContinuation: playlist.has_continuation
   };
 }

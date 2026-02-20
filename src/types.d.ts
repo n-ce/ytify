@@ -6,7 +6,7 @@ declare global {
   type TranslationKeys = keyof typeof en;
   type SyncState = 'synced' | 'syncing' | 'dirty' | 'error';
   type Features = 'search' | 'library' | 'player' | 'list' | 'settings' | 'queue' | 'updater';
-  type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue';
+  type Context = 'link' | 'search' | 'hub' | 'playlists' | 'collection' | 'channels' | 'queue' | 'album';
 
   interface YTImage {
     url: string;
@@ -48,6 +48,7 @@ declare global {
     author?: string;
     videoCount?: string;
     items?: YTItem[];
+    hasContinuation?: boolean;
   }
 
   interface YTArtistItem extends ListItem {
@@ -73,11 +74,9 @@ declare global {
   type Playlist = ListItem & {
     author: string
   };
-  type Album = Playlist & {
-    tracks: string[]
-  };
+  type Album = Playlist;
 
-  type LibraryAlbums = { [id: string]: Album };
+  type LibraryAlbums = Album[];
 
   interface Meta {
     version: number,

@@ -1,5 +1,5 @@
 import { Accessor, For, Show } from "solid-js";
-import { listStore } from "@lib/stores";
+import { listStore, loadAll, t } from "@lib/stores";
 import StreamItem from "@components/StreamItem";
 
 export default function Results(_: {
@@ -30,6 +30,11 @@ export default function Results(_: {
         }
         </For>
       </div>
+      <Show when={listStore.type === 'playlists' && listStore.hasContinuation}>
+        <button class="loadAllBtn" onclick={loadAll}>
+          {t('list_load_all')}
+        </button>
+      </Show>
     </Show>
   );
 }

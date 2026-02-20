@@ -102,7 +102,27 @@
     }
   }
 
-  #sortMenu {
-    margin-right: auto;
+      #sortMenu {
+      margin-right: auto;
+    }
   }
-}
+  
+  .loadAllBtn {
+    margin: var(--gap) auto;
+    padding: var(--size-2) var(--size-4);
+    border-radius: var(--roundness);
+    border: var(--border);
+    background-color: var(--onBg);
+    color: var(--text);
+    font-size: var(--font-size-1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: block;
+    width: fit-content;
+  
+    &:hover {
+      background-color: var(--onBg2);
+      color: var(--text2);
+    }
+  }
+  

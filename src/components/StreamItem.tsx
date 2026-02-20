@@ -55,8 +55,7 @@ export default function(data: YTItem & {
 
 
 
-  const isAlbum = data.context?.id.startsWith('MPREb');
-  console.log(data.context);
+  const isAlbum = data.context?.id.startsWith('MPREb') || listStore.type === 'album';
   const isFromArtist = data.context?.id?.startsWith('Artist - ');
   const isMusic = data.author?.endsWith('- Topic');
 
@@ -186,7 +185,9 @@ export default function(data: YTItem & {
         <p class='title'>{data.title}</p>
         <div class='avu'>
           <p class='author truncate'>{data.author?.replace(' - Topic', '')}</p>
-          <p class='viewsXuploaded truncate'>{data.subtext}</p>
+          <Show when={!isAlbum}>
+            <p class='viewsXuploaded truncate'>{data.subtext}</p>
+          </Show>
         </div>
       </div>
       <Show when={data.draggable}>

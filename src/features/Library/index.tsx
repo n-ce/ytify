@@ -1,54 +1,14 @@
 import { For, Show, lazy, onMount, createSignal } from "solid-js";
 import './Library.css';
 import Collections from "./Collections";
-import SubLists from "./SubLists";
-import { getLibraryAlbums, config } from "@lib/utils";
+
+import { getLibraryAlbums, config, getMeta, getLists } from "@lib/utils";
 import { t, setNavStore, store } from "@lib/stores";
 import ListItem from "@components/ListItem";
 import Dropdown from "./Dropdown";
 
 const Gallery = lazy(() => import('./Gallery'));
 const SubFeed = lazy(() => import('./SubFeed'));
-
-const NewAlbums = () => {
-  const newAlbums = getLibraryAlbums();
-  const albumIds = Object.keys(newAlbums);
-
-  const array = albumIds.map(albumId => {
-    const album = newAlbums[albumId];
-    return {
-      type: 'playlist',
-      name: album.name,
-      author: album.author,
-      id: albumId,
-      img: album.img
-    };
-  });
-
-  return (
-    <Show when={array.length > 0}>
-      <article>
-        <p>
-          <i class="ri-album-fill"></i>&nbsp;
-          {t('library_albums')}
-        </p>
-        <div>
-          <For each={array}>
-            {(item) =>
-              <ListItem
-                name={item.name}
-                id={item.id}
-                img={item.img}
-                author={item.author}
-                type='album'
-              />
-            }
-          </For>
-        </div>
-      </article>
-    </Show>
-  );
-};
 
 
 export default function() {
@@ -57,10 +17,14 @@ export default function() {
   let libraryRef!: HTMLElement;
   let syncBtn!: HTMLElement;
 
-  onMount(() => {
-    libraryRef.scrollIntoView();
-    setNavStore('library', 'ref', libraryRef);
-  });
+  if (getMeta().version === 4)
+    import('@lib/modules/libraryMigratorV5').then(m => m.default());
+  else
+    onMount(() => {
+
+      libraryRef.scrollIntoView();
+      setNavStore('library', 'ref', libraryRef);
+    });
 
   return (
     <section class="library" ref={libraryRef}>
@@ -123,13 +87,53 @@ export default function() {
       </Show>
       <Collections />
       <br />
-      <NewAlbums />
+      <Show when={getLibraryAlbums().length > 0}>
+        <article>
+          <p>
+            <i class="ri-album-fill"></i>&nbsp;
+            {t('library_albums')}
+          </p>
+          <div>
+            <For each={getLibraryAlbums()}>
+              {(item) =>
+                <ListItem
+                  name={item.name}
+                  id={item.id}
+                  img={item.img}
+                  author={item.author}
+                  type='album'
+                />
+              }
+            </For>
+          </div>
+        </article>
+      </Show>
       <br />
-      <For each={['albums', 'playlists']}>
-        {(item) =>
-          <SubLists flag={item as 'albums' | 'playlists'} />
-        }
-      </For>
+
+      <Show when={getLists('playlists').length > 0}>
+        <article>
+          <p>
+            <i class='ri-youtube-fill'></i>&nbsp;
+            {t('library_playlists')}
+          </p>
+          <div>
+            <For each={getLists('playlists')}>
+              {(item) =>
+                <ListItem
+                  name={item.name}
+                  id={item.id}
+                  img={item.img}
+                  author={item.author}
+                  type='playlist'
+                />
+              }
+            </For>
+          </div>
+        </article>
+      </Show>
+
+      <br />
+
     </section>
   );
 }

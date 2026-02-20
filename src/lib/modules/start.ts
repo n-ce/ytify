@@ -27,6 +27,8 @@ export default async function() {
   const shared = params.get('si');
   const channel = params.get('channel');
   const playlist = params.get('playlist');
+  const artist = params.get('artist');
+  const album = params.get('album');
 
   if (collection || shared)
     fetchCollection(collection || shared, Boolean(shared));
@@ -34,12 +36,17 @@ export default async function() {
     getList(channel, 'channel')
   else if (playlist)
     getList(playlist, 'playlist')
+  else if (artist)
+    getList(artist, 'artist')
+  else if (album)
+    getList(album, 'album')
 
   const q = params.get('q');
   if (q) {
     const f = params.get('f') || 'all';
     setConfig('searchFilter', f);
     setSearchStore('query', q);
+    setNavStore('search', 'state', true);
   }
 
 
