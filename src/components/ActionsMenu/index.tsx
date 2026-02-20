@@ -1,4 +1,4 @@
-import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore } from '@lib/stores';
+import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore, setQueueStore, queueStore } from '@lib/stores';
 import { getDownloadLink } from '@lib/utils';
 import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
 import './ActionsMenu.css';
@@ -24,9 +24,11 @@ export default function() {
 
   const [isListenLater, setIsListenLater] = createSignal(false);
   const [isDownloading, setIsDownloading] = createSignal(false);
+  const [isViewingAuthor, setIsViewingAuthor] = createSignal(false);
+  const [isViewingAlbum, setIsViewingAlbum] = createSignal(false);
 
   createEffect(() => {
-    const { id } = store.actionsMenu as CollectionItem;
+    const { id } = store.actionsMenu as TrackItem;
     if (id)
       setIsListenLater(getCollection('listenLater').includes(id));
   })
@@ -36,13 +38,15 @@ export default function() {
     <dialog
       id="actionsMenu"
       ref={dialog}
-      onclick={() => !isDownloading() && closeDialog()}
+      onclick={() => !isDownloading() && !isViewingAuthor() && !isViewingAlbum() && closeDialog()}
     >
       <StreamItem
         id={store.actionsMenu?.id || ''}
         title={store.actionsMenu?.title || ''}
-        author={store.actionsMenu?.author}
+        authorId={store.actionsMenu?.authorId || ''}
+        author={store.actionsMenu?.author || ''}
         duration={store.actionsMenu?.duration || ''}
+        type="video"
         context={{
           src: 'queue', /* only for invoking  humbnail  cropping*/
           id: '1'
@@ -70,7 +74,7 @@ export default function() {
             }}
           ></i>
           <i aria-label={t('collection_selector_add_to')}>
-            <CollectionSelector close={closeDialog} data={[store.actionsMenu as CollectionItem]} />
+            <CollectionSelector close={closeDialog} data={[store.actionsMenu as TrackItem]} />
           </i>
         </li>
 
@@ -81,7 +85,7 @@ export default function() {
 
           closeDialog();
         }}>
-          <i class="ri-skip-forward-line"></i>{t('player_play_next')}
+          <i class="ri-skip-forward-fill"></i>{t('player_play_next')}
         </li>
 
         <li tabindex="1" onclick={() => {
@@ -94,26 +98,42 @@ export default function() {
         </li>
 
         <li tabindex="3" onclick={async () => {
-          if (navStore.queue.state)
-            navStore.queue.ref?.scrollIntoView();
-          else setNavStore('queue', 'state', true);
-          getList('RD' + store?.actionsMenu?.id, 'mix');
-          closeDialog();
+          const id = store.actionsMenu?.id;
+          if (!id) return;
+
+          setQueueStore('isLoading', true);
+          import('@lib/modules/getRadio')
+            .then(mod => mod.default(id))
+            .then(data => {
+              setQueueStore('list', []);
+              addToQueue(data);
+              if (navStore.queue.state)
+                navStore.queue.ref?.scrollIntoView();
+              else setNavStore('queue', 'state', true);
+            })
+            .catch(e => {
+              setStore('snackbar', e instanceof Error ? e.message : 'Unknown error');
+            })
+            .finally(() => {
+              setQueueStore('isLoading', false);
+              closeDialog();
+            });
         }}>
-          <i class="ri-radio-line"></i>{t('actions_menu_start_radio')}
+          <i class={queueStore.isLoading ? "ri-loader-3-line loading-spinner" : "ri-radio-line"}>
+          </i>{t('actions_menu_start_radio')}
         </li>
 
 
 
         <li tabindex="4" onclick={async () => {
           if (isDownloading()) return;
-          
+
           const id = store?.actionsMenu?.id;
           if (!id) {
             setStore('snackbar', t('actions_menu_id_not_found'));
             return;
           }
-          
+
           setIsDownloading(true);
           try {
             await getDownloadLink(id);
@@ -122,12 +142,13 @@ export default function() {
             closeDialog();
           }
         }}>
-          <i class={isDownloading() ? "ri-loader-3-line" : "ri-download-2-fill"}></i>
+          <i class={isDownloading() ? "ri-loader-3-line loading-spinner" : "ri-download-2-fill"}></i>
           {t(isDownloading() ? 'actions_menu_downloading' : 'actions_menu_download')}
         </li>
 
-        <li tabindex="5" onclick={() => {
-          const { author, authorId } = store.actionsMenu as CollectionItem;
+        <li tabindex="5" onclick={async () => {
+          if (isViewingAuthor()) return;
+          const { author, authorId } = store.actionsMenu as TrackItem;
 
           if (author)
             setListStore('name',
@@ -135,13 +156,18 @@ export default function() {
                 ('Artist - ' + author.replace('- Topic', ''))
                 : '');
 
-          if (authorId)
-            getList(authorId, isMusic ? 'artist' : 'channel');
-
-          closeDialog();
+          if (authorId) {
+            setIsViewingAuthor(true);
+            try {
+              await getList(authorId, isMusic ? 'artist' : 'channel');
+            } finally {
+              setIsViewingAuthor(false);
+              closeDialog();
+            }
+          }
         }}>
 
-          <i class="ri-user-3-line"></i>
+          <i class={isViewingAuthor() ? "ri-loader-3-line loading-spinner" : "ri-user-3-line"}></i>
           {t(isMusic ?
             'actions_menu_view_artist' :
             'actions_menu_view_channel')
@@ -150,14 +176,20 @@ export default function() {
 
         <Show when={store.actionsMenu?.albumId}>
 
-          <li tabindex="6" onclick={() => {
+          <li tabindex="6" onclick={async () => {
+            if (isViewingAlbum()) return;
             const albumId = store.actionsMenu?.albumId;
             if (albumId) {
-              getList(albumId, 'album');
+              setIsViewingAlbum(true);
+              try {
+                await getList(albumId, 'album');
+              } finally {
+                setIsViewingAlbum(false);
+                closeDialog();
+              }
             }
-            closeDialog();
           }}>
-            <i class="ri-album-fill"></i>{t('actions_menu_view_album')}
+            <i class={isViewingAlbum() ? "ri-loader-3-line loading-spinner" : "ri-album-fill"}></i>{t('actions_menu_view_album')}
           </li>
 
         </Show>

@@ -1,6 +1,15 @@
 import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
-import { config } from '@lib/utils/config';
+import { config, drawer, setDrawer } from '@lib/utils/config';
+
+const syncLibrary = (action: 'add' | 'remove' | 'schedule', id?: string) => {
+  if (!config.dbsync) return;
+  import('@lib/modules/cloudSync').then(m => {
+    if (action === 'add' && id) m.addDirtyTrack(id);
+    else if (action === 'remove' && id) m.removeDirtyTrack(id);
+    else if (action === 'schedule') m.scheduleSync();
+  });
+};
 
 
 // New Library V2 utils
@@ -11,7 +20,7 @@ export const getMeta = (): Meta => {
     return JSON.parse(meta);
   }
 
-  const newMeta: Meta = { version: 4, tracks: 0 };
+  const newMeta: Meta = { version: 5, tracks: 0 };
   const timestamp = Date.now();
 
   const tracks = getTracksMap();
@@ -67,12 +76,12 @@ export const getCollection = (name: string) => JSON.parse(localStorage.getItem('
 
 export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channel[] : Playlist[] => JSON.parse(localStorage.getItem('library_' + type) || '[]');
 
-export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '{}');
+export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '[]');
 
-export function getCollectionItems(collectionId: string): CollectionItem[] {
+export function getCollectionItems(collectionId: string): TrackItem[] {
   const collectionIds = getCollection(collectionId);
   const tracksMap = getTracksMap();
-  return collectionIds.map((id: string) => tracksMap[id]).filter(Boolean) as CollectionItem[];
+  return collectionIds.map((id: string) => tracksMap[id]).filter(Boolean) as TrackItem[];
 }
 
 export function saveTracksMap(tracks: Collection) {
@@ -95,74 +104,31 @@ export function saveLibraryAlbums(albums: LibraryAlbums) {
   localStorage.setItem('library_albums', JSON.stringify(albums));
 }
 
-export function saveAlbumToLibrary(albumId: string, albumData: Album, tracksData: CollectionItem[]) {
+export function saveAlbumToLibrary(albumId: string, albumData: Album) {
   const albums = getLibraryAlbums();
-  albums[albumId] = albumData;
-  saveLibraryAlbums(albums);
-
-  const tracks = getTracksMap();
-  for (const track of tracksData) {
-    if (tracks[track.id]) {
-      tracks[track.id].albumId = albumId;
-    } else {
-      tracks[track.id] = { ...track, albumId: albumId };
-    }
-    
-    if (config.dbsync) {
-      import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-        addDirtyTrack(track.id);
-      });
-    }
+  if (!albums.find(a => a.id === albumId)) {
+    albums.push(albumData);
+    saveLibraryAlbums(albums);
   }
-  saveTracksMap(tracks);
   metaUpdater('albums');
 }
 
 export function removeAlbumFromLibrary(albumId: string) {
   const albums = getLibraryAlbums();
-  const tracksToRemove = albums[albumId]?.tracks || [];
-  delete albums[albumId];
-  saveLibraryAlbums(albums);
-
-  const tracks = getTracksMap();
-  const allOtherTrackIds = new Set([
-    ...getCollectionsKeys().flatMap(getCollection),
-    ...Object.values(albums).flatMap(a => a.tracks)
-  ]);
-
-  for (const trackId of tracksToRemove) {
-    if (!allOtherTrackIds.has(trackId)) {
-      delete tracks[trackId];
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
-          removeDirtyTrack(trackId);
-        });
-      }
-    } else {
-      const track = tracks[trackId];
-      if (track?.albumId === albumId) {
-        delete track.albumId;
-        if (config.dbsync) {
-          import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-            addDirtyTrack(trackId);
-          });
-        }
-      }
-    }
-  }
-
-  saveTracksMap(tracks);
+  const newAlbums = albums.filter(a => a.id !== albumId);
+  saveLibraryAlbums(newAlbums);
   metaUpdater('albums');
 }
 
 
 export function addToCollection(
   name: string,
-  data: CollectionItem[]
+  data: TrackItem[]
 ) {
   const collection = getCollection(name);
   const tracks = getTracksMap();
-  const prepend = ['history', 'favorites'].includes(name);
+  const prepend = ['history', 'favorites', 'liked'].includes(name);
+  const { libraryPlays } = drawer;
 
   for (const item of data) {
     if (!item?.id) continue;
@@ -177,20 +143,12 @@ export function addToCollection(
     else collection.push(id);
 
     if (id in tracks) {
-      const track = tracks[id];
-      track.plays = (track.plays || 1) + 1;
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-          addDirtyTrack(id); // Mark as updated
-        });
-      }
+      libraryPlays[id] = (libraryPlays[id] || 1) + 1;
+      setDrawer('libraryPlays', libraryPlays);
+      syncLibrary('add', id);
     } else {
       tracks[id] = item;
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-          addDirtyTrack(id); // Mark as added
-        });
-      }
+      syncLibrary('add', id);
     }
   }
 
@@ -221,11 +179,7 @@ export function removeFromCollection(
 
     if (!isReferenced) {
       delete tracks[id];
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
-          removeDirtyTrack(id); // Mark as deleted
-        });
-      }
+      syncLibrary('remove', id);
     }
   }
 
@@ -254,11 +208,7 @@ export function deleteCollection(name: string) {
 
     if (!isReferenced) {
       delete tracks[id];
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
-          removeDirtyTrack(id); // Mark as deleted
-        });
-      }
+      syncLibrary('remove', id);
     }
   }
 
@@ -279,11 +229,7 @@ export const metaUpdater = (key: string, remove?: boolean) => {
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
   setStore('syncState', 'dirty');
-  if (config.dbsync) {
-    import('@lib/modules/cloudSync').then(({ scheduleSync }) => {
-      scheduleSync();
-    });
-  }
+  syncLibrary('schedule');
 }
 
 
@@ -387,9 +333,10 @@ function getLocalCollection(
   const tracks = getTracksMap();
 
   let sortedIds = ids;
-  if (config.sortOrder !== 'modified') {
+  const isReserved = listStore.reservedCollections.includes(decodeURI(collection));
+  if (!isReserved && (config.sortBy !== 'modified' || config.sortOrder === 'asc')) {
     const items = ids.map(id => tracks[id]);
-    const sortedItems = sortCollection(items, config.sortOrder);
+    const sortedItems = sortCollection(items, config.sortBy, config.sortOrder);
     sortedIds = sortedItems.map(item => item.id);
   }
 
@@ -402,7 +349,7 @@ function getLocalCollection(
 
   if (usePagination) {
     let loadedCount = 20;
-    setListStore('list', sortedIds.slice(0, loadedCount).map(id => tracks[id]));
+    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({ ...tracks[id], type: 'video' as const })));
 
     const observerCallback = () => {
       if (loadedCount >= sortedIds.length) return 0;
@@ -410,14 +357,14 @@ function getLocalCollection(
       const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
-      setListStore('list', (l) => [...l, ...nextBatch.map(id => tracks[id])]);
+      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({ ...tracks[id], type: 'video' as const }))]);
       return sortedIds.length - loadedCount;
     };
 
     setTimeout(() => setObserver(observerCallback), 100);
 
   } else {
-    setListStore('list', sortedIds.map(id => tracks[id]));
+    setListStore('list', sortedIds.map(id => ({ ...tracks[id], type: 'video' as const })));
   }
 
   setListStore('id', decodeURI(collection));
@@ -439,21 +386,29 @@ async function getSharedCollection(
   setListStore('isLoading', false);
 }
 
-export type SortOrder = 'modified' | 'name' | 'artist' | 'duration';
+export type SortBy = 'modified' | 'name' | 'artist' | 'duration';
 
-export function sortCollection(list: CollectionItem[], sortOrder: SortOrder): CollectionItem[] {
-  if (sortOrder === 'modified') {
-    return list;
-  }
+export function sortCollection(list: TrackItem[], sortBy: SortBy, sortOrder: 'asc' | 'desc'): TrackItem[] {
 
   const listToSort = [...list];
 
+  if (sortBy === 'modified') {
+    // If modified and desc, we just return the list (it's already in the order we want for manual/time)
+    // Actually, if it's 'asc', we reverse it. 
+    // Manual order is usually newest first for reserved, but for non-reserved it's oldest first.
+    return sortOrder === 'asc' ? listToSort.reverse() : listToSort;
+  }
+
+
   listToSort.sort((a, b) => {
-    switch (sortOrder) {
+    let result = 0;
+    switch (sortBy) {
       case 'name':
-        return a.title.localeCompare(b.title);
+        result = a.title.localeCompare(b.title);
+        break;
       case 'artist':
-        return (a.author || '').localeCompare(b.author || '');
+        result = (a.author || '').localeCompare(b.author || '');
+        break;
       case 'duration':
         const parseDuration = (d: string) => {
           const parts = d.split(':').map(Number);
@@ -461,10 +416,10 @@ export function sortCollection(list: CollectionItem[], sortOrder: SortOrder): Co
           if (parts.length === 2) return parts[0] * 60 + parts[1];
           return 0;
         };
-        return parseDuration(a.duration) - parseDuration(b.duration);
-      default:
-        return 0;
+        result = parseDuration(a.duration) - parseDuration(b.duration);
+        break;
     }
+    return sortOrder === 'asc' ? result : -result;
   });
 
   return listToSort;
@@ -472,23 +427,49 @@ export function sortCollection(list: CollectionItem[], sortOrder: SortOrder): Co
 
 export function cleanseLibraryData() {
 
-  // 1. Cleanse library_tracks
+  // 1. Get all tracks from library_tracks
   const rawTracks = JSON.parse(localStorage.getItem('library_tracks') || '{}') as Collection;
+
+  // 2. Identify all valid track IDs by checking all collections
+  const collections = getCollectionsKeys();
+  const referencedTrackIds = new Set<string>();
+
+  collections.forEach(c => {
+    const ids = getCollection(c);
+    ids.forEach(tId => referencedTrackIds.add(tId));
+  });
+
+  // 3. Cleanse library_tracks: Only keep tracks that are referenced and strip extra properties
   const cleanedTracks: Collection = {};
   let tracksCleaned = false;
+
   for (const id in rawTracks) {
-    if (id) {
-      cleanedTracks[id] = rawTracks[id];
+    if (id && referencedTrackIds.has(id)) {
+      const track = rawTracks[id];
+      const cleanedTrack: TrackItem = {
+        id: track.id,
+        title: track.title,
+        duration: track.duration,
+        author: track.author,
+        authorId: track.authorId || '',
+      };
+
+      cleanedTracks[id] = cleanedTrack;
+
+      if (!tracksCleaned && Object.keys(track).length !== Object.keys(cleanedTrack).length) {
+        tracksCleaned = true;
+      }
     } else {
       tracksCleaned = true;
+      syncLibrary('remove', id);
     }
   }
+
   if (tracksCleaned)
     saveTracksMap(cleanedTracks);
 
-  // 2. Cleanse all other collections
-  const collectionKeys = getCollectionsKeys();
-  for (const key of collectionKeys) {
+  // 4. Cleanse all other collections from empty IDs
+  for (const key of collections) {
     const collection = JSON.parse(localStorage.getItem('library_' + key) || '[]') as string[];
     const validCollection = collection.filter(id => id);
     if (validCollection.length < collection.length) {

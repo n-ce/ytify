@@ -7,6 +7,7 @@ import OpenProps from 'open-props';
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
 import path from 'path';
+import url from 'url';
 
 
 export default defineConfig(({ command }) => ({
@@ -14,8 +15,8 @@ export default defineConfig(({ command }) => ({
   define: {
     Locales: readdirSync(resolve(__dirname, './src/locales')).map(file => file.slice(0, 2)),
     Build: JSON.stringify('v' + require('./package.json').version),
-    Backend: JSON.stringify([
-      'https://ytify-zeta.vercel.app',
+    Backend: command === 'serve' ? JSON.stringify(['']) : JSON.stringify([
+      'https://ytify-zeta.vercel.app'
     ]),
   },
   resolve: {
@@ -27,6 +28,7 @@ export default defineConfig(({ command }) => ({
   plugins: [
     solidPlugin(),
     injectEruda(command === 'serve'),
+    apiMiddleware(command === 'serve'),
     VitePWA({
       manifest: {
         "short_name": "Ytify",
@@ -136,5 +138,29 @@ const injectEruda = (serve: boolean) => serve ? (<PluginOption>{
     ]
   })
 }) : [];
+
+const apiMiddleware = (serve: boolean): PluginOption => serve ? {
+  name: 'api-middleware',
+  configureServer(server) {
+    server.middlewares.use(async (req, res, next) => {
+      if (req.url?.startsWith('/api/')) {
+        const { createLocalAdapter } = await server.ssrLoadModule('./src/backend/localAdapter.ts');
+        const parsedUrl = url.parse(req.url, true);
+        const endpoint = parsedUrl.pathname?.split('/').pop();
+
+        try {
+          const handlerModule = await server.ssrLoadModule(`./api/${endpoint}.ts`);
+          const adapter = createLocalAdapter(handlerModule.default);
+          return adapter(req, res);
+        } catch (e) {
+          console.error(`Failed to load API handler for ${endpoint}:`, e);
+          next();
+        }
+      } else {
+        next();
+      }
+    });
+  }
+} : [];
 
 

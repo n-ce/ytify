@@ -1,0 +1,38 @@
+.about {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--size-8);
+
+  svg {
+    transform: scale(9);
+    margin: var(--font-size-7) var(--font-size-6);
+  }
+
+  a {
+    color: var(--text);
+  }
+
+  a.underline {
+    text-decoration-line: underline !important
+  }
+
+  >p {
+    font-size: var(--font-size-1);
+
+    a {
+      padding: 0;
+    }
+
+    svg {
+      margin: 0 8px 3px 6px;
+      display: inline-block;
+    }
+  }
+
+  span {
+    a {
+      margin-right: 1ch;
+    }
+  }
+
+}

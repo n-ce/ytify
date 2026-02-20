@@ -42,7 +42,6 @@
     "queue_change_notification": "As alterações terão efeito a partir do próximo stream",
     "queue_author_grouping": "Agrupamento por autor",
     "queue_prefetch": "Pré-carregamento da fila",
-    "queue_standby_header": "Sugestões para si",
     "fetchlist_url_null": "Nenhuma URL de Canal fornecida",
     "fetchlist_error": "Não foi possível obter playlistData",
     "fetchlist_nonexistent": "Erro obtido: \"A playlist não existe.\"",

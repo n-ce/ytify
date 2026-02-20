@@ -1,12 +1,13 @@
 import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, fetchUma } from '@lib/utils';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, drawer } from '@lib/utils';
 
 
 
 export default async function() {
 
-  if (!params.size)
-    setNavStore('home', 'state', true);
+  if (!params.size) {
+    setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', true);
+  }
 
   // Handle /s/:id URLs by transforming them to /?s=id internally
   const pathParts = location.pathname.split('/');
@@ -22,21 +23,12 @@ export default async function() {
 
 
 
-  await fetchUma()
-    .then(data => {
-      setStore({
-        invidious: data,
-        index: 0
-      })
-    })
-    .catch(() => {
-      setStore('snackbar', '⚠️  Failed to Fetch Instances from Uma');
-    });
-
   const collection = params.get('collection');
   const shared = params.get('si');
   const channel = params.get('channel');
   const playlist = params.get('playlist');
+  const artist = params.get('artist');
+  const album = params.get('album');
 
   if (collection || shared)
     fetchCollection(collection || shared, Boolean(shared));
@@ -44,19 +36,26 @@ export default async function() {
     getList(channel, 'channel')
   else if (playlist)
     getList(playlist, 'playlist')
+  else if (artist)
+    getList(artist, 'artist')
+  else if (album)
+    getList(album, 'album')
 
   const q = params.get('q');
   if (q) {
     const f = params.get('f') || 'all';
     setConfig('searchFilter', f);
     setSearchStore('query', q);
+    setNavStore('search', 'state', true);
   }
 
 
   const isPWA = idFromURL(params.get('url') || params.get('text'));
   const id = params.get('s') || isPWA;
 
+
   if (id) {
+
     if (isPWA && shareAction === 'watch') {
       setPlayerStore('stream', 'id', id);
       setPlayerStore('isWatching', true);
@@ -109,4 +108,7 @@ export default async function() {
     });
 
   cleanseLibraryData();
+
+
+
 }

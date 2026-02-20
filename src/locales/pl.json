@@ -42,7 +42,6 @@
     "queue_change_notification": "Zmiany zostaną wprowadzone od następnego strumienia",
     "queue_author_grouping": "Grupowanie według autora",
     "queue_prefetch": "Wstępne pobieranie kolejki",
-    "queue_standby_header": "Propozycje dla Ciebie",
     "fetchlist_url_null": "Nie podano adresu URL kanału",
     "fetchlist_error": "Nie udało się pobrać listy odtwarzania",
     "fetchlist_nonexistent": "Błąd: Lista odtwarzania nie istnieje.”",

@@ -8,6 +8,7 @@ type RecommendedVideo = {
   lengthSeconds: number;
   videoId: string;
   authorUrl: string;
+  authorId: string;
 };
 
 export default function(
@@ -35,7 +36,8 @@ export default function(
           title: stream.title,
           author: stream.author,
           duration: convertSStoHHMMSS(stream.lengthSeconds),
-          authorId: stream.authorUrl.slice(9),
+          authorId: stream.authorId || stream.authorUrl?.slice(9) || '',
+          type: 'video' as const,
           frequency: 1
         });
       }

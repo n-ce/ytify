@@ -42,7 +42,6 @@
     "queue_change_notification": "ستحدث التغييرات من التدفق التالي",
     "queue_author_grouping": "تجميع حسب المؤلف",
     "queue_prefetch": "الجلب المسبق لقائمة الانتظار",
-    "queue_standby_header": "اقتراحات لك",
     "fetchlist_url_null": "لم يتم توفير عنوان URL للقناة",
     "fetchlist_error": "تعذر الحصول على بيانات قائمة التشغيل",
     "fetchlist_nonexistent": "حدث خطأ: \"قائمة التشغيل غير موجودة.\"",

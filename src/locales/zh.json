@@ -42,7 +42,6 @@
     "queue_change_notification": "更改将从下一个流开始生效",
     "queue_author_grouping": "作者分组",
     "queue_prefetch": "队列预取",
-    "queue_standby_header": "为您推荐",
     "fetchlist_url_null": "未提供频道URL",
     "fetchlist_error": "无法获取播放列表数据",
     "fetchlist_nonexistent": "出现错误：“播放列表不存在。”",

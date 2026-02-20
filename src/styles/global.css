@@ -1,7 +1,8 @@
 @import 'open-props/normalize.min.css';
-@import 'remixicon.css';
-@import 'header.css';
+@import 'patterns.css';
+@import 'layout.css';
 @import 'footer.css';
+@import 'remixicon.css';
 @import 'tooltips.css';
 
 :root {
@@ -27,10 +28,6 @@
   --font: ui-rounded, Segoe UI, source-sans-pro, Inter, Noto Sans, Oxygen, Calibri, Cantarell, Ubuntu, Roboto, system-ui, Open Sans, Helvetica Neue, sans-serif;
 }
 
-
-
-
-
 html {
   height: 100dvh;
   background: var(--trueBg);
@@ -42,149 +39,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-main {
-  color: color-mix(in srgb, oklch(from var(--source) 50% calc(c * var(--chroma)) h), var(--text) 80%);
-  display: flex;
-  height: 100%;
-  overflow-x: auto;
-  flex-direction: row;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-
-  section {
-    height: 100%;
-    flex: 1 0 0;
-    padding: var(--gap) var(--size-fluid-3);
-    padding-top: 0;
-    overflow-y: auto;
-    scroll-snap-align: start;
-    min-width: calc(100dvw / var(--landscapeSections));
-    flex-shrink: 0;
-
-  }
-
-
-  @media(orientation:landscape) {
-    section:first-child {
-      padding-left: var(--size-fluid-5);
-    }
-
-    section:last-child {
-      padding-right: var(--size-fluid-5);
-    }
-
-    section:only-child {
-      .hub {
-
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: var(--gap);
-
-      }
-
-
-      &:has(>img) {
-        overflow: initial !important;
-
-        .list-thumbnail {
-          display: inline-block;
-          height: calc(100% - var(--size-12));
-          margin: 0;
-          margin-right: var(--gap);
-          vertical-align: middle;
-        }
-
-        .listContainer {
-          height: calc(100% - var(--size-10));
-          width: calc(100% - var(--size-13));
-          display: inline-block;
-          vertical-align: top;
-          margin: 0 !important;
-          overflow-y: auto !important;
-        }
-      }
-
-
-      .searchlist,
-      .listContainer {
-
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--gap);
-
-        .streamItem {
-          display: inline-flex;
-          width: 100%;
-          grid-column: span 2;
-          margin: 0;
-        }
-
-        .listItem {
-          width: 100%;
-          grid-column: span 1;
-          margin: 0;
-        }
-
-      }
-    }
-
-  }
-
-  @media (orientation: portrait) {
-
-    section {
-      flex: 0 0 100%;
-      scroll-snap-align: center;
-      padding: 0 var(--gap);
-    }
-  }
-
-
-}
-
-
-
-dialog {
-  width: 100dvw;
-  border-radius: 0;
-  box-shadow: none;
-
-  @media(orientation:landscape) {
-    width: calc(100dvw / 1.5);
-    margin-left: calc(100dvw / 3);
-  }
-
-  &::backdrop {
-    background: none;
-  }
-}
-
-@keyframes spinner {
-  from {
-    transform: rotate(0turn)
-  }
-
-  to {
-    transform: rotate(1turn)
-  }
-}
-
-.ri-loader-3-line {
-  display: block;
-  font-size: var(--font-size-6);
-  animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
-  text-align: center;
-  margin-top: auto;
-}
-
-
 select {
   font-family: inherit;
   background: none;
   outline: none;
   color: var(--text);
 
-  /* fix white on white issue on dark mode */
   option,
   optgroup {
     cursor: pointer;
@@ -196,69 +56,7 @@ a {
   color: var(--text);
 }
 
-.displayer {
-  white-space: pre;
-  background: var(--onBg);
-  box-shadow: var(--shadow-1);
-  border: var(--border);
-  color: var(--text);
-  border-radius: var(--roundness);
-  width: calc(100dvmin - calc(var(--gap) - var(--border-size-1)) * 2);
-  margin: auto;
-
-  &::backdrop {
-    background-color: #0007;
-  }
-
-  &[open] {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    gap: var(--gap);
-  }
-
-  input {
-    background: none;
-    border-bottom: var(--border);
-    font-weight: var(--font-weight-5);
-    height: var(--size-7);
-    font-size: var(--font-size-2);
-
-    &::placeholder {
-      color: inherit;
-    }
-
-    &:disabled {
-      opacity: 0;
-    }
-  }
-
-  span {
-    width: 100%;
-    display: flex;
-    margin-top: var(--size-2);
-
-    button {
-      background-color: var(--text);
-      color: var(--onBg);
-      border-radius: var(--roundness);
-    }
-
-    button.ri-close-large-line {
-      margin-left: auto;
-    }
-  }
-
-  h4 {
-    margin-bottom: var(--size-4);
-  }
-
-}
-
 i {
-
   cursor: pointer;
-
   position: relative;
-
 }

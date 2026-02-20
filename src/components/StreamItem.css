@@ -1,31 +1,38 @@
 .streamItem {
 	width: 100%;
 	user-select: none;
-	color: var(--text);
 	margin-bottom: calc(var(--gap) - var(--size-2));
 	padding: var(--size-1);
-	border: var(--border-size-1) solid none;
-	border-radius: var(--roundness);
 	display: flex;
 	align-items: center;
 	position: relative;
-	transition: transform 0.4s;
 	text-decoration: none;
 	overflow: hidden;
-	cursor: pointer;
+	background-color: transparent;
+	border: var(--border-size-1) solid transparent;
+
+	&:hover {
+		background-color: var(--onBg2);
+		color: var(--text2);
+		border: var(--border);
+	}
 
 	&.ravel {
 		* {
 			opacity: 0;
 		}
 
-		background: var(--onBg) !important;
+		background-color: var(--onBg) !important;
+		border: var(--border) !important;
 	}
 
-	&:hover {
-		background: var(--onBg);
-		color: var(--text2);
-		border: var(--border);
+	&.marked {
+		background-color: var(--onBg);
+		color: var(--text);
+	}
+
+	&.delete {
+		background-color: color-mix(in srgb, #f22, var(--onBg) 80%);
 	}
 
 	div,
@@ -33,7 +40,6 @@
 		pointer-events: none;
 		transition: opacity 0.4s;
 	}
-
 
 	span {
 		position: relative;
@@ -48,7 +54,6 @@
 			box-shadow: var(--shadow-1);
 		}
 
-
 		.duration {
 			position: absolute;
 			padding: 0 var(--size-1);
@@ -62,30 +67,29 @@
 		}
 	}
 
-	div {
+	div.metadata {
 		height: 100%;
-		width: auto;
+		width: calc(100% - var(--size-11));
 		display: flex;
 		flex-direction: column;
 		justify-content: space-evenly;
-
+		row-gap: var(--size-1);
 
 		.title {
 			max-height: 100%;
 			line-height: var(--size-4);
 			font-size: var(--font-size-1);
 			overflow: hidden;
-			text-overflow: ellipsis;
 			font-weight: var(--font-weight-5);
 			letter-spacing: var(--font-letterspacing-1);
-			margin-bottom: auto;
+			margin: 0;
 		}
 
 		.avu {
 			height: var(--size-7);
-			overflow: hidden;
 			line-height: var(--size-3);
 			width: 100%;
+			overflow: hidden;
 
 			p {
 				font-size: var(--font-size-0);
@@ -93,7 +97,6 @@
 				letter-spacing: var(--font-letterspacing-1);
 				opacity: 0.9
 			}
-
 		}
 	}
 
@@ -117,11 +120,8 @@
 			opacity: 1;
 			background-image: radial-gradient(var(--onBg), var(--onBg2) 80%);
 		}
-
 	}
-
 }
-
 
 #queuelist>a {
 	transition: initial;

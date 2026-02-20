@@ -1,19 +1,16 @@
 import { Show, createEffect, createSignal } from 'solid-js';
 import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary } from '@lib/utils/library';
-import { getThumbIdFromLink } from '@lib/utils/image';
 import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavStore, setListStore, setQueueStore } from '@lib/stores';
 import { importList, shareCollection } from '@lib/modules/listUtils';
 import { player } from '@lib/utils';
 
-export default function Dropdown(_: {
-  toggleSort: () => void
-}) {
+export default function Dropdown() {
 
   const [isSubscribed, setSubscribed] = createSignal(false);
 
   createEffect(() => {
-    // Determine if the current list item is an album based on listStore.id
-    const isAlbum = listStore.id.startsWith('OLAK5uy_'); // Album IDs start with OLAK5uy
+    // Determine if the current list item is an album based on listStore.id or type
+    const isAlbum = listStore.id.startsWith('MPREb') || listStore.type === 'album';
 
     if (isAlbum) {
       const albums = getLibraryAlbums();
@@ -28,8 +25,8 @@ export default function Dropdown(_: {
 
 
   function subscriptionHandler() {
-    // Determine if the current list item is an album based on listStore.id
-    const isAlbum = listStore.id.startsWith('OLAK5uy_'); // Album IDs start with OLAK5uy
+    // Determine if the current list item is an album based on listStore.id or type
+    const isAlbum = listStore.id.startsWith('MPREb') || listStore.type === 'album';
 
     if (isAlbum) {
       if (isSubscribed()) {
@@ -37,18 +34,18 @@ export default function Dropdown(_: {
       } else {
         const albumData: Album = {
           name: listStore.name,
-          artist: listStore.uploader,
-          thumbnail: getThumbIdFromLink(listStore.thumbnail),
-          tracks: listStore.list.map(t => t.id)
+          author: listStore.author,
+          img: listStore.img,
+          id: listStore.id
         };
-        saveAlbumToLibrary(listStore.id, albumData, listStore.list); // Use listStore.id (album browseId) for saving
+        saveAlbumToLibrary(listStore.id, albumData); // Use listStore.id (album browseId) for saving
       }
       setSubscribed(!isSubscribed());
       return;
     }
 
     // Existing playlist/channel logic
-    const { name, type, id, uploader, thumbnail } = listStore;
+    const { name, type, id, author, img } = listStore;
     if (type === 'collection') return;
 
     let data = getLists(type as 'channels' | 'playlists');
@@ -62,11 +59,11 @@ export default function Dropdown(_: {
         {
           id,
           name,
-          thumbnail: getThumbIdFromLink(thumbnail)
+          img
         } as Playlist;
 
       if (type === 'playlists')
-        dataset.uploader = uploader;
+        dataset.author = author;
 
       data.push(dataset);
     }
@@ -117,18 +114,15 @@ export default function Dropdown(_: {
             This correctly covers both regular playlists and albums (which are 'playlists' type)
             and channels.
         */}
-        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists'}>
+        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists' || listStore.type === 'album'}>
 
-          <li
-            id="subscribeListBtn"
-            onclick={subscriptionHandler}
-          >
+          <li onclick={subscriptionHandler}>
             <i
               class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? t('list_saved_to_library') : t('list_save_to_library')}
           </li>
 
-          <li id="viewOnYTBtn">
-            <i class="ri-external-link-line"></i>{listStore.name || t('list_view_on_yt')}
+          <li>
+            <i class="ri-youtube-fill"></i>{listStore.name || t('list_view_on_yt')}
           </li>
         </Show>
 
@@ -169,7 +163,7 @@ export default function Dropdown(_: {
           </li>
 
           <li id="exportCollectionBtn" onclick={() => {
-            const collectionData: CollectionItem[] = getCollectionItems(listStore.id);
+            const collectionData: TrackItem[] = getCollectionItems(listStore.id);
             console.log(collectionData);
             const jsonString = JSON.stringify(collectionData, null, 2);
             navigator.clipboard.writeText(jsonString)
@@ -181,17 +175,6 @@ export default function Dropdown(_: {
               });
           }}>
             <i class="ri-export-line"></i>{t('list_export')}
-          </li>
-
-          <li id="radioCollectionBtn">
-            <i class="ri-radio-line"></i>{t("list_radio")}
-          </li>
-
-          <li
-            id="sortCollectionBtn"
-            onclick={_.toggleSort}
-          >
-            <i class="ri-draggable"></i>{t("list_sort")}
           </li>
 
         </Show>

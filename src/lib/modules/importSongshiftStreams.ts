@@ -14,15 +14,14 @@ export default async function(e: File) {
   const getMetadata = async (
     seed: string,
     src = 'songshift',
-    apiIndex = 0
-  ): Promise<CollectionItem & { src: string } | undefined> => await fetch(`${piped[apiIndex]}/search?q=${encodeURIComponent(seed)}&filter=music_songs`)
+  ): Promise<void | TrackItem & { src: string }> => await fetch(`${piped}/search?q=${encodeURIComponent(seed)}&filter=music_songs`)
     .then(res => res.json())
     .then(data => {
       if ('items' in data && data.items.length > 0)
         return data.items[0];
       else throw new Error('insufficient data');
     })
-    .then((metadata: StreamItem) => ({
+    .then((metadata) => ({
       id: metadata.url.substring(9),
       title: metadata.title,
       author: metadata.uploaderName + ' - Topic',
@@ -31,13 +30,9 @@ export default async function(e: File) {
       src
     }))
     .catch((e) => {
-      if (apiIndex < piped.length - 1)
-        return getMetadata(seed, src, apiIndex + 1);
-      else {
-        console.error(e);
-        setStore('snackbar', 'Failed to import ' + seed);
-        return;
-      }
+      console.error(e);
+      setStore('snackbar', 'Failed to import ' + seed);
+      return;
     });
 
   const promises = songshiftData.map(
@@ -57,16 +52,16 @@ export default async function(e: File) {
         author: v?.author,
         duration: v?.duration,
         authorId: v?.authorId
-      })) as (CollectionItem & { src: string })[];
+      })) as (TrackItem & { src: string })[];
 
       const groupedBySource = imports.reduce((acc, track) => {
         const { src, ...rest } = track;
         if (!acc[src]) {
           acc[src] = [];
         }
-        acc[src].push(rest as CollectionItem);
+        acc[src].push(rest as TrackItem);
         return acc;
-      }, {} as Record<string, CollectionItem[]>);
+      }, {} as Record<string, TrackItem[]>);
 
       for (const src in groupedBySource)
         addToCollection(src, groupedBySource[src]);

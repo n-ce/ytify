@@ -2,8 +2,7 @@ import { createStore } from "solid-js/store";
 import { config, convertSStoHHMMSS } from "@lib/utils";
 
 export const [queueStore, setQueueStore] = createStore({
-  list: [] as CollectionItem[],
-  standby: [] as CollectionItem[],
+  list: [] as TrackItem[],
   removeMode: false,
   isLoading: false,
 });
@@ -16,7 +15,7 @@ export function parseDuration(d: string): number {
   return 0;
 }
 
-export function filterItemsByConfig(items: CollectionItem[], options: { ignoreList?: CollectionItem[], ignoreConfig?: boolean } = {}): CollectionItem[] {
+export function filterItemsByConfig(items: TrackItem[], options: { ignoreList?: TrackItem[], ignoreConfig?: boolean } = {}): TrackItem[] {
   if (options.ignoreConfig) return items;
 
   let filtered = items;
@@ -37,7 +36,7 @@ export function filterItemsByConfig(items: CollectionItem[], options: { ignoreLi
   return filtered;
 }
 
-export function addToQueue(items: CollectionItem[], options: { replace?: boolean, prepend?: boolean, ignoreConfig?: boolean } = {}) {
+export function addToQueue(items: TrackItem[], options: { replace?: boolean, prepend?: boolean, ignoreConfig?: boolean } = {}) {
   let itemsToAdd = (config.allowDuplicates || options.replace || options.ignoreConfig)
     ? items
     : items.filter(item => !queueStore.list.some(existingItem => existingItem.id === item.id));
@@ -55,7 +54,7 @@ export function addToQueue(items: CollectionItem[], options: { replace?: boolean
   }
 
   setQueueStore('list', list => {
-    let newList: CollectionItem[];
+    let newList: TrackItem[];
     if (options.replace) {
       newList = itemsToAdd;
     } else if (options.prepend) {
@@ -71,10 +70,10 @@ export function addToQueue(items: CollectionItem[], options: { replace?: boolean
   });
 }
 
-export function groupQueueByAuthor(list: CollectionItem[]): CollectionItem[] {
+export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
   if (list.length <= 1) return [...list];
 
-  const result: CollectionItem[] = [];
+  const result: TrackItem[] = [];
   const remaining = [...list];
 
   while (remaining.length > 0) {
@@ -95,7 +94,7 @@ export function groupQueueByAuthor(list: CollectionItem[]): CollectionItem[] {
   return result;
 }
 
-export function totalQueueDuration(list: CollectionItem[]): string {
+export function totalQueueDuration(list: TrackItem[]): string {
   if (list.length === 0) return '';
 
   const totalSeconds = list.reduce((acc, item) => acc + parseDuration(item.duration), 0);

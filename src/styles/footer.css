@@ -1,5 +1,12 @@
-footer {
+/*
+show navbar and miniplayer together in mobile.
+in landcape show separately,
+when player active hide miniplayer in both.
 
+*/
+
+/* --- Footer & MiniPlayer Container --- */
+footer {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -9,18 +16,16 @@ footer {
   --height: var(--size-8);
   height: var(--height);
   background: linear-gradient(rgb(from var(--onBg) r g b / 0.4), var(--trueBg));
-  backdrop-filter: blur(var(--size-px-4));
+  backdrop-filter: blur(var(--size-px-3));
   border-top-left-radius: var(--roundness);
   border-top-right-radius: var(--roundness);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-1);
   overflow: hidden;
 
   &:has(.miniplayer) {
     --height: calc(var(--size-9) + var(--size-7));
 
     @media(orientation:portrait) {
-      border-top: var(--border);
-
       img {
         height: var(--size-8);
         margin-left: var(--size-1);
@@ -28,10 +33,199 @@ footer {
     }
   }
 
+
   @media(orientation:landscape) {
     margin: 0 auto;
+    align-items: center;
+    flex-direction: row;
+    height: var(--size-9);
+    bottom: var(--size-10);
+    border-radius: var(--roundness);
+    --navW: calc(var(--size-8) * 3);
+    width: var(--navW);
+
+    &:has(.miniplayer) {
+      width: calc(100dvmin + var(--navW)) !important;
+    }
+
+    nav {
+      width: var(--navW);
+      row-gap: var(--size-1);
+    }
+
+    .miniplayer {
+      width: 100dvmin;
+    }
+
+    :root:has(#playerSection) & {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: auto;
+      height: auto;
+      bottom: unset;
+      background: none;
+      backdrop-filter: none;
+      border: none;
+      border-radius: 0;
+      z-index: 100;
+      box-shadow: none;
+      margin: 0;
+
+      nav {
+        flex-direction: column;
+        width: auto;
+        height: auto;
+        margin: 0;
+
+        i {
+          margin: var(--size-2) 0;
+          width: 100%;
+          flex-grow: 0;
+          height: auto;
+        }
+
+      }
+    }
+  }
+
+}
+
+
+
+.miniplayer {
+  display: flex;
+  align-items: center;
+  height: var(--size-9);
+  padding: var(--size-1);
+  animation: var(--animation-slide-in-up) forwards;
+  cursor: pointer;
+
+  &,
+  * {
+    transition: all 0.4s ease;
+  }
+
+  img {
+    height: calc(var(--size-8) + var(--size-2));
+    object-fit: cover;
     border: var(--border);
-    border-bottom: none;
+    border-radius: calc(var(--roundness) * 0.7);
+    box-shadow: var(--shadow-1);
+    pointer-events: none;
+  }
+
+  button,
+  i {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: var(--size-5);
+    aspect-ratio: 1;
+    padding: 0;
+    margin: 0 var(--size-1);
+    transition: transform 0.4s;
+
+    &:active {
+      transform: scale(0.75);
+    }
+  }
+
+  #playButton {
+    display: flex;
+    align-items: center;
+    font-size: var(--size-7);
+    margin-left: var(--size-2);
+    margin-right: var(--size-2);
+  }
+
+  .ri-heart-line,
+  .ri-heart-fill {
+    font-size: var(--size-6);
+  }
+
+  .mediaDetails {
+    width: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    margin-left: var(--size-2);
+
+    a {
+      font-weight: var(--font-weight-6);
+      font-size: var(--font-size-2);
+      display: block;
+    }
+
+    a,
+    p {
+      white-space: nowrap;
+      overflow: clip;
+      text-overflow: ellipsis;
+      color: var(--text);
+    }
+
+    p {
+      font-size: calc(var(--size-6) / 2);
+      font-weight: var(--font-weight-5);
+      opacity: 90%;
+    }
+  }
+
+  progress {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    appearance: none;
+    border: none;
+
+    &::-webkit-progress-bar {
+      background: transparent;
+    }
+
+    &::-moz-progress-bar {
+      background: linear-gradient(transparent, var(--onBg2));
+      border-bottom: var(--border-size-1) solid var(--text2);
+      transition: all 1s linear;
+    }
+
+    &::-webkit-progress-value {
+      background: linear-gradient(transparent, var(--onBg2));
+      border-bottom: var(--border-size-1) solid var(--text2);
+      transition: all 1s linear;
+    }
+  }
+}
+
+
+
+/* --- NavBar --- */
+nav {
+  display: flex;
+  width: 100%;
+  margin: auto 0;
+
+  i {
+    font-size: var(--font-size-3);
+    padding: 0 var(--size-2);
+    opacity: 0.5;
+    flex-grow: 1;
+    flex-basis: 0;
+    text-align: center;
+    color: var(--text);
+    height: var(--size-7);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .on {
+    opacity: 1;
+    color: var(--text);
+    font-weight: var(--font-weight-7);
   }
 
 }

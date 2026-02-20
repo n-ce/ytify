@@ -1,15 +1,12 @@
 .settingsSection {
   header {
-    display: flex;
-    justify-content: space-between;
-
     .ri-close-large-line {
       margin-right: calc(var(--size-7) + var(--size-1));
       margin-top: var(--size-0);
     }
   }
 
-  > div {
+  >div {
     width: 100%;
     margin-bottom: var(--size-8);
 
@@ -19,7 +16,13 @@
       align-items: center;
       width: 100%;
       margin: 0 auto;
-      padding: var(--size-2) 0;
+      padding: 0;
+      transition: background-color 0.2s;
+      font-weight: var(--font-weight-5);
+
+      i {
+        font-size: var(--font-size-5);
+      }
 
       &:hover {
         background-color: var(--onBg);
@@ -30,11 +33,10 @@
         font-size: inherit;
         font-weight: var(--font-weight-5);
         padding: 0 var(--size-2);
+        margin: var(--size-3) 0;
         max-width: 50%;
         text-align: right;
       }
     }
-
   }
-
 }

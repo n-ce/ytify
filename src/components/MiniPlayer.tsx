@@ -1,5 +1,4 @@
 import { lazy, Show } from "solid-js";
-import './MiniPlayer.css';
 import { config } from "@lib/utils/config";
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "./MediaPartials";
 import { playerStore, setNavStore } from "@lib/stores";

@@ -21,11 +21,11 @@ export let config = {
   contextualFill: false,
   queuePrefetch: false,
   authorGrouping: false,
-  home: '',
   searchFilter: 'all',
   volume: '100',
   dbsync: '',
-  sortOrder: 'modified' as 'modified' | 'name' | 'artist' | 'duration'
+  sortBy: 'modified' as 'modified' | 'name' | 'artist' | 'duration',
+  sortOrder: 'desc' as 'asc' | 'desc'
 }
 
 type AppConfig = typeof config;
@@ -47,12 +47,9 @@ export function setConfig<K extends
 
 export let drawer = {
   recentSearches: [] as string[],
-  lastUsedQueueAction: '',
-  discovery: [] as (CollectionItem & { frequency: number })[],
-  userArtists: [] as Channel[],
-  relatedPlaylists: [] as Playlist[],
-  relatedArtists: [] as Channel[],
-  subfeed: [] as CollectionItem[],
+  discovery: [] as (YTItem & { frequency: number })[],
+  lastMainFeature: 'search' as 'search' | 'library',
+  libraryPlays: {} as Record<string, number>,
 }
 const savedDrawer = localStorage.getItem('drawer');
 if (savedDrawer)

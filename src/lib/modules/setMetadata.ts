@@ -2,7 +2,7 @@ import { playerStore, setPlayerStore } from "@lib/stores";
 import { config, generateImageUrl } from "@lib/utils";
 
 
-export default async function(data: CollectionItem) {
+export default async function(data: TrackItem) {
 
   setPlayerStore('stream', data);
 

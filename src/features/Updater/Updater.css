@@ -15,29 +15,21 @@
     max-height: calc(100% - var(--size-fluid-7));
     width: 100%;
 
-
     li {
       list-style-type: none;
-
       &:first-child {
         font-size: var(--font-size-5);
         font-weight: var(--font-weight-6);
         margin-bottom: var(--size-5);
       }
-
       &:last-child {
-
         font-weight: var(--font-weight-5);
         border-bottom: 0;
       }
-
-      margin-bottom:var(--size-2);
-      border-bottom:var(--border);
+      margin-bottom: var(--size-2);
+      border-bottom: var(--border);
     }
-
   }
-
-
 
   span {
     display: flex;
@@ -52,6 +44,8 @@
       width: calc(50% - var(--size-4));
       box-shadow: var(--shadow-1);
       border-radius: var(--roundness);
+      cursor: pointer;
+      transition: background-color 0.2s;
 
       &:hover {
         background-color: var(--onBg2);
@@ -59,5 +53,4 @@
       }
     }
   }
-
 }

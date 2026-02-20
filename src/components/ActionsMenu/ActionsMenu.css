@@ -7,11 +7,12 @@
   background: rgb(from var(--onBg) r g b / 0.8);
   backdrop-filter: blur(var(--size-px-2));
   overflow: auto;
-  animation: var(--animation-slide-out-down) forwards;
 
   >.streamItem {
     margin: 0;
     pointer-events: none;
+    border: none;
+    max-width: 100dvmin;
 
     .ri-more-2-fill {
       display: none;
@@ -20,11 +21,7 @@
 
   &[open],
   &:open {
-    animation: var(--animation-slide-in-up) forwards;
-  }
-
-  &:open {
-    animation-duration: 0.3s;
+    animation: var(--animation-slide-in-up);
   }
 
   @media(orientation:portrait) {
@@ -34,27 +31,22 @@
   @media(orientation:landscape) {
     margin-right: var(--size-fluid-2);
     width: max-content;
-    animation: var(--animation-slide-out-right) forwards;
 
     &[open],
     &:open {
-      animation: var(--animation-slide-in-left) forwards;
+      animation: var(--animation-slide-in-left);
     }
 
   }
 
   &::backdrop {
     background-color: var(--blurMix);
-    margin: 0;
-    padding: 0;
     backdrop-filter: blur(var(--size-px-1));
   }
-
 
   ul {
     list-style: none;
     padding: 0;
-    width: auto;
     display: grid;
   }
 
@@ -69,9 +61,9 @@
     gap: var(--gap);
     padding: var(--size-1) var(--size-5);
     border-top: var(--border);
+    transition: background-color 0.2s;
 
     &:hover {
-      border: var(--border);
       background: var(--onBg2);
       color: var(--text2);
     }
@@ -80,7 +72,6 @@
       font-size: var(--font-size-3);
       font-weight: var(--font-weight-3);
     }
-
   }
 
   .clxnShelf {
@@ -92,25 +83,19 @@
       max-width: 34%;
       text-align: center;
       flex: 1;
-      font-style: inherit;
+      font-style: inherit !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
       select {
-        margin: 0;
-        padding: 0;
+        appearance: none;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 33%;
+        text-align: right;
+        color: inherit !important;
       }
     }
-
   }
-
-
-}
-
-#collectionSelector {
-  font-weight: inherit;
-  font-size: inherit;
-  margin: 0;
-  appearance: none;
-  background: transparent;
-  padding: 0;
-  color: inherit;
 }

@@ -42,7 +42,6 @@
     "queue_change_notification": "পরবর্তীর স্ট্রীম থেকে পরিবর্তন ঘটবে",
     "queue_author_grouping": "লেখক গ্রুপিং",
     "queue_prefetch": "কিউ প্রিফেচ",
-    "queue_standby_header": "আপনার জন্য পরামর্শ",
     "fetchlist_url_null": "কনো চেনেলের লিংক নেই",
     "fetchlist_error": "প্লেলিস্টের ডেটা পাওয়া গেলো না",
     "fetchlist_nonexistent": "এই প্লেলিস্টের অস্তিত্ত নেই",

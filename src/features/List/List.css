@@ -1,12 +1,4 @@
 #listSection>header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background:
-    linear-gradient(to right, var(--trueBg), transparent, var(--trueBg)),
-    linear-gradient(var(--trueBg), transparent);
-  backdrop-filter: blur(var(--size-px-3));
-
   >p {
     overflow: clip;
     text-overflow: ellipsis;
@@ -28,20 +20,12 @@
   margin-bottom: var(--size-fluid-6);
 }
 
-#viewOnYTBtn,
-#subscribeListBtn {
-  i {
-    &:after {
-      content: attr(data-state);
-      font-family: inherit;
-    }
-  }
-}
-
 .markBar {
   i {
     font-size: var(--font-size-3);
     padding: var(--size-1);
+    border-radius: var(--roundness);
+    cursor: pointer;
 
     &:hover {
       background-color: var(--onBg2);
@@ -66,7 +50,6 @@
   img {
     filter: invert();
   }
-
 }
 
 .list-thumbnail {
@@ -77,7 +60,6 @@
   width: 100%;
 
   &:has(>img) {
-
     .listContainer {
       border-radius: var(--roundness);
       overflow: hidden;
@@ -98,32 +80,49 @@
   }
 }
 
-#collectionSelector {
-  font-weight: inherit;
-  font-size: inherit;
-  margin: 0;
-  appearance: none;
-  background: transparent;
-  padding: 0;
-  color: inherit;
-}
 
-.albums-carousel {
+.sortBar {
   display: flex;
-  overflow: auto;
-  background-color: var(--onBg);
-  border-radius: var(--roundness);
-  margin-bottom: var(--size-2);
-  padding: var(--size-1);
-  border: var(--border);
+  justify-content: center;
+  align-items: center;
+  opacity: 0.7;
 
-  .listItem {
-    width: var(--size-11);
-    flex-shrink: 0;
-    margin: 0;
-    background-color: transparent;
-    border: none;
+  i {
+    font-size: var(--font-size-4);
+    cursor: pointer;
 
+    &.active {
+      background-color: var(--onBg2);
+      color: var(--text2);
+      border-radius: var(--roundness);
+    }
+
+    &.ri-draggable {
+      margin-right: var(--size-2);
+    }
   }
 
-}
+      #sortMenu {
+      margin-right: auto;
+    }
+  }
+  
+  .loadAllBtn {
+    margin: var(--gap) auto;
+    padding: var(--size-2) var(--size-4);
+    border-radius: var(--roundness);
+    border: var(--border);
+    background-color: var(--onBg);
+    color: var(--text);
+    font-size: var(--font-size-1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: block;
+    width: fit-content;
+  
+    &:hover {
+      background-color: var(--onBg2);
+      color: var(--text2);
+    }
+  }
+  

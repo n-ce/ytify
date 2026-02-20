@@ -42,7 +42,6 @@
     "queue_change_notification": "Los cambios tendrán lugar a partir de la próxima transmisión",
     "queue_author_grouping": "Agrupación por autor",
     "queue_prefetch": "Pre-carga de cola",
-    "queue_standby_header": "Sugerencias para ti",
     "fetchlist_url_null": "No se proporcionó ninguna URL del canal",
     "fetchlist_error": "No se pudo obtener la información de la lista de reproducción",
     "fetchlist_nonexistent": "Error obtenido: \"La lista de reproducción no existe.\"",

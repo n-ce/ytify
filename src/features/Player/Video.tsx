@@ -1,6 +1,6 @@
 import { createSignal, For, createEffect, Show } from "solid-js";
-import { config, generateImageUrl, getApi, proxyHandler, setConfig } from "@lib/utils";
-import { playerStore, playNext, setPlayerStore, setStore, store, t } from "@lib/stores";
+import { config, generateImageUrl, proxyHandler, setConfig } from "@lib/utils";
+import { playerStore, playNext, setPlayerStore, t } from "@lib/stores";
 import { queueStore } from "@lib/stores/queue";
 
 export default function() {
@@ -54,7 +54,7 @@ export default function() {
         .map(f => ([f.resolution || f.quality, f.url])),
       captions: data.captions.map(c => ({
         ...c,
-        url: getApi() + c.url
+        url: playerStore.proxy + c.url
       }))
     });
 
@@ -126,16 +126,11 @@ export default function() {
         onerror={() => {
           if (video.src.endsWith('&fallback')) return;
           const origin = new URL(video.src).origin;
-          const { invidious, index } = store;
+          const proxy = playerStore.proxy;
 
-
-          if (index < invidious.length) {
-
-            const proxy = invidious[index];
+          if (proxy && origin !== proxy) {
             video.src = video.src.replace(origin, proxy);
             playerStore.audio.src = playerStore.audio.src.replace(origin, proxy);
-
-            setStore('index', index + 1);
           }
         }}
 

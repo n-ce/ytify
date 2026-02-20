@@ -1,24 +1,7 @@
-import './NavBar.css';
-import { setConfig } from '@lib/utils';
-import { navStore, setNavStore, store, setStore, t } from '@lib/stores';
+import { navStore, setNavStore, t } from '@lib/stores';
+import { setDrawer } from '@lib/utils';
 
 export default function() {
-
-
-  type Nav = 'Hub' | 'Library' | 'Search';
-
-  function saveHome(name: '' | Nav) {
-    if (store.homeView === name && navStore.home.state) {
-      setNavStore('home', 'state', false);
-    } else {
-      setStore('homeView', name);
-      setConfig('home', name);
-      setNavStore('home', 'state', true);
-      navStore.home.ref?.scrollIntoView();
-    }
-  }
-
-  const navView = (item: Nav) => navStore.home.state && store.homeView === item;
 
   return (
     <nav>
@@ -32,22 +15,36 @@ export default function() {
       ></i>
 
       <i
-        aria-label={t('nav_hub')}
-        class="ri-store-2-line"
-        classList={{ 'on': navView('Hub') }}
-        onclick={() => saveHome('Hub')}
+        aria-label={t('nav_search')}
+        class={'ri-search-2-' + (navStore.search.state ? 'fill' : 'line')
+        }
+        classList={{
+          'on': navStore.search.state
+        }}
+        onclick={() => {
+          const state = !navStore.search.state;
+          setNavStore('search', 'state', state);
+          if (state) {
+            setNavStore('library', 'state', false);
+            navStore.search.ref?.scrollIntoView();
+            setDrawer('lastMainFeature', 'search');
+          }
+        }}
       ></i>
+
       <i
         aria-label={t('nav_library')}
-        class="ri-archive-stack-line"
-        classList={{ 'on': navView('Library') }}
-        onclick={() => saveHome('Library')}
-      ></i>
-      <i
-        aria-label={t('nav_search')}
-        class="ri-search-2-line"
-        classList={{ 'on': navView('Search') }}
-        onclick={() => saveHome('Search')}
+        class={'ri-archive-stack-' + (navStore.library.state ? 'fill' : 'line')}
+        classList={{ 'on': navStore.library.state }}
+        onclick={() => {
+          const state = !navStore.library.state;
+          setNavStore('library', 'state', state);
+          if (state) {
+            setNavStore('search', 'state', false);
+            navStore.library.ref?.scrollIntoView();
+            setDrawer('lastMainFeature', 'library');
+          }
+        }}
       ></i>
 
     </nav>

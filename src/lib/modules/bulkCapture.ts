@@ -5,7 +5,7 @@ import { setStore } from "@lib/stores";
 
 export default function(ids: string[]): Promise<void> {
   setStore('snackbar', 'Processing pasted links...'); // Notify user of process start
-  const collectionItems: CollectionItem[] = [];
+  const collectionItems: TrackItem[] = [];
 
   const processId = async (id: string): Promise<void> => {
     return getStreamData(id)

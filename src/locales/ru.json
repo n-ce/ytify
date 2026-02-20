@@ -42,7 +42,6 @@
     "queue_change_notification": "Изменения вступят в силу со следующей трансляции",
     "queue_author_grouping": "Группировка по автору",
     "queue_prefetch": "Предзагрузка очереди",
-    "queue_standby_header": "Предложения для вас",
     "fetchlist_url_null": "URL канала не предоставлен",
     "fetchlist_error": "Не удалось получить данные плейлиста",
     "fetchlist_nonexistent": "Получена ошибка: «Плейлист не существует.»",

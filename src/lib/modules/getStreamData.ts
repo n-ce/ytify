@@ -1,4 +1,4 @@
-import { store, setStore } from "../stores";
+import { playerStore } from "../stores";
 
 export default async function(
   id: string,
@@ -6,31 +6,17 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
-
-  const fetchDataFromInvidious = (
-    index: number
-  ) => fetch(`${index === -1 ? '' : store.invidious[index]}/api/v1/videos/${id}`, { signal })
-    .then(res => res.json() as Promise<Invidious | { error: string }>)
-    .then(data => {
-      if ('adaptiveFormats' in data) {
-        setStore('index', index === -1 ? 0 : index);
-        return data;
-      }
-      else throw new Error(data.error || 'Invalid response');
-    });
-
-
-  const useInvidious = (index = store.index): Promise<Invidious> =>
-    fetchDataFromInvidious(index)
-      .catch(e => {
-        if (index + 1 === store.invidious.length) {
-          setStore('index', 0);
-          return prefetch ? e :
-            fetchDataFromInvidious(-1)
-              .catch(() => e);
-        }
-        else return useInvidious(index + 1);
+  const fetchData = (proxy?: string) =>
+    fetch(`${proxy || ''}/api/v1/videos/${id}`, { signal })
+      .then(res => res.json() as Promise<Invidious | { error: string }>)
+      .then(data => {
+        if ('adaptiveFormats' in data) return data;
+        else throw new Error(data.error || 'Invalid response');
       });
 
-  return useInvidious();
+  return fetchData(playerStore.proxy)
+    .catch(e => {
+      return prefetch ? e : fetchData()
+        .catch(() => e);
+    });
 }

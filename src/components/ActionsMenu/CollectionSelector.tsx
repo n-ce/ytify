@@ -4,7 +4,7 @@ import { For, Show } from 'solid-js';
 
 export default function(_: {
   close?: () => void,
-  data: CollectionItem[]
+  data: TrackItem[]
 }) {
 
   const handleCollectionChange = (e: Event & { target: HTMLSelectElement }) => {
@@ -50,12 +50,12 @@ export default function(_: {
 
   return (
     <select
-      class="ri-play-list-add-line"
+      class="ri-play-list-add-fill"
       id="collectionSelector"
       onchange={handleCollectionChange}
       aria-label={t('collection_selector_add_to')}
     >
-      <option value="" selected disabled>&#xf00f</option>
+      <option value="" selected disabled>&#xf00e</option>
       <option value="+cl">{t('collection_selector_create_new')}</option>
       <Show when={getKeys(true).length}>
         <optgroup label="Add to Collection">

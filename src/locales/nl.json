@@ -42,7 +42,6 @@
     "queue_change_notification": "De wijzigingen worden doorgevoerd vanaf de volgende stream",
     "queue_author_grouping": "Auteursgroepering",
     "queue_prefetch": "Wachtrij-vooruitladen",
-    "queue_standby_header": "Suggesties voor u",
     "fetchlist_url_null": "Geen kanaal-URL opgegeven",
     "fetchlist_error": "Kon playlistData niet ophalen",
     "fetchlist_nonexistent": "Foutmelding: “De afspeellijst bestaat niet.”",
@@ -57,7 +56,7 @@
     "search_filter_music_albums": "Albums",
     "search_filter_music_playlists": "Afspeellijsten",
     "search_filter_youtube": "YouTube",
-    "search_filter_youtube_music": "YouTube Music",
+    "search_filter_youtube_music": "YouTube Muziek",
     "search_filter_sort_by": "Sorteer op",
     "search_filter_date": "Tijd",
     "search_filter_views": "Weergaven",
@@ -164,9 +163,9 @@
     "settings_stable_volume": "Geef de voorkeur aan stabiel volume",
     "settings_watchmode": "Bekijkmodus",
     "settings_library_sync": "Cloudsynchronisatie",
-    "settings_store_discoveries": "Bewaar ontdekkingen",
+    "settings_store_discoveries": "Sla gerelateerde streams op in Hub Discovery",
     "settings_clear_discoveries": "Hiermee worden uw bestaande $-ontdekkingen gewist. Wilt u doorgaan?",
-    "settings_store_history": "Bewaar geschiedenis",
+    "settings_store_history": "Afspeelgeschiedenis opslaan",
     "settings_clear_history": "Hiermee worden $ items uit uw geschiedenis gewist. Wilt u doorgaan?",
     "settings_landscape_sections": "Maximale landschapssecties",
     "settings_load_images": "Afbeeldingen laden",
@@ -221,5 +220,6 @@
     "library_import_songshift": "Afspeellijsten importeren uit SongShift",
     "library_about_ytify": "Over ytify",
     "nav_logout": "Uitloggen",
-    "player_video_resolution": "Resolutie"
+    "player_video_resolution": "Resolutie",
+    "queue_reload_notification": "De wijzigingen worden vanaf de volgende sessie zichtbaar"
 }

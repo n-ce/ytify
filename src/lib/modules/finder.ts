@@ -5,7 +5,7 @@ const removeDiacritics = (str: string) =>
 
 export default (searchTerm: string, tracksMap: Collection) => {
   const toFind = removeDiacritics(searchTerm.toLowerCase());
-  const results: CollectionItem[] = [];
+  const results: TrackItem[] = [];
   let isTruncated = false;
 
   if (!toFind) {
