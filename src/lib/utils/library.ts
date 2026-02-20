@@ -2,6 +2,15 @@ import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
 import { listStore, setListStore } from '@lib/stores';
 import { config, drawer, setDrawer } from '@lib/utils/config';
 
+const syncLibrary = (action: 'add' | 'remove' | 'schedule', id?: string) => {
+  if (!config.dbsync) return;
+  import('@lib/modules/cloudSync').then(m => {
+    if (action === 'add' && id) m.addDirtyTrack(id);
+    else if (action === 'remove' && id) m.removeDirtyTrack(id);
+    else if (action === 'schedule') m.scheduleSync();
+  });
+};
+
 
 // New Library V2 utils
 
@@ -136,19 +145,10 @@ export function addToCollection(
     if (id in tracks) {
       libraryPlays[id] = (libraryPlays[id] || 1) + 1;
       setDrawer('libraryPlays', libraryPlays);
-
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-          addDirtyTrack(id); // Mark as updated
-        });
-      }
+      syncLibrary('add', id);
     } else {
       tracks[id] = item;
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ addDirtyTrack }) => {
-          addDirtyTrack(id); // Mark as added
-        });
-      }
+      syncLibrary('add', id);
     }
   }
 
@@ -179,11 +179,7 @@ export function removeFromCollection(
 
     if (!isReferenced) {
       delete tracks[id];
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
-          removeDirtyTrack(id); // Mark as deleted
-        });
-      }
+      syncLibrary('remove', id);
     }
   }
 
@@ -212,11 +208,7 @@ export function deleteCollection(name: string) {
 
     if (!isReferenced) {
       delete tracks[id];
-      if (config.dbsync) {
-        import('@lib/modules/cloudSync').then(({ removeDirtyTrack }) => {
-          removeDirtyTrack(id); // Mark as deleted
-        });
-      }
+      syncLibrary('remove', id);
     }
   }
 
@@ -237,11 +229,7 @@ export const metaUpdater = (key: string, remove?: boolean) => {
 
   localStorage.setItem('library_meta', JSON.stringify(meta));
   setStore('syncState', 'dirty');
-  if (config.dbsync) {
-    import('@lib/modules/cloudSync').then(({ scheduleSync }) => {
-      scheduleSync();
-    });
-  }
+  syncLibrary('schedule');
 }
 
 
@@ -451,15 +439,29 @@ export function cleanseLibraryData() {
     ids.forEach(tId => referencedTrackIds.add(tId));
   });
 
-  // 3. Cleanse library_tracks: Only keep tracks that are referenced
+  // 3. Cleanse library_tracks: Only keep tracks that are referenced and strip extra properties
   const cleanedTracks: Collection = {};
   let tracksCleaned = false;
 
   for (const id in rawTracks) {
     if (id && referencedTrackIds.has(id)) {
-      cleanedTracks[id] = rawTracks[id];
+      const track = rawTracks[id];
+      const cleanedTrack: TrackItem = {
+        id: track.id,
+        title: track.title,
+        duration: track.duration,
+        author: track.author,
+        authorId: track.authorId || '',
+      };
+
+      cleanedTracks[id] = cleanedTrack;
+
+      if (!tracksCleaned && Object.keys(track).length !== Object.keys(cleanedTrack).length) {
+        tracksCleaned = true;
+      }
     } else {
       tracksCleaned = true;
+      syncLibrary('remove', id);
     }
   }
 

@@ -21,9 +21,8 @@ export default function() {
     import('@lib/modules/libraryMigratorV5').then(m => m.default());
   else
     onMount(() => {
-
-      libraryRef.scrollIntoView();
       setNavStore('library', 'ref', libraryRef);
+      libraryRef.scrollIntoView();
     });
 
   return (

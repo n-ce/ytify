@@ -42,7 +42,8 @@ export default async (req: Request, _context: Context) => {
   }
 
   // 2. Password Hashing (hash of email + password)
-  const combinedString = email + password; // Concatenate email and password
+  const normalizedEmail = email.toLowerCase().trim();
+  const combinedString = `${normalizedEmail}|${password}`; // Concatenate email and password with separator
   const msgBuffer = new TextEncoder().encode(combinedString);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashedPassword = Array

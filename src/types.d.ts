@@ -19,7 +19,7 @@ declare global {
     title: string;
     duration: string;
     author: string;
-    authorId?: string;
+    authorId: string;
   }
   // For Network Usage
   interface YTItem extends TrackItem {
@@ -101,7 +101,8 @@ declare global {
       author: string,
       lengthSeconds: number,
       authorUrl: string,
-      videoId: string
+      videoId: string,
+      authorId: string
     }[],
     title: string,
     captions: Record<'url' | 'label' | 'language_code', string>[],

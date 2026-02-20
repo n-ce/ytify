@@ -76,6 +76,7 @@ export default function migrateV4toV5() {
   meta.version = 5;
   localStorage.setItem('library_meta', JSON.stringify(meta));
 
-  setStore('snackbar', 'Library updated to V5...Reload');
+  setStore('snackbar', 'Library updated to V5...Reloading..');
+  location.reload();
   console.log('Library migration to V5 complete.');
 }

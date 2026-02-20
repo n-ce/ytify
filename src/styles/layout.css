@@ -197,19 +197,19 @@ main {
       .searchlist,
       .listContainer {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--gap);
+        grid-template-columns: repeat(8, 1fr);
+        gap: var(--gap) !important;
 
         .streamItem {
           display: inline-flex;
           width: 100%;
-          grid-column: span 2;
+          grid-column: span 4;
           margin: 0;
         }
 
         .listItem {
           width: 100%;
-          grid-column: span 1;
+          grid-column: span 2;
           margin: 0;
         }
       }

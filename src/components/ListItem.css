@@ -11,12 +11,15 @@
   }
 
   &.ravel {
-    * { opacity: 0; }
+    * {
+      opacity: 0;
+    }
   }
 
   img {
     height: auto;
     width: calc(100% - var(--size-2));
+    max-width: var(--size-13);
     border-radius: calc(var(--roundness) * 0.5);
     box-shadow: var(--shadow-1);
     margin: var(--size-1);
@@ -37,7 +40,8 @@
     margin-bottom: var(--size-1);
   }
 
-  p.uData, p.stats {
+  p.uData,
+  p.stats {
     font-size: var(--font-size-0);
     line-height: var(--size-3);
   }

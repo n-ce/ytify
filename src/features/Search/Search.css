@@ -102,13 +102,11 @@
     }
   }
 
-  .listItem {
-    &:nth-child(odd) {
+  .searchlist {
+    .listItem:nth-child(odd) {
       margin-right: var(--gap);
     }
-  }
 
-  .searchlist {
     margin-bottom: var(--size-fluid-6);
   }
 }

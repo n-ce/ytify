@@ -131,8 +131,6 @@ export default function() {
           if (proxy && origin !== proxy) {
             video.src = video.src.replace(origin, proxy);
             playerStore.audio.src = playerStore.audio.src.replace(origin, proxy);
-            video.load();
-            video.play();
           }
         }}
 

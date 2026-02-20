@@ -29,12 +29,12 @@ export default function Results(_: {
             />
         }
         </For>
+        <Show when={listStore.type === 'playlists' && listStore.hasContinuation}>
+          <button class="loadAllBtn" onclick={loadAll}>
+            {t('list_load_all')}
+          </button>
+        </Show>
       </div>
-      <Show when={listStore.type === 'playlists' && listStore.hasContinuation}>
-        <button class="loadAllBtn" onclick={loadAll}>
-          {t('list_load_all')}
-        </button>
-      </Show>
     </Show>
   );
 }

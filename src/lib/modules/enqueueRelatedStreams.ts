@@ -15,6 +15,7 @@ type RecommendedVideo = {
   author: string;
   lengthSeconds: number;
   videoId: string;
+  authorId: string;
 };
 
 export default function(data: RecommendedVideo[]) {
@@ -36,6 +37,7 @@ export default function(data: RecommendedVideo[]) {
         id: id,
         title: stream.title,
         author: stream.author,
+        authorId: stream.authorId,
         duration: convertSStoHHMMSS(stream.lengthSeconds)
       }) as TrackItem])
   });

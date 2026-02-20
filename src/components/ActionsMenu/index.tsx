@@ -43,7 +43,7 @@ export default function() {
       <StreamItem
         id={store.actionsMenu?.id || ''}
         title={store.actionsMenu?.title || ''}
-        authorId={store.actionsMenu?.authorId}
+        authorId={store.actionsMenu?.authorId || ''}
         author={store.actionsMenu?.author || ''}
         duration={store.actionsMenu?.duration || ''}
         type="video"

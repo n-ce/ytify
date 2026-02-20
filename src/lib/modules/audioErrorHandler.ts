@@ -30,6 +30,4 @@ export default function(
 
   console.log('ErrorHandler: Switching to proxy ' + proxy);
   audio.src = audio.src.replace(url.origin, proxy);
-  audio.load();
-  audio.play();
 }

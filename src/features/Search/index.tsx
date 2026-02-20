@@ -11,8 +11,8 @@ export default function() {
   let searchRef!: HTMLElement;
 
   onMount(() => {
-    searchRef.scrollIntoView();
     setNavStore('search', 'ref', searchRef);
+    searchRef.scrollIntoView();
   });
 
   onCleanup(resetSearch);
