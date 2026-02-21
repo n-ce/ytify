@@ -17,16 +17,19 @@ export default async function(ids: string[]) {
   );
 
   const allVideos = results.flatMap(r =>
-    r.videos
-      .filter(v => v.is(YTNodes.Video) && (v.as(YTNodes.Video).duration?.seconds || 0) > 90)
-      .map(v => {
+    r.videos.flatMap(v => {
+      if (v.is(YTNodes.Video)) {
         const video = v.as(YTNodes.Video);
-        return {
-          video,
-          authorName: r.author,
-          authorId: r.authorId
-        };
-      })
+        if ((video.duration?.seconds || 0) > 90 && (video.short_view_count?.toString() || video.view_count?.toString())) {
+          return [{
+            video,
+            authorName: r.author,
+            authorId: r.authorId
+          }];
+        }
+      }
+      return [];
+    })
   );
 
   return allVideos

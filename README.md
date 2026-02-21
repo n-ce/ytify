@@ -33,7 +33,6 @@ The journey began with a frustration. As a regular user of NewPipe in 2021, I re
 
 ## Usage 👆
 - Official Instance - https://ytify.pp.ua
-- Testing Instance - https://dev--ytify.netlify.app
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Community [@ytifytg](https://t.me/ytifytg)
 
@@ -84,8 +83,9 @@ npm run dev -- --open
 ytify is being translated into multiple languages using [Weblate](https://hosted.weblate.org/projects/ytify/web).
  
 ## Acknowledgements 🙏
+- [Shashwat](https://github.com/Shashwat-CODING) - Maintainer / Developer of Streaming services
+- [InnerTube API](https://github.com/LuanRT/YouTube.js) - Powers the ytify backend.
 - [Solid.js](https://www.solidjs.com/) - Performant UI Library
-- [Invidious](https://invidious.io) - YouTube Data API & Progressive Streaming Proxy
 - [LRCLIB](https://lrclib.net) - Synced Lyrics Provider
 - [Netlify](https://www.netlify.com) - Hosting, PR Previews, Edge Functions
 - [Vite](https://vitejs.dev) - Development Server, Code Bundling, Project Scaffolding

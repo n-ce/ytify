@@ -1,5 +1,4 @@
 - A strong preference for fully-typed, generic, and reusable code over quick fixes. avoid the use of `any`.
-- Prefers Promise-based `.then().catch()` syntax over `async/await` or `try...catch` blocks.
 - Analyzes build errors and existing code thoroughly before making changes.
 - Keen on identifying opportunities for optimization, code reduction, and file consolidation to avoid redundancy.
 - npm run build - ignore environmental build errors considering service worker, its a known issue
