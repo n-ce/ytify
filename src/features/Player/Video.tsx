@@ -1,7 +1,7 @@
 import { createSignal, For, createEffect, Show } from "solid-js";
-import { config, generateImageUrl, proxyHandler, setConfig } from "@lib/utils";
-import { playerStore, playNext, setPlayerStore, t } from "@lib/stores";
-import { queueStore } from "@lib/stores/queue";
+import { config, generateImageUrl, proxyHandler, setConfig } from "@utils";
+import { playerStore, playNext, setPlayerStore, t, queueStore } from "@stores";
+
 
 export default function() {
 
@@ -62,6 +62,7 @@ export default function() {
       video.src = '';
       video.pause();
     }
+    delete video.dataset.retried;
     if (savedQ)
       video.src = proxyHandler(selector.value, true);
 
@@ -123,14 +124,13 @@ export default function() {
         onratechange={() => {
           playerStore.audio.playbackRate = video.playbackRate;
         }}
-        onerror={() => {
-          if (video.src.endsWith('&fallback')) return;
-          const origin = new URL(video.src).origin;
-          const proxy = playerStore.proxy;
-
-          if (proxy && origin !== proxy) {
-            video.src = video.src.replace(origin, proxy);
-            playerStore.audio.src = playerStore.audio.src.replace(origin, proxy);
+        onerror={async () => {
+          const oldOrigin = new URL(video.src).origin;
+          const { default: audioErrorHandler } = await import("@modules/audioErrorHandler");
+          audioErrorHandler(video);
+          if (video.dataset.retried) {
+            const { proxy, audio } = playerStore;
+            audio.src = audio.src.replace(oldOrigin, proxy);
           }
         }}
 

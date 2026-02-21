@@ -1,8 +1,7 @@
 import { createSignal, For, Show, createMemo } from "solid-js";
-import { fetchCollection, getCollectionsKeys, getTracksMap, drawer } from "@lib/utils";
-import { t, setListStore, setNavStore } from "@lib/stores";
+import { fetchCollection, getCollectionsKeys, getTracksMap, drawer } from "@utils";
+import { t, setListStore, setNavStore } from "@stores";
 import StreamItem from "@components/StreamItem";
-import searchTracks from "@lib/modules/finder";
 
 export default function() {
 
@@ -10,6 +9,13 @@ export default function() {
   const [searchText, setSearchText] = createSignal('');
   const [debouncedSearchText, setDebouncedSearchText] = createSignal('');
   const [isTruncated, setIsTruncated] = createSignal(false);
+  const [searchFn, setSearchFn] = createSignal<((searchTerm: string, tracksMap: Collection) => { results: TrackItem[]; isTruncated: boolean }) | null>(null);
+
+  const loadFinder = async () => {
+    if (searchFn()) return;
+    const mod = await import("@modules/finder");
+    setSearchFn(() => mod.default);
+  };
 
   const tracksMap = createMemo(() => getTracksMap());
 
@@ -23,7 +29,7 @@ export default function() {
   };
 
   if (localStorage.getItem('library')) {
-    import('@lib/modules/libraryMigrator')
+    import('@modules/libraryMigrator')
       .then(m => m.default());
     return t('library_migration_in_place');
   }
@@ -42,7 +48,9 @@ export default function() {
   }
 
   const searchResults = createMemo(() => {
-    const { results, isTruncated } = searchTracks(debouncedSearchText(), tracksMap());
+    const finder = searchFn();
+    if (!finder) return [];
+    const { results, isTruncated } = finder(debouncedSearchText(), tracksMap());
     setIsTruncated(isTruncated);
     return results;
   });
@@ -55,6 +63,7 @@ export default function() {
         type="text"
         placeholder={t('library_search_placeholder')}
         onInput={handleInput}
+        onFocus={loadFinder}
       />
       <Show when={searchText()}>
         <For each={searchResults()}>

@@ -1,4 +1,4 @@
-import { t } from '@lib/stores';
+import { t } from '@stores';
 
 export default function Dropdown() {
 

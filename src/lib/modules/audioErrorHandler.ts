@@ -1,15 +1,19 @@
-import { setStore } from '@lib/stores/app.ts';
-import { playerStore, setPlayerStore } from '@lib/stores/player.ts';
+import { setStore, playerStore, setPlayerStore } from '@stores';
 
 export default function(
-  audio: HTMLAudioElement,
+  audio: HTMLAudioElement | HTMLVideoElement,
   prefetch = ''
 ) {
   audio.pause();
   const { proxy } = playerStore;
-  const url = new URL(audio.src);
 
-  if (audio.src.endsWith('&fallback')) {
+  if (!audio.src || audio.src === location.href) return;
+
+  const url = new URL(audio.src);
+  const isFallback = audio.src.endsWith('&fallback');
+  const isAlreadyProxy = url.origin === proxy || audio.dataset.retried === 'true';
+
+  if (isFallback) {
     if (!playerStore.isWatching && !prefetch) {
       setStore('snackbar', 'Error 403 : Unauthenticated Stream');
       setPlayerStore('playbackState', 'none');
@@ -17,7 +21,7 @@ export default function(
     return;
   }
 
-  if (!proxy || url.origin === proxy) {
+  if (!proxy || isAlreadyProxy) {
     if (!prefetch) {
       setPlayerStore({
         playbackState: 'none',
@@ -29,5 +33,15 @@ export default function(
   }
 
   console.log('ErrorHandler: Switching to proxy ' + proxy);
-  audio.src = audio.src.replace(url.origin, proxy);
+  const newSrc = audio.src.replace(url.origin, proxy);
+
+  if (newSrc !== audio.src) {
+    audio.dataset.retried = 'true';
+    audio.src = newSrc;
+  } else if (!prefetch) {
+    setPlayerStore({
+      playbackState: 'none',
+      status: 'Streaming Failed'
+    });
+  }
 }

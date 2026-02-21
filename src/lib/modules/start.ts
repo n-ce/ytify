@@ -1,5 +1,5 @@
-import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@lib/stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, drawer } from '@lib/utils';
+import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@stores';
+import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, drawer } from '@utils';
 
 
 

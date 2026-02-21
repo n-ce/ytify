@@ -1,5 +1,5 @@
 import type { JSXElement } from 'solid-js';
-import { t } from '@lib/stores';
+import { t } from '@stores';
 
 type Selector = {
   label: TranslationKeys | string,

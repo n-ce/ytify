@@ -1,9 +1,32 @@
-import { setStore, playerStore, setPlayerStore, t } from "../stores";
-import { config } from "./config";
-import { player } from "./player";
-import getStreamData from "../modules/getStreamData";
+import { setStore, playerStore, setPlayerStore, t } from "@stores";
+import { config, player } from "@utils";
 
-export * from './pure';
+export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
+
+
+export function parseDuration(d: string): number {
+  const parts = d.split(':').map(Number);
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  if (parts.length === 1) return parts[0] * 60;
+  return 0;
+}
+
+export function convertSStoHHMMSS(seconds: number): string {
+  if (seconds < 0) return '';
+  if (seconds === Infinity) return 'Emergency Mode';
+  const hh = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const mm = Math.floor(seconds / 60);
+  const ss = Math.floor(seconds % 60);
+  let mmStr = String(mm);
+  let ssStr = String(ss);
+  if (mm < 10) mmStr = '0' + mmStr;
+  if (ss < 10) ssStr = '0' + ssStr;
+  return (hh > 0 ?
+    hh + ':' : '') + `${mmStr}:${ssStr}`;
+}
+
 
 const pathModifier = (url: string) => url.includes('=') ?
   'playlists=' + url.split('=')[1] :
@@ -97,8 +120,10 @@ function isErrorResponse(data: Invidious | ErrorResponse): data is ErrorResponse
 export async function getDownloadLink(id: string): Promise<void> {
   setStore('snackbar', t('actions_menu_downloading'));
 
+  const getStreamData = await import('@modules/getStreamData').then(mod => mod.default);
+
   return getStreamData(id)
-    .then(data => {
+    .then(async data => {
       if (isErrorResponse(data)) {
         throw new Error(data.error || data.message || 'Unknown error');
       }

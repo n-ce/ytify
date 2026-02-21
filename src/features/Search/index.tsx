@@ -2,7 +2,7 @@ import { onCleanup, onMount, Show, lazy } from "solid-js";
 import './Search.css';
 import Results from './Results';
 import Input from "./Input";
-import { resetSearch, setNavStore, searchStore, t, navStore } from "@lib/stores";
+import { resetSearch, setNavStore, searchStore, t, navStore } from "@stores";
 import Filters from "./Filters";
 
 const About = lazy(() => import('./About'));

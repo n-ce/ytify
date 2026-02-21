@@ -1,6 +1,6 @@
-import { playerStore } from "@lib/stores";
-import { convertSStoHHMMSS, getCollection } from "@lib/utils";
-import { drawer, setDrawer } from "@lib/utils";
+import { playerStore } from "@stores";
+import { convertSStoHHMMSS, getCollection } from "@utils";
+import { drawer, setDrawer } from "@utils";
 
 type RecommendedVideo = {
   title: string;

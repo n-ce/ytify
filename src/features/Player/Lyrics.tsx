@@ -1,5 +1,5 @@
 import { createSignal, For, onMount, onCleanup } from "solid-js";
-import { playerStore, setPlayerStore, setStore, t } from "@lib/stores";
+import { playerStore, setPlayerStore, setStore, t } from "@stores";
 
 export default function(props: { onClose: () => void }) {
 

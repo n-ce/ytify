@@ -51,7 +51,10 @@ export default async (_: Request, context: Context) => {
   };
 
   return new Response(JSON.stringify(data), {
-    headers: { 'content-type': 'application/json' },
+    headers: {
+      'content-type': 'application/json',
+      'Cache-Control': 's-maxage=86400, stale-while-revalidate=3600'
+    },
   });
 };
 

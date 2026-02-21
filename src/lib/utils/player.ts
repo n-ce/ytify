@@ -1,7 +1,5 @@
-import { convertSStoHHMMSS } from "./helpers";
-import { playerStore, setPlayerStore, setStore, store } from "@lib/stores";
-import { config } from "./config";
-import getStreamData from "../modules/getStreamData";
+import { playerStore, setPlayerStore, setStore, store } from "@stores";
+import { config, convertSStoHHMMSS } from "@utils";
 
 let playerAbortController: AbortController;
 export async function player(id?: string) {
@@ -27,6 +25,7 @@ export async function player(id?: string) {
   else if (playerStore.stream.author?.endsWith('Topic'))
     return import('../modules/jioSaavn').then(mod => mod.default());
 
+  const getStreamData = await import('@modules/getStreamData').then(mod => mod.default);
   const data = await getStreamData(id, false, playerAbortController.signal);
 
   if (data && 'adaptiveFormats' in data)
@@ -63,9 +62,9 @@ export async function player(id?: string) {
     ));
 
 
-    if (config.similarContent && !enforceVideo)
-      import('../modules/enqueueRelatedStreams')
-        .then(mod => mod.default(invidiousData.recommendedVideos));
+  if (config.similarContent && !enforceVideo)
+    import('../modules/enqueueRelatedStreams')
+      .then(mod => mod.default(invidiousData.recommendedVideos));
 
 
 

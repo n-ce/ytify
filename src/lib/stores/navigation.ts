@@ -1,12 +1,12 @@
 import { JSX, lazy } from "solid-js";
 import { createStore } from "solid-js/store";
-const Search = lazy(() => import('../../features/Search'));
-const Library = lazy(() => import('../../features/Library'));
-const List = lazy(() => import('../../features/List'));
-const Queue = lazy(() => import('../../features/Queue'));
-const Player = lazy(() => import('../../features/Player'));
-const Settings = lazy(() => import('../../features/Settings'));
-const Updater = lazy(() => import('../../features/Updater'));
+const Search = lazy(() => import('@features/Search'));
+const Library = lazy(() => import('@features/Library'));
+const List = lazy(() => import('@features/List'));
+const Queue = lazy(() => import('@features/Queue'));
+const Player = lazy(() => import('@features/Player'));
+const Settings = lazy(() => import('@features/Settings'));
+const Updater = lazy(() => import('@features/Updater'));
 
 export const params = (new URL(location.href)).searchParams;
 

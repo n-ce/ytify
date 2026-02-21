@@ -1,14 +1,16 @@
 import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
-import { addToCollection, config, cssVar, player, themer } from "@lib/utils";
-import { instances } from "@lib/utils/pure";
-import { navStore, params, updateParam } from "./navigation";
-import { addToQueue, queueStore, setQueueStore } from "./queue";
-import audioErrorHandler from "@lib/modules/audioErrorHandler";
-import { setStore, store } from "./app";
-import getStreamData from "../modules/getStreamData";
+import { navStore, params, updateParam, addToQueue, queueStore, setQueueStore, setStore, store } from "@stores";
+import { config, cssVar, themer, addToCollection, player } from "@utils";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+const instances = [
+  "https://www.gcx.co.in",
+  "https://ubiquitous-rugelach-b30b3f.netlify.app",
+  "https://super-duper-system.netlify.app",
+  "https://crispy-octo-waddle.netlify.app"
+];
 
 type PlayerStore = {
   stream: TrackItem & { albumId?: string },
@@ -211,9 +213,10 @@ createRoot(() => {
 
     if (!nextItem) return;
 
-    const data = await getStreamData(nextItem, true);
+    const data = await import('@modules/getStreamData').then(mod => mod.default(nextItem, true));
     const prefetchRef = new Audio();
-    prefetchRef.onerror = () => audioErrorHandler(prefetchRef, nextItem);
+    prefetchRef.onerror = () =>
+      import('@modules/audioErrorHandler').then(mod => mod.default(prefetchRef, nextItem));
     if (data && 'adaptiveFormats' in data)
       import('../modules/setAudioStreams')
         .then(mod => mod.default(
@@ -224,7 +227,7 @@ createRoot(() => {
         ));
   }
 
-  playerStore.audio.onerror = () => audioErrorHandler(playerStore.audio);
+  playerStore.audio.onerror = () => import('@modules/audioErrorHandler').then(mod => mod.default(playerStore.audio));
 
 });
 

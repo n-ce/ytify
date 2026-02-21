@@ -3,9 +3,9 @@ import {
   getMeta,
   metaUpdater,
   rehydrateStores,
-} from "@lib/utils/library";
-import { setStore, t } from "@lib/stores";
-import { config } from "@lib/utils/config";
+  config,
+} from "@utils";
+import { setStore, t } from "@stores";
 
 // --- Type Definitions ---
 

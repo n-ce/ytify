@@ -1,4 +1,4 @@
-import { setPlayerStore, playerStore } from "@lib/stores";
+import { setPlayerStore, playerStore } from "@stores";
 
 export default function() {
 

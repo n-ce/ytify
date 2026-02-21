@@ -1,6 +1,6 @@
 import { onMount, Show } from 'solid-js';
 import './Queue.css';
-import { queueStore, setNavStore, t, setQueueStore, totalQueueDuration } from "@lib/stores";
+import { queueStore, setNavStore, t, setQueueStore, totalQueueDuration } from "@stores";
 import List from "./List";
 import Dropdown from './Dropdown';
 

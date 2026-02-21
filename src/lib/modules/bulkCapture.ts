@@ -1,13 +1,12 @@
-import getStreamData from "./getStreamData";
-import { convertSStoHHMMSS } from "@lib/utils";
-import { addToCollection } from "@lib/utils/library";
-import { setStore } from "@lib/stores";
+import { convertSStoHHMMSS, addToCollection } from "@utils";
+import { setStore } from "@stores";
 
 export default function(ids: string[]): Promise<void> {
   setStore('snackbar', 'Processing pasted links...'); // Notify user of process start
   const collectionItems: TrackItem[] = [];
 
   const processId = async (id: string): Promise<void> => {
+    const { default: getStreamData } = await import("./getStreamData");
     return getStreamData(id)
       .then(streamData => {
         if ("error" in streamData) {

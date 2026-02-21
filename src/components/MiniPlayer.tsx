@@ -1,11 +1,10 @@
 import { lazy, Show } from "solid-js";
-import { config } from "@lib/utils/config";
+import { config } from "@utils";
 import { LikeButton, MediaDetails, PlayButton, PlayNextButton } from "./MediaPartials";
-import { playerStore, setNavStore } from "@lib/stores";
-import { queueStore } from "@lib/stores/queue";
+import { playerStore, setNavStore, queueStore } from "@stores";
 
 
-const MediaArtwork = lazy(() => import('./MediaPartials/MediaArtwork'))
+const MediaArtwork = lazy(() => import('@components/MediaPartials/MediaArtwork'))
 
 export default function() {
 

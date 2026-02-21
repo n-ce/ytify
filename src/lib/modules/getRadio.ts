@@ -1,4 +1,4 @@
-import { convertSStoHHMMSS } from "../utils";
+import { convertSStoHHMMSS } from '@utils';
 
 interface PipedStream {
   url: string;

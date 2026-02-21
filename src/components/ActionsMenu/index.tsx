@@ -1,12 +1,11 @@
-import { store, t, playerStore, setListStore, setStore, getList, addToQueue, navStore, setNavStore, setQueueStore, queueStore } from '@lib/stores';
-import { getDownloadLink } from '@lib/utils';
-import { addToCollection, getCollection, removeFromCollection } from '@lib/utils/library';
+import { getDownloadLink, addToCollection, getCollection, removeFromCollection } from '@utils';
 import './ActionsMenu.css';
 import { onMount, Show, createEffect, createSignal } from 'solid-js';
 import { render } from 'solid-js/web';
 import { LikeButton } from '@components/MediaPartials';
 import CollectionSelector from './CollectionSelector';
 import StreamItem from '@components/StreamItem';
+import { setStore, store, t, playerStore, getList, setListStore, addToQueue, queueStore, setQueueStore, navStore, setNavStore } from '@stores';
 
 
 export default function() {
@@ -102,7 +101,7 @@ export default function() {
           if (!id) return;
 
           setQueueStore('isLoading', true);
-          import('@lib/modules/getRadio')
+          import('@modules/getRadio')
             .then(mod => mod.default(id))
             .then(data => {
               setQueueStore('list', []);
@@ -245,7 +244,7 @@ export default function() {
 
 
         <li tabindex="9" onclick={() => {
-          open('https://youtu.be/' + store.actionsMenu?.id);
+          open('https://www.youtube.com/watch?v=' + store.actionsMenu?.id);
         }}>
           <i class="ri-youtube-fill"></i>{t('actions_menu_yt_link')}
         </li>

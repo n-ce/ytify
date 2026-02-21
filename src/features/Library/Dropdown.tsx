@@ -1,5 +1,5 @@
-import { getTracksMap, setConfig, config } from '@lib/utils';
-import { setStore, t } from '@lib/stores';
+import { getTracksMap, setConfig, config } from '@utils';
+import { setStore, t } from '@stores';
 import { lazy, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 
@@ -93,7 +93,7 @@ export default function Dropdown() {
           <label>
             <i class="ri-refresh-line"></i>&nbsp;Import Playlists from SongShift
           </label>
-          <input type="file" id="upload_songshift" onchange={async (e) => (await import('@lib/modules/importSongshiftStreams')).default(e.target.files![0])} />
+          <input type="file" id="upload_songshift" onchange={async (e) => (await import('@modules/importSongshiftStreams')).default(e.target.files![0])} />
         </li>
 
         <Show when={config.dbsync}

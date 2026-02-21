@@ -1,8 +1,7 @@
 import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
-import { config, hostResolver, player, removeFromCollection, getCollectionItems } from '@lib/utils';
-import { generateImageUrl } from '@lib/utils/image';
-import { listStore, setNavStore, setPlayerStore, setStore, store, setQueueStore, navStore, playerStore } from '@lib/stores';
+import { config, hostResolver, player, removeFromCollection, getCollectionItems, generateImageUrl } from '@utils';
+import { setStore, store, setQueueStore, listStore, navStore, setNavStore, playerStore, setPlayerStore } from '@stores';
 
 export default function(data: YTItem & {
   draggable?: boolean,
@@ -144,9 +143,8 @@ export default function(data: YTItem & {
 
 
           if (data.context?.src === 'queue') {
-            const indexToRemove = parseInt(data.context.id, 10);
             setQueueStore('list', (list) =>
-              list.filter((_, idx) => idx !== indexToRemove)
+              list.filter((item) => item.id !== data.id)
             );
           }
         }

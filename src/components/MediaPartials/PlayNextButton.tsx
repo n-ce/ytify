@@ -1,4 +1,4 @@
-import { playNext, t } from '@lib/stores';
+import { playNext, t } from '@stores';
 
 export default function PlayNextButton() {
   return (

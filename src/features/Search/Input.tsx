@@ -1,6 +1,6 @@
 import { For, onMount, Show } from "solid-js";
-import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "@lib/stores";
-import { config, drawer, idFromURL, player } from "@lib/utils";
+import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "@stores";
+import { config, drawer, idFromURL, player } from "@utils";
 
 export default function() {
 
@@ -42,7 +42,7 @@ export default function() {
             const array = pastedText?.split(isBulk).map(idFromURL).filter(s => s?.length === 11);
             superInput.value = '';
             if (array?.length)
-              await import('@lib/modules/bulkCapture')
+              await import('@modules/bulkCapture')
                 .then(mod => mod.default(array as string[]));
             return;
           }

@@ -1,17 +1,16 @@
 import { Connect } from 'vite';
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import url from 'url';
 
 /**
  * Wraps a Vercel/Serverless handler so it can be used as a Vite middleware.
  */
 export function createLocalAdapter(handler: (req: VercelRequest, res: VercelResponse) => Promise<any> | any) {
   return async (req: Connect.IncomingMessage, res: any) => {
-    const parsedUrl = url.parse(req.url || '', true);
+    const parsedUrl = new URL(req.url || '', 'http://localhost');
     
     // Mock VercelRequest
     const vercelReq = req as unknown as VercelRequest;
-    vercelReq.query = parsedUrl.query as any;
+    vercelReq.query = Object.fromEntries(parsedUrl.searchParams) as any;
     
     // Mock VercelResponse
     // We must capture original methods to avoid infinite recursion

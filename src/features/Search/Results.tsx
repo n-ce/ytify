@@ -1,5 +1,5 @@
 import { For, Show } from 'solid-js';
-import { searchStore } from '@lib/stores';
+import { searchStore } from '@stores';
 import ListItem from '@components/ListItem';
 import StreamItem from '@components/StreamItem';
 

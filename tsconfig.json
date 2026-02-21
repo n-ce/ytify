@@ -26,12 +26,11 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "paths": {
-      "@lib/*": [
-        "./src/lib/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ]
+      "@stores": ["./src/lib/stores"],
+      "@utils": ["./src/lib/utils"],
+      "@modules/*": ["./src/lib/modules/*"],
+      "@components/*": ["./src/components/*"],
+      "@features/*": ["./src/features/*"]
     }
   },
   "include": [

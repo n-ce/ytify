@@ -2,8 +2,8 @@ import { For, Show, lazy, onMount, createSignal } from "solid-js";
 import './Library.css';
 import Collections from "./Collections";
 
-import { getLibraryAlbums, config, getMeta, getLists } from "@lib/utils";
-import { t, setNavStore, store } from "@lib/stores";
+import { getLibraryAlbums, config, getMeta, getLists } from "@utils";
+import { t, setNavStore, store } from "@stores";
 import ListItem from "@components/ListItem";
 import Dropdown from "./Dropdown";
 
@@ -18,7 +18,7 @@ export default function() {
   let syncBtn!: HTMLElement;
 
   if (getMeta().version === 4)
-    import('@lib/modules/libraryMigratorV5').then(m => m.default());
+    import('@modules/libraryMigratorV5').then(m => m.default());
   else
     onMount(() => {
       setNavStore('library', 'ref', libraryRef);
@@ -48,7 +48,7 @@ export default function() {
               }
               ref={syncBtn}
               onclick={() => {
-                import('@lib/modules/cloudSync').then(({ runSync }) => {
+                import('@modules/cloudSync').then(({ runSync }) => {
                   runSync(config.dbsync);
                 });
               }}

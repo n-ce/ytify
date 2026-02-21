@@ -1,7 +1,6 @@
 import { createStore } from "solid-js/store";
-import { closeFeature, navStore, setNavStore, updateParam } from "./navigation";
-import { setStore, store } from "./app";
-import { getLibraryAlbums, drawer } from "@lib/utils";
+import { closeFeature, navStore, setNavStore, updateParam, setStore, store } from "@stores";
+import { getLibraryAlbums, drawer } from "@utils";
 
 const initialState = () => ({
   isLoading: false,

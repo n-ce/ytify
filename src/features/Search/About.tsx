@@ -1,6 +1,6 @@
 import './About.css';
 
-import { t } from '@lib/stores';
+import { t } from '@stores';
 import './About.css';
 
 export default function() {

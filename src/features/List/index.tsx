@@ -1,20 +1,16 @@
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { createSignal, For, onMount, Show } from 'solid-js';
 import './List.css';
-import Sortable, { type SortableEvent } from 'sortablejs';
-import { addToQueue, listStore, resetList, setListStore, setNavStore, t } from '@lib/stores';
-import { fetchCollection, metaUpdater, removeFromCollection, saveCollection } from '@lib/utils/library';
-import { setConfig, config, drawer } from '@lib/utils/config';
-import { generateImageUrl } from '@lib/utils';
+import { addToQueue, listStore, resetList, setNavStore, t } from '@stores';
+import { fetchCollection, removeFromCollection, setConfig, config, drawer, generateImageUrl } from '@utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
-import ListItem from '@components/ListItem'; // Added import
+import ListItem from '@components/ListItem';
 
 type SortBy = 'modified' | 'name' | 'artist' | 'duration';
 
 export default function() {
   let listSection!: HTMLElement;
-  let sortableRef: Sortable | undefined;
 
   const [markMode, setMarkMode] = createSignal(false);
   const [markList, setMarkList] = createSignal<string[]>([]);
@@ -23,46 +19,11 @@ export default function() {
   const [localSortOrder, setLocalSortOrder] = createSignal<'asc' | 'desc'>(config.sortOrder);
   const [showSortable, setShowSortable] = createSignal(false);
 
-  function initSortable() {
-    const listContainer = document.querySelector('.listContainer') as HTMLDivElement;
-    sortableRef = new Sortable(listContainer, {
-      handle: '.ri-draggable',
-      onUpdate(e: SortableEvent) {
-        if (e.oldIndex == null || e.newIndex == null) return;
-
-        setListStore('list', (currentList) => {
-          const newList = [...currentList];
-          const [removedItem] = newList.splice(e.oldIndex!, 1);
-          newList.splice(e.newIndex!, 0, removedItem);
-
-          const collection = listStore.id;
-          const dataArray = newList.map(item => item.id);
-          saveCollection(collection, dataArray);
-          metaUpdater(collection);
-
-          return [...newList];
-        });
-      }
-    });
-  }
-
   onMount(() => {
     setNavStore('list', 'ref', listSection);
     listSection.scrollIntoView();
     listSection.scrollTo(0, 0);
     setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', false);
-  });
-  createEffect(() => {
-    if (localSortBy() === 'modified' && showSortable() && !listStore.reservedCollections.includes(listStore.id)) {
-      initSortable();
-    } else {
-      sortableRef?.destroy();
-      sortableRef = undefined;
-    }
-  });
-  onCleanup(() => {
-    sortableRef?.destroy();
-    sortableRef = undefined;
   });
 
 

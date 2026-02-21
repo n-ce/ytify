@@ -1,5 +1,5 @@
-import { getMeta } from '../utils/library';
-import { setStore } from '../stores';
+import { getMeta } from '@utils';
+import { setStore } from '@stores';
 
 interface OldListItem {
   id: string;

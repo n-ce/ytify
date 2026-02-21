@@ -1,7 +1,5 @@
-import { getTracksMap, saveTracksMap, saveCollection, metaUpdater } from '@lib/utils/library';
-import { setStore } from '@lib/stores';
-import { drawer, setDrawer } from '@lib/utils';
-import { convertSStoHHMMSS } from '@lib/utils/helpers';
+import { getTracksMap, saveTracksMap, saveCollection, metaUpdater, drawer, setDrawer, convertSStoHHMMSS } from '@utils';
+import { setStore } from '@stores';
 
 type CollectionItemV1 = {
   id: string,

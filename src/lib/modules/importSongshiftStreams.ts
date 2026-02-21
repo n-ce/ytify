@@ -1,5 +1,5 @@
-import { setListStore, setStore } from "@lib/stores";
-import { addToCollection, convertSStoHHMMSS } from "@lib/utils";
+import { setListStore, setStore } from "@stores";
+import { addToCollection, convertSStoHHMMSS } from "@utils";
 
 type songshift = Record<'track' | 'album' | 'artist' | 'service', string>[];
 

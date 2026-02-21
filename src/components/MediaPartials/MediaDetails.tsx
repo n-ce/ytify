@@ -1,5 +1,5 @@
-import { playerStore } from "@lib/stores";
-import { hostResolver } from "@lib/utils";
+import { playerStore } from "@stores";
+import { hostResolver } from "@utils";
 
 export default function() {
 

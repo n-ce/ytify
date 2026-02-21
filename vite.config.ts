@@ -7,7 +7,6 @@ import OpenProps from 'open-props';
 import { resolve } from 'path';
 import { readdirSync } from 'fs';
 import path from 'path';
-import url from 'url';
 
 
 export default defineConfig(({ command }) => ({
@@ -17,13 +16,17 @@ export default defineConfig(({ command }) => ({
     Build: JSON.stringify('v' + require('./package.json').version),
     Backend: command === 'serve' ? JSON.stringify(['']) : JSON.stringify([
       'https://ytify-zeta.vercel.app',
-      'https://ytify-legacy.vercel.app'
+      'https://ytify-legacy.vercel.app',
+      'https://ytify-2nx7.onrender.com'
     ]),
   },
   resolve: {
     alias: {
+      '@stores': path.resolve(__dirname, './src/lib/stores'),
+      '@modules': path.resolve(__dirname, './src/lib/modules'),
+      '@utils': path.resolve(__dirname, './src/lib/utils'),
       '@components': path.resolve(__dirname, './src/components'),
-      '@lib': path.resolve(__dirname, './src/lib'),
+      '@features': path.resolve(__dirname, './src/features'),
     },
   },
   plugins: [
@@ -146,8 +149,8 @@ const apiMiddleware = (serve: boolean): PluginOption => serve ? {
     server.middlewares.use(async (req, res, next) => {
       if (req.url?.startsWith('/api/')) {
         const { createLocalAdapter } = await server.ssrLoadModule('./src/backend/localAdapter.ts');
-        const parsedUrl = url.parse(req.url, true);
-        const endpoint = parsedUrl.pathname?.split('/').pop();
+        const parsedUrl = new URL(req.url, 'http://localhost');
+        const endpoint = parsedUrl.pathname.split('/').pop();
 
         try {
           const handlerModule = await server.ssrLoadModule(`./api/${endpoint}.ts`);

@@ -1,6 +1,6 @@
 import { createSignal, For, onMount } from 'solid-js';
 import './Updater.css';
-import { closeFeature, setStore, store, t } from '@lib/stores';
+import { closeFeature, setStore, store, t } from '@stores';
 
 export default function() {
 

@@ -1,5 +1,5 @@
-import { playerStore, setPlayerStore, setStore, updateParam } from "@lib/stores";
-import { config, player } from "@lib/utils";
+import { playerStore, setPlayerStore, setStore, updateParam } from "@stores";
+import { config, player } from "@utils";
 
 export default function() {
   setPlayerStore('status', 'Loading music information...');
@@ -32,6 +32,7 @@ export default function() {
         .then(mod => mod.default(stream));
 
 
+      delete audio.dataset.retried;
       audio.src = fullDownloadUrl;
       updateParam('s', id);
 

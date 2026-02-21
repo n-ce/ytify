@@ -1,5 +1,5 @@
-import { navStore, setNavStore, t } from '@lib/stores';
-import { setDrawer } from '@lib/utils';
+import { navStore, setNavStore, t } from "@stores";
+import { setDrawer } from "@utils";
 
 export default function() {
 

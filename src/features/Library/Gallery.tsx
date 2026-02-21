@@ -1,7 +1,7 @@
 import { For, Show, createSignal, onMount } from "solid-js";
-import { getTracksMap, getCollection } from "@lib/utils";
+import { getTracksMap, getCollection } from "@utils";
 import ListItem from "@components/ListItem";
-import { t, store } from "@lib/stores";
+import { t, store } from "@stores";
 
 export default function() {
   const [gallery, setGallery] = createSignal({

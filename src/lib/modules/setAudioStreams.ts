@@ -1,5 +1,5 @@
-import { playerStore, setPlayerStore, t } from "@lib/stores";
-import { handleXtags, preferredStream, proxyHandler } from "@lib/utils";
+import { playerStore, setPlayerStore, t } from "@stores";
+import { handleXtags, preferredStream, proxyHandler } from "@utils";
 
 export default async function(
   audioStreams: AudioStream[],
@@ -20,6 +20,8 @@ export default async function(
 
   const stream = await preferredStream(handleXtags(audioStreams));
   //qualityView.textContent = stream.quality + ' ' + stream.codec;
-  (prefetchNode || playerStore.audio).src = proxyHandler(stream.url, Boolean(prefetchNode));
+  const target = prefetchNode || playerStore.audio;
+  delete target.dataset.retried;
+  target.src = proxyHandler(stream.url, Boolean(prefetchNode));
 
 }

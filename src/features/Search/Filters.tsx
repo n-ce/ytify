@@ -1,5 +1,5 @@
-import { getSearchResults, searchStore, setSearchStore, updateParam, t } from "@lib/stores";
-import { config, setConfig } from "@lib/utils";
+import { getSearchResults, searchStore, setSearchStore, updateParam, t } from "@stores";
+import { config, setConfig } from "@utils";
 
 export default function() {
 

@@ -25,7 +25,7 @@
         },
         {
           "key": "Cache-Control",
-          "value": "s-maxage=300, stale-while-revalidate"
+          "value": "s-maxage=86400, stale-while-revalidate=3600"
         }
       ]
     }

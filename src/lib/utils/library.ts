@@ -1,14 +1,15 @@
-import { navStore, setNavStore, setStore, t, updateParam } from '@lib/stores';
-import { listStore, setListStore } from '@lib/stores';
-import { config, drawer, setDrawer } from '@lib/utils/config';
+import { setStore, t, listStore, setListStore, navStore, setNavStore, updateParam } from '@stores';
+import { config, drawer, setDrawer, parseDuration } from '@utils';
 
-const syncLibrary = (action: 'add' | 'remove' | 'schedule', id?: string) => {
-  if (!config.dbsync) return;
-  import('@lib/modules/cloudSync').then(m => {
-    if (action === 'add' && id) m.addDirtyTrack(id);
-    else if (action === 'remove' && id) m.removeDirtyTrack(id);
-    else if (action === 'schedule') m.scheduleSync();
-  });
+export const syncLibrary = (action: 'add' | 'remove' | 'schedule' | 'init', id?: string) => {
+  if (config.dbsync)
+    import('@modules/cloudSync')
+      .then(m => {
+        if (action === 'add' && id) m.addDirtyTrack(id);
+        else if (action === 'remove' && id) m.removeDirtyTrack(id);
+        else if (action === 'schedule') m.scheduleSync();
+        else if (action === 'init') m.runSync(config.dbsync);
+      });
 };
 
 
@@ -415,12 +416,6 @@ export function sortCollection(list: TrackItem[], sortBy: SortBy, sortOrder: 'as
         result = (a.author || '').localeCompare(b.author || '');
         break;
       case 'duration':
-        const parseDuration = (d: string) => {
-          const parts = d.split(':').map(Number);
-          if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
-          if (parts.length === 2) return parts[0] * 60 + parts[1];
-          return 0;
-        };
         result = parseDuration(a.duration) - parseDuration(b.duration);
         break;
     }

@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "8.3.3",
+  "version": "8.3.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "solid-js": "1.9.11",
+    "solid-sortablejs": "^2.1.8",
     "sortablejs": "^1.15.7"
   },
   "devDependencies": {

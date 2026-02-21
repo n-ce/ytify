@@ -1,6 +1,6 @@
 import { LikeButton, PlayButton, PlayNextButton } from "@components/MediaPartials";
-import { params, playerStore, playPrev, queueStore, setPlayerStore, updateParam, t } from "@lib/stores";
-import { convertSStoHHMMSS, setConfig } from "@lib/utils";
+import { params, playerStore, playPrev, queueStore, setPlayerStore, updateParam, t } from "@stores";
+import { convertSStoHHMMSS, setConfig } from "@utils";
 import { Accessor, createSignal, onMount, Setter, Show } from "solid-js";
 
 export default function(_: {

@@ -1,7 +1,6 @@
-import { setStore, store } from './app';
-import { config, drawer, setDrawer } from '@lib/utils';
 import { createStore } from 'solid-js/store';
-import { updateParam } from './navigation';
+import { config, drawer, setDrawer } from '@utils';
+import { updateParam, setStore, store } from '@stores';
 
 const createInitialState = () => ({
   query: '',

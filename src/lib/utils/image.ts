@@ -1,5 +1,5 @@
-import { playerStore } from '@lib/stores';
-import { config } from './config';
+import { playerStore } from '@stores';
+import { config } from '@utils';
 
 
 // Generates both channel and stream thumbnails

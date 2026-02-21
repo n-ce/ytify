@@ -1,7 +1,7 @@
-import { config, hostResolver, generateImageUrl } from '@lib/utils';
+import { config, hostResolver, generateImageUrl } from '@utils';
 import './ListItem.css';
 import { Show, createSignal } from 'solid-js';
-import { getList, setListStore } from '@lib/stores';
+import { getList, setListStore } from '@stores';
 
 export default function(data: YTListItem) {
 

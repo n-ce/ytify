@@ -1,8 +1,6 @@
 import { Show, createEffect, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary } from '@lib/utils/library';
-import { listStore, resetList, setPlayerStore, setStore, t, addToQueue, setNavStore, setListStore, setQueueStore } from '@lib/stores';
-import { importList, shareCollection } from '@lib/modules/listUtils';
-import { player } from '@lib/utils';
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary, player } from '@utils';
+import { listStore, resetList, setListStore, setStore, t, addToQueue, setQueueStore, setNavStore, setPlayerStore } from '@stores';
 
 export default function Dropdown() {
 
@@ -93,7 +91,7 @@ export default function Dropdown() {
           <i class="ri-play-large-line"></i>{t("list_play")}
         </li>
 
-        <li id="enqueueAllBtn" onclick={() => {
+        <li onclick={() => {
           const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
           addToQueue(fullList);
           setNavStore('queue', 'state', true);
@@ -101,7 +99,7 @@ export default function Dropdown() {
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
-        <li onclick={importList} id="importListBtn">
+        <li onclick={() => import('@modules/listUtils').then(mod => mod.importList)}>
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
@@ -121,8 +119,21 @@ export default function Dropdown() {
               class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? t('list_saved_to_library') : t('list_save_to_library')}
           </li>
 
-          <li>
-            <i class="ri-youtube-fill"></i>{listStore.name || t('list_view_on_yt')}
+          <li onclick={() => {
+            const { type, id } = listStore;
+            let url = '';
+
+            if (id.startsWith('MPREb')) {
+              url = 'https://music.youtube.com/browse/' + id;
+            } else if (type === 'playlists' || type === 'album' || id.startsWith('OLAK5uy')) {
+              url = 'https://www.youtube.com/playlist?list=' + id;
+            } else if (type === 'channels') {
+              url = 'https://www.youtube.com/channel/' + id;
+            }
+
+            if (url) open(url);
+          }}>
+            <i class="ri-youtube-fill"></i>{t('actions_menu_yt_link')}
           </li>
         </Show>
 
@@ -158,7 +169,7 @@ export default function Dropdown() {
             <i class="ri-edit-line"></i>{t("list_rename")}
           </li>
 
-          <li id="shareCollectionBtn" onclick={() => shareCollection(getCollectionItems(listStore.id))}>
+          <li id="shareCollectionBtn" onclick={() => import('@modules/listUtils').then(mod => mod.shareCollection(getCollectionItems(listStore.id)))}>
             <i class="ri-link"></i>{t("list_share")}
           </li>
 

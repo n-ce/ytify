@@ -1,5 +1,5 @@
-import { addToCollection, createCollection, getCollection, getCollectionsKeys, removeFromCollection } from '@lib/utils/library';
-import { t } from '@lib/stores';
+import { addToCollection, createCollection, getCollection, getCollectionsKeys, removeFromCollection } from '@utils';
+import { t } from '@stores';
 import { For, Show } from 'solid-js';
 
 export default function(_: {

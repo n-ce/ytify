@@ -1,7 +1,6 @@
 import './Queue.css';
-import { setStore, t, addToQueue, queueStore } from "@lib/stores";
-import { config, setConfig } from "@lib/utils";
-import { setQueueStore, groupQueueByAuthor } from "@lib/stores/queue";
+import { setStore, t, addToQueue, queueStore, setQueueStore, groupQueueByAuthor } from "@stores";
+import { config, setConfig } from "@utils";
 
 export default function Dropdown() {
   return (

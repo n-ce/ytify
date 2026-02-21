@@ -1,8 +1,8 @@
 import { For, Show, createSignal, onMount } from "solid-js";
-import { getLists } from "@lib/utils";
+import { getLists } from "@utils";
 import StreamItem from "@components/StreamItem";
 import ListItem from "@components/ListItem";
-import { t, store } from "@lib/stores";
+import { t, store } from "@stores";
 
 export default function() {
   const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);

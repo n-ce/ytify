@@ -1,8 +1,8 @@
 import { onMount, createEffect, For, createSignal } from "solid-js";
 import './Settings.css';
-import { closeFeature, setNavStore, t, setStore, setI18nStore, updateLang } from '@lib/stores';
+import { closeFeature, setNavStore, t, setStore, updateLang } from '@stores';
 import { Selector } from '@components/Selector.tsx';
-import { config, setConfig, drawer, setDrawer, cssVar, themer, quickSwitch, deleteCollection, getCollection } from '@lib/utils';
+import { config, setConfig, drawer, setDrawer, cssVar, themer, quickSwitch, deleteCollection, getCollection } from '@utils';
 import Dropdown from "./Dropdown";
 
 export default function() {
@@ -60,7 +60,7 @@ export default function() {
           id='languageSelector'
           onchange={(e) => {
             setConfig('language', e.target.value);
-            setI18nStore('locale', e.target.value);
+            setStore('locale', e.target.value);
             setStore('snackbar', t('settings_reload'));
           }}
           value={document.documentElement.lang}
