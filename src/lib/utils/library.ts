@@ -260,6 +260,11 @@ export function renameCollection(oldName: string, newName: string) {
   metaUpdater(newName);
 }
 
+export function rehydrateStores() {
+  if (listStore.type === 'collection' && listStore.id) {
+    fetchCollection(listStore.id);
+  }
+}
 
 export async function fetchCollection(
   id: string | null,
