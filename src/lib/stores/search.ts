@@ -17,6 +17,10 @@ const createInitialState = () => ({
 
 export const [searchStore, setSearchStore] = createStore(createInitialState());
 
+let suggestionTimeout: ReturnType<typeof setTimeout> | undefined;
+let lastQuery = '';
+const DEBOUNCE_TIME = 400;
+
 export function resetSearch() {
   searchStore.observer.disconnect();
   setSearchStore(createInitialState());
@@ -25,31 +29,39 @@ export function resetSearch() {
 }
 
 export function getSearchSuggestions(text: string) {
+  searchStore.suggestions.controller.abort();
+  clearTimeout(suggestionTimeout);
+
   if (text.length < 3) {
     setSearchStore('suggestions', 'data', []);
+    lastQuery = '';
     return;
   }
 
-  setSearchStore('page', 1);
-  setSearchStore('suggestions', 'index', -1);
+  if (text === lastQuery) return;
 
-  searchStore.suggestions.controller.abort();
-  const newController = new AbortController();
-  setSearchStore('suggestions', 'controller', newController);
+  suggestionTimeout = setTimeout(() => {
+    lastQuery = text;
+    setSearchStore('page', 1);
+    setSearchStore('suggestions', 'index', -1);
 
-  const isMusic = ['song', 'artist', 'album'].includes(config.searchFilter);
-  const url = `${store.api}/api/search-suggestions?q=${encodeURIComponent(text)}&music=${isMusic}`;
+    const newController = new AbortController();
+    setSearchStore('suggestions', 'controller', newController);
 
-  fetch(url, { signal: newController.signal })
-    .then(res => res.json() as Promise<string[]>)
-    .then(data => {
-      setSearchStore('suggestions', 'data', data);
-    })
-    .catch(e => {
-      if (e.name === 'AbortError') return;
-      setStore('snackbar', e.message);
-      setSearchStore('suggestions', 'data', []);
-    });
+    const isMusic = ['song', 'artist', 'album'].includes(config.searchFilter);
+    const url = `/api/search-suggestions?q=${encodeURIComponent(text)}&music=${isMusic}`;
+
+    fetch(url, { signal: newController.signal })
+      .then(res => res.json() as Promise<string[]>)
+      .then(data => {
+        setSearchStore('suggestions', 'data', data);
+      })
+      .catch(e => {
+        if (e.name === 'AbortError') return;
+        setStore('snackbar', e.message);
+        setSearchStore('suggestions', 'data', []);
+      });
+  }, DEBOUNCE_TIME);
 }
 
 export async function getSearchResults() {

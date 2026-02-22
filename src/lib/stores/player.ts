@@ -5,13 +5,6 @@ import { config, cssVar, themer, addToCollection, player } from "@utils";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-const instances = [
-  "https://www.gcx.co.in",
-  "https://ubiquitous-rugelach-b30b3f.netlify.app",
-  "https://super-duper-system.netlify.app",
-  "https://crispy-octo-waddle.netlify.app"
-];
-
 type PlayerStore = {
   stream: TrackItem & { albumId?: string },
   history: TrackItem[],
@@ -70,7 +63,7 @@ const createInitialState = (): PlayerStore => ({
   audioURL: '',
   videoURL: '',
   isWatching: Boolean(config.watchMode),
-  proxy: instances[Math.floor(Math.random() * instances.length)]
+  proxy: ''
 });
 
 const [playerStore, setPlayerStore] = createStore(createInitialState());
@@ -98,6 +91,7 @@ export function playPrev() {
 }
 
 createRoot(() => {
+
   let historyID: string | undefined = '';
   let historyTimeoutId = 0;
 

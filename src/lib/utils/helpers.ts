@@ -3,6 +3,18 @@ import { config, player } from "@utils";
 
 export const idFromURL = (link: string | null) => link?.match(/(https?:\/\/)?((www\.)?(youtube(-nocookie)?|youtube.googleapis)\.com.*(v\/|v=|vi=|vi\/|e\/|embed\/|user\/.*\/u\/\d+\/)|youtu\.be\/)([_0-9a-z-]+)/i)?.[7];
 
+export function shuffle<T>(array: T[]): T[] {
+  let currentIndex = array.length;
+
+  while (currentIndex != 0) {
+    const randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
 
 export function parseDuration(d: string): number {
   const parts = d.split(':').map(Number);
