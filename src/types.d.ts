@@ -20,6 +20,10 @@ declare global {
     duration: string;
     author: string;
     authorId: string;
+    context?: {
+      src: Context;
+      id: string;
+    };
   }
   // For Network Usage
   interface YTItem extends TrackItem {

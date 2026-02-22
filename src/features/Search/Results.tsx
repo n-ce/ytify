@@ -18,10 +18,12 @@ export default function SearchResults() {
             fallback={<ListItem {...item as YTListItem}
             />}>
             <StreamItem
-              {...item as YTItem}
-              context={{
-                src: 'search',
-                id: searchStore.query
+              {...{
+                ...item as YTItem,
+                context: {
+                  src: 'search',
+                  id: searchStore.query
+                }
               }}
             />
           </Show>

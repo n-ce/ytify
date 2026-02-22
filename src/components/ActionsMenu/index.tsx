@@ -46,10 +46,7 @@ export default function() {
         author={store.actionsMenu?.author || ''}
         duration={store.actionsMenu?.duration || ''}
         type="video"
-        context={{
-          src: 'queue', /* only for invoking  humbnail  cropping*/
-          id: '1'
-        }}
+        context={store.actionsMenu?.context}
       />
 
       <ul
@@ -98,6 +95,7 @@ export default function() {
 
         <li tabindex="3" onclick={async () => {
           const id = store.actionsMenu?.id;
+          const currentTitle = store.actionsMenu?.title;
           if (!id) return;
 
           setQueueStore('isLoading', true);
@@ -105,7 +103,10 @@ export default function() {
             .then(mod => mod.default(id))
             .then(data => {
               setQueueStore('list', []);
-              addToQueue(data);
+              addToQueue(data.map(item => ({
+                ...item,
+                context: { src: 'queue', id: `Radio: ${currentTitle}` }
+              })));
               if (navStore.queue.state)
                 navStore.queue.ref?.scrollIntoView();
               else setNavStore('queue', 'state', true);

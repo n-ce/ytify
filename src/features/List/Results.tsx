@@ -40,11 +40,11 @@ export default function Results(_: {
           <For each={listStore.list}>{
             (item) =>
               <StreamItem
-                {...item}
+                {...{
+                  ...item,
+                  context: { id: listStore.name || listStore.id, src: listStore.type }
+                }}
                 draggable={false}
-                context={
-                  { id: listStore.name || listStore.id, src: listStore.type }
-                }
                 mark={_.mark}
               />
           }
@@ -59,11 +59,11 @@ export default function Results(_: {
           >
             {(item: YTItem) =>
               <StreamItem
-                {...item}
+                {...{
+                  ...item,
+                  context: { id: listStore.name || listStore.id, src: listStore.type }
+                }}
                 draggable={true}
-                context={
-                  { id: listStore.name || listStore.id, src: listStore.type }
-                }
                 mark={_.mark}
               />
             }

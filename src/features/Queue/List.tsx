@@ -20,10 +20,8 @@ export default function() {
               type="video"
               draggable={false}
               removeMode={queueStore.removeMode}
-              context={{
-                src: 'queue',
-                id: item.id
-              }}
+              context={item.context}
+              inQueue={true}
             />
           )}
         </For>
@@ -45,10 +43,8 @@ export default function() {
               type="video"
               draggable={true}
               removeMode={queueStore.removeMode}
-              context={{
-                src: 'queue',
-                id: item.id
-              }}
+              context={item.context}
+              inQueue={true}
             />
           )}
         </Sortable>

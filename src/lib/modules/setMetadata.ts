@@ -42,8 +42,10 @@ export default async function(data: TrackItem) {
 
 
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.setPositionState();
-    navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
+    import('@modules/mediaSession').then(m => {
+      m.updateMediaSessionPosition();
+      navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
+    });
   }
 
 }

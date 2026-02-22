@@ -19,14 +19,8 @@ export default function(_: {
   })
 
   function updatePositionState() {
-    const { audio } = playerStore;
-    const msn = 'mediaSession' in navigator;
-    if (msn && 'setPositionState' in navigator.mediaSession)
-      navigator.mediaSession.setPositionState({
-        duration: audio.duration || 0,
-        playbackRate: audio.playbackRate || 1,
-        position: Math.floor(audio.currentTime || 0),
-      });
+    if ('mediaSession' in navigator)
+      import('@modules/mediaSession').then(m => m.updateMediaSessionPosition());
   }
 
   return (

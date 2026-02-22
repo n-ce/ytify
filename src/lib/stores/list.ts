@@ -64,33 +64,37 @@ export async function getList(
 
     if (data.type === 'artist') {
       const artist = data as YTArtistItem;
+      const contextId = 'Artist - ' + artist.name;
       setListStore({
-        name: 'Artist - ' + artist.name,
+        name: contextId,
         id: id,
         type: 'channels',
         url: id,
         img: artist.img,
         list: (artist.items || []).map(v => ({
           ...v,
-          author: v.author.endsWith(' - Topic') ? v.author : `${v.author} - Topic`
+          author: v.author.endsWith(' - Topic') ? v.author : `${v.author} - Topic`,
+          context: { src: 'channels' as const, id: contextId }
         }) as YTItem),
         artistAlbums: artist.albums
       });
     } else {
       const listData = data as (YTPlaylistItem | YTChannelItem | YTAlbumItem);
       const isChannel = data.type === 'channel';
+      const listType = isChannel ? 'channels' : (data.type === 'album' ? 'album' : 'playlists');
 
       setListStore({
         name: listData.name,
         img: listData.img,
         id: id,
         author: 'author' in listData ? (listData as YTPlaylistItem | YTAlbumItem).author || '' : listData.name,
-        type: isChannel ? 'channels' : (data.type === 'album' ? 'album' : 'playlists'),
+        type: listType,
         url: id,
         hasContinuation: 'hasContinuation' in listData ? (listData as YTPlaylistItem).hasContinuation : false,
         list: (listData.items || []).map(v => ({
           ...v,
-          author: (data.type === 'album' && !v.author.endsWith(' - Topic')) ? `${v.author} - Topic` : v.author
+          author: (data.type === 'album' && !v.author.endsWith(' - Topic')) ? `${v.author} - Topic` : v.author,
+          context: { src: listType as Context, id: listData.name }
         }) as YTItem)
       });
     }

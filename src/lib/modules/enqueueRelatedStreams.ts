@@ -20,7 +20,8 @@ type RecommendedVideo = {
 
 export default function(data: RecommendedVideo[]) {
 
-  const { history, isMusic } = playerStore;
+  const { history, isMusic, stream } = playerStore;
+  const currentTitle = stream.title;
 
 
   data.forEach(stream => {
@@ -38,7 +39,11 @@ export default function(data: RecommendedVideo[]) {
         title: stream.title,
         author: stream.author,
         authorId: stream.authorId,
-        duration: convertSStoHHMMSS(stream.lengthSeconds)
+        duration: convertSStoHHMMSS(stream.lengthSeconds),
+        context: {
+          src: 'queue',
+          id: `Related to ${currentTitle}`
+        }
       }) as TrackItem])
   });
 

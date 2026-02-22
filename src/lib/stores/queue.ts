@@ -30,9 +30,11 @@ export function filterItemsByConfig(items: TrackItem[], options: { ignoreList?: 
 }
 
 export function addToQueue(items: TrackItem[], options: { replace?: boolean, prepend?: boolean, ignoreConfig?: boolean } = {}) {
-  let itemsToAdd = (config.allowDuplicates || options.replace || options.ignoreConfig)
-    ? items
-    : items.filter(item => !queueStore.list.some(existingItem => existingItem.id === item.id));
+  let itemsToAdd = items;
+
+  if (!config.allowDuplicates && !options.replace && !options.ignoreConfig) {
+    itemsToAdd = items.filter(item => !queueStore.list.some(existingItem => existingItem.id === item.id));
+  }
 
   if (config.durationFilter && !options.ignoreConfig) {
     const limitInSeconds = parseDuration(config.durationFilter);

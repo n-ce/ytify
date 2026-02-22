@@ -82,7 +82,10 @@ export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.get
 export function getCollectionItems(collectionId: string): TrackItem[] {
   const collectionIds = getCollection(collectionId);
   const tracksMap = getTracksMap();
-  return collectionIds.map((id: string) => tracksMap[id]).filter(Boolean) as TrackItem[];
+  return collectionIds.map((id: string) => ({
+    ...tracksMap[id],
+    context: { src: 'collection' as const, id: collectionId }
+  })).filter(item => item.id) as TrackItem[];
 }
 
 export function saveTracksMap(tracks: Collection) {
@@ -265,6 +268,11 @@ export function rehydrateStores() {
   if (listStore.type === 'collection' && listStore.id) {
     fetchCollection(listStore.id);
   }
+
+  if (navStore.library.state) {
+    setNavStore('library', 'state', false);
+    setTimeout(() => setNavStore('library', 'state', true), 10);
+  }
 }
 
 export async function fetchCollection(
@@ -355,7 +363,11 @@ function getLocalCollection(
 
   if (usePagination) {
     let loadedCount = 20;
-    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({ ...tracks[id], type: 'video' as const })));
+    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({ 
+      ...tracks[id], 
+      type: 'video' as const,
+      context: { src: 'collection' as const, id: collection }
+    })));
 
     const observerCallback = () => {
       if (loadedCount >= sortedIds.length) return 0;
@@ -363,14 +375,22 @@ function getLocalCollection(
       const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
-      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({ ...tracks[id], type: 'video' as const }))]);
+      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({ 
+        ...tracks[id], 
+        type: 'video' as const,
+        context: { src: 'collection' as const, id: collection }
+      }))]);
       return sortedIds.length - loadedCount;
     };
 
     setTimeout(() => setObserver(observerCallback), 100);
 
   } else {
-    setListStore('list', sortedIds.map(id => ({ ...tracks[id], type: 'video' as const })));
+    setListStore('list', sortedIds.map(id => ({ 
+      ...tracks[id], 
+      type: 'video' as const,
+      context: { src: 'collection' as const, id: collection }
+    })));
   }
 
   setListStore('id', decodeURI(collection));
