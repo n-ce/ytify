@@ -11,7 +11,7 @@ let isFetching = false;
 async function fetchInstances() {
   if (isFetching) return;
   isFetching = true;
-  fetch('https://stremion.zeabur.app/api/instances')
+  await fetch('https://stremion.zeabur.app/api/instances')
     .then(res => res.json() as Promise<string[]>)
     .then(data => {
       if (Array.isArray(data)) {
@@ -30,7 +30,7 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
-  if (!isFetching) fetchInstances();
+  if (!isFetching) await fetchInstances();
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
     const res = await fetch(`${proxy}/api/v1/videos/${id}`, { signal });

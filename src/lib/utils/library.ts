@@ -22,7 +22,7 @@ export const getMeta = (): Meta => {
   }
 
   const newMeta: Meta = { version: 5, tracks: 0 };
-  const timestamp = Date.now();
+  const timestamp = 0;
 
   const tracks = getTracksMap();
   if (Object.keys(tracks).length > 0) {
