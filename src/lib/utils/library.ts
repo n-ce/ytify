@@ -171,7 +171,9 @@ export function addToCollection(
   saveCollection(name, collection);
   saveTracksMap(tracks);
   metaUpdater(name);
-  rehydrateStores();
+
+  if (listStore.id === name)
+    rehydrateStores();
 }
 
 export function removeFromCollection(
@@ -204,7 +206,8 @@ export function removeFromCollection(
   saveTracksMap(tracks);
   metaUpdater(name);
 
-  rehydrateStores();
+  if (listStore.id === name)
+    rehydrateStores();
 }
 
 export function deleteCollection(name: string) {
