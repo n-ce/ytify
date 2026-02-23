@@ -56,8 +56,10 @@ export default function() {
 
       <header class="topShelf">
         <p>
-          <Show when={playerStore.context.src === 'queue'} fallback={t('player_from', getContext())}>
-            {getContext()}
+          <Show when={playerStore.context.src}>
+            <Show when={playerStore.context.src === 'queue'} fallback={t('player_from', getContext())}>
+              {getContext()}
+            </Show>
           </Show>
         </p>
 

@@ -43,7 +43,7 @@ export default function(_: {
 
       <div class="mainShelf">
 
-        <Show when={playerStore.history.length}>
+        <Show when={queueStore.history.length}>
           <button
             aria-label={t('player_play_previous')}
             class="ri-skip-back-fill"

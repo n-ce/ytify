@@ -35,7 +35,7 @@ export default function(data: YTItem & {
       setImage(src.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
     else {
       // most likely been removed from yt so remove it
-      if (data.context)
+      if (data.context?.src)
         removeFromCollection(data.context?.id, [data.id])
     }
   }
@@ -76,7 +76,19 @@ export default function(data: YTItem & {
         e.preventDefault();
 
         if (data.removeMode) {
-          setQueueStore('list', (list) => list.filter((item) => item.id !== data.id));
+          setQueueStore('list', (list) => {
+            const index = list.findIndex(item => 
+              item.id === data.id && 
+              item.context?.id === data.context?.id && 
+              item.context?.src === data.context?.src
+            );
+            if (index !== -1) {
+              const newList = [...list];
+              newList.splice(index, 1);
+              return newList;
+            }
+            return list;
+          });
           return;
         }
 
@@ -102,11 +114,10 @@ export default function(data: YTItem & {
             setPlayerStore('stream', 'albumId', undefined);
 
 
-          if (data.context)
-            setPlayerStore('context', {
-              id: data.context.id,
-              src: data.context.src
-            });
+          setPlayerStore('context', {
+            id: data.context?.id || '',
+            src: data.context?.src || ''
+          });
 
 
           const isPortrait = matchMedia('(orientation:portrait)').matches;
@@ -142,12 +153,19 @@ export default function(data: YTItem & {
 
           player(data.id);
 
-
-          if (data.inQueue) {
-            setQueueStore('list', (list) =>
-              list.filter((item) => item.id !== data.id)
+          setQueueStore('list', (list) => {
+            const index = list.findIndex(item => 
+              item.id === data.id && 
+              item.context?.id === data.context?.id && 
+              item.context?.src === data.context?.src
             );
-          }
+            if (index !== -1) {
+              const newList = [...list];
+              newList.splice(index, 1);
+              return newList;
+            }
+            return list;
+          });
         }
         else {
           setStore('actionsMenu', {

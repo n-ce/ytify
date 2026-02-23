@@ -32,7 +32,9 @@ export default async (req: Request, context: Context) => {
     const timestamp = Date.now();
     const key = String(timestamp);
 
-    await store.setJSON(key, data);
+    await store.setJSON(key, data, {
+      metadata: { lastModified: timestamp.toString() }
+    });
 
     // Return the key (timestamp) to the client
     return new Response(JSON.stringify({ timestamp }), {

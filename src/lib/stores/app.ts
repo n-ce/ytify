@@ -3,6 +3,20 @@ import { createStore } from "solid-js/store";
 
 const nl = navigator.language.slice(0, 2);
 const initLocale = config.language || (Locales.includes(nl) ? nl : 'en');
+
+const getAllottedInstance = () => {
+  if (import.meta.env.DEV)
+    return '';
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  if (["Asia", "Indian", "Pacific", "Australia"].some(r => tz.includes(r)))
+    return "https://ytify-2nx7.onrender.com";
+  if (["Europe", "Africa", "Atlantic"].some(r => tz.includes(r)))
+    return "https://ytify-legacy.vercel.app";
+  return "https://ytify-zeta.vercel.app";
+};
+
+
 const storeInit: {
   useSaavn: boolean,
   api: string,
@@ -13,7 +27,7 @@ const storeInit: {
   locale: string,
   translations: Record<TranslationKeys, string> | {}
 } = {
-  api: Backend[Math.floor(Math.random() * Backend.length)],
+  api: getAllottedInstance(),
   useSaavn: true,
   locale: initLocale,
   translations: {},

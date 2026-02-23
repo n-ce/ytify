@@ -86,7 +86,6 @@ export async function runSync(userId: string, retryData?: { count: number, serve
 
   try {
     const localMeta = getMeta();
-    const localTracks = getTracksMap();
     
     let remoteMeta: Meta;
     let ETag: string;
@@ -131,7 +130,9 @@ export async function runSync(userId: string, retryData?: { count: number, serve
     }
 
     const inFlightDirtyTracks = getDirtyTracks();
+    // Refetch these to ensure we have the latest data if they changed during the POST/pull phase
     const currentMeta = getMeta(); 
+    const currentTracks = getTracksMap();
     
     const deltaPayload: DeltaPayload = {
       meta: {},
@@ -142,7 +143,7 @@ export async function runSync(userId: string, retryData?: { count: number, serve
     };
 
     inFlightDirtyTracks.added.forEach(id => {
-      if(localTracks[id]) deltaPayload.addedOrUpdatedTracks[id] = localTracks[id];
+      if(currentTracks[id]) deltaPayload.addedOrUpdatedTracks[id] = currentTracks[id];
     });
     deltaPayload.deletedTrackIds = inFlightDirtyTracks.deleted;
     

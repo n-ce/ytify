@@ -24,7 +24,7 @@ export function initMediaSession() {
   });
 
   msn.setActionHandler('previoustrack', () => {
-    if (playerStore.history.length) {
+    if (queueStore.history.length) {
       playPrev();
     }
   });

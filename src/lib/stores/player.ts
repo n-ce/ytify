@@ -7,7 +7,6 @@ const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAA
 
 type PlayerStore = {
   stream: TrackItem & { albumId?: string },
-  history: TrackItem[],
   audio: HTMLAudioElement,
   context: {
     src: Context,
@@ -35,7 +34,7 @@ type PlayerStore = {
 const createInitialState = (): PlayerStore => ({
   audio: new Audio(),
   playbackState: 'none',
-  context: { id: 'share link', src: 'link' },
+  context: { id: '', src: '' },
   status: '',
   currentTime: 0,
   fullDuration: 0,
@@ -49,7 +48,6 @@ const createInitialState = (): PlayerStore => ({
     id: '',
     duration: ''
   },
-  history: [],
   mediaArtwork: blankImage,
   supportsOpus: navigator.mediaCapabilities.decodingInfo({
     type: 'file',
@@ -66,42 +64,42 @@ const createInitialState = (): PlayerStore => ({
   proxy: ''
 });
 
-const [playerStore, setPlayerStore] = createStore(createInitialState());
+export const [playerStore, setPlayerStore] = createStore(createInitialState());
 
 export function playNext() {
   const { stream } = playerStore;
   const { list } = queueStore;
   const nextStream = list[0];
-  setPlayerStore('history', h => [{ ...stream }, ...h]);
+
+  if (!nextStream) return;
+
+  if (stream.id) setQueueStore('history', h => [{ ...stream }, ...h]);
+
   setPlayerStore('stream', nextStream);
-  if (nextStream.context) {
-    setPlayerStore('context', {
-      id: nextStream.context.id,
-      src: nextStream.context.src
-    });
-  }
+  setPlayerStore('context', {
+    id: nextStream.context?.id || '',
+    src: nextStream.context?.src || ''
+  });
   setQueueStore('list', l => l.slice(1));
   player(nextStream.id);
-
 }
-
 export function playPrev() {
-  const { history, stream } = playerStore;
+  const { stream } = playerStore;
+  const { history } = queueStore;
 
   const prevStream = history[0];
-  setPlayerStore('history', h => h.slice(1));
-  setQueueStore('list', l => [{ ...stream }, ...l]);
+  if (!prevStream) return;
+
+  setQueueStore('history', h => h.slice(1));
+  if (stream.id) setQueueStore('list', l => [{ ...stream }, ...l]);
 
   setPlayerStore('stream', prevStream);
-  if (prevStream.context) {
-    setPlayerStore('context', {
-      id: prevStream.context.id,
-      src: prevStream.context.src
-    });
-  }
+  setPlayerStore('context', {
+    id: prevStream.context?.id || '',
+    src: prevStream.context?.src || ''
+  });
   player(prevStream.id);
 }
-
 createRoot(() => {
 
   let historyID: string | undefined = '';
@@ -161,7 +159,7 @@ createRoot(() => {
 
   let isPlayable = false;
   const playableCheckerID = setInterval(() => {
-    if (playerStore.history.length || params.has('url') || params.has('text') || !params.has('s')) {
+    if (queueStore.history.length || params.has('url') || params.has('text') || !params.has('s')) {
       isPlayable = true;
       clearInterval(playableCheckerID);
     }
@@ -269,7 +267,5 @@ async function getRecommendations() {
     }))))
     .catch(e => setStore('snackbar', `Could not get recommendations for the track: ${e.message}`));
 
+
 }
-
-
-export { playerStore, setPlayerStore };

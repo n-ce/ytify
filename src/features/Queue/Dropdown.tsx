@@ -22,17 +22,6 @@ export default function Dropdown() {
         </li>
 
         <li
-          classList={{ on: config.manualOrdering }}
-          onclick={(e) => {
-            setConfig('manualOrdering', !config.manualOrdering);
-            setStore('snackbar', t('queue_reload_notification'));
-            (e.currentTarget as HTMLElement).classList.toggle('on');
-          }}
-        >
-          {t('queue_manual_ordering')}
-        </li>
-
-        <li
           classList={{ on: Boolean(config.durationFilter) }}
           onclick={(e) => {
             const val = config.durationFilter ? '' : prompt('Enter duration limit (e.g. 10:00)', '10:00');
@@ -44,31 +33,6 @@ export default function Dropdown() {
           }}
         >
           {t('queue_duration_filter')}
-        </li>
-
-        <li
-          classList={{ on: config.allowDuplicates }}
-          onclick={(e) => {
-            const allowDuplicates = !config.allowDuplicates;
-            setConfig('allowDuplicates', allowDuplicates);
-            (e.currentTarget as HTMLElement).classList.toggle('on');
-
-            if (!allowDuplicates) {
-              setQueueStore('list', (list) => {
-                const uniqueIds = new Set<string>();
-                return list.filter(item => {
-                  if (uniqueIds.has(item.id)) {
-                    return false;
-                  } else {
-                    uniqueIds.add(item.id);
-                    return true;
-                  }
-                });
-              });
-            }
-          }}
-        >
-          {t('queue_allow_duplicates')}
         </li>
 
         <li
@@ -118,7 +82,8 @@ export default function Dropdown() {
 
         <li onclick={
           () => {
-            setQueueStore('list', [])
+            setQueueStore('list', []);
+            setQueueStore('history', []);
           }
         }>
           {t('queue_clear')}

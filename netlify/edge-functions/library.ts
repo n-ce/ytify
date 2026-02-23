@@ -43,8 +43,11 @@ export default async (req: Request, context: Context): Promise<Response> => {
     try {
       const newLibraryObject = await req.json();
       
-      await libraryStore.set(userIdHash, JSON.stringify(newLibraryObject), {
-        metadata: { contentType: "application/json" }
+      await libraryStore.setJSON(userIdHash, newLibraryObject, {
+        metadata: { 
+          contentType: "application/json",
+          lastModified: Date.now().toString()
+        }
       });
 
       return new Response(null, { status: 204 }); 

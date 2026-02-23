@@ -29,7 +29,7 @@ interface LibrarySnapshot {
 }
 
 interface DeltaPayload {
-  meta: Meta;
+  meta: Partial<Meta>;
   addedOrUpdatedTracks: Collection;
   deletedTrackIds: string[];
   updatedCollections: { [collectionName: string]: CollectionData };
@@ -83,7 +83,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
       const serverMeta = snapshot.meta || { version: 5, tracks: 0 };
       
       const delta: DeltaPayload = {
-        meta: serverMeta,
+        meta: {}, // Start with empty meta for surgical delta
         addedOrUpdatedTracks: {},
         deletedTrackIds: [],
         updatedCollections: {},
@@ -92,6 +92,12 @@ export default async (req: Request, context: Context): Promise<Response> => {
 
       let hasChanges = false;
       let isFullTrackSync = false;
+
+      // Only include version if it's newer on server
+      if ((serverMeta.version || 5) > (clientMeta.version || 5)) {
+        delta.meta.version = serverMeta.version;
+        hasChanges = true;
+      }
 
       if ((serverMeta.tracks || 0) > (clientMeta.tracks || 0)) {
          const serverTracks = snapshot.tracks || {};
@@ -110,6 +116,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
             delta.addedOrUpdatedTracks = deltaTracks;
             isFullTrackSync = false;
          }
+         delta.meta.tracks = serverMeta.tracks; // Only include if server is ahead
          hasChanges = true;
       }
 
@@ -117,16 +124,9 @@ export default async (req: Request, context: Context): Promise<Response> => {
          if (key === 'version' || key === 'tracks') continue;
          if ((serverMeta[key] || 0) > (clientMeta[key] || 0)) {
             delta.updatedCollections[key] = snapshot[key] as CollectionData;
+            delta.meta[key] = serverMeta[key]; // Only include if server is ahead
             hasChanges = true;
          }
-      }
-
-      for (const key in clientMeta) {
-          if (key === 'version' || key === 'tracks') continue;
-          if (!serverMeta[key]) {
-             delta.deletedCollectionNames.push(key);
-             hasChanges = true;
-          }
       }
 
       return new Response(JSON.stringify({
@@ -166,9 +166,12 @@ export default async (req: Request, context: Context): Promise<Response> => {
       
       applyDeltaInPlace(currentSnapshot, delta);
 
-      await libraryStore.set(userIdHash, JSON.stringify(currentSnapshot), { 
+      await libraryStore.setJSON(userIdHash, currentSnapshot, { 
         onlyIfMatch: clientETag,
-        metadata: { contentType: "application/json" }
+        metadata: { 
+          contentType: "application/json",
+          lastModified: Date.now().toString()
+        }
       });
 
       return new Response(null, { status: 204 }); 

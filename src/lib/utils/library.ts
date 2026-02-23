@@ -107,6 +107,7 @@ export function saveCollection(
 export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T extends 'channels' ? Channel[] : Playlist[]) {
   localStorage.setItem(`library_${type}`, JSON.stringify(data));
   metaUpdater(type);
+  rehydrateStores();
 };
 
 export function saveLibraryAlbums(albums: LibraryAlbums) {
@@ -120,6 +121,7 @@ export function saveAlbumToLibrary(albumId: string, albumData: Album) {
     saveLibraryAlbums(albums);
   }
   metaUpdater('albums');
+  rehydrateStores();
 }
 
 export function removeAlbumFromLibrary(albumId: string) {
@@ -127,6 +129,7 @@ export function removeAlbumFromLibrary(albumId: string) {
   const newAlbums = albums.filter(a => a.id !== albumId);
   saveLibraryAlbums(newAlbums);
   metaUpdater('albums');
+  rehydrateStores();
 }
 
 
@@ -168,6 +171,7 @@ export function addToCollection(
   saveCollection(name, collection);
   saveTracksMap(tracks);
   metaUpdater(name);
+  rehydrateStores();
 }
 
 export function removeFromCollection(
@@ -200,10 +204,7 @@ export function removeFromCollection(
   saveTracksMap(tracks);
   metaUpdater(name);
 
-
-  if (listStore.type === 'collection')
-    setListStore('list', l => l.filter(item => !ids.includes(item.id)));
-
+  rehydrateStores();
 }
 
 export function deleteCollection(name: string) {
@@ -228,6 +229,7 @@ export function deleteCollection(name: string) {
   localStorage.removeItem('library_' + name);
   saveTracksMap(tracks);
   metaUpdater(name, true);
+  rehydrateStores();
 }
 
 
@@ -255,6 +257,7 @@ export function createCollection(title: string) {
   }
 
   metaUpdater(title);
+  rehydrateStores();
 }
 
 export function renameCollection(oldName: string, newName: string) {
@@ -271,6 +274,7 @@ export function renameCollection(oldName: string, newName: string) {
   localStorage.removeItem('library_' + oldName);
   metaUpdater(oldName, true);
   metaUpdater(newName);
+  rehydrateStores();
 }
 
 export function rehydrateStores() {

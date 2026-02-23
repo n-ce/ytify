@@ -2,5 +2,4 @@
 /// <reference types="vite-plugin-pwa/client" />
 
 declare const Build: string;
-declare const Backend: string[];
 declare const Locales: string[];

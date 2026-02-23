@@ -1,4 +1,3 @@
-
 /*
 > Get all related streams of a stream
 > Check if stream exists in stream history or trash history or queue, if not enqueue it
@@ -6,8 +5,7 @@
 > we need to account for this using the trashHistory array
 */
 
-import { playerStore } from "@stores";
-import { setQueueStore } from "@stores";
+import { playerStore, addToQueue } from "@stores";
 import { convertSStoHHMMSS } from "@utils";
 
 type RecommendedVideo = {
@@ -20,31 +18,31 @@ type RecommendedVideo = {
 
 export default function(data: RecommendedVideo[]) {
 
-  const { history, isMusic, stream } = playerStore;
+  const { isMusic, stream } = playerStore;
   const currentTitle = stream.title;
 
+  const tracksToAdd: TrackItem[] = data
+    .filter(item => {
+      const id = item.videoId;
+      return (
+        item.lengthSeconds > 45 &&
+        !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
+        (!isMusic || item.author.endsWith(' - Topic'))
+      );
+    })
+    .map(item => ({
+      id: item.videoId,
+      title: item.title,
+      author: item.author,
+      authorId: item.authorId,
+      duration: convertSStoHHMMSS(item.lengthSeconds),
+      context: {
+        src: 'queue',
+        id: `Related to ${currentTitle}`
+      }
+    }));
 
-  data.forEach(stream => {
-
-    const id = stream.videoId;
-
-    if (
-      stream.lengthSeconds > 45 &&
-      !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
-      !history.some(item => item.id === id) &&
-      (!isMusic || stream.author.endsWith(' - Topic'))
-    )
-      setQueueStore('list', l => [...l, ({
-        id: id,
-        title: stream.title,
-        author: stream.author,
-        authorId: stream.authorId,
-        duration: convertSStoHHMMSS(stream.lengthSeconds),
-        context: {
-          src: 'queue',
-          id: `Related to ${currentTitle}`
-        }
-      }) as TrackItem])
-  });
-
+  if (tracksToAdd.length > 0) {
+    addToQueue(tracksToAdd);
+  }
 }
