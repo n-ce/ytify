@@ -1,11 +1,11 @@
 import { getStore } from "@netlify/blobs";
-import type { Config, Handler } from "@netlify/functions";
+import type { Config } from "@netlify/functions";
 
 // Define constants for the retention policy
 const DATA_RETENTION_DAYS = 100;
 const INACTIVE_THRESHOLD_MS = DATA_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
-const handler: Handler = async () => {
+export default async () => {
   console.log("--- Starting Scheduled Data Cleanup ---");
   const now = Date.now();
 
@@ -47,7 +47,7 @@ const handler: Handler = async () => {
       // Use metadata lastModified, fallback to parsing key if it looks like a timestamp
       let lastModifiedTime = blobWithMeta.metadata?.lastModified as number;
       if (!lastModifiedTime && /^\d+$/.test(blob.key)) {
-          lastModifiedTime = parseInt(blob.key);
+        lastModifiedTime = parseInt(blob.key);
       }
       lastModifiedTime = lastModifiedTime || now;
 
@@ -62,11 +62,9 @@ const handler: Handler = async () => {
   }
 
   console.log(`Cleanup complete. Deleted ${deletedLibraryCount} libraries and ${deletedStaticCount} static blobs.`);
-  return { statusCode: 200 };
+  return new Response("OK", { status: 200 });
 };
 
 export const config: Config = {
   schedule: "0 0 * * *", // Runs daily at midnight UTC
 };
-
-export { handler };

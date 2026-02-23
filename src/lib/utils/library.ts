@@ -22,31 +22,36 @@ export const getMeta = (): Meta => {
   }
 
   const newMeta: Meta = { version: 5, tracks: 0 };
-  const timestamp = 0;
+  const now = Date.now();
 
   const tracks = getTracksMap();
   if (Object.keys(tracks).length > 0) {
-    newMeta.tracks = timestamp;
+    newMeta.tracks = now;
   }
 
   const collections = getCollectionsKeys();
   for (const key of collections) {
-    newMeta[key] = timestamp;
+    const items = getCollection(key);
+    if (items.length > 0) {
+      newMeta[key] = now;
+    } else {
+      newMeta[key] = 0;
+    }
   }
 
   const channels = getLists('channels');
   if (channels.length > 0) {
-    newMeta.channels = timestamp;
+    newMeta.channels = now;
   }
 
   const playlists = getLists('playlists');
   if (playlists.length > 0) {
-    newMeta.playlists = timestamp;
+    newMeta.playlists = now;
   }
 
   const albums = getLibraryAlbums();
   if (Object.keys(albums).length > 0) {
-    newMeta.albums = timestamp;
+    newMeta.albums = now;
   }
 
   return newMeta;
@@ -149,11 +154,15 @@ export function addToCollection(
     if (id in tracks) {
       libraryPlays[id] = (libraryPlays[id] || 1) + 1;
       setDrawer('libraryPlays', libraryPlays);
-      syncLibrary('add', id);
     } else {
       tracks[id] = item;
-      syncLibrary('add', id);
     }
+
+    if (config.dbsync) {
+      tracks[id].modified = Date.now();
+    }
+
+    syncLibrary('add', id);
   }
 
   saveCollection(name, collection);
@@ -363,8 +372,8 @@ function getLocalCollection(
 
   if (usePagination) {
     let loadedCount = 20;
-    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({ 
-      ...tracks[id], 
+    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({
+      ...tracks[id],
       type: 'video' as const,
       context: { src: 'collection' as const, id: collection }
     })));
@@ -375,8 +384,8 @@ function getLocalCollection(
       const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
-      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({ 
-        ...tracks[id], 
+      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({
+        ...tracks[id],
         type: 'video' as const,
         context: { src: 'collection' as const, id: collection }
       }))]);
@@ -386,8 +395,8 @@ function getLocalCollection(
     setTimeout(() => setObserver(observerCallback), 100);
 
   } else {
-    setListStore('list', sortedIds.map(id => ({ 
-      ...tracks[id], 
+    setListStore('list', sortedIds.map(id => ({
+      ...tracks[id],
       type: 'video' as const,
       context: { src: 'collection' as const, id: collection }
     })));
@@ -473,6 +482,10 @@ export function cleanseLibraryData() {
         author: track.author,
         authorId: track.authorId || '',
       };
+
+      if (config.dbsync && track.modified) {
+        cleanedTrack.modified = track.modified;
+      }
 
       cleanedTracks[id] = cleanedTrack;
 

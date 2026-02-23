@@ -41,7 +41,8 @@ export async function pullFullLibrary(userId: string): Promise<void> {
   for (const key in snapshot) {
     const value = snapshot[key];
     if (value !== undefined) {
-      localStorage.setItem(`library_${key}`, JSON.stringify(value));
+      const storageKey = key.startsWith('library_') ? key : `library_${key}`;
+      localStorage.setItem(storageKey, JSON.stringify(value));
     }
   }
 }
@@ -216,13 +217,16 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
     let localTracks = getTracksMap();
     
     if (isFullTrackSync) {
+        // Start with the server's track map
         const newTracks = { ...delta.addedOrUpdatedTracks };
         const dirty = getDirtyTracks();
         
+        // Re-apply any local tracks that haven't been pushed to the server yet
         dirty.added.forEach(id => {
             if (localTracks[id]) newTracks[id] = localTracks[id];
         });
         
+        // Ensure tracks deleted locally stay deleted even if they exist on the server
         dirty.deleted.forEach(id => {
             delete newTracks[id];
         });

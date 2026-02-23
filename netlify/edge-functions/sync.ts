@@ -9,6 +9,7 @@ interface TrackItem {
   duration: string;
   author: string;
   authorId: string;
+  modified?: number;
 }
 
 type Collection = { [index: string]: TrackItem };
@@ -93,9 +94,23 @@ export default async (req: Request, context: Context): Promise<Response> => {
       let isFullTrackSync = false;
 
       if ((serverMeta.tracks || 0) > (clientMeta.tracks || 0)) {
-         delta.addedOrUpdatedTracks = snapshot.tracks || {};
+         const serverTracks = snapshot.tracks || {};
+         const clientTracksTimestamp = clientMeta.tracks || 0;
+         
+         if (clientTracksTimestamp === 0) {
+            delta.addedOrUpdatedTracks = serverTracks;
+            isFullTrackSync = true;
+         } else {
+            const deltaTracks: Collection = {};
+            for (const id in serverTracks) {
+              if ((serverTracks[id].modified || 0) > clientTracksTimestamp) {
+                deltaTracks[id] = serverTracks[id];
+              }
+            }
+            delta.addedOrUpdatedTracks = deltaTracks;
+            isFullTrackSync = false;
+         }
          hasChanges = true;
-         isFullTrackSync = true;
       }
 
       for (const key in serverMeta) {
@@ -151,11 +166,9 @@ export default async (req: Request, context: Context): Promise<Response> => {
       
       applyDeltaInPlace(currentSnapshot, delta);
 
-      const finalPayload = JSON.stringify(currentSnapshot);
-      currentSnapshot = null; 
-
-      await libraryStore.set(userIdHash, finalPayload, { 
-        onlyIfMatch: clientETag
+      await libraryStore.set(userIdHash, JSON.stringify(currentSnapshot), { 
+        onlyIfMatch: clientETag,
+        metadata: { contentType: "application/json" }
       });
 
       return new Response(null, { status: 204 }); 
@@ -182,31 +195,40 @@ export default async (req: Request, context: Context): Promise<Response> => {
 };
 
 function applyDeltaInPlace(next: LibrarySnapshot, delta: DeltaPayload): void {
-  const currentVersion = next.meta?.version || 5;
   if (!next.meta) next.meta = { version: 5, tracks: 0 };
   
+  // Merge metadata (timestamps)
   Object.assign(next.meta, delta.meta);
 
-  // One-way street for versioning: preserve the highest version
-  if (currentVersion > next.meta.version) {
+  // Preserve highest version
+  const currentVersion = next.meta.version || 5;
+  if (delta.meta.version && delta.meta.version > currentVersion) {
+    next.meta.version = delta.meta.version;
+  } else {
     next.meta.version = currentVersion;
   }
 
+  // Merge tracks
   if (!next.tracks) next.tracks = {};
-  Object.assign(next.tracks, delta.addedOrUpdatedTracks);
+  if (delta.addedOrUpdatedTracks) {
+    Object.assign(next.tracks, delta.addedOrUpdatedTracks);
+  }
   
+  // Handle deleted tracks
   if (delta.deletedTrackIds) {
     for (const id of delta.deletedTrackIds) {
       delete next.tracks[id];
     }
   }
 
+  // Merge collections
   if (delta.updatedCollections) {
     for (const [name, collectionData] of Object.entries(delta.updatedCollections)) {
       next[name] = collectionData;
     }
   }
 
+  // Handle deleted collections
   if (delta.deletedCollectionNames) {
     for (const name of delta.deletedCollectionNames) {
       delete next[name];

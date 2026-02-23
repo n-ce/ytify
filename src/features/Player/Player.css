@@ -140,7 +140,14 @@
     justify-content: space-between;
 
     p {
-      font-size: var(--font-size-1);
+      font-size: var(--font-size-0);
+      letter-spacing: var(--font-letterspacing-2);
+      font-weight: var(--font-weight-7);
+      opacity: 0.8;
+    }
+
+    #fullDuration {
+      text-align: right;
     }
   }
 }
@@ -176,8 +183,14 @@
 
   }
 
+  button {
+    opacity: 0.9;
+    font-size: var(--font-size-4) !important;
+    font-weight: var(--font-weight-1) !important;
+  }
+
   #playButton {
-    transform: scale(1.5)
+    transform: scale(1.5);
   }
 
 }
@@ -189,11 +202,12 @@
   margin-bottom: var(--size-9);
 
   i {
-    font-size: var(--font-size-3) !important;
+    font-size: var(--font-size-2) !important;
     padding: 0 var(--size-2);
     border-radius: var(--roundness);
+    opacity: 0.7;
+    font-weight: var(--font-weight-6);
   }
-
 
 
   select {
@@ -202,7 +216,10 @@
     padding: 0;
     margin: 0;
     appearance: none;
-    font-size: var(--font-size-1);
+    opacity: 0.5;
+    font-size: var(--font-size-0);
+    letter-spacing: var(--font-letterspacing-2);
+    font-weight: var(--font-weight-6);
   }
 
   #volumeChanger {
