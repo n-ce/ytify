@@ -5,13 +5,12 @@ let youtube: Innertube | null = null;
 export async function getClient(): Promise<Innertube> {
   if (youtube) return Promise.resolve(youtube);
 
-  return Innertube.create({
+  youtube = await Innertube.create({
     cache: new UniversalCache(false),
-    generate_session_locally: true
-  }).then((client) => {
-    youtube = client;
-    return youtube;
+    generate_session_locally: true,
+    retrieve_player: false
   });
+  return youtube;
 }
 
 export function getThumbnailId(url?: string): string {

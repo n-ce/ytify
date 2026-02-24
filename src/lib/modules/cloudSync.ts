@@ -85,7 +85,9 @@ export async function runSync(userId: string, retryData?: { count: number, serve
   if (retryCount === 0) setStore("syncState", "syncing");
 
   try {
-    const localMeta = getMeta();
+    // Capture initial local state to prevent clobbering during the pull phase
+    const initialLocalMeta = getMeta();
+    const inFlightDirtyTracks = getDirtyTracks();
     
     let remoteMeta: Meta;
     let ETag: string;
@@ -97,7 +99,7 @@ export async function runSync(userId: string, retryData?: { count: number, serve
         const pullResponse = await fetch(`/sync/${userId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ meta: localMeta })
+            body: JSON.stringify({ meta: initialLocalMeta })
         });
 
         if ([502, 503, 504].includes(pullResponse.status) && retryCount < MAX_RETRIES) {
@@ -129,9 +131,7 @@ export async function runSync(userId: string, retryData?: { count: number, serve
         }
     }
 
-    const inFlightDirtyTracks = getDirtyTracks();
-    // Refetch these to ensure we have the latest data if they changed during the POST/pull phase
-    const currentMeta = getMeta(); 
+    // Refetch latest data for payload, but use initialLocalMeta for comparison
     const currentTracks = getTracksMap();
     
     const deltaPayload: DeltaPayload = {
@@ -142,34 +142,45 @@ export async function runSync(userId: string, retryData?: { count: number, serve
       deletedCollectionNames: [],
     };
 
-    inFlightDirtyTracks.added.forEach(id => {
-      if(currentTracks[id]) deltaPayload.addedOrUpdatedTracks[id] = currentTracks[id];
-    });
-    deltaPayload.deletedTrackIds = inFlightDirtyTracks.deleted;
-    
-    if(inFlightDirtyTracks.added.length > 0 || inFlightDirtyTracks.deleted.length > 0) {
-       deltaPayload.meta.tracks = currentMeta.tracks || Date.now();
+    // Tracks logic: push dirty tracks OR full library if server is empty but client has tracks
+    const hasDirtyTracks = inFlightDirtyTracks.added.length > 0 || inFlightDirtyTracks.deleted.length > 0;
+    const serverHasNoTracks = (remoteMeta.tracks === 0 || !remoteMeta.tracks) && Object.keys(currentTracks).length > 0;
+
+    if (hasDirtyTracks || serverHasNoTracks) {
+        if (serverHasNoTracks) {
+            Object.assign(deltaPayload.addedOrUpdatedTracks, currentTracks);
+        } else {
+            inFlightDirtyTracks.added.forEach(id => {
+                if(currentTracks[id]) deltaPayload.addedOrUpdatedTracks[id] = currentTracks[id];
+            });
+        }
+        deltaPayload.deletedTrackIds = inFlightDirtyTracks.deleted;
+        deltaPayload.meta.tracks = initialLocalMeta.tracks || Date.now();
     }
     
-    for(const key in currentMeta){
+    // Compare initial local meta vs remote meta to decide what to push
+    for(const key in initialLocalMeta){
         if(key === 'version' || key === 'tracks') continue;
-        if((currentMeta[key] || 0) > (remoteMeta[key] || 0)){
+        if((initialLocalMeta[key] || 0) > (remoteMeta[key] || 0)){
             const rawData = localStorage.getItem(`library_${key}`);
             if(rawData) {
               deltaPayload.updatedCollections[key] = JSON.parse(rawData) as CollectionData;
-              deltaPayload.meta[key] = currentMeta[key];
+              deltaPayload.meta[key] = initialLocalMeta[key];
             }
         }
     }
 
     for(const key in remoteMeta){
        if(key === 'version' || key === 'tracks') continue;
-       if(!currentMeta[key]){
+       if(!initialLocalMeta[key]){
            deltaPayload.deletedCollectionNames.push(key);
        }
     }
 
-    if (Object.keys(deltaPayload.meta).length === 0 && Object.keys(deltaPayload.addedOrUpdatedTracks).length === 0 && deltaPayload.deletedTrackIds.length === 0 && deltaPayload.deletedCollectionNames.length === 0) {
+    if (Object.keys(deltaPayload.meta).length === 0 && 
+        Object.keys(deltaPayload.addedOrUpdatedTracks).length === 0 && 
+        deltaPayload.deletedTrackIds.length === 0 && 
+        deltaPayload.deletedCollectionNames.length === 0) {
       setStore("syncState", "synced");
       return { success: true, message: t("sync_up_to_date") };
     }
@@ -190,10 +201,7 @@ export async function runSync(userId: string, retryData?: { count: number, serve
 
     if (putResponse.status === 412) {
       if (retryCount < MAX_RETRIES) {
-        const errorData = await putResponse.json() as { serverMeta: Meta };
-        const serverMeta = errorData.serverMeta;
-        const newETag = putResponse.headers.get("ETag") || "";
-        return runSync(userId, { count: retryCount + 1, serverMeta, ETag: newETag });
+        return runSync(userId, { count: retryCount + 1 });
       }
       throw new Error(t("sync_conflict"));
     }
@@ -208,6 +216,7 @@ export async function runSync(userId: string, retryData?: { count: number, serve
     return { success: true, message: t("sync_changes_synced") };
 
   } catch (error) {
+    console.error("Sync failure:", error);
     const message = error instanceof Error ? error.message : String(error);
     setStore("syncState", "error");
     return { success: false, message: `${t("sync_failed")} ${message}` };
@@ -218,16 +227,13 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
     let localTracks = getTracksMap();
     
     if (isFullTrackSync) {
-        // Start with the server's track map
         const newTracks = { ...delta.addedOrUpdatedTracks };
         const dirty = getDirtyTracks();
         
-        // Re-apply any local tracks that haven't been pushed to the server yet
         dirty.added.forEach(id => {
             if (localTracks[id]) newTracks[id] = localTracks[id];
         });
         
-        // Ensure tracks deleted locally stay deleted even if they exist on the server
         dirty.deleted.forEach(id => {
             delete newTracks[id];
         });
@@ -249,7 +255,12 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
     }
 
     const currentMeta = getMeta();
-    Object.assign(currentMeta, delta.meta);
+    // Only update meta if the incoming delta is actually newer
+    for (const [key, timestamp] of Object.entries(delta.meta)) {
+      if (typeof timestamp === 'number' && timestamp > (currentMeta[key] || 0)) {
+          currentMeta[key] = timestamp;
+      }
+    }
     
     for (const key of delta.deletedCollectionNames) {
         delete currentMeta[key];
@@ -266,7 +277,7 @@ export function scheduleSync() {
   syncTimeout = setTimeout(() => {
     runSync(config.dbsync!);
     syncTimeout = null;
-  }, 2 * 60 * 1000); 
+  }, 30 * 1000); 
 }
 
 export const getDirtyTracks = (): { added: string[]; deleted: string[] } => {

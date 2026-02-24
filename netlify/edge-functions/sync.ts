@@ -76,9 +76,11 @@ export default async (req: Request, context: Context): Promise<Response> => {
       const libraryBlob = await libraryStore.getWithMetadata(userIdHash, { type: "json" });
 
       if (!libraryBlob || !libraryBlob.data) {
+        console.warn(`POST /sync: Library not found for user ${userIdHash}`);
         return new Response("No library found.", { status: 404 });
       }
 
+      console.log(`POST /sync: Comparing metadata for user ${userIdHash}`);
       const snapshot = libraryBlob.data as LibrarySnapshot;
       const serverMeta = snapshot.meta || { version: 5, tracks: 0 };
       
@@ -156,13 +158,16 @@ export default async (req: Request, context: Context): Promise<Response> => {
     }
 
     try {
-      let currentSnapshot = await libraryStore.get(userIdHash, { type: "json" }) as LibrarySnapshot | null;
+      const libraryBlob = await libraryStore.getWithMetadata(userIdHash, { type: "json" });
+      let currentSnapshot = libraryBlob?.data as LibrarySnapshot | null;
 
       if (!currentSnapshot) {
+         console.error(`PUT /sync: Library not found for user ${userIdHash}`);
          return new Response("Library not found.", { status: 404 });
       }
 
       const delta = await req.json() as DeltaPayload;
+      console.log(`PUT /sync: Applying delta for user ${userIdHash}. Tracks: ${Object.keys(delta.addedOrUpdatedTracks || {}).length}, Collections: ${Object.keys(delta.updatedCollections || {}).length}`);
       
       applyDeltaInPlace(currentSnapshot, delta);
 
@@ -174,9 +179,11 @@ export default async (req: Request, context: Context): Promise<Response> => {
         }
       });
 
+      console.log(`PUT /sync: Successfully updated library for user ${userIdHash}`);
       return new Response(null, { status: 204 }); 
     } catch (e) {
       if (String(e).includes("Precondition Failed")) {
+        console.warn(`PUT /sync: ETag mismatch for user ${userIdHash}`);
         const latestBlob = await libraryStore.getWithMetadata(userIdHash, { type: "json" });
         const latestSnapshot = latestBlob?.data as LibrarySnapshot | undefined;
         const serverMeta = latestSnapshot?.meta || { version: 5, tracks: 0 };
