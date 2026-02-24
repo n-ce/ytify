@@ -37,7 +37,7 @@ const getAllottedInstance = () => {
     }
     // Midwest / Central (Netlify - Ohio)
     else if (["Chicago", "Winnipeg", "Mexico_City", "Denver", "Detroit"].some(c => tz.includes(c))) {
-      url = "/.netlify/functions";
+      url = "";
       loc = "Ohio, USA";
     }
   }
