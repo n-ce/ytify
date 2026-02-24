@@ -1,7 +1,6 @@
 import './About.css';
 
 import { t, store } from '@stores';
-import './About.css';
 
 export default function() {
   return (

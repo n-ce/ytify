@@ -5,7 +5,7 @@ const nl = navigator.language.slice(0, 2);
 const initLocale = config.language || (Locales.includes(nl) ? nl : 'en');
 
 const getAllottedInstance = () => {
-  if (import.meta.env.DEV) return '';
+  if (import.meta.env.DEV) return { url: '', loc: 'Local' };
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   let url = "https://ytify-zeta.vercel.app";
@@ -42,11 +42,10 @@ const getAllottedInstance = () => {
     }
   }
 
-  setStore('instanceLocation', loc);
-
-  return url;
+  return { url, loc };
 };
 
+const instance = getAllottedInstance();
 
 const storeInit: {
   useSaavn: boolean,
@@ -59,17 +58,14 @@ const storeInit: {
   locale: string,
   translations: Record<TranslationKeys, string> | {}
 } = {
-  api: getAllottedInstance(),
-  instanceLocation: 'Local',
+  api: instance.url,
+  instanceLocation: instance.loc,
   useSaavn: true,
   locale: initLocale,
   translations: {},
 };
 
 export const [store, setStore] = createStore(storeInit);
-
-// Trigger location set after store is initialized
-getAllottedInstance();
 
 
 export function t(key: TranslationKeys, value: string = ''): string {
