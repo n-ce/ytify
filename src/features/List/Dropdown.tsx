@@ -99,7 +99,7 @@ export default function Dropdown() {
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
-        <li onclick={() => import('@modules/listUtils').then(mod => mod.importList)}>
+        <li onclick={() => import('@modules/listUtils').then(mod => mod.importList())}>
           <i class="ri-import-line"></i>{t("list_import")}
         </li>
 
