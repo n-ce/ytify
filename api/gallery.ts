@@ -8,5 +8,5 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Missing id parameter' });
   }
   const ids = id.split(',');
-  return wrap(res, handler(ids));
+  return wrap(req, res, handler(ids));
 }

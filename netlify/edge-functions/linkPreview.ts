@@ -35,7 +35,10 @@ export default async (_: Request, context: Context) => {
 </head>
 <script>location.replace('/?s=${id}')</script></html>
     `, {
-    headers: { 'content-type': 'text/html' },
+    headers: { 
+      'content-type': 'text/html',
+      'Cache-Control': 's-maxage=86400, stale-while-revalidate=3600'
+    },
   });
 };
 

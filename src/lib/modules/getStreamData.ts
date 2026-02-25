@@ -36,8 +36,20 @@ export default async function(
     const res = await fetch(`${proxy}/api/v1/videos/${id}`, { signal });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();
-    if ('adaptiveFormats' in data) return data;
-    throw new Error(data.error || 'Invalid response');
+
+    if (!data || !('adaptiveFormats' in data) || !Array.isArray(data.adaptiveFormats)) {
+      throw new Error(data?.error || 'Invalid response: adaptiveFormats missing or not an array');
+    }
+
+    if (!data.adaptiveFormats.every((f: { type: string }) => typeof f.type === 'string')) {
+      throw new Error('Invalid response: formats missing type property');
+    }
+
+    if (!data.adaptiveFormats.some((f: { type: string }) => f.type.startsWith('audio'))) {
+      throw new Error('Invalid response: no audio streams found');
+    }
+
+    return data;
   };
 
   // 1. Try current proxy first if available

@@ -7,5 +7,5 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   if (!q || typeof q !== 'string') {
     return res.status(400).json({ error: 'Missing q parameter' });
   }
-  return wrap(res, handler({ q, music: music === 'true' }));
+  return wrap(req, res, handler({ q, music: music === 'true' }));
 }

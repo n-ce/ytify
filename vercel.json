@@ -1,33 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "bunVersion": "1.x",
   "rewrites": [
     {
       "source": "(.*)",
       "destination": "/api"
     }
   ],
-  "outputDirectory": "dist",
-  "headers": [
-    {
-      "source": "(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, OPTIONS"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "s-maxage=86400, stale-while-revalidate=3600"
-        }
-      ]
-    }
-  ]
+  "outputDirectory": "dist"
 }

@@ -5,9 +5,14 @@ export default async (request: Request, _context: Context) => {
   const q = url.searchParams.get('q');
   const music = url.searchParams.get('music') === 'true';
 
+  const cacheHeaders = {
+    'content-type': 'application/json',
+    'Cache-Control': 's-maxage=86400, stale-while-revalidate=3600'
+  };
+
   if (!q) {
     return new Response(JSON.stringify([]), {
-      headers: { 'content-type': 'application/json' },
+      headers: cacheHeaders,
     });
   }
 
@@ -45,7 +50,7 @@ export default async (request: Request, _context: Context) => {
       }).filter(Boolean) || [];
 
       return new Response(JSON.stringify(suggestions), {
-        headers: { 'content-type': 'application/json' },
+        headers: cacheHeaders,
       });
     } else {
       // General YouTube suggestions (WEB)
@@ -70,7 +75,7 @@ export default async (request: Request, _context: Context) => {
       const suggestions = data[1].map((s: any) => s[0]);
 
       return new Response(JSON.stringify(suggestions), {
-        headers: { 'content-type': 'application/json' },
+        headers: cacheHeaders,
       });
     }
   } catch (error) {

@@ -7,5 +7,5 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   if (!id || typeof id !== 'string') {
     return res.status(400).json({ error: 'Missing id parameter' });
   }
-  return wrap(res, handler(id, all === 'true'));
+  return wrap(req, res, handler(id, all === 'true'));
 }

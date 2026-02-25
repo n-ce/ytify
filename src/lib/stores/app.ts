@@ -32,7 +32,7 @@ const getAllottedInstance = () => {
   else if (tz.includes("America")) {
     // West Coast (Zeabur - California)
     if (["Los_Angeles", "Vancouver", "Tijuana", "Phoenix"].some(c => tz.includes(c))) {
-      url = "https://ytify-zeta.vercel.app"; /* CHANGE TO A SFO1 INSTANCE IN FUTURE*/
+      url = "https://ytify.zeabur.app";
       loc = "California, USA";
     }
     // Midwest / Central (Netlify - Ohio)

@@ -12,6 +12,8 @@ const port = process.env.PORT || 3000;
 
 const ALLOWED_ORIGINS = [
   'https://ytify.pp.ua',
+  'https://ytify.netlify.app',
+  'https://ytify.zeabur.app',
   'https://ytify-zeta.vercel.app',
   'https://ytify-legacy.vercel.app',
   'https://ytify-2nx7.onrender.com',

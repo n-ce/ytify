@@ -7,7 +7,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
   if (!title || typeof title !== 'string' || !artist || typeof artist !== 'string') {
     return res.status(400).json({ error: 'Missing title or artist parameter' });
   }
-  return wrap(res, handler({ 
+  return wrap(req, res, handler({ 
     title, 
     artist, 
     limit: typeof limit === 'string' ? limit : undefined 
