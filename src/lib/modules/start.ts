@@ -1,4 +1,4 @@
-import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore } from '@stores';
+import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore, t } from '@stores';
 import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, drawer } from '@utils';
 
 
@@ -100,9 +100,9 @@ export default async function() {
     await import('virtual:pwa-register').then(pwa => {
 
       const handleUpdate = pwa.registerSW({
-        onNeedRefresh() {
-          setStore({ updater: handleUpdate });
-          setNavStore('updater', 'state', true)
+        async onNeedRefresh() {
+          setStore('snackbar', `${t('updating')}`);
+          setTimeout(() => handleUpdate(true), 1500);
         }
       });
     });

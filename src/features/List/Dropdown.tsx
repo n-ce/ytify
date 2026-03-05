@@ -12,7 +12,7 @@ export default function Dropdown() {
 
     if (isAlbum) {
       const albums = getLibraryAlbums();
-      setSubscribed(listStore.id in albums); // Check if listStore.id (album browseId) is in saved albums
+      setSubscribed(albums.some(a => a.id === listStore.id)); // Check if listStore.id (album browseId) is in saved albums
     } else {
       // Existing logic for channels/playlists, using listStore.id
       setSubscribed(
@@ -99,9 +99,11 @@ export default function Dropdown() {
           <i class="ri-list-check-2"></i>{t("list_enqueue")}
         </li>
 
-        <li onclick={() => import('@modules/listUtils').then(mod => mod.importList())}>
-          <i class="ri-import-line"></i>{t("list_import")}
-        </li>
+        <Show when={listStore.type !== 'collection' || listStore.isShared}>
+          <li onclick={() => import('@modules/listUtils').then(mod => mod.importList())}>
+            <i class="ri-import-line"></i>{t("list_import")}
+          </li>
+        </Show>
 
         {/* The Show condition below seems to be designed to enable the subscription button for both playlists and albums.
             Albums have type 'playlists' and their ID starts with 'OLAK5uy_'.
@@ -144,7 +146,7 @@ export default function Dropdown() {
         </Show>
 
 
-        <Show when={listStore.type === 'collection' && !listStore.isReversed}>
+        <Show when={listStore.type === 'collection' && !listStore.isReversed && !listStore.isShared}>
 
           <li id="deleteCollectionBtn" onclick={() => {
             const { id } = listStore;

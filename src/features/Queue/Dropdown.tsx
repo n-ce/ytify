@@ -14,7 +14,9 @@ export default function Dropdown() {
         <li
           classList={{ on: config.persistentShuffle }}
           onclick={(e) => {
-            setConfig('persistentShuffle', !config.persistentShuffle);
+            const val = !config.persistentShuffle;
+            setConfig('persistentShuffle', val);
+            if (val && config.queuePrefetch) setConfig('queuePrefetch', false);
             (e.currentTarget as HTMLElement).classList.toggle('on');
           }}
         >
@@ -59,7 +61,9 @@ export default function Dropdown() {
         <li
           classList={{ on: config.queuePrefetch }}
           onclick={(e) => {
-            setConfig('queuePrefetch', !config.queuePrefetch);
+            const val = !config.queuePrefetch;
+            setConfig('queuePrefetch', val);
+            if (val && config.persistentShuffle) setConfig('persistentShuffle', false);
             (e.currentTarget as HTMLElement).classList.toggle('on');
           }}
         >

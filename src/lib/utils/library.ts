@@ -311,6 +311,7 @@ export async function fetchCollection(
 
   setListStore({
     name: decodeURIComponent(display),
+    type: 'collection',
     isReversed: isReserved,
     isShared: shared
   });

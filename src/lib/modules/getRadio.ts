@@ -1,48 +1,38 @@
 import { convertSStoHHMMSS } from '@utils';
 
-interface PipedStream {
-  url: string;
-  type: string;
+interface InvidiousMix {
   title: string;
-  thumbnail: string;
-  uploaderName: string;
-  uploaderUrl: string;
-  uploaderAvatar: string | null;
-  uploadedDate: string | null;
-  shortDescription: string | null;
-  duration: number;
-  views: number;
-  uploaded: number;
-  uploaderVerified: boolean;
-  isShort: boolean;
+  mixId: string;
+  videos: {
+    title: string;
+    videoId: string;
+    author: string;
+    authorId: string;
+    authorUrl: string;
+    videoThumbnails: {
+      quality: string;
+      url: string;
+      width: number;
+      height: number;
+    }[];
+    index: number;
+    lengthSeconds: number;
+  }[];
 }
 
-interface PipedMix {
-  name: string;
-  thumbnailUrl: string;
-  description: string;
-  bannerUrl: string | null;
-  nextpage: string;
-  uploader: string;
-  uploaderUrl: string | null;
-  uploaderAvatar: string | null;
-  videos: number;
-  relatedStreams: PipedStream[];
-}
-
-export default function(id: string): Promise<TrackItem[]> {
-  return fetch(`https://api.piped.private.coffee/playlists/RD${id}`)
+export default async function(id: string): Promise<TrackItem[]> {
+  return fetch(`https://inv.thepixora.com/api/v1/mixes/RD${id}`)
     .then(res => {
-      if (!res.ok) throw new Error('Fetch failed');
-      return res.json() as Promise<PipedMix>;
+      if (!res.ok) throw new Error('Fetch failed, Try Again');
+      return res.json() as Promise<InvidiousMix>;
     })
     .then(data => {
-      return (data.relatedStreams || []).map(v => ({
-        id: v.url.split('=')[1],
+      return (data.videos || []).map(v => ({
+        id: v.videoId,
         title: v.title,
-        authorId: v.uploaderUrl?.split('/').pop() || '',
-        author: v.uploaderName,
-        duration: convertSStoHHMMSS(v.duration)
+        authorId: v.authorId,
+        author: v.author,
+        duration: convertSStoHHMMSS(v.lengthSeconds)
       }) as TrackItem);
     });
 }

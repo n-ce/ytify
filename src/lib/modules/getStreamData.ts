@@ -1,28 +1,9 @@
 import { playerStore, setPlayerStore } from '@stores';
-import { shuffle } from '@utils';
 
 const instances = [
-  "https://lekker.gay",
-  "https://yt.omada.cafe"
+  "https://yt.omada.cafe",
+  "https://lekker.gay"
 ];
-
-let isFetching = false;
-
-async function fetchInstances() {
-  if (isFetching) return;
-  isFetching = true;
-  await fetch('https://stremion.zeabur.app/api/instances')
-    .then(res => res.json() as Promise<string[]>)
-    .then(data => {
-      if (Array.isArray(data)) {
-        instances.unshift(...shuffle(data));
-      }
-    })
-    .catch(err => {
-      console.error('Failed to fetch instances:', err);
-      isFetching = false; // allow retry on next call
-    });
-}
 
 export default async function(
   id: string,
@@ -30,7 +11,6 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
-  if (!isFetching) await fetchInstances();
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
     const res = await fetch(`${proxy}/api/v1/videos/${id}`, { signal });

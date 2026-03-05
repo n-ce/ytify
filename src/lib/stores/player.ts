@@ -1,7 +1,7 @@
 import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
-import { navStore, params, updateParam, addToQueue, queueStore, setQueueStore, setStore, store } from "@stores";
-import { config, cssVar, themer, addToCollection, player } from "@utils";
+import { navStore, params, updateParam, addToQueue, queueStore, setQueueStore, setStore, store, groupQueueByAuthor } from "@stores";
+import { config, cssVar, themer, addToCollection, player, shuffle } from "@utils";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -80,7 +80,14 @@ export function playNext() {
     id: nextStream.context?.id || '',
     src: nextStream.context?.src || ''
   });
-  setQueueStore('list', l => l.slice(1));
+  setQueueStore('list', l => {
+    let newList = l.slice(1);
+    if (newList.length > 1) {
+      if (config.persistentShuffle) newList = shuffle(newList);
+      if (config.authorGrouping) newList = groupQueueByAuthor(newList);
+    }
+    return newList;
+  });
   player(nextStream.id);
 }
 export function playPrev() {

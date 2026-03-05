@@ -222,5 +222,6 @@
   "library_import_songshift": "Import Playlists from SongShift",
   "library_about_ytify": "About ytify",
   "nav_logout": "Logout",
-  "player_video_resolution": "Resolution"
+  "player_video_resolution": "Resolution",
+  "updating": "Update in Progress..."
 }

@@ -6,7 +6,7 @@ const List = lazy(() => import('@features/List'));
 const Queue = lazy(() => import('@features/Queue'));
 const Player = lazy(() => import('@features/Player'));
 const Settings = lazy(() => import('@features/Settings'));
-const Updater = lazy(() => import('@features/Updater'));
+
 
 export const params = (new URL(location.href)).searchParams;
 
@@ -24,7 +24,6 @@ export const [navStore, setNavStore] = createStore<Nav>({
   library: { ref: null, state: false, component: Library },
   list: { ref: null, state: false, component: List },
   settings: { ref: null, state: false, component: Settings },
-  updater: { ref: null, state: false, component: Updater }
 });
 
 

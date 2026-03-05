@@ -121,6 +121,8 @@ export default function() {
               .map(id => tracks[id]);
             setListStore({
               name: t('hub_frequently_played'),
+              type: 'collection',
+              isShared: true,
               list: frequentlyPlayedItems as YTItem[],
             });
             setNavStore('list', 'state', true);
@@ -135,6 +137,8 @@ export default function() {
             const discoveryItems = drawer.discovery || [];
             setListStore({
               name: t('hub_discovery'),
+              type: 'collection',
+              isShared: true,
               list: discoveryItems as YTItem[],
             });
             setNavStore('list', 'state', true);

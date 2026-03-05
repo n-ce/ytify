@@ -22,7 +22,7 @@ export default async () => {
 
         const lastModifiedStr = blobWithMeta.metadata?.lastModified as string | undefined;
         const lastModifiedTime = lastModifiedStr ? parseInt(lastModifiedStr) : 0;
-        
+
         // Only delete if we have a valid lastModified AND it's older than threshold
         if (lastModifiedTime && (now - lastModifiedTime) > INACTIVE_THRESHOLD_MS) {
           console.log(`Deleting inactive library: ${blob.key}`);
@@ -49,13 +49,8 @@ export default async () => {
         if (!blobWithMeta) continue;
 
         // Use metadata lastModified, fallback to parsing key if it looks like a timestamp
-        const lastModifiedStr = blobWithMeta.metadata?.lastModified as string | undefined;
-        let lastModifiedTime = lastModifiedStr ? parseInt(lastModifiedStr) : 0;
-        
-        if (!lastModifiedTime && /^\d+$/.test(blob.key)) {
-          lastModifiedTime = parseInt(blob.key);
-        }
-        lastModifiedTime = lastModifiedTime || now;
+
+        let lastModifiedTime = parseInt(blob.key) || now;
 
         if ((now - lastModifiedTime) > INACTIVE_THRESHOLD_MS) {
           console.log(`Deleting old static blob: ${blob.key}`);

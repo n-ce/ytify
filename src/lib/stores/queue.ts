@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { createEffect, createRoot, untrack } from "solid-js";
+import { createRoot } from "solid-js";
 import { config, convertSStoHHMMSS, parseDuration, shuffle } from "@utils";
 import { playerStore } from "./player";
 
@@ -11,32 +11,8 @@ export const [queueStore, setQueueStore] = createStore({
 });
 
 createRoot(() => {
-  let bypass = false;
-
-  createEffect(() => {
-    const list = queueStore.list;
-    const isShuffleOn = config.persistentShuffle;
-    const isGroupingOn = config.authorGrouping;
-
-    if (bypass) {
-      bypass = false;
-      return;
-    }
-
-    // Process if shuffle/grouping is on and we have items.
-    // We now process even on removals (like playNext) to ensure the remaining list is always randomized/grouped.
-    if ((isShuffleOn || isGroupingOn) && list.length > 1) {
-      untrack(() => {
-        let newList = [...list];
-        if (isShuffleOn) newList = shuffle(newList);
-        if (isGroupingOn) newList = groupQueueByAuthor(newList);
-
-        bypass = true;
-        setQueueStore('list', newList);
-      });
-    }
-  });
 });
+
 /**
  * Filter items based on configuration and state.
  * By default blocks duplicates in queue/history and respects duration.
@@ -77,7 +53,11 @@ export function addToQueue(items: TrackItem[], options: {
   let itemsToAdd = filterItemsByConfig(items);
 
   setQueueStore('list', prevList => {
-    const combined = options.replace ? itemsToAdd : (options.prepend ? [...itemsToAdd, ...prevList] : [...prevList, ...itemsToAdd]);
+    let combined = options.replace ? itemsToAdd : (options.prepend ? [...itemsToAdd, ...prevList] : [...prevList, ...itemsToAdd]);
+    if (combined.length > 1) {
+      if (config.persistentShuffle) combined = shuffle(combined);
+      if (config.authorGrouping) combined = groupQueueByAuthor(combined);
+    }
     return combined;
   });
 }
