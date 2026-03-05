@@ -421,8 +421,17 @@ async function getSharedCollection(
   const data = await fetch(`${location.origin}/ss/${id}`)
     .then(res => res.json())
     .catch(() => '');
-  if (data)
-    setListStore('list', data);
+
+  if (data) {
+    if (Array.isArray(data)) {
+      setListStore('list', data);
+    } else if (typeof data === 'object' && data.tracks) {
+      setListStore({
+        name: data.collection || 'Shared Collection',
+        list: data.tracks
+      });
+    }
+  }
   else
     setStore('snackbar', `Collection does not exist`);
 
@@ -509,10 +518,10 @@ export function cleanseLibraryData() {
   if (tracksCleaned)
     saveTracksMap(cleanedTracks);
 
-  // 4. Cleanse all other collections from empty IDs
+  // 4. Cleanse all other collections from empty or missing IDs
   for (const key of collections) {
     const collection = JSON.parse(localStorage.getItem('library_' + key) || '[]') as string[];
-    const validCollection = collection.filter(id => id);
+    const validCollection = collection.filter(id => id && rawTracks[id]);
     if (validCollection.length < collection.length) {
       console.log(`Found and removed ${collection.length - validCollection.length} invalid entries from '${key}' collection.`);
       saveCollection(key, validCollection);

@@ -20,12 +20,17 @@ export function importList() {
 export function shareCollection(data: TrackItem[]) {
   setListStore('isLoading', true);
 
+  const payload = {
+    collection: listStore.name,
+    tracks: data.map(({ context, ...rest }) => rest)
+  };
+
   fetch(location.origin + '/ss', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   })
     .then(res => res.json())
     .then(res => {
