@@ -1,48 +1,52 @@
 import { Connect } from 'vite';
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import worker from './worker.js';
 
 /**
- * Wraps a Vercel/Serverless handler so it can be used as a Vite middleware.
+ * Adapts the Cloudflare Worker fetch handler for use as a Vite middleware.
  */
-export function createLocalAdapter(handler: (req: VercelRequest, res: VercelResponse) => Promise<any> | any) {
+export function createLocalAdapter() {
   return async (req: Connect.IncomingMessage, res: any) => {
-    const parsedUrl = new URL(req.url || '', 'http://localhost');
-    
-    // Mock VercelRequest
-    const vercelReq = req as unknown as VercelRequest;
-    vercelReq.query = Object.fromEntries(parsedUrl.searchParams) as any;
-    
-    // Mock VercelResponse
-    // We must capture original methods to avoid infinite recursion
-    const originalSetHeader = res.setHeader.bind(res);
-    const originalEnd = res.end.bind(res);
+    const protocol = (req.socket as any).encrypted ? 'https' : 'http';
+    const host = req.headers.host || 'localhost';
+    const url = new URL(req.url || '', `${protocol}://${host}`);
 
-    const vercelRes = res as unknown as VercelResponse;
-    vercelRes.status = (code: number) => {
-      res.statusCode = code;
-      return vercelRes;
-    };
-    vercelRes.json = (data: any) => {
-      originalSetHeader('Content-Type', 'application/json');
-      originalEnd(JSON.stringify(data));
-      return vercelRes;
-    };
-    vercelRes.setHeader = (name: string, value: string) => {
-      originalSetHeader(name, value);
-      return vercelRes;
-    };
-    vercelRes.end = (data: any | undefined) => {
-      originalEnd(data);
-      return vercelRes;
-    };
+    // Create a Fetch Request object from the Node.js request
+    const request = new Request(url.toString(), {
+      method: req.method,
+      headers: req.headers as Record<string, string>,
+      // For GET requests, body must be null
+      body: (req.method !== 'GET' && req.method !== 'HEAD') ? (req as any) : null,
+      // @ts-ignore - duplex is required for streaming bodies in some environments
+      duplex: 'half'
+    });
 
     try {
-      await handler(vercelReq, vercelRes);
+      // Call the worker's fetch method
+      // @ts-ignore
+      const response = await worker.fetch(request, {}, {});
+
+      // Copy status and headers to the Node.js response
+      res.statusCode = response.status;
+      response.headers.forEach((value, key) => {
+        res.setHeader(key, value);
+      });
+
+      // Stream the response body back to the client
+      if (response.body) {
+        const reader = response.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          res.write(value);
+        }
+      }
+      res.end();
     } catch (err) {
-      console.error('Local API Error:', err);
+      console.error('Local Worker Error:', err);
       if (!res.headersSent) {
-          res.statusCode = 500;
-          originalEnd(JSON.stringify({ error: 'Internal Server Error', message: (err as Error).message }));
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'Internal Server Error', message: (err as Error).message }));
       }
     }
   };

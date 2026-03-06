@@ -266,7 +266,7 @@ async function getRecommendations() {
   const currentTitle = playerStore.stream.title;
   const title = encodeURIComponent(currentTitle);
   const artist = encodeURIComponent(playerStore.stream.author?.slice(0, -8) ?? '');
-  fetch(`${store.api}/api/similar?title=${title}&artist=${artist}&limit=10`)
+  fetch(`${store.api}/similar?title=${title}&artist=${artist}&limit=10`)
     .then(res => res.json())
     .then(data => addToQueue(data.map((item: TrackItem) => ({
       ...item,

@@ -17,7 +17,7 @@ export default function() {
     setIsSubfeedLoading(true);
     const channelIds = channels.map(channel => channel.id).join(',');
     try {
-      const res = await fetch(`${store.api}/api/subfeed?id=${channelIds}`);
+      const res = await fetch(`${store.api}/subfeed?id=${channelIds}`);
       const data = await res.json() as YTItem[];
       setSubfeed(data);
     } catch (e) {

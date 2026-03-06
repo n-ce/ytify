@@ -41,7 +41,7 @@ export default async (request: Request, _context: Context) => {
       });
 
       const data = await res.json();
-      
+
       // Parse YTMUSIC response
       const suggestions = data.contents?.[0]?.searchSuggestionsSectionRenderer?.contents?.map((s: any) => {
         const renderer = s.searchSuggestionRenderer;
@@ -68,7 +68,7 @@ export default async (request: Request, _context: Context) => {
 
       const res = await fetch(suggestUrl.toString());
       const text = await res.text();
-      
+
       // youtubei.js parses window.google.ac.h(...)
       const jsonText = text.replace('window.google.ac.h(', '').slice(0, -1);
       const data = JSON.parse(jsonText);
@@ -88,5 +88,5 @@ export default async (request: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: '/api/search-suggestions'
+  path: '/search-suggestions'
 };

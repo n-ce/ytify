@@ -39,7 +39,7 @@ export default function() {
 
     setIsGalleryLoading(true);
     try {
-      const res = await fetch(`${store.api}/api/gallery?id=${artistIds.join(',')}`);
+      const res = await fetch(`${store.api}/gallery?id=${artistIds.join(',')}`);
       const data = await res.json() as { userArtists: Channel[], relatedArtists: Channel[], relatedPlaylists: Playlist[] };
       setGallery(data);
     } catch (e) {

@@ -58,7 +58,7 @@ export async function getList(
   }
 
   try {
-    const res = await fetch(`${store.api}/api/${type}?id=${id}${all ? '&all=true' : ''}`);
+    const res = await fetch(`${store.api}/${type}?id=${id}${all ? '&all=true' : ''}`);
     if (!res.ok) throw new Error(`Failed to fetch ${type}`);
     const data = await res.json() as YTListItem;
 

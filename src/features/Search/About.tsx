@@ -1,6 +1,5 @@
 import './About.css';
-
-import { t, store } from '@stores';
+import { t } from '@stores';
 
 export default function() {
   return (
@@ -38,9 +37,6 @@ export default function() {
         <a href="https://github.com/n-ce/ytify" target="_blank">[Github]</a>
         <a href="https://github.com/n-ce/ytify#donations" target="_blank">[Crypto Donations]</a>
       </span>
-      <br />
-      <p style={{ "font-size": '0.8rem', "font-weight": "bold", opacity: '0.9' }}>🌍 Connected to {store.instanceLocation}</p>
-      <br />
       <br />
     </div >
   );

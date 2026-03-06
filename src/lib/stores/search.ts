@@ -49,7 +49,7 @@ export function getSearchSuggestions(text: string) {
     setSearchStore('suggestions', 'controller', newController);
 
     const isMusic = ['song', 'artist', 'album'].includes(config.searchFilter);
-    const url = `/api/search-suggestions?q=${encodeURIComponent(text)}&music=${isMusic}`;
+    const url = `/search-suggestions?q=${encodeURIComponent(text)}&music=${isMusic}`;
 
     fetch(url, { signal: newController.signal })
       .then(res => res.json() as Promise<string[]>)
@@ -90,7 +90,7 @@ export async function getSearchResults() {
     setDrawer('recentSearches', recentSearches);
   }
 
-  const url = `${store.api}/api/search?q=${encodeURIComponent(query)}&f=${searchFilter}`;
+  const url = `${store.api}/search?q=${encodeURIComponent(query)}&f=${searchFilter}`;
 
   fetch(url)
     .then(res => res.json() as Promise<(YTItem | YTListItem)[]>)
