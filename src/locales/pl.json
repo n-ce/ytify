@@ -220,5 +220,6 @@
     "library_import_songshift": "Importuj playlisty z SongShift",
     "library_about_ytify": "O ytify",
     "nav_logout": "Wyloguj się",
-    "player_video_resolution": "Rozdzielczość"
+    "player_video_resolution": "Rozdzielczość",
+    "queue_reload_notification": ""
 }
