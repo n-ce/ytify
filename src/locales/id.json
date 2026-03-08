@@ -220,5 +220,6 @@
     "library_import_songshift": "Impor Daftar Putar dari SongShift",
     "library_about_ytify": "Tentang ytify",
     "nav_logout": "Logout",
-    "player_video_resolution": "Resolusi"
+    "player_video_resolution": "Resolusi",
+    "queue_reload_notification": ""
 }
