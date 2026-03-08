@@ -220,5 +220,6 @@
     "library_import_songshift": "Importă playlist-uri din SongShift",
     "library_about_ytify": "Despre ytify",
     "nav_logout": "Deconectare",
-    "player_video_resolution": "Rezoluție"
+    "player_video_resolution": "Rezoluție",
+    "queue_reload_notification": ""
 }
