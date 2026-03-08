@@ -220,5 +220,6 @@
     "library_import_songshift": "SongShift থেকে প্লেলিস্ট ইমপোর্ট করুন",
     "library_about_ytify": "ytify সম্পর্কে",
     "nav_logout": "লগআউট",
-    "player_video_resolution": "রেজোলিউশন"
+    "player_video_resolution": "রেজোলিউশন",
+    "queue_reload_notification": ""
 }
