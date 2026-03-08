@@ -220,5 +220,6 @@
     "library_import_songshift": "استيراد قوائم التشغيل من SongShift",
     "library_about_ytify": "حول ytify",
     "nav_logout": "تسجيل الخروج",
-    "player_video_resolution": "الدقة"
+    "player_video_resolution": "الدقة",
+    "queue_reload_notification": ""
 }
