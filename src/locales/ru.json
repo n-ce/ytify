@@ -220,5 +220,6 @@
     "library_import_songshift": "Импорт плейлистов из SongShift",
     "library_about_ytify": "О ytify",
     "nav_logout": "Выйти",
-    "player_video_resolution": "Разрешение"
+    "player_video_resolution": "Разрешение",
+    "queue_reload_notification": ""
 }
