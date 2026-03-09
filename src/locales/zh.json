@@ -221,5 +221,6 @@
     "library_import_songshift": "从SongShift导入播放列表",
     "library_about_ytify": "关于ytify",
     "nav_logout": "登出",
-    "player_video_resolution": "分辨率"
+    "player_video_resolution": "分辨率",
+    "queue_reload_notification": ""
 }
