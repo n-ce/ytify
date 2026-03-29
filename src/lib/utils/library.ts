@@ -297,6 +297,11 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
+  if (listStore.id === id && navStore.list.state) {
+    navStore.list.ref?.scrollIntoView();
+    return;
+  }
+
   const { state, ref } = navStore.list;
   if (state)
     ref?.scrollIntoView();

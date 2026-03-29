@@ -1,5 +1,4 @@
 import { createStore } from "solid-js/store";
-import { createRoot } from "solid-js";
 import { config, convertSStoHHMMSS, parseDuration, shuffle } from "@utils";
 import { playerStore } from "./player";
 
@@ -10,8 +9,6 @@ export const [queueStore, setQueueStore] = createStore({
   isLoading: false,
 });
 
-createRoot(() => {
-});
 
 /**
  * Filter items based on configuration and state.

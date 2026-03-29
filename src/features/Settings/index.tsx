@@ -1,4 +1,4 @@
-import { onMount, createEffect, For, createSignal } from "solid-js";
+import { onMount, createEffect, For, createSignal, Show } from "solid-js";
 import './Settings.css';
 import { closeFeature, setNavStore, t, setStore, updateLang } from '@stores';
 import { Selector } from '@components/Selector.tsx';
@@ -7,6 +7,7 @@ import Dropdown from "./Dropdown";
 
 export default function() {
   let settingsSection!: HTMLDivElement;
+  const isPWA = matchMedia('(display-mode: standalone)').matches;
 
   onMount(() => {
     setNavStore('settings', 'ref', settingsSection);
@@ -72,18 +73,20 @@ export default function() {
           </For>
         </Selector>
 
-        <Selector
-          id='shareAction'
-          label='settings_pwa_share_action'
-          onchange={(e) => {
-            setConfig('shareAction', e.target.value as 'play' | 'watch' | 'download');
-          }}
-          value={config.shareAction}
-        >
-          <option value='play'>{t('player_play_button')}</option>
-          <option value='watch'>{t('settings_pwa_watch')}</option>
-          <option value='dl'>{t('actions_menu_download')}</option>
-        </Selector>
+        <Show when={isPWA}>
+          <Selector
+            id='shareAction'
+            label='settings_pwa_share_action'
+            onchange={(e) => {
+              setConfig('shareAction', e.target.value as 'play' | 'watch' | 'download');
+            }}
+            value={config.shareAction}
+          >
+            <option value='play'>{t('player_play_button')}</option>
+            <option value='watch'>{t('settings_pwa_watch')}</option>
+            <option value='dl'>{t('actions_menu_download')}</option>
+          </Selector>
+        </Show>
 
         {/* Playback Settings */}
         <Selector

@@ -64,11 +64,12 @@ export function getSearchSuggestions(text: string) {
   }, DEBOUNCE_TIME);
 }
 
-export async function getSearchResults() {
-  const { query } = searchStore;
+export async function getSearchResults(force = false) {
+  const { query, results, isLoading } = searchStore;
   const { searchFilter } = config;
 
-  if (!query) return;
+  if (!query || (isLoading && !force)) return;
+  if (!force && results.length > 0) return;
 
   setSearchStore('isLoading', true);
   searchStore.suggestions.controller.abort();

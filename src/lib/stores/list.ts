@@ -24,13 +24,21 @@ const initialState = () => ({
 });
 
 export const [listStore, setListStore] = createStore(initialState());
-
 export async function getList(
   id: string,
   type: 'playlist' | 'channel' | 'album' | 'artist',
   all?: boolean
 ) {
+  if (listStore.id === id && listStore.list.length > 0 && !all) {
+    if (navStore.list.state)
+      navStore.list.ref?.scrollIntoView();
+    else
+      setNavStore('list', 'state', true);
+    return;
+  }
+
   setListStore('hasContinuation', false);
+
   setListStore('isLoading', true);
   if (navStore.list.state)
     navStore.list.ref?.scrollIntoView();

@@ -1,8 +1,8 @@
-import { onCleanup, onMount, Show, lazy } from "solid-js";
+import { onMount, Show, lazy } from "solid-js";
 import './Search.css';
 import Results from './Results';
 import Input from "./Input";
-import { resetSearch, setNavStore, searchStore, t, navStore } from "@stores";
+import { searchStore, t, navStore, setNavStore } from "@stores";
 import Filters from "./Filters";
 
 const About = lazy(() => import('./About'));
@@ -14,8 +14,6 @@ export default function() {
     setNavStore('search', 'ref', searchRef);
     searchRef.scrollIntoView();
   });
-
-  onCleanup(resetSearch);
 
   function toggleFullScreen() {
     if (!document.fullscreenElement) {

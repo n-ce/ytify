@@ -6,10 +6,7 @@ export default function() {
 
   let superInput!: HTMLInputElement;
 
-  onMount(() => {
-    if (searchStore.query)
-      getSearchResults();
-  });
+  onMount(getSearchResults);
 
   function textToSearch(text: string) {
     superInput.blur();
@@ -61,14 +58,14 @@ export default function() {
         onfocus={() => {
           if (searchStore.query)
             return;
-          setSearchStore('suggestions', 'data', drawer.recentSearches);
+          setSearchStore('suggestions', 'data', [...drawer.recentSearches].reverse());
         }}
         oninput={async (e) => {
           const { value } = e.target;
           setSearchStore('query', value);
 
           if (!value) {
-            setSearchStore('suggestions', 'data', drawer.recentSearches);
+            setSearchStore('suggestions', 'data', [...drawer.recentSearches].reverse());
             return;
           }
 
