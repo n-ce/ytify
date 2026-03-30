@@ -220,5 +220,6 @@
     "library_import_songshift": "SongShift سے پلے لسٹس امپورٹ کریں",
     "library_about_ytify": "ytify کے بارے میں",
     "nav_logout": "لاگ آؤٹ",
-    "player_video_resolution": "ریزولیوشن"
+    "player_video_resolution": "ریزولیوشن",
+    "queue_reload_notification": ""
 }

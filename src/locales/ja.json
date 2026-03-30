@@ -220,5 +220,6 @@
     "library_import_songshift": "SongShiftからプレイリストをインポート",
     "library_about_ytify": "ytifyについて",
     "nav_logout": "ログアウト",
-    "player_video_resolution": "解像度"
+    "player_video_resolution": "解像度",
+    "queue_reload_notification": ""
 }
