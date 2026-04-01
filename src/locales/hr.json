@@ -152,9 +152,9 @@
     "settings_pwa_download": "Preuzimanja",
     "settings_pwa_always_ask": "Uvijek pitaj",
     "settings_quality_worst": "Najgore",
-    "settings_quality_low": "Nizak",
+    "settings_quality_low": "Nisko",
     "settings_quality_medium": "Srednje",
-    "settings_quality_high": "Visok",
+    "settings_quality_high": "Visoko",
     "settings_import_prompt": "Hoće li ovo nadpisati vaše trenutne postavke uvoženim postavkama? Nastaviti?",
     "settings_more_options": "Više opcija",
     "settings_display_suggestions": "Prikaži prijedloge za pretraživanje",
@@ -221,5 +221,6 @@
     "library_import_songshift": "Uvezi playliste iz SongShift",
     "library_about_ytify": "O ytify",
     "nav_logout": "Odjava",
-    "player_video_resolution": "Rezolucija"
+    "player_video_resolution": "Rezolucija",
+    "updating": "Ažuriranje u tijeku..."
 }
