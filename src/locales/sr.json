@@ -221,5 +221,6 @@
     "library_import_songshift": "Увези плејлисте из SongShift",
     "library_about_ytify": "О ytify",
     "nav_logout": "Одјава",
-    "player_video_resolution": "Резолуција"
+    "player_video_resolution": "Резолуција",
+    "updating": "Ажурирање у току..."
 }
