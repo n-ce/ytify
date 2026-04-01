@@ -151,7 +151,7 @@
     "settings_pwa_watch": "Gledaj",
     "settings_pwa_download": "Preuzimanje",
     "settings_pwa_always_ask": "Uvijek pitajte",
-    "settings_quality_worst": "Biću manje pripremljena",
+    "settings_quality_worst": "Najgore",
     "settings_quality_low": "Nisko",
     "settings_quality_medium": "Umjereno",
     "settings_quality_high": "Visoko",
@@ -221,5 +221,6 @@
     "library_import_songshift": "Uvezi playliste sa SongShift",
     "library_about_ytify": "O ytify",
     "nav_logout": "Odjavi se",
-    "player_video_resolution": "Odluka"
+    "player_video_resolution": "Odluka",
+    "updating": "Ažuriranje u toku..."
 }
