@@ -8,7 +8,7 @@
     "loading": "Wird geladen...",
     "about_description": "ytify ist eine ressourceneffiziente Audio-Streaming-Plattform, die YouTube- und YTMusic-Bibliothek nutzt.",
     "about_learn_more": "Erfahren Sie mehr darüber, wie Sie es effektiv nutzen können.",
-    "about_support_project": "Unterstützen Sie das ytify-Projekt: Über UPI",
+    "about_support_project": "Unterstützen Sie das Projekt über UPI",
     "about_support_earth": "Unterstützen Sie unsere Erde:",
     "about_lifestyle_changes": "Lebensstiländerungen zur Bekämpfung des Klimawandels",
     "about_crypto_any": "oder jede andere Kryptowährung über Trocador",
@@ -221,5 +221,6 @@
     "library_about_ytify": "Über ytify",
     "nav_logout": "Abmelden",
     "player_video_resolution": "Auflösung",
-    "queue_reload_notification": "Änderungen werden ab der nächsten Sitzung angezeigt"
+    "queue_reload_notification": "Änderungen werden ab der nächsten Sitzung angezeigt",
+    "updating": "Aktualisierung läuft..."
 }
