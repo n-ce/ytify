@@ -221,5 +221,6 @@
     "library_about_ytify": "Over ytify",
     "nav_logout": "Uitloggen",
     "player_video_resolution": "Resolutie",
-    "queue_reload_notification": "De wijzigingen worden vanaf de volgende sessie zichtbaar"
+    "queue_reload_notification": "De wijzigingen worden vanaf de volgende sessie zichtbaar",
+    "updating": "Wordt bijgewerkt..."
 }
