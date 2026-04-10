@@ -29,13 +29,6 @@ export async function getList(
   type: 'playlist' | 'channel' | 'album' | 'artist',
   all?: boolean
 ) {
-  if (listStore.id === id && listStore.list.length > 0 && !all) {
-    if (navStore.list.state)
-      navStore.list.ref?.scrollIntoView();
-    else
-      setNavStore('list', 'state', true);
-    return;
-  }
 
   setListStore('hasContinuation', false);
 
