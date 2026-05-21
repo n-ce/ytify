@@ -1,5 +1,4 @@
 - A strong preference for fully-typed, generic, and reusable code over quick fixes. avoid the use of `any`.
 - Analyzes build errors and existing code thoroughly before making changes.
 - Keen on identifying opportunities for optimization, code reduction, and file consolidation to avoid redundancy.
-- npm run build - ignore environmental build errors considering service worker, its a known issue
 - when the task is achieved run the build, prompt user for pushing code via asking for git status permission, form the git commit message based on the status and the git diff analysis, most of the times you need to add all files, git add , commit, push at once.
