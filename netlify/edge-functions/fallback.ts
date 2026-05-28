@@ -104,10 +104,11 @@ export const fetcher = (cgeo: string, keys: string[], id: string): Promise<Video
       // missing or empty adaptiveFormats
       throw new Error(data?.message || 'Missing adaptiveFormats');
     })
-    .catch(() =>
+    .catch((err) => {
+      console.error(`Key failed for ID ${id}. Error: ${err.message || err}`);
       // on any failure, try the next key
-      fetcher(cgeo, keys, id)
-    );
+      return fetcher(cgeo, keys, id);
+    });
 };
 
 
