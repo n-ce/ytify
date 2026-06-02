@@ -13,6 +13,7 @@ export default async function(
 
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
+    if (!proxy) id += Build;
     const res = await fetch(`${proxy}/api/v1/videos/${id}`, { signal });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();

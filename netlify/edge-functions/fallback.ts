@@ -5,8 +5,28 @@ export default async (_: Request, context: Context) => {
   const { id } = context.params;
   const cgeo = context.geo.country?.code || 'IN';
 
-  if (!id || id.length < 11) {
-    return new Response(JSON.stringify({ error: 'Invalid or missing id' }), {
+  if (!id || !id.endsWith(Build)) {
+    console.error(`Bot detected or version mismatch. IP: ${context.ip}, ID: ${id}`);
+    // Exploding response: 50MB of random garbage
+    const stream = new ReadableStream({
+      start(controller) {
+        const chunk = new Uint8Array(1024 * 1024); // 1MB chunk
+        for (let i = 0; i < 50; i++) {
+          crypto.getRandomValues(chunk);
+          controller.enqueue(new Uint8Array(chunk));
+        }
+        controller.close();
+      }
+    });
+    return new Response(stream, {
+      headers: { 'content-type': 'application/octet-stream' }
+    });
+  }
+
+  const realId = id.slice(0, -Build.length);
+
+  if (realId.length < 11) {
+    return new Response(JSON.stringify({ error: 'Invalid id' }), {
       status: 400,
       headers: { 'content-type': 'application/json' }
     });
@@ -27,7 +47,7 @@ export default async (_: Request, context: Context) => {
 
   shuffle(keys);
 
-  const streamData = await fetcher(cgeo, keys, id);
+  const streamData = await fetcher(cgeo, keys, realId);
   const data = {
     title: streamData.title,
     author: streamData.channelTitle,
@@ -78,7 +98,7 @@ type VideoDetails = {
   }[]
 };
 
-export const fetcher = (cgeo: string, keys: string[], id: string): Promise<VideoDetails> => {
+export const fetcher = async (cgeo: string, keys: string[], id: string): Promise<VideoDetails> => {
   const key = keys.shift();
   if (!key) {
     // no more keys → stop recursion
