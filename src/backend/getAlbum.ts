@@ -1,5 +1,5 @@
 import { YTNodes } from 'youtubei.js';
-import { getClient, getThumbnail, formatDuration, getThumbnailId } from './utils.js';
+import { getClient, getThumbnail, formatDuration, getThumbnailId, getVideoId } from './utils.js';
 
 export default async function(id: string) {
   const yt = await getClient();
@@ -97,7 +97,7 @@ export default async function(id: string) {
         finalItems = (playlist.contents || []).map((item) => {
           if (item.is(YTNodes.MusicResponsiveListItem)) {
             const musicItem = item.as(YTNodes.MusicResponsiveListItem);
-            const videoId = musicItem.id || (musicItem as any).videoId;
+            const videoId = getVideoId(musicItem);
             if (!videoId) return null;
 
             const itemAuthor = musicItem.author?.name || (musicItem as any).authors?.[0]?.name || musicItem.artists?.[0]?.name || author || '';
@@ -127,7 +127,7 @@ export default async function(id: string) {
     finalItems = (album.contents || []).map((item) => {
       if (item.is(YTNodes.MusicResponsiveListItem)) {
         const musicItem = item.as(YTNodes.MusicResponsiveListItem);
-        const videoId = musicItem.id || (musicItem as any).videoId;
+        const videoId = getVideoId(musicItem);
         if (!videoId) return null;
 
         const itemAuthor = musicItem.author?.name || (musicItem as any).authors?.[0]?.name || musicItem.artists?.[0]?.name || author || '';

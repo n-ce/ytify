@@ -80,6 +80,14 @@ export function getThumbnail(thumbnails: { url: string, width: number }[]): stri
   return thumbnails.sort((a, b) => (b.width || 0) - (a.width || 0))[0]?.url || '';
 }
 
+export function getVideoId(song: YTNodes.MusicResponsiveListItem): string {
+  return song.id || (song as any).videoId ||
+    (song.overlay?.content?.is(YTNodes.MusicPlayButton) ? (song.overlay.content as any).endpoint?.payload?.videoId : undefined) ||
+    song.flex_columns?.find(c => c.is(YTNodes.MusicResponsiveListItemFlexColumn) && c.as(YTNodes.MusicResponsiveListItemFlexColumn).title?.endpoint?.name === 'watchEndpoint')?.as(YTNodes.MusicResponsiveListItemFlexColumn).title?.endpoint?.payload?.videoId ||
+    song.menu?.items?.find((i: any) => i.endpoint?.payload?.videoId)?.endpoint?.payload?.videoId ||
+    "";
+}
+
 export function streamMapper(node: Helpers.YTNode): YTItem | null {
   if (node.is(YTNodes.Video)) {
     const video = node.as(YTNodes.Video);
@@ -107,6 +115,8 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
     const views = song.views?.toString();
     const subtext = (album || '') + (views ? (album ? ' • ' : '') + views : '');
 
+    const videoId = getVideoId(song);
+
     // Try to get playlistId (OLAK...) from menu items for the albumId field
     const playlistId = song.menu?.items?.find((i: any) =>
       i.is(YTNodes.MenuNavigationItem) &&
@@ -114,7 +124,7 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
     )?.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId || song.album?.id || "";
 
     return {
-      id: song.id || "",
+      id: videoId,
       title: song.title?.toString() || "Unknown",
       author: song.artists?.[0]?.name ? `${song.artists[0].name} - Topic` : "Unknown",
       authorId: song.artists?.[0]?.channel_id || "",
