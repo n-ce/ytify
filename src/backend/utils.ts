@@ -84,7 +84,7 @@ export function getVideoId(song: YTNodes.MusicResponsiveListItem): string {
   return song.id || (song as any).videoId ||
     (song.overlay?.content?.is(YTNodes.MusicPlayButton) ? (song.overlay.content as any).endpoint?.payload?.videoId : undefined) ||
     song.flex_columns?.find(c => c.is(YTNodes.MusicResponsiveListItemFlexColumn) && c.as(YTNodes.MusicResponsiveListItemFlexColumn).title?.endpoint?.name === 'watchEndpoint')?.as(YTNodes.MusicResponsiveListItemFlexColumn).title?.endpoint?.payload?.videoId ||
-    song.menu?.items?.find((i: any) => i.endpoint?.payload?.videoId)?.endpoint?.payload?.videoId ||
+    (song.menu?.items?.find((i: any) => i.endpoint?.payload?.videoId) as any)?.endpoint?.payload?.videoId ||
     "";
 }
 
