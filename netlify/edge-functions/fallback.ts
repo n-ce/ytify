@@ -6,13 +6,21 @@ export default async (_: Request, context: Context) => {
   const cgeo = context.geo.country?.code || 'IN';
   const Build = Netlify.env.get('build') || '';
 
-  if (!id || !id.endsWith(Build)) {
-    console.error(`Bot detected or version mismatch. IP: ${context.ip}, ID: ${id}`);
+  // IP-based bot detection
+  const botsRaw = Netlify.env.get('bots') || '';
+  const botIPs = botsRaw.split(',').map(ip => ip.trim()).filter(Boolean);
+  const isBotIP = botIPs.includes(context.ip);
+
+  if (!id || !id.endsWith(Build) || isBotIP) {
+    console.error(`[Bot Detection] ${isBotIP ? 'Blacklisted IP' : 'Version mismatch'}. IP: ${context.ip}, ID: ${id}, Expected suffix: ${Build}`);
     // Exploding response: 50MB of random garbage
     const stream = new ReadableStream({
       start(controller) {
-        const chunk = new Uint8Array(1024 * 1024); // 1MB chunk
-        for (let i = 0; i < 50; i++) {
+        const chunkSize = 64 * 1024; // 64KB limit for Deno crypto.getRandomValues
+        const chunk = new Uint8Array(chunkSize);
+        const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize);
+
+        for (let i = 0; i < totalChunks; i++) {
           crypto.getRandomValues(chunk);
           controller.enqueue(new Uint8Array(chunk));
         }
