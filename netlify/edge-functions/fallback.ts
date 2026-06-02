@@ -1,32 +1,33 @@
 import { Config, Context } from '@netlify/edge-functions';
 
 export default async (_: Request, context: Context) => {
-
   const { id } = context.params;
   const cgeo = context.geo.country?.code || 'IN';
-  const Build = Netlify.env.get('build') || '';
+  const build = Netlify.env.get('build') || '';
 
-  // IP-based bot detection
-  const botsRaw = Netlify.env.get('bots') || '';
-  const botIPs = botsRaw.split(',').map(ip => ip.trim()).filter(Boolean);
-  const isBotIP = botIPs.includes(context.ip);
+  // Validation check: ensure ID exists and matches your expected version suffix
+  if (!id || !id.endsWith(build)) {
+    console.error(`[Validation Mismatch] Version mismatch or missing ID. IP: ${context.ip}, ID: ${id}, Expected suffix: ${Build}`);
+    
+    // Memory-safe lazy-loading ReadableStream
+    let chunksSent = 0;
+    const chunkSize = 64 * 1024; // 64KB chunks
+    const chunk = new Uint8Array(chunkSize);
+    const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize); // Target: ~50MB
 
-  if (!id || !id.endsWith(Build) || isBotIP) {
-    console.error(`[Bot Detection] ${isBotIP ? 'Blacklisted IP' : 'Version mismatch'}. IP: ${context.ip}, ID: ${id}, Expected suffix: ${Build}`);
-    // Exploding response: 50MB of random garbage
     const stream = new ReadableStream({
-      start(controller) {
-        const chunkSize = 64 * 1024; // 64KB limit for Deno crypto.getRandomValues
-        const chunk = new Uint8Array(chunkSize);
-        const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize);
-
-        for (let i = 0; i < totalChunks; i++) {
-          crypto.getRandomValues(chunk);
-          controller.enqueue(new Uint8Array(chunk));
+      // pull() is called on-demand as the client reads data, preventing memory explosion
+      async pull(controller) {
+        if (chunksSent >= totalChunks) {
+          controller.close();
+          return;
         }
-        controller.close();
+        crypto.getRandomValues(chunk);
+        controller.enqueue(new Uint8Array(chunk));
+        chunksSent++;
       }
     });
+
     return new Response(stream, {
       headers: { 'content-type': 'application/octet-stream' }
     });
@@ -40,51 +41,64 @@ export default async (_: Request, context: Context) => {
       headers: { 'content-type': 'application/json' }
     });
   }
+
   // Edge Functions-native environment lookup
   const raw = Netlify.env.get('rkeys');
   if (!raw) {
     throw new Error('Missing environment variable: rkeys');
   }
-  // Split, trim, and remove empty entries
+
   const keys = raw
     .split(',')
     .map(k => k.trim())
     .filter(Boolean);
+
   if (keys.length === 0) {
     throw new Error('No RapidAPI keys configured in rkeys');
   }
 
   shuffle(keys);
 
-  const streamData = await fetcher(cgeo, keys, realId);
-  const data = {
-    title: streamData.title,
-    author: streamData.channelTitle,
-    authorId: streamData.authorId,
-    lengthSeconds: streamData.lengthSeconds,
-    adaptiveFormats: streamData.adaptiveFormats
-      .map(_ => ({
+  try {
+    const streamData = await fetcher(cgeo, keys, realId);
+    
+    const data = {
+      title: streamData.title,
+      author: streamData.channelTitle,
+      authorId: streamData.authorId,
+      lengthSeconds: streamData.lengthSeconds,
+      adaptiveFormats: streamData.adaptiveFormats.map(_ => ({
         url: _.url + '&fallback',
-        quality: _.qualityLabel, // qualityLabel from RapidAPI maps to quality/resolution
+        quality: _.qualityLabel, 
         type: _.mimeType,
         encoding: _.mimeType.split('codecs="')[1]?.split('"')[0],
         bitrate: _.bitrate.toString(),
         clen: _.contentLength,
         resolution: _.qualityLabel
       })),
-    recommendedVideos: [], // empty array for compatibility
-    captions: [], // empty array for compatibility
-    liveNow: streamData.isLiveContent,
-    hlsUrl: '',
-    dashUrl: ''
-  };
+      recommendedVideos: [], 
+      captions: [], 
+      liveNow: streamData.isLiveContent,
+      hlsUrl: '',
+      dashUrl: ''
+    };
 
-  return new Response(JSON.stringify(data), {
-    headers: {
-      'content-type': 'application/json',
-      'Cache-Control': 's-maxage=86400, stale-while-revalidate=3600'
-    },
-  });
+    return new Response(JSON.stringify(data), {
+      headers: {
+        'content-type': 'application/json',
+        'Cache-Control': 's-maxage=86400, stale-while-revalidate=3600'
+      },
+    });
+
+  } catch (err) {
+    console.error(`Execution failed for ID ${realId}: ${(err as Error).message}`);
+    
+    // Graceful fallback for total API key failure/network drops
+    return new Response(JSON.stringify({ error: 'Service temporarily unavailable' }), {
+      status: 503,
+      headers: { 'content-type': 'application/json' }
+    });
+  }
 };
 
 export const config: Config = {
@@ -110,8 +124,7 @@ type VideoDetails = {
 export const fetcher = async (cgeo: string, keys: string[], id: string): Promise<VideoDetails> => {
   const key = keys.shift();
   if (!key) {
-    // no more keys → stop recursion
-    return Promise.reject(new Error('Exhausted RapidAPI keys'));
+    return Promise.reject(new Error('Exhausted all available RapidAPI keys'));
   }
 
   return fetch(`https://${host}/dl?id=${id}&cgeo=${cgeo}`, {
@@ -120,36 +133,25 @@ export const fetcher = async (cgeo: string, keys: string[], id: string): Promise
       'X-RapidAPI-Host': host
     }
   })
-    .then(res =>
-      // ensure we got a 2xx before parsing
-      res.ok
-        ? res.json()
-        : Promise.reject(new Error(`HTTP ${res.status}`))
-    )
+    .then(res => res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`)))
     .then(data => {
       if (data && Array.isArray(data.adaptiveFormats) && data.adaptiveFormats.length) {
         return data;
       }
-      // missing or empty adaptiveFormats
       throw new Error(data?.message || 'Missing adaptiveFormats');
     })
     .catch((err) => {
-      console.error(`Key failed for ID ${id}. Error: ${err.message || err}`);
-      // on any failure, try the next key
+      console.error(`Key rotation triggered. Failed Key: .... Error: ${err.message || err}`);
+      // Safely recurse down the remaining keys array
       return fetcher(cgeo, keys, id);
     });
 };
 
-
 export function shuffle(array: string[]) {
   let currentIndex = array.length;
-
   while (currentIndex != 0) {
-
     const randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
-
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
   }
 }
