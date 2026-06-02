@@ -7,7 +7,7 @@ export default async (_: Request, context: Context) => {
 
   // Validation check: ensure ID exists and matches your expected version suffix
   if (!id || !id.endsWith(build)) {
-    console.error(`[Validation Mismatch] Version mismatch or missing ID. IP: ${context.ip}, ID: ${id}, Expected suffix: ${Build}`);
+    console.error(`[Validation Mismatch] Version mismatch or missing ID. IP: ${context.ip}, ID: ${id}, Expected suffix: ${build}`);
     
     // Memory-safe lazy-loading ReadableStream
     let chunksSent = 0;
@@ -33,7 +33,7 @@ export default async (_: Request, context: Context) => {
     });
   }
 
-  const realId = id.slice(0, -Build.length);
+  const realId = id.slice(0, -build.length);
 
   if (realId.length < 11) {
     return new Response(JSON.stringify({ error: 'Invalid id' }), {
