@@ -4,6 +4,7 @@ export default async (_: Request, context: Context) => {
 
   const { id } = context.params;
   const cgeo = context.geo.country?.code || 'IN';
+  const Build = Netlify.env.get('build');
 
   if (!id || !id.endsWith(Build)) {
     console.error(`Bot detected or version mismatch. IP: ${context.ip}, ID: ${id}`);
