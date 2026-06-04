@@ -10,15 +10,20 @@ interface RapidAPIState {
   ips: Record<string, number>;
 }
 
-// Helper to safely extract the actual user IP behind the proxy
+// Bot subnets identified from your logs
+const BANNED_SUBNETS = [
+  "162.158.179.",
+  "172.68.211.",
+  "172.71.215.",
+  "162.159.98.",
+  "172.68.225."
+];
+
 function getClientIp(request: Request, context: Context): string {
   const xForwardedFor = request.headers.get("x-forwarded-for");
   if (xForwardedFor) {
-    // x-forwarded-for can be a comma-separated chain (client, proxy1, proxy2). 
-    // The first one is always the true client.
     return xForwardedFor.split(",")[0].trim();
   }
-  // Netlify specific true client IP fallback, then final fallback to context
   return request.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
 }
 
@@ -72,8 +77,23 @@ export default async (request: Request, context: Context) => {
   const accept = request.headers.get("accept") || "";
   const isJson = accept.includes("application/json");
 
-  // Get the TRUE visitor IP
+  // 1. Identify the real client IP
   const clientIp = getClientIp(request, context);
+
+  // 2. Enforce explicit subnet blocklist drops
+  const matchedSubnet = BANNED_SUBNETS.find(subnet => clientIp.startsWith(subnet));
+
+  if (matchedSubnet) {
+    console.warn(`[BLOCK] Blocked request for ID ${id} from Bot IP: ${clientIp} (Matched subnet: ${matchedSubnet}xx)`);
+
+    return new Response(
+      isJson ? JSON.stringify({ error: "Access denied" }) : "Access Denied",
+      {
+        status: 403,
+        headers: { "content-type": isJson ? "application/json" : "text/plain" }
+      }
+    );
+  }
 
   const rawKeys = Netlify.env.get("rkeys") || "";
   const allKeys = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
@@ -87,16 +107,6 @@ export default async (request: Request, context: Context) => {
 
   if (isJson) {
     state = await getRapidAPIState();
-
-    // OPTIONAL: Early rate limit enforcement using your existing blob tracking.
-    // If a single actual IP has made more than 30 total recorded requests, block them.
-    if (state && state.ips[clientIp] && state.ips[clientIp] > 30) {
-      return new Response(JSON.stringify({ error: "Too many requests from this IP." }), {
-        status: 429,
-        headers: { "content-type": "application/json" }
-      });
-    }
-
     selectedKey = selectBestKey(state, allKeys);
   } else {
     selectedKey = allKeys[Math.floor(Math.random() * allKeys.length)];
@@ -113,7 +123,6 @@ export default async (request: Request, context: Context) => {
     if (isJson) {
       const remaining = parseInt(res.headers.get("x-ratelimit-requests-remaining") || "0");
       const resetSec = parseInt(res.headers.get("x-ratelimit-requests-reset") || "0");
-      // Use clientIp here instead of context.ip
       await updateRapidAPIState(selectedKey, remaining, Date.now() + resetSec * 1000, clientIp);
     }
 
