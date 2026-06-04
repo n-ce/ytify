@@ -3,25 +3,11 @@ import { getStore } from "@netlify/blobs";
 
 interface RapidAPIState {
   keys: Array<{
-    key: string;
     remaining: number;
     resetsat: number;
   }>;
   ips: Record<string, number>;
 }
-
-// Bot subnets identified from your logs
-const BANNED_SUBNETS = [
-  "162.158.179.",
-  "172.68.211.",
-  "172.71.215.",
-  "162.159.98.",
-  "172.68.225.",
-  "210.14.11.154",
-  "203.28.67.142",
-  "190.217.64.170",
-  "190.107.19.30"
-];
 
 function getClientIp(request: Request, context: Context): string {
   const xForwardedFor = request.headers.get("x-forwarded-for");
@@ -34,41 +20,39 @@ function getClientIp(request: Request, context: Context): string {
 async function getRapidAPIState() {
   const store = getStore("rapidapi");
   try {
-    return (await store.get("state", { type: "json" })) as RapidAPIState | null;
+    return (await store.get("coolstate", { type: "json" })) as RapidAPIState | null;
   } catch (e) {
     return null;
   }
 }
 
-function selectBestKey(state: RapidAPIState | null, allKeys: string[]): string {
-  if (!state || !state.keys.length) return allKeys[Math.floor(Math.random() * allKeys.length)];
-
+function selectBestKey(state: RapidAPIState | null, allKeys: string[]): { key: string; index: number } {
   const now = Date.now();
-  const available = allKeys.map(k => {
-    const entry = state.keys.find(e => e.key === k);
-    if (!entry) return { key: k, remaining: 500, resetsat: 0 };
-    if (now > entry.resetsat) return { ...entry, remaining: 500 };
-    return entry;
+
+  const available = allKeys.map((k, idx) => {
+    const entry = state?.keys[idx];
+    if (!entry) return { key: k, index: idx, remaining: 500, resetsat: 0 };
+    if (now > entry.resetsat) return { key: k, index: idx, remaining: 500, resetsat: 0 };
+    return { key: k, index: idx, remaining: entry.remaining, resetsat: entry.resetsat };
   });
 
   available.sort((a, b) => b.remaining - a.remaining || a.resetsat - b.resetsat);
-  return available[0].key;
+  return { key: available[0].key, index: available[0].index };
 }
 
-async function updateRapidAPIState(key: string, remaining: number, resetsat: number, ip: string) {
+async function updateRapidAPIState(index: number, remaining: number, resetsat: number, ip: string) {
   const store = getStore("rapidapi");
   const state = (await getRapidAPIState()) || { keys: [], ips: {} };
 
-  const keyIdx = state.keys.findIndex(k => k.key === key);
-  const keyEntry = { key, remaining, resetsat };
+  while (state.keys.length <= index) {
+    state.keys.push({ remaining: 500, resetsat: 0 });
+  }
 
-  if (keyIdx > -1) state.keys[keyIdx] = keyEntry;
-  else state.keys.push(keyEntry);
-
-  state.ips[ip] = (state.ips[ip] || 0) + 1;
+  state.keys[index] = { remaining, resetsat };
+  state.ips[ip] = Date.now();
 
   try {
-    await store.setJSON("state", state);
+    await store.setJSON("coolstate", state);
   } catch (e) {
     console.error("Failed to update RapidAPI state:", e);
   }
@@ -81,23 +65,7 @@ export default async (request: Request, context: Context) => {
   const accept = request.headers.get("accept") || "";
   const isJson = accept.includes("application/json");
 
-  // 1. Identify the real client IP
   const clientIp = getClientIp(request, context);
-
-  // 2. Enforce explicit subnet blocklist drops
-  const matchedSubnet = BANNED_SUBNETS.find(subnet => clientIp.startsWith(subnet));
-
-  if (matchedSubnet) {
-    console.warn(`[BLOCK] Blocked request for ID ${id} from Bot IP: ${clientIp} (Matched subnet: ${matchedSubnet}xx)`);
-
-    return new Response(
-      isJson ? JSON.stringify({ error: "Access denied" }) : "Access Denied",
-      {
-        status: 403,
-        headers: { "content-type": isJson ? "application/json" : "text/plain" }
-      }
-    );
-  }
 
   const rawKeys = Netlify.env.get("rkeys") || "";
   const allKeys = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
@@ -107,13 +75,57 @@ export default async (request: Request, context: Context) => {
   }
 
   let selectedKey = "";
+  let selectedIndex = 0;
   let state: RapidAPIState | null = null;
 
   if (isJson) {
     state = await getRapidAPIState();
-    selectedKey = selectBestKey(state, allKeys);
+
+    // ⚡ Elastic 1-Minute Cooldown Penalty Filter (Entropy Honeypot Mode)
+    if (state && state.ips[clientIp]) {
+      const lastRequestAt = state.ips[clientIp];
+      const BASE_COOLDOWN = 60000;
+      const timePassed = Date.now() - lastRequestAt;
+
+      if (timePassed <= BASE_COOLDOWN) {
+        const timeEarly = BASE_COOLDOWN - timePassed;
+
+        const store = getStore("rapidapi");
+        state.ips[clientIp] = Date.now() + timeEarly;
+        await store.setJSON("coolstate", state);
+
+        console.warn(`[VIOLATION] Sinking IP ${clientIp} into the 50MB random chunk loop. Deficit: ${(timeEarly / 1000).toFixed(1)}s.`);
+
+        // 🌊 Dynamic memory-safe lazy-loading noise pipe response
+        let chunksSent = 0;
+        const chunkSize = 64 * 1024; // 64KB chunks
+        const chunk = new Uint8Array(chunkSize);
+        const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize); // Target: ~50MB
+
+        const stream = new ReadableStream({
+          async pull(controller) {
+            if (chunksSent >= totalChunks) {
+              controller.close();
+              return;
+            }
+            crypto.getRandomValues(chunk);
+            controller.enqueue(new Uint8Array(chunk));
+            chunksSent++;
+          }
+        });
+
+        return new Response(stream, {
+          headers: { 'content-type': 'application/octet-stream' }
+        });
+      }
+    }
+
+    const selection = selectBestKey(state, allKeys);
+    selectedKey = selection.key;
+    selectedIndex = selection.index;
   } else {
-    selectedKey = allKeys[Math.floor(Math.random() * allKeys.length)];
+    selectedIndex = Math.floor(Math.random() * allKeys.length);
+    selectedKey = allKeys[selectedIndex];
   }
 
   try {
@@ -127,7 +139,7 @@ export default async (request: Request, context: Context) => {
     if (isJson) {
       const remaining = parseInt(res.headers.get("x-ratelimit-requests-remaining") || "0");
       const resetSec = parseInt(res.headers.get("x-ratelimit-requests-reset") || "0");
-      await updateRapidAPIState(selectedKey, remaining, Date.now() + resetSec * 1000, clientIp);
+      await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
     }
 
     if (!res.ok) throw new Error(`RapidAPI Error: ${res.status}`);
