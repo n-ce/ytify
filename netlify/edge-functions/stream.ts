@@ -1,12 +1,17 @@
 import { Config, Context } from "@netlify/edge-functions";
 import { getStore } from "@netlify/blobs";
 
+interface IPRecord {
+  lastSeen: number;
+  totalViolations: number;
+}
+
 interface RapidAPIState {
   keys: Array<{
     remaining: number;
     resetsat: number;
   }>;
-  ips: Record<string, number>;
+  ips: Record<string, IPRecord>;
 }
 
 const HARD_BANNED_SUBNETS = [
@@ -32,7 +37,7 @@ function getClientIp(request: Request, context: Context): string {
 async function getRapidAPIState() {
   const store = getStore("rapidapi");
   try {
-    return (await store.get("coolstate", { type: "json" })) as RapidAPIState | null;
+    return (await store.get("data", { type: "json" })) as RapidAPIState | null;
   } catch (e) {
     return null;
   }
@@ -61,10 +66,16 @@ async function updateRapidAPIState(index: number, remaining: number, resetsat: n
   }
 
   state.keys[index] = { remaining, resetsat };
-  state.ips[ip] = Date.now();
+  
+  // Clean request: Preserve historical total counts if they exist, update lastSeen timestamp
+  const existingRecord = state.ips[ip];
+  state.ips[ip] = {
+    lastSeen: Date.now(),
+    totalViolations: existingRecord ? existingRecord.totalViolations : 0
+  };
 
   try {
-    await store.setJSON("coolstate", state);
+    await store.setJSON("data", state);
   } catch (e) {
     console.error("Failed to update RapidAPI state:", e);
   }
@@ -77,10 +88,9 @@ export default async (request: Request, context: Context) => {
   const accept = request.headers.get("accept") || "";
   const isJson = accept.includes("application/json");
 
-  // 1. Resolve client IP instantly
   const clientIp = getClientIp(request, context);
 
-  // 2. ⚡ FAST GATEWAY DROP: Kick out offenders before reading data
+  // Fast gateway firewall drop
   const isBanned = HARD_BANNED_SUBNETS.some(subnet => clientIp.startsWith(subnet));
   if (isBanned) {
     console.warn(`[FAST-DROP] Blocked heavy abuser ${clientIp} at the gate.`);
@@ -106,25 +116,26 @@ export default async (request: Request, context: Context) => {
 
   if (isJson) {
     state = await getRapidAPIState();
+    const now = Date.now();
+    const BASE_COOLDOWN = 60000; 
 
-    // ⚡ Fixed Accumulative Stacking Cooldown Penalty Filter
     if (state && state.ips[clientIp]) {
-      const lastRequestAt = state.ips[clientIp];
-      const BASE_COOLDOWN = 60000;
-      const now = Date.now();
+      const record = state.ips[clientIp];
+      const timePassed = now - record.lastSeen;
 
-      if (lastRequestAt > now || (now - lastRequestAt) <= BASE_COOLDOWN) {
-        const currentTarget = lastRequestAt > now ? lastRequestAt : now;
-        const deficit = lastRequestAt > now ? (lastRequestAt - now) : (BASE_COOLDOWN - (now - lastRequestAt));
-        const penaltyIncrement = BASE_COOLDOWN + deficit;
+      // 🛑 The Simple Rule: If they hit the server within less than 60 seconds, drop them.
+      if (timePassed <= BASE_COOLDOWN) {
+        // Increment the metric tracking value for your personal logs
+        record.totalViolations += 1;
+        // Slide their lockout window base to right now
+        record.lastSeen = now;
 
         const store = getStore("rapidapi");
-        state.ips[clientIp] = currentTarget + penaltyIncrement;
-        await store.setJSON("coolstate", state);
+        await store.setJSON("data", state);
 
-        console.warn(`[VIOLATION] Sinking IP ${clientIp}. Penalty stacked to timestamp: ${state.ips[clientIp]}`);
+        console.warn(`[VIOLATION] IP ${clientIp} requested early. Metric Tracker: ${record.totalViolations}. Sinking into noise pipe.`);
 
-        // Infinite lazy-loading cryptographic entropy dump
+        // Infinite lazy-loading cryptographic entropy dump stream
         let chunksSent = 0;
         const chunkSize = 64 * 1024;
         const chunk = new Uint8Array(chunkSize);
