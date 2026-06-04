@@ -91,6 +91,7 @@ async function updateRapidAPIState(index: number, remaining: number, resetsat: n
 
 export default async (request: Request, context: Context) => {
   const { id } = context.params;
+  const cgeo = context.geo?.country?.code || "IN";
   if (!id || id.length < 11) return new Response("Invalid ID", { status: 400 });
 
   const accept = request.headers.get("accept") || "";
@@ -183,7 +184,7 @@ export default async (request: Request, context: Context) => {
   }
 
   try {
-    const res = await fetch(`https://yt-api.p.rapidapi.com/dl?id=${id}`, {
+    const res = await fetch(`https://yt-api.p.rapidapi.com/dl?id=${id}&cgeo=${cgeo}`, {
       headers: {
         "X-RapidAPI-Key": selectedKey,
         "X-RapidAPI-Host": "yt-api.p.rapidapi.com"
