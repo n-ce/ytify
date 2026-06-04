@@ -107,21 +107,19 @@ export default async (request: Request, context: Context) => {
   if (isJson) {
     state = await getRapidAPIState();
 
-    // ⚡ Accumulative Stacking coolstatedown Penalty Filter (Catching unknown/residential scrapers)
+    // ⚡ Fixed Accumulative Stacking Cooldown Penalty Filter
     if (state && state.ips[clientIp]) {
       const lastRequestAt = state.ips[clientIp];
-      const BASE_coolstateDOWN = 60000;
+      const BASE_COOLDOWN = 60000;
       const now = Date.now();
 
-      const isStillLocked = lastRequestAt > now;
-      const timePassed = now - lastRequestAt;
-
-      if (isStillLocked || timePassed <= BASE_coolstateDOWN) {
-        const timeEarly = isStillLocked ? BASE_coolstateDOWN : BASE_coolstateDOWN - timePassed;
-        const effectiveBase = isStillLocked ? lastRequestAt : now;
+      if (lastRequestAt > now || (now - lastRequestAt) <= BASE_COOLDOWN) {
+        const currentTarget = lastRequestAt > now ? lastRequestAt : now;
+        const deficit = lastRequestAt > now ? (lastRequestAt - now) : (BASE_COOLDOWN - (now - lastRequestAt));
+        const penaltyIncrement = BASE_COOLDOWN + deficit;
 
         const store = getStore("rapidapi");
-        state.ips[clientIp] = effectiveBase + timeEarly;
+        state.ips[clientIp] = currentTarget + penaltyIncrement;
         await store.setJSON("coolstate", state);
 
         console.warn(`[VIOLATION] Sinking IP ${clientIp}. Penalty stacked to timestamp: ${state.ips[clientIp]}`);
