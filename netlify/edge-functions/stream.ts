@@ -14,6 +14,7 @@ interface RapidAPIState {
   ips: Record<string, IPRecord>;
 }
 
+// 🛡️ The Heavy Offender Wall - Kicked out before any database or API interaction
 const HARD_BANNED_SUBNETS = [
   "190.217.64.",
   "190.107.19.",
@@ -23,7 +24,9 @@ const HARD_BANNED_SUBNETS = [
   "172.68.211.",
   "172.71.215.",
   "162.159.98.",
-  "172.68.225."
+  "172.68.225.",
+  "27.121.41.",
+  "27.121.6.",
 ];
 
 function getClientIp(request: Request, context: Context): string {
@@ -67,11 +70,15 @@ async function updateRapidAPIState(index: number, remaining: number, resetsat: n
 
   state.keys[index] = { remaining, resetsat };
   
-  // Clean request: Preserve historical total counts if they exist, update lastSeen timestamp
+  // Clean request: Safely resolve historical totals if transitioning from a raw numerical schema
   const existingRecord = state.ips[ip];
+  const historicalViolations = existingRecord && typeof existingRecord === 'object' 
+    ? existingRecord.totalViolations 
+    : 0;
+
   state.ips[ip] = {
     lastSeen: Date.now(),
-    totalViolations: existingRecord ? existingRecord.totalViolations : 0
+    totalViolations: historicalViolations
   };
 
   try {
@@ -121,19 +128,26 @@ export default async (request: Request, context: Context) => {
 
     if (state && state.ips[clientIp]) {
       const record = state.ips[clientIp];
-      const timePassed = now - record.lastSeen;
+      
+      // ✅ STRUCTURAL PROTECTION FALLBACK: Handle transitions from raw numbers to objects cleanly
+      const lastSeenTime = record && typeof record === 'object' ? record.lastSeen : Number(record || 0);
+      const timePassed = now - lastSeenTime;
 
       // 🛑 The Simple Rule: If they hit the server within less than 60 seconds, drop them.
       if (timePassed <= BASE_COOLDOWN) {
-        // Increment the metric tracking value for your personal logs
-        record.totalViolations += 1;
-        // Slide their lockout window base to right now
-        record.lastSeen = now;
+        // Guarantee structure allocation before setting internal values
+        if (!state.ips[clientIp] || typeof state.ips[clientIp] !== 'object') {
+          state.ips[clientIp] = { lastSeen: now, totalViolations: 0 };
+        }
+
+        // Increment tracking values safely for your metrics
+        state.ips[clientIp].totalViolations += 1;
+        state.ips[clientIp].lastSeen = now;
 
         const store = getStore("rapidapi");
         await store.setJSON("data", state);
 
-        console.warn(`[VIOLATION] IP ${clientIp} requested early. Metric Tracker: ${record.totalViolations}. Sinking into noise pipe.`);
+        console.warn(`[VIOLATION] IP ${clientIp} requested early. Metrics Accumulator: ${state.ips[clientIp].totalViolations}. Sinking into noise pipe.`);
 
         // Infinite lazy-loading cryptographic entropy dump stream
         let chunksSent = 0;
@@ -185,72 +199,4 @@ export default async (request: Request, context: Context) => {
       if (isJson) {
         await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
       }
-      throw new Error(`RapidAPI HTTP Error: ${res.status}`);
-    }
-
-    let data: any;
-    try {
-      data = JSON.parse(rawResponseText);
-    } catch (e) {
-      console.error(`[PARSE ERROR] Invalid JSON payload from RapidAPI: ${rawResponseText}`);
-      throw new Error("Received malformed JSON data payload from source API.");
-    }
-
-    if (!data || !data.adaptiveFormats) {
-      console.error(`[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`);
-    }
-
-    if (isJson) {
-      await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
-
-      return new Response(JSON.stringify({
-        title: data?.title || "Unknown Title",
-        author: data?.channelTitle || "Unknown Author",
-        authorId: data?.authorId || "",
-        lengthSeconds: data?.lengthSeconds || 0,
-        adaptiveFormats: data?.adaptiveFormats ? data.adaptiveFormats.map((f: any) => ({
-          ...f,
-          url: f.url + "&fallback"
-        })) : [],
-        liveNow: data?.isLiveContent || false
-      }), {
-        headers: {
-          "content-type": "application/json",
-          "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
-        }
-      });
-    }
-
-    const music = data.channelTitle?.endsWith(" - Topic") ? "https://wsrv.nl?w=180&h=180&fit=cover&url=" : "";
-    const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
-
-    return new Response(`<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="description" content="${data.title || ''} by ${(data.channelTitle || '').replace(' - Topic', '')} in ytify">
-  <meta property="og:title" content="${data.title || ''}">
-  <meta property="og:description" content="By ${(data.channelTitle || '').replace(' - Topic', '')}">
-  <meta property="og:image" content="${thumbnail}">
-  <meta property="og:type" content="website">
-  <title>${data.title || 'Playback'} | ytify</title>
-  <script>location.replace('/?s=${id}')</script>
-</head>
-<body>Redirecting...</body>
-</html>`, {
-      headers: {
-        "content-type": "text/html",
-        "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
-      }
-    });
-
-  } catch (err) {
-    console.error("Stream Edge Function failed:", err);
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 500,
-      headers: { "content-type": "application/json" }
-    });
-  }
-};
-
-export const config: Config = { path: "/s/:id" };
+      throw new Error(`RapidAPI HTTP
