@@ -103,13 +103,13 @@ export default async (request: Request, context: Context) => {
   const isBanned = HARD_BANNED_SUBNETS.some(subnet => clientIp.startsWith(subnet));
   if (isBanned) {
     console.warn(`[FAST-DROP] Blocked heavy abuser ${clientIp} at the gate.`);
-    return new Response(
-      isJson ? JSON.stringify({ error: "Access denied" }) : "Access Denied",
-      {
-        status: 403,
-        headers: { "content-type": isJson ? "application/json" : "text/plain" }
+    return new Response(null, {
+      status: 403,
+      headers: {
+        "Cache-Control": "public, s-maxage=86400",
+        "Vary": "x-forwarded-for"
       }
-    );
+    });
   }
 
   const rawKeys = Netlify.env.get("rkeys") || "";
@@ -126,7 +126,7 @@ export default async (request: Request, context: Context) => {
   if (isJson) {
     state = await getRapidAPIState();
     const now = Date.now();
-    const BASE_COOLDOWN = 60000; 
+    const BASE_COOLDOWN = 20000; 
 
     if (state && state.ips[clientIp]) {
       const record = state.ips[clientIp];
@@ -149,28 +149,14 @@ export default async (request: Request, context: Context) => {
         const store = getStore("rapidapi");
         await store.setJSON("data", state);
 
-        console.warn(`[VIOLATION] IP ${clientIp} requested early. Metrics Accumulator: ${state.ips[clientIp].totalViolations}. Sinking into noise pipe.`);
+        console.warn(`[VIOLATION] IP ${clientIp} requested early. Metrics Accumulator: ${state.ips[clientIp].totalViolations}. Returning cached empty 403.`);
 
-        // Infinite lazy-loading cryptographic entropy dump stream
-        let chunksSent = 0;
-        const chunkSize = 64 * 1024;
-        const chunk = new Uint8Array(chunkSize);
-        const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize);
-
-        const stream = new ReadableStream({
-          async pull(controller) {
-            if (chunksSent >= totalChunks) {
-              controller.close();
-              return;
-            }
-            crypto.getRandomValues(chunk);
-            controller.enqueue(new Uint8Array(chunk));
-            chunksSent++;
+        return new Response(null, {
+          status: 403,
+          headers: {
+            "Cache-Control": "public, s-maxage=86400",
+            "Vary": "x-forwarded-for"
           }
-        });
-
-        return new Response(stream, {
-          headers: { 'content-type': 'application/octet-stream' }
         });
       }
     }
