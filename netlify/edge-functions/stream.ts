@@ -27,6 +27,7 @@ const HARD_BANNED_SUBNETS = [
   "172.68.225.",
   "27.121.41.",
   "27.121.6.",
+  "184.174.140." 
 ];
 
 function getClientIp(request: Request, context: Context): string {
@@ -199,4 +200,72 @@ export default async (request: Request, context: Context) => {
       if (isJson) {
         await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
       }
-      throw new Error(`RapidAPI HTTP
+      throw new Error(`RapidAPI HTTP Error: ${res.status}`);
+    }
+
+    let data: any;
+    try {
+      data = JSON.parse(rawResponseText);
+    } catch (e) {
+      console.error(`[PARSE ERROR] Invalid JSON payload from RapidAPI: ${rawResponseText}`);
+      throw new Error("Received malformed JSON data payload from source API.");
+    }
+
+    if (!data || !data.adaptiveFormats) {
+      console.error(`[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`);
+    }
+
+    if (isJson) {
+      await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
+
+      return new Response(JSON.stringify({
+        title: data?.title || "Unknown Title",
+        author: data?.channelTitle || "Unknown Author",
+        authorId: data?.authorId || "",
+        lengthSeconds: data?.lengthSeconds || 0,
+        adaptiveFormats: data?.adaptiveFormats ? data.adaptiveFormats.map((f: any) => ({
+          ...f,
+          url: f.url + "&fallback"
+        })) : [],
+        liveNow: data?.isLiveContent || false
+      }), {
+        headers: {
+          "content-type": "application/json",
+          "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
+        }
+      });
+    }
+
+    const music = data.channelTitle?.endsWith(" - Topic") ? "https://wsrv.nl?w=180&h=180&fit=cover&url=" : "";
+    const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
+
+    return new Response(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="${data.title || ''} by ${(data.channelTitle || '').replace(' - Topic', '')} in ytify">
+  <meta property="og:title" content="${data.title || ''}">
+  <meta property="og:description" content="By ${(data.channelTitle || '').replace(' - Topic', '')}">
+  <meta property="og:image" content="${thumbnail}">
+  <meta property="og:type" content="website">
+  <title>${data.title || 'Playback'} | ytify</title>
+  <script>location.replace('/?s=${id}')</script>
+</head>
+<body>Redirecting...</body>
+</html>`, {
+      headers: {
+        "content-type": "text/html",
+        "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
+      }
+    });
+
+  } catch (err) {
+    console.error("Stream Edge Function failed:", err);
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
+      status: 500,
+      headers: { "content-type": "application/json" }
+    });
+  }
+};
+
+export const config: Config = { path: "/s/:id" };
