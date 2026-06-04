@@ -10,6 +10,18 @@ interface RapidAPIState {
   ips: Record<string, number>;
 }
 
+// Helper to safely extract the actual user IP behind the proxy
+function getClientIp(request: Request, context: Context): string {
+  const xForwardedFor = request.headers.get("x-forwarded-for");
+  if (xForwardedFor) {
+    // x-forwarded-for can be a comma-separated chain (client, proxy1, proxy2). 
+    // The first one is always the true client.
+    return xForwardedFor.split(",")[0].trim();
+  }
+  // Netlify specific true client IP fallback, then final fallback to context
+  return request.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
+}
+
 async function getRapidAPIState() {
   const store = getStore("rapidapi");
   try {
@@ -30,7 +42,6 @@ function selectBestKey(state: RapidAPIState | null, allKeys: string[]): string {
     return entry;
   });
 
-  // Sort by remaining descending, then by resetsat ascending
   available.sort((a, b) => b.remaining - a.remaining || a.resetsat - b.resetsat);
   return available[0].key;
 }
@@ -38,15 +49,15 @@ function selectBestKey(state: RapidAPIState | null, allKeys: string[]): string {
 async function updateRapidAPIState(key: string, remaining: number, resetsat: number, ip: string) {
   const store = getStore("rapidapi");
   const state = (await getRapidAPIState()) || { keys: [], ips: {} };
-  
+
   const keyIdx = state.keys.findIndex(k => k.key === key);
   const keyEntry = { key, remaining, resetsat };
-  
+
   if (keyIdx > -1) state.keys[keyIdx] = keyEntry;
   else state.keys.push(keyEntry);
-  
+
   state.ips[ip] = (state.ips[ip] || 0) + 1;
-  
+
   try {
     await store.setJSON("state", state);
   } catch (e) {
@@ -61,9 +72,12 @@ export default async (request: Request, context: Context) => {
   const accept = request.headers.get("accept") || "";
   const isJson = accept.includes("application/json");
 
+  // Get the TRUE visitor IP
+  const clientIp = getClientIp(request, context);
+
   const rawKeys = Netlify.env.get("rkeys") || "";
   const allKeys = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
-  
+
   if (!allKeys.length) {
     return new Response(JSON.stringify({ error: "No API keys configured" }), { status: 500 });
   }
@@ -73,6 +87,16 @@ export default async (request: Request, context: Context) => {
 
   if (isJson) {
     state = await getRapidAPIState();
+
+    // OPTIONAL: Early rate limit enforcement using your existing blob tracking.
+    // If a single actual IP has made more than 30 total recorded requests, block them.
+    if (state && state.ips[clientIp] && state.ips[clientIp] > 30) {
+      return new Response(JSON.stringify({ error: "Too many requests from this IP." }), {
+        status: 429,
+        headers: { "content-type": "application/json" }
+      });
+    }
+
     selectedKey = selectBestKey(state, allKeys);
   } else {
     selectedKey = allKeys[Math.floor(Math.random() * allKeys.length)];
@@ -89,7 +113,8 @@ export default async (request: Request, context: Context) => {
     if (isJson) {
       const remaining = parseInt(res.headers.get("x-ratelimit-requests-remaining") || "0");
       const resetSec = parseInt(res.headers.get("x-ratelimit-requests-reset") || "0");
-      await updateRapidAPIState(selectedKey, remaining, Date.now() + resetSec * 1000, context.ip);
+      // Use clientIp here instead of context.ip
+      await updateRapidAPIState(selectedKey, remaining, Date.now() + resetSec * 1000, clientIp);
     }
 
     if (!res.ok) throw new Error(`RapidAPI Error: ${res.status}`);
@@ -106,11 +131,11 @@ export default async (request: Request, context: Context) => {
           url: f.url + "&fallback"
         })),
         liveNow: data.isLiveContent
-      }), { 
-        headers: { 
+      }), {
+        headers: {
           "content-type": "application/json",
           "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
-        } 
+        }
       });
     }
 
@@ -130,16 +155,16 @@ export default async (request: Request, context: Context) => {
   <script>location.replace('/?s=${id}')</script>
 </head>
 <body>Redirecting...</body>
-</html>`, { 
-      headers: { 
+</html>`, {
+      headers: {
         "content-type": "text/html",
         "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
-      } 
+      }
     });
 
   } catch (err) {
     console.error("Stream Edge Function failed:", err);
-    return new Response(JSON.stringify({ error: (err as Error).message }), { 
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { "content-type": "application/json" }
     });
