@@ -221,12 +221,17 @@ export default async (request: Request, context: Context) => {
       return new Response(JSON.stringify({
         title: data?.title || "Unknown Title",
         author: data?.channelTitle || "Unknown Author",
-        authorId: data?.authorId || "",
-        lengthSeconds: data?.lengthSeconds || 0,
+        authorId: data?.authorId || data?.channelId || "",
+        lengthSeconds: parseInt(data?.lengthSeconds || "0"),
         adaptiveFormats: data?.adaptiveFormats ? data.adaptiveFormats.map((f: any) => ({
           ...f,
+          type: f.mimeType,
+          bitrate: f.bitrate?.toString() || "",
+          clen: f.contentLength,
           url: f.url + "&fallback"
         })) : [],
+        recommendedVideos: [],
+        captions: [],
         liveNow: data?.isLiveContent || false
       }), {
         headers: {
