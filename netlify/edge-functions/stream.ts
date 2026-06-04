@@ -9,6 +9,18 @@ interface RapidAPIState {
   ips: Record<string, number>;
 }
 
+const HARD_BANNED_SUBNETS = [
+  "190.217.64.",
+  "190.107.19.",
+  "203.28.67.",
+  "210.14.11.",
+  "162.158.179.",
+  "172.68.211.",
+  "172.71.215.",
+  "162.159.98.",
+  "172.68.225."
+];
+
 function getClientIp(request: Request, context: Context): string {
   const xForwardedFor = request.headers.get("x-forwarded-for");
   if (xForwardedFor) {
@@ -65,7 +77,21 @@ export default async (request: Request, context: Context) => {
   const accept = request.headers.get("accept") || "";
   const isJson = accept.includes("application/json");
 
+  // 1. Resolve client IP instantly
   const clientIp = getClientIp(request, context);
+
+  // 2. ⚡ FAST GATEWAY DROP: Kick out offenders before reading data
+  const isBanned = HARD_BANNED_SUBNETS.some(subnet => clientIp.startsWith(subnet));
+  if (isBanned) {
+    console.warn(`[FAST-DROP] Blocked heavy abuser ${clientIp} at the gate.`);
+    return new Response(
+      isJson ? JSON.stringify({ error: "Access denied" }) : "Access Denied",
+      {
+        status: 403,
+        headers: { "content-type": isJson ? "application/json" : "text/plain" }
+      }
+    );
+  }
 
   const rawKeys = Netlify.env.get("rkeys") || "";
   const allKeys = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
@@ -81,26 +107,30 @@ export default async (request: Request, context: Context) => {
   if (isJson) {
     state = await getRapidAPIState();
 
-    // ⚡ Elastic 1-Minute Cooldown Penalty Filter (Entropy Honeypot Mode)
+    // ⚡ Accumulative Stacking coolstatedown Penalty Filter (Catching unknown/residential scrapers)
     if (state && state.ips[clientIp]) {
       const lastRequestAt = state.ips[clientIp];
-      const BASE_COOLDOWN = 60000;
-      const timePassed = Date.now() - lastRequestAt;
+      const BASE_coolstateDOWN = 60000;
+      const now = Date.now();
 
-      if (timePassed <= BASE_COOLDOWN) {
-        const timeEarly = BASE_COOLDOWN - timePassed;
+      const isStillLocked = lastRequestAt > now;
+      const timePassed = now - lastRequestAt;
+
+      if (isStillLocked || timePassed <= BASE_coolstateDOWN) {
+        const timeEarly = isStillLocked ? BASE_coolstateDOWN : BASE_coolstateDOWN - timePassed;
+        const effectiveBase = isStillLocked ? lastRequestAt : now;
 
         const store = getStore("rapidapi");
-        state.ips[clientIp] = Date.now() + timeEarly;
+        state.ips[clientIp] = effectiveBase + timeEarly;
         await store.setJSON("coolstate", state);
 
-        console.warn(`[VIOLATION] Sinking IP ${clientIp} into the 50MB random chunk loop. Deficit: ${(timeEarly / 1000).toFixed(1)}s.`);
+        console.warn(`[VIOLATION] Sinking IP ${clientIp}. Penalty stacked to timestamp: ${state.ips[clientIp]}`);
 
-        // 🌊 Dynamic memory-safe lazy-loading noise pipe response
+        // Infinite lazy-loading cryptographic entropy dump
         let chunksSent = 0;
-        const chunkSize = 64 * 1024; // 64KB chunks
+        const chunkSize = 64 * 1024;
         const chunk = new Uint8Array(chunkSize);
-        const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize); // Target: ~50MB
+        const totalChunks = Math.ceil((50 * 1024 * 1024) / chunkSize);
 
         const stream = new ReadableStream({
           async pull(controller) {
@@ -136,26 +166,44 @@ export default async (request: Request, context: Context) => {
       }
     });
 
-    if (isJson) {
-      const remaining = parseInt(res.headers.get("x-ratelimit-requests-remaining") || "0");
-      const resetSec = parseInt(res.headers.get("x-ratelimit-requests-reset") || "0");
-      await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
+    const remaining = parseInt(res.headers.get("x-ratelimit-requests-remaining") || "0");
+    const resetSec = parseInt(res.headers.get("x-ratelimit-requests-reset") || "0");
+
+    const rawResponseText = await res.text();
+
+    if (!res.ok) {
+      console.error(`[RAPIDAPI ERROR] Key Index: ${selectedIndex}, Status: ${res.status}. Raw Payload: ${rawResponseText}`);
+      if (isJson) {
+        await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
+      }
+      throw new Error(`RapidAPI HTTP Error: ${res.status}`);
     }
 
-    if (!res.ok) throw new Error(`RapidAPI Error: ${res.status}`);
-    const data = await res.json();
+    let data: any;
+    try {
+      data = JSON.parse(rawResponseText);
+    } catch (e) {
+      console.error(`[PARSE ERROR] Invalid JSON payload from RapidAPI: ${rawResponseText}`);
+      throw new Error("Received malformed JSON data payload from source API.");
+    }
+
+    if (!data || !data.adaptiveFormats) {
+      console.error(`[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`);
+    }
 
     if (isJson) {
+      await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
+
       return new Response(JSON.stringify({
-        title: data.title,
-        author: data.channelTitle,
-        authorId: data.authorId,
-        lengthSeconds: data.lengthSeconds,
-        adaptiveFormats: data.adaptiveFormats.map((f: any) => ({
+        title: data?.title || "Unknown Title",
+        author: data?.channelTitle || "Unknown Author",
+        authorId: data?.authorId || "",
+        lengthSeconds: data?.lengthSeconds || 0,
+        adaptiveFormats: data?.adaptiveFormats ? data.adaptiveFormats.map((f: any) => ({
           ...f,
           url: f.url + "&fallback"
-        })),
-        liveNow: data.isLiveContent
+        })) : [],
+        liveNow: data?.isLiveContent || false
       }), {
         headers: {
           "content-type": "application/json",
@@ -164,19 +212,19 @@ export default async (request: Request, context: Context) => {
       });
     }
 
-    const music = data.channelTitle.endsWith(" - Topic") ? "https://wsrv.nl?w=180&h=180&fit=cover&url=" : "";
+    const music = data.channelTitle?.endsWith(" - Topic") ? "https://wsrv.nl?w=180&h=180&fit=cover&url=" : "";
     const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
 
     return new Response(`<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="${data.title} by ${data.channelTitle.replace(' - Topic', '')} in ytify">
-  <meta property="og:title" content="${data.title}">
-  <meta property="og:description" content="By ${data.channelTitle.replace(' - Topic', '')}">
+  <meta name="description" content="${data.title || ''} by ${(data.channelTitle || '').replace(' - Topic', '')} in ytify">
+  <meta property="og:title" content="${data.title || ''}">
+  <meta property="og:description" content="By ${(data.channelTitle || '').replace(' - Topic', '')}">
   <meta property="og:image" content="${thumbnail}">
   <meta property="og:type" content="website">
-  <title>${data.title} | ytify</title>
+  <title>${data.title || 'Playback'} | ytify</title>
   <script>location.replace('/?s=${id}')</script>
 </head>
 <body>Redirecting...</body>
