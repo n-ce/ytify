@@ -1,6 +1,6 @@
 {
   "name": "ytify",
-  "version": "8.3.23",
+  "version": "8.3.24",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,11 +13,11 @@
     "sortablejs": "^1.15.7"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260604.1",
+    "@cloudflare/workers-types": "^4.20260606.1",
     "@netlify/blobs": "^10.7.9",
     "@netlify/edge-functions": "^3.0.8",
     "@netlify/functions": "^5.3.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "@types/sortablejs": "^1.15.9",
     "autoprefixer": "^10.5.0",
     "eruda": "^3.4.3",

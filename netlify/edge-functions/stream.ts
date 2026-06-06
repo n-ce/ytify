@@ -27,7 +27,7 @@ const HARD_BANNED_SUBNETS = [
   "172.68.225.",
   "27.121.41.",
   "27.121.6.",
-  "184.174.140." 
+  "184.174.140."
 ];
 
 function getClientIp(request: Request, context: Context): string {
@@ -70,11 +70,11 @@ async function updateRapidAPIState(index: number, remaining: number, resetsat: n
   }
 
   state.keys[index] = { remaining, resetsat };
-  
+
   // Clean request: Safely resolve historical totals if transitioning from a raw numerical schema
   const existingRecord = state.ips[ip];
-  const historicalViolations = existingRecord && typeof existingRecord === 'object' 
-    ? existingRecord.totalViolations 
+  const historicalViolations = existingRecord && typeof existingRecord === 'object'
+    ? existingRecord.totalViolations
     : 0;
 
   state.ips[ip] = {
@@ -126,11 +126,11 @@ export default async (request: Request, context: Context) => {
   if (isJson) {
     state = await getRapidAPIState();
     const now = Date.now();
-    const BASE_COOLDOWN = 20000; 
+    const BASE_COOLDOWN = 20000;
 
     if (state && state.ips[clientIp]) {
       const record = state.ips[clientIp];
-      
+
       // ✅ STRUCTURAL PROTECTION FALLBACK: Handle transitions from raw numbers to objects cleanly
       const lastSeenTime = record && typeof record === 'object' ? record.lastSeen : Number(record || 0);
       const timePassed = now - lastSeenTime;
@@ -202,6 +202,8 @@ export default async (request: Request, context: Context) => {
       console.error(`[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`);
     }
 
+    const expireSeconds = parseInt(data?.expiresInSeconds || "21600");
+
     if (isJson) {
       await updateRapidAPIState(selectedIndex, remaining, Date.now() + resetSec * 1000, clientIp);
 
@@ -223,7 +225,8 @@ export default async (request: Request, context: Context) => {
       }), {
         headers: {
           "content-type": "application/json",
-          "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
+          "Cache-Control": `public, s-maxage=${expireSeconds}`,
+          "Vary": "Accept, x-nf-country"
         }
       });
     }
@@ -247,7 +250,8 @@ export default async (request: Request, context: Context) => {
 </html>`, {
       headers: {
         "content-type": "text/html",
-        "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600"
+        "Cache-Control": "public, s-maxage=604800",
+        "Vary": "Accept"
       }
     });
 

@@ -29,7 +29,8 @@ export default function Dropdown() {
 
   function exportLibrary() {
     const link = document.createElement('a');
-    link.download = 'ytify_library.json';
+    const date = new Date().toISOString().split('T')[0];
+    link.download = `ytify_library_${date}.json`;
 
     const exportedData: { [key: string]: any } = {};
     for (let i = 0; i < localStorage.length; i++) {
