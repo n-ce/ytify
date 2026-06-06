@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { closeFeature, navStore, setNavStore, updateParam, setStore, store } from "@stores";
+import { setNavStore, updateParam, setStore, store } from "@stores";
 import { getLibraryAlbums, drawer } from "@utils";
 
 const initialState = () => ({
@@ -33,10 +33,7 @@ export async function getList(
   setListStore('hasContinuation', false);
 
   setListStore('isLoading', true);
-  if (navStore.list.state)
-    navStore.list.ref?.scrollIntoView();
-  else
-    setNavStore('list', 'state', true);
+  setNavStore('active', 'list');
 
   if (!all) updateParam(type, id);
 
@@ -108,8 +105,7 @@ export async function getList(
 }
 
 export function resetList() {
-  setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', true);
-  closeFeature('list');
+  setNavStore('active', drawer.lastMainFeature as 'search' | 'library');
   listStore.observer.disconnect();
 
   updateParam('collection');

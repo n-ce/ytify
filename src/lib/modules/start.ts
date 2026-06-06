@@ -6,7 +6,7 @@ import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig,
 export default async function() {
 
   if (!params.size) {
-    setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', true);
+    setNavStore('active', drawer.lastMainFeature as 'search' | 'library');
   }
 
   // Handle /s/:id URLs by transforming them to /?s=id internally
@@ -46,7 +46,7 @@ export default async function() {
     const f = params.get('f') || 'all';
     setConfig('searchFilter', f);
     setSearchStore('query', q);
-    setNavStore('search', 'state', true);
+    setNavStore('active', 'search');
   }
 
 

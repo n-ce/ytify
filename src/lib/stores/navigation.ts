@@ -11,42 +11,41 @@ const Settings = lazy(() => import('@features/Settings'));
 export const params = (new URL(location.href)).searchParams;
 
 
-type Nav = { [key in Features]: {
-  ref: HTMLElement | null,
-  state: boolean,
-  component: () => JSX.Element
-} }
+export type MainFeature = 'search' | 'library' | 'list' | 'settings';
+export type SidePanel = 'queue' | 'player';
+export type Feature = MainFeature | SidePanel;
 
-export const [navStore, setNavStore] = createStore<Nav>({
+type Nav = { 
+  [key in MainFeature]: {
+    ref: HTMLElement | null,
+    component: () => JSX.Element
+  }
+} & {
+  [key in SidePanel]: {
+    ref: HTMLElement | null,
+    state: boolean,
+    component: () => JSX.Element
+  }
+}
+
+import { drawer } from "@utils";
+
+export const [navStore, setNavStore] = createStore<Nav & { active: MainFeature }>({
+  active: drawer.lastMainFeature as MainFeature,
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
-  search: { ref: null, state: false, component: Search },
-  library: { ref: null, state: false, component: Library },
-  list: { ref: null, state: false, component: List },
-  settings: { ref: null, state: false, component: Settings },
+  search: { ref: null, component: Search },
+  library: { ref: null, component: Library },
+  list: { ref: null, component: List },
+  settings: { ref: null, component: Settings },
 });
 
 
 
-export function closeFeature(name: Features) {
-  const keys = Object.keys(navStore);
-  const removedIndex = keys.indexOf(name);
-
-  const active = Object.entries(navStore)
-    .filter(f => f[1].state && f[0] !== name)
-    .sort((a, b) => {
-      const aa = Math.abs(keys.indexOf(a[0]) - removedIndex);
-      const bb = Math.abs(keys.indexOf(b[0]) - removedIndex);
-      return aa - bb;
-    });
-
-  const closestRef = active[0]?.[1]?.ref;
-
-  if (removedIndex >= 3)
-    closestRef?.scrollIntoView();
-
-
-  setNavStore(name, { ref: null, state: false });
+export function closeFeature(name: Feature) {
+  if (name === 'queue' || name === 'player') {
+    setNavStore(name, 'state', false);
+  }
 }
 
 type Params = 'q' | 's' | 'f' | 'collection' | 'playlist' | 'channel' | 'artist' | 'album' | 'si' | 't';

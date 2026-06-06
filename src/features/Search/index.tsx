@@ -36,11 +36,11 @@ export default function() {
               onclick={toggleFullScreen}
             ></i>
           </Show>
-          <Show when={!navStore.settings.state}>
+          <Show when={navStore.active !== 'settings'}>
             <i
               class="ri-settings-line"
               aria-label={t('nav_settings')}
-              onclick={() => setNavStore('settings', 'state', true)}
+              onclick={() => setNavStore('active', 'settings')}
             ></i>
           </Show>
         </div>

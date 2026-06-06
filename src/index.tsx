@@ -1,6 +1,6 @@
 /* @refresh reload */
 
-import { For, lazy, onMount, Show } from 'solid-js';
+import { lazy, onMount, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import { themer, syncLibrary } from '@utils';
 import NavBar from '@components/NavBar.tsx';
@@ -30,16 +30,27 @@ export default function App() {
     syncLibrary('init');
   });
 
+  const Search = navStore.search.component;
+  const Library = navStore.library.component;
+  const List = navStore.list.component;
+  const Settings = navStore.settings.component;
+  const Queue = navStore.queue.component;
+  const Player = navStore.player.component;
+
   return (
     <>
       <main>
-        <For each={Object.values(navStore)}>
-          {(item) =>
-            <Show when={item.state}>
-              <item.component />
-            </Show>
-          }
-        </For>
+        <Show when={navStore.queue.state}>
+          <Queue />
+        </Show>
+        <Show when={navStore.player.state}>
+          <Player />
+        </Show>
+
+        <Show when={navStore.active === 'search'}><Search /></Show>
+        <Show when={navStore.active === 'library'}><Library /></Show>
+        <Show when={navStore.active === 'list'}><List /></Show>
+        <Show when={navStore.active === 'settings'}><Settings /></Show>
       </main>
       <footer>
         <Show when={!navStore.player.state && playerStore.playbackState !== 'none'}>
