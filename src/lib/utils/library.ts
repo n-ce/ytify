@@ -297,11 +297,7 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
-  const { state, ref } = navStore.list;
-  if (state)
-    ref?.scrollIntoView();
-  else
-    setNavStore('list', 'state', true);
+  setNavStore('active', 'list');
 
   setListStore('isLoading', true);
 
@@ -325,7 +321,6 @@ export async function fetchCollection(
     updateParam('collection', id);
   }
 
-  setNavStore('list', 'state', true);
   setListStore('isLoading', false);
 
   document.title = display + ' - ytify';

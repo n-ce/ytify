@@ -40,7 +40,7 @@ export default function() {
             <i
               class="ri-settings-line"
               aria-label={t('nav_settings')}
-              onclick={() => setNavStore('settings', 'state', true)}
+              onclick={() => setNavStore('active', 'settings')}
             ></i>
           </Show>
         </div>

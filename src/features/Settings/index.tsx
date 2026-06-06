@@ -1,6 +1,6 @@
 import { onMount, createEffect, For, createSignal, Show } from "solid-js";
 import './Settings.css';
-import { closeFeature, setNavStore, t, setStore, updateLang } from '@stores';
+import { setNavStore, t, setStore, updateLang } from '@stores';
 import { Selector } from '@components/Selector.tsx';
 import { config, setConfig, drawer, setDrawer, cssVar, themer, quickSwitch, deleteCollection, getCollection } from '@utils';
 import Dropdown from "./Dropdown";
@@ -51,7 +51,7 @@ export default function() {
         <p>ytify {Build}</p>
         <i
           aria-label={t('close')}
-          class="ri-close-large-line" onclick={() => closeFeature('settings')}></i>
+          class="ri-close-large-line" onclick={() => setNavStore('active', drawer.lastMainFeature as 'search' | 'library')}></i>
         <Dropdown />
       </header>
       <div>

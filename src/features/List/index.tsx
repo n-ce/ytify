@@ -1,7 +1,7 @@
 import { createSignal, For, onMount, Show } from 'solid-js';
 import './List.css';
 import { addToQueue, listStore, resetList, setNavStore, t } from '@stores';
-import { fetchCollection, removeFromCollection, setConfig, config, drawer, generateImageUrl } from '@utils';
+import { fetchCollection, removeFromCollection, setConfig, config, generateImageUrl } from '@utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
@@ -22,8 +22,6 @@ export default function() {
   onMount(() => {
     setNavStore('list', 'ref', listSection);
     listSection.scrollIntoView();
-    listSection.scrollTo(0, 0);
-    setNavStore(drawer.lastMainFeature as 'search' | 'library', 'state', false);
   });
 
 

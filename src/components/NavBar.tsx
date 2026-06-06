@@ -16,34 +16,24 @@ export default function() {
 
       <i
         aria-label={t('nav_search')}
-        class={'ri-search-2-' + (navStore.search.state ? 'fill' : 'line')
+        class={'ri-search-2-' + (navStore.active === 'search' ? 'fill' : 'line')
         }
         classList={{
-          'on': navStore.search.state
+          'on': navStore.active === 'search'
         }}
         onclick={() => {
-          const state = !navStore.search.state;
-          setNavStore('search', 'state', state);
-          if (state) {
-            setNavStore('library', 'state', false);
-            navStore.search.ref?.scrollIntoView();
-            setDrawer('lastMainFeature', 'search');
-          }
+          setNavStore('active', 'search');
+          setDrawer('lastMainFeature', 'search');
         }}
       ></i>
 
       <i
         aria-label={t('nav_library')}
-        class={'ri-archive-stack-' + (navStore.library.state ? 'fill' : 'line')}
-        classList={{ 'on': navStore.library.state }}
+        class={'ri-archive-stack-' + (navStore.active === 'library' ? 'fill' : 'line')}
+        classList={{ 'on': navStore.active === 'library' }}
         onclick={() => {
-          const state = !navStore.library.state;
-          setNavStore('library', 'state', state);
-          if (state) {
-            setNavStore('search', 'state', false);
-            navStore.library.ref?.scrollIntoView();
-            setDrawer('lastMainFeature', 'library');
-          }
+          setNavStore('active', 'library');
+          setDrawer('lastMainFeature', 'library');
         }}
       ></i>
 

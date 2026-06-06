@@ -46,7 +46,7 @@ export default async function() {
     const f = params.get('f') || 'all';
     setConfig('searchFilter', f);
     setSearchStore('query', q);
-    setNavStore('search', 'state', true);
+    setNavStore('active', 'search');
   }
 
 

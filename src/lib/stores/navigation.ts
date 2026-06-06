@@ -11,13 +11,19 @@ const Settings = lazy(() => import('@features/Settings'));
 export const params = (new URL(location.href)).searchParams;
 
 
+export type MainFeature = 'search' | 'library' | 'list' | 'settings';
+export type Feature = MainFeature | 'queue' | 'player';
+
 type Nav = { [key in Features]: {
   ref: HTMLElement | null,
   state: boolean,
   component: () => JSX.Element
 } }
 
-export const [navStore, setNavStore] = createStore<Nav>({
+import { drawer } from "@utils";
+
+export const [navStore, setNavStore] = createStore<Nav & { active: MainFeature }>({
+  active: drawer.lastMainFeature as MainFeature,
   queue: { ref: null, state: false, component: Queue },
   player: { ref: null, state: false, component: Player },
   search: { ref: null, state: false, component: Search },
@@ -29,23 +35,6 @@ export const [navStore, setNavStore] = createStore<Nav>({
 
 
 export function closeFeature(name: Features) {
-  const keys = Object.keys(navStore);
-  const removedIndex = keys.indexOf(name);
-
-  const active = Object.entries(navStore)
-    .filter(f => f[1].state && f[0] !== name)
-    .sort((a, b) => {
-      const aa = Math.abs(keys.indexOf(a[0]) - removedIndex);
-      const bb = Math.abs(keys.indexOf(b[0]) - removedIndex);
-      return aa - bb;
-    });
-
-  const closestRef = active[0]?.[1]?.ref;
-
-  if (removedIndex >= 3)
-    closestRef?.scrollIntoView();
-
-
   setNavStore(name, { ref: null, state: false });
 }
 

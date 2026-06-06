@@ -125,7 +125,7 @@ export default function() {
               isShared: true,
               list: frequentlyPlayedItems as YTItem[],
             });
-            setNavStore('list', 'state', true);
+            setNavStore('active', 'list');
           }}
         >
           <i class="ri-bar-chart-2-fill"></i>
@@ -141,7 +141,7 @@ export default function() {
               isShared: true,
               list: discoveryItems as YTItem[],
             });
-            setNavStore('list', 'state', true);
+            setNavStore('active', 'list');
           }}
         >
           <i class="ri-compass-3-fill"></i>
