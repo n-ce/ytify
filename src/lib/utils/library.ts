@@ -285,9 +285,9 @@ export function rehydrateStores() {
     fetchCollection(listStore.id);
   }
 
-  if (navStore.library.state) {
-    setNavStore('library', 'state', false);
-    setTimeout(() => setNavStore('library', 'state', true), 10);
+  if (navStore.active === 'library') {
+    setNavStore('active', '' as 'library');
+    setTimeout(() => setNavStore('active', 'library'), 10);
   }
 }
 
