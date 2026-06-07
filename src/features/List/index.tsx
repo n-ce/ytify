@@ -1,7 +1,7 @@
-import { createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, For, onMount, Show, onCleanup } from 'solid-js';
 import './List.css';
 import { addToQueue, listStore, resetList, setNavStore, t } from '@stores';
-import { fetchCollection, removeFromCollection, setConfig, config, generateImageUrl } from '@utils';
+import { fetchCollection, removeFromCollection, setConfig, config, generateImageUrl, setDrawer } from '@utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
@@ -22,6 +22,17 @@ export default function() {
   onMount(() => {
     setNavStore('list', 'ref', listSection);
     listSection.scrollIntoView();
+  });
+
+  onCleanup(() => {
+    if (listStore.id) {
+      setDrawer('lastList', {
+        id: listStore.id,
+        type: listStore.type === 'playlists' ? 'playlist' : (listStore.type === 'channels' ? 'channel' : listStore.type),
+        shared: listStore.isShared
+      });
+    }
+    resetList();
   });
 
 
@@ -97,11 +108,6 @@ export default function() {
               if (!markMode())
                 setMarkList([]);
             }}
-          ></i>
-          <i
-            aria-label={t('close')}
-            class="ri-close-large-line"
-            onclick={resetList}
           ></i>
         </div>
         <Dropdown />

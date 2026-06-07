@@ -53,6 +53,7 @@ export let drawer = {
   recentSearches: [] as string[],
   discovery: [] as (YTItem & { frequency: number })[],
   lastMainFeature: 'search' as 'search' | 'library',
+  lastList: null as { id: string, type: string, shared?: boolean } | null,
   libraryPlays: {} as Record<string, number>,
 }
 const savedDrawer = localStorage.getItem('drawer');
@@ -60,6 +61,7 @@ if (savedDrawer) {
   const parsed = JSON.parse(savedDrawer) as Record<string, unknown>;
   (Object.keys(drawer) as (keyof AppDrawer)[]).forEach(key => {
     if (parsed[key] !== undefined) {
+      if (key === 'lastMainFeature' && parsed[key] !== 'search' && parsed[key] !== 'library') return;
       (drawer as Record<keyof AppDrawer, unknown>)[key] = parsed[key];
     }
   });

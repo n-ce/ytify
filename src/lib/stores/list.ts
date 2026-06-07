@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { setNavStore, updateParam, setStore, store } from "@stores";
+import { setNavStore, updateParam, setStore, store, navStore } from "@stores";
 import { getLibraryAlbums, drawer } from "@utils";
 
 const initialState = () => ({
@@ -105,7 +105,9 @@ export async function getList(
 }
 
 export function resetList() {
-  setNavStore('active', drawer.lastMainFeature as 'search' | 'library');
+  if (navStore.active === 'list') {
+    setNavStore('active', drawer.lastMainFeature as 'search' | 'library');
+  }
   listStore.observer.disconnect();
 
   updateParam('collection');
