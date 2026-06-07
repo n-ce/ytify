@@ -1,4 +1,4 @@
-import { navStore, setNavStore, t, getList, resetList } from "@stores";
+import { navStore, setNavStore, t, getList } from "@stores";
 import { setDrawer, drawer, fetchCollection } from "@utils";
 
 export default function() {
