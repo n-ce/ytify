@@ -1,7 +1,7 @@
 import { Accessor, Show, createSignal } from 'solid-js';
 import './StreamItem.css';
 import { config, hostResolver, player, removeFromCollection, getCollectionItems, generateImageUrl } from '@utils';
-import { setStore, store, setQueueStore, listStore, navStore, setNavStore, playerStore, setPlayerStore } from '@stores';
+import { setStore, store, queueStore, setQueueStore, listStore, navStore, setNavStore, playerStore, setPlayerStore } from '@stores';
 
 export default function(data: YTItem & {
   draggable?: boolean,
@@ -77,9 +77,9 @@ export default function(data: YTItem & {
 
         if (data.removeMode) {
           setQueueStore('list', (list) => {
-            const index = list.findIndex(item => 
-              item.id === data.id && 
-              item.context?.id === data.context?.id && 
+            const index = list.findIndex(item =>
+              item.id === data.id &&
+              item.context?.id === data.context?.id &&
               item.context?.src === data.context?.src
             );
             if (index !== -1) {
@@ -99,6 +99,9 @@ export default function(data: YTItem & {
 
         if (!e.target.classList.contains('ri-more-2-fill')) {
 
+          if (playerStore.stream.id) {
+            setQueueStore('history', h => [{ ...playerStore.stream }, ...h]);
+          }
 
           setPlayerStore('stream', {
             id: data.id,
@@ -139,12 +142,16 @@ export default function(data: YTItem & {
               let right = currentIndex + 1;
               const len = collectionItems.length;
 
+              const historyIds = new Set(queueStore.history.map(i => i.id));
+
               while (left >= 0 || right < len) {
                 if (right < len) {
-                  zigzagQueue.push(collectionItems[right++]);
+                  const item = collectionItems[right++];
+                  if (!historyIds.has(item.id)) zigzagQueue.push(item);
                 }
                 if (left >= 0) {
-                  zigzagQueue.push(collectionItems[left--]);
+                  const item = collectionItems[left--];
+                  if (!historyIds.has(item.id)) zigzagQueue.push(item);
                 }
               }
               setQueueStore('list', zigzagQueue);
@@ -154,9 +161,9 @@ export default function(data: YTItem & {
           player(data.id);
 
           setQueueStore('list', (list) => {
-            const index = list.findIndex(item => 
-              item.id === data.id && 
-              item.context?.id === data.context?.id && 
+            const index = list.findIndex(item =>
+              item.id === data.id &&
+              item.context?.id === data.context?.id &&
               item.context?.src === data.context?.src
             );
             if (index !== -1) {

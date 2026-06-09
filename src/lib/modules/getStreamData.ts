@@ -1,9 +1,10 @@
 import { playerStore, setPlayerStore } from '@stores';
+import { shuffle } from '@utils';
 
-const instances = [
-  "https://yt.omada.cafe",
-  "https://lekker.gay"
-];
+const instances = shuffle([
+  "https://invidious.kemonomimi.nl",
+  "https://invidious.schenkel.eti.br",
+]);
 
 export default async function(
   id: string,
@@ -14,9 +15,9 @@ export default async function(
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
     const path = proxy ? '/api/v1/videos/' : '/s/';
-    const res = await fetch(proxy + path + id, { 
+    const res = await fetch(proxy + path + id, {
       headers: { 'Accept': 'application/json' },
-      signal 
+      signal
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();

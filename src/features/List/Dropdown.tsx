@@ -80,11 +80,16 @@ export default function Dropdown() {
         <li
           id="playAllBtn"
           onclick={() => {
-            setQueueStore('list', []);
             const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
-            addToQueue(fullList);
+            if (!fullList.length) return;
+
+            setQueueStore('history', []);
+            setQueueStore('list', []);
             setPlayerStore('stream', fullList[0]);
+            addToQueue(fullList.slice(1));
             player(fullList[0].id);
+
+            setNavStore('queue', 'state', false);
             setNavStore('queue', 'state', true);
           }}
         >
@@ -93,7 +98,9 @@ export default function Dropdown() {
 
         <li onclick={() => {
           const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
+          setQueueStore('history', []);
           addToQueue(fullList);
+          setNavStore('queue', 'state', false);
           setNavStore('queue', 'state', true);
         }}>
           <i class="ri-list-check-2"></i>{t("list_enqueue")}

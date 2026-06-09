@@ -7,6 +7,7 @@ const Sortable = lazy(() => import("solid-sortablejs"));
 
 export default function Results(_: {
   draggable: boolean,
+  items?: TrackItem[],
   mark?: {
     mode: Accessor<boolean>,
     set: (id: string) => void,
@@ -14,17 +15,19 @@ export default function Results(_: {
   }
 }) {
 
-  const handleReorder = (newList: YTItem[]) => {
-    setListStore('list', newList);
-    
+  const items = () => _.items || (listStore.list as TrackItem[]);
+
+  const handleReorder = (newList: TrackItem[]) => {
+    setListStore('list', newList as YTItem[]);
+
     if (listStore.type === 'collection') {
       const collectionId = listStore.id;
       const fullCollection = getCollection(collectionId);
-      
+
       // Since we load from the beginning, newList represents the start of the collection
       const newIds = newList.map(i => i.id);
       const remainingIds = fullCollection.slice(newList.length);
-      
+
       saveCollection(collectionId, [...newIds, ...remainingIds]);
       metaUpdater(collectionId);
     }
@@ -37,12 +40,13 @@ export default function Results(_: {
     >
       <div class="listContainer">
         <Show when={_.draggable} fallback={
-          <For each={listStore.list}>{
+          <For each={items()}>{
             (item) =>
               <StreamItem
                 {...{
                   ...item,
-                  context: { id: listStore.name || listStore.id, src: listStore.type }
+                  type: 'video',
+                  context: { id: listStore.name || listStore.id, src: listStore.type as Context }
                 }}
                 draggable={false}
                 mark={_.mark}
@@ -51,17 +55,18 @@ export default function Results(_: {
           </For>
         }>
           <Sortable
-            items={listStore.list}
+            items={items()}
             setItems={handleReorder}
             idField="id"
             animation={150}
             handle=".ri-draggable"
           >
-            {(item: YTItem) =>
+            {(item: TrackItem) =>
               <StreamItem
                 {...{
                   ...item,
-                  context: { id: listStore.name || listStore.id, src: listStore.type }
+                  type: 'video',
+                  context: { id: listStore.name || listStore.id, src: listStore.type as Context }
                 }}
                 draggable={true}
                 mark={_.mark}

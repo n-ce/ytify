@@ -5,7 +5,7 @@ import { render } from 'solid-js/web';
 import { LikeButton } from '@components/MediaPartials';
 import CollectionSelector from './CollectionSelector';
 import StreamItem from '@components/StreamItem';
-import { setStore, store, t, playerStore, getList, setListStore, addToQueue, queueStore, setQueueStore, navStore, setNavStore } from '@stores';
+import { setStore, store, t, playerStore, getList, setListStore, addToQueue, queueStore, setQueueStore, setNavStore } from '@stores';
 
 
 export default function() {
@@ -113,9 +113,8 @@ export default function() {
                 ...item,
                 context: { src: 'queue', id: `Radio: ${currentTitle}` }
               })));
-              if (navStore.queue.state)
-                navStore.queue.ref?.scrollIntoView();
-              else setNavStore('queue', 'state', true);
+              setNavStore('queue', 'state', false);
+              setNavStore('queue', 'state', true);
             })
             .catch(e => {
               setStore('snackbar', e instanceof Error ? e.message : 'Unknown error');

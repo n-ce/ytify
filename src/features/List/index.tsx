@@ -1,7 +1,7 @@
 import { createSignal, For, onMount, Show, onCleanup } from 'solid-js';
 import './List.css';
-import { addToQueue, listStore, resetList, setNavStore, t } from '@stores';
-import { fetchCollection, removeFromCollection, setConfig, config, generateImageUrl, setDrawer } from '@utils';
+import { addToQueue, listStore, resetList, setNavStore, t, setQueueStore } from '@stores';
+import { fetchCollection, removeFromCollection, setConfig, config, generateImageUrl, setDrawer, getCollectionItems } from '@utils';
 import Dropdown from './Dropdown';
 import Results from './Results';
 import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
@@ -13,11 +13,27 @@ export default function() {
   let listSection!: HTMLElement;
 
   const [markMode, setMarkMode] = createSignal(false);
+  const [isSearching, setIsSearching] = createSignal(false);
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
   const [localSortBy, setLocalSortBy] = createSignal<SortBy>(config.sortBy);
   const [localSortOrder, setLocalSortOrder] = createSignal<'asc' | 'desc'>(config.sortOrder);
   const [showSortable, setShowSortable] = createSignal(false);
+  const [searchQuery, setSearchQuery] = createSignal('');
+
+  const filteredItems = () => {
+    const query = searchQuery().normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+    if (!query) return listStore.list;
+
+    const source = listStore.type === 'collection' && !listStore.isShared
+      ? getCollectionItems(listStore.id)
+      : listStore.list;
+
+    return source.filter(item => {
+      const normalize = (str: string) => str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+      return normalize(item.title).includes(query) || normalize(item.author).includes(query);
+    });
+  };
 
   onMount(() => {
     setNavStore('list', 'ref', listSection);
@@ -66,7 +82,9 @@ export default function() {
             const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as TrackItem[];
 
             if (listToEnqueue.length) {
+              setQueueStore('history', []);
               addToQueue(listToEnqueue);
+              setNavStore('queue', 'state', false);
               setNavStore('queue', 'state', true);
             }
 
@@ -87,14 +105,32 @@ export default function() {
         <Show
           when={!markMode()}
           fallback={<MarkBar />}>
-          <p
-            onclick={() => setShowStreamsNumber(!showStreamsNumber())}
-            id="listTitle"
-          >{
-              showStreamsNumber() ?
-                t('list_streams_count', listStore.length.toString()) :
-                listStore.name
-            }</p>
+          <Show when={!isSearching()} fallback={
+            <input
+              autofocus
+              type="text"
+              class="listSearchInput"
+              placeholder="Search within List"
+              oninput={(e) => {
+                setSearchQuery((e.target as HTMLInputElement).value.toLowerCase());
+              }}
+              onkeydown={(e) => {
+                if (e.key === 'Escape') {
+                  setIsSearching(false);
+                  setSearchQuery('');
+                }
+              }}
+            />
+          }>
+            <p
+              onclick={() => setShowStreamsNumber(!showStreamsNumber())}
+              id="listTitle"
+            >{
+                showStreamsNumber() ?
+                  t('list_streams_count', listStore.length.toString()) :
+                  listStore.name
+              }</p>
+          </Show>
         </Show>
 
 
@@ -107,6 +143,14 @@ export default function() {
               setMarkMode(!markMode());
               if (!markMode())
                 setMarkList([]);
+            }}
+          ></i>
+          <i
+            aria-label={t('nav_search')}
+            class="ri-search-2-line"
+            onclick={() => {
+              setIsSearching(!isSearching());
+              if (!isSearching()) setSearchQuery('');
             }}
           ></i>
         </div>
@@ -172,6 +216,7 @@ export default function() {
       </Show>
 
       <Results
+        items={filteredItems()}
         draggable={showSortable() && localSortBy() === 'modified' && !listStore.reservedCollections.includes(listStore.id)}
         mark={{
           mode: markMode,
