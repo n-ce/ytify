@@ -41,7 +41,41 @@ function getClientIp(request: Request, context: Context): string {
 async function getRapidAPIState() {
   const store = getStore("rapidapi");
   try {
-    return (await store.get("data", { type: "json" })) as RapidAPIState | null;
+    const state = (await store.get("data", { type: "json" })) as RapidAPIState | null;
+
+    if (state?.ips) {
+      let stateModified = false;
+      const now = Date.now();
+      const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+      const ipKeys = Object.keys(state.ips);
+
+      for (const ip of ipKeys) {
+        const record = state.ips[ip];
+        const timePassed = now - record.lastSeen;
+        const periodsPassed = Math.floor(timePassed / SIX_HOURS_MS);
+
+        if (periodsPassed > 0) {
+          const newViolations = Math.max(0, record.totalViolations - periodsPassed);
+
+          if (newViolations === 0) {
+            delete state.ips[ip];
+            stateModified = true;
+          } else if (newViolations !== record.totalViolations) {
+            state.ips[ip].totalViolations = newViolations;
+            // Advance lastSeen by the exact number of 6-hour blocks processed to keep remainder time intact for the next cycle.
+            state.ips[ip].lastSeen = record.lastSeen + (periodsPassed * SIX_HOURS_MS);
+            stateModified = true;
+          }
+        }
+      }
+
+      if (stateModified) {
+        // Run in background, don't await so we don't block the critical path
+        store.setJSON("data", state).catch(e => console.error("Failed to persist decayed state:", e));
+      }
+    }
+
+    return state;
   } catch (e) {
     return null;
   }
