@@ -13,7 +13,7 @@
     "sortablejs": "^1.15.7"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260609.1",
+    "@cloudflare/workers-types": "^4.20260610.1",
     "@netlify/blobs": "^10.7.9",
     "@netlify/edge-functions": "^3.0.8",
     "@netlify/functions": "^5.3.0",

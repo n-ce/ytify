@@ -24,6 +24,11 @@ export default function() {
         <b>animesh.5383@waicici</b>&nbsp;
       </p>
       <br />
+      <p>
+        {t('about_support_xmr')}&nbsp;
+        <b style={{ "word-break": "break-all" }}>87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH</b>
+      </p>
+      <br />
       <p>{t('about_support_earth')}&nbsp;
         <a
           href='https://en.m.wikipedia.org/wiki/Individual_action_on_climate_change' target='_blank'><b>{t('about_lifestyle_changes')}</b></a>
@@ -35,7 +40,6 @@ export default function() {
           target="_blank">[Changelog]</a>
 
         <a href="https://github.com/n-ce/ytify" target="_blank">[Github]</a>
-        <a href="https://github.com/n-ce/ytify#donations" target="_blank">[Crypto Donations]</a>
       </span>
       <br />
     </div >
