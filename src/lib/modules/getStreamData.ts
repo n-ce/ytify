@@ -1,10 +1,9 @@
 import { playerStore, setPlayerStore } from '@stores';
-import { shuffle } from '@utils';
+import { streamCache } from '@utils';
 
-const instances = shuffle([
-  "https://invidious.kemonomimi.nl",
-  "https://invidious.schenkel.eti.br",
-]);
+const instances = [
+  "https://yt.omada.cafe",
+];
 
 export default async function(
   id: string,
@@ -12,6 +11,8 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
+  const cached = streamCache.get(id);
+  if (cached) return cached;
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
     const path = proxy ? '/api/v1/videos/' : '/s/';
@@ -34,6 +35,7 @@ export default async function(
       throw new Error('Invalid response: no audio streams found');
     }
 
+    streamCache.set(id, data);
     return data;
   };
 

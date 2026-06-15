@@ -17,7 +17,6 @@ export let config = {
   durationFilter: '',
   similarContent: false,
   contextualFill: false,
-  queuePrefetch: false,
   authorGrouping: false,
   searchFilter: 'all',
   volume: '100',

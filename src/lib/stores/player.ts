@@ -2,6 +2,7 @@ import { createRoot } from "solid-js";
 import { createStore } from "solid-js/store";
 import { navStore, params, updateParam, addToQueue, queueStore, setQueueStore, setStore, store, groupQueueByAuthor } from "@stores";
 import { config, cssVar, themer, addToCollection, player, shuffle } from "@utils";
+import { isQueuePrefetchActive } from "@modules/queuePrefetch";
 
 const blankImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
@@ -239,7 +240,7 @@ createRoot(() => {
   }
 
   playerStore.audio.oncanplaythrough = async function() {
-    const nextItem = config.queuePrefetch && queueStore.list[0]?.id;
+    const nextItem = isQueuePrefetchActive() && queueStore.list[0]?.id;
 
     if (!nextItem) return;
 

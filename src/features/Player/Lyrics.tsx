@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, onCleanup } from "solid-js";
+import { createSignal, For, onCleanup, createEffect } from "solid-js";
 import { playerStore, setPlayerStore, setStore, t } from "@stores";
 
 export default function(props: { onClose: () => void }) {
@@ -7,13 +7,19 @@ export default function(props: { onClose: () => void }) {
   const [activeLine, setActiveLine] = createSignal(-1);
   let lyricsSection!: HTMLDivElement;
 
-  onMount(() => {
-    const { title, author } = playerStore.stream;
+  createEffect(() => {
+    const { title, author, id } = playerStore.stream;
+    if (!id) return;
     if (!author) {
       setStore('snackbar', t('lyrics_artist_not_available'));
       props.onClose();
       return;
     }
+
+    setLrcMap([t('loading')]);
+    setActiveLine(-1);
+    setPlayerStore('lrcSync', undefined);
+
     fetch(
       `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}&duration=${playerStore.fullDuration}`,
       {

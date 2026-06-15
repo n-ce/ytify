@@ -1,6 +1,7 @@
 import './Queue.css';
 import { setStore, t, addToQueue, queueStore, setQueueStore, groupQueueByAuthor } from "@stores";
 import { config, setConfig } from "@utils";
+import { isQueuePrefetchActive, activateQueuePrefetch, deactivateQueuePrefetch } from "@modules/queuePrefetch";
 
 export default function Dropdown() {
   return (
@@ -16,7 +17,7 @@ export default function Dropdown() {
           onclick={(e) => {
             const val = !config.persistentShuffle;
             setConfig('persistentShuffle', val);
-            if (val && config.queuePrefetch) setConfig('queuePrefetch', false);
+            if (val && isQueuePrefetchActive()) deactivateQueuePrefetch();
             (e.currentTarget as HTMLElement).classList.toggle('on');
           }}
         >
@@ -59,11 +60,14 @@ export default function Dropdown() {
         </li>
 
         <li
-          classList={{ on: config.queuePrefetch }}
+          classList={{ on: isQueuePrefetchActive() }}
           onclick={(e) => {
-            const val = !config.queuePrefetch;
-            setConfig('queuePrefetch', val);
-            if (val && config.persistentShuffle) setConfig('persistentShuffle', false);
+            if (!isQueuePrefetchActive()) {
+              if (config.persistentShuffle) setConfig('persistentShuffle', false);
+              activateQueuePrefetch();
+            } else {
+              deactivateQueuePrefetch();
+            }
             (e.currentTarget as HTMLElement).classList.toggle('on');
           }}
         >

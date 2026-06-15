@@ -225,5 +225,8 @@
   "library_about_ytify": "About ytify",
   "nav_logout": "Logout",
   "player_video_resolution": "Resolution",
-  "updating": "Update in Progress..."
+  "updating": "Update in Progress...",
+  "queue_prefetch_limit_exceeded": "Queue exceeds prefetch limit (20 items or 1 hour)",
+  "queue_prefetch_activating": "Activating Queue Prefetch...",
+  "queue_prefetch_ready": "Queue Prefetch Ready"
 }
