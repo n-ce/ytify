@@ -1,9 +1,11 @@
 import { playerStore, setPlayerStore } from '@stores';
-import { streamCache } from '@utils';
+import { streamCache, shuffle } from '@utils';
 
-const instances = [
+const instances = shuffle([
   "https://yt.omada.cafe",
-];
+  "https://invidious.schenkel.eti.br",
+  "https://invidious.kemonomimi.nl"
+]);
 
 export default async function(
   id: string,
@@ -53,7 +55,6 @@ export default async function(
       if (proxy === playerStore.proxy) continue;
       try {
         const data = await fetchData(proxy);
-        setPlayerStore('proxy', proxy);
         data.proxy = proxy;
         return data;
       } catch (e) {
@@ -62,17 +63,14 @@ export default async function(
     }
 
     // 3. Last resort: Emergency Fallback (Local Edge Function)
-    if (!prefetch) {
-      try {
-        console.warn('All proxies failed, attempting emergency fallback...');
-        const data = await fetchData('');
-        setPlayerStore('proxy', '');
-        data.proxy = '';
-        // reset proxy to use local fallback
-        return data;
-      } catch (e) {
-        console.error('Emergency fallback failed:', e);
-      }
+    try {
+      console.warn('All proxies failed, attempting emergency fallback...');
+      const data = await fetchData('');
+      data.proxy = '';
+      // reset proxy to use local fallback
+      return data;
+    } catch (e) {
+      console.error('Emergency fallback failed:', e);
     }
   }
   const cached = streamCache.get(id) as Invidious;
