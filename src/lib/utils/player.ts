@@ -1,5 +1,6 @@
 import { playerStore, setPlayerStore, setStore, store } from "@stores";
 import { config, convertSStoHHMMSS, streamCache } from "@utils";
+import { isQueuePrefetchActive } from "../modules/queuePrefetch";
 
 let playerAbortController: AbortController;
 export async function player(id?: string) {
@@ -26,7 +27,7 @@ export async function player(id?: string) {
     return import('../modules/jioSaavn').then(mod => mod.default());
 
   const getStreamData = await import('@modules/getStreamData').then(mod => mod.default);
-  const data = await getStreamData(id, false, playerAbortController.signal);
+  const data = await getStreamData(id, playerAbortController.signal);
 
   if (data && 'adaptiveFormats' in data)
     setPlayerStore({
@@ -62,7 +63,7 @@ export async function player(id?: string) {
     ));
 
 
-  if (config.similarContent && !enforceVideo)
+  if (config.similarContent && !enforceVideo && !isQueuePrefetchActive())
     import('../modules/enqueueRelatedStreams')
       .then(mod => mod.default(invidiousData.recommendedVideos));
 

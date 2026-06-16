@@ -67,10 +67,6 @@ const createInitialState = (): PlayerStore => ({
 
 export const [playerStore, setPlayerStore] = createStore(createInitialState());
 
-const backgroundAudio = new Audio();
-backgroundAudio.muted = true;
-backgroundAudio.preload = 'auto';
-
 export function playNext() {
   const { stream } = playerStore;
   const { list } = queueStore;
@@ -150,6 +146,7 @@ createRoot(() => {
           if (
             config.similarContent
             && playerStore.isMusic
+            && !isQueuePrefetchActive()
           )
             getRecommendations();
           addToCollection('history', [playerStore.stream]);
@@ -248,17 +245,22 @@ createRoot(() => {
 
     if (!nextItem) return;
 
-    const cached = streamCache.get(nextItem);
+    const prefetchRef = new Audio();
+    prefetchRef.onerror = () =>
+      import('@modules/audioErrorHandler').then(mod => mod.default(prefetchRef, nextItem));
 
-    if (cached && 'adaptiveFormats' in cached) {
-      const formats = (cached as Invidious).adaptiveFormats
+    const data = streamCache.get(nextItem) || await import('@modules/getStreamData').then(mod => mod.default(nextItem));
+
+    if (data && 'adaptiveFormats' in data) {
+      const formats = (data as Invidious).adaptiveFormats
         .filter(f => f.type.startsWith('audio'))
         .sort((a, b) => (parseInt(a.bitrate) - parseInt(b.bitrate)));
-
       import('../modules/setAudioStreams')
-        .then(mod => mod.default(formats, backgroundAudio));
+        .then(mod => mod.default(formats, prefetchRef));
     }
+
   }
+
 
   playerStore.audio.onerror = () => import('@modules/audioErrorHandler').then(mod => mod.default(playerStore.audio));
 

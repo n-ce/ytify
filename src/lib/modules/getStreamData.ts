@@ -9,7 +9,6 @@ const instances = shuffle([
 
 export default async function(
   id: string,
-  prefetch: boolean = false,
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
@@ -39,7 +38,7 @@ export default async function(
 
   async function getData() {
     // 1. Try current proxy first if available
-    if (playerStore.proxy || prefetch) {
+    if (playerStore.proxy) {
       const p = playerStore.proxy || instances[0];
       try {
         const data = await fetchData(p);

@@ -132,7 +132,7 @@ export default function(data: YTItem & {
               navStore.player.ref?.scrollIntoView();
           }
 
-          if (config.contextualFill && (data.context?.src === 'collection' || (data.context?.src === 'playlists')) && data.context?.id !== 'history') {
+          if (config.contextualFill && !queueStore.isSession && (data.context?.src === 'collection' || (data.context?.src === 'playlists')) && data.context?.id !== 'history') {
             const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) :
               listStore.list;
             const currentIndex = collectionItems.findIndex(item => item.id === data.id);

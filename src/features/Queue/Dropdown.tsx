@@ -92,6 +92,7 @@ export default function Dropdown() {
           () => {
             setQueueStore('list', []);
             setQueueStore('history', []);
+            deactivateQueuePrefetch();
           }
         }>
           {t('queue_clear')}

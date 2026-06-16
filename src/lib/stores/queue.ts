@@ -7,6 +7,8 @@ export const [queueStore, setQueueStore] = createStore({
   history: [] as TrackItem[],
   removeMode: false,
   isLoading: false,
+  isSession: false,
+  sessionMap: new Map<string, HTMLAudioElement>(),
 });
 
 
@@ -46,6 +48,11 @@ export function addToQueue(items: TrackItem[], options: {
   replace?: boolean,
   prepend?: boolean
 } = {}) {
+
+  if (queueStore.isSession && !items.some(item => item.context?.src === '')) {
+    return;
+  }
+
   // Items with context.src === '' bypass all config filters
   let itemsToAdd = filterItemsByConfig(items);
 

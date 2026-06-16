@@ -228,5 +228,5 @@
   "updating": "Update in Progress...",
   "queue_prefetch_limit_exceeded": "Queue exceeds prefetch limit (20 items or 1 hour)",
   "queue_prefetch_activating": "Preparing Queue for Background Session Experience $",
-  "queue_prefetch_ready": "Your Listening Session is ready"
+  "queue_prefetch_ready": "Listening Session is Ready. Queue has been Locked. Clear Queue to Reset."
 }
