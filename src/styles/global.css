@@ -19,7 +19,7 @@
   --gap: var(--size-fluid-2);
   --borderColor: oklch(from var(--text) l c h / 0.2);
   --border: var(--border-size-1) solid var(--borderColor);
-  --roundness: 0.4rem;
+  --roundness: 0.3rem;
   --blur: blur(var(--size-px-3));
   --player-bg: none;
   --player-bp: 0 0;

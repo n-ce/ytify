@@ -2,13 +2,8 @@ import { createSignal } from 'solid-js';
 import { queueStore, t, setStore } from "@stores";
 import { parseDuration } from "@utils";
 import getStreamData from "./getStreamData";
-import setAudioStreams from "./setAudioStreams";
 
 export const [isQueuePrefetchActive, setIsQueuePrefetchActive] = createSignal(false);
-
-export const queuePrefetchState = {
-  map: new Map<string, HTMLAudioElement>()
-};
 
 export async function activateQueuePrefetch() {
   const { list } = queueStore;
@@ -20,24 +15,15 @@ export async function activateQueuePrefetch() {
   }
 
   setIsQueuePrefetchActive(true);
-  setStore('snackbar', t('queue_prefetch_activating'));
+
+  let count = 0;
+  const total = list.length;
 
   for (const track of list) {
     if (!isQueuePrefetchActive()) break;
-    if (queuePrefetchState.map.has(track.id)) continue;
-
-    const data = await getStreamData(track.id, true);
-    if (data && 'adaptiveFormats' in data) {
-      const ghost = new Audio();
-      ghost.preload = 'auto';
-      
-      const formats = data.adaptiveFormats
-        .filter(f => f.type.startsWith('audio'))
-        .sort((a, b) => (parseInt(a.bitrate) - parseInt(b.bitrate)));
-      
-      await setAudioStreams(formats, ghost);
-      queuePrefetchState.map.set(track.id, ghost);
-    }
+    setStore('snackbar', t('queue_prefetch_activating').replace('$', `${count}/${total}`));
+    await getStreamData(track.id, true);
+    count++;
   }
 
   if (isQueuePrefetchActive())
@@ -45,7 +31,5 @@ export async function activateQueuePrefetch() {
 }
 
 export function deactivateQueuePrefetch() {
-  queuePrefetchState.map.forEach(audio => { audio.src = ''; audio.load(); });
-  queuePrefetchState.map.clear();
   setIsQueuePrefetchActive(false);
 }

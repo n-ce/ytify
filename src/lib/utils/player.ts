@@ -1,5 +1,5 @@
 import { playerStore, setPlayerStore, setStore, store } from "@stores";
-import { config, convertSStoHHMMSS } from "@utils";
+import { config, convertSStoHHMMSS, streamCache } from "@utils";
 
 let playerAbortController: AbortController;
 export async function player(id?: string) {
@@ -22,7 +22,7 @@ export async function player(id?: string) {
 
   if (!store.useSaavn)
     setStore('useSaavn', true);
-  else if (playerStore.stream.author?.endsWith('Topic'))
+  else if (playerStore.stream.author?.endsWith('Topic') && !streamCache.get(id))
     return import('../modules/jioSaavn').then(mod => mod.default());
 
   const getStreamData = await import('@modules/getStreamData').then(mod => mod.default);

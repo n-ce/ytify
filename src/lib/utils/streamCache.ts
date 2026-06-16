@@ -15,6 +15,9 @@ export const streamCache = {
       console.warn('Failed to save stream data to cache (possibly storage limit reached)', e);
     }
   },
+  remove: (id: string) => {
+    sessionStorage.removeItem(`streamData_${id}`);
+  },
   clear: () => {
     Object.keys(sessionStorage).forEach(key => {
       if (key.startsWith('streamData_')) {
