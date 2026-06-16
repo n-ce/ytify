@@ -44,8 +44,7 @@ export default async function(
         data.proxy = p;
         return data;
       } catch (e) {
-        if (prefetch) return { error: 'Prefetch failed', message: (e as Error).message };
-        console.warn(`Current proxy ${p} failed, starting retries...`);
+        console.warn(`Prefetch failed with error ${(e as Error).message} on ${p}, starting retries...`);
       }
     }
 
