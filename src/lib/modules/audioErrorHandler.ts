@@ -29,9 +29,10 @@ export default function(
     if (!prefetch) {
       setPlayerStore({
         playbackState: 'none',
-        status: 'Streaming Failed'
+        status: 'Streaming Failed EA'
       });
-      setStore('snackbar', 'Streaming Failed');
+      setStore('snackbar', 'Streaming Failed EA');
+      console.log(audio.src);
     }
     streamCache.remove(id);
     return;
@@ -46,7 +47,7 @@ export default function(
   } else if (!prefetch) {
     setPlayerStore({
       playbackState: 'none',
-      status: 'Streaming Failed'
+      status: 'Streaming Failed EB'
     });
     streamCache.remove(id);
   }

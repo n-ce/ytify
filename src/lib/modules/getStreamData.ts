@@ -11,9 +11,6 @@ export default async function(
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
-  const cached = streamCache.get(id);
-  if (cached) return cached;
-
   const fetchData = async (proxy: string): Promise<Invidious> => {
     const path = proxy ? '/api/v1/videos/' : '/s/';
     const res = await fetch(proxy + path + id, {
@@ -35,43 +32,58 @@ export default async function(
       throw new Error('Invalid response: no audio streams found');
     }
 
-    streamCache.set(id, data);
     return data;
   };
 
-  // 1. Try current proxy first if available
-  if (playerStore.proxy || prefetch) {
-    const p = playerStore.proxy || instances[0];
-    try {
-      return await fetchData(p);
-    } catch (e) {
-      if (prefetch) return { error: 'Prefetch failed', message: (e as Error).message };
-      console.warn(`Current proxy ${p} failed, starting retries...`);
+  async function getData() {
+    // 1. Try current proxy first if available
+    if (playerStore.proxy || prefetch) {
+      const p = playerStore.proxy || instances[0];
+      try {
+        const data = await fetchData(p);
+        data.proxy = p;
+        return data;
+      } catch (e) {
+        if (prefetch) return { error: 'Prefetch failed', message: (e as Error).message };
+        console.warn(`Current proxy ${p} failed, starting retries...`);
+      }
+    }
+
+    // 2. One by one retry through all instances
+    for (const proxy of instances) {
+      if (proxy === playerStore.proxy) continue;
+      try {
+        const data = await fetchData(proxy);
+        setPlayerStore('proxy', proxy);
+        data.proxy = proxy;
+        return data;
+      } catch (e) {
+        console.warn(`Proxy ${proxy} failed, trying next...`);
+      }
+    }
+
+    // 3. Last resort: Emergency Fallback (Local Edge Function)
+    if (!prefetch) {
+      try {
+        console.warn('All proxies failed, attempting emergency fallback...');
+        const data = await fetchData('');
+        setPlayerStore('proxy', '');
+        data.proxy = '';
+        // reset proxy to use local fallback
+        return data;
+      } catch (e) {
+        console.error('Emergency fallback failed:', e);
+      }
     }
   }
+  const cached = streamCache.get(id) as Invidious;
 
-  // 2. One by one retry through all instances
-  for (const proxy of instances) {
-    if (proxy === playerStore.proxy) continue;
-    try {
-      const data = await fetchData(proxy);
-      setPlayerStore('proxy', proxy);
-      return data;
-    } catch (e) {
-      console.warn(`Proxy ${proxy} failed, trying next...`);
-    }
-  }
+  const data = cached || await getData();
 
-  // 3. Last resort: Emergency Fallback (Local Edge Function)
-  if (!prefetch) {
-    try {
-      console.warn('All proxies failed, attempting emergency fallback...');
-      const data = await fetchData('');
-      setPlayerStore('proxy', ''); // reset proxy to use local fallback
-      return data;
-    } catch (e) {
-      console.error('Emergency fallback failed:', e);
-    }
+  if (data) {
+    streamCache.set(id, data);
+    setPlayerStore('proxy', data.proxy || '');
+    return data;
   }
 
   return { error: 'All proxies failed', message: 'Failed to fetch stream data from all available instances' };

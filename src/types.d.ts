@@ -115,6 +115,7 @@ declare global {
     lengthSeconds: number,
     authorId: string,
     liveNow: boolean,
+    proxy?: string
   }
 }
 
