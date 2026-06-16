@@ -1,7 +1,6 @@
 import { createSignal } from 'solid-js';
 import { queueStore, t, setStore } from "@stores";
 import { parseDuration } from "@utils";
-import getStreamData from "./getStreamData";
 
 export const [isQueuePrefetchActive, setIsQueuePrefetchActive] = createSignal(false);
 
@@ -22,7 +21,7 @@ export async function activateQueuePrefetch() {
   for (const track of list) {
     if (!isQueuePrefetchActive()) break;
     setStore('snackbar', t('queue_prefetch_activating').replace('$', `${count}/${total}`));
-    await getStreamData(track.id, true);
+    await import('@modules/getStreamData').then(mod => mod.default(track.id, true));
     count++;
   }
 
