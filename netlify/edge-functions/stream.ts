@@ -31,7 +31,8 @@ const HARD_BANNED_SUBNETS = [
   "159.18.195.32",
   "41.224.2.11",
   "163.116.174.",
-  "124.6.140.178"
+  "124.6.140.178",
+  "170.80.97.251"
 ];
 
 function getClientIp(request: Request, context: Context): string {
