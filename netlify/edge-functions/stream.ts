@@ -142,7 +142,7 @@ export default async (request: Request, context: Context) => {
   const isBanned = HARD_BANNED_SUBNETS.some(subnet => clientIp.startsWith(subnet));
   if (isBanned) {
     console.warn(`[FAST-DROP] Blocked heavy abuser ${clientIp} at the gate.`);
-    return new Response(null, {
+    return new Response('Fast Gateway Firewall Drop | You have been restricted from access to the ytify fallback service.', {
       status: 403,
       headers: {
         "Cache-Control": "public, s-maxage=86400",
