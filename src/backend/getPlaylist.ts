@@ -49,6 +49,39 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
           subtext,
           type: 'video' as const
         });
+      } else if (item.is(YTNodes.LockupView)) {
+        // YouTube migrated playlist videos to the modern LockupView layout.
+        const lockup = item.as(YTNodes.LockupView);
+        if (lockup.content_id && lockup.content_type === 'VIDEO') {
+          const rows = (lockup.metadata?.metadata as any)?.metadata_rows || [];
+          const rowParts = (row: any) =>
+            (row?.metadata_parts || []).map((p: any) => p.text?.toString()).filter(Boolean);
+
+          const firstRow = rowParts(rows[0]);
+          const secondRow = rowParts(rows[1]);
+          const itemAuthor = firstRow[0] || author || 'Unknown';
+          const subtext = secondRow.join(' • ');
+
+          let duration = '';
+          const contentImage = lockup.content_image as any;
+          const overlays = contentImage?.overlays || contentImage?.primary_thumbnail?.overlays || [];
+          for (const overlay of overlays) {
+            if (overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
+              duration = overlay.as(YTNodes.ThumbnailBottomOverlayView).badges?.[0]?.text || '';
+              break;
+            }
+          }
+
+          allItems.push({
+            id: lockup.content_id,
+            title: lockup.metadata?.title?.toString() || 'Unknown',
+            author: itemAuthor,
+            authorId: '',
+            duration: formatDuration(duration),
+            subtext,
+            type: 'video' as const
+          });
+        }
       } else if (item.is(YTNodes.MusicResponsiveListItem)) {
         const song = item.as(YTNodes.MusicResponsiveListItem);
         const videoId = getVideoId(song);

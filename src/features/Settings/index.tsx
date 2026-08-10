@@ -84,7 +84,7 @@ export default function() {
           >
             <option value='play'>{t('player_play_button')}</option>
             <option value='watch'>{t('settings_pwa_watch')}</option>
-            <option value='dl'>{t('actions_menu_download')}</option>
+            <option value='download'>{t('actions_menu_download')}</option>
           </Selector>
         </Show>
 
