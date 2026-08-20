@@ -26,6 +26,41 @@ export default async function(id: string) {
     }
   }
 
+  // YouTube migrated channel videos to the modern LockupView layout.
+  const mapLockupView = (lockup: any): any => {
+    if (!lockup?.content_id) return null;
+
+    const rows = (lockup.metadata?.metadata as any)?.metadata_rows || [];
+    const rowParts = (row: any) =>
+      (row?.metadata_parts || []).map((p: any) => p.text?.toString()).filter(Boolean);
+
+    const firstRow = rowParts(rows[0]);
+    const secondRow = rowParts(rows[1]);
+    const views = firstRow[0] || '';
+    const published = secondRow[0]?.replace('Streamed ', '') || '';
+    const subtext = (views || '') + (published ? ' • ' + published : '');
+
+    let duration = '';
+    const contentImage = lockup.content_image as any;
+    const overlays = contentImage?.overlays || contentImage?.primary_thumbnail?.overlays || [];
+    for (const overlay of overlays) {
+      if (overlay.is && overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
+        duration = overlay.as(YTNodes.ThumbnailBottomOverlayView).badges?.[0]?.text || '';
+        break;
+      }
+    }
+
+    return {
+      id: lockup.content_id,
+      title: lockup.metadata?.title?.toString() || '',
+      author: name,
+      authorId: id,
+      duration: formatDuration(duration),
+      subtext,
+      type: 'video' as const
+    };
+  };
+
   const items = rawItems.map((item) => {
     if (item.is && item.is(YTNodes.Video)) {
       const video = item.as(YTNodes.Video);
@@ -41,31 +76,12 @@ export default async function(id: string) {
         subtext,
         type: 'video' as const
       };
+    } else if (item.is && item.is(YTNodes.LockupView)) {
+      // Modern layout: LockupView is returned directly.
+      return mapLockupView(item);
     } else if (item.type === 'RichItem' && item.content?.type === 'LockupView') {
-      const lockup = item.content;
-      const metadataParts = lockup.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts || [];
-      const views = metadataParts[0]?.text?.text || '';
-      const published = metadataParts[1]?.text?.text?.replace('Streamed ', '') || '';
-      const subtext = (views || '') + (published ? ' • ' + published : '');
-      
-      let duration = '';
-      const overlays = lockup.content_image?.overlays || [];
-      for (const overlay of overlays) {
-        if (overlay.type === 'ThumbnailBottomOverlayView') {
-          duration = overlay.badges?.[0]?.text || '';
-          break;
-        }
-      }
-      
-      return {
-        id: lockup.content_id,
-        title: lockup.metadata?.title?.text || '',
-        author: name,
-        authorId: id,
-        duration: formatDuration(duration),
-        subtext,
-        type: 'video' as const
-      };
+      // Legacy layout: LockupView nested inside a RichItem.
+      return mapLockupView(item.content);
     }
     return null;
   }).filter((item): item is NonNullable<typeof item> => item !== null);

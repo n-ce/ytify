@@ -50,6 +50,59 @@ export default async function(ids: string[]) {
     )
   );
 
+  // YouTube migrated channel videos to the modern LockupView layout.
+  // Compute views/published/duration from a LockupView node.
+  const getLockupMeta = (lockup: any) => {
+    const metadataParts = lockup?.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts || [];
+    const views = metadataParts[0]?.text?.text || '';
+    const publishedText = metadataParts[1]?.text?.text?.replace('Streamed ', '') || '';
+
+    let durationStr = '';
+    const contentImage = lockup?.content_image as any;
+    const overlays = contentImage?.overlays || contentImage?.primary_thumbnail?.overlays || [];
+    for (const overlay of overlays) {
+      if (overlay.is && overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
+        durationStr = overlay.as(YTNodes.ThumbnailBottomOverlayView).badges?.[0]?.text || '';
+        break;
+      }
+    }
+
+    return { views, publishedText, durationStr };
+  };
+
+  // Approximate duration check > 30 seconds.
+  // durationStr is like "21:18" or "1:02:30" or "0:15"
+  const parseDurationSeconds = (durationStr: string) => {
+    let durationSeconds = 0;
+    if (durationStr) {
+      const parts = durationStr.split(':').map(Number);
+      if (parts.length === 2) {
+        durationSeconds = parts[0] * 60 + parts[1];
+      } else if (parts.length === 3) {
+        durationSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+      }
+    }
+    return durationSeconds;
+  };
+
+  const mapLockup = (lockup: any, authorName: string, authorId: string): SubFeedItem[] => {
+    if (!lockup?.content_id) return [];
+    const { durationStr, views, publishedText } = getLockupMeta(lockup);
+    const durationSeconds = parseDurationSeconds(durationStr);
+    if (durationSeconds > 90 && views) {
+      return [{
+        lockup,
+        type: 'lockup',
+        durationStr,
+        views,
+        publishedText,
+        authorName,
+        authorId
+      }];
+    }
+    return [];
+  };
+
   const allVideos: SubFeedItem[] = results.flatMap(r =>
     r.videos.flatMap((v): SubFeedItem[] => {
       if (v.is && v.is(YTNodes.Video)) {
@@ -62,44 +115,12 @@ export default async function(ids: string[]) {
             authorId: r.authorId
           }];
         }
+      } else if (v.is && v.is(YTNodes.LockupView)) {
+        // Modern layout: LockupView is returned directly.
+        return mapLockup(v, r.author, r.authorId);
       } else if (v.type === 'RichItem' && v.content?.type === 'LockupView') {
-        const lockup = v.content;
-        const metadataParts = lockup.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts || [];
-        const views = metadataParts[0]?.text?.text || '';
-        const publishedText = metadataParts[1]?.text?.text?.replace('Streamed ', '') || '';
-        
-        let durationStr = '';
-        const overlays = lockup.content_image?.overlays || [];
-        for (const overlay of overlays) {
-          if (overlay.type === 'ThumbnailBottomOverlayView') {
-            durationStr = overlay.badges?.[0]?.text || '';
-            break;
-          }
-        }
-        
-        // Approximate duration check > 90 seconds. 
-        // durationStr is like "21:18" or "1:02:30" or "0:15"
-        let durationSeconds = 0;
-        if (durationStr) {
-          const parts = durationStr.split(':').map(Number);
-          if (parts.length === 2) {
-             durationSeconds = parts[0] * 60 + parts[1];
-          } else if (parts.length === 3) {
-             durationSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
-          }
-        }
-        
-        if (durationSeconds > 90 && views) {
-           return [{
-              lockup,
-              type: 'lockup',
-              durationStr,
-              views,
-              publishedText,
-              authorName: r.author,
-              authorId: r.authorId
-           }];
-        }
+        // Legacy layout: LockupView nested inside a RichItem.
+        return mapLockup(v.content, r.author, r.authorId);
       }
       return [];
     })
