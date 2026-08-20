@@ -81,12 +81,42 @@ export function getThumbnail(thumbnails: { url: string, width: number }[]): stri
 }
 
 export function getVideoId(song: YTNodes.MusicResponsiveListItem): string {
-  return song.id || (song as any).videoId ||
+  return song.id ||
     (song.overlay?.content?.is(YTNodes.MusicPlayButton) ? (song.overlay.content as any).endpoint?.payload?.videoId : undefined) ||
-    song.flex_columns?.find(c => c.is(YTNodes.MusicResponsiveListItemFlexColumn) && c.as(YTNodes.MusicResponsiveListItemFlexColumn).title?.endpoint?.name === 'watchEndpoint')?.as(YTNodes.MusicResponsiveListItemFlexColumn).title?.endpoint?.payload?.videoId ||
-    (song.menu?.items?.find((i: any) => i.endpoint?.payload?.videoId) as any)?.endpoint?.payload?.videoId ||
-    (song.thumbnail?.contents?.[0]?.url ? getThumbnailId(song.thumbnail.contents[0].url) : "") ||
     "";
+}
+
+/**
+ * Extract views / published / duration from the modern LockupView layout
+ */
+export function getLockupMeta(lockup: YTNodes.LockupView): { views: string; published: string; duration: string } {
+  const parts: string[] = [];
+  for (const row of lockup.metadata?.metadata?.metadata_rows || []) {
+    for (const p of row.metadata_parts || []) {
+      const text = p.text?.toString()?.trim();
+      if (text) parts.push(text);
+    }
+  }
+
+  let views = '';
+  let published = '';
+  for (const part of parts) {
+    const p = part.replace(/^Streamed /, '');
+    if (!views && /^\d*\.?\d+[KMB]?\s+views?$/.test(p)) views = p;
+    else if (!published && /\b\d{1,2}\s+(second|minute|hour|day|week|month|year)s?\s+ago$/.test(p)) published = p;
+  }
+
+  let duration = '';
+  const contentImage = lockup.content_image;
+  const thumbnail = contentImage && 'primary_thumbnail' in contentImage ? contentImage.primary_thumbnail : contentImage;
+  for (const overlay of thumbnail?.overlays || []) {
+    if (overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
+      duration = overlay.as(YTNodes.ThumbnailBottomOverlayView).badges?.[0]?.text || '';
+      break;
+    }
+  }
+
+  return { views, published, duration };
 }
 
 export function streamMapper(node: Helpers.YTNode): YTItem | null {
