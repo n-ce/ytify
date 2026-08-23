@@ -1,5 +1,5 @@
 import { YTNodes, type Helpers } from 'youtubei.js';
-import { getClient, getThumbnail, formatDuration, getThumbnailId, getVideoId } from './utils.js';
+import { getClient, getThumbnail, formatDuration, getThumbnailId, getVideoId, getLockupMeta } from './utils.js';
 
 export default async function(id: string, all?: boolean): Promise<YTPlaylistItem> {
   const yt = await getClient();
@@ -49,6 +49,24 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
           subtext,
           type: 'video' as const
         });
+      } else if (item.is(YTNodes.LockupView)) {
+        // YouTube migrated playlist videos to the modern LockupView layout.
+        const lockup = item.as(YTNodes.LockupView);
+        if (lockup.content_id && lockup.content_type === 'VIDEO') {
+          const { views, published, duration } = getLockupMeta(lockup);
+          const itemAuthor = lockup.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts?.[0]?.text?.toString() || author || 'Unknown';
+          const subtext = (views || '') + (published ? ' • ' + published : '');
+
+          allItems.push({
+            id: lockup.content_id,
+            title: lockup.metadata?.title?.toString() || 'Unknown',
+            author: itemAuthor,
+            authorId: '',
+            duration: formatDuration(duration),
+            subtext,
+            type: 'video' as const
+          });
+        }
       } else if (item.is(YTNodes.MusicResponsiveListItem)) {
         const song = item.as(YTNodes.MusicResponsiveListItem);
         const videoId = getVideoId(song);

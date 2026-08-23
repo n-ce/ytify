@@ -45,12 +45,12 @@ export default async function(id: string) {
   } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
     const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
     name = responsiveHeader.title.text || '';
-    thumbnails = (responsiveHeader as any).thumbnail?.contents || [];
+    thumbnails = responsiveHeader.thumbnail?.contents || [];
 
-    const strapline = (responsiveHeader as any).strapline_text_one;
+    const strapline = responsiveHeader.strapline_text_one;
     if (strapline) {
       author = strapline.text || '';
-      const run = strapline.runs?.[0];
+      const run = (strapline as any).runs?.[0];
       if (run && run.endpoint) {
         authorId = run.endpoint.payload?.browseId || run.endpoint.browseId;
       }
