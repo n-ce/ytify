@@ -254,9 +254,7 @@ main {
         flex-direction: column;
     }
 
-    .right-panel.has-miniplayer {
-        padding-bottom: calc(var(--size-9) + var(--gap));
-    }
+
 
     .left-panel section,
     .right-panel section {
