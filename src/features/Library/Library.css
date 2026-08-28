@@ -1,7 +1,6 @@
 .library {
   overflow-y: auto;
   width: 100%;
-  margin-bottom: var(--size-10);
 
   .subfeed-article {
 
