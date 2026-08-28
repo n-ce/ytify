@@ -102,6 +102,27 @@ export const getLibraryAlbums = (): LibraryAlbums =>
   JSON.parse(localStorage.getItem("library_albums") || "[]");
 
 export function getCollectionItems(collectionId: string): TrackItem[] {
+  if (collectionId === "frequently_played") {
+    const { libraryPlays } = drawer;
+    const tracks = getTracksMap();
+    return Object.keys(libraryPlays || {})
+      .filter((id) => libraryPlays[id] > 1 && tracks[id])
+      .sort((a, b) => libraryPlays[b] - libraryPlays[a])
+      .map((id) => ({
+        ...tracks[id],
+        type: "video" as const,
+        context: { src: "collection" as const, id: "frequently_played" },
+      }))
+      .filter((item) => item.id) as TrackItem[];
+  }
+
+  if (collectionId === "discovery") {
+    return ((drawer.discovery || []) as TrackItem[]).map((item) => ({
+      ...item,
+      context: { src: "collection" as const, id: "discovery" },
+    }));
+  }
+
   const collectionIds = getCollection(collectionId);
   const tracksMap = getTracksMap();
   return collectionIds
@@ -303,15 +324,23 @@ export async function fetchCollection(
 
   setListStore("isLoading", true);
 
-  const display = shared ? "Shared Collection" : id;
+  const display =
+    id === "frequently_played"
+      ? t("hub_frequently_played")
+      : id === "discovery"
+        ? t("hub_discovery")
+        : shared
+          ? "Shared Collection"
+          : id;
   const { reservedCollections } = listStore;
   const isReserved = reservedCollections.includes(id);
 
   setListStore({
     name: decodeURIComponent(display),
+    id: id,
     type: "collection",
     isReversed: isReserved,
-    isShared: shared,
+    isShared: shared || id === "frequently_played" || id === "discovery",
   });
 
   if (shared) {
@@ -346,6 +375,41 @@ function setObserver(callback: () => number) {
 }
 
 function getLocalCollection(collection: string) {
+  const isFrequentlyPlayed = collection === "frequently_played";
+  const isDiscovery = collection === "discovery";
+
+  if (isFrequentlyPlayed || isDiscovery) {
+    const items = getCollectionItems(collection);
+    const displayName = isFrequentlyPlayed
+      ? t("hub_frequently_played")
+      : t("hub_discovery");
+
+    if (items.length === 0) {
+      setStore("snackbar", "No items found");
+      setListStore({
+        list: [],
+        length: 0,
+        name: displayName,
+        id: collection,
+        type: "collection",
+        isShared: true,
+        isReversed: true,
+      });
+      return;
+    }
+
+    setListStore({
+      name: displayName,
+      id: collection,
+      type: "collection",
+      isShared: true,
+      isReversed: true,
+      length: items.length,
+      list: items,
+    });
+    return;
+  }
+
   let ids = getCollection(decodeURI(collection));
   if (ids.length === 0) {
     setStore("snackbar", "No items found");

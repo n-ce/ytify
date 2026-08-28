@@ -24,6 +24,8 @@ const initialState = () => ({
     "listenLater",
     "channels",
     "playlists",
+    "frequently_played",
+    "discovery",
   ],
   name: "",
   url: "",

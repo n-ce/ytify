@@ -23,7 +23,7 @@ export default function () {
     setSearchStore("page", 1);
     setSearchStore("results", []);
     setSearchStore("query", text);
-    getSearchResults();
+    getSearchResults(true);
   }
 
   return (
@@ -67,7 +67,7 @@ export default function () {
         onblur={() => {
           setTimeout(() => {
             setSearchStore("suggestions", "data", []);
-          }, 100);
+          }, 150);
         }}
         onfocus={() => {
           if (searchStore.query) return;
@@ -133,6 +133,10 @@ export default function () {
               <li
                 classList={{
                   hover: index() === searchStore.suggestions.index,
+                }}
+                onmousedown={(e) => {
+                  e.preventDefault();
+                  textToSearch(item);
                 }}
                 onclick={() => {
                   textToSearch(item);
