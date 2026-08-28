@@ -1,22 +1,32 @@
-import { setStore, t, listStore, setListStore, navStore, setNavStore, updateParam } from '@stores';
-import { config, drawer, setDrawer, parseDuration } from '@utils';
+import {
+  setStore,
+  t,
+  listStore,
+  setListStore,
+  navStore,
+  setNavStore,
+  updateParam,
+  openSubView,
+} from "@stores";
+import { config, drawer, setDrawer, parseDuration } from "@utils";
 
-export const syncLibrary = (action: 'add' | 'remove' | 'schedule' | 'init', id?: string) => {
+export const syncLibrary = (
+  action: "add" | "remove" | "schedule" | "init",
+  id?: string,
+) => {
   if (config.dbsync)
-    import('@modules/cloudSync')
-      .then(m => {
-        if (action === 'add' && id) m.addDirtyTrack(id);
-        else if (action === 'remove' && id) m.removeDirtyTrack(id);
-        else if (action === 'schedule') m.scheduleSync();
-        else if (action === 'init') m.runSync(config.dbsync);
-      });
+    import("@modules/cloudSync").then((m) => {
+      if (action === "add" && id) m.addDirtyTrack(id);
+      else if (action === "remove" && id) m.removeDirtyTrack(id);
+      else if (action === "schedule") m.scheduleSync();
+      else if (action === "init") m.runSync(config.dbsync);
+    });
 };
-
 
 // New Library V2 utils
 
 export const getMeta = (): Meta => {
-  const meta = localStorage.getItem('library_meta');
+  const meta = localStorage.getItem("library_meta");
   if (meta) {
     return JSON.parse(meta);
   }
@@ -39,12 +49,12 @@ export const getMeta = (): Meta => {
     }
   }
 
-  const channels = getLists('channels');
+  const channels = getLists("channels");
   if (channels.length > 0) {
     newMeta.channels = now;
   }
 
-  const playlists = getLists('playlists');
+  const playlists = getLists("playlists");
   if (playlists.length > 0) {
     newMeta.playlists = now;
   }
@@ -57,89 +67,120 @@ export const getMeta = (): Meta => {
   return newMeta;
 };
 
-
 export const getCollectionsKeys = () => {
-  const allKeys = Object
-    .keys(localStorage)
-    .filter(key => key.startsWith('library_'))
-    .map(key => key.slice(8))
-    .filter(key => !['channels', 'playlists', 'tracks', 'meta', 'albums']
-      .includes(key));
+  const allKeys = Object.keys(localStorage)
+    .filter((key) => key.startsWith("library_"))
+    .map((key) => key.slice(8))
+    .filter(
+      (key) =>
+        !["channels", "playlists", "tracks", "meta", "albums"].includes(key),
+    );
 
-  const reservedOrder = ['history', 'favorites', 'liked', 'listenLater'];
-  const meta = JSON.parse(localStorage.getItem('library_meta') || '{}');
+  const reservedOrder = ["history", "favorites", "liked", "listenLater"];
+  const meta = JSON.parse(localStorage.getItem("library_meta") || "{}");
 
   return [
-    ...reservedOrder.filter(key => allKeys.includes(key)),
-    ...allKeys.filter(key => !reservedOrder.includes(key)).sort((a, b) => (meta[a] || 0) - (meta[b] || 0))
+    ...reservedOrder.filter((key) => allKeys.includes(key)),
+    ...allKeys
+      .filter((key) => !reservedOrder.includes(key))
+      .sort((a, b) => (meta[a] || 0) - (meta[b] || 0)),
   ];
 };
 
 export const getTracksMap = (): Collection =>
-  JSON.parse(localStorage.getItem('library_tracks') || '{}');
+  JSON.parse(localStorage.getItem("library_tracks") || "{}");
 
-export const getCollection = (name: string) => JSON.parse(localStorage.getItem('library_' + name) || '[]') as string[];
+export const getCollection = (name: string) =>
+  JSON.parse(localStorage.getItem("library_" + name) || "[]") as string[];
 
-export const getLists = <T extends 'channels' | 'playlists'>(type: T): T extends 'channels' ? Channel[] : Playlist[] => JSON.parse(localStorage.getItem('library_' + type) || '[]');
+export const getLists = <T extends "channels" | "playlists">(
+  type: T,
+): T extends "channels" ? Channel[] : Playlist[] =>
+  JSON.parse(localStorage.getItem("library_" + type) || "[]");
 
-export const getLibraryAlbums = (): LibraryAlbums => JSON.parse(localStorage.getItem('library_albums') || '[]');
+export const getLibraryAlbums = (): LibraryAlbums =>
+  JSON.parse(localStorage.getItem("library_albums") || "[]");
 
-export function getCollectionItems(collectionId: string): TrackItem[] {
+export function getCollectionItems(
+  collectionId: string,
+): (TrackItem & { type?: "video" | "song" })[] {
+  if (collectionId === "frequently_played") {
+    const { libraryPlays } = drawer;
+    const tracks = getTracksMap();
+    return Object.keys(libraryPlays || {})
+      .filter((id) => libraryPlays[id] > 1 && tracks[id])
+      .sort((a, b) => libraryPlays[b] - libraryPlays[a])
+      .map((id) => ({
+        ...tracks[id],
+        type: "video" as const,
+        context: { src: "collection" as const, id: "frequently_played" },
+      }))
+      .filter((item) => item.id);
+  }
+
+  if (collectionId === "discovery") {
+    return ((drawer.discovery || []) as (YTItem & { frequency: number })[]).map(
+      (item) => ({
+        ...item,
+        type: (item.type || "video") as "video" | "song",
+        context: { src: "collection" as const, id: "discovery" },
+      }),
+    );
+  }
+
   const collectionIds = getCollection(collectionId);
   const tracksMap = getTracksMap();
-  return collectionIds.map((id: string) => ({
-    ...tracksMap[id],
-    context: { src: 'collection' as const, id: collectionId }
-  })).filter(item => item.id) as TrackItem[];
+  return collectionIds
+    .map((id: string) => ({
+      ...tracksMap[id],
+      context: { src: "collection" as const, id: collectionId },
+    }))
+    .filter((item) => item.id);
 }
 
 export function saveTracksMap(tracks: Collection) {
-  localStorage.setItem('library_tracks', JSON.stringify(tracks))
-};
-
-export function saveCollection(
-  name: string,
-  collection: string[]
-) {
-  localStorage.setItem('library_' + name, JSON.stringify(collection));
+  localStorage.setItem("library_tracks", JSON.stringify(tracks));
 }
 
-export function saveLists<T extends 'channels' | 'playlists'>(type: T, data: T extends 'channels' ? Channel[] : Playlist[]) {
+export function saveCollection(name: string, collection: string[]) {
+  localStorage.setItem("library_" + name, JSON.stringify(collection));
+}
+
+export function saveLists<T extends "channels" | "playlists">(
+  type: T,
+  data: T extends "channels" ? Channel[] : Playlist[],
+) {
   localStorage.setItem(`library_${type}`, JSON.stringify(data));
   metaUpdater(type);
   rehydrateStores();
-};
+}
 
 export function saveLibraryAlbums(albums: LibraryAlbums) {
-  localStorage.setItem('library_albums', JSON.stringify(albums));
+  localStorage.setItem("library_albums", JSON.stringify(albums));
 }
 
 export function saveAlbumToLibrary(albumId: string, albumData: Album) {
   const albums = getLibraryAlbums();
-  if (!albums.find(a => a.id === albumId)) {
+  if (!albums.find((a) => a.id === albumId)) {
     albums.push(albumData);
     saveLibraryAlbums(albums);
   }
-  metaUpdater('albums');
+  metaUpdater("albums");
   rehydrateStores();
 }
 
 export function removeAlbumFromLibrary(albumId: string) {
   const albums = getLibraryAlbums();
-  const newAlbums = albums.filter(a => a.id !== albumId);
+  const newAlbums = albums.filter((a) => a.id !== albumId);
   saveLibraryAlbums(newAlbums);
-  metaUpdater('albums');
+  metaUpdater("albums");
   rehydrateStores();
 }
 
-
-export function addToCollection(
-  name: string,
-  data: TrackItem[]
-) {
+export function addToCollection(name: string, data: TrackItem[]) {
   const collection = getCollection(name);
   const tracks = getTracksMap();
-  const prepend = ['history', 'favorites', 'liked'].includes(name);
+  const prepend = ["history", "favorites", "liked"].includes(name);
   const { libraryPlays } = drawer;
 
   for (const item of data) {
@@ -147,16 +188,14 @@ export function addToCollection(
     const { id } = item;
     const idx = collection.indexOf(id);
 
-    if (idx !== -1)
-      collection.splice(idx, 1);
+    if (idx !== -1) collection.splice(idx, 1);
 
-    if (prepend)
-      collection.unshift(id);
+    if (prepend) collection.unshift(id);
     else collection.push(id);
 
     if (id in tracks) {
       libraryPlays[id] = (libraryPlays[id] || 1) + 1;
-      setDrawer('libraryPlays', libraryPlays);
+      setDrawer("libraryPlays", libraryPlays);
     } else {
       tracks[id] = item;
     }
@@ -165,29 +204,24 @@ export function addToCollection(
       tracks[id].modified = Date.now();
     }
 
-    syncLibrary('add', id);
+    syncLibrary("add", id);
   }
 
   saveCollection(name, collection);
   saveTracksMap(tracks);
   metaUpdater(name);
 
-  if (listStore.id === name)
-    rehydrateStores();
+  if (listStore.id === name) rehydrateStores();
 }
 
-export function removeFromCollection(
-  name: string,
-  ids: string[]
-) {
+export function removeFromCollection(name: string, ids: string[]) {
   const collection = getCollection(name);
-  const collections = getCollectionsKeys().filter(k => k !== name);;
+  const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
 
   for (const id of ids) {
     const idx = collection.indexOf(id);
-    if (idx !== -1)
-      collection.splice(idx, 1);
+    if (idx !== -1) collection.splice(idx, 1);
 
     let isReferenced = false;
     for (const key of collections)
@@ -198,7 +232,7 @@ export function removeFromCollection(
 
     if (!isReferenced) {
       delete tracks[id];
-      syncLibrary('remove', id);
+      syncLibrary("remove", id);
     }
   }
 
@@ -206,13 +240,12 @@ export function removeFromCollection(
   saveTracksMap(tracks);
   metaUpdater(name);
 
-  if (listStore.id === name)
-    rehydrateStores();
+  if (listStore.id === name) rehydrateStores();
 }
 
 export function deleteCollection(name: string) {
   const ids = getCollection(name);
-  const collections = getCollectionsKeys().filter(k => k !== name);;
+  const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
 
   for (const id of ids) {
@@ -225,37 +258,32 @@ export function deleteCollection(name: string) {
 
     if (!isReferenced) {
       delete tracks[id];
-      syncLibrary('remove', id);
+      syncLibrary("remove", id);
     }
   }
 
-  localStorage.removeItem('library_' + name);
+  localStorage.removeItem("library_" + name);
   saveTracksMap(tracks);
   metaUpdater(name, true);
   rehydrateStores();
 }
 
-
 export const metaUpdater = (key: string, remove?: boolean) => {
   const meta = getMeta();
   const timestamp = Date.now();
 
-  if (remove)
-    delete meta[key];
-  else
-    meta[key] = timestamp;
+  if (remove) delete meta[key];
+  else meta[key] = timestamp;
 
-  localStorage.setItem('library_meta', JSON.stringify(meta));
-  setStore('syncState', 'dirty');
-  syncLibrary('schedule');
-}
-
-
+  localStorage.setItem("library_meta", JSON.stringify(meta));
+  setStore("syncState", "dirty");
+  syncLibrary("schedule");
+};
 
 export function createCollection(title: string) {
   const exists = getCollectionsKeys().includes(title);
   if (exists) {
-    setStore('snackbar', t('list_already_exists'));
+    setStore("snackbar", t("list_already_exists"));
     return;
   }
 
@@ -268,90 +296,131 @@ export function renameCollection(oldName: string, newName: string) {
 
   const collections = getCollectionsKeys();
   if (collections.includes(newName)) {
-    setStore('snackbar', t('list_already_exists'));
+    setStore("snackbar", t("list_already_exists"));
     return;
   }
 
   const collectionItems = getCollection(oldName);
   saveCollection(newName, collectionItems);
-  localStorage.removeItem('library_' + oldName);
+  localStorage.removeItem("library_" + oldName);
   metaUpdater(oldName, true);
   metaUpdater(newName);
   rehydrateStores();
 }
 
 export function rehydrateStores() {
-  if (listStore.type === 'collection' && listStore.id) {
+  if (listStore.type === "collection" && listStore.id) {
     fetchCollection(listStore.id);
   }
 
-  if (navStore.active === 'library') {
-    setNavStore('active', '' as 'library');
-    setTimeout(() => setNavStore('active', 'library'), 10);
+  if (navStore.active === "library") {
+    setNavStore("active", "library");
   }
 }
 
 export async function fetchCollection(
   id: string | null,
-  shared: boolean = false
+  shared: boolean = false,
 ) {
   if (!id) return;
 
-  setNavStore('active', 'list');
+  openSubView("list");
 
-  setListStore('isLoading', true);
+  setListStore("isLoading", true);
 
-  const display = shared ? 'Shared Collection' : id;
+  const display =
+    id === "frequently_played"
+      ? t("hub_frequently_played")
+      : id === "discovery"
+        ? t("hub_discovery")
+        : shared
+          ? "Shared Collection"
+          : id;
   const { reservedCollections } = listStore;
   const isReserved = reservedCollections.includes(id);
 
   setListStore({
     name: decodeURIComponent(display),
-    type: 'collection',
+    id: id,
+    type: "collection",
     isReversed: isReserved,
-    isShared: shared
+    isShared: shared || id === "frequently_played" || id === "discovery",
   });
 
   if (shared) {
     await getSharedCollection(id);
-    updateParam('si', id);
-  }
-  else {
+    updateParam("si", id);
+  } else {
     getLocalCollection(id);
-    updateParam('collection', id);
+    updateParam("collection", id);
   }
 
-  setListStore('isLoading', false);
+  setListStore("isLoading", false);
 
-  document.title = display + ' - ytify';
-
+  document.title = display + " - ytify";
 }
 
 function setObserver(callback: () => number) {
-  const ref = document.querySelector(`.listContainer > :last-child`) as HTMLElement;
+  const ref = document.querySelector(
+    `.listContainer > :last-child`,
+  ) as HTMLElement;
   if (!ref) return;
   const obs = new IntersectionObserver((entries, observer) =>
-    entries.forEach(e => {
+    entries.forEach((e) => {
       if (e.isIntersecting) {
         observer.disconnect();
         const itemsLeft = callback();
-        if (itemsLeft)
-          setObserver(callback);
-
+        if (itemsLeft) setObserver(callback);
       }
-    }));
+    }),
+  );
   obs.observe(ref);
-  setListStore('observer', obs);
+  setListStore("observer", obs);
 }
 
+function getLocalCollection(collection: string) {
+  const isFrequentlyPlayed = collection === "frequently_played";
+  const isDiscovery = collection === "discovery";
 
-function getLocalCollection(
-  collection: string,
-) {
+  if (isFrequentlyPlayed || isDiscovery) {
+    const rawItems = getCollectionItems(collection);
+    const items: YTItem[] = rawItems.map((item) => ({
+      ...item,
+      type: (item.type || "video") as "video" | "song",
+    }));
+    const displayName = isFrequentlyPlayed
+      ? t("hub_frequently_played")
+      : t("hub_discovery");
+
+    if (items.length === 0) {
+      setStore("snackbar", "No items found");
+      setListStore({
+        list: [],
+        length: 0,
+        name: displayName,
+        id: collection,
+        type: "collection",
+        isShared: true,
+        isReversed: true,
+      });
+      return;
+    }
+
+    setListStore({
+      name: displayName,
+      id: collection,
+      type: "collection",
+      isShared: true,
+      isReversed: true,
+      length: items.length,
+      list: items,
+    });
+    return;
+  }
 
   let ids = getCollection(decodeURI(collection));
   if (ids.length === 0) {
-    setStore('snackbar', 'No items found');
+    setStore("snackbar", "No items found");
     setListStore({ list: [], length: 0, name: collection });
     return;
   }
@@ -359,27 +428,35 @@ function getLocalCollection(
   const tracks = getTracksMap();
 
   let sortedIds = ids;
-  const isReserved = listStore.reservedCollections.includes(decodeURI(collection));
-  if (!isReserved && (config.sortBy !== 'modified' || config.sortOrder === 'asc')) {
-    const items = ids.map(id => tracks[id]);
+  const isReserved = listStore.reservedCollections.includes(
+    decodeURI(collection),
+  );
+  if (
+    !isReserved &&
+    (config.sortBy !== "modified" || config.sortOrder === "asc")
+  ) {
+    const items = ids.map((id) => tracks[id]);
     const sortedItems = sortCollection(items, config.sortBy, config.sortOrder);
-    sortedIds = sortedItems.map(item => item.id);
+    sortedIds = sortedItems.map((item) => item.id);
   }
 
   const usePagination = sortedIds.length > 10;
 
   setListStore({
     name: collection,
-    length: sortedIds.length
+    length: sortedIds.length,
   });
 
   if (usePagination) {
     let loadedCount = 20;
-    setListStore('list', sortedIds.slice(0, loadedCount).map(id => ({
-      ...tracks[id],
-      type: 'video' as const,
-      context: { src: 'collection' as const, id: collection }
-    })));
+    setListStore(
+      "list",
+      sortedIds.slice(0, loadedCount).map((id) => ({
+        ...tracks[id],
+        type: "video" as const,
+        context: { src: "collection" as const, id: collection },
+      })),
+    );
 
     const observerCallback = () => {
       if (loadedCount >= sortedIds.length) return 0;
@@ -387,97 +464,100 @@ function getLocalCollection(
       const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
-      setListStore('list', (l) => [...l, ...nextBatch.map(id => ({
-        ...tracks[id],
-        type: 'video' as const,
-        context: { src: 'collection' as const, id: collection }
-      }))]);
+      setListStore("list", (l) => [
+        ...l,
+        ...nextBatch.map((id) => ({
+          ...tracks[id],
+          type: "video" as const,
+          context: { src: "collection" as const, id: collection },
+        })),
+      ]);
       return sortedIds.length - loadedCount;
     };
 
     setTimeout(() => setObserver(observerCallback), 100);
-
   } else {
-    setListStore('list', sortedIds.map(id => ({
-      ...tracks[id],
-      type: 'video' as const,
-      context: { src: 'collection' as const, id: collection }
-    })));
+    setListStore(
+      "list",
+      sortedIds.map((id) => ({
+        ...tracks[id],
+        type: "video" as const,
+        context: { src: "collection" as const, id: collection },
+      })),
+    );
   }
 
-  setListStore('id', decodeURI(collection));
+  setListStore("id", decodeURI(collection));
 }
 
-async function getSharedCollection(
-  id: string
-) {
-
-  setListStore('isLoading', true);
+async function getSharedCollection(id: string) {
+  setListStore("isLoading", true);
   const data = await fetch(`${location.origin}/ss/${id}`)
-    .then(res => res.json())
-    .catch(() => '');
+    .then((res) => res.json())
+    .catch(() => "");
 
   if (data) {
     if (Array.isArray(data)) {
-      setListStore('list', data);
-    } else if (typeof data === 'object' && data.tracks) {
+      setListStore("list", data);
+    } else if (typeof data === "object" && data.tracks) {
       setListStore({
-        name: data.collection || 'Shared Collection',
-        list: data.tracks
+        name: data.collection || "Shared Collection",
+        list: data.tracks,
       });
     }
-  }
-  else
-    setStore('snackbar', `Collection does not exist`);
+  } else setStore("snackbar", `Collection does not exist`);
 
-  setListStore('isLoading', false);
+  setListStore("isLoading", false);
 }
 
-export type SortBy = 'modified' | 'name' | 'artist' | 'duration';
+export type SortBy = "modified" | "name" | "artist" | "duration";
 
-export function sortCollection(list: TrackItem[], sortBy: SortBy, sortOrder: 'asc' | 'desc'): TrackItem[] {
-
+export function sortCollection(
+  list: TrackItem[],
+  sortBy: SortBy,
+  sortOrder: "asc" | "desc",
+): TrackItem[] {
   const listToSort = [...list];
 
-  if (sortBy === 'modified') {
+  if (sortBy === "modified") {
     // If modified and desc, we just return the list (it's already in the order we want for manual/time)
-    // Actually, if it's 'asc', we reverse it. 
+    // Actually, if it's 'asc', we reverse it.
     // Manual order is usually newest first for reserved, but for non-reserved it's oldest first.
-    return sortOrder === 'asc' ? listToSort.reverse() : listToSort;
+    return sortOrder === "asc" ? listToSort.reverse() : listToSort;
   }
-
 
   listToSort.sort((a, b) => {
     let result = 0;
     switch (sortBy) {
-      case 'name':
+      case "name":
         result = a.title.localeCompare(b.title);
         break;
-      case 'artist':
-        result = (a.author || '').localeCompare(b.author || '');
+      case "artist":
+        result = (a.author || "").localeCompare(b.author || "");
         break;
-      case 'duration':
+      case "duration":
         result = parseDuration(a.duration) - parseDuration(b.duration);
         break;
     }
-    return sortOrder === 'asc' ? result : -result;
+    return sortOrder === "asc" ? result : -result;
   });
 
   return listToSort;
 }
 
 export function cleanseLibraryData() {
-
   // 1. Get all tracks from library_tracks
-  const rawTracks = JSON.parse(localStorage.getItem('library_tracks') || '{}') as Collection;
+  const rawTracks = JSON.parse(
+    localStorage.getItem("library_tracks") || "{}",
+  ) as Collection;
 
   // 2. Identify all valid track IDs by checking all collections
   const collections = getCollectionsKeys();
   const referencedTrackIds = new Set<string>();
 
-  collections.forEach(c => {
+  collections.forEach((c) => {
     const ids = getCollection(c);
-    ids.forEach(tId => referencedTrackIds.add(tId));
+    ids.forEach((tId) => referencedTrackIds.add(tId));
   });
 
   // 3. Cleanse library_tracks: Only keep tracks that are referenced and strip extra properties
@@ -492,7 +572,7 @@ export function cleanseLibraryData() {
         title: track.title,
         duration: track.duration,
         author: track.author,
-        authorId: track.authorId || '',
+        authorId: track.authorId || "",
       };
 
       if (config.dbsync && track.modified) {
@@ -501,24 +581,30 @@ export function cleanseLibraryData() {
 
       cleanedTracks[id] = cleanedTrack;
 
-      if (!tracksCleaned && Object.keys(track).length !== Object.keys(cleanedTrack).length) {
+      if (
+        !tracksCleaned &&
+        Object.keys(track).length !== Object.keys(cleanedTrack).length
+      ) {
         tracksCleaned = true;
       }
     } else {
       tracksCleaned = true;
-      syncLibrary('remove', id);
+      syncLibrary("remove", id);
     }
   }
 
-  if (tracksCleaned)
-    saveTracksMap(cleanedTracks);
+  if (tracksCleaned) saveTracksMap(cleanedTracks);
 
   // 4. Cleanse all other collections from empty or missing IDs
   for (const key of collections) {
-    const collection = JSON.parse(localStorage.getItem('library_' + key) || '[]') as string[];
-    const validCollection = collection.filter(id => id && rawTracks[id]);
+    const collection = JSON.parse(
+      localStorage.getItem("library_" + key) || "[]",
+    ) as string[];
+    const validCollection = collection.filter((id) => id && rawTracks[id]);
     if (validCollection.length < collection.length) {
-      console.log(`Found and removed ${collection.length - validCollection.length} invalid entries from '${key}' collection.`);
+      console.log(
+        `Found and removed ${collection.length - validCollection.length} invalid entries from '${key}' collection.`,
+      );
       saveCollection(key, validCollection);
     }
   }

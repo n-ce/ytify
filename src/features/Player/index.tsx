@@ -1,55 +1,71 @@
-import { createEffect, createSignal, lazy, onCleanup, onMount, Show } from "solid-js"
-import './Player.css'
+import {
+  createEffect,
+  createSignal,
+  lazy,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
+import "./Player.css";
 import { MediaDetails } from "@components/MediaPartials";
 import { config, cssVar } from "@utils";
-import { closeFeature, playerStore, setNavStore, setStore, t, updateParam } from "@stores";
+import {
+  playerStore,
+  setNavStore,
+  setStore,
+  t,
+  updateParam,
+  queueStore,
+  setQueueStore,
+  totalQueueDuration,
+} from "@stores";
+import QueueList from "@features/Queue/List";
+import Dropdown from "@features/Queue/Dropdown";
 
-const MediaArtwork = lazy(() => import('../../components/MediaPartials/MediaArtwork'));
-const Lyrics = lazy(() => import('./Lyrics'));
-const Video = lazy(() => import('./Video'));
-const Controls = lazy(() => import('./Controls'));
+const MediaArtwork = lazy(
+  () => import("../../components/MediaPartials/MediaArtwork"),
+);
+const Lyrics = lazy(() => import("./Lyrics"));
+const Video = lazy(() => import("./Video"));
+const Controls = lazy(() => import("./Controls"));
 
-export default function() {
+export default function () {
   let playerSection!: HTMLDivElement;
-
-
+  let queueRef!: HTMLDivElement;
   const [showLyrics, setShowLyrics] = createSignal(false);
 
   onMount(() => {
-    setNavStore('player', 'ref', playerSection);
+    setNavStore("player", "ref", playerSection);
     playerSection.scrollIntoView();
   });
 
   createEffect(() => {
-    if (playerStore.stream.id)
-      updateParam('s', playerStore.stream.id);
+    if (playerStore.stream.id) updateParam("s", playerStore.stream.id);
   });
 
   onCleanup(() => {
-    updateParam('s');
+    updateParam("s");
   });
-
 
   createEffect(() => {
     const { immersive, mediaArtwork } = playerStore;
-    if (immersive)
-      cssVar('--player-bg', `url(${mediaArtwork})`);
+    if (immersive) cssVar("--player-bg", `url(${mediaArtwork})`);
   });
-
 
   function getContext() {
     const { id } = playerStore.context;
-
     return id;
   }
 
+  const scrollToQueue = () => {
+    if (queueRef) {
+      queueRef.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <section
-      id="playerSection"
-      ref={playerSection}>
-
-      <Show when={playerStore.immersive} >
+    <section id="playerSection" ref={playerSection}>
+      <Show when={playerStore.immersive}>
         <div class="bg-pane" />
         <div class="bg-image" />
       </Show>
@@ -57,29 +73,23 @@ export default function() {
       <header class="topShelf">
         <p>
           <Show when={playerStore.context.src}>
-            <Show when={playerStore.context.src === 'queue'} fallback={t('player_from', getContext())}>
+            <Show
+              when={playerStore.context.src === "queue"}
+              fallback={t("player_from", getContext())}
+            >
               {getContext()}
             </Show>
           </Show>
         </p>
 
-        <div class="right-group">
-
-          <i
-            aria-label={t('close')}
-            onclick={() => { closeFeature('player') }}
-            class="ri-close-large-line"></i>
-
-        </div>
         <i
-          aria-label={t('player_more')}
+          aria-label={t("player_more")}
           class="ri-more-2-fill"
           id="moreBtn"
-          onclick={() => setStore('actionsMenu', playerStore.stream)}
+          onclick={() => setStore("actionsMenu", playerStore.stream)}
         ></i>
       </header>
       <article>
-
         <Show when={playerStore.isWatching && !playerStore.isMusic}>
           <Video />
         </Show>
@@ -88,18 +98,66 @@ export default function() {
           <Lyrics onClose={() => setShowLyrics(false)} />
         </Show>
 
-        <Show when={(!playerStore.isWatching || playerStore.isMusic) && config.loadImage && !showLyrics()}>
+        <Show
+          when={
+            (!playerStore.isWatching || playerStore.isMusic) &&
+            config.loadImage &&
+            !showLyrics()
+          }
+        >
           <MediaArtwork />
         </Show>
-
 
         <MediaDetails />
 
         <Show when={!playerStore.isWatching || playerStore.isMusic}>
           <Controls showLyrics={showLyrics} setShowLyrics={setShowLyrics} />
         </Show>
-
       </article>
+
+      <div class="player-queue-section" ref={queueRef}>
+        <header class="sticky-bar">
+          <p onclick={scrollToQueue}>
+            {queueStore.list.length === 0
+              ? t("nav_queue")
+              : totalQueueDuration(queueStore.list)}
+          </p>
+          <div class="right-group">
+            <i
+              class="ri-shuffle-line"
+              aria-label={t("queue_shuffle")}
+              onclick={() => {
+                setQueueStore("list", (list) => {
+                  const shuffled = [...list];
+                  for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                  }
+                  return shuffled;
+                });
+              }}
+            ></i>
+            <i
+              class="ri-indeterminate-circle-line"
+              classList={{
+                on: queueStore.removeMode,
+              }}
+              aria-label={t("queue_remove_mode")}
+              onclick={() => {
+                setQueueStore("removeMode", !queueStore.removeMode);
+              }}
+            ></i>
+          </div>
+          <Dropdown />
+        </header>
+
+        <Show
+          when={!queueStore.isLoading}
+          fallback={<i class="ri-loader-3-line loading-spinner"></i>}
+        >
+          <QueueList />
+        </Show>
+      </div>
     </section>
-  )
+  );
 }

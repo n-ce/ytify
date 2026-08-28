@@ -1,48 +1,28 @@
-import { onMount, Show, lazy } from "solid-js";
-import './Search.css';
-import Results from './Results';
+import { onMount, Show } from "solid-js";
+import "./Search.css";
+import Results from "./Results";
 import Input from "./Input";
-import { searchStore, t, navStore, setNavStore } from "@stores";
+import { searchStore, t, setNavStore, closeSubView } from "@stores";
 import Filters from "./Filters";
 
-const About = lazy(() => import('./About'));
-
-export default function() {
+export default function () {
   let searchRef!: HTMLElement;
 
   onMount(() => {
-    setNavStore('search', 'ref', searchRef);
+    setNavStore("search", "ref", searchRef);
     searchRef.scrollIntoView();
   });
-
-  function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
 
   return (
     <section class="search" ref={searchRef}>
       <header class="sticky-bar">
-        <p>{t('nav_search')}</p>
-
+        <p>{t("nav_search")}</p>
         <div class="right-group">
-          <Show when={!matchMedia('(display-mode: standalone)').matches}>
-            <i
-              class="ri-fullscreen-line"
-              aria-label={t('settings_fullscreen')}
-              onclick={toggleFullScreen}
-            ></i>
-          </Show>
-          <Show when={navStore.active !== 'settings'}>
-            <i
-              class="ri-settings-line"
-              aria-label={t('nav_settings')}
-              onclick={() => setNavStore('active', 'settings')}
-            ></i>
-          </Show>
+          <i
+            aria-label={t("close")}
+            class="ri-close-large-line"
+            onclick={closeSubView}
+          ></i>
         </div>
       </header>
 
@@ -51,7 +31,7 @@ export default function() {
         <Filters />
       </form>
 
-      <Show when={searchStore.query || searchStore.results.length > 0} fallback={<About />}>
+      <Show when={searchStore.query || searchStore.results.length > 0}>
         <Results />
       </Show>
     </section>
