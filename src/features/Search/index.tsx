@@ -32,7 +32,6 @@ export default function () {
       </form>
 
       <Show when={searchStore.query || searchStore.results.length > 0}>
-        \
         <Results />
       </Show>
     </section>

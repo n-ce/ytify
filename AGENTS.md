@@ -73,7 +73,7 @@ The application is strictly partitioned into two primary screens/panels:
 - **Persistent Side-by-Side View**: Both panels are rendered simultaneously.
 - **MiniPlayer Suppression**: The MiniPlayer is strictly disabled/unmounted in landscape mode.
 - **Configurable Panel Width Ratios**:
-  - The width split between Left and Right panels is user-configurable via Settings (default: `2:3`).
+  - The width split between Left and Right panels is user-configurable via Settings (default: `2:5`).
   - Supported split ratios: `1:1`, `2:3`, `3:4`, `1:2`, `2:5`.
   - Stored persistently and applied dynamically via CSS variables (e.g., `--player-ratio`, `--sub-ratio`).
 

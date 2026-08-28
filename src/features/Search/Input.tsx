@@ -1,25 +1,35 @@
 import { For, onMount, Show } from "solid-js";
-import { getSearchResults, getSearchSuggestions, playerStore, searchStore, setSearchStore, t } from "@stores";
+import {
+  getSearchResults,
+  getSearchSuggestions,
+  playerStore,
+  searchStore,
+  setSearchStore,
+  t,
+} from "@stores";
 import { config, drawer, idFromURL, player } from "@utils";
 
-export default function() {
-
+export default function () {
   let superInput!: HTMLInputElement;
 
-  onMount(getSearchResults);
+  onMount(() => {
+    getSearchResults();
+    superInput?.focus();
+  });
 
   function textToSearch(text: string) {
     superInput.blur();
-    setSearchStore('suggestions', 'data', []);
-    setSearchStore('page', 1);
-    setSearchStore('results', []);
-    setSearchStore('query', text);
+    setSearchStore("suggestions", "data", []);
+    setSearchStore("page", 1);
+    setSearchStore("results", []);
+    setSearchStore("query", text);
     getSearchResults();
   }
 
   return (
     <>
       <input
+        autofocus
         value={searchStore.query}
         placeholder={t("search_placeholder")}
         type="search"
@@ -27,20 +37,25 @@ export default function() {
         class="superInput"
         autocomplete="off"
         onpaste={async (e) => {
-          const pastedText = e.clipboardData?.getData('text');
-          const id = idFromURL(pastedText || '');
-          const separators = ['\n', ' ', ','];
-          const isBulk = separators.find(separator => pastedText?.includes(separator));
+          const pastedText = e.clipboardData?.getData("text");
+          const id = idFromURL(pastedText || "");
+          const separators = ["\n", " ", ","];
+          const isBulk = separators.find((separator) =>
+            pastedText?.includes(separator),
+          );
 
-          if (!config.searchBarLinkCapture)
-            return;
+          if (!config.searchBarLinkCapture) return;
 
           if (!id && isBulk) {
-            const array = pastedText?.split(isBulk).map(idFromURL).filter(s => s?.length === 11);
-            superInput.value = '';
+            const array = pastedText
+              ?.split(isBulk)
+              .map(idFromURL)
+              .filter((s) => s?.length === 11);
+            superInput.value = "";
             if (array?.length)
-              await import('@modules/bulkCapture')
-                .then(mod => mod.default(array as string[]));
+              await import("@modules/bulkCapture").then((mod) =>
+                mod.default(array as string[]),
+              );
             return;
           }
 
@@ -48,24 +63,30 @@ export default function() {
             player(id);
             return;
           }
-
         }}
         onblur={() => {
           setTimeout(() => {
-            setSearchStore('suggestions', 'data', []);
+            setSearchStore("suggestions", "data", []);
           }, 100);
         }}
         onfocus={() => {
-          if (searchStore.query)
-            return;
-          setSearchStore('suggestions', 'data', [...drawer.recentSearches].reverse());
+          if (searchStore.query) return;
+          setSearchStore(
+            "suggestions",
+            "data",
+            [...drawer.recentSearches].reverse(),
+          );
         }}
         oninput={async (e) => {
           const { value } = e.target;
-          setSearchStore('query', value);
+          setSearchStore("query", value);
 
           if (!value) {
-            setSearchStore('suggestions', 'data', [...drawer.recentSearches].reverse());
+            setSearchStore(
+              "suggestions",
+              "data",
+              [...drawer.recentSearches].reverse(),
+            );
             return;
           }
 
@@ -74,43 +95,51 @@ export default function() {
         onkeydown={(e) => {
           const { data, index } = searchStore.suggestions;
 
-          if (e.key === 'Enter') {
+          if (e.key === "Enter") {
             e.preventDefault();
-            textToSearch(
-              data[index] ||
-              superInput.value
-            );
+            textToSearch(data[index] || superInput.value);
             return;
           }
 
-          if (e.key === 'ArrowUp') {
-
-            setSearchStore('suggestions', 'index', (index === -1) ? data.length - 1 : index - 1);
+          if (e.key === "ArrowUp") {
+            setSearchStore(
+              "suggestions",
+              "index",
+              index === -1 ? data.length - 1 : index - 1,
+            );
           }
 
-          if (e.key === 'ArrowDown') {
-            setSearchStore('suggestions', 'index', (index === data.length) ? -1 : index + 1);
+          if (e.key === "ArrowDown") {
+            setSearchStore(
+              "suggestions",
+              "index",
+              index === data.length ? -1 : index + 1,
+            );
           }
 
-          document.querySelectorAll('li.hover')[0]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
+          document
+            .querySelectorAll("li.hover")[0]
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
         }}
       />
       <Show
-        when={config.searchSuggestions && searchStore.suggestions.data.length > 0}
+        when={
+          config.searchSuggestions && searchStore.suggestions.data.length > 0
+        }
       >
         <ul class="suggestions">
           <For each={searchStore.suggestions.data}>
             {(item, index) => (
-
               <li
                 classList={{
-                  hover: index() === searchStore.suggestions.index
+                  hover: index() === searchStore.suggestions.index,
                 }}
                 onclick={() => {
                   textToSearch(item);
                 }}
-              >{item}</li>
+              >
+                {item}
+              </li>
             )}
           </For>
         </ul>
