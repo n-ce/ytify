@@ -1,86 +1,109 @@
-import { Accessor, Show, createSignal } from 'solid-js';
-import './StreamItem.css';
-import { config, hostResolver, player, removeFromCollection, getCollectionItems, generateImageUrl } from '@utils';
-import { setStore, store, queueStore, setQueueStore, listStore, navStore, setNavStore, playerStore, setPlayerStore } from '@stores';
+import { Accessor, Show, createSignal } from "solid-js";
+import "./StreamItem.css";
+import {
+  config,
+  hostResolver,
+  player,
+  removeFromCollection,
+  getCollectionItems,
+  generateImageUrl,
+} from "@utils";
+import {
+  setStore,
+  store,
+  queueStore,
+  setQueueStore,
+  listStore,
+  navStore,
+  setNavStore,
+  playerStore,
+  setPlayerStore,
+} from "@stores";
 
-export default function(data: YTItem & {
-  draggable?: boolean,
-  inQueue?: boolean,
-  context?: {
-    src: Context,
-    id: string
+export default function (
+  data: YTItem & {
+    draggable?: boolean;
+    inQueue?: boolean;
+    context?: {
+      src: Context;
+      id: string;
+    };
+    mark?: {
+      mode: Accessor<boolean>;
+      set: (id: string) => void;
+      get: (id: string) => boolean;
+    };
+    removeMode?: boolean;
   },
-  mark?: {
-    mode: Accessor<boolean>,
-    set: (id: string) => void,
-    get: (id: string) => boolean
-  },
-  removeMode?: boolean
-}) {
-
-  const [getImage, setImage] = createSignal('');
+) {
+  const [getImage, setImage] = createSignal("");
 
   let parent!: HTMLAnchorElement;
-
 
   function handleThumbnailLoad(e: Event) {
     const img = e.target as HTMLImageElement;
     const src = getImage();
 
     if (img.naturalWidth !== 120) {
-      parent.classList.remove('ravel');
+      parent.classList.remove("ravel");
       return;
     }
-    if (src.includes('webp'))
-      setImage(src.replace('.webp', '.jpg').replace('vi_webp', 'vi'));
+    if (src.includes("webp"))
+      setImage(src.replace(".webp", ".jpg").replace("vi_webp", "vi"));
     else {
       // most likely been removed from yt so remove it
-      if (data.context?.src)
-        removeFromCollection(data.context?.id, [data.id])
+      if (data.context?.src) removeFromCollection(data.context?.id, [data.id]);
     }
   }
 
   function handleThumbnailError() {
-
     const src = getImage();
 
     setImage(
-      src.includes('vi_webp') ?
-        src.replace('.webp', '.jpg').replace('vi_webp', 'vi') :
-        '/logo192.png'
+      src.includes("vi_webp")
+        ? src.replace(".webp", ".jpg").replace("vi_webp", "vi")
+        : "/logo192.png",
     );
 
-    parent.classList.remove('ravel');
+    parent.classList.remove("ravel");
   }
 
-
-
-  const isAlbum = data.context?.id.startsWith('MPREb') || listStore.type === 'album';
-  const isFromArtist = data.context?.id?.startsWith('Artist - ');
-  const isMusic = data.author?.endsWith('- Topic');
+  const isAlbum =
+    data.context?.id.startsWith("MPREb") || listStore.type === "album";
+  const isFromArtist = data.context?.id?.startsWith("Artist - ");
+  const isMusic = data.author?.endsWith("- Topic");
 
   if (config.loadImage && !isAlbum)
-    setImage(generateImageUrl(data.img || data.id, 'mq', data.context?.id === 'favorites' || isFromArtist || ((data.context?.src === 'queue') && isMusic)));
+    setImage(
+      generateImageUrl(
+        data.img || data.id,
+        "mq",
+        data.context?.id === "favorites" ||
+          isFromArtist ||
+          (data.context?.src === "queue" && isMusic),
+      ),
+    );
 
   return (
     <a
-      class='streamItem card card--interactive'
+      class="streamItem card card--interactive"
       classList={{
-        'ravel': config.loadImage && !isAlbum,
-        'marked': data.mark?.get(data.id),
-        'delete': data.removeMode
+        ravel: config.loadImage && !isAlbum,
+        marked: data.mark?.get(data.id),
+        delete: data.removeMode,
       }}
-      href={hostResolver('/watch?v=' + data.id)}
+      href={hostResolver("/watch?v=" + data.id)}
       ref={parent}
       onclick={(e) => {
         e.preventDefault();
 
         if (data.removeMode) {
-          setQueueStore('list', (list) => {
-            const index = list.findIndex(item =>
-              item.id === data.id &&
-              item.context?.id === data.context?.id &&
-              item.context?.src === data.context?.src
+          setQueueStore("list", (list) => {
+            const index = list.findIndex(
+              (item) =>
+                item.id === data.id &&
+                item.context?.id === data.context?.id &&
+                item.context?.src === data.context?.src,
             );
             if (index !== -1) {
               const newList = [...list];
@@ -97,52 +120,57 @@ export default function(data: YTItem & {
           return;
         }
 
-        if (!e.target.classList.contains('ri-more-2-fill')) {
-
+        if (!e.target.classList.contains("ri-more-2-fill")) {
           if (playerStore.stream.id) {
-            setQueueStore('history', h => [{ ...playerStore.stream }, ...h]);
+            setQueueStore("history", (h) => [{ ...playerStore.stream }, ...h]);
           }
 
-          setPlayerStore('stream', {
+          setPlayerStore("stream", {
             id: data.id,
             title: data.title,
-            author: data.author || '',
+            author: data.author || "",
             duration: data.duration,
-            authorId: data.authorId || '',
+            authorId: data.authorId || "",
           });
 
-          if (data.albumId)
-            setPlayerStore('stream', 'albumId', data.albumId);
+          if (data.albumId) setPlayerStore("stream", "albumId", data.albumId);
           else if (playerStore.stream.albumId)
-            setPlayerStore('stream', 'albumId', undefined);
+            setPlayerStore("stream", "albumId", undefined);
 
-
-          setPlayerStore('context', {
-            id: data.context?.id || '',
-            src: data.context?.src || ''
+          setPlayerStore("context", {
+            id: data.context?.id || "",
+            src: data.context?.src || "",
           });
 
+          const isPortrait = matchMedia("(orientation:portrait)").matches;
 
-          const isPortrait = matchMedia('(orientation:portrait)').matches;
+          if (isPortrait) {
+            setNavStore("player", "state", Boolean(config.watchMode));
 
-          if (isPortrait || config.landscapeSections === '1') {
-            setNavStore('player', 'state', Boolean(config.watchMode));
-
-            if (config.watchMode)
-              navStore.player.ref?.scrollIntoView();
+            if (config.watchMode) navStore.player.ref?.scrollIntoView();
           }
 
-          if (config.contextualFill && !queueStore.isSession && (data.context?.src === 'collection' || (data.context?.src === 'playlists')) && data.context?.id !== 'history') {
-            const collectionItems = data.context.src === 'collection' ? getCollectionItems(data.context.id) :
-              listStore.list;
-            const currentIndex = collectionItems.findIndex(item => item.id === data.id);
+          if (
+            config.contextualFill &&
+            !queueStore.isSession &&
+            (data.context?.src === "collection" ||
+              data.context?.src === "playlists") &&
+            data.context?.id !== "history"
+          ) {
+            const collectionItems =
+              data.context.src === "collection"
+                ? getCollectionItems(data.context.id)
+                : listStore.list;
+            const currentIndex = collectionItems.findIndex(
+              (item) => item.id === data.id,
+            );
             if (currentIndex !== -1) {
               const zigzagQueue: TrackItem[] = [];
               let left = currentIndex - 1;
               let right = currentIndex + 1;
               const len = collectionItems.length;
 
-              const historyIds = new Set(queueStore.history.map(i => i.id));
+              const historyIds = new Set(queueStore.history.map((i) => i.id));
 
               while (left >= 0 || right < len) {
                 if (right < len) {
@@ -154,17 +182,18 @@ export default function(data: YTItem & {
                   if (!historyIds.has(item.id)) zigzagQueue.push(item);
                 }
               }
-              setQueueStore('list', zigzagQueue);
+              setQueueStore("list", zigzagQueue);
             }
           }
 
           player(data.id);
 
-          setQueueStore('list', (list) => {
-            const index = list.findIndex(item =>
-              item.id === data.id &&
-              item.context?.id === data.context?.id &&
-              item.context?.src === data.context?.src
+          setQueueStore("list", (list) => {
+            const index = list.findIndex(
+              (item) =>
+                item.id === data.id &&
+                item.context?.id === data.context?.id &&
+                item.context?.src === data.context?.src,
             );
             if (index !== -1) {
               const newList = [...list];
@@ -173,45 +202,40 @@ export default function(data: YTItem & {
             }
             return list;
           });
-        }
-        else {
-          setStore('actionsMenu', {
+        } else {
+          setStore("actionsMenu", {
             id: data.id,
             title: data.title,
             author: data.author,
             duration: data.duration,
             authorId: data.authorId,
-            context: data.context
+            context: data.context,
           });
-
 
           const { albumId } = data;
           if (store.actionsMenu?.albumId)
-            setStore('actionsMenu', 'albumId', undefined);
-          if (albumId)
-            setStore('actionsMenu', 'albumId', albumId);
-
+            setStore("actionsMenu", "albumId", undefined);
+          if (albumId) setStore("actionsMenu", "albumId", albumId);
         }
       }}
     >
       <span>
         <Show when={!isAlbum && config.loadImage} fallback={data.duration}>
-
           <img
-            crossorigin='anonymous'
+            crossorigin="anonymous"
             onerror={handleThumbnailError}
             onload={handleThumbnailLoad}
             src={getImage()}
           />
-          <p class='duration'>{data.duration}</p>
+          <p class="duration">{data.duration}</p>
         </Show>
       </span>
-      <div class='metadata'>
-        <p class='title'>{data.title}</p>
-        <div class='avu'>
-          <p class='author truncate'>{data.author?.replace(' - Topic', '')}</p>
+      <div class="metadata">
+        <p class="title">{data.title}</p>
+        <div class="avu">
+          <p class="author truncate">{data.author?.replace(" - Topic", "")}</p>
           <Show when={!isAlbum}>
-            <p class='viewsXuploaded truncate'>{data.subtext}</p>
+            <p class="viewsXuploaded truncate">{data.subtext}</p>
           </Show>
         </div>
       </div>
@@ -222,5 +246,5 @@ export default function(data: YTItem & {
         <i aria-label="More" class="ri-more-2-fill"></i>
       </Show>
     </a>
-  )
+  );
 }

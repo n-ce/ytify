@@ -1,114 +1,107 @@
-import { params, setNavStore, setStore, setPlayerStore, getList, setSearchStore, playerStore, t } from '@stores';
-import { config, getDownloadLink, idFromURL, fetchCollection, player, setConfig, cleanseLibraryData, drawer } from '@utils';
+import {
+  params,
+  setNavStore,
+  setStore,
+  setPlayerStore,
+  getList,
+  setSearchStore,
+  playerStore,
+  t,
+} from "@stores";
+import {
+  config,
+  getDownloadLink,
+  idFromURL,
+  fetchCollection,
+  player,
+  setConfig,
+  cleanseLibraryData,
+} from "@utils";
 
-
-
-export default async function() {
-
+export default async function () {
   if (!params.size) {
-    setNavStore('active', drawer.lastMainFeature as 'search' | 'library');
+    setNavStore("active", "library");
   }
 
   // Handle /s/:id URLs by transforming them to /?s=id internally
-  const pathParts = location.pathname.split('/');
-  if (pathParts.length === 3 && pathParts[1] === 's') {
+  const pathParts = location.pathname.split("/");
+  if (pathParts.length === 3 && pathParts[1] === "s") {
     const id = pathParts[2];
     if (id) {
-      params.set('s', id);
-      history.replaceState({}, '', `/?s=${id}`);
+      params.set("s", id);
+      history.replaceState({}, "", `/?s=${id}`);
     }
   }
 
   const { shareAction } = config;
 
-
-
-  const collection = params.get('collection');
-  const shared = params.get('si');
-  const channel = params.get('channel');
-  const playlist = params.get('playlist');
-  const artist = params.get('artist');
-  const album = params.get('album');
+  const collection = params.get("collection");
+  const shared = params.get("si");
+  const channel = params.get("channel");
+  const playlist = params.get("playlist");
+  const artist = params.get("artist");
+  const album = params.get("album");
 
   if (collection || shared)
     fetchCollection(collection || shared, Boolean(shared));
-  else if (channel)
-    getList(channel, 'channel')
-  else if (playlist)
-    getList(playlist, 'playlist')
-  else if (artist)
-    getList(artist, 'artist')
-  else if (album)
-    getList(album, 'album')
+  else if (channel) getList(channel, "channel");
+  else if (playlist) getList(playlist, "playlist");
+  else if (artist) getList(artist, "artist");
+  else if (album) getList(album, "album");
 
-  const q = params.get('q');
+  const q = params.get("q");
   if (q) {
-    const f = params.get('f') || 'all';
-    setConfig('searchFilter', f);
-    setSearchStore('query', q);
-    setNavStore('active', 'search');
+    const f = params.get("f") || "all";
+    setConfig("searchFilter", f);
+    setSearchStore("query", q);
+    setNavStore("active", "search");
   }
 
-
-  const isPWA = idFromURL(params.get('url') || params.get('text'));
-  const id = params.get('s') || isPWA;
-
+  const isPWA = idFromURL(params.get("url") || params.get("text"));
+  const id = params.get("s") || isPWA;
 
   if (id) {
-
-    if (isPWA && shareAction === 'watch') {
-      setPlayerStore('stream', 'id', id);
-      setPlayerStore('isWatching', true);
-
-
-    } else if (isPWA && shareAction === 'download') {
+    if (isPWA && shareAction === "watch") {
+      setPlayerStore("stream", "id", id);
+      setPlayerStore("isWatching", true);
+    } else if (isPWA && shareAction === "download") {
       getDownloadLink(id);
     } else {
-      if (params.size === 1)
-        setNavStore('player', 'state', true);
+      if (params.size === 1) setNavStore("player", "state", true);
       await player(id);
-      const t = params.get('t');
+      const t = params.get("t");
       if (t) {
         playerStore.audio.currentTime = Number(t);
-        setPlayerStore('currentTime', Number(t));
+        setPlayerStore("currentTime", Number(t));
       }
     }
-
   }
 
-
-
-  document.addEventListener('click', (e) => {
+  document.addEventListener("click", (e) => {
     const click = e.target as HTMLElement;
-    const detail = document.querySelector('details:open');
+    const detail = document.querySelector("details:open");
 
     if (!detail?.firstElementChild?.contains(click))
-      detail?.removeAttribute('open');
+      detail?.removeAttribute("open");
   });
 
   function toggleTooltip(event: PointerEvent) {
     const t = event.target as HTMLElement;
-    if (t.matches('i[aria-label]'))
-      t.classList.toggle('show')
+    if (t.matches("i[aria-label]")) t.classList.toggle("show");
   }
 
-  document.addEventListener('pointerover', toggleTooltip);
-  document.addEventListener('pointerout', toggleTooltip);
-
+  document.addEventListener("pointerover", toggleTooltip);
+  document.addEventListener("pointerout", toggleTooltip);
 
   if (import.meta.env.PROD)
-    await import('virtual:pwa-register').then(pwa => {
-
+    await import("virtual:pwa-register").then((pwa) => {
       const handleUpdate = pwa.registerSW({
         async onNeedRefresh() {
-          setStore('snackbar', `${t('updating')}`);
+          setStore("snackbar", `${t("updating")}`);
           setTimeout(() => handleUpdate(true), 1500);
-        }
+        },
       });
     });
 
   cleanseLibraryData();
-
-
-
 }

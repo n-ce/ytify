@@ -1,23 +1,26 @@
 import { queueStore, setQueueStore, t, setStore } from "@stores";
 import { parseDuration } from "@utils";
-import getStreamData from "./getStreamData";
-import setAudioStreams from "./setAudioStreams";
 
 export const isQueuePrefetchActive = () => queueStore.isSession;
 
 export async function activateQueuePrefetch() {
   const { list } = queueStore;
-  const totalSeconds = list.reduce((acc, item) => acc + parseDuration(item.duration), 0);
+  const totalSeconds = list.reduce(
+    (acc, item) => acc + parseDuration(item.duration),
+    0,
+  );
 
   if (list.length > 20 || totalSeconds > 3600) {
-    setStore('snackbar', t('queue_prefetch_limit_exceeded'));
+    setStore("snackbar", t("queue_prefetch_limit_exceeded"));
     return;
   }
 
-  setQueueStore('isSession', true);
+  setQueueStore("isSession", true);
 
   let count = 0;
   const total = list.length;
+  const { default: getStreamData } = await import("./getStreamData");
+  const { default: setAudioStreams } = await import("./setAudioStreams");
 
   for (const track of list) {
     if (!queueStore.isSession) break;
@@ -26,16 +29,19 @@ export async function activateQueuePrefetch() {
       continue;
     }
 
-    setStore('snackbar', t('queue_prefetch_activating').replace('$', `${count}/${total}`));
+    setStore(
+      "snackbar",
+      t("queue_prefetch_activating").replace("$", `${count}/${total}`),
+    );
 
     const data = await getStreamData(track.id);
-    if (data && 'adaptiveFormats' in data) {
+    if (data && "adaptiveFormats" in data) {
       const ghost = new Audio();
-      ghost.preload = 'auto';
+      ghost.preload = "auto";
 
       const formats = data.adaptiveFormats
-        .filter(f => f.type.startsWith('audio'))
-        .sort((a, b) => (parseInt(a.bitrate) - parseInt(b.bitrate)));
+        .filter((f) => f.type.startsWith("audio"))
+        .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
       await setAudioStreams(formats, ghost);
       queueStore.sessionMap.set(track.id, ghost);
@@ -43,15 +49,14 @@ export async function activateQueuePrefetch() {
     count++;
   }
 
-  if (queueStore.isSession)
-    setStore('snackbar', t('queue_prefetch_ready'));
+  if (queueStore.isSession) setStore("snackbar", t("queue_prefetch_ready"));
 }
 
 export function deactivateQueuePrefetch() {
-  queueStore.sessionMap.forEach(audio => {
-    audio.src = '';
+  queueStore.sessionMap.forEach((audio) => {
+    audio.src = "";
     audio.load();
   });
   queueStore.sessionMap.clear();
-  setQueueStore('isSession', false);
+  setQueueStore("isSession", false);
 }

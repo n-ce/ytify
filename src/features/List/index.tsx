@@ -1,15 +1,30 @@
-import { createSignal, For, onMount, Show, onCleanup } from 'solid-js';
-import './List.css';
-import { addToQueue, listStore, resetList, setNavStore, t, setQueueStore } from '@stores';
-import { fetchCollection, removeFromCollection, setConfig, config, generateImageUrl, setDrawer, getCollectionItems } from '@utils';
-import Dropdown from './Dropdown';
-import Results from './Results';
-import CollectionSelector from '@components/ActionsMenu/CollectionSelector';
-import ListItem from '@components/ListItem';
+import { createSignal, For, onMount, Show, onCleanup } from "solid-js";
+import "./List.css";
+import {
+  addToQueue,
+  listStore,
+  resetList,
+  setNavStore,
+  t,
+  setQueueStore,
+} from "@stores";
+import {
+  fetchCollection,
+  removeFromCollection,
+  setConfig,
+  config,
+  generateImageUrl,
+  setDrawer,
+  getCollectionItems,
+} from "@utils";
+import Dropdown from "./Dropdown";
+import Results from "./Results";
+import CollectionSelector from "@components/ActionsMenu/CollectionSelector";
+import ListItem from "@components/ListItem";
 
-type SortBy = 'modified' | 'name' | 'artist' | 'duration';
+type SortBy = "modified" | "name" | "artist" | "duration";
 
-export default function() {
+export default function () {
   let listSection!: HTMLElement;
 
   const [markMode, setMarkMode] = createSignal(false);
@@ -17,57 +32,72 @@ export default function() {
   const [markList, setMarkList] = createSignal<string[]>([]);
   const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
   const [localSortBy, setLocalSortBy] = createSignal<SortBy>(config.sortBy);
-  const [localSortOrder, setLocalSortOrder] = createSignal<'asc' | 'desc'>(config.sortOrder);
+  const [localSortOrder, setLocalSortOrder] = createSignal<"asc" | "desc">(
+    config.sortOrder,
+  );
   const [showSortable, setShowSortable] = createSignal(false);
-  const [searchQuery, setSearchQuery] = createSignal('');
+  const [searchQuery, setSearchQuery] = createSignal("");
 
   const filteredItems = () => {
-    const query = searchQuery().normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+    const query = searchQuery()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
     if (!query) return listStore.list;
 
-    const source = listStore.type === 'collection' && !listStore.isShared
-      ? getCollectionItems(listStore.id)
-      : listStore.list;
+    const source =
+      listStore.type === "collection" && !listStore.isShared
+        ? getCollectionItems(listStore.id)
+        : listStore.list;
 
-    return source.filter(item => {
-      const normalize = (str: string) => str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-      return normalize(item.title).includes(query) || normalize(item.author).includes(query);
+    return source.filter((item) => {
+      const normalize = (str: string) =>
+        str
+          .normalize("NFD")
+          .replace(/\p{Diacritic}/gu, "")
+          .toLowerCase();
+      return (
+        normalize(item.title).includes(query) ||
+        normalize(item.author).includes(query)
+      );
     });
   };
 
   onMount(() => {
-    setNavStore('list', 'ref', listSection);
+    setNavStore("list", "ref", listSection);
     listSection.scrollIntoView();
   });
 
   onCleanup(() => {
     if (listStore.id) {
-      setDrawer('lastList', {
+      setDrawer("lastList", {
         id: listStore.id,
-        type: listStore.type === 'playlists' ? 'playlist' : (listStore.type === 'channels' ? 'channel' : listStore.type),
-        shared: listStore.isShared
+        type:
+          listStore.type === "playlists"
+            ? "playlist"
+            : listStore.type === "channels"
+              ? "channel"
+              : listStore.type,
+        shared: listStore.isShared,
       });
     }
     resetList();
   });
 
-
   const MarkBar = () => (
     <div class="markBar">
       <i
-        aria-label={t('list_mark_all')}
-        class={'ri-checkbox-multiple-fill'}
+        aria-label={t("list_mark_all")}
+        class={"ri-checkbox-multiple-fill"}
         onclick={() => {
-          if (markList().length === listStore.list.length)
-            setMarkList([]);
-          else
-            setMarkList(listStore.list.map(v => v.id));
+          if (markList().length === listStore.list.length) setMarkList([]);
+          else setMarkList(listStore.list.map((v) => v.id));
         }}
       ></i>
       <Show when={markList().length}>
-        <Show when={listStore.type === 'collection'}>
+        <Show when={listStore.type === "collection"}>
           <i
-            aria-label={t('list_remove_marked')}
+            aria-label={t("list_remove_marked")}
             class="ri-indeterminate-circle-line"
             onclick={() => {
               removeFromCollection(listStore.name, markList());
@@ -75,126 +105,147 @@ export default function() {
           ></i>
         </Show>
         <i
-          aria-label={t('list_enqueue_marked')}
+          aria-label={t("list_enqueue_marked")}
           class="ri-list-check-2"
           onclick={() => {
-
-            const listToEnqueue = markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as TrackItem[];
+            const listToEnqueue = markList()
+              .map((id) => listStore.list.find((v) => v.id === id))
+              .filter(Boolean) as TrackItem[];
 
             if (listToEnqueue.length) {
-              setQueueStore('history', []);
+              setQueueStore("history", []);
               addToQueue(listToEnqueue);
-              setNavStore('queue', 'state', false);
-              setNavStore('queue', 'state', true);
+              setNavStore("queue", "state", false);
+              setNavStore("queue", "state", true);
             }
-
           }}
         ></i>
 
-        <i aria-label={t('collection_selector_add_to')}>
-          <CollectionSelector data={markList().map(id => listStore.list.find(v => v.id === id)).filter(Boolean) as TrackItem[]
-          } />
+        <i aria-label={t("collection_selector_add_to")}>
+          <CollectionSelector
+            data={
+              markList()
+                .map((id) => listStore.list.find((v) => v.id === id))
+                .filter(Boolean) as TrackItem[]
+            }
+          />
         </i>
       </Show>
-    </div >
+    </div>
   );
 
   return (
     <section ref={listSection} id="listSection">
       <header class="sticky-bar">
-        <Show
-          when={!markMode()}
-          fallback={<MarkBar />}>
-          <Show when={!isSearching()} fallback={
-            <input
-              autofocus
-              type="text"
-              class="listSearchInput"
-              placeholder="Search within List"
-              oninput={(e) => {
-                setSearchQuery((e.target as HTMLInputElement).value.toLowerCase());
-              }}
-              onkeydown={(e) => {
-                if (e.key === 'Escape') {
-                  setIsSearching(false);
-                  setSearchQuery('');
-                }
-              }}
-            />
-          }>
+        <Show when={!markMode()} fallback={<MarkBar />}>
+          <Show
+            when={!isSearching()}
+            fallback={
+              <input
+                autofocus
+                type="text"
+                class="listSearchInput"
+                placeholder="Search within List"
+                oninput={(e) => {
+                  setSearchQuery(
+                    (e.target as HTMLInputElement).value.toLowerCase(),
+                  );
+                }}
+                onkeydown={(e) => {
+                  if (e.key === "Escape") {
+                    setIsSearching(false);
+                    setSearchQuery("");
+                  }
+                }}
+              />
+            }
+          >
             <p
               onclick={() => setShowStreamsNumber(!showStreamsNumber())}
               id="listTitle"
-            >{
-                showStreamsNumber() ?
-                  t('list_streams_count', listStore.length.toString()) :
-                  listStore.name
-              }</p>
+            >
+              {showStreamsNumber()
+                ? t("list_streams_count", listStore.length.toString())
+                : listStore.name}
+            </p>
           </Show>
         </Show>
 
-
         <div class="right-group">
           <i
-            aria-label={t('list_mark_mode')}
+            aria-label={t("list_mark_mode")}
             aria-checked={markMode()}
-            class={markMode() ? 'ri-checkbox-fill' : 'ri-checkbox-line'}
+            class={markMode() ? "ri-checkbox-fill" : "ri-checkbox-line"}
             onclick={() => {
               setMarkMode(!markMode());
-              if (!markMode())
-                setMarkList([]);
+              if (!markMode()) setMarkList([]);
             }}
           ></i>
           <i
-            aria-label={t('nav_search')}
+            aria-label={t("nav_search")}
             class="ri-search-2-line"
             onclick={() => {
               setIsSearching(!isSearching());
-              if (!isSearching()) setSearchQuery('');
+              if (!isSearching()) setSearchQuery("");
             }}
           ></i>
         </div>
         <Dropdown />
-
-
       </header>
 
-
-      <Show when={listStore.type === 'collection' && listStore.id && !listStore.reservedCollections.includes(listStore.id)}>
+      <Show
+        when={
+          listStore.type === "collection" &&
+          listStore.id &&
+          !listStore.reservedCollections.includes(listStore.id)
+        }
+      >
         <span class="sortBar">
-          <label for="sortMenu">{t('list_sort_order')} :</label>
-          <select id="sortMenu" onchange={(e) => {
-            const newSortBy = e.target.value as SortBy;
-            setLocalSortBy(newSortBy);
-            setConfig('sortBy', newSortBy);
-            fetchCollection(listStore.id);
-          }} value={localSortBy()}>
-            <option value="modified">{t('list_sort_modified')}</option>
-            <option value="name">{t('list_sort_name')}</option>
-            <option value="artist">{t('list_sort_artist')}</option>
-            <option value="duration">{t('list_sort_duration')}</option>
+          <label for="sortMenu">{t("list_sort_order")} :</label>
+          <select
+            id="sortMenu"
+            onchange={(e) => {
+              const newSortBy = e.target.value as SortBy;
+              setLocalSortBy(newSortBy);
+              setConfig("sortBy", newSortBy);
+              fetchCollection(listStore.id);
+            }}
+            value={localSortBy()}
+          >
+            <option value="modified">{t("list_sort_modified")}</option>
+            <option value="name">{t("list_sort_name")}</option>
+            <option value="artist">{t("list_sort_artist")}</option>
+            <option value="duration">{t("list_sort_duration")}</option>
           </select>
-          <Show when={localSortBy() === 'modified' && !listStore.reservedCollections.includes(listStore.id)}>
+          <Show
+            when={
+              localSortBy() === "modified" &&
+              !listStore.reservedCollections.includes(listStore.id)
+            }
+          >
             <i
               class="ri-draggable"
-              classList={{ 'active': showSortable() }}
+              classList={{ active: showSortable() }}
               onclick={() => setShowSortable(!showSortable())}
             ></i>
           </Show>
           <i
-            class={localSortOrder() === 'asc' ? 'ri-sort-asc' : 'ri-sort-desc'}
+            class={localSortOrder() === "asc" ? "ri-sort-asc" : "ri-sort-desc"}
             onclick={() => {
-              const newOrder = config.sortOrder === 'asc' ? 'desc' : 'asc';
-              setConfig('sortOrder', newOrder);
+              const newOrder = config.sortOrder === "asc" ? "desc" : "asc";
+              setConfig("sortOrder", newOrder);
               setLocalSortOrder(newOrder);
               fetchCollection(listStore.id);
             }}
           ></i>
         </span>
-
       </Show>
 
-      <Show when={listStore.name.startsWith('Artist') && listStore.artistAlbums?.length}>
+      <Show
+        when={
+          listStore.name.startsWith("Artist") && listStore.artistAlbums?.length
+        }
+      >
         <div class="list-carousel">
           <For each={listStore.artistAlbums}>
             {(album) => (
@@ -204,30 +255,40 @@ export default function() {
                 img={album.img}
                 author={album.author}
                 id={album.id}
-                type='album'
+                type="album"
               />
             )}
           </For>
         </div>
       </Show>
 
-      <Show when={config.loadImage && listStore.id.startsWith('MPREb')}>
-        <img src={generateImageUrl(listStore.img, '720')} alt={listStore.name} class="list-thumbnail" />
+      <Show when={config.loadImage && listStore.id.startsWith("MPREb")}>
+        <img
+          src={generateImageUrl(listStore.img, "720")}
+          alt={listStore.name}
+          class="list-thumbnail"
+        />
       </Show>
 
       <Results
         items={filteredItems()}
-        draggable={showSortable() && localSortBy() === 'modified' && !listStore.reservedCollections.includes(listStore.id)}
+        draggable={
+          showSortable() &&
+          localSortBy() === "modified" &&
+          !listStore.reservedCollections.includes(listStore.id)
+        }
         mark={{
           mode: markMode,
           set: (id: string) => {
             setMarkList((prev) =>
-              prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+              prev.includes(id)
+                ? prev.filter((item) => item !== id)
+                : [...prev, id],
             );
           },
-          get: (id: string) => markList().includes(id)
+          get: (id: string) => markList().includes(id),
         }}
       />
     </section>
-  )
+  );
 }
