@@ -101,7 +101,9 @@ export const getLists = <T extends "channels" | "playlists">(
 export const getLibraryAlbums = (): LibraryAlbums =>
   JSON.parse(localStorage.getItem("library_albums") || "[]");
 
-export function getCollectionItems(collectionId: string): TrackItem[] {
+export function getCollectionItems(
+  collectionId: string,
+): (TrackItem & { type?: "video" | "song" })[] {
   if (collectionId === "frequently_played") {
     const { libraryPlays } = drawer;
     const tracks = getTracksMap();
@@ -113,14 +115,17 @@ export function getCollectionItems(collectionId: string): TrackItem[] {
         type: "video" as const,
         context: { src: "collection" as const, id: "frequently_played" },
       }))
-      .filter((item) => item.id) as TrackItem[];
+      .filter((item) => item.id);
   }
 
   if (collectionId === "discovery") {
-    return ((drawer.discovery || []) as TrackItem[]).map((item) => ({
-      ...item,
-      context: { src: "collection" as const, id: "discovery" },
-    }));
+    return ((drawer.discovery || []) as (YTItem & { frequency: number })[]).map(
+      (item) => ({
+        ...item,
+        type: (item.type || "video") as "video" | "song",
+        context: { src: "collection" as const, id: "discovery" },
+      }),
+    );
   }
 
   const collectionIds = getCollection(collectionId);
@@ -130,7 +135,7 @@ export function getCollectionItems(collectionId: string): TrackItem[] {
       ...tracksMap[id],
       context: { src: "collection" as const, id: collectionId },
     }))
-    .filter((item) => item.id) as TrackItem[];
+    .filter((item) => item.id);
 }
 
 export function saveTracksMap(tracks: Collection) {
@@ -309,8 +314,7 @@ export function rehydrateStores() {
   }
 
   if (navStore.active === "library") {
-    setNavStore("active", "" as "library");
-    setTimeout(() => setNavStore("active", "library"), 10);
+    setNavStore("active", "library");
   }
 }
 
@@ -379,7 +383,11 @@ function getLocalCollection(collection: string) {
   const isDiscovery = collection === "discovery";
 
   if (isFrequentlyPlayed || isDiscovery) {
-    const items = getCollectionItems(collection);
+    const rawItems = getCollectionItems(collection);
+    const items: YTItem[] = rawItems.map((item) => ({
+      ...item,
+      type: (item.type || "video") as "video" | "song",
+    }));
     const displayName = isFrequentlyPlayed
       ? t("hub_frequently_played")
       : t("hub_discovery");
