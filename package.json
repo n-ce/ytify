@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260828.1",
-    "@netlify/blobs": "^11.0.2",
+    "@netlify/blobs": "^11.0.1",
     "@netlify/edge-functions": "^4.0.0",
     "@netlify/functions": "^6.0.0",
     "@types/node": "^26.4.0",

@@ -36,7 +36,6 @@ export default function () {
 
   onMount(() => {
     setNavStore("player", "ref", playerSection);
-    playerSection.scrollIntoView();
   });
 
   createEffect(() => {
@@ -63,8 +62,7 @@ export default function () {
     }
   };
 
-  return (
-    <section id="playerSection" ref={playerSection}>
+  return (<section id="playerSection" ref={playerSection}>
       <Show when={playerStore.immersive}>
         <div class="bg-pane" />
         <div class="bg-image" />

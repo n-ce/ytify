@@ -18,6 +18,7 @@ import {
   navStore,
   setNavStore,
   playerStore,
+  params,
 } from "@stores";
 import "./styles/global.css";
 
@@ -68,6 +69,12 @@ export default function App() {
     }
 
     await import("@modules/start.ts").then((mod) => mod.default());
+
+    if (params.has("s")) {
+      leftPanelRef?.scrollIntoView({ behavior: "instant" });
+    } else {
+      rightPanelRef?.scrollIntoView({ behavior: "instant" });
+    }
 
     setStore("syncState", "synced");
     syncLibrary("init");
