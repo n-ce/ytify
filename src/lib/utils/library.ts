@@ -32,36 +32,22 @@ export const getMeta = (): Meta => {
   }
 
   const newMeta: Meta = { version: 5, tracks: 0 };
-  const now = Date.now();
-
-  const tracks = getTracksMap();
-  if (Object.keys(tracks).length > 0) {
-    newMeta.tracks = now;
-  }
 
   const collections = getCollectionsKeys();
   for (const key of collections) {
-    const items = getCollection(key);
-    if (items.length > 0) {
-      newMeta[key] = now;
-    } else {
-      newMeta[key] = 0;
-    }
+    newMeta[key] = 0;
   }
 
-  const channels = getLists("channels");
-  if (channels.length > 0) {
-    newMeta.channels = now;
+  if (getLists("channels").length > 0) {
+    newMeta.channels = 0;
   }
 
-  const playlists = getLists("playlists");
-  if (playlists.length > 0) {
-    newMeta.playlists = now;
+  if (getLists("playlists").length > 0) {
+    newMeta.playlists = 0;
   }
 
-  const albums = getLibraryAlbums();
-  if (Object.keys(albums).length > 0) {
-    newMeta.albums = now;
+  if (getLibraryAlbums().length > 0) {
+    newMeta.albums = 0;
   }
 
   return newMeta;
@@ -133,6 +119,7 @@ export function getCollectionItems(
   return collectionIds
     .map((id: string) => ({
       ...tracksMap[id],
+      type: "video" as const,
       context: { src: "collection" as const, id: collectionId },
     }))
     .filter((item) => item.id);
@@ -264,6 +251,9 @@ export function deleteCollection(name: string) {
 
   localStorage.removeItem("library_" + name);
   saveTracksMap(tracks);
+  if (config.dbsync) {
+    import("@modules/cloudSync").then((m) => m.addDeletedCollection(name));
+  }
   metaUpdater(name, true);
   rehydrateStores();
 }
@@ -303,12 +293,17 @@ export function renameCollection(oldName: string, newName: string) {
   const collectionItems = getCollection(oldName);
   saveCollection(newName, collectionItems);
   localStorage.removeItem("library_" + oldName);
+  if (config.dbsync) {
+    import("@modules/cloudSync").then((m) => m.addDeletedCollection(oldName));
+  }
   metaUpdater(oldName, true);
   metaUpdater(newName);
   rehydrateStores();
 }
 
 export function rehydrateStores() {
+  setStore("libraryUpdated", (c) => (c || 0) + 1);
+
   if (listStore.type === "collection" && listStore.id) {
     fetchCollection(listStore.id);
   }
@@ -520,9 +515,6 @@ export function sortCollection(
   const listToSort = [...list];
 
   if (sortBy === "modified") {
-    // If modified and desc, we just return the list (it's already in the order we want for manual/time)
-    // Actually, if it's 'asc', we reverse it.
-    // Manual order is usually newest first for reserved, but for non-reserved it's oldest first.
     return sortOrder === "asc" ? listToSort.reverse() : listToSort;
   }
 
@@ -589,7 +581,8 @@ export function cleanseLibraryData() {
       }
     } else {
       tracksCleaned = true;
-      syncLibrary("remove", id);
+      // Do not mark local unreferenced tracks for cloud deletion,
+      // as they may still be referenced on other devices or tabs.
     }
   }
 

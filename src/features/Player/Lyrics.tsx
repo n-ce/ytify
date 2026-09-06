@@ -2,7 +2,9 @@ import { createSignal, For, onCleanup, createEffect } from "solid-js";
 import { playerStore, setPlayerStore, setStore, t } from "@stores";
 
 export default function (props: { onClose: () => void }) {
-  const [lrcMap, setLrcMap] = createSignal([t("loading")]);
+  const [lrcMap, setLrcMap] = createSignal<{ time?: number; text: string }[]>([
+    { text: t("loading") },
+  ]);
   const [activeLine, setActiveLine] = createSignal(-1);
   let lyricsSection!: HTMLDivElement;
 
@@ -15,20 +17,37 @@ export default function (props: { onClose: () => void }) {
       return;
     }
 
-    setLrcMap([t("loading")]);
+    const controller = new AbortController();
+    let active = true;
+
+    onCleanup(() => {
+      active = false;
+      controller.abort();
+      setPlayerStore("lrcSync", undefined);
+    });
+
+    setLrcMap([{ text: t("loading") }]);
     setActiveLine(-1);
     setPlayerStore("lrcSync", undefined);
 
-    fetch(
-      `https://lrclib.net/api/get?track_name=${title}&artist_name=${author.slice(0, -8)}&duration=${playerStore.fullDuration}`,
-      {
-        headers: {
-          "Lrclib-Client": `ytify ${Build} (https://github.com/n-ce/ytify)`,
-        },
+    const params = new URLSearchParams({
+      track_name: title,
+      artist_name: author.slice(0, -8),
+      duration: (playerStore.fullDuration ?? "").toString(),
+    });
+
+    fetch(`https://lrclib.net/api/get?${params.toString()}`, {
+      signal: controller.signal,
+      headers: {
+        "Lrclib-Client": `ytify ${Build} (https://github.com/n-ce/ytify)`,
       },
-    )
-      .then((res) => res.json())
-      .then((data: { syncedLyrics?: string; duration?: number }) => {
+    })
+      .then((res) => {
+        if (!active) return;
+        return res.json();
+      })
+      .then((data?: { syncedLyrics?: string; duration?: number }) => {
+        if (!active || !data) return;
         const lrc = data.syncedLyrics;
         const fetchedDuration = data.duration;
         const localDuration = playerStore.fullDuration;
@@ -39,23 +58,35 @@ export default function (props: { onClose: () => void }) {
         }
 
         if (lrc) {
-          const durarr: number[] = [];
-          const lrcMap: string[] = lrc.split("\n").map((line: string) => {
-            const [d, l] = line.split("]");
-            if (!l) return "...";
-            const [mm, ss] = d.substring(1).split(":");
-            const s = parseInt(mm) * 60 + parseFloat(ss);
-            durarr.push(s - offset);
-            return l;
-          });
-          setLrcMap(lrcMap);
+          const parsedLines: { time: number; text: string }[] = [];
+          for (const line of lrc.split("\n")) {
+            const match = line.match(/^\[(\d+):(\d+(?:\.\d+)?)\](.*)$/);
+            if (!match) continue;
+            const text = match[3].trim();
+            if (!text) continue;
+            const mm = parseFloat(match[1]);
+            const ss = parseFloat(match[2]);
+            parsedLines.push({
+              time: mm * 60 + ss - offset,
+              text,
+            });
+          }
+
+          if (parsedLines.length === 0) {
+            setStore("snackbar", t("lyrics_no_found"));
+            props.onClose();
+            return;
+          }
+
+          setLrcMap(parsedLines);
 
           setPlayerStore({
             lrcSync: (d: number) => {
+              if (!active) return;
               let currentIndex = -1;
-              const { length } = durarr;
+              const { length } = parsedLines;
               for (let i = 0; i < length; i++) {
-                if (durarr[i] <= d) {
+                if (parsedLines[i].time <= d) {
                   currentIndex = i;
                 } else {
                   break;
@@ -81,7 +112,8 @@ export default function (props: { onClose: () => void }) {
           props.onClose();
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        if (!active || (err as any)?.name === "AbortError") return;
         setStore("snackbar", t("lyrics_failed"));
         props.onClose();
       });
@@ -95,7 +127,7 @@ export default function (props: { onClose: () => void }) {
     <div ref={lyricsSection} class="lyrics">
       <For each={lrcMap()}>
         {(item, i) => (
-          <p classList={{ active: activeLine() === i() }}>{item}</p>
+          <p classList={{ active: activeLine() === i() }}>{item.text}</p>
         )}
       </For>
     </div>

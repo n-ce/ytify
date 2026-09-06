@@ -60,7 +60,7 @@ export default function () {
   const filteredItems = () => {
     const rawQuery = searchQuery().trim();
     const source = getSourceItems();
-    if (!rawQuery) return listStore.list;
+    if (!rawQuery) return source;
 
     const query = rawQuery
       .normalize("NFD")

@@ -90,7 +90,7 @@ export default function Dropdown() {
               setShowConfigure(true);
             }}
           >
-            <i class="ri-equalizer-2-line"></i>&nbsp;{t("library_configure")}
+            <i class="ri-archive-stack-line"></i>&nbsp;{t("library_configure")}
           </li>
           <li onclick={() => document.getElementById("upload_ytify")?.click()}>
             <label>

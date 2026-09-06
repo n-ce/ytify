@@ -13,7 +13,6 @@ import {
   applyPanelRatio,
 } from "@utils";
 import Dropdown from "./Dropdown";
-import About from "../Search/About";
 
 export default function () {
   let settingsSection!: HTMLDivElement;
@@ -230,8 +229,6 @@ export default function () {
           <option value="light">{t("settings_theming_scheme_light")}</option>
           <option value="dark">{t("settings_theming_scheme_dark")}</option>
         </Selector>
-
-        <About />
       </div>
       <br />
       <br />

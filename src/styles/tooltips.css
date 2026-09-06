@@ -35,12 +35,6 @@ i[aria-label]::after {
     }
 }
 
-i[aria-label]:active::after {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: none !important;
-}
-
 i[aria-label].show::after {
     opacity: 1 !important;
     visibility: visible !important;
@@ -49,4 +43,10 @@ i[aria-label].show::after {
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
     transition-delay: 0.5s;
+}
+
+i[aria-label]:active::after {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: none !important;
 }

@@ -1,4 +1,4 @@
-import { For, Show, lazy, onMount } from "solid-js";
+import { For, Show, lazy, onMount, createMemo } from "solid-js";
 import "./Library.css";
 import Collections from "./Collections";
 
@@ -27,6 +27,16 @@ export default function () {
       setNavStore("library", "ref", libraryRef);
       libraryRef.scrollIntoView();
     });
+
+  const libraryAlbums = createMemo(() => {
+    store.libraryUpdated;
+    return getLibraryAlbums();
+  });
+
+  const libraryPlaylists = createMemo(() => {
+    store.libraryUpdated;
+    return getLists("playlists");
+  });
 
   return (
     <section class="library" ref={libraryRef}>
@@ -73,14 +83,14 @@ export default function () {
       </Show>
       <Collections />
       <br />
-      <Show when={getLibraryAlbums().length > 0}>
+      <Show when={libraryAlbums().length > 0}>
         <article>
           <p>
             <i class="ri-album-fill"></i>&nbsp;
             {t("library_albums")}
           </p>
           <div>
-            <For each={getLibraryAlbums()}>
+            <For each={libraryAlbums()}>
               {(item) => (
                 <ListItem
                   name={item.name}
@@ -96,14 +106,14 @@ export default function () {
       </Show>
       <br />
 
-      <Show when={getLists("playlists").length > 0}>
+      <Show when={libraryPlaylists().length > 0}>
         <article>
           <p>
             <i class="ri-youtube-fill"></i>&nbsp;
             {t("library_playlists")}
           </p>
           <div>
-            <For each={getLists("playlists")}>
+            <For each={libraryPlaylists()}>
               {(item) => (
                 <ListItem
                   name={item.name}

@@ -5,7 +5,7 @@ import {
   getTracksMap,
   librarySections,
 } from "@utils";
-import { t } from "@stores";
+import { t, store } from "@stores";
 import StreamItem from "@components/StreamItem";
 
 export default function () {
@@ -27,7 +27,10 @@ export default function () {
     setSearchFn(() => mod.default);
   };
 
-  const tracksMap = createMemo(() => getTracksMap());
+  const tracksMap = createMemo(() => {
+    store.libraryUpdated;
+    return getTracksMap();
+  });
 
   let debounceTimer: NodeJS.Timeout;
   const handleInput = () => {
@@ -65,9 +68,10 @@ export default function () {
     return true;
   };
 
-  const visibleCollections = createMemo(() =>
-    getCollectionsKeys().filter(isCollectionVisible),
-  );
+  const visibleCollections = createMemo(() => {
+    store.libraryUpdated;
+    return getCollectionsKeys().filter(isCollectionVisible);
+  });
 
   const hasVisibleItems = createMemo(
     () =>

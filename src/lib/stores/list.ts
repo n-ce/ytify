@@ -1,12 +1,5 @@
 import { createStore } from "solid-js/store";
-import {
-  setNavStore,
-  updateParam,
-  setStore,
-  store,
-  navStore,
-  openSubView,
-} from "@stores";
+import { updateParam, setStore, store, navStore, openSubView } from "@stores";
 import { getLibraryAlbums } from "@utils";
 
 const initialState = () => ({
@@ -144,7 +137,7 @@ export async function getList(
 
 export function resetList() {
   if (navStore.active === "list") {
-    setNavStore("active", "search");
+    openSubView("search");
   }
   listStore.observer.disconnect();
 

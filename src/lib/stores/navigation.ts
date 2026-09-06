@@ -40,6 +40,13 @@ export const [navStore, setNavStore] = createStore<
 
 export function openSubView(feature: MainFeature) {
   if (feature === "search") {
+    if (typeof history !== "undefined" && history.state?.panel) {
+      history.replaceState(
+        { ...history.state, panel: null },
+        "",
+        location.href,
+      );
+    }
     setNavStore("active", "search");
     return;
   }

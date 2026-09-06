@@ -96,4 +96,8 @@ export default async function () {
     });
 
   cleanseLibraryData();
+
+  if (config.dbsync) {
+    import("@modules/cloudSync").then((m) => m.initSyncLifecycle());
+  }
 }
