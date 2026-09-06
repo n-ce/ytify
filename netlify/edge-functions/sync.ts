@@ -269,7 +269,7 @@ function applyDeltaInPlace(next: LibrarySnapshot, delta: DeltaPayload): void {
   if (delta.meta) {
     for (const [key, ts] of Object.entries(delta.meta)) {
       if (typeof ts === "number") {
-        next.meta[key] = Math.max(next.meta[key] || 0, ts, now);
+        next.meta[key] = Math.max(next.meta[key] || 0, ts);
       }
     }
   }

@@ -7,6 +7,11 @@ const INACTIVE_THRESHOLD_MS = DATA_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const TOMBSTONE_RETENTION_DAYS = 30;
 const TOMBSTONE_THRESHOLD_MS = TOMBSTONE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
+type LibrarySnapshotCleanup = {
+  deletedCollections?: Record<string, number>;
+  deletedTracks?: Record<string, number>;
+};
+
 export default async () => {
   console.log("--- Starting Scheduled Data Cleanup ---");
   const now = Date.now();
@@ -44,14 +49,15 @@ export default async () => {
         }
 
         // Prune old tombstones from active library
-        const snapshot = blobWithMeta.data as any;
+        const snapshot = blobWithMeta.data as
+          LibrarySnapshotCleanup | null | undefined;
         if (snapshot && typeof snapshot === "object") {
           let modified = false;
           if (snapshot.deletedCollections) {
             for (const [name, time] of Object.entries(
               snapshot.deletedCollections,
             )) {
-              if (now - (time as number) > TOMBSTONE_THRESHOLD_MS) {
+              if (now - time > TOMBSTONE_THRESHOLD_MS) {
                 delete snapshot.deletedCollections[name];
                 modified = true;
               }
@@ -59,19 +65,31 @@ export default async () => {
           }
           if (snapshot.deletedTracks) {
             for (const [id, time] of Object.entries(snapshot.deletedTracks)) {
-              if (now - (time as number) > TOMBSTONE_THRESHOLD_MS) {
+              if (now - time > TOMBSTONE_THRESHOLD_MS) {
                 delete snapshot.deletedTracks[id];
                 modified = true;
               }
             }
           }
           if (modified) {
-            await libraryStore.setJSON(blob.key, snapshot, {
+            if (!blobWithMeta.etag) {
+              console.warn(
+                `Skipping tombstone pruning write for ${blob.key}: missing ETag`,
+              );
+              continue;
+            }
+            const writeResult = await libraryStore.setJSON(blob.key, snapshot, {
               metadata: blobWithMeta.metadata || {
                 contentType: "application/json",
                 lastModified: Date.now().toString(),
               },
+              onlyIfMatch: blobWithMeta.etag,
             });
+            if (!writeResult.modified) {
+              console.log(
+                `Concurrent change detected for ${blob.key}; skipping tombstone pruning`,
+              );
+            }
           }
         }
       }

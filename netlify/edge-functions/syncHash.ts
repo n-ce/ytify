@@ -17,9 +17,11 @@ export default async (req: Request, _context: Context) => {
     });
   }
 
+  const trimmedEmail = typeof email === "string" ? email.trim() : "";
+
   // 1. Email Format Verification
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!emailRegex.test(trimmedEmail)) {
     return new Response("Email is not valid", {
       status: 400,
       headers: { "content-type": "text/plain" },
@@ -27,29 +29,32 @@ export default async (req: Request, _context: Context) => {
   }
 
   // 2. Optional external verification with timeout
-  const validatorUrl = `https://rapid-email-verifier.fly.dev/api/validate?email=${encodeURIComponent(email)}`;
+  const validatorUrl = `https://rapid-email-verifier.fly.dev/api/validate?email=${encodeURIComponent(trimmedEmail)}`;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
-    const emailResponse = await fetch(validatorUrl, {
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-    if (emailResponse.ok) {
-      const emailData = await emailResponse.json();
-      if (emailData.status === "INVALID") {
-        return new Response("Email is not valid", {
-          status: 400,
-          headers: { "content-type": "text/plain" },
-        });
+    try {
+      const emailResponse = await fetch(validatorUrl, {
+        signal: controller.signal,
+      });
+      if (emailResponse.ok) {
+        const emailData = await emailResponse.json();
+        if (emailData.status === "INVALID") {
+          return new Response("Email is not valid", {
+            status: 400,
+            headers: { "content-type": "text/plain" },
+          });
+        }
       }
+    } finally {
+      clearTimeout(timeout);
     }
   } catch (error) {
     console.warn("Optional email validator check skipped/timed out:", error);
   }
 
   // 3. Password Hashing (hash of email + password)
-  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedEmail = trimmedEmail.toLowerCase();
   const combinedString = `${normalizedEmail}|${password}`;
   const msgBuffer = new TextEncoder().encode(combinedString);
   const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);

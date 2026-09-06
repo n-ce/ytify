@@ -10,6 +10,7 @@ import { setStore, t } from "@stores";
 // --- Type Definitions ---
 
 type CollectionData = string[] | Channel[] | Playlist[] | Album[];
+type SyncItem = { id: string };
 
 interface LibrarySnapshot {
   meta: Meta;
@@ -208,6 +209,7 @@ export async function runSync(
         applyDelta(
           pullResult.delta,
           pullResult.isFullTrackSync || isInitialSync,
+          isInitialSync,
         );
         rehydrateStores();
       } else if (pullResult.fullSyncRequired) {
@@ -322,7 +324,11 @@ export async function runSync(
   }
 }
 
-function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
+function applyDelta(
+  delta: DeltaPayload,
+  isFullTrackSync?: boolean,
+  isInitialSync?: boolean,
+) {
   let localTracks = getTracksMap();
 
   if (isFullTrackSync) {
@@ -352,6 +358,8 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
 
   localStorage.setItem("library_tracks", JSON.stringify(localTracks));
 
+  const currentMeta = getMeta();
+
   // Process updated collections with intelligent merging
   for (const [key, remoteData] of Object.entries(delta.updatedCollections)) {
     const localRaw = localStorage.getItem(`library_${key}`);
@@ -360,27 +368,40 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
       continue;
     }
 
-    try {
-      const localData = JSON.parse(localRaw);
-      if (key === "channels" || key === "playlists" || key === "albums") {
-        const merged = mergeItemList(
-          Array.isArray(localData) ? localData : [],
-          Array.isArray(remoteData) ? (remoteData as any[]) : [],
-        );
-        localStorage.setItem(`library_${key}`, JSON.stringify(merged));
-      } else if (Array.isArray(remoteData) && Array.isArray(localData)) {
-        const isPrepended = ["history", "favorites", "liked"].includes(key);
-        const merged = mergeTrackIds(
-          localData,
-          remoteData as string[],
-          isPrepended,
-        );
-        localStorage.setItem(`library_${key}`, JSON.stringify(merged));
-      } else {
+    const localTimestamp = currentMeta[key] || 0;
+    const serverTimestamp =
+      typeof delta.meta[key] === "number" ? delta.meta[key]! : 0;
+    const hasLocalState = localTimestamp > 0;
+
+    // Use union merging only for initial sync when no local collection state exists
+    if (isInitialSync && !hasLocalState) {
+      try {
+        const localData = JSON.parse(localRaw);
+        if (key === "channels" || key === "playlists" || key === "albums") {
+          const merged = mergeItemList(
+            Array.isArray(localData) ? localData : [],
+            Array.isArray(remoteData) ? (remoteData as SyncItem[]) : [],
+          );
+          localStorage.setItem(`library_${key}`, JSON.stringify(merged));
+        } else if (Array.isArray(remoteData) && Array.isArray(localData)) {
+          const isPrepended = ["history", "favorites", "liked"].includes(key);
+          const merged = mergeTrackIds(
+            localData,
+            remoteData as string[],
+            isPrepended,
+          );
+          localStorage.setItem(`library_${key}`, JSON.stringify(merged));
+        } else {
+          localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+        }
+      } catch {
         localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
       }
-    } catch {
-      localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+    } else {
+      // Last-write-wins: apply newer server snapshot so complete server collections can remove locally stored items
+      if (serverTimestamp >= localTimestamp) {
+        localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+      }
     }
   }
 
@@ -389,7 +410,6 @@ function applyDelta(delta: DeltaPayload, isFullTrackSync?: boolean) {
     localStorage.removeItem(`library_${key}`);
   }
 
-  const currentMeta = getMeta();
   for (const [key, timestamp] of Object.entries(delta.meta)) {
     if (typeof timestamp === "number" && timestamp > (currentMeta[key] || 0)) {
       currentMeta[key] = timestamp;
