@@ -9,18 +9,7 @@ import {
 import "./Player.css";
 import { MediaDetails } from "@components/MediaPartials";
 import { config, cssVar } from "@utils";
-import {
-  playerStore,
-  setNavStore,
-  setStore,
-  t,
-  updateParam,
-  queueStore,
-  setQueueStore,
-  totalQueueDuration,
-} from "@stores";
-import QueueList from "@features/Queue/List";
-import Dropdown from "@features/Queue/Dropdown";
+import { playerStore, setNavStore, setStore, t, updateParam } from "@stores";
 
 const MediaArtwork = lazy(
   () => import("../../components/MediaPartials/MediaArtwork"),
@@ -31,7 +20,6 @@ const Controls = lazy(() => import("./Controls"));
 
 export default function () {
   let playerSection!: HTMLDivElement;
-  let queueRef!: HTMLDivElement;
   const [showLyrics, setShowLyrics] = createSignal(false);
 
   onMount(() => {
@@ -56,13 +44,8 @@ export default function () {
     return id;
   }
 
-  const scrollToQueue = () => {
-    if (queueRef) {
-      queueRef.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  return (<section id="playerSection" ref={playerSection}>
+  return (
+    <section id="playerSection" ref={playerSection}>
       <Show when={playerStore.immersive}>
         <div class="bg-pane" />
         <div class="bg-image" />
@@ -87,6 +70,7 @@ export default function () {
           onclick={() => setStore("actionsMenu", playerStore.stream)}
         ></i>
       </header>
+
       <article>
         <Show when={playerStore.isWatching && !playerStore.isMusic}>
           <Video />
@@ -112,50 +96,6 @@ export default function () {
           <Controls showLyrics={showLyrics} setShowLyrics={setShowLyrics} />
         </Show>
       </article>
-
-      <div class="player-queue-section" ref={queueRef}>
-        <header class="sticky-bar">
-          <p onclick={scrollToQueue}>
-            {queueStore.list.length === 0
-              ? t("nav_queue")
-              : totalQueueDuration(queueStore.list)}
-          </p>
-          <div class="right-group">
-            <i
-              class="ri-shuffle-line"
-              aria-label={t("queue_shuffle")}
-              onclick={() => {
-                setQueueStore("list", (list) => {
-                  const shuffled = [...list];
-                  for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                  }
-                  return shuffled;
-                });
-              }}
-            ></i>
-            <i
-              class="ri-indeterminate-circle-line"
-              classList={{
-                on: queueStore.removeMode,
-              }}
-              aria-label={t("queue_remove_mode")}
-              onclick={() => {
-                setQueueStore("removeMode", !queueStore.removeMode);
-              }}
-            ></i>
-          </div>
-          <Dropdown />
-        </header>
-
-        <Show
-          when={!queueStore.isLoading}
-          fallback={<i class="ri-loader-3-line loading-spinner"></i>}
-        >
-          <QueueList />
-        </Show>
-      </div>
     </section>
   );
 }

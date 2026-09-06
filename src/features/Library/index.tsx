@@ -1,9 +1,15 @@
-import { For, Show, lazy, onMount, createSignal } from "solid-js";
+import { For, Show, lazy, onMount } from "solid-js";
 import "./Library.css";
 import Collections from "./Collections";
 
-import { getLibraryAlbums, config, getMeta, getLists } from "@utils";
-import { t, setNavStore, store, openSubView } from "@stores";
+import {
+  getLibraryAlbums,
+  config,
+  getMeta,
+  getLists,
+  librarySections,
+} from "@utils";
+import { t, setNavStore, store } from "@stores";
 import ListItem from "@components/ListItem";
 import Dropdown from "./Dropdown";
 
@@ -11,8 +17,6 @@ const Gallery = lazy(() => import("./Gallery"));
 const SubFeed = lazy(() => import("./SubFeed"));
 
 export default function () {
-  const [showGallery, setShowGallery] = createSignal(false);
-  const [showSubFeed, setShowSubFeed] = createSignal(false);
   let libraryRef!: HTMLElement;
   let syncBtn!: HTMLElement;
 
@@ -23,14 +27,6 @@ export default function () {
       setNavStore("library", "ref", libraryRef);
       libraryRef.scrollIntoView();
     });
-
-  function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
 
   return (
     <section class="library" ref={libraryRef}>
@@ -64,54 +60,15 @@ export default function () {
               }}
             ></i>
           </Show>
-
-          <i
-            aria-label={t("nav_search")}
-            class="ri-search-2-line"
-            onclick={() => openSubView("search")}
-          ></i>
-
-          <Show when={!matchMedia("(display-mode: standalone)").matches}>
-            <i
-              class="ri-fullscreen-line"
-              aria-label={t("settings_fullscreen")}
-              onclick={toggleFullScreen}
-            ></i>
-          </Show>
-
-          <i
-            class="ri-settings-line"
-            aria-label={t("nav_settings")}
-            onclick={() => openSubView("settings")}
-          ></i>
-
-          <i
-            aria-label={t("hub_subfeed")}
-            class={`ri-tv-${showSubFeed() ? "fill" : "line"}`}
-            onclick={() => {
-              setShowSubFeed(!showSubFeed());
-              if (showSubFeed()) setShowGallery(false);
-            }}
-          ></i>
-
-          <i
-            aria-label={t("hub_gallery")}
-            class="ri-user-heart-line"
-            classList={{ "ri-user-heart-fill": showGallery() }}
-            onclick={() => {
-              setShowGallery(!showGallery());
-              if (showGallery()) setShowSubFeed(false);
-            }}
-          ></i>
         </div>
 
         <Dropdown />
       </header>
 
-      <Show when={showGallery()}>
+      <Show when={librarySections().gallery}>
         <Gallery />
       </Show>
-      <Show when={showSubFeed()}>
+      <Show when={librarySections().subfeed}>
         <SubFeed />
       </Show>
       <Collections />

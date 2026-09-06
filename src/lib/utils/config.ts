@@ -1,4 +1,30 @@
+import { createSignal } from "solid-js";
+
 export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
+
+export interface LibrarySections {
+  subfeed: boolean;
+  gallery: boolean;
+  listenLater: boolean;
+  history: boolean;
+  favorites: boolean;
+  liked: boolean;
+  frequentlyPlayed: boolean;
+  discovery: boolean;
+}
+
+export type LibrarySectionKey = keyof LibrarySections;
+
+export const defaultLibrarySections: LibrarySections = {
+  subfeed: true,
+  gallery: true,
+  listenLater: true,
+  history: true,
+  favorites: true,
+  liked: true,
+  frequentlyPlayed: true,
+  discovery: true,
+};
 
 export let config = {
   language: "",
@@ -25,6 +51,7 @@ export let config = {
   dbsync: "",
   sortBy: "modified" as "modified" | "name" | "artist" | "duration",
   sortOrder: "desc" as "asc" | "desc",
+  librarySections: { ...defaultLibrarySections },
 };
 
 type AppConfig = typeof config;
@@ -35,7 +62,18 @@ if (savedStore) {
     const parsed = JSON.parse(savedStore) as Record<string, unknown>;
     (Object.keys(config) as (keyof AppConfig)[]).forEach((key) => {
       if (parsed[key] !== undefined) {
-        (config as Record<keyof AppConfig, unknown>)[key] = parsed[key];
+        if (
+          key === "librarySections" &&
+          typeof parsed[key] === "object" &&
+          parsed[key] !== null
+        ) {
+          config.librarySections = {
+            ...defaultLibrarySections,
+            ...(parsed[key] as Partial<LibrarySections>),
+          };
+        } else {
+          (config as Record<keyof AppConfig, unknown>)[key] = parsed[key];
+        }
       }
     });
   } catch (e) {
@@ -50,6 +88,20 @@ export function setConfig<K extends keyof AppConfig>(
   config[key] = val;
   const str = JSON.stringify(config);
   localStorage.setItem("config", str);
+}
+
+export const [librarySections, setLibrarySectionsSignal] =
+  createSignal<LibrarySections>({
+    ...config.librarySections,
+  });
+
+export function setLibrarySection(key: LibrarySectionKey, val: boolean) {
+  const updated = {
+    ...librarySections(),
+    [key]: val,
+  };
+  setLibrarySectionsSignal(updated);
+  setConfig("librarySections", updated);
 }
 
 /* Transitory local saves thats not supposed to be transferrable */

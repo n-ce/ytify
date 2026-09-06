@@ -1,16 +1,14 @@
 /* App Layout Shell */
 
 /* --- Header & Navigation --- */
-section:has(> header > details[open]),
-.player-queue-section:has(> header > details[open]) {
+section:has(> header > details[open]) {
     > *:not(header) {
         filter: blur(var(--size-px-1));
         pointer-events: none;
     }
 }
 
-section > header,
-.player-queue-section > header {
+section > header {
     display: flex;
     justify-content: space-between;
     position: relative;
@@ -138,6 +136,35 @@ section > header,
     }
 }
 
+/* --- App NavBar --- */
+nav.app-navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--onBg);
+    backdrop-filter: blur(var(--size-px-2));
+    z-index: 15;
+    padding: var(--size-1) 0;
+
+    i {
+        position: relative;
+        font-size: var(--font-size-4);
+        padding: var(--size-1) var(--size-4);
+        border-radius: var(--roundness);
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.85;
+        }
+
+        &.on {
+            opacity: 1;
+        }
+    }
+}
+
 /* --- Main content area & Dual-Panel Shell --- */
 main {
     color: color-mix(
@@ -156,27 +183,64 @@ main {
         overflow: hidden;
     }
 
+    nav.app-navbar {
+        background: transparent;
+        background-color: transparent;
+        backdrop-filter: none;
+        padding-top: var(--gap);
+    }
+
+    nav.app-navbar i[aria-label]::after {
+        right: auto;
+        left: 50%;
+        top: calc(100% + var(--size-1));
+        bottom: auto;
+        transform: translateX(-50%) translateY(calc(-1 * var(--size-1)));
+    }
+
+    @media (hover: hover) {
+        nav.app-navbar i[aria-label]:hover:not(:active)::after,
+        nav.app-navbar i[aria-label].show::after {
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
     .left-panel {
         flex: var(--panelRatioLeft, 2);
         height: 100%;
         overflow-y: auto;
-        border-right: var(--border);
         position: relative;
         display: flex;
         flex-direction: column;
+    }
+
+    .left-panel nav.app-navbar {
+        background: transparent;
+        background-color: transparent;
+        backdrop-filter: none;
+        flex-shrink: 0;
+        padding-top: var(--gap);
     }
 
     .right-panel {
         flex: var(--panelRatioRight, 5);
         height: 100%;
-        overflow-y: auto;
         position: relative;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+    }
+
+    .right-panel-content {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
     }
 
     .left-panel section,
-    .right-panel section {
+    .right-panel-content section {
         min-width: unset;
         width: 100%;
         height: 100%;
@@ -186,7 +250,7 @@ main {
         flex: 1;
     }
 
-    .right-panel section:has(> img) {
+    .right-panel-content section:has(> img) {
         overflow: initial !important;
 
         .list-thumbnail {
@@ -207,8 +271,8 @@ main {
         }
     }
 
-    .right-panel .searchlist,
-    .right-panel .listContainer {
+    .right-panel-content .searchlist,
+    .right-panel-content .listContainer {
         display: grid;
         grid-template-columns: repeat(8, 1fr);
         gap: var(--gap) !important;
@@ -236,6 +300,10 @@ main {
         scroll-behavior: smooth;
     }
 
+    main.player-closed {
+        overflow-x: hidden;
+    }
+
     .left-panel,
     .right-panel {
         flex: 0 0 100vw;
@@ -243,15 +311,54 @@ main {
         min-width: 100vw;
         max-width: 100vw;
         height: 100%;
-        overflow-y: auto;
         scroll-snap-align: start;
         scroll-snap-stop: always;
         display: flex;
         flex-direction: column;
     }
 
+    .left-panel {
+        overflow-y: auto;
+    }
+
+    .right-panel {
+        overflow: hidden;
+    }
+
+    .right-panel nav.app-navbar {
+        border-top: var(--border);
+        flex-shrink: 0;
+    }
+
+    .right-panel:has(.miniplayer) nav.app-navbar {
+        border-top: none;
+    }
+
+    nav.app-navbar i[aria-label]::after {
+        right: auto;
+        left: 50%;
+        bottom: calc(100% + var(--size-1));
+        top: auto;
+        transform: translateX(-50%) translateY(var(--size-1));
+    }
+
+    @media (hover: hover) {
+        nav.app-navbar i[aria-label]:hover:not(:active)::after,
+        nav.app-navbar i[aria-label].show::after {
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    .right-panel-content {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
     .left-panel section,
-    .right-panel section {
+    .right-panel-content section {
         width: 100%;
         min-width: 100%;
         height: 100%;

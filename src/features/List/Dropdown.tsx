@@ -1,30 +1,52 @@
-import { Show, createEffect, createSignal } from 'solid-js';
-import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary, player } from '@utils';
-import { listStore, resetList, setListStore, setStore, t, addToQueue, setQueueStore, setNavStore, setPlayerStore } from '@stores';
+import { Show, createEffect, createSignal } from "solid-js";
+import {
+  deleteCollection,
+  getLists,
+  saveLists,
+  getCollectionItems,
+  renameCollection,
+  getLibraryAlbums,
+  saveAlbumToLibrary,
+  removeAlbumFromLibrary,
+  player,
+} from "@utils";
+import {
+  listStore,
+  resetList,
+  setListStore,
+  setStore,
+  t,
+  addToQueue,
+  setQueueStore,
+  openSubView,
+  setPlayerStore,
+} from "@stores";
 
 export default function Dropdown() {
-
   const [isSubscribed, setSubscribed] = createSignal(false);
 
   createEffect(() => {
     // Determine if the current list item is an album based on listStore.id or type
-    const isAlbum = listStore.id.startsWith('MPREb') || listStore.type === 'album';
+    const isAlbum =
+      listStore.id.startsWith("MPREb") || listStore.type === "album";
 
     if (isAlbum) {
       const albums = getLibraryAlbums();
-      setSubscribed(albums.some(a => a.id === listStore.id)); // Check if listStore.id (album browseId) is in saved albums
+      setSubscribed(albums.some((a) => a.id === listStore.id)); // Check if listStore.id (album browseId) is in saved albums
     } else {
       // Existing logic for channels/playlists, using listStore.id
       setSubscribed(
-        getLists(listStore.type as 'channels' | 'playlists').some(item => item.id === listStore.id)
-      )
+        getLists(listStore.type as "channels" | "playlists").some(
+          (item) => item.id === listStore.id,
+        ),
+      );
     }
   });
 
-
   function subscriptionHandler() {
     // Determine if the current list item is an album based on listStore.id or type
-    const isAlbum = listStore.id.startsWith('MPREb') || listStore.type === 'album';
+    const isAlbum =
+      listStore.id.startsWith("MPREb") || listStore.type === "album";
 
     if (isAlbum) {
       if (isSubscribed()) {
@@ -34,7 +56,7 @@ export default function Dropdown() {
           name: listStore.name,
           author: listStore.author,
           img: listStore.img,
-          id: listStore.id
+          id: listStore.id,
         };
         saveAlbumToLibrary(listStore.id, albumData); // Use listStore.id (album browseId) for saving
       }
@@ -44,71 +66,78 @@ export default function Dropdown() {
 
     // Existing playlist/channel logic
     const { name, type, id, author, img } = listStore;
-    if (type === 'collection') return;
+    if (type === "collection") return;
 
-    let data = getLists(type as 'channels' | 'playlists');
-
+    let data = getLists(type as "channels" | "playlists");
 
     if (isSubscribed()) {
-      data = data.filter(item => item.id !== id);
-    }
-    else {
-      const dataset =
-        {
-          id,
-          name,
-          img
-        } as Playlist;
+      data = data.filter((item) => item.id !== id);
+    } else {
+      const dataset = {
+        id,
+        name,
+        img,
+      } as Playlist;
 
-      if (type === 'playlists')
-        dataset.author = author;
+      if (type === "playlists") dataset.author = author;
 
       data.push(dataset);
     }
 
-    saveLists(type as 'channels' | 'playlists', data);
+    saveLists(type as "channels" | "playlists", data);
     setSubscribed(!isSubscribed());
   }
   return (
     <details>
-      <summary><i
-        aria-label={t('settings_more_options')}
-        class="ri-more-2-fill"></i></summary>
+      <summary>
+        <i aria-label={t("settings_more_options")} class="ri-more-2-fill"></i>
+      </summary>
       <ul id="listTools">
-
-
         <li
           id="playAllBtn"
           onclick={() => {
-            const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
+            const fullList =
+              listStore.type === "collection"
+                ? getCollectionItems(listStore.id)
+                : listStore.list;
             if (!fullList.length) return;
 
-            setQueueStore('history', []);
-            setQueueStore('list', []);
-            setPlayerStore('stream', fullList[0]);
+            setQueueStore("history", []);
+            setQueueStore("list", []);
+            setPlayerStore("stream", fullList[0]);
             addToQueue(fullList.slice(1));
             player(fullList[0].id);
 
-            setNavStore('queue', 'state', false);
-            setNavStore('queue', 'state', true);
+            openSubView("queue");
           }}
         >
-          <i class="ri-play-large-line"></i>{t("list_play")}
+          <i class="ri-play-large-line"></i>
+          {t("list_play")}
         </li>
 
-        <li onclick={() => {
-          const fullList = listStore.type === 'collection' ? getCollectionItems(listStore.id) : listStore.list;
-          setQueueStore('history', []);
-          addToQueue(fullList);
-          setNavStore('queue', 'state', false);
-          setNavStore('queue', 'state', true);
-        }}>
-          <i class="ri-list-check-2"></i>{t("list_enqueue")}
+        <li
+          onclick={() => {
+            const fullList =
+              listStore.type === "collection"
+                ? getCollectionItems(listStore.id)
+                : listStore.list;
+            setQueueStore("history", []);
+            addToQueue(fullList);
+            openSubView("queue");
+          }}
+        >
+          <i class="ri-list-check-2"></i>
+          {t("list_enqueue")}
         </li>
 
-        <Show when={listStore.type !== 'collection' || listStore.isShared}>
-          <li onclick={() => import('@modules/listUtils').then(mod => mod.importList())}>
-            <i class="ri-import-line"></i>{t("list_import")}
+        <Show when={listStore.type !== "collection" || listStore.isShared}>
+          <li
+            onclick={() =>
+              import("@modules/listUtils").then((mod) => mod.importList())
+            }
+          >
+            <i class="ri-import-line"></i>
+            {t("list_import")}
           </li>
         </Show>
 
@@ -121,84 +150,126 @@ export default function Dropdown() {
             This correctly covers both regular playlists and albums (which are 'playlists' type)
             and channels.
         */}
-        <Show when={(listStore.type === 'channels' && !listStore.name.startsWith('Artist')) || listStore.type === 'playlists' || listStore.type === 'album'}>
-
+        <Show
+          when={
+            (listStore.type === "channels" &&
+              !listStore.name.startsWith("Artist")) ||
+            listStore.type === "playlists" ||
+            listStore.type === "album"
+          }
+        >
           <li onclick={subscriptionHandler}>
-            <i
-              class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>{isSubscribed() ? t('list_saved_to_library') : t('list_save_to_library')}
+            <i class={"ri-star-" + (isSubscribed() ? "fill" : "line")}></i>
+            {isSubscribed()
+              ? t("list_saved_to_library")
+              : t("list_save_to_library")}
           </li>
 
-          <li onclick={() => {
-            const { type, id } = listStore;
-            let url = '';
+          <li
+            onclick={() => {
+              const { type, id } = listStore;
+              let url = "";
 
-            if (id.startsWith('MPREb')) {
-              url = 'https://music.youtube.com/browse/' + id;
-            } else if (type === 'playlists' || type === 'album' || id.startsWith('OLAK5uy')) {
-              url = 'https://www.youtube.com/playlist?list=' + id;
-            } else if (type === 'channels') {
-              url = 'https://www.youtube.com/channel/' + id;
-            }
+              if (id.startsWith("MPREb")) {
+                url = "https://music.youtube.com/browse/" + id;
+              } else if (
+                type === "playlists" ||
+                type === "album" ||
+                id.startsWith("OLAK5uy")
+              ) {
+                url = "https://www.youtube.com/playlist?list=" + id;
+              } else if (type === "channels") {
+                url = "https://www.youtube.com/channel/" + id;
+              }
 
-            if (url) open(url);
-          }}>
-            <i class="ri-youtube-fill"></i>{t('actions_menu_yt_link')}
+              if (url) open(url);
+            }}
+          >
+            <i class="ri-youtube-fill"></i>
+            {t("actions_menu_yt_link")}
           </li>
         </Show>
 
-        <Show when={listStore.type === 'collection' && listStore.isReversed}>
+        <Show when={listStore.type === "collection" && listStore.isReversed}>
           <li id="clearListBtn">
-            <i class="ri-close-large-line"></i>{t("list_clear_all")}
+            <i class="ri-close-large-line"></i>
+            {t("list_clear_all")}
           </li>
         </Show>
 
+        <Show
+          when={
+            listStore.type === "collection" &&
+            !listStore.isReversed &&
+            !listStore.isShared
+          }
+        >
+          <li
+            id="deleteCollectionBtn"
+            onclick={() => {
+              const { id } = listStore;
+              if (confirm(t("list_prompt_delete", id))) {
+                deleteCollection(id);
+                resetList();
+              }
+            }}
+          >
+            <i class="ri-delete-bin-2-line"></i>
+            {t("list_delete")}
+          </li>
 
-        <Show when={listStore.type === 'collection' && !listStore.isReversed && !listStore.isShared}>
+          <li
+            id="renameCollectionBtn"
+            onclick={() => {
+              const oldName = listStore.name;
+              const newName = prompt(t("list_rename_prompt"), oldName);
+              if (newName && newName !== oldName) {
+                renameCollection(oldName, newName);
+                setListStore("name", newName);
+                setListStore("id", newName);
+                setStore("snackbar", t("list_rename_success"));
+              }
+            }}
+          >
+            <i class="ri-edit-line"></i>
+            {t("list_rename")}
+          </li>
 
-          <li id="deleteCollectionBtn" onclick={() => {
-            const { id } = listStore;
-            if (confirm(t("list_prompt_delete", id))) {
-              deleteCollection(id);
-              resetList();
+          <li
+            id="shareCollectionBtn"
+            onclick={() =>
+              import("@modules/listUtils").then((mod) =>
+                mod.shareCollection(getCollectionItems(listStore.id)),
+              )
             }
-          }}>
-            <i class="ri-delete-bin-2-line"></i>{t("list_delete")}
+          >
+            <i class="ri-link"></i>
+            {t("list_share")}
           </li>
 
-          <li id="renameCollectionBtn" onclick={() => {
-            const oldName = listStore.name;
-            const newName = prompt(t('list_rename_prompt'), oldName);
-            if (newName && newName !== oldName) {
-              renameCollection(oldName, newName);
-              setListStore('name', newName);
-              setListStore('id', newName);
-              setStore('snackbar', t('list_rename_success'));
-            }
-          }}>
-            <i class="ri-edit-line"></i>{t("list_rename")}
+          <li
+            id="exportCollectionBtn"
+            onclick={() => {
+              const collectionData: TrackItem[] = getCollectionItems(
+                listStore.id,
+              );
+              console.log(collectionData);
+              const jsonString = JSON.stringify(collectionData, null, 2);
+              navigator.clipboard
+                .writeText(jsonString)
+                .then(() => {
+                  setStore("snackbar", t("list_export_success"));
+                })
+                .catch((err) => {
+                  setStore("snackbar", t("list_export_error") + err);
+                });
+            }}
+          >
+            <i class="ri-export-line"></i>
+            {t("list_export")}
           </li>
-
-          <li id="shareCollectionBtn" onclick={() => import('@modules/listUtils').then(mod => mod.shareCollection(getCollectionItems(listStore.id)))}>
-            <i class="ri-link"></i>{t("list_share")}
-          </li>
-
-          <li id="exportCollectionBtn" onclick={() => {
-            const collectionData: TrackItem[] = getCollectionItems(listStore.id);
-            console.log(collectionData);
-            const jsonString = JSON.stringify(collectionData, null, 2);
-            navigator.clipboard.writeText(jsonString)
-              .then(() => {
-                setStore('snackbar', t('list_export_success'));
-              })
-              .catch((err) => {
-                setStore('snackbar', t('list_export_error') + err);
-              });
-          }}>
-            <i class="ri-export-line"></i>{t('list_export')}
-          </li>
-
         </Show>
       </ul>
     </details>
-  )
+  );
 }

@@ -1,10 +1,9 @@
 /* --- Floating MiniPlayer (Portrait Only) --- */
 .miniplayer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
+    position: relative;
+    width: 100%;
+    flex-shrink: 0;
+    z-index: 20;
     display: flex;
     align-items: center;
     height: var(--size-9);
@@ -14,7 +13,6 @@
         var(--trueBg)
     );
     backdrop-filter: blur(var(--size-px-3));
-    border-top: var(--border);
     box-shadow: var(--shadow-2);
     animation: var(--animation-slide-in-up) forwards;
     cursor: pointer;

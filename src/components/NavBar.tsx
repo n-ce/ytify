@@ -1,67 +1,69 @@
-import { navStore, setNavStore, t, getList } from "@stores";
-import { setDrawer, drawer, fetchCollection } from "@utils";
+import { navStore, openSubView, t, getList } from "@stores";
+import { drawer, fetchCollection } from "@utils";
 
-export default function() {
-
+export default function NavBar() {
   return (
-    <nav>
+    <nav class="app-navbar">
       <i
-        aria-label={t('nav_queue')}
+        aria-label={t("nav_queue")}
         class="ri-order-play-fill"
-        classList={{ on: navStore.queue.state }}
+        classList={{ on: navStore.active === "queue" }}
         onclick={() => {
-          setNavStore('queue', 'state', !navStore.queue.state);
+          if (navStore.active === "queue") {
+            navStore.queue.ref?.scrollIntoView({ behavior: "smooth" });
+          } else {
+            openSubView("queue");
+          }
         }}
       ></i>
 
       <i
-        aria-label={t('nav_search')}
-        class={'ri-search-2-' + (navStore.active === 'search' ? 'fill' : 'line')
+        aria-label={t("nav_search")}
+        class={
+          "ri-search-2-" + (navStore.active === "search" ? "fill" : "line")
         }
-        classList={{
-          'on': navStore.active === 'search'
-        }}
+        classList={{ on: navStore.active === "search" }}
         onclick={() => {
-          if (navStore.active === 'search') {
-            navStore.search.ref?.scrollIntoView({ behavior: 'smooth' });
+          if (navStore.active === "search") {
+            navStore.search.ref?.scrollIntoView({ behavior: "smooth" });
           } else {
-            setNavStore('active', 'search');
-            setDrawer('lastMainFeature', 'search');
+            openSubView("search");
           }
         }}
       ></i>
 
       <i
-        aria-label={t('nav_library')}
-        class={'ri-archive-stack-' + (navStore.active === 'library' ? 'fill' : 'line')}
-        classList={{ 'on': navStore.active === 'library' }}
+        aria-label={t("nav_library")}
+        class={
+          "ri-archive-stack-" +
+          (navStore.active === "library" ? "fill" : "line")
+        }
+        classList={{ on: navStore.active === "library" }}
         onclick={() => {
-          if (navStore.active === 'library') {
-            navStore.library.ref?.scrollIntoView({ behavior: 'smooth' });
+          if (navStore.active === "library") {
+            navStore.library.ref?.scrollIntoView({ behavior: "smooth" });
           } else {
-            setNavStore('active', 'library');
-            setDrawer('lastMainFeature', 'library');
+            openSubView("library");
           }
         }}
       ></i>
 
       <i
-        aria-label={t('nav_list')}
+        aria-label={t("nav_list")}
         class="ri-play-list-2-fill"
-        classList={{ 'on': navStore.active === 'list' }}
+        classList={{ on: navStore.active === "list" }}
         onclick={() => {
-          if (navStore.active === 'list') {
-            navStore.list.ref?.scrollIntoView({ behavior: 'smooth' });
+          if (navStore.active === "list") {
+            navStore.list.ref?.scrollIntoView({ behavior: "smooth" });
           } else if (drawer.lastList) {
             const { id, type, shared } = drawer.lastList;
-            if (type === 'collection') fetchCollection(id, shared);
+            if (type === "collection") fetchCollection(id, shared);
             else getList(id, type as any);
           } else {
-            setNavStore('active', 'list');
+            openSubView("list");
           }
         }}
       ></i>
-
     </nav>
   );
 }

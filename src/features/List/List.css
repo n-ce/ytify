@@ -1,145 +1,144 @@
-#listSection>header {
-  >p {
-    overflow: clip;
-    text-overflow: ellipsis;
-  }
+#listSection > header {
+    > p {
+        overflow: clip;
+        text-overflow: ellipsis;
+    }
 
-  &.reverse {
-    display: flex;
-    flex-direction: column-reverse;
-  }
+    &.reverse {
+        display: flex;
+        flex-direction: column-reverse;
+    }
 
-  &~li {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
+    & ~ li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
 }
 
 .listContainer {
-  margin-bottom: var(--size-fluid-6);
+    margin-bottom: var(--size-fluid-6);
 }
 
 .listSearchInput {
-  display: block;
-  border: none;
-  background: none;
-  border-radius: var(--roundness);
-  color: inherit;
-  font-family: inherit;
-  font-size: var(--font-size-2);
-  letter-spacing: var(--font-letterspacing-1);
-  font-weight: var(--font-weight-5);
-  width: calc(100% - var(--size-12));
-  height: 100%;
-  outline: none;
-  padding: 0;
-  margin: auto 0;
-  opacity: 0.9;
+    display: block;
+    border: none;
+    background: none;
+    border-radius: var(--roundness);
+    color: inherit;
+    font-family: inherit;
+    font-size: var(--font-size-2);
+    letter-spacing: var(--font-letterspacing-1);
+    font-weight: var(--font-weight-5);
+    width: calc(100% - var(--size-12));
+    height: 100%;
+    outline: none;
+    padding: 0;
+    margin: auto 0;
+    opacity: 0.9;
 }
 
 .markBar {
-  i {
-    font-size: var(--font-size-3);
-    padding: var(--size-1);
-    border-radius: var(--roundness);
-    cursor: pointer;
+    i {
+        font-size: var(--font-size-3);
+        padding: var(--size-1);
+        border-radius: var(--roundness);
+        cursor: pointer;
 
-    &:hover {
-      background-color: var(--onBg2);
-      color: var(--text2);
+        &:hover {
+            background-color: var(--onBg2);
+            color: var(--text2);
+        }
     }
-  }
 
-  .ri-indeterminate-circle-line,
-  .ri-list-check-2 {
-    margin-left: var(--size-3);
-  }
+    .ri-indeterminate-circle-line,
+    .ri-list-check-2 {
+        margin-left: var(--size-3);
+    }
 
-  :nth-last-of-type(1) {
-    margin-left: var(--size-3);
-    font-style: normal;
-  }
+    :nth-last-of-type(1) {
+        margin-left: var(--size-3);
+        font-style: normal;
+    }
 }
 
 .marked {
-  filter: invert();
-
-  img {
     filter: invert();
-  }
+
+    img {
+        filter: invert();
+    }
 }
 
 .list-thumbnail {
-  border-radius: var(--roundness);
+    border-radius: var(--roundness);
 }
 
 #listSection {
-  width: 100%;
+    width: 100%;
 
-  &:has(>img) {
-    .listContainer {
-      border-radius: var(--roundness);
-      overflow: hidden;
-      margin-top: var(--gap);
+    &:has(> img) {
+        .listContainer {
+            border-radius: var(--roundness);
+            overflow: hidden;
+            margin-top: var(--gap);
+        }
+
+        .streamItem {
+            margin-bottom: 0;
+            width: 100%;
+            border-radius: 0;
+            flex-shrink: 0;
+
+            .title {
+                height: var(--size-4);
+                text-overflow: clip;
+            }
+        }
     }
-
-    .streamItem {
-      margin-bottom: 0;
-      width: 100%;
-      border-radius: 0;
-      flex-shrink: 0;
-
-      .title {
-        height: var(--size-4);
-        text-overflow: clip;
-      }
-    }
-  }
 }
 
-
 .sortBar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0.7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.7;
 
-  i {
-    font-size: var(--font-size-4);
-    cursor: pointer;
+    i {
+        font-size: var(--font-size-4);
+        cursor: pointer;
 
-    &.active {
-      background-color: var(--onBg2);
-      color: var(--text2);
-      border-radius: var(--roundness);
+        &.active {
+            background-color: var(--onBg2);
+            color: var(--text2);
+            border-radius: var(--roundness);
+        }
+
+        &.ri-draggable {
+            margin-right: var(--size-2);
+        }
     }
 
-    &.ri-draggable {
-      margin-right: var(--size-2);
+    #sortMenu {
+        margin-right: auto;
     }
-  }
-
-  #sortMenu {
-    margin-right: auto;
-  }
 }
 
 .loadAllBtn {
-  margin: var(--gap) auto;
-  padding: var(--size-2) var(--size-4);
-  border-radius: var(--roundness);
-  border: var(--border);
-  background-color: var(--onBg);
-  color: var(--text);
-  font-size: var(--font-size-1);
-  cursor: pointer;
-  transition: background-color 0.2s;
-  display: block;
-  width: fit-content;
+    margin: var(--gap) auto;
+    padding: var(--size-2) var(--size-4);
+    border-radius: var(--roundness);
+    border: var(--border);
+    background-color: var(--onBg);
+    color: var(--text);
+    font-size: var(--font-size-1);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: block;
+    width: fit-content;
 
-  &:hover {
-    background-color: var(--onBg2);
-    color: var(--text2);
-  }
+    &:hover {
+        background-color: var(--onBg2);
+        color: var(--text2);
+    }
 }

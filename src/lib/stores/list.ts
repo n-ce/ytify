@@ -144,7 +144,7 @@ export async function getList(
 
 export function resetList() {
   if (navStore.active === "list") {
-    setNavStore("active", "library");
+    setNavStore("active", "search");
   }
   listStore.observer.disconnect();
 

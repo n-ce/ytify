@@ -1,5 +1,10 @@
 import { createSignal, For, Show, createMemo } from "solid-js";
-import { fetchCollection, getCollectionsKeys, getTracksMap } from "@utils";
+import {
+  fetchCollection,
+  getCollectionsKeys,
+  getTracksMap,
+  librarySections,
+} from "@utils";
 import { t } from "@stores";
 import StreamItem from "@components/StreamItem";
 
@@ -51,6 +56,26 @@ export default function () {
     }
   }
 
+  const isCollectionVisible = (item: string) => {
+    const s = librarySections();
+    if (item === "history") return s.history;
+    if (item === "favorites") return s.favorites;
+    if (item === "listenLater") return s.listenLater;
+    if (item === "liked") return s.liked;
+    return true;
+  };
+
+  const visibleCollections = createMemo(() =>
+    getCollectionsKeys().filter(isCollectionVisible),
+  );
+
+  const hasVisibleItems = createMemo(
+    () =>
+      visibleCollections().length > 0 ||
+      librarySections().frequentlyPlayed ||
+      librarySections().discovery,
+  );
+
   const searchResults = createMemo(() => {
     const finder = searchFn();
     if (!finder) return [];
@@ -90,8 +115,8 @@ export default function () {
         </Show>
       </Show>
       <Show when={!searchText()}>
-        <Show when={getCollectionsKeys().length} fallback={t("library_empty")}>
-          <For each={getCollectionsKeys()}>
+        <Show when={hasVisibleItems()} fallback={t("library_empty")}>
+          <For each={visibleCollections()}>
             {(item) => (
               <a
                 href={"?collection=" + item}
@@ -101,50 +126,52 @@ export default function () {
                   fetchCollection(item);
                 }}
               >
-                {
-                  <Show
-                    when={item in reservedCollections}
-                    fallback={
-                      <>
-                        <i class="ri-play-list-2-fill"></i>
-                        {item}
-                      </>
-                    }
-                  >
-                    <i class={reservedCollections[item as "history"][0]}></i>
-                    {t(
-                      reservedCollections[
-                        item as "history"
-                      ][1] as "library_history",
-                    )}
-                  </Show>
-                }
+                <Show
+                  when={item in reservedCollections}
+                  fallback={
+                    <>
+                      <i class="ri-play-list-2-fill"></i>
+                      {item}
+                    </>
+                  }
+                >
+                  <i class={reservedCollections[item as "history"][0]}></i>
+                  {t(
+                    reservedCollections[
+                      item as "history"
+                    ][1] as "library_history",
+                  )}
+                </Show>
               </a>
             )}
           </For>
+          <Show when={librarySections().frequentlyPlayed}>
+            <a
+              href="?collection=frequently_played"
+              class="clxn_item"
+              onclick={(e) => {
+                e.preventDefault();
+                fetchCollection("frequently_played");
+              }}
+            >
+              <i class="ri-bar-chart-2-fill"></i>
+              {t("hub_frequently_played")}
+            </a>
+          </Show>
+          <Show when={librarySections().discovery}>
+            <a
+              href="?collection=discovery"
+              class="clxn_item"
+              onclick={(e) => {
+                e.preventDefault();
+                fetchCollection("discovery");
+              }}
+            >
+              <i class="ri-compass-3-fill"></i>
+              {t("hub_discovery")}
+            </a>
+          </Show>
         </Show>
-        <a
-          href="?collection=frequently_played"
-          class="clxn_item"
-          onclick={(e) => {
-            e.preventDefault();
-            fetchCollection("frequently_played");
-          }}
-        >
-          <i class="ri-bar-chart-2-fill"></i>
-          {t("hub_frequently_played")}
-        </a>
-        <a
-          href="?collection=discovery"
-          class="clxn_item"
-          onclick={(e) => {
-            e.preventDefault();
-            fetchCollection("discovery");
-          }}
-        >
-          <i class="ri-compass-3-fill"></i>
-          {t("hub_discovery")}
-        </a>
       </Show>
     </>
   );

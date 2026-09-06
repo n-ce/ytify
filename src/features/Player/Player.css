@@ -42,7 +42,6 @@
 
         .ri-more-2-fill {
             margin: auto 0;
-            padding: 0 var(--size-00);
             opacity: 1;
         }
     }
@@ -50,6 +49,7 @@
     & i.on {
         background-color: var(--text2);
         color: var(--onBg2);
+        opacity: 1;
     }
 }
 
@@ -151,8 +151,11 @@
     }
 
     .right-group {
-        margin-right: var(--size-4);
+        margin-right: 0;
         margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: var(--size-2);
     }
 }
 
@@ -252,10 +255,4 @@
         font-style: italic;
         opacity: 0.5;
     }
-}
-
-/* Integrated Queue Section inside Player */
-.player-queue-section {
-    width: 100%;
-    margin-top: auto;
 }

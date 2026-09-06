@@ -6,7 +6,7 @@ import {
   PlayButton,
   PlayNextButton,
 } from "./MediaPartials";
-import { playerStore, setNavStore, queueStore, navStore } from "@stores";
+import { playerStore, setNavStore, queueStore } from "@stores";
 
 const MediaArtwork = lazy(
   () => import("@components/MediaPartials/MediaArtwork"),
@@ -20,7 +20,10 @@ export default function () {
         const target = e.target as HTMLElement;
         if (!target.closest("button")) {
           setNavStore("player", "state", true);
-          navStore.player.ref?.scrollIntoView({ behavior: "smooth" });
+          requestAnimationFrame(() => {
+            const leftPanel = document.querySelector(".left-panel");
+            leftPanel?.scrollIntoView({ behavior: "smooth" });
+          });
         }
       }}
     >

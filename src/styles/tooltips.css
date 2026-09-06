@@ -1,30 +1,52 @@
 i[aria-label]::after {
-  position: absolute;
-  content: attr(aria-label);
-  font-size: var(--font-size-0);
-  font-family: var(--font);
-  font-weight: var(--font-weight-6);
-  background: var(--text);
-  color: var(--bg);
-  right: var(--size-8);
-  z-index: 100;
-  padding: var(--size-px-1) var(--size-px-2) !important;
-  border-radius: var(--roundness);
-  white-space: nowrap;
-  visibility: hidden;
+    position: absolute;
+    content: attr(aria-label);
+    font-size: var(--font-size-0);
+    font-family: var(--font);
+    font-weight: var(--font-weight-6);
+    background: var(--text);
+    color: var(--bg);
+    right: var(--size-8);
+    z-index: 100;
+    padding: var(--size-px-1) var(--size-px-2) !important;
+    border-radius: var(--roundness);
+    white-space: nowrap;
+    visibility: hidden;
 
-  opacity: 0;
-  transform: translateX(var(--size-2));
-  pointer-events: none;
-  transition: none;
+    opacity: 0;
+    transform: translateX(var(--size-2));
+    pointer-events: none;
+    transition:
+        opacity 0.15s ease-out,
+        transform 0.15s ease-out,
+        visibility 0.15s ease-out;
+    transition-delay: 0s;
+}
+
+@media (hover: hover) {
+    i[aria-label]:hover:not(:active)::after {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateX(0);
+        transition-property: opacity, transform;
+        transition-duration: 0.2s;
+        transition-timing-function: ease-out;
+        transition-delay: 0.5s;
+    }
+}
+
+i[aria-label]:active::after {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: none !important;
 }
 
 i[aria-label].show::after {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: translateX(0);
-  transition-property: opacity, transform;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-out;
-  transition-delay: 1s;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateX(0);
+    transition-property: opacity, transform;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+    transition-delay: 0.5s;
 }

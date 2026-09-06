@@ -7,6 +7,7 @@ import {
   setNavStore,
   t,
   setQueueStore,
+  openSubView,
 } from "@stores";
 import {
   fetchCollection,
@@ -117,16 +118,20 @@ export default function () {
             else setMarkList(items.map((v) => v.id));
           }}
         ></i>
+
+        <Show when={listStore.type === "collection" && !listStore.isShared}>
+          <i
+            aria-label={t("list_remove_marked")}
+            class="ri-indeterminate-circle-line"
+            onclick={() => {
+              removeFromCollection(listStore.id, markList());
+              setMarkList([]);
+            }}
+          ></i>
+        </Show>
+
         <Show when={markList().length}>
-          <Show when={listStore.type === "collection"}>
-            <i
-              aria-label={t("list_remove_marked")}
-              class="ri-indeterminate-circle-line"
-              onclick={() => {
-                removeFromCollection(listStore.name, markList());
-              }}
-            ></i>
-          </Show>
+          <span>{markList().length}</span>
           <i
             aria-label={t("list_enqueue_marked")}
             class="ri-list-check-2"
@@ -139,8 +144,7 @@ export default function () {
               if (listToEnqueue.length) {
                 setQueueStore("history", []);
                 addToQueue(listToEnqueue);
-                setNavStore("queue", "state", false);
-                setNavStore("queue", "state", true);
+                openSubView("queue");
               }
             }}
           ></i>

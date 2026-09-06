@@ -1,9 +1,11 @@
-import { onMount, Show } from "solid-js";
+import { onMount, Show, lazy } from "solid-js";
 import "./Search.css";
 import Results from "./Results";
 import Input from "./Input";
-import { searchStore, t, setNavStore, closeSubView } from "@stores";
+import { searchStore, t, navStore, setNavStore, openSubView } from "@stores";
 import Filters from "./Filters";
+
+const About = lazy(() => import("./About"));
 
 export default function () {
   let searchRef!: HTMLElement;
@@ -13,16 +15,34 @@ export default function () {
     searchRef.scrollIntoView();
   });
 
+  function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+
   return (
     <section class="search" ref={searchRef}>
       <header class="sticky-bar">
         <p>{t("nav_search")}</p>
+
         <div class="right-group">
-          <i
-            aria-label={t("close")}
-            class="ri-close-large-line"
-            onclick={closeSubView}
-          ></i>
+          <Show when={!matchMedia("(display-mode: standalone)").matches}>
+            <i
+              class="ri-fullscreen-line"
+              aria-label={t("settings_fullscreen")}
+              onclick={toggleFullScreen}
+            ></i>
+          </Show>
+          <Show when={navStore.active !== "settings"}>
+            <i
+              class="ri-settings-line"
+              aria-label={t("nav_settings")}
+              onclick={() => openSubView("settings")}
+            ></i>
+          </Show>
         </div>
       </header>
 
@@ -31,7 +51,10 @@ export default function () {
         <Filters />
       </form>
 
-      <Show when={searchStore.query || searchStore.results.length > 0}>
+      <Show
+        when={searchStore.query || searchStore.results.length > 0}
+        fallback={<About />}
+      >
         <Results />
       </Show>
     </section>
