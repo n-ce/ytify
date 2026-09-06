@@ -116,32 +116,36 @@ export default async (req: Request, context: Context): Promise<Response> => {
         hasChanges = true;
       }
 
-      if ((serverMeta.tracks || 0) > (clientMeta.tracks || 0)) {
-        const serverTracks = snapshot.tracks || {};
-        const clientTracksTimestamp = clientMeta.tracks || 0;
+      const serverTracks = snapshot.tracks || {};
+      const serverTrackCount = Object.keys(serverTracks).length;
+      const clientTracksTimestamp = clientMeta.tracks || 0;
 
-        if (clientTracksTimestamp === 0) {
-          delta.addedOrUpdatedTracks = serverTracks;
-          isFullTrackSync = true;
-        } else {
-          const deltaTracks: Collection = {};
-          for (const id in serverTracks) {
-            if ((serverTracks[id].modified || 0) > clientTracksTimestamp) {
-              deltaTracks[id] = serverTracks[id];
-            }
+      if (clientTracksTimestamp === 0 && serverTrackCount > 0) {
+        delta.addedOrUpdatedTracks = serverTracks;
+        delta.meta.tracks = serverMeta.tracks || Date.now();
+        isFullTrackSync = true;
+        hasChanges = true;
+      } else if ((serverMeta.tracks || 0) > clientTracksTimestamp) {
+        const deltaTracks: Collection = {};
+        for (const id in serverTracks) {
+          if ((serverTracks[id].modified || 0) > clientTracksTimestamp) {
+            deltaTracks[id] = serverTracks[id];
           }
-          delta.addedOrUpdatedTracks = deltaTracks;
-          isFullTrackSync = false;
         }
-        delta.meta.tracks = serverMeta.tracks; // Only include if server is ahead
+        delta.addedOrUpdatedTracks = deltaTracks;
+        delta.meta.tracks = serverMeta.tracks;
+        isFullTrackSync = false;
         hasChanges = true;
       }
 
       for (const key in serverMeta) {
         if (key === "version" || key === "tracks") continue;
-        if ((serverMeta[key] || 0) > (clientMeta[key] || 0)) {
+        if (
+          clientMeta[key] === undefined ||
+          (serverMeta[key] || 0) > (clientMeta[key] || 0)
+        ) {
           delta.updatedCollections[key] = snapshot[key] as CollectionData;
-          delta.meta[key] = serverMeta[key]; // Only include if server is ahead
+          delta.meta[key] = serverMeta[key] || Date.now();
           hasChanges = true;
         }
       }
@@ -153,7 +157,7 @@ export default async (req: Request, context: Context): Promise<Response> => {
           snapshot.deletedCollections,
         )) {
           if (
-            clientMeta[name] !== undefined &&
+            clientMeta[name] === undefined ||
             (clientMeta[name] || 0) <= deletedAt
           ) {
             if (!delta.deletedCollectionNames.includes(name)) {
@@ -165,9 +169,9 @@ export default async (req: Request, context: Context): Promise<Response> => {
       }
 
       // Check deleted tracks tombstones:
-      if (snapshot.deletedTracks && (clientMeta.tracks || 0) > 0) {
+      if (snapshot.deletedTracks) {
         for (const [id, deletedAt] of Object.entries(snapshot.deletedTracks)) {
-          if (deletedAt > (clientMeta.tracks || 0)) {
+          if (deletedAt > clientTracksTimestamp) {
             if (!delta.deletedTrackIds.includes(id)) {
               delta.deletedTrackIds.push(id);
               hasChanges = true;
@@ -233,7 +237,15 @@ export default async (req: Request, context: Context): Promise<Response> => {
       console.log(
         `PUT /sync: Successfully updated library for user ${userIdHash}`,
       );
-      return new Response(null, { status: 204 });
+      return new Response(
+        JSON.stringify({ serverMeta: currentSnapshot.meta }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
     } catch (e) {
       if (String(e).includes("Precondition Failed")) {
         console.warn(`PUT /sync: ETag mismatch for user ${userIdHash}`);

@@ -169,6 +169,7 @@ export function addToCollection(name: string, data: TrackItem[]) {
   const tracks = getTracksMap();
   const prepend = ["history", "favorites", "liked"].includes(name);
   const { libraryPlays } = drawer;
+  const now = Date.now();
 
   for (const item of data) {
     if (!item?.id) continue;
@@ -187,9 +188,7 @@ export function addToCollection(name: string, data: TrackItem[]) {
       tracks[id] = item;
     }
 
-    if (config.dbsync) {
-      tracks[id].modified = Date.now();
-    }
+    tracks[id].modified = tracks[id].modified || now;
 
     syncLibrary("add", id);
   }
@@ -565,11 +564,8 @@ export function cleanseLibraryData() {
         duration: track.duration,
         author: track.author,
         authorId: track.authorId || "",
+        modified: track.modified || Date.now(),
       };
-
-      if (config.dbsync && track.modified) {
-        cleanedTrack.modified = track.modified;
-      }
 
       cleanedTracks[id] = cleanedTrack;
 

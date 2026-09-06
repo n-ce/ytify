@@ -13,7 +13,7 @@
         var(--trueBg)
     );
     backdrop-filter: blur(var(--size-px-3));
-    box-shadow: var(--shadow-2);
+    box-shadow: none;
     animation: var(--animation-slide-in-up) forwards;
     cursor: pointer;
     overflow: hidden;

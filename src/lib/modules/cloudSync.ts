@@ -114,6 +114,7 @@ export async function pullFullLibrary(userId: string): Promise<void> {
 
 export async function pushFullLibrary(userId: string): Promise<void> {
   const snapshot: Partial<LibrarySnapshot> = {};
+  const now = Date.now();
 
   Object.keys(localStorage).forEach((key) => {
     if (key.startsWith("library_")) {
@@ -130,6 +131,27 @@ export async function pushFullLibrary(userId: string): Promise<void> {
     }
   });
 
+  if (!snapshot.meta) {
+    snapshot.meta = getMeta();
+  }
+
+  // Ensure meta tracks and track modified timestamps are populated
+  if (snapshot.tracks && Object.keys(snapshot.tracks).length > 0) {
+    snapshot.meta.tracks = Math.max(snapshot.meta.tracks || 0, now);
+    for (const id in snapshot.tracks) {
+      if (!snapshot.tracks[id].modified) {
+        snapshot.tracks[id].modified = now;
+      }
+    }
+    localStorage.setItem("library_tracks", JSON.stringify(snapshot.tracks));
+  }
+  for (const key in snapshot) {
+    if (!["meta", "tracks", "deletedCollections", "deletedTracks"].includes(key)) {
+      snapshot.meta[key] = Math.max(snapshot.meta[key] || 0, now);
+    }
+  }
+  localStorage.setItem("library_meta", JSON.stringify(snapshot.meta));
+
   const response = await fetch(`/library/${userId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -141,15 +163,24 @@ export async function pushFullLibrary(userId: string): Promise<void> {
   }
 }
 
-// --- Delta Sync ---
+// --- Delta Sync & Mutex Guard ---
 
 let lastSyncTime = 0;
+let isSyncing = false;
+let syncQueued = false;
 
 export async function runSync(
   userId: string,
   retryData?: { count: number; serverMeta?: Meta; ETag?: string },
 ): Promise<{ success: boolean; message: string }> {
+  if (isSyncing && !retryData) {
+    syncQueued = true;
+    return { success: true, message: "sync_queued" };
+  }
+  isSyncing = true;
+
   const retryCount = retryData?.count || 0;
+  const isConflictRetry = retryCount > 0;
   const MAX_RETRIES = 3;
   if (retryCount === 0) setStore("syncState", "syncing");
 
@@ -158,8 +189,6 @@ export async function runSync(
     const initialLocalMeta = isInitialSync
       ? { version: 5, tracks: 0 }
       : getMeta();
-    const inFlightDirtyTracks = getDirtyTracks();
-    const inFlightDirtyCollections = getDirtyCollections();
 
     let remoteMeta: Meta;
     let ETag: string;
@@ -210,6 +239,7 @@ export async function runSync(
           pullResult.delta,
           pullResult.isFullTrackSync || isInitialSync,
           isInitialSync,
+          isConflictRetry,
         );
         rehydrateStores();
       } else if (pullResult.fullSyncRequired) {
@@ -220,6 +250,10 @@ export async function runSync(
 
     localStorage.setItem("dbsync_account", userId);
 
+    // Re-read current state after applyDelta
+    const currentDirtyTracks = getDirtyTracks();
+    const currentDirtyCollections = getDirtyCollections();
+    const postSyncMeta = getMeta();
     const currentTracks = getTracksMap();
 
     const deltaPayload: DeltaPayload = {
@@ -230,43 +264,36 @@ export async function runSync(
       deletedCollectionNames: [],
     };
 
-    // Tracks logic: push dirty tracks OR full library if server is empty but client has tracks
+    // Tracks logic: push dirty tracks
     const hasDirtyTracks =
-      inFlightDirtyTracks.added.length > 0 ||
-      inFlightDirtyTracks.deleted.length > 0;
-    const serverHasNoTracks =
-      (remoteMeta.tracks === 0 || !remoteMeta.tracks) &&
-      Object.keys(currentTracks).length > 0;
+      currentDirtyTracks.added.length > 0 ||
+      currentDirtyTracks.deleted.length > 0;
 
-    if (hasDirtyTracks || serverHasNoTracks) {
-      if (serverHasNoTracks) {
-        Object.assign(deltaPayload.addedOrUpdatedTracks, currentTracks);
-      } else {
-        inFlightDirtyTracks.added.forEach((id) => {
-          if (currentTracks[id])
-            deltaPayload.addedOrUpdatedTracks[id] = currentTracks[id];
-        });
-      }
-      deltaPayload.deletedTrackIds = inFlightDirtyTracks.deleted;
-      deltaPayload.meta.tracks = initialLocalMeta.tracks || Date.now();
+    if (hasDirtyTracks) {
+      currentDirtyTracks.added.forEach((id) => {
+        if (currentTracks[id])
+          deltaPayload.addedOrUpdatedTracks[id] = currentTracks[id];
+      });
+      deltaPayload.deletedTrackIds = currentDirtyTracks.deleted;
+      deltaPayload.meta.tracks = Date.now();
     }
 
-    // Compare initial local meta vs remote meta to decide what to push
-    for (const key in initialLocalMeta) {
+    // Compare post-sync local meta vs remote meta to determine which collections to push
+    for (const key in postSyncMeta) {
       if (key === "version" || key === "tracks") continue;
-      if ((initialLocalMeta[key] || 0) > (remoteMeta[key] || 0)) {
+      if ((postSyncMeta[key] || 0) > (remoteMeta[key] || 0)) {
         const rawData = localStorage.getItem(`library_${key}`);
         if (rawData) {
           deltaPayload.updatedCollections[key] = JSON.parse(
             rawData,
           ) as CollectionData;
-          deltaPayload.meta[key] = initialLocalMeta[key];
+          deltaPayload.meta[key] = postSyncMeta[key];
         }
       }
     }
 
-    // Only send collections that were explicitly deleted locally
-    deltaPayload.deletedCollectionNames = [...inFlightDirtyCollections.deleted];
+    // Collections explicitly deleted locally
+    deltaPayload.deletedCollectionNames = [...currentDirtyCollections.deleted];
 
     if (
       Object.keys(deltaPayload.meta).length === 0 &&
@@ -310,8 +337,8 @@ export async function runSync(
       throw new Error(`Failed to push delta: ${putResponse.statusText}`);
     }
 
-    clearDirtyTracks(inFlightDirtyTracks);
-    clearDeletedCollections(inFlightDirtyCollections.deleted);
+    clearDirtyTracks(currentDirtyTracks);
+    clearDeletedCollections(currentDirtyCollections.deleted);
     setStore("syncState", "synced");
     lastSyncTime = Date.now();
 
@@ -321,6 +348,14 @@ export async function runSync(
     const message = error instanceof Error ? error.message : String(error);
     setStore("syncState", "error");
     return { success: false, message: `${t("sync_failed")} ${message}` };
+  } finally {
+    isSyncing = false;
+    if (syncQueued && config.dbsync) {
+      syncQueued = false;
+      setTimeout(() => {
+        if (config.dbsync) runSync(config.dbsync);
+      }, 50);
+    }
   }
 }
 
@@ -328,28 +363,45 @@ function applyDelta(
   delta: DeltaPayload,
   isFullTrackSync?: boolean,
   isInitialSync?: boolean,
+  isConflictRetry?: boolean,
 ) {
   let localTracks = getTracksMap();
+  const dirtyTracks = getDirtyTracks();
+  const dirtyCollections = getDirtyCollections();
+  const now = Date.now();
+
+  // PROTECTION: Do not resurrect tracks locally marked as deleted
+  for (const id of dirtyTracks.deleted) {
+    if (delta.addedOrUpdatedTracks && delta.addedOrUpdatedTracks[id]) {
+      delete delta.addedOrUpdatedTracks[id];
+    }
+  }
+
+  // PROTECTION: Do not resurrect collections locally marked as deleted
+  for (const name of dirtyCollections.deleted) {
+    if (delta.updatedCollections && delta.updatedCollections[name]) {
+      delete delta.updatedCollections[name];
+    }
+  }
 
   if (isFullTrackSync) {
     const mergedTracks: Collection = { ...delta.addedOrUpdatedTracks };
-    const dirty = getDirtyTracks();
 
     // Preserve any local tracks that were not on the server
     for (const [id, track] of Object.entries(localTracks)) {
       if (!mergedTracks[id]) {
         mergedTracks[id] = track;
-        if (!dirty.added.includes(id)) {
-          dirty.added.push(id);
+        if (!dirtyTracks.added.includes(id)) {
+          dirtyTracks.added.push(id);
         }
       }
     }
 
-    dirty.deleted.forEach((id) => {
+    dirtyTracks.deleted.forEach((id) => {
       delete mergedTracks[id];
     });
 
-    saveDirtyTracks(dirty);
+    saveDirtyTracks(dirtyTracks);
     localTracks = mergedTracks;
   } else {
     Object.assign(localTracks, delta.addedOrUpdatedTracks);
@@ -365,42 +417,62 @@ function applyDelta(
     const localRaw = localStorage.getItem(`library_${key}`);
     if (!localRaw) {
       localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+      currentMeta[key] = delta.meta[key] || now;
       continue;
     }
 
     const localTimestamp = currentMeta[key] || 0;
     const serverTimestamp =
       typeof delta.meta[key] === "number" ? delta.meta[key]! : 0;
-    const hasLocalState = localTimestamp > 0;
 
-    // Use union merging only for initial sync when no local collection state exists
-    if (isInitialSync && !hasLocalState) {
+    // Use union merging for initial sync OR during conflict retry
+    if (isInitialSync || isConflictRetry) {
       try {
         const localData = JSON.parse(localRaw);
+        let merged: CollectionData;
         if (key === "channels" || key === "playlists" || key === "albums") {
-          const merged = mergeItemList(
+          merged = mergeItemList(
             Array.isArray(localData) ? localData : [],
             Array.isArray(remoteData) ? (remoteData as SyncItem[]) : [],
           );
-          localStorage.setItem(`library_${key}`, JSON.stringify(merged));
         } else if (Array.isArray(remoteData) && Array.isArray(localData)) {
           const isPrepended = ["history", "favorites", "liked"].includes(key);
-          const merged = mergeTrackIds(
+          merged = mergeTrackIds(
             localData,
             remoteData as string[],
             isPrepended,
           );
-          localStorage.setItem(`library_${key}`, JSON.stringify(merged));
         } else {
-          localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+          merged = remoteData;
+        }
+        localStorage.setItem(`library_${key}`, JSON.stringify(merged));
+
+        // If local contained items that were not on the server, ensure timestamp is fresh so it will be pushed back
+        const hasLocalItemsNotOnServer =
+          Array.isArray(localData) &&
+          localData.some((item) => {
+            const id = typeof item === "string" ? item : (item as SyncItem)?.id;
+            return (
+              Array.isArray(remoteData) &&
+              !remoteData.some(
+                (r) => (typeof r === "string" ? r : (r as SyncItem)?.id) === id,
+              )
+            );
+          });
+        if (hasLocalItemsNotOnServer) {
+          currentMeta[key] = now;
+        } else {
+          currentMeta[key] = Math.max(localTimestamp, serverTimestamp);
         }
       } catch {
         localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+        currentMeta[key] = Math.max(localTimestamp, serverTimestamp);
       }
     } else {
-      // Last-write-wins: apply newer server snapshot so complete server collections can remove locally stored items
+      // Last-write-wins: apply newer server snapshot
       if (serverTimestamp >= localTimestamp) {
         localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+        currentMeta[key] = serverTimestamp;
       }
     }
   }
@@ -408,16 +480,13 @@ function applyDelta(
   // Handle deleted collections from server
   for (const key of delta.deletedCollectionNames) {
     localStorage.removeItem(`library_${key}`);
+    delete currentMeta[key];
   }
 
   for (const [key, timestamp] of Object.entries(delta.meta)) {
     if (typeof timestamp === "number" && timestamp > (currentMeta[key] || 0)) {
       currentMeta[key] = timestamp;
     }
-  }
-
-  for (const key of delta.deletedCollectionNames) {
-    delete currentMeta[key];
   }
 
   localStorage.setItem("library_meta", JSON.stringify(currentMeta));
@@ -432,6 +501,16 @@ export function scheduleSync() {
     runSync(config.dbsync!);
     syncTimeout = null;
   }, 30 * 1000);
+}
+
+export function cleanupSyncState() {
+  localStorage.removeItem("dbsync_account");
+  localStorage.removeItem("dbsync_dirty_tracks");
+  localStorage.removeItem("dbsync_dirty_collections");
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+    syncTimeout = null;
+  }
 }
 
 // --- Lifecycle Sync Listeners (Focus / Visibility) ---
