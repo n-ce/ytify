@@ -146,7 +146,9 @@ export async function pushFullLibrary(userId: string): Promise<void> {
     localStorage.setItem("library_tracks", JSON.stringify(snapshot.tracks));
   }
   for (const key in snapshot) {
-    if (!["meta", "tracks", "deletedCollections", "deletedTracks"].includes(key)) {
+    if (
+      !["meta", "tracks", "deletedCollections", "deletedTracks"].includes(key)
+    ) {
       snapshot.meta[key] = Math.max(snapshot.meta[key] || 0, now);
     }
   }
@@ -171,7 +173,12 @@ let syncQueued = false;
 
 export async function runSync(
   userId: string,
-  retryData?: { count: number; serverMeta?: Meta; ETag?: string },
+  retryData?: {
+    count: number;
+    serverMeta?: Meta;
+    ETag?: string;
+    isConflictRetry?: boolean;
+  },
 ): Promise<{ success: boolean; message: string }> {
   if (isSyncing && !retryData) {
     syncQueued = true;
@@ -180,7 +187,7 @@ export async function runSync(
   isSyncing = true;
 
   const retryCount = retryData?.count || 0;
-  const isConflictRetry = retryCount > 0;
+  const isConflictRetry = Boolean(retryData?.isConflictRetry);
   const MAX_RETRIES = 3;
   if (retryCount === 0) setStore("syncState", "syncing");
 
@@ -208,7 +215,10 @@ export async function runSync(
         retryCount < MAX_RETRIES
       ) {
         await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
-        return runSync(userId, { count: retryCount + 1 });
+        return runSync(userId, {
+          count: retryCount + 1,
+          isConflictRetry: false,
+        });
       }
 
       if (pullResponse.status === 404) {
@@ -320,7 +330,10 @@ export async function runSync(
       retryCount < MAX_RETRIES
     ) {
       await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
-      return runSync(userId, { count: retryCount + 1 });
+      return runSync(userId, {
+        count: retryCount + 1,
+        isConflictRetry: false,
+      });
     }
 
     if (putResponse.status === 412) {
@@ -328,7 +341,10 @@ export async function runSync(
         await new Promise((r) =>
           setTimeout(r, 150 * Math.pow(2, retryCount) + Math.random() * 100),
         );
-        return runSync(userId, { count: retryCount + 1 });
+        return runSync(userId, {
+          count: retryCount + 1,
+          isConflictRetry: true,
+        });
       }
       throw new Error(t("sync_conflict"));
     }

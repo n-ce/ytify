@@ -136,8 +136,9 @@ export default function Dropdown() {
             }
           >
             <li
-              onclick={() => {
-                import("@modules/cloudSync").then((m) => m.cleanupSyncState());
+              onclick={async () => {
+                const { cleanupSyncState } = await import("@modules/cloudSync");
+                cleanupSyncState();
                 setConfig("dbsync", "");
                 location.reload();
               }}

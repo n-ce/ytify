@@ -1,12 +1,16 @@
 import { setConfig } from "@utils";
 import { setStore, t } from "@stores";
-import { createSignal, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 
 export default function Login() {
   const [email, setEmail] = createSignal("");
   const [pw, setPw] = createSignal("");
   const [loading, setLoading] = createSignal(false);
   let dialogRef!: HTMLDialogElement;
+
+  onMount(() => {
+    dialogRef.showModal();
+  });
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
