@@ -16,28 +16,19 @@ function getLocalDO(hash: string): UserSyncDO {
         exec(query: string, ...bindings: any[]) {
           const trimmed = query.trim();
           if (trimmed.toUpperCase().startsWith("SELECT")) {
-            const stmt = db.prepare(query);
-            const rows = stmt.all(...bindings) as any[];
+            const rows = db.prepare(query).all(...bindings) as any[];
             return {
               toArray: () => rows,
-              one: () => rows[0] || { count: 0 },
-            };
-          } else {
-            if (bindings.length > 0) {
-              const stmt = db.prepare(query);
-              stmt.run(...bindings);
-            } else {
-              db.exec(query);
-            }
-            return {
-              toArray: () => [],
-              one: () => undefined,
+              one: () => rows[0] || { c: 0, count: 0 },
             };
           }
+          if (bindings.length > 0) db.prepare(query).run(...bindings);
+          else db.exec(query);
+          return { toArray: () => [], one: () => undefined };
         },
       },
       transactionSync<T>(closure: () => T): T {
-        db.exec("BEGIN TRANSACTION");
+        db.exec("BEGIN");
         try {
           const res = closure();
           db.exec("COMMIT");
@@ -68,15 +59,10 @@ function getLocalDO(hash: string): UserSyncDO {
 
 const localEnv = {
   USER_SYNC_DO: {
-    idFromName(name: string) {
-      return { toString: () => name } as any;
-    },
-    get(id: any) {
-      const instance = getLocalDO(id.toString());
-      return {
-        fetch: (req: Request) => instance.fetch(req),
-      } as any;
-    },
+    idFromName: (name: string) => ({ toString: () => name }),
+    get: (id: any) => ({
+      fetch: (req: Request) => getLocalDO(id.toString()).fetch(req),
+    }),
   } as any,
 };
 
@@ -92,20 +78,16 @@ export function createLocalAdapter() {
     let body: Buffer | null = null;
     if (req.method !== "GET" && req.method !== "HEAD") {
       const chunks: Buffer[] = [];
-      for await (const chunk of req) {
+      for await (const chunk of req)
         chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-      }
       body = Buffer.concat(chunks);
     }
 
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
       if (value !== undefined) {
-        if (Array.isArray(value)) {
-          for (const v of value) headers.append(key, v);
-        } else {
-          headers.set(key, value);
-        }
+        if (Array.isArray(value)) for (const v of value) headers.append(key, v);
+        else headers.set(key, value);
       }
     }
 
@@ -122,9 +104,7 @@ export function createLocalAdapter() {
       const response = await worker.fetch(request, localEnv, {});
 
       res.statusCode = response.status;
-      response.headers.forEach((value, key) => {
-        res.setHeader(key, value);
-      });
+      response.headers.forEach((value, key) => res.setHeader(key, value));
 
       if (response.body) {
         const reader = response.body.getReader();

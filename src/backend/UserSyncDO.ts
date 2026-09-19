@@ -1,4 +1,4 @@
-import type { DurableObjectState } from '@cloudflare/workers-types';
+import type { DurableObjectState } from "@cloudflare/workers-types";
 
 interface TrackItem {
   id: string;
@@ -10,263 +10,187 @@ interface TrackItem {
   [key: string]: unknown;
 }
 
-type Collection = { [index: string]: TrackItem };
-
-interface Meta {
-  version: number;
-  tracks: number;
-  [index: string]: number;
-}
-
-type CollectionData = string[] | unknown[];
+type Collection = Record<string, TrackItem>;
+type Meta = { version: number; tracks: number; [index: string]: number };
+type CollectionData = unknown[];
 
 interface LibrarySnapshot {
   meta: Meta;
   tracks: Collection;
-  deletedCollections?: Record<string, number>;
-  deletedTracks?: Record<string, number>;
   [key: string]:
-    | Collection
-    | Meta
-    | CollectionData
-    | Record<string, number>
-    | number
-    | string
-    | undefined;
+    Collection | Meta | CollectionData | number | string | undefined;
 }
 
 interface DeltaPayload {
   meta: Partial<Meta>;
   addedOrUpdatedTracks: Collection;
   deletedTrackIds: string[];
-  updatedCollections: { [collectionName: string]: CollectionData };
+  updatedCollections: Record<string, CollectionData>;
   deletedCollectionNames: string[];
 }
 
-const CORS_HEADERS: Record<string, string> = {
-  'Content-Type': 'application/json',
+const JSON_HEADER = { "Content-Type": "application/json" };
+const parse = <T>(val: string, fallback: T): T => {
+  try {
+    return JSON.parse(val);
+  } catch {
+    return fallback;
+  }
 };
 
 export class UserSyncDO {
   private ctx: DurableObjectState;
+  private sql: DurableObjectState["storage"]["sql"];
   private initialized = false;
 
   constructor(ctx: DurableObjectState) {
     this.ctx = ctx;
+    this.sql = ctx.storage.sql;
   }
 
   private initSchema(): void {
     if (this.initialized) return;
-
-    this.ctx.storage.sql.exec(`
-      CREATE TABLE IF NOT EXISTS meta (
-        key TEXT PRIMARY KEY,
-        value REAL NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS tracks (
-        id TEXT PRIMARY KEY,
-        data TEXT NOT NULL,
-        modified REAL NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_tracks_modified ON tracks(modified);
-      CREATE TABLE IF NOT EXISTS collections (
-        name TEXT PRIMARY KEY,
-        data TEXT NOT NULL,
-        modified REAL NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS deleted_tracks (
-        id TEXT PRIMARY KEY,
-        deleted_at REAL NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_deleted_tracks ON deleted_tracks(deleted_at);
-      CREATE TABLE IF NOT EXISTS deleted_collections (
-        name TEXT PRIMARY KEY,
-        deleted_at REAL NOT NULL
-      );
+    this.sql.exec(`
+      CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value REAL NOT NULL);
+      CREATE TABLE IF NOT EXISTS tracks (id TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
+      CREATE INDEX IF NOT EXISTS idx_tracks_mod ON tracks(modified);
+      CREATE TABLE IF NOT EXISTS collections (name TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
+      CREATE TABLE IF NOT EXISTS deleted_tracks (id TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
+      CREATE INDEX IF NOT EXISTS idx_del_tracks ON deleted_tracks(deleted_at);
+      CREATE TABLE IF NOT EXISTS deleted_collections (name TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
     `);
-
     this.initialized = true;
   }
 
   private hasLibrary(): boolean {
-    const metaCount = this.ctx.storage.sql
-      .exec<{ count: number }>('SELECT count(*) as count FROM meta')
-      .one().count;
-    const tracksCount = this.ctx.storage.sql
-      .exec<{ count: number }>('SELECT count(*) as count FROM tracks')
-      .one().count;
-    return metaCount > 0 || tracksCount > 0;
+    return (
+      this.sql.exec<{ c: number }>("SELECT count(*) as c FROM meta").one().c >
+        0 ||
+      this.sql.exec<{ c: number }>("SELECT count(*) as c FROM tracks").one().c >
+        0
+    );
   }
 
   private getMeta(): Meta {
-    const rows = this.ctx.storage.sql
-      .exec<{ key: string; value: number }>('SELECT key, value FROM meta')
-      .toArray();
-
     const meta: Meta = { version: 5, tracks: 0 };
-    for (const row of rows) {
-      meta[row.key] = row.value;
+    for (const r of this.sql
+      .exec<{ key: string; value: number }>("SELECT key, value FROM meta")
+      .toArray()) {
+      meta[r.key] = r.value;
     }
     return meta;
   }
 
   private getFullSnapshot(): LibrarySnapshot {
-    const meta = this.getMeta();
-    const trackRows = this.ctx.storage.sql
-      .exec<{ id: string; data: string }>('SELECT id, data FROM tracks')
-      .toArray();
-
-    const tracks: Collection = {};
-    for (const row of trackRows) {
-      try {
-        tracks[row.id] = JSON.parse(row.data);
-      } catch {
-        // ignore corrupted json
-      }
+    const snapshot: LibrarySnapshot = { meta: this.getMeta(), tracks: {} };
+    for (const r of this.sql
+      .exec<{ id: string; data: string }>("SELECT id, data FROM tracks")
+      .toArray()) {
+      snapshot.tracks[r.id] = parse(r.data, null as any);
     }
-
-    const collectionRows = this.ctx.storage.sql
-      .exec<{ name: string; data: string }>('SELECT name, data FROM collections')
-      .toArray();
-
-    const snapshot: LibrarySnapshot = {
-      meta,
-      tracks,
-    };
-
-    for (const row of collectionRows) {
-      try {
-        snapshot[row.name] = JSON.parse(row.data);
-      } catch {
-        // ignore corrupted json
-      }
+    for (const r of this.sql
+      .exec<{ name: string; data: string }>(
+        "SELECT name, data FROM collections",
+      )
+      .toArray()) {
+      snapshot[r.name] = parse(r.data, []);
     }
-
     return snapshot;
   }
 
   private setFullSnapshot(snapshot: LibrarySnapshot): void {
     const now = Date.now();
     this.ctx.storage.transactionSync(() => {
-      this.ctx.storage.sql.exec('DELETE FROM meta');
-      this.ctx.storage.sql.exec('DELETE FROM tracks');
-      this.ctx.storage.sql.exec('DELETE FROM collections');
-      this.ctx.storage.sql.exec('DELETE FROM deleted_tracks');
-      this.ctx.storage.sql.exec('DELETE FROM deleted_collections');
-
+      this.sql.exec(
+        "DELETE FROM meta; DELETE FROM tracks; DELETE FROM collections; DELETE FROM deleted_tracks; DELETE FROM deleted_collections;",
+      );
       const meta = snapshot.meta || { version: 5, tracks: 0 };
       if (!meta.version) meta.version = 5;
 
-      for (const [key, val] of Object.entries(meta)) {
-        if (typeof val === 'number') {
-          this.ctx.storage.sql.exec(
-            'INSERT INTO meta (key, value) VALUES (?, ?)',
-            key,
-            val
-          );
-        }
+      for (const [k, v] of Object.entries(meta)) {
+        if (typeof v === "number")
+          this.sql.exec("INSERT INTO meta (key, value) VALUES (?, ?)", k, v);
       }
-
-      if (snapshot.tracks) {
-        for (const [id, track] of Object.entries(snapshot.tracks)) {
-          const mod = track.modified || now;
-          this.ctx.storage.sql.exec(
-            'INSERT INTO tracks (id, data, modified) VALUES (?, ?, ?)',
-            id,
-            JSON.stringify(track),
-            mod
-          );
-        }
+      for (const [id, trk] of Object.entries(snapshot.tracks || {})) {
+        this.sql.exec(
+          "INSERT INTO tracks (id, data, modified) VALUES (?, ?, ?)",
+          id,
+          JSON.stringify(trk),
+          trk.modified || now,
+        );
       }
-
-      for (const [key, val] of Object.entries(snapshot)) {
-        if (['meta', 'tracks', 'deletedCollections', 'deletedTracks'].includes(key)) {
-          continue;
-        }
-        if (val !== undefined) {
-          const mod = typeof meta[key] === 'number' ? meta[key] : now;
-          this.ctx.storage.sql.exec(
-            'INSERT INTO collections (name, data, modified) VALUES (?, ?, ?)',
-            key,
-            JSON.stringify(val),
-            mod
+      for (const [k, v] of Object.entries(snapshot)) {
+        if (
+          !["meta", "tracks", "deletedCollections", "deletedTracks"].includes(
+            k,
+          ) &&
+          v !== undefined
+        ) {
+          this.sql.exec(
+            "INSERT INTO collections (name, data, modified) VALUES (?, ?, ?)",
+            k,
+            JSON.stringify(v),
+            typeof meta[k] === "number" ? meta[k] : now,
           );
         }
       }
     });
-
-    this.touchActivity();
+    this.touch();
   }
 
-  private touchActivity(): void {
-    void this.ctx.storage.put('last_active', Date.now());
-    // Schedule maintenance alarm 30 days from now
-    void this.ctx.storage.setAlarm(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  private touch(): void {
+    void this.ctx.storage.put("last_active", Date.now());
+    void this.ctx.storage.setAlarm(Date.now() + 30 * 86400000);
   }
 
   async fetch(request: Request): Promise<Response> {
     this.initSchema();
     const url = new URL(request.url);
-    const method = request.method.toUpperCase();
-    const path = url.pathname.replace(/^\/api\//, '').replace(/^\//, '');
+    const m = request.method.toUpperCase();
+    const p = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
 
-    const isSync = path.startsWith('sync');
-    const isLibrary = path.startsWith('library');
-
-    if (isLibrary) {
-      if (method === 'GET') {
-        if (!this.hasLibrary()) {
-          const defaultState: LibrarySnapshot = {
-            meta: { version: 5, tracks: 0 },
-            tracks: {},
-          };
-          return new Response(JSON.stringify(defaultState), {
-            status: 200,
-            headers: CORS_HEADERS,
-          });
-        }
-        return new Response(JSON.stringify(this.getFullSnapshot()), {
-          status: 200,
-          headers: CORS_HEADERS,
-        });
+    if (p.startsWith("library")) {
+      if (m === "GET") {
+        return new Response(
+          JSON.stringify(
+            this.hasLibrary()
+              ? this.getFullSnapshot()
+              : { meta: { version: 5, tracks: 0 }, tracks: {} },
+          ),
+          { status: 200, headers: JSON_HEADER },
+        );
       }
-
-      if (method === 'PUT') {
-        const snapshot = (await request.json()) as LibrarySnapshot;
-        this.setFullSnapshot(snapshot);
-        return new Response(null, { status: 204, headers: CORS_HEADERS });
+      if (m === "PUT") {
+        this.setFullSnapshot((await request.json()) as LibrarySnapshot);
+        return new Response(null, { status: 204, headers: JSON_HEADER });
       }
-
-      return new Response(`Method ${method} not allowed`, { status: 405 });
+      return new Response(`Method ${m} not allowed`, { status: 405 });
     }
 
-    if (isSync) {
-      if (method === 'GET') {
-        if (!this.hasLibrary()) {
-          return new Response('No library found. Perform a full sync first.', {
+    if (p.startsWith("sync")) {
+      if (m === "GET") {
+        if (!this.hasLibrary())
+          return new Response("No library found. Perform a full sync first.", {
             status: 404,
-            headers: CORS_HEADERS,
+            headers: JSON_HEADER,
           });
-        }
         return new Response(JSON.stringify(this.getMeta()), {
           status: 200,
-          headers: CORS_HEADERS,
+          headers: JSON_HEADER,
         });
       }
 
-      // Delta Pull (Smart Pull)
-      if (method === 'POST') {
-        if (!this.hasLibrary()) {
-          return new Response('No library found.', {
+      if (m === "POST") {
+        if (!this.hasLibrary())
+          return new Response("No library found.", {
             status: 404,
-            headers: CORS_HEADERS,
+            headers: JSON_HEADER,
           });
-        }
-
-        const body = (await request.json().catch(() => ({}))) as { meta?: Meta };
+        const body = (await request.json().catch(() => ({}))) as {
+          meta?: Meta;
+        };
         const clientMeta = body?.meta || { version: 5, tracks: 0 };
         const serverMeta = this.getMeta();
-
         const delta: DeltaPayload = {
           meta: {},
           addedOrUpdatedTracks: {},
@@ -274,107 +198,82 @@ export class UserSyncDO {
           updatedCollections: {},
           deletedCollectionNames: [],
         };
+        let hasChanges = false,
+          isFullTrackSync = false;
 
-        let hasChanges = false;
-        let isFullTrackSync = false;
-
-        // Version check
         if ((serverMeta.version || 5) > (clientMeta.version || 5)) {
           delta.meta.version = serverMeta.version;
           hasChanges = true;
         }
 
-        // Tracks delta
-        const clientTracksTimestamp = clientMeta.tracks || 0;
-        const totalServerTracks = this.ctx.storage.sql
-          .exec<{ count: number }>('SELECT count(*) as count FROM tracks')
-          .one().count;
+        const clientTracksTs = clientMeta.tracks || 0;
+        const trackCount = this.sql
+          .exec<{ c: number }>("SELECT count(*) as c FROM tracks")
+          .one().c;
 
-        if (clientTracksTimestamp === 0 && totalServerTracks > 0) {
-          const allTracks = this.ctx.storage.sql
-            .exec<{ id: string; data: string }>('SELECT id, data FROM tracks')
-            .toArray();
-          for (const row of allTracks) {
-            try {
-              delta.addedOrUpdatedTracks[row.id] = JSON.parse(row.data);
-            } catch {
-              // ignore
-            }
+        if (clientTracksTs === 0 && trackCount > 0) {
+          for (const r of this.sql
+            .exec<{ id: string; data: string }>("SELECT id, data FROM tracks")
+            .toArray()) {
+            delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
           }
           delta.meta.tracks = serverMeta.tracks || Date.now();
-          isFullTrackSync = true;
-          hasChanges = true;
-        } else if ((serverMeta.tracks || 0) > clientTracksTimestamp) {
-          const changedTracks = this.ctx.storage.sql
+          hasChanges = isFullTrackSync = true;
+        } else if ((serverMeta.tracks || 0) > clientTracksTs) {
+          for (const r of this.sql
             .exec<{ id: string; data: string }>(
-              'SELECT id, data FROM tracks WHERE modified > ?',
-              clientTracksTimestamp
+              "SELECT id, data FROM tracks WHERE modified > ?",
+              clientTracksTs,
             )
-            .toArray();
-          for (const row of changedTracks) {
-            try {
-              delta.addedOrUpdatedTracks[row.id] = JSON.parse(row.data);
-            } catch {
-              // ignore
-            }
+            .toArray()) {
+            delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
           }
           delta.meta.tracks = serverMeta.tracks;
-          isFullTrackSync = false;
           hasChanges = true;
         }
 
-        // Collections delta
         for (const [key, serverTime] of Object.entries(serverMeta)) {
-          if (key === 'version' || key === 'tracks') continue;
+          if (key === "version" || key === "tracks") continue;
           if (
             clientMeta[key] === undefined ||
             (serverTime || 0) > (clientMeta[key] || 0)
           ) {
-            const colRow = this.ctx.storage.sql
+            const rows = this.sql
               .exec<{ data: string }>(
-                'SELECT data FROM collections WHERE name = ?',
-                key
+                "SELECT data FROM collections WHERE name = ?",
+                key,
               )
               .toArray();
-            if (colRow.length > 0) {
-              try {
-                delta.updatedCollections[key] = JSON.parse(colRow[0].data);
-                delta.meta[key] = serverTime;
-                hasChanges = true;
-              } catch {
-                // ignore
-              }
-            }
-          }
-        }
-
-        // Deleted collections tombstones
-        const deletedCols = this.ctx.storage.sql
-          .exec<{ name: string; deleted_at: number }>(
-            'SELECT name, deleted_at FROM deleted_collections'
-          )
-          .toArray();
-        for (const col of deletedCols) {
-          if (
-            clientMeta[col.name] === undefined ||
-            (clientMeta[col.name] || 0) <= col.deleted_at
-          ) {
-            if (!delta.deletedCollectionNames.includes(col.name)) {
-              delta.deletedCollectionNames.push(col.name);
+            if (rows.length > 0) {
+              delta.updatedCollections[key] = parse(rows[0].data, []);
+              delta.meta[key] = serverTime;
               hasChanges = true;
             }
           }
         }
 
-        // Deleted tracks tombstones
-        if (clientTracksTimestamp > 0) {
-          const deletedTrk = this.ctx.storage.sql
+        for (const col of this.sql
+          .exec<{ name: string; deleted_at: number }>(
+            "SELECT name, deleted_at FROM deleted_collections",
+          )
+          .toArray()) {
+          if (
+            (clientMeta[col.name] === undefined ||
+              (clientMeta[col.name] || 0) <= col.deleted_at) &&
+            !delta.deletedCollectionNames.includes(col.name)
+          ) {
+            delta.deletedCollectionNames.push(col.name);
+            hasChanges = true;
+          }
+        }
+
+        if (clientTracksTs > 0) {
+          for (const trk of this.sql
             .exec<{ id: string }>(
-              'SELECT id FROM deleted_tracks WHERE deleted_at > ?',
-              clientTracksTimestamp
+              "SELECT id FROM deleted_tracks WHERE deleted_at > ?",
+              clientTracksTs,
             )
-            .toArray();
-          for (const trk of deletedTrk) {
+            .toArray()) {
             if (!delta.deletedTrackIds.includes(trk.id)) {
               delta.deletedTrackIds.push(trk.id);
               hasChanges = true;
@@ -389,153 +288,135 @@ export class UserSyncDO {
             fullSyncRequired: false,
             isFullTrackSync,
           }),
-          {
-            status: 200,
-            headers: CORS_HEADERS,
-          }
+          { status: 200, headers: JSON_HEADER },
         );
       }
 
-      // Delta Push
-      if (method === 'PUT') {
+      if (m === "PUT") {
         const delta = (await request.json()) as DeltaPayload;
         const now = Date.now();
 
         this.ctx.storage.transactionSync(() => {
-          // 1. Tracks added/updated
           if (
             delta.addedOrUpdatedTracks &&
             Object.keys(delta.addedOrUpdatedTracks).length > 0
           ) {
-            for (const [id, track] of Object.entries(delta.addedOrUpdatedTracks)) {
+            for (const [id, track] of Object.entries(
+              delta.addedOrUpdatedTracks,
+            )) {
               track.modified = Math.max(track.modified || 0, now);
-              this.ctx.storage.sql.exec(
-                'INSERT OR REPLACE INTO tracks (id, data, modified) VALUES (?, ?, ?)',
+              this.sql.exec(
+                "INSERT OR REPLACE INTO tracks (id, data, modified) VALUES (?, ?, ?)",
                 id,
                 JSON.stringify(track),
-                track.modified
+                track.modified,
               );
-              this.ctx.storage.sql.exec('DELETE FROM deleted_tracks WHERE id = ?', id);
+              this.sql.exec("DELETE FROM deleted_tracks WHERE id = ?", id);
             }
-            this.ctx.storage.sql.exec(
-              'INSERT OR REPLACE INTO meta (key, value) VALUES (\'tracks\', ?)',
-              now
+            this.sql.exec(
+              "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
+              now,
             );
           }
 
-          // 2. Tracks deleted
-          if (delta.deletedTrackIds && delta.deletedTrackIds.length > 0) {
+          if (delta.deletedTrackIds?.length) {
             for (const id of delta.deletedTrackIds) {
-              this.ctx.storage.sql.exec('DELETE FROM tracks WHERE id = ?', id);
-              this.ctx.storage.sql.exec(
-                'INSERT OR REPLACE INTO deleted_tracks (id, deleted_at) VALUES (?, ?)',
+              this.sql.exec("DELETE FROM tracks WHERE id = ?", id);
+              this.sql.exec(
+                "INSERT OR REPLACE INTO deleted_tracks (id, deleted_at) VALUES (?, ?)",
                 id,
-                now
+                now,
               );
             }
-            this.ctx.storage.sql.exec(
-              'INSERT OR REPLACE INTO meta (key, value) VALUES (\'tracks\', ?)',
-              now
+            this.sql.exec(
+              "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
+              now,
             );
           }
 
-          // 3. Collections added/updated
           if (delta.updatedCollections) {
-            for (const [name, collectionData] of Object.entries(
-              delta.updatedCollections
+            for (const [name, data] of Object.entries(
+              delta.updatedCollections,
             )) {
-              const mod = (delta.meta && typeof delta.meta[name] === 'number')
-                ? delta.meta[name]!
-                : now;
-
-              this.ctx.storage.sql.exec(
-                'INSERT OR REPLACE INTO collections (name, data, modified) VALUES (?, ?, ?)',
+              const mod =
+                typeof delta.meta?.[name] === "number"
+                  ? delta.meta[name]!
+                  : now;
+              this.sql.exec(
+                "INSERT OR REPLACE INTO collections (name, data, modified) VALUES (?, ?, ?)",
                 name,
-                JSON.stringify(collectionData),
-                mod
+                JSON.stringify(data),
+                mod,
               );
-              this.ctx.storage.sql.exec(
-                'DELETE FROM deleted_collections WHERE name = ?',
-                name
-              );
-              this.ctx.storage.sql.exec(
-                'INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)',
+              this.sql.exec(
+                "DELETE FROM deleted_collections WHERE name = ?",
                 name,
-                mod
+              );
+              this.sql.exec(
+                "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+                name,
+                mod,
               );
             }
           }
 
-          // 4. Collections deleted
-          if (
-            delta.deletedCollectionNames &&
-            delta.deletedCollectionNames.length > 0
-          ) {
+          if (delta.deletedCollectionNames?.length) {
             for (const name of delta.deletedCollectionNames) {
-              this.ctx.storage.sql.exec('DELETE FROM collections WHERE name = ?', name);
-              this.ctx.storage.sql.exec('DELETE FROM meta WHERE key = ?', name);
-              this.ctx.storage.sql.exec(
-                'INSERT OR REPLACE INTO deleted_collections (name, deleted_at) VALUES (?, ?)',
+              this.sql.exec("DELETE FROM collections WHERE name = ?", name);
+              this.sql.exec("DELETE FROM meta WHERE key = ?", name);
+              this.sql.exec(
+                "INSERT OR REPLACE INTO deleted_collections (name, deleted_at) VALUES (?, ?)",
                 name,
-                now
+                now,
               );
             }
           }
 
-          // 5. Monotonic metadata timestamps and version
           if (delta.meta) {
-            for (const [key, ts] of Object.entries(delta.meta)) {
-              if (typeof ts === 'number') {
-                const currentVal = this.ctx.storage.sql
-                  .exec<{ value: number }>('SELECT value FROM meta WHERE key = ?', key)
+            for (const [k, ts] of Object.entries(delta.meta)) {
+              if (typeof ts === "number") {
+                const cur = this.sql
+                  .exec<{ value: number }>(
+                    "SELECT value FROM meta WHERE key = ?",
+                    k,
+                  )
                   .toArray();
-                const nextVal = currentVal.length > 0
-                  ? Math.max(currentVal[0].value, ts)
-                  : ts;
-                this.ctx.storage.sql.exec(
-                  'INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)',
-                  key,
-                  nextVal
+                this.sql.exec(
+                  "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+                  k,
+                  cur.length ? Math.max(cur[0].value, ts) : ts,
                 );
               }
             }
           }
         });
 
-        this.touchActivity();
-
+        this.touch();
         return new Response(JSON.stringify({ serverMeta: this.getMeta() }), {
           status: 200,
-          headers: CORS_HEADERS,
+          headers: JSON_HEADER,
         });
       }
 
-      return new Response(`Method ${method} not allowed`, { status: 405 });
+      return new Response(`Method ${m} not allowed`, { status: 405 });
     }
 
-    return new Response('Not Found', { status: 404 });
+    return new Response("Not Found", { status: 404 });
   }
 
   async alarm(): Promise<void> {
     const now = Date.now();
-    const lastActive = (await this.ctx.storage.get<number>('last_active')) || 0;
-    const INACTIVE_THRESHOLD = 100 * 24 * 60 * 60 * 1000;
-
-    // Inactive for > 100 days: wipe storage
-    if (lastActive && now - lastActive > INACTIVE_THRESHOLD) {
+    const lastActive = (await this.ctx.storage.get<number>("last_active")) || 0;
+    if (lastActive && now - lastActive > 100 * 86400000) {
       await this.ctx.storage.deleteAll();
       return;
     }
-
-    // Prune tombstones older than 30 days
-    const TOMBSTONE_THRESHOLD = 30 * 24 * 60 * 60 * 1000;
-    const cutoff = now - TOMBSTONE_THRESHOLD;
-
     this.initSchema();
-    this.ctx.storage.sql.exec('DELETE FROM deleted_tracks WHERE deleted_at < ?', cutoff);
-    this.ctx.storage.sql.exec(
-      'DELETE FROM deleted_collections WHERE deleted_at < ?',
-      cutoff
+    const cutoff = now - 30 * 86400000;
+    this.sql.exec("DELETE FROM deleted_tracks WHERE deleted_at < ?", cutoff);
+    this.sql.exec(
+      "DELETE FROM deleted_collections WHERE deleted_at < ?",
+      cutoff,
     );
   }
 }
