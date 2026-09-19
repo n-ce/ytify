@@ -59,8 +59,9 @@ export default function () {
 
   const filteredItems = () => {
     const rawQuery = searchQuery().trim();
+    if (!rawQuery) return listStore.list as TrackItem[];
+
     const source = getSourceItems();
-    if (!rawQuery) return source;
 
     const query = rawQuery
       .normalize("NFD")

@@ -1,11 +1,7 @@
 import { For, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import { t } from "@stores";
-import {
-  librarySections,
-  setLibrarySection,
-  LibrarySectionKey,
-} from "@utils";
+import { librarySections, setLibrarySection, LibrarySectionKey } from "@utils";
 
 interface SectionConfigItem {
   key: LibrarySectionKey;
@@ -14,9 +10,8 @@ interface SectionConfigItem {
 }
 
 const SECTIONS: SectionConfigItem[] = [
-  { key: "subfeed", label: "hub_subfeed", icon: "ri-tv-fill" },
-  { key: "gallery", label: "hub_gallery", icon: "ri-user-heart-fill" },
-  { key: "featured", label: "hub_featured", icon: "ri-star-fill" },
+  { key: "subfeed", label: "hub_subfeed", icon: "ri-tv-line" },
+  { key: "gallery", label: "hub_gallery", icon: "ri-user-heart-line" },
   {
     key: "listenLater",
     label: "library_listen_later",
@@ -26,8 +21,8 @@ const SECTIONS: SectionConfigItem[] = [
   { key: "favorites", label: "library_favorites", icon: "ri-heart-fill" },
   { key: "liked", label: "library_liked", icon: "ri-thumb-up-fill" },
   {
-    key: "frequentlyPlayed",
-    label: "hub_frequently_played",
+    key: "cached",
+    label: "hub_cached",
     icon: "ri-bar-chart-2-fill",
   },
   { key: "discovery", label: "hub_discovery", icon: "ri-compass-3-fill" },

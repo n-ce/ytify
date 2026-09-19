@@ -11,59 +11,78 @@ export const [queueStore, setQueueStore] = createStore({
   sessionMap: new Map<string, HTMLAudioElement>(),
 });
 
-
 /**
  * Filter items based on configuration and state.
  * By default blocks duplicates in queue/history and respects duration.
  * Items with context.src === '' bypass these filters (manual user intent).
  */
-export function filterItemsByConfig(items: TrackItem[], options: {
-  ignoreList?: TrackItem[]
-} = {}): TrackItem[] {
-
-  const historyIds = new Set(queueStore.history.map(i => i.id));
-  const queueIds = new Set(queueStore.list.map(i => i.id));
-  const ignoreIds = new Set(options.ignoreList?.map(i => i.id) || []);
+export function filterItemsByConfig(
+  items: TrackItem[],
+  options: {
+    ignoreList?: TrackItem[];
+  } = {},
+): TrackItem[] {
+  const historyIds = new Set(queueStore.history.map((i) => i.id));
+  const queueIds = new Set(queueStore.list.map((i) => i.id));
+  const ignoreIds = new Set(options.ignoreList?.map((i) => i.id) || []);
   const currentId = playerStore.stream.id;
-  const durationLimit = config.durationFilter ? parseDuration(config.durationFilter) : Infinity;
+  const durationLimit = config.durationFilter
+    ? parseDuration(config.durationFilter)
+    : Infinity;
 
-  return items.filter(item => {
+  return items.filter((item) => {
     if (!item.id) return false;
 
     // Manual intent override: if src is exactly '', we allow it regardless of filters.
-    if (item.context?.src === '') return true;
+    if (item.context?.src === "") return true;
 
-    return item.id !== currentId &&
+    return (
+      item.id !== currentId &&
       !queueIds.has(item.id) &&
       !historyIds.has(item.id) &&
       !ignoreIds.has(item.id) &&
-      parseDuration(item.duration) < durationLimit;
+      parseDuration(item.duration) < durationLimit
+    );
   });
 }
 
 /**
  * Main entry point for adding items to the queue.
  */
-export function addToQueue(items: TrackItem[], options: {
-  replace?: boolean,
-  prepend?: boolean
-} = {}) {
-
-  if (queueStore.isSession && !items.some(item => item.context?.src === '')) {
+export function addToQueue(
+  items: TrackItem[],
+  options: {
+    replace?: boolean;
+    prepend?: boolean;
+  } = {},
+) {
+  if (queueStore.isSession && !items.some((item) => item.context?.src === "")) {
     return;
   }
 
   // Items with context.src === '' bypass all config filters
   let itemsToAdd = filterItemsByConfig(items);
 
-  setQueueStore('list', prevList => {
-    let combined = options.replace ? itemsToAdd : (options.prepend ? [...itemsToAdd, ...prevList] : [...prevList, ...itemsToAdd]);
+  setQueueStore("list", (prevList) => {
+    let combined = options.replace
+      ? itemsToAdd
+      : options.prepend
+        ? [...itemsToAdd, ...prevList]
+        : [...prevList, ...itemsToAdd];
     if (combined.length > 1) {
       if (config.persistentShuffle) combined = shuffle(combined);
       if (config.authorGrouping) combined = groupQueueByAuthor(combined);
     }
     return combined;
   });
+}
+
+function normalizeAuthor(author?: string): string {
+  if (!author) return "";
+  return author
+    .replace(/\s*-\s*Topic$/i, "")
+    .trim()
+    .toLowerCase();
 }
 
 export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
@@ -74,9 +93,10 @@ export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
   while (remaining.length > 0) {
     const current = remaining.shift()!;
     result.push(current);
-    if (current.author) {
+    const currentNorm = normalizeAuthor(current.author);
+    if (currentNorm) {
       for (let i = 0; i < remaining.length; i++) {
-        if (remaining[i].author === current.author) {
+        if (normalizeAuthor(remaining[i].author) === currentNorm) {
           result.push(remaining.splice(i, 1)[0]);
           i--;
         }
@@ -87,7 +107,10 @@ export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
 }
 
 export function totalQueueDuration(list: TrackItem[]): string {
-  if (list.length === 0) return '';
-  const totalSeconds = list.reduce((acc, item) => acc + parseDuration(item.duration), 0);
+  if (list.length === 0) return "";
+  const totalSeconds = list.reduce(
+    (acc, item) => acc + parseDuration(item.duration),
+    0,
+  );
   return convertSStoHHMMSS(totalSeconds);
 }

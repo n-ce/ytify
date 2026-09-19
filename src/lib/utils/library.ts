@@ -8,8 +8,8 @@ import {
   updateParam,
   openSubView,
 } from "@stores";
-import { config, drawer, setDrawer, parseDuration } from "@utils";
-import { cacheHighestQualityOpus } from "./opfsCache";
+import { config, drawer, parseDuration } from "@utils";
+import { cacheHighestQualityOpus, getCachedTrackIdsSync } from "./opfsCache";
 
 export const syncLibrary = (
   action: "add" | "remove" | "schedule" | "init",
@@ -20,7 +20,7 @@ export const syncLibrary = (
       if (action === "add" && id) m.addDirtyTrack(id);
       else if (action === "remove" && id) m.removeDirtyTrack(id);
       else if (action === "schedule") m.scheduleSync();
-      else if (action === "init") m.runSync(config.dbsync);
+      else if (action === "init") m.runSync(config.dbsync!);
     });
 };
 
@@ -60,7 +60,14 @@ export const getCollectionsKeys = () => {
     .map((key) => key.slice(8))
     .filter(
       (key) =>
-        !["channels", "playlists", "tracks", "meta", "albums"].includes(key),
+        ![
+          "channels",
+          "playlists",
+          "tracks",
+          "meta",
+          "albums",
+          "frequently_played",
+        ].includes(key),
     );
 
   const reservedOrder = ["history", "favorites", "liked", "listenLater"];
@@ -91,16 +98,15 @@ export const getLibraryAlbums = (): LibraryAlbums =>
 export function getCollectionItems(
   collectionId: string,
 ): (TrackItem & { type?: "video" | "song" })[] {
-  if (collectionId === "frequently_played") {
-    const { libraryPlays } = drawer;
+  if (collectionId === "cached") {
     const tracks = getTracksMap();
-    return Object.keys(libraryPlays || {})
-      .filter((id) => (libraryPlays[id] || 0) > 1 && tracks[id])
-      .sort((a, b) => (libraryPlays[b] || 0) - (libraryPlays[a] || 0))
+    const cachedIds = getCachedTrackIdsSync();
+    return cachedIds
+      .filter((id) => tracks[id])
       .map((id) => ({
         ...tracks[id],
         type: "video" as const,
-        context: { src: "collection" as const, id: "frequently_played" },
+        context: { src: "collection" as const, id: "cached" },
       }))
       .filter((item) => item.id);
   }
@@ -168,7 +174,6 @@ export function removeAlbumFromLibrary(albumId: string) {
 export function recordTrackPlay(track: TrackItem) {
   if (!track?.id) return;
   const { id } = track;
-  const libraryPlays = drawer.libraryPlays || {};
   const tracks = getTracksMap();
 
   if (!tracks[id]) {
@@ -183,12 +188,11 @@ export function recordTrackPlay(track: TrackItem) {
     saveTracksMap(tracks);
   }
 
-  libraryPlays[id] = (libraryPlays[id] || 0) + 1;
-  setDrawer("libraryPlays", libraryPlays);
+  cacheHighestQualityOpus(id);
 
-  // Cache highest-quality Opus to OPFS once track is played >= 2 times
-  if (libraryPlays[id] >= 2) {
-    cacheHighestQualityOpus(id);
+  const cachedTracks = getCollection("cached");
+  if (!cachedTracks.includes(id)) {
+    saveCollection("cached", [id, ...cachedTracks]);
   }
 
   setStore("libraryUpdated", (c) => (c || 0) + 1);
@@ -230,7 +234,6 @@ export function removeFromCollection(name: string, ids: string[]) {
   const collection = getCollection(name);
   const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
-  const { libraryPlays } = drawer;
 
   for (const id of ids) {
     const idx = collection.indexOf(id);
@@ -243,8 +246,7 @@ export function removeFromCollection(name: string, ids: string[]) {
         break;
       }
 
-    const isFrequent = (libraryPlays?.[id] || 0) > 1;
-    if (!isReferenced && !isFrequent) {
+    if (!isReferenced) {
       delete tracks[id];
       syncLibrary("remove", id);
     }
@@ -261,7 +263,6 @@ export function deleteCollection(name: string) {
   const ids = getCollection(name);
   const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
-  const { libraryPlays } = drawer;
 
   for (const id of ids) {
     let isReferenced = false;
@@ -271,8 +272,7 @@ export function deleteCollection(name: string) {
         break;
       }
 
-    const isFrequent = (libraryPlays?.[id] || 0) > 1;
-    if (!isReferenced && !isFrequent) {
+    if (!isReferenced) {
       delete tracks[id];
       syncLibrary("remove", id);
     }
@@ -349,8 +349,8 @@ export async function fetchCollection(
   setListStore("isLoading", true);
 
   const display =
-    id === "frequently_played"
-      ? t("hub_frequently_played")
+    id === "cached"
+      ? t("hub_cached")
       : id === "discovery"
         ? t("hub_discovery")
         : shared
@@ -364,7 +364,7 @@ export async function fetchCollection(
     id: id,
     type: "collection",
     isReversed: isReserved,
-    isShared: shared || id === "frequently_played" || id === "discovery",
+    isShared: shared || id === "cached" || id === "discovery",
   });
 
   if (shared) {
@@ -399,18 +399,16 @@ function setObserver(callback: () => number) {
 }
 
 function getLocalCollection(collection: string) {
-  const isFrequentlyPlayed = collection === "frequently_played";
+  const isCached = collection === "cached";
   const isDiscovery = collection === "discovery";
 
-  if (isFrequentlyPlayed || isDiscovery) {
+  if (isCached || isDiscovery) {
     const rawItems = getCollectionItems(collection);
     const items: YTItem[] = rawItems.map((item) => ({
       ...item,
       type: (item.type || "video") as "video" | "song",
     }));
-    const displayName = isFrequentlyPlayed
-      ? t("hub_frequently_played")
-      : t("hub_discovery");
+    const displayName = isCached ? t("hub_cached") : t("hub_discovery");
 
     if (items.length === 0) {
       setStore("snackbar", "No items found");
@@ -562,12 +560,20 @@ export function sortCollection(
 }
 
 export function cleanseLibraryData() {
+  // Purge deprecated frequently played data
+  localStorage.removeItem("library_frequently_played");
+  const storedDrawer = JSON.parse(localStorage.getItem("drawer") || "{}");
+  if (storedDrawer.libraryPlays) {
+    delete storedDrawer.libraryPlays;
+    localStorage.setItem("drawer", JSON.stringify(storedDrawer));
+  }
+
   // 1. Get all tracks from library_tracks
   const rawTracks = JSON.parse(
     localStorage.getItem("library_tracks") || "{}",
   ) as Collection;
 
-  // 2. Identify all valid track IDs by checking all collections and frequently played
+  // 2. Identify all valid track IDs by checking all collections and cached tracks
   const collections = getCollectionsKeys();
   const referencedTrackIds = new Set<string>();
 
@@ -576,14 +582,8 @@ export function cleanseLibraryData() {
     ids.forEach((tId) => referencedTrackIds.add(tId));
   });
 
-  const { libraryPlays } = drawer;
-  if (libraryPlays) {
-    for (const pId in libraryPlays) {
-      if ((libraryPlays[pId] || 0) > 1) {
-        referencedTrackIds.add(pId);
-      }
-    }
-  }
+  const cachedIds = getCachedTrackIdsSync();
+  cachedIds.forEach((cId) => referencedTrackIds.add(cId));
 
   // 3. Cleanse library_tracks: Only keep tracks that are referenced and strip extra properties
   const cleanedTracks: Collection = {};

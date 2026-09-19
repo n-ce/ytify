@@ -9,7 +9,7 @@
     height: var(--size-9);
     padding: var(--size-1) var(--size-2);
     background: linear-gradient(
-        rgb(from var(--onBg) r g b / 0.8),
+        rgb(from var(--onBg) r g b / 0.4),
         var(--trueBg)
     );
     backdrop-filter: blur(var(--size-px-3));
@@ -25,12 +25,16 @@
 
     img {
         height: calc(var(--size-8) + var(--size-1));
-        aspect-ratio: 1;
+        aspect-ratio: 16 / 9;
         object-fit: cover;
         border: var(--border);
         border-radius: calc(var(--roundness) * 0.7);
         box-shadow: var(--shadow-1);
         pointer-events: none;
+    }
+
+    img.is-music {
+        aspect-ratio: 1;
     }
 
     button,

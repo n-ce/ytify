@@ -141,12 +141,13 @@ nav.app-navbar {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background: rgb(from var(--onBg) r g b / 0.4);
+    background-color: rgb(from var(--onBg) r g b / 0.4);
     backdrop-filter: blur(var(--size-px-3));
     box-shadow: none;
     border: none;
     z-index: 15;
     padding: var(--size-1) 0;
+    transition: background-color 0.4s ease;
 
     i {
         position: relative;
@@ -331,10 +332,12 @@ main {
         border-top: none;
         flex-shrink: 0;
         box-shadow: none;
+        transition: background-color 0.4s ease;
     }
 
     .right-panel:has(.miniplayer) nav.app-navbar {
         border-top: none;
+        background-color: var(--trueBg);
     }
 
     nav.app-navbar i[aria-label]::after {

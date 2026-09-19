@@ -1,15 +1,25 @@
-import { YTNodes, type Helpers } from 'youtubei.js';
-import { getClient, getThumbnail, formatDuration, formatThumbnailId, getVideoId, getLockupMeta } from './utils.js';
+import { YTNodes, type Helpers } from "youtubei.js";
+import {
+  getClient,
+  getThumbnail,
+  formatDuration,
+  formatThumbnailId,
+  getVideoId,
+  getLockupMeta,
+} from "./utils.js";
 
-export default async function(id: string, all?: boolean): Promise<YTPlaylistItem> {
+export default async function (
+  id: string,
+  all?: boolean,
+): Promise<YTPlaylistItem> {
   const yt = await getClient();
   let playlist: any = null;
   let items: any[] = [];
-  let name = 'Unknown Playlist';
-  let author = 'Unknown';
-  let img = '';
+  let name = "Unknown Playlist";
+  let author = "";
+  let img = "";
 
-  const isMusic = id.startsWith('RD') || id.startsWith('OLAK');
+  const isMusic = id.startsWith("RD") || id.startsWith("OLAK");
 
   if (isMusic) {
     try {
@@ -26,15 +36,30 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
         } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
           const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
           name = responsiveHeader.title.text || name;
-          const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find((r: any) => r.text && !/^\d+/.test(r.text) && r.text !== 'Playlist' && r.text.trim() !== '•')?.text;
-          author = foundAuthor?.trim() || author || 'YouTube Music';
-          const thumbContents = (responsiveHeader as any).thumbnail?.contents || [];
+          const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find(
+            (r: any) =>
+              r.text &&
+              !/^\d+/.test(r.text) &&
+              r.text !== "Playlist" &&
+              r.text.trim() !== "•",
+          )?.text;
+          author =
+            foundAuthor?.trim() ||
+            (responsiveHeader as any).strapline_text_one?.text ||
+            author ||
+            "YouTube Music";
+          const thumbContents =
+            (responsiveHeader as any).thumbnail?.contents || [];
           img = formatThumbnailId(getThumbnail(thumbContents));
         }
       }
     } catch (e) {
-      console.error('Error fetching music playlist:', e);
+      console.error("Error fetching music playlist:", e);
     }
+  }
+
+  if (isMusic && (!author || author === "Unknown")) {
+    author = "YouTube Music";
   }
 
   if (!playlist) {
@@ -45,7 +70,7 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
       author = playlist.info?.author?.name || author;
       img = formatThumbnailId(getThumbnail(playlist.info?.thumbnails || []));
     } catch (e) {
-      console.error('Error fetching regular playlist:', e);
+      console.error("Error fetching regular playlist:", e);
     }
   }
 
@@ -60,20 +85,40 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
         const header = musicPlaylist.header;
         if (header?.is(YTNodes.MusicDetailHeader)) {
           const detailHeader = header.as(YTNodes.MusicDetailHeader);
-          if (name === 'Unknown Playlist') name = detailHeader.title.text || name;
-          if (author === 'Unknown' || author === ' • ') author = detailHeader.author?.name || author || 'YouTube Music';
-          if (!img) img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
+          if (name === "Unknown Playlist")
+            name = detailHeader.title.text || name;
+          if (!author || author === "Unknown" || author === " • ")
+            author = detailHeader.author?.name || author || "YouTube Music";
+          if (!img)
+            img = formatThumbnailId(
+              getThumbnail(detailHeader.thumbnails || []),
+            );
         } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
           const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
-          if (name === 'Unknown Playlist') name = responsiveHeader.title.text || name;
+          if (name === "Unknown Playlist")
+            name = responsiveHeader.title.text || name;
+          if (!author || author === "Unknown" || author === " • ") {
+            const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find(
+              (r: any) =>
+                r.text &&
+                !/^\d+/.test(r.text) &&
+                r.text !== "Playlist" &&
+                r.text.trim() !== "•",
+            )?.text;
+            author =
+              foundAuthor?.trim() ||
+              (responsiveHeader as any).strapline_text_one?.text ||
+              "YouTube Music";
+          }
           if (!img) {
-            const thumbContents = (responsiveHeader as any).thumbnail?.contents || [];
+            const thumbContents =
+              (responsiveHeader as any).thumbnail?.contents || [];
             img = formatThumbnailId(getThumbnail(thumbContents));
           }
         }
       }
     } catch (e) {
-      console.error('Error in music playlist fallback:', e);
+      console.error("Error in music playlist fallback:", e);
     }
   }
 
@@ -83,7 +128,7 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
     nodes.forEach((item) => {
       if (item.is(YTNodes.PlaylistVideo)) {
         const v = item.as(YTNodes.PlaylistVideo);
-        const subtext = v.video_info?.toString() || '';
+        const subtext = v.video_info?.toString() || "";
         allItems.push({
           id: v.id,
           title: v.title.toString(),
@@ -91,39 +136,54 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
           authorId: v.author.id,
           duration: formatDuration(v.duration.text),
           subtext,
-          type: 'video' as const
+          type: "video" as const,
         });
       } else if (item.is(YTNodes.LockupView)) {
         const lockup = item.as(YTNodes.LockupView);
-        if (lockup.content_id && lockup.content_type === 'VIDEO') {
+        if (lockup.content_id && lockup.content_type === "VIDEO") {
           const { views, published, duration } = getLockupMeta(lockup);
-          const itemAuthor = lockup.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts?.[0]?.text?.toString() || author || 'Unknown';
-          const subtext = (views || '') + (published ? ' • ' + published : '');
+          const itemAuthor =
+            lockup.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts?.[0]?.text?.toString() ||
+            author ||
+            "Unknown";
+          const subtext = (views || "") + (published ? " • " + published : "");
 
           allItems.push({
             id: lockup.content_id,
-            title: lockup.metadata?.title?.toString() || 'Unknown',
+            title: lockup.metadata?.title?.toString() || "Unknown",
             author: itemAuthor,
-            authorId: '',
+            authorId: "",
             duration: formatDuration(duration),
             subtext,
-            type: 'video' as const
+            type: "video" as const,
           });
         }
       } else if (item.is(YTNodes.MusicResponsiveListItem)) {
         const song = item.as(YTNodes.MusicResponsiveListItem);
         const videoId = getVideoId(song);
         if (videoId) {
-          const itemAuthor = song.authors?.[0]?.name || song.author?.name || author || 'Unknown';
-          const itemAuthorId = song.authors?.[0]?.channel_id || song.author?.channel_id || '';
+          const rawArtists = (song as any).artists || (song as any).authors;
+          const itemAuthor =
+            Array.isArray(rawArtists) && rawArtists.length > 0
+              ? rawArtists
+                  .map((a: any) => a.name)
+                  .filter(Boolean)
+                  .join(", ")
+              : (song as any).author?.name ||
+                (author && author !== "Unknown" ? author : "YouTube Music");
+          const itemAuthorId =
+            Array.isArray(rawArtists) && rawArtists.length > 0
+              ? rawArtists[0]?.channel_id || ""
+              : (song as any).author?.channel_id || "";
           allItems.push({
             id: videoId,
-            title: song.title?.toString() || 'Unknown',
+            title: song.title?.toString() || "Unknown",
             author: itemAuthor,
             authorId: itemAuthorId,
             duration: formatDuration(song.duration?.text),
-            subtext: song.album?.name || name || '',
-            type: 'song' as const
+            subtext: song.album?.name || name || "",
+            type: ((song as any).item_type === "video" ? "video" : "song") as
+              "video" | "song",
           });
         }
       }
@@ -146,10 +206,10 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
   return {
     id: id,
     name,
-    author,
+    author: author || "Unknown",
     img,
-    type: 'playlist' as const,
+    type: "playlist" as const,
     items: allItems,
-    hasContinuation: playlist?.has_continuation || false
+    hasContinuation: playlist?.has_continuation || false,
   };
 }

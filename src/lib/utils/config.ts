@@ -10,7 +10,7 @@ export interface LibrarySections {
   history: boolean;
   favorites: boolean;
   liked: boolean;
-  frequentlyPlayed: boolean;
+  cached: boolean;
   discovery: boolean;
 }
 
@@ -24,7 +24,7 @@ export const defaultLibrarySections: LibrarySections = {
   history: true,
   favorites: true,
   liked: true,
-  frequentlyPlayed: true,
+  cached: true,
   discovery: true,
 };
 
@@ -69,9 +69,11 @@ if (savedStore) {
           typeof parsed[key] === "object" &&
           parsed[key] !== null
         ) {
+          const sections = parsed[key] as Record<string, unknown>;
+          delete sections.frequentlyPlayed;
           config.librarySections = {
             ...defaultLibrarySections,
-            ...(parsed[key] as Partial<LibrarySections>),
+            ...(sections as Partial<LibrarySections>),
           };
         } else {
           (config as Record<keyof AppConfig, unknown>)[key] = parsed[key];
@@ -113,12 +115,16 @@ export let drawer = {
   discovery: [] as (YTItem & { frequency: number })[],
   lastMainFeature: "search" as "search" | "library",
   lastList: null as { id: string; type: string; shared?: boolean } | null,
-  libraryPlays: {} as Record<string, number>,
 };
 const savedDrawer = localStorage.getItem("drawer");
 if (savedDrawer) {
   try {
     const parsed = JSON.parse(savedDrawer) as Record<string, unknown>;
+    let hadLegacyPlays = false;
+    if ("libraryPlays" in parsed) {
+      delete parsed.libraryPlays;
+      hadLegacyPlays = true;
+    }
     (Object.keys(drawer) as (keyof AppDrawer)[]).forEach((key) => {
       if (parsed[key] !== undefined) {
         if (
@@ -130,6 +136,9 @@ if (savedDrawer) {
         (drawer as Record<keyof AppDrawer, unknown>)[key] = parsed[key];
       }
     });
+    if (hadLegacyPlays) {
+      localStorage.setItem("drawer", JSON.stringify(drawer));
+    }
   } catch (e) {
     console.error(e);
   }

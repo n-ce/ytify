@@ -76,7 +76,7 @@ export default function () {
   const hasVisibleItems = createMemo(
     () =>
       visibleCollections().length > 0 ||
-      librarySections().frequentlyPlayed ||
+      librarySections().cached ||
       librarySections().discovery,
   );
 
@@ -149,17 +149,17 @@ export default function () {
               </a>
             )}
           </For>
-          <Show when={librarySections().frequentlyPlayed}>
+          <Show when={librarySections().cached}>
             <a
-              href="?collection=frequently_played"
+              href="?collection=cached"
               class="clxn_item"
               onclick={(e) => {
                 e.preventDefault();
-                fetchCollection("frequently_played");
+                fetchCollection("cached");
               }}
             >
               <i class="ri-bar-chart-2-fill"></i>
-              {t("hub_frequently_played")}
+              {t("hub_cached")}
             </a>
           </Show>
           <Show when={librarySections().discovery}>

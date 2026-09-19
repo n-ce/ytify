@@ -23,6 +23,40 @@ export async function getOpfsAudioDir(): Promise<FileSystemDirectoryHandle | nul
 }
 
 /**
+ * Returns an array of track IDs currently cached in local cache state synchronously.
+ */
+export function getCachedTrackIdsSync(): string[] {
+  try {
+    return JSON.parse(
+      localStorage.getItem("library_cached") || "[]",
+    ) as string[];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Returns an array of track IDs currently cached in OPFS.
+ */
+export async function getCachedTrackIds(): Promise<string[]> {
+  try {
+    const dir = await getOpfsAudioDir();
+    if (!dir) return getCachedTrackIdsSync();
+    const ids: string[] = [];
+    // @ts-ignore - values() iterator exists on modern FileSystemDirectoryHandle
+    for await (const entry of dir.values()) {
+      if (entry.kind === "file" && entry.name.endsWith(".opus")) {
+        ids.push(entry.name.replace(/\.opus$/, ""));
+      }
+    }
+    localStorage.setItem("library_cached", JSON.stringify(ids));
+    return ids;
+  } catch {
+    return getCachedTrackIdsSync();
+  }
+}
+
+/**
  * Retrieves a playable Object URL for a cached Opus audio track, or null if not found.
  */
 export async function getCachedOpusUrl(id: string): Promise<string | null> {
@@ -61,7 +95,16 @@ export async function isTrackCached(id: string): Promise<boolean> {
  */
 export async function cacheHighestQualityOpus(id: string): Promise<boolean> {
   if (!id) return false;
-  if (await isTrackCached(id)) return true;
+  if (await isTrackCached(id)) {
+    const cached = JSON.parse(
+      localStorage.getItem("library_cached") || "[]",
+    ) as string[];
+    if (!cached.includes(id)) {
+      cached.unshift(id);
+      localStorage.setItem("library_cached", JSON.stringify(cached));
+    }
+    return true;
+  }
 
   try {
     const getStreamData = await import("@modules/getStreamData").then(
@@ -121,6 +164,14 @@ export async function cacheHighestQualityOpus(id: string): Promise<boolean> {
     const writable = await fileHandle.createWritable();
     await res.body.pipeTo(writable);
 
+    const cached = JSON.parse(
+      localStorage.getItem("library_cached") || "[]",
+    ) as string[];
+    if (!cached.includes(id)) {
+      cached.unshift(id);
+      localStorage.setItem("library_cached", JSON.stringify(cached));
+    }
+
     console.log(`[OPFS] Successfully cached highest quality Opus for: ${id}`);
     return true;
   } catch (err) {
@@ -138,6 +189,11 @@ export async function deleteCachedOpus(id: string): Promise<boolean> {
     const dir = await getOpfsAudioDir();
     if (!dir) return false;
     await dir.removeEntry(`${id}.opus`);
+    const cached = JSON.parse(
+      localStorage.getItem("library_cached") || "[]",
+    ) as string[];
+    const updated = cached.filter((item) => item !== id);
+    localStorage.setItem("library_cached", JSON.stringify(updated));
     return true;
   } catch {
     return false;
@@ -151,6 +207,7 @@ export async function clearOpusCache(): Promise<void> {
   try {
     const root = await navigator.storage.getDirectory();
     await root.removeEntry(OPFS_DIR, { recursive: true });
+    localStorage.setItem("library_cached", "[]");
   } catch (err) {
     console.warn("[OPFS] Failed to clear opus cache:", err);
   }

@@ -1,6 +1,6 @@
 import { defineConfig, PluginOption } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
 import solidPlugin from "vite-plugin-solid";
+import { VitePWA } from "vite-plugin-pwa";
 import autoprefixer from "autoprefixer";
 import postcssJitProps from "postcss-jit-props";
 import OpenProps from "open-props";
@@ -19,6 +19,9 @@ export default defineConfig(({ command }) => ({
       (file) => file.slice(0, 2),
     ),
     Build: JSON.stringify("v" + pkg.version),
+  },
+  build: {
+    target: "esnext",
   },
   resolve: {
     alias: {
@@ -97,8 +100,12 @@ export default defineConfig(({ command }) => ({
             ],
           },
         ],
+        scope: "/",
         start_url: "/",
         display: "standalone",
+        launch_handler: {
+          client_mode: "focus-existing",
+        },
         theme_color: "black",
         background_color: "black",
         share_target: {

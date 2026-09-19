@@ -45,6 +45,10 @@ export default function App() {
   let rightPanelRef!: HTMLDivElement;
 
   onMount(async () => {
+    if ("launchQueue" in window) {
+      (window as any).launchQueue.setConsumer(() => {});
+    }
+
     const mql = window.matchMedia("(orientation: portrait)");
     const updateOrientation = (e: MediaQueryListEvent) =>
       setIsPortrait(e.matches);

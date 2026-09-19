@@ -3,6 +3,7 @@ import {
   addToCollection,
   getCollection,
   removeFromCollection,
+  player,
 } from "@utils";
 import "./ActionsMenu.css";
 import { onMount, Show, createEffect, createSignal } from "solid-js";
@@ -15,6 +16,9 @@ import {
   store,
   t,
   playerStore,
+  setPlayerStore,
+  navStore,
+  setNavStore,
   getList,
   setListStore,
   addToQueue,
@@ -90,6 +94,48 @@ export default function () {
             />
           </i>
         </li>
+
+        <Show when={!isMusic}>
+          <li
+            tabindex="0"
+            onclick={async () => {
+              const item = store.actionsMenu;
+              if (!item?.id) return;
+
+              closeDialog();
+
+              if (playerStore.stream.id !== item.id) {
+                if (playerStore.stream.id) {
+                  setQueueStore("history", (h) => [
+                    { ...playerStore.stream },
+                    ...h,
+                  ]);
+                }
+                setPlayerStore("stream", {
+                  id: item.id,
+                  title: item.title,
+                  author: item.author || "",
+                  duration: item.duration,
+                  authorId: item.authorId || "",
+                });
+                if (item.albumId)
+                  setPlayerStore("stream", "albumId", item.albumId);
+                setPlayerStore("context", {
+                  id: item.context?.id || "",
+                  src: item.context?.src || "",
+                });
+                await player(item.id);
+              }
+
+              setPlayerStore("isWatching", true);
+              setNavStore("player", "state", true);
+              navStore.player.ref?.scrollIntoView({ behavior: "smooth" });
+            }}
+          >
+            <i class="ri-youtube-fill"></i>
+            {t("actions_menu_watch_video")}
+          </li>
+        </Show>
 
         <li
           tabindex="0"
