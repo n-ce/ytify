@@ -5,7 +5,7 @@ import {
   rehydrateStores,
   config,
 } from "@utils";
-import { setStore, t } from "@stores";
+import { store, setStore, t } from "@stores";
 
 // --- Type Definitions ---
 
@@ -92,7 +92,7 @@ function mergeTrackIds(
 // --- Full Sync ---
 
 export async function pullFullLibrary(userId: string): Promise<void> {
-  const response = await fetch(`/library/${userId}`);
+  const response = await fetch(`${store.api}/library/${userId}`);
   if (!response.ok) {
     throw new Error(`Failed to pull library: ${response.statusText}`);
   }
@@ -154,7 +154,7 @@ export async function pushFullLibrary(userId: string): Promise<void> {
   }
   localStorage.setItem("library_meta", JSON.stringify(snapshot.meta));
 
-  const response = await fetch(`/library/${userId}`, {
+  const response = await fetch(`${store.api}/library/${userId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(snapshot),
@@ -165,7 +165,7 @@ export async function pushFullLibrary(userId: string): Promise<void> {
   }
 }
 
-// --- Delta Sync & Mutex Guard ---
+// --- Delta Sync & Coordinator ---
 
 let lastSyncTime = 0;
 let isSyncing = false;
@@ -173,21 +173,14 @@ let syncQueued = false;
 
 export async function runSync(
   userId: string,
-  retryData?: {
-    count: number;
-    serverMeta?: Meta;
-    ETag?: string;
-    isConflictRetry?: boolean;
-  },
+  retryCount = 0,
 ): Promise<{ success: boolean; message: string }> {
-  if (isSyncing && !retryData) {
+  if (isSyncing && retryCount === 0) {
     syncQueued = true;
     return { success: true, message: "sync_queued" };
   }
   isSyncing = true;
 
-  const retryCount = retryData?.count || 0;
-  const isConflictRetry = Boolean(retryData?.isConflictRetry);
   const MAX_RETRIES = 3;
   if (retryCount === 0) setStore("syncState", "syncing");
 
@@ -197,65 +190,52 @@ export async function runSync(
       ? { version: 5, tracks: 0 }
       : getMeta();
 
-    let remoteMeta: Meta;
-    let ETag: string;
+    const pullResponse = await fetch(`${store.api}/sync/${userId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ meta: initialLocalMeta }),
+    });
 
-    if (retryData?.serverMeta && retryData?.ETag) {
-      remoteMeta = retryData.serverMeta;
-      ETag = retryData.ETag;
-    } else {
-      const pullResponse = await fetch(`/sync/${userId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ meta: initialLocalMeta }),
-      });
+    if (
+      [502, 503, 504].includes(pullResponse.status) &&
+      retryCount < MAX_RETRIES
+    ) {
+      await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
+      return runSync(userId, retryCount + 1);
+    }
 
-      if (
-        [502, 503, 504].includes(pullResponse.status) &&
-        retryCount < MAX_RETRIES
-      ) {
-        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
-        return runSync(userId, {
-          count: retryCount + 1,
-          isConflictRetry: false,
-        });
-      }
+    if (pullResponse.status === 404) {
+      await pushFullLibrary(userId);
+      localStorage.setItem("dbsync_account", userId);
+      localStorage.removeItem("dbsync_dirty_tracks");
+      localStorage.removeItem("dbsync_dirty_collections");
+      setStore("syncState", "synced");
+      lastSyncTime = Date.now();
+      return { success: true, message: t("sync_initial_complete") };
+    }
 
-      if (pullResponse.status === 404) {
-        await pushFullLibrary(userId);
-        localStorage.setItem("dbsync_account", userId);
-        localStorage.removeItem("dbsync_dirty_tracks");
-        localStorage.removeItem("dbsync_dirty_collections");
-        setStore("syncState", "synced");
-        lastSyncTime = Date.now();
-        return { success: true, message: t("sync_initial_complete") };
-      }
+    if (!pullResponse.ok) {
+      throw new Error(`Failed to initiate sync: ${pullResponse.statusText}`);
+    }
 
-      if (!pullResponse.ok) {
-        throw new Error(`Failed to initiate sync: ${pullResponse.statusText}`);
-      }
+    const pullResult = (await pullResponse.json()) as {
+      serverMeta: Meta;
+      delta: DeltaPayload | null;
+      fullSyncRequired: boolean;
+      isFullTrackSync: boolean;
+    };
+    const remoteMeta = pullResult.serverMeta;
 
-      const pullResult = (await pullResponse.json()) as {
-        serverMeta: Meta;
-        delta: DeltaPayload | null;
-        fullSyncRequired: boolean;
-        isFullTrackSync: boolean;
-      };
-      remoteMeta = pullResult.serverMeta;
-      ETag = pullResponse.headers.get("ETag") || "";
-
-      if (pullResult.delta) {
-        applyDelta(
-          pullResult.delta,
-          pullResult.isFullTrackSync || isInitialSync,
-          isInitialSync,
-          isConflictRetry,
-        );
-        rehydrateStores();
-      } else if (pullResult.fullSyncRequired) {
-        await pullFullLibrary(userId);
-        rehydrateStores();
-      }
+    if (pullResult.delta) {
+      applyDelta(
+        pullResult.delta,
+        pullResult.isFullTrackSync || isInitialSync,
+        isInitialSync,
+      );
+      rehydrateStores();
+    } else if (pullResult.fullSyncRequired) {
+      await pullFullLibrary(userId);
+      rehydrateStores();
     }
 
     localStorage.setItem("dbsync_account", userId);
@@ -316,11 +296,10 @@ export async function runSync(
       return { success: true, message: t("sync_up_to_date") };
     }
 
-    const putResponse = await fetch(`/sync/${userId}`, {
+    const putResponse = await fetch(`${store.api}/sync/${userId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "If-Match": ETag,
       },
       body: JSON.stringify(deltaPayload),
     });
@@ -330,23 +309,7 @@ export async function runSync(
       retryCount < MAX_RETRIES
     ) {
       await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
-      return runSync(userId, {
-        count: retryCount + 1,
-        isConflictRetry: false,
-      });
-    }
-
-    if (putResponse.status === 412) {
-      if (retryCount < MAX_RETRIES) {
-        await new Promise((r) =>
-          setTimeout(r, 150 * Math.pow(2, retryCount) + Math.random() * 100),
-        );
-        return runSync(userId, {
-          count: retryCount + 1,
-          isConflictRetry: true,
-        });
-      }
-      throw new Error(t("sync_conflict"));
+      return runSync(userId, retryCount + 1);
     }
 
     if (!putResponse.ok) {
@@ -379,7 +342,6 @@ function applyDelta(
   delta: DeltaPayload,
   isFullTrackSync?: boolean,
   isInitialSync?: boolean,
-  isConflictRetry?: boolean,
 ) {
   let localTracks = getTracksMap();
   const dirtyTracks = getDirtyTracks();
@@ -441,8 +403,8 @@ function applyDelta(
     const serverTimestamp =
       typeof delta.meta[key] === "number" ? delta.meta[key]! : 0;
 
-    // Use union merging for initial sync OR during conflict retry
-    if (isInitialSync || isConflictRetry) {
+    // Use union merging for initial sync
+    if (isInitialSync) {
       try {
         const localData = JSON.parse(localRaw);
         let merged: CollectionData;
@@ -598,7 +560,6 @@ export const clearDirtyTracks = (pushed: {
   current.deleted = current.deleted.filter(
     (id) => !pushed.deleted.includes(id),
   );
-
   if (current.added.length === 0 && current.deleted.length === 0) {
     localStorage.removeItem("dbsync_dirty_tracks");
   } else {
@@ -613,29 +574,25 @@ export const getDirtyCollections = (): { deleted: string[] } => {
   return dirty ? JSON.parse(dirty) : { deleted: [] };
 };
 
-export const saveDirtyCollections = (dirtyCollections: {
-  deleted: string[];
-}) => {
-  localStorage.setItem(
-    "dbsync_dirty_collections",
-    JSON.stringify(dirtyCollections),
-  );
-};
-
-export const addDeletedCollection = (name: string) => {
+export const markCollectionDeleted = (collectionName: string) => {
   const dirty = getDirtyCollections();
-  if (!dirty.deleted.includes(name)) dirty.deleted.push(name);
-  saveDirtyCollections(dirty);
+  if (!dirty.deleted.includes(collectionName)) {
+    dirty.deleted.push(collectionName);
+    localStorage.setItem("dbsync_dirty_collections", JSON.stringify(dirty));
+  }
   scheduleSync();
 };
 
-export const clearDeletedCollections = (pushed: string[]) => {
-  const current = getDirtyCollections();
-  current.deleted = current.deleted.filter((name) => !pushed.includes(name));
+export const addDeletedCollection = markCollectionDeleted;
 
+export const clearDeletedCollections = (deletedNames: string[]) => {
+  const current = getDirtyCollections();
+  current.deleted = current.deleted.filter(
+    (name) => !deletedNames.includes(name),
+  );
   if (current.deleted.length === 0) {
     localStorage.removeItem("dbsync_dirty_collections");
   } else {
-    saveDirtyCollections(current);
+    localStorage.setItem("dbsync_dirty_collections", JSON.stringify(current));
   }
 };

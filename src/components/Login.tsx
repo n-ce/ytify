@@ -1,5 +1,5 @@
 import { setConfig } from "@utils";
-import { setStore, t } from "@stores";
+import { store, setStore, t } from "@stores";
 import { createSignal, onMount, Show } from "solid-js";
 
 export default function Login() {
@@ -16,7 +16,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    fetch("/syncHash", {
+    fetch(`${store.api}/syncHash`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email(), password: pw() }),

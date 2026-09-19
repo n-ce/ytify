@@ -5,3 +5,11 @@ compatibility_flags = [ "nodejs_compat" ]
 
 [observability]
 enabled = true
+
+[[durable_objects.bindings]]
+name = "USER_SYNC_DO"
+class_name = "UserSyncDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["UserSyncDO"]

@@ -161,6 +161,10 @@ const apiMiddleware = (serve: boolean): PluginOption =>
             "search-suggestions",
             "similar",
             "subfeed",
+            "sync",
+            "syncHash",
+            "hash",
+            "library",
           ];
           server.middlewares.use(async (req, res, next) => {
             const url = new URL(req.url || "", "http://localhost");
@@ -168,7 +172,12 @@ const apiMiddleware = (serve: boolean): PluginOption =>
               .replace(/^\/api\//, "")
               .replace(/^\//, "");
 
-            if (endpoints.includes(path) || req.url?.startsWith("/api/")) {
+            const isKnownEndpoint =
+              endpoints.some(
+                (ep) => path === ep || path.startsWith(`${ep}/`),
+              ) || req.url?.startsWith("/api/");
+
+            if (isKnownEndpoint) {
               const { createLocalAdapter } = await server.ssrLoadModule(
                 "./src/backend/localAdapter.ts",
               );
