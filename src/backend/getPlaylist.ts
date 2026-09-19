@@ -24,14 +24,14 @@ export default async function (
   if (isMusic) {
     try {
       const musicPlaylist = await yt.music.getPlaylist(id);
-      if (musicPlaylist.contents && musicPlaylist.contents.length > 0) {
+      if (musicPlaylist) {
         playlist = musicPlaylist;
-        items = musicPlaylist.contents;
+        items = musicPlaylist.items || [];
         const header = musicPlaylist.header;
         if (header?.is(YTNodes.MusicDetailHeader)) {
           const detailHeader = header.as(YTNodes.MusicDetailHeader);
           name = detailHeader.title.text || name;
-          author = detailHeader.author?.name || author;
+          author = detailHeader.author?.name || author || "YouTube Music";
           img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
         } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
           const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
@@ -65,7 +65,7 @@ export default async function (
   if (!playlist) {
     try {
       playlist = await yt.getPlaylist(id);
-      items = playlist.items || [];
+      items = playlist.videos || [];
       name = playlist.info?.title || name;
       author = playlist.info?.author?.name || author;
       img = formatThumbnailId(getThumbnail(playlist.info?.thumbnails || []));
@@ -74,14 +74,15 @@ export default async function (
     }
   }
 
-  if ((!items || items.length === 0 || !img) && !isMusic) {
+  if (
+    !playlist ||
+    (name === "Unknown Playlist" && (!items || items.length === 0))
+  ) {
     try {
       const musicPlaylist = await yt.music.getPlaylist(id);
-      if (musicPlaylist.contents && musicPlaylist.contents.length > 0) {
-        if (!items || items.length === 0) {
-          playlist = musicPlaylist;
-          items = musicPlaylist.contents;
-        }
+      if (musicPlaylist) {
+        playlist = musicPlaylist;
+        items = musicPlaylist.items || [];
         const header = musicPlaylist.header;
         if (header?.is(YTNodes.MusicDetailHeader)) {
           const detailHeader = header.as(YTNodes.MusicDetailHeader);
@@ -141,18 +142,21 @@ export default async function (
       } else if (item.is(YTNodes.LockupView)) {
         const lockup = item.as(YTNodes.LockupView);
         if (lockup.content_id && lockup.content_type === "VIDEO") {
-          const { views, published, duration } = getLockupMeta(lockup);
-          const itemAuthor =
-            lockup.metadata?.metadata?.metadata_rows?.[0]?.metadata_parts?.[0]?.text?.toString() ||
-            author ||
-            "Unknown";
+          const {
+            views,
+            published,
+            duration,
+            author: lockupAuthor,
+            authorId: lockupAuthorId,
+          } = getLockupMeta(lockup);
+          const itemAuthor = lockupAuthor || author || "Unknown";
           const subtext = (views || "") + (published ? " • " + published : "");
 
           allItems.push({
             id: lockup.content_id,
             title: lockup.metadata?.title?.toString() || "Unknown",
             author: itemAuthor,
-            authorId: "",
+            authorId: lockupAuthorId || "",
             duration: formatDuration(duration),
             subtext,
             type: "video" as const,

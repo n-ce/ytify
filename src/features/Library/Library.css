@@ -3,7 +3,7 @@
     width: 100%;
 
     .subfeed-article {
-        .list-carousel {
+        &:has(.subfeed-list) .list-carousel {
             border-bottom: 0;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
@@ -15,7 +15,7 @@
             border-top-left-radius: 0;
             border-top-right-radius: 0;
             margin-top: 0;
-            height: 380px;
+            max-height: 380px;
             overflow-y: auto;
         }
     }
