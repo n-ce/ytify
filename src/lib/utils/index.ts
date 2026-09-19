@@ -4,4 +4,4 @@ export * from "./image";
 export * from "./library";
 export * from "./player";
 export * from "./streamCache";
-
+export * from "./opfsCache";

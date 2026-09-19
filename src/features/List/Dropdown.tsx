@@ -76,7 +76,7 @@ export default function Dropdown() {
       const dataset = {
         id,
         name,
-        img,
+        img: img || listStore.list?.[0]?.id || "",
       } as Playlist;
 
       if (type === "playlists") dataset.author = author;

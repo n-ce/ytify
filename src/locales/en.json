@@ -229,5 +229,8 @@
   "updating": "Update in Progress...",
   "queue_prefetch_limit_exceeded": "Queue exceeds prefetch limit (20 items or 1 hour)",
   "queue_prefetch_activating": "Preparing Queue for Background Session Experience $",
-  "queue_prefetch_ready": "Listening Session is Ready. Queue has been Locked. Clear Queue to Reset."
+  "queue_prefetch_ready": "Listening Session is Ready. Queue has been Locked. Clear Queue to Reset.",
+  "hub_featured": "Featured",
+  "hub_featured_desc": "Featured Playlists based on ur listening history.",
+  "hub_featured_fallback": "Listen to music to get featured playlists here."
 }

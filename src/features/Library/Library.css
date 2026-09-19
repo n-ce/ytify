@@ -7,7 +7,7 @@
             border-bottom: 0;
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
-            margin: 0;
+            margin-bottom: 0;
         }
 
         .subfeed-list {
@@ -30,8 +30,61 @@
         }
     }
 
+    .featured-article {
+        grid-column: span 2;
+
+        .featuredPlaylists {
+            img {
+                border-top-left-radius: var(--radius-4);
+                border-bottom-right-radius: var(--radius-4);
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
+            }
+
+            .listItem {
+                p.title {
+                    max-height: var(--size-4) !important;
+                }
+            }
+
+            &:has(.listItem) {
+                display: grid;
+                grid-template-rows: repeat(2, auto);
+                grid-auto-flow: column;
+                grid-auto-columns: var(--size-11);
+                overflow-x: auto;
+                padding: var(--size-2);
+                gap: var(--size-2) var(--size-1);
+
+                .listItem {
+                    width: var(--size-11);
+                    margin: 0;
+                    background-color: transparent;
+                    border: none;
+                }
+            }
+        }
+    }
     article {
         margin-bottom: var(--size-5);
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: var(--size-4);
+        }
+
+        p.fallback {
+            padding: var(--size-3);
+            margin: 0;
+            font-size: var(--font-size-1);
+            color: var(--text2);
+            opacity: 0.7;
+            width: 100%;
+            text-align: center;
+        }
 
         > p {
             display: inline-block;
@@ -44,10 +97,6 @@
         }
 
         &.gallery-article {
-            > p {
-                width: calc(100% - var(--size-11) + var(--size-6));
-            }
-
             > .loading {
                 display: inline-block;
                 animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1)

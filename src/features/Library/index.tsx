@@ -15,6 +15,7 @@ import Dropdown from "./Dropdown";
 
 const Gallery = lazy(() => import("./Gallery"));
 const SubFeed = lazy(() => import("./SubFeed"));
+const Featured = lazy(() => import("./Featured"));
 
 export default function () {
   let libraryRef!: HTMLElement;
@@ -80,6 +81,9 @@ export default function () {
       </Show>
       <Show when={librarySections().subfeed}>
         <SubFeed />
+      </Show>
+      <Show when={librarySections().featured}>
+        <Featured />
       </Show>
       <Collections />
       <br />

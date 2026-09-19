@@ -35,6 +35,9 @@ export default function() {
 
   return (
     <article class="subfeed-article">
+      <p>
+        <i class="ri-tv-fill"></i>&nbsp;{t("hub_subfeed")}
+      </p>
       <div class="list-carousel">
         <For each={channels}>
           {(channel) => (

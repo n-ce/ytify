@@ -1,16 +1,17 @@
 import { YTNodes, type Helpers } from 'youtubei.js';
-import { getClient, getThumbnail, formatDuration, getThumbnailId, getVideoId, getLockupMeta } from './utils.js';
+import { getClient, getThumbnail, formatDuration, formatThumbnailId, getVideoId, getLockupMeta } from './utils.js';
 
 export default async function(id: string, all?: boolean): Promise<YTPlaylistItem> {
   const yt = await getClient();
-  let playlist: any = await yt.getPlaylist(id);
+  let playlist: any = null;
+  let items: any[] = [];
+  let name = 'Unknown Playlist';
+  let author = 'Unknown';
+  let img = '';
 
-  let items = playlist.items;
-  let name = playlist.info.title || 'Unknown Playlist';
-  let author = playlist.info.author.name || 'Unknown';
-  let img = '/' + getThumbnailId(getThumbnail(playlist.info.thumbnails || []));
+  const isMusic = id.startsWith('RD') || id.startsWith('OLAK');
 
-  if (items.length === 0) {
+  if (isMusic) {
     try {
       const musicPlaylist = await yt.music.getPlaylist(id);
       if (musicPlaylist.contents && musicPlaylist.contents.length > 0) {
@@ -21,22 +22,65 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
           const detailHeader = header.as(YTNodes.MusicDetailHeader);
           name = detailHeader.title.text || name;
           author = detailHeader.author?.name || author;
-          img = '/' + getThumbnailId(getThumbnail(detailHeader.thumbnails || []));
+          img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
         } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
           const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
           name = responsiveHeader.title.text || name;
-          img = '/' + getThumbnailId(getThumbnail((responsiveHeader as any).thumbnail?.contents || []));
+          const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find((r: any) => r.text && !/^\d+/.test(r.text) && r.text !== 'Playlist' && r.text.trim() !== '•')?.text;
+          author = foundAuthor?.trim() || author || 'YouTube Music';
+          const thumbContents = (responsiveHeader as any).thumbnail?.contents || [];
+          img = formatThumbnailId(getThumbnail(thumbContents));
         }
       }
     } catch (e) {
-      console.error('Error fetching music playlist fallback:', e);
+      console.error('Error fetching music playlist:', e);
+    }
+  }
+
+  if (!playlist) {
+    try {
+      playlist = await yt.getPlaylist(id);
+      items = playlist.items || [];
+      name = playlist.info?.title || name;
+      author = playlist.info?.author?.name || author;
+      img = formatThumbnailId(getThumbnail(playlist.info?.thumbnails || []));
+    } catch (e) {
+      console.error('Error fetching regular playlist:', e);
+    }
+  }
+
+  if ((!items || items.length === 0 || !img) && !isMusic) {
+    try {
+      const musicPlaylist = await yt.music.getPlaylist(id);
+      if (musicPlaylist.contents && musicPlaylist.contents.length > 0) {
+        if (!items || items.length === 0) {
+          playlist = musicPlaylist;
+          items = musicPlaylist.contents;
+        }
+        const header = musicPlaylist.header;
+        if (header?.is(YTNodes.MusicDetailHeader)) {
+          const detailHeader = header.as(YTNodes.MusicDetailHeader);
+          if (name === 'Unknown Playlist') name = detailHeader.title.text || name;
+          if (author === 'Unknown' || author === ' • ') author = detailHeader.author?.name || author || 'YouTube Music';
+          if (!img) img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
+        } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
+          const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
+          if (name === 'Unknown Playlist') name = responsiveHeader.title.text || name;
+          if (!img) {
+            const thumbContents = (responsiveHeader as any).thumbnail?.contents || [];
+            img = formatThumbnailId(getThumbnail(thumbContents));
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Error in music playlist fallback:', e);
     }
   }
 
   const allItems: YTItem[] = [];
 
-  const mapItems = (items: Helpers.YTNode[]) => {
-    items.forEach((item) => {
+  const mapItems = (nodes: Helpers.YTNode[]) => {
+    nodes.forEach((item) => {
       if (item.is(YTNodes.PlaylistVideo)) {
         const v = item.as(YTNodes.PlaylistVideo);
         const subtext = v.video_info?.toString() || '';
@@ -50,7 +94,6 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
           type: 'video' as const
         });
       } else if (item.is(YTNodes.LockupView)) {
-        // YouTube migrated playlist videos to the modern LockupView layout.
         const lockup = item.as(YTNodes.LockupView);
         if (lockup.content_id && lockup.content_type === 'VIDEO') {
           const { views, published, duration } = getLockupMeta(lockup);
@@ -87,13 +130,17 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
     });
   };
 
-  mapItems(items);
+  mapItems(items || []);
 
-  if (all) {
+  if (all && playlist?.has_continuation) {
     while (playlist.has_continuation) {
       playlist = await playlist.getContinuation();
       mapItems(playlist.items || playlist.contents || []);
     }
+  }
+
+  if (!img && allItems.length > 0 && allItems[0].id) {
+    img = allItems[0].id;
   }
 
   return {
@@ -103,6 +150,6 @@ export default async function(id: string, all?: boolean): Promise<YTPlaylistItem
     img,
     type: 'playlist' as const,
     items: allItems,
-    hasContinuation: playlist.has_continuation
+    hasContinuation: playlist?.has_continuation || false
   };
 }

@@ -100,9 +100,12 @@ export async function getList(
           ? "album"
           : "playlists";
 
+      const validApiImg = listData.img && !listData.img.includes("maxresdefault") ? listData.img : "";
+      const playlistImg = validApiImg || listStore.img || (listData.items?.[0]?.id || "");
+
       setListStore({
         name: listData.name,
-        img: listData.img,
+        img: listType === "playlists" ? playlistImg : (listData.img || listStore.img),
         id: id,
         author:
           "author" in listData

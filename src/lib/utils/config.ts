@@ -5,6 +5,7 @@ export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
 export interface LibrarySections {
   subfeed: boolean;
   gallery: boolean;
+  featured: boolean;
   listenLater: boolean;
   history: boolean;
   favorites: boolean;
@@ -18,6 +19,7 @@ export type LibrarySectionKey = keyof LibrarySections;
 export const defaultLibrarySections: LibrarySections = {
   subfeed: true,
   gallery: true,
+  featured: true,
   listenLater: true,
   history: true,
   favorites: true,

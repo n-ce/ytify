@@ -67,6 +67,9 @@ export default function() {
 
   return (
     <article class="gallery-article">
+      <p>
+        <i class="ri-user-heart-fill"></i>&nbsp;{t("hub_gallery")}
+      </p>
       <Show when={!isGalleryLoading()} fallback={<div class="loading-container"><i class="ri-loader-3-line loading-spinner"></i></div>}>
         <div class="userArtists">
           <Show

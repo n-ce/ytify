@@ -9,6 +9,7 @@ import {
   openSubView,
 } from "@stores";
 import { config, drawer, setDrawer, parseDuration } from "@utils";
+import { cacheHighestQualityOpus } from "./opfsCache";
 
 export const syncLibrary = (
   action: "add" | "remove" | "schedule" | "init",
@@ -94,8 +95,8 @@ export function getCollectionItems(
     const { libraryPlays } = drawer;
     const tracks = getTracksMap();
     return Object.keys(libraryPlays || {})
-      .filter((id) => libraryPlays[id] > 1 && tracks[id])
-      .sort((a, b) => libraryPlays[b] - libraryPlays[a])
+      .filter((id) => (libraryPlays[id] || 0) > 1 && tracks[id])
+      .sort((a, b) => (libraryPlays[b] || 0) - (libraryPlays[a] || 0))
       .map((id) => ({
         ...tracks[id],
         type: "video" as const,
@@ -164,11 +165,39 @@ export function removeAlbumFromLibrary(albumId: string) {
   rehydrateStores();
 }
 
+export function recordTrackPlay(track: TrackItem) {
+  if (!track?.id) return;
+  const { id } = track;
+  const libraryPlays = drawer.libraryPlays || {};
+  const tracks = getTracksMap();
+
+  if (!tracks[id]) {
+    tracks[id] = {
+      id: track.id,
+      title: track.title,
+      duration: track.duration,
+      author: track.author,
+      authorId: track.authorId || "",
+      modified: Date.now(),
+    };
+    saveTracksMap(tracks);
+  }
+
+  libraryPlays[id] = (libraryPlays[id] || 0) + 1;
+  setDrawer("libraryPlays", libraryPlays);
+
+  // Cache highest-quality Opus to OPFS once track is played >= 2 times
+  if (libraryPlays[id] >= 2) {
+    cacheHighestQualityOpus(id);
+  }
+
+  setStore("libraryUpdated", (c) => (c || 0) + 1);
+}
+
 export function addToCollection(name: string, data: TrackItem[]) {
   const collection = getCollection(name);
   const tracks = getTracksMap();
   const prepend = ["history", "favorites", "liked"].includes(name);
-  const { libraryPlays } = drawer;
   const now = Date.now();
 
   for (const item of data) {
@@ -181,10 +210,7 @@ export function addToCollection(name: string, data: TrackItem[]) {
     if (prepend) collection.unshift(id);
     else collection.push(id);
 
-    if (id in tracks) {
-      libraryPlays[id] = (libraryPlays[id] || 1) + 1;
-      setDrawer("libraryPlays", libraryPlays);
-    } else {
+    if (!tracks[id]) {
       tracks[id] = item;
     }
 
@@ -204,6 +230,7 @@ export function removeFromCollection(name: string, ids: string[]) {
   const collection = getCollection(name);
   const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
+  const { libraryPlays } = drawer;
 
   for (const id of ids) {
     const idx = collection.indexOf(id);
@@ -216,7 +243,8 @@ export function removeFromCollection(name: string, ids: string[]) {
         break;
       }
 
-    if (!isReferenced) {
+    const isFrequent = (libraryPlays?.[id] || 0) > 1;
+    if (!isReferenced && !isFrequent) {
       delete tracks[id];
       syncLibrary("remove", id);
     }
@@ -233,6 +261,7 @@ export function deleteCollection(name: string) {
   const ids = getCollection(name);
   const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
+  const { libraryPlays } = drawer;
 
   for (const id of ids) {
     let isReferenced = false;
@@ -242,7 +271,8 @@ export function deleteCollection(name: string) {
         break;
       }
 
-    if (!isReferenced) {
+    const isFrequent = (libraryPlays?.[id] || 0) > 1;
+    if (!isReferenced && !isFrequent) {
       delete tracks[id];
       syncLibrary("remove", id);
     }
@@ -276,6 +306,7 @@ export function createCollection(title: string) {
     return;
   }
 
+  saveCollection(title, []);
   metaUpdater(title);
   rehydrateStores();
 }
@@ -292,17 +323,12 @@ export function renameCollection(oldName: string, newName: string) {
   const collectionItems = getCollection(oldName);
   saveCollection(newName, collectionItems);
   localStorage.removeItem("library_" + oldName);
-  if (config.dbsync) {
-    import("@modules/cloudSync").then((m) => m.addDeletedCollection(oldName));
-  }
   metaUpdater(oldName, true);
   metaUpdater(newName);
   rehydrateStores();
 }
 
 export function rehydrateStores() {
-  setStore("libraryUpdated", (c) => (c || 0) + 1);
-
   if (listStore.type === "collection" && listStore.id) {
     fetchCollection(listStore.id);
   }
@@ -454,7 +480,6 @@ function getLocalCollection(collection: string) {
 
     const observerCallback = () => {
       if (loadedCount >= sortedIds.length) return 0;
-
       const nextBatch = sortedIds.slice(loadedCount, loadedCount + 20);
       loadedCount += 20;
 
@@ -542,7 +567,7 @@ export function cleanseLibraryData() {
     localStorage.getItem("library_tracks") || "{}",
   ) as Collection;
 
-  // 2. Identify all valid track IDs by checking all collections
+  // 2. Identify all valid track IDs by checking all collections and frequently played
   const collections = getCollectionsKeys();
   const referencedTrackIds = new Set<string>();
 
@@ -550,6 +575,15 @@ export function cleanseLibraryData() {
     const ids = getCollection(c);
     ids.forEach((tId) => referencedTrackIds.add(tId));
   });
+
+  const { libraryPlays } = drawer;
+  if (libraryPlays) {
+    for (const pId in libraryPlays) {
+      if ((libraryPlays[pId] || 0) > 1) {
+        referencedTrackIds.add(pId);
+      }
+    }
+  }
 
   // 3. Cleanse library_tracks: Only keep tracks that are referenced and strip extra properties
   const cleanedTracks: Collection = {};
@@ -577,8 +611,6 @@ export function cleanseLibraryData() {
       }
     } else {
       tracksCleaned = true;
-      // Do not mark local unreferenced tracks for cloud deletion,
-      // as they may still be referenced on other devices or tabs.
     }
   }
 

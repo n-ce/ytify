@@ -50,6 +50,15 @@ export function getThumbnailId(url?: string): string {
   }
 }
 
+
+export function formatThumbnailId(rawUrl?: string): string {
+  if (!rawUrl) return '';
+  const id = getThumbnailId(rawUrl);
+  if (!id || id.includes('maxresdefault')) return '';
+  if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+  return id.startsWith('/') ? id : '/' + id;
+}
+
 export function formatDuration(durationText?: string): string {
   if (durationText?.length === 4)
     durationText = '0' + durationText;
@@ -202,7 +211,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
       id: playlist.id,
       name: playlist.title?.toString() || "Unknown",
       videoCount: playlist.video_count?.toString() || "0 videos",
-      img: '/' + getThumbnailId(playlist.thumbnails?.[0]?.url),
+      img: formatThumbnailId(playlist.thumbnails?.[0]?.url),
       type: 'playlist'
     };
   }
