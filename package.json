@@ -14,10 +14,10 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260919.1",
-    "@netlify/blobs": "^11.0.3",
+    "@netlify/blobs": "^11.1.0",
     "@netlify/edge-functions": "^4.0.0",
     "@netlify/functions": "^6.0.0",
-    "@types/node": "^26.6.2",
+    "@types/node": "^25.5.0",
     "@types/sortablejs": "^1.15.9",
     "autoprefixer": "^10.6.1",
     "eruda": "^3.4.3",
