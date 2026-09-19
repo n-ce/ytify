@@ -158,7 +158,7 @@ export default function () {
                 fetchCollection("cached");
               }}
             >
-              <i class="ri-bar-chart-2-fill"></i>
+              <i class="ri-thunderstorms-fill"></i>
               {t("hub_cached")}
             </a>
           </Show>

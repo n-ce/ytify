@@ -23,7 +23,7 @@ const SECTIONS: SectionConfigItem[] = [
   {
     key: "cached",
     label: "hub_cached",
-    icon: "ri-bar-chart-2-fill",
+    icon: "ri-thunderstorms-fill",
   },
   { key: "discovery", label: "hub_discovery", icon: "ri-compass-3-fill" },
 ];

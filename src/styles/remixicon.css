@@ -1,8 +1,7 @@
 /*
-* https://remixicon.com
-* https://github.com/Remix-Design/RemixIcon
-* Copyright RemixIcon.com
-* Released under the Remix Icon License v1.0
+* Auto-generated RemixIcon subset
+* Total icons: 65
+* Generated at: 2026-09-19T20:23:32.102Z
 */
 
 @font-face {
@@ -12,163 +11,43 @@
 }
 
 [class^="ri-"],
-[class*="ri-"] {
+[class*=" ri-"] {
   font-family: 'remixicon' !important;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ri-compass-3-fill:before {
-  content: "\ebbd";
+.ri-album-fill:before {
+  content: "\ea1e";
 }
 
-.ri-cloud-fill:before {
-  content: "\eb9c";
-}
-
-.ri-cloud-off-fill:before {
-  content: "\eb9e";
+.ri-archive-stack-fill:before {
+  content: "\f426";
 }
 
 .ri-archive-stack-line:before {
   content: "\f427";
 }
 
-.ri-calendar-schedule-fill:before {
-  content: "\f3f1";
-}
-
-.ri-edit-line:before {
-  content: "\ec86";
-}
-
 .ri-braces-line:before {
   content: "\eae9";
 }
 
-.ri-tv-fill:before {
-  content: "\f236";
+.ri-calendar-schedule-fill:before {
+  content: "\f3f1";
 }
 
-.ri-list-check-2:before {
-  content: "\eeb9";
-}
-
-.ri-link:before {
-  content: "\eeb2";
-}
-
-.ri-sort-asc:before {
-  content: "\f15f";
-}
-
-.ri-sort-desc:before {
-  content: "\f160";
-}
-
-.ri-draggable:before {
-  content: "\f38f";
-}
-
-.ri-youtube-fill:before {
-  content: "\f2d4";
-}
-
-.ri-signpost-line:before {
-  content: "\f48d";
-}
-
-.ri-signpost-fill:before {
-  content: "\f48c";
-}
-
-.ri-play-circle-fill:before {
-  content: "\f008";
-}
-
-.ri-pause-circle-fill:before {
-  content: "\efd5";
-}
-
-.ri-stop-circle-fill:before {
-  content: "\f19e";
-}
-
-.ri-skip-forward-fill:before {
-  content: "\f143";
-}
-
-.ri-skip-back-fill:before {
-  content: "\f13f";
-}
-
-.ri-play-large-line:before {
-  content: "\f508";
-}
-
-.ri-replay-15-line:before {
-  content: "\f354";
-}
-
-.ri-forward-15-line:before {
-  content: "\f32d";
-}
-
-.ri-memories-fill:before {
-  content: "\f340";
-}
-
-.ri-repeat-fill:before {
-  content: "\f073";
-}
-
-.ri-order-play-fill:before {
-  content: "\efb6";
-}
-
-.ri-play-list-2-fill:before {
-  content: "\f00c";
-}
-
-.ri-play-list-add-fill:before {
-  content: "\f00e";
-}
-
-.ri-fullscreen-line:before {
-  content: "\ed9c";
-}
-
-.ri-more-2-fill:before {
-  content: "\ef76";
-}
-
-.ri-star-line:before {
-  content: "\f18b";
-}
-
-.ri-star-fill:before {
-  content: "\f186";
-}
-
-.ri-settings-line:before {
-  content: "\f0ee";
-}
-
-.ri-checkbox-line:before {
-  content: "\eb85";
+.ri-calendar-schedule-line:before {
+  content: "\f3f2";
 }
 
 .ri-checkbox-fill:before {
   content: "\eb82";
 }
 
-.ri-indeterminate-circle-line:before {
-  content: "\ee57";
-}
-
-.ri-checkbox-multiple-line:before {
-  content: "\eb89";
+.ri-checkbox-line:before {
+  content: "\eb85";
 }
 
 .ri-checkbox-multiple-fill:before {
@@ -179,106 +58,222 @@
   content: "\f4c7";
 }
 
-.ri-import-line:before {
-  content: "\f446";
+.ri-close-line:before {
+  content: "\eb99";
 }
 
-.ri-export-line:before {
-  content: "\f436";
+.ri-cloud-fill:before {
+  content: "\eb9c";
 }
 
-.ri-download-2-fill:before {
-  content: "\ec53";
+.ri-cloud-off-fill:before {
+  content: "\eb9e";
+}
+
+.ri-compass-3-fill:before {
+  content: "\ebbd";
 }
 
 .ri-delete-bin-2-line:before {
   content: "\ec1e";
 }
 
-.ri-search-2-line:before {
-  content: "\f0cd";
+.ri-download-2-fill:before {
+  content: "\ec53";
 }
 
-.ri-search-2-fill:before {
-  content: "\f0cc";
+.ri-draggable:before {
+  content: "\f38f";
 }
 
-.ri-history-line:before {
-  content: "\ee17";
+.ri-edit-line:before {
+  content: "\ec86";
 }
 
-.ri-thumb-up-line:before {
-  content: "\f207";
+.ri-export-line:before {
+  content: "\f436";
 }
 
-.ri-thumb-up-fill:before {
-  content: "\f206";
+.ri-forward-15-line:before {
+  content: "\f32d";
 }
 
-.ri-loader-3-line:before {
-  content: "\eec4";
-}
-
-.ri-refresh-line:before {
-  content: "\f064";
-}
-
-.ri-user-heart-line:before {
-  content: "\f263";
-}
-
-.ri-user-heart-fill:before {
-  content: "\f262";
-}
-
-.ri-archive-stack-fill:before {
-  content: "\f426";
-}
-
-.ri-radio-line:before {
-  content: "\f052";
-}
-
-.ri-heart-line:before {
-  content: "\ee0f";
+.ri-fullscreen-line:before {
+  content: "\ed9c";
 }
 
 .ri-heart-fill:before {
   content: "\ee0e";
 }
 
-.ri-bar-chart-2-fill:before {
-  content: "\ea95";
+.ri-heart-line:before {
+  content: "\ee0f";
 }
 
-.ri-shuffle-line:before {
-  content: "\f124";
+.ri-import-line:before {
+  content: "\f446";
 }
 
-.ri-album-fill:before {
-  content: "\ea1e";
+.ri-indeterminate-circle-line:before {
+  content: "\ee57";
+}
+
+.ri-link:before {
+  content: "\eeb2";
+}
+
+.ri-list-check-2:before {
+  content: "\eeb9";
+}
+
+.ri-loader-3-line:before {
+  content: "\eec4";
+}
+
+.ri-memories-fill:before {
+  content: "\f340";
+}
+
+.ri-more-2-fill:before {
+  content: "\ef76";
 }
 
 .ri-music-2-line:before {
   content: "\ef83";
 }
 
-.ri-calendar-schedule-line:before {
-  content: "\f3f2";
+.ri-order-play-fill:before {
+  content: "\efb6";
 }
 
-.ri-user-3-line:before {
-  content: "\f256";
+.ri-pause-circle-fill:before {
+  content: "\efd5";
 }
 
-.ri-tv-line:before {
-  content: "\f237";
+.ri-play-circle-fill:before {
+  content: "\f008";
+}
+
+.ri-play-large-line:before {
+  content: "\f508";
+}
+
+.ri-play-list-2-fill:before {
+  content: "\f00c";
+}
+
+.ri-play-list-add-fill:before {
+  content: "\f00e";
+}
+
+.ri-radio-line:before {
+  content: "\f052";
+}
+
+.ri-refresh-line:before {
+  content: "\f064";
+}
+
+.ri-repeat-fill:before {
+  content: "\f073";
+}
+
+.ri-replay-15-line:before {
+  content: "\f354";
+}
+
+.ri-search-2-fill:before {
+  content: "\f0cc";
+}
+
+.ri-search-2-line:before {
+  content: "\f0cd";
+}
+
+.ri-settings-line:before {
+  content: "\f0ee";
+}
+
+.ri-shuffle-line:before {
+  content: "\f124";
+}
+
+.ri-signpost-fill:before {
+  content: "\f48c";
+}
+
+.ri-signpost-line:before {
+  content: "\f48d";
+}
+
+.ri-skip-back-fill:before {
+  content: "\f13f";
+}
+
+.ri-skip-forward-fill:before {
+  content: "\f143";
+}
+
+.ri-sort-asc:before {
+  content: "\f15f";
+}
+
+.ri-sort-desc:before {
+  content: "\f160";
+}
+
+.ri-star-fill:before {
+  content: "\f186";
+}
+
+.ri-star-line:before {
+  content: "\f18b";
+}
+
+.ri-stop-circle-fill:before {
+  content: "\f19e";
+}
+
+.ri-thumb-up-fill:before {
+  content: "\f206";
+}
+
+.ri-thumb-up-line:before {
+  content: "\f207";
+}
+
+.ri-thunderstorms-fill:before {
+  content: "\f208";
+}
+
+.ri-toggle-fill:before {
+  content: "\f218";
 }
 
 .ri-toggle-line:before {
   content: "\f219";
 }
 
-.ri-toggle-fill:before {
-  content: "\f218";
+.ri-tv-fill:before {
+  content: "\f236";
+}
+
+.ri-tv-line:before {
+  content: "\f237";
+}
+
+.ri-user-3-line:before {
+  content: "\f256";
+}
+
+.ri-user-heart-fill:before {
+  content: "\f262";
+}
+
+.ri-user-heart-line:before {
+  content: "\f263";
+}
+
+.ri-youtube-fill:before {
+  content: "\f2d4";
 }
