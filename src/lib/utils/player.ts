@@ -3,6 +3,7 @@ import {
   config,
   convertSStoHHMMSS,
   getTracksMap,
+  saveTracksMap,
   handleXtags,
   preferredStream,
   proxyHandler,
@@ -49,6 +50,25 @@ export async function applyMetadata(data: TrackItem) {
       await import("@modules/mediaSession");
     updateMediaSessionPosition();
     navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
+  }
+
+  // Dynamic fix for tracks with corrupted "Release - Topic" author
+  const rawAuthor = data.author?.trim().toLowerCase();
+  if (rawAuthor === "release - topic" || rawAuthor === "release") {
+    import("@modules/metadataFixer").then(async (m) => {
+      const fixed = await m.fixSingleTrack(data);
+      if (fixed.author !== data.author && playerStore.stream.id === data.id) {
+        applyMetadata(fixed);
+        const tracks = getTracksMap();
+        if (tracks[data.id]) {
+          tracks[data.id].author = fixed.author;
+          tracks[data.id].authorId = fixed.authorId;
+          tracks[data.id].modified = Date.now();
+          saveTracksMap(tracks);
+          setStore("libraryUpdated", (c) => (c || 0) + 1);
+        }
+      }
+    });
   }
 }
 

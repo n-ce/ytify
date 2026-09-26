@@ -97,6 +97,8 @@ export default async function () {
 
   cleanseLibraryData();
 
+  import("@modules/metadataFixer").then((m) => m.runMetadataFixer());
+
   if (config.dbsync) {
     import("@modules/cloudSync").then((m) => m.initSyncLifecycle());
   }

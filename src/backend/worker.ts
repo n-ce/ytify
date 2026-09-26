@@ -7,6 +7,7 @@ import getSearch from "./getSearch.js";
 import getSearchSuggestions from "./getSearchSuggestions.js";
 import getSimilar from "./getSimilar.js";
 import getSubFeed from "./getSubFeed.js";
+import { handleFixMetadata, type FixTarget } from "./fixMetadata.js";
 import { UserSyncDO } from "./UserSyncDO.ts";
 import type {
   Request,
@@ -62,7 +63,7 @@ export default {
     const path = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
     const searchParams = url.searchParams;
 
-    // --- Sync Hash Route (Stateless SHA-256) ---
+    // --- Sync Hash Route (Stateless SHA-256) ---\
     if (path === "syncHash" || path === "hash") {
       if (request.method !== "POST") {
         return new Response("Method Not Allowed", {
@@ -85,7 +86,7 @@ export default {
       }
 
       const trimmedEmail = typeof email === "string" ? email.trim() : "";
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
       if (!emailRegex.test(trimmedEmail)) {
         return new Response("Email is not valid", {
           status: 400,
@@ -114,7 +115,10 @@ export default {
           }
         }
       } catch (error) {
-        console.warn("Optional email validator check skipped/timed out:", error);
+        console.warn(
+          "Optional email validator check skipped/timed out:",
+          error,
+        );
       } finally {
         clearTimeout(validatorTimeout);
       }
@@ -184,6 +188,38 @@ export default {
           const id = searchParams.get("id");
           if (!id) throw new Error("Missing id parameter");
           data = await getChannel(id);
+          break;
+        }
+        case "fix-metadata": {
+          let targets: FixTarget[] = [];
+          if (request.method === "POST") {
+            const body = (await request.json().catch(() => ({}))) as {
+              tracks?: FixTarget[];
+              id?: string;
+              title?: string;
+            };
+            if (Array.isArray(body.tracks)) {
+              targets = body.tracks.filter((t) => t && (t.id || t.title));
+            } else if (body.id) {
+              targets = [{ id: body.id, title: body.title || "" }];
+            }
+          } else {
+            const id = searchParams.get("id");
+            const title = searchParams.get("title") || "";
+            if (id) targets = [{ id, title }];
+          }
+
+          if (targets.length === 0) {
+            return new Response(
+              JSON.stringify({ error: "Missing tracks or id parameter" }),
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+
+          data = await handleFixMetadata(targets, env);
           break;
         }
         case "gallery": {

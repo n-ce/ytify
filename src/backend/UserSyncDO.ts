@@ -58,6 +58,8 @@ export class UserSyncDO {
       CREATE TABLE IF NOT EXISTS deleted_tracks (id TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
       CREATE INDEX IF NOT EXISTS idx_del_tracks ON deleted_tracks(deleted_at);
       CREATE TABLE IF NOT EXISTS deleted_collections (name TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
+      CREATE TABLE IF NOT EXISTS track_metadata_fix (track_id TEXT PRIMARY KEY, author TEXT NOT NULL, author_id TEXT, title TEXT, updated_at REAL NOT NULL);
+      CREATE INDEX IF NOT EXISTS idx_metadata_fix_updated ON track_metadata_fix(updated_at);
     `);
     this.initialized = true;
   }
@@ -149,6 +151,76 @@ export class UserSyncDO {
     const m = request.method.toUpperCase();
     const p = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
 
+    if (p.startsWith("metadata-fix")) {
+      if (m === "GET") {
+        const ids = (url.searchParams.get("ids") || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        if (ids.length === 0) {
+          return new Response(JSON.stringify({}), {
+            status: 200,
+            headers: JSON_HEADER,
+          });
+        }
+        const placeholders = ids.map(() => "?").join(",");
+        const rows = this.sql
+          .exec<{
+            track_id: string;
+            author: string;
+            author_id: string;
+            title: string;
+          }>(
+            `SELECT track_id, author, author_id, title FROM track_metadata_fix WHERE track_id IN (${placeholders})`,
+            ...ids,
+          )
+          .toArray();
+        const result: Record<
+          string,
+          { author: string; authorId: string; title: string }
+        > = {};
+        for (const r of rows) {
+          result[r.track_id] = {
+            author: r.author,
+            authorId: r.author_id,
+            title: r.title,
+          };
+        }
+        return new Response(JSON.stringify(result), {
+          status: 200,
+          headers: JSON_HEADER,
+        });
+      }
+
+      if (m === "POST") {
+        const body = (await request.json().catch(() => ({}))) as Record<
+          string,
+          { author: string; authorId: string; title: string }
+        >;
+        const now = Date.now();
+        this.ctx.storage.transactionSync(() => {
+          for (const [id, item] of Object.entries(body)) {
+            if (id && item?.author) {
+              this.sql.exec(
+                "INSERT OR REPLACE INTO track_metadata_fix (track_id, author, author_id, title, updated_at) VALUES (?, ?, ?, ?, ?)",
+                id,
+                item.author,
+                item.authorId || "",
+                item.title || "",
+                now,
+              );
+            }
+          }
+        });
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: JSON_HEADER,
+        });
+      }
+
+      return new Response(`Method ${m} not allowed`, { status: 405 });
+    }
+
     if (p.startsWith("library")) {
       if (m === "GET") {
         return new Response(
@@ -218,65 +290,58 @@ export class UserSyncDO {
             delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
           }
           delta.meta.tracks = serverMeta.tracks || Date.now();
-          hasChanges = isFullTrackSync = true;
-        } else if ((serverMeta.tracks || 0) > clientTracksTs) {
+          hasChanges = true;
+          isFullTrackSync = true;
+        } else if (clientTracksTs > 0) {
           for (const r of this.sql
-            .exec<{ id: string; data: string }>(
-              "SELECT id, data FROM tracks WHERE modified > ?",
+            .exec<{ id: string; data: string; modified: number }>(
+              "SELECT id, data, modified FROM tracks WHERE modified > ?",
               clientTracksTs,
             )
             .toArray()) {
             delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
-          }
-          delta.meta.tracks = serverMeta.tracks;
-          hasChanges = true;
-        }
-
-        for (const [key, serverTime] of Object.entries(serverMeta)) {
-          if (key === "version" || key === "tracks") continue;
-          if (
-            clientMeta[key] === undefined ||
-            (serverTime || 0) > (clientMeta[key] || 0)
-          ) {
-            const rows = this.sql
-              .exec<{ data: string }>(
-                "SELECT data FROM collections WHERE name = ?",
-                key,
-              )
-              .toArray();
-            if (rows.length > 0) {
-              delta.updatedCollections[key] = parse(rows[0].data, []);
-              delta.meta[key] = serverTime;
-              hasChanges = true;
-            }
-          }
-        }
-
-        for (const col of this.sql
-          .exec<{ name: string; deleted_at: number }>(
-            "SELECT name, deleted_at FROM deleted_collections",
-          )
-          .toArray()) {
-          if (
-            (clientMeta[col.name] === undefined ||
-              (clientMeta[col.name] || 0) <= col.deleted_at) &&
-            !delta.deletedCollectionNames.includes(col.name)
-          ) {
-            delta.deletedCollectionNames.push(col.name);
             hasChanges = true;
           }
         }
 
-        if (clientTracksTs > 0) {
-          for (const trk of this.sql
+        for (const r of this.sql
+          .exec<{ name: string; data: string; modified: number }>(
+            "SELECT name, data, modified FROM collections",
+          )
+          .toArray()) {
+          const clientColTs = clientMeta[r.name] || 0;
+          if (r.modified > clientColTs) {
+            delta.updatedCollections[r.name] = parse(r.data, []);
+            hasChanges = true;
+          }
+        }
+
+        if (clientTracksTs > 0 && !isFullTrackSync) {
+          for (const r of this.sql
             .exec<{ id: string }>(
               "SELECT id FROM deleted_tracks WHERE deleted_at > ?",
               clientTracksTs,
             )
             .toArray()) {
-            if (!delta.deletedTrackIds.includes(trk.id)) {
-              delta.deletedTrackIds.push(trk.id);
-              hasChanges = true;
+            delta.deletedTrackIds.push(r.id);
+            hasChanges = true;
+          }
+        }
+
+        for (const [name] of Object.entries(clientMeta)) {
+          if (name !== "version" && name !== "tracks") {
+            const clientColTs = clientMeta[name];
+            if (typeof clientColTs === "number" && clientColTs > 0) {
+              for (const r of this.sql
+                .exec<{ name: string }>(
+                  "SELECT name FROM deleted_collections WHERE name = ? AND deleted_at > ?",
+                  name,
+                  clientColTs,
+                )
+                .toArray()) {
+                delta.deletedCollectionNames.push(r.name);
+                hasChanges = true;
+              }
             }
           }
         }

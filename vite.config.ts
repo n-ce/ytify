@@ -162,6 +162,7 @@ const apiMiddleware = (serve: boolean): PluginOption =>
             "album",
             "artist",
             "channel",
+            "fix-metadata",
             "gallery",
             "playlist",
             "search",
