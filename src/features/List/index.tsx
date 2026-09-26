@@ -24,6 +24,7 @@ import Dropdown from "./Dropdown";
 import Results from "./Results";
 import CollectionSelector from "@components/ActionsMenu/CollectionSelector";
 import ListItem from "@components/ListItem";
+import HeaderNav from "@components/HeaderNav";
 
 type SortBy = "modified" | "name" | "artist" | "duration";
 
@@ -172,42 +173,52 @@ export default function () {
     );
   };
 
+  const SearchInput = () => (
+    <input
+      ref={(el) => setTimeout(() => el?.focus(), 10)}
+      autofocus
+      type="text"
+      class="listSearchInput"
+      placeholder="Search within List"
+      value={searchQuery()}
+      oninput={(e) => {
+        setSearchQuery(e.currentTarget.value);
+      }}
+      onkeydown={(e) => {
+        if (e.key === "Escape") {
+          setIsSearching(false);
+          setSearchQuery("");
+        }
+      }}
+    />
+  );
+
   return (
     <section ref={listSection} id="listSection">
       <header class="sticky-bar">
-        <Show when={!markMode()} fallback={<MarkBar />}>
-          <Show
-            when={!isSearching()}
-            fallback={
-              <input
-                ref={(el) => setTimeout(() => el?.focus(), 10)}
-                autofocus
-                type="text"
-                class="listSearchInput"
-                placeholder="Search within List"
-                value={searchQuery()}
-                oninput={(e) => {
-                  setSearchQuery(e.currentTarget.value);
-                }}
-                onkeydown={(e) => {
-                  if (e.key === "Escape") {
-                    setIsSearching(false);
-                    setSearchQuery("");
-                  }
-                }}
-              />
-            }
-          >
-            <p
-              onclick={() => setShowStreamsNumber(!showStreamsNumber())}
-              id="listTitle"
-            >
-              {showStreamsNumber()
-                ? t("list_streams_count", listStore.length.toString())
-                : listStore.name}
-            </p>
-          </Show>
-        </Show>
+        <HeaderNav
+          title={
+            <Show when={!markMode()} fallback={<MarkBar />}>
+              <Show when={!isSearching()} fallback={<SearchInput />}>
+                <p
+                  onclick={() => setShowStreamsNumber(!showStreamsNumber())}
+                  id="listTitle"
+                >
+                  {showStreamsNumber()
+                    ? t("list_streams_count", listStore.length.toString())
+                    : listStore.name}
+                </p>
+              </Show>
+            </Show>
+          }
+          extra={
+            <Show when={!markMode()} fallback={<MarkBar />}>
+              <Show when={isSearching()}>
+                <SearchInput />
+              </Show>
+            </Show>
+          }
+        />
 
         <div class="right-group">
           <i

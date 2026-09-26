@@ -4,6 +4,7 @@ import Results from "./Results";
 import Input from "./Input";
 import { searchStore, t, navStore, setNavStore, openSubView } from "@stores";
 import Filters from "./Filters";
+import HeaderNav from "@components/HeaderNav";
 
 const About = lazy(() => import("./About"));
 
@@ -26,7 +27,7 @@ export default function () {
   return (
     <section class="search" ref={searchRef}>
       <header class="sticky-bar">
-        <p>{t("nav_search")}</p>
+        <HeaderNav title={<p>{t("nav_search")}</p>} />
 
         <div class="right-group">
           <Show when={!matchMedia("(display-mode: standalone)").matches}>

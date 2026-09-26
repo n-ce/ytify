@@ -2,15 +2,11 @@ import { For, Show, lazy, onMount, createMemo } from "solid-js";
 import "./Library.css";
 import Collections from "./Collections";
 
-import {
-  getLibraryAlbums,
-  config,
-  getLists,
-  librarySections,
-} from "@utils";
+import { getLibraryAlbums, config, getLists, librarySections } from "@utils";
 import { t, setNavStore, store } from "@stores";
 import ListItem from "@components/ListItem";
 import Dropdown from "./Dropdown";
+import HeaderNav from "@components/HeaderNav";
 
 const Gallery = lazy(() => import("./Gallery"));
 const SubFeed = lazy(() => import("./SubFeed"));
@@ -38,7 +34,7 @@ export default function () {
   return (
     <section class="library" ref={libraryRef}>
       <header class="sticky-bar">
-        <p>{t("nav_library")}</p>
+        <HeaderNav title={<p>{t("nav_library")}</p>} />
 
         <div class="right-group">
           <Show when={config.dbsync}>

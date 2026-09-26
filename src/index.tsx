@@ -121,9 +121,6 @@ export default function App() {
         }}
       >
         <div class="left-panel" ref={leftPanelRef}>
-          <Show when={!isPortrait()}>
-            <NavBar />
-          </Show>
           <Player />
         </div>
         <div class="right-panel" ref={rightPanelRef}>
