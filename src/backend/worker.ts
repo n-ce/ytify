@@ -86,7 +86,7 @@ export default {
       }
 
       const trimmedEmail = typeof email === "string" ? email.trim() : "";
-      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(trimmedEmail)) {
         return new Response("Email is not valid", {
           status: 400,
