@@ -1,5 +1,5 @@
 import { queueStore, setQueueStore, t, setStore } from "@stores";
-import { parseDuration } from "@utils";
+import { applyAudioStreams, parseDuration } from "@utils";
 
 export const isQueuePrefetchActive = () => queueStore.isSession;
 
@@ -20,7 +20,6 @@ export async function activateQueuePrefetch() {
   let count = 0;
   const total = list.length;
   const { default: getStreamData } = await import("./getStreamData");
-  const { default: setAudioStreams } = await import("./setAudioStreams");
 
   for (const track of list) {
     if (!queueStore.isSession) break;
@@ -43,7 +42,7 @@ export async function activateQueuePrefetch() {
         .filter((f) => f.type.startsWith("audio"))
         .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
 
-      await setAudioStreams(formats, ghost);
+      await applyAudioStreams(formats, ghost);
       queueStore.sessionMap.set(track.id, ghost);
     }
     count++;

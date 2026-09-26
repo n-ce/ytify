@@ -148,6 +148,7 @@
     > p {
         overflow: clip;
         text-overflow: ellipsis;
+        white-space: normal;
     }
 
     .right-group {

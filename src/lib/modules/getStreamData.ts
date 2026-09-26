@@ -1,5 +1,6 @@
 import { playerStore, setPlayerStore } from '@stores';
-import { streamCache, shuffle } from '@utils';
+import { shuffle } from '@utils';
+import { streamCache } from './audioCache';
 
 const instances = shuffle([
   "https://yt.omada.cafe",

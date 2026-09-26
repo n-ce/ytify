@@ -1,5 +1,5 @@
 import { setStore, playerStore, setPlayerStore } from '@stores';
-import { streamCache } from '@utils';
+import { streamCache } from './audioCache';
 
 export default function(
   audio: HTMLAudioElement | HTMLVideoElement,

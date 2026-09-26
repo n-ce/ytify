@@ -7,9 +7,64 @@ import {
   setNavStore,
   updateParam,
   openSubView,
+  resetList,
 } from "@stores";
-import { config, drawer, parseDuration } from "@utils";
-import { cacheHighestQualityOpus, getCachedTrackIdsSync } from "./opfsCache";
+import {
+  cachingMode,
+  config,
+  CACHE_LIMIT_PRESETS,
+  drawer,
+  parseDuration,
+  setCachingModeSignal,
+  setCacheLimitSignal,
+  setConfig,
+  type CachingMode,
+} from "@utils";
+import {
+  cacheTracks,
+  clearOpusCache,
+  deleteCachedOpus,
+  enforceCacheLimit,
+  getCachedTrackIdsSync,
+} from "@modules/audioCache";
+
+/** The OPFS-backed "Cached" collection. Device-local: it never syncs. */
+export const CACHED_COLLECTION = "cached";
+
+/** The algorithmically ranked "Discovery" collection. Virtual: never stored. */
+export const DISCOVERY_COLLECTION = "discovery";
+
+/** Collections that are not user-managed localStorage collection lists. */
+const PSEUDO_COLLECTIONS = [CACHED_COLLECTION, DISCOVERY_COLLECTION];
+
+/** localStorage `library_` keys that hold something other than a collection list. */
+const NON_COLLECTION_KEYS = [
+  "channels",
+  "playlists",
+  "tracks",
+  "meta",
+  "albums",
+  "frequently_played",
+];
+
+/**
+ * Built-in collections: seeded into localStorage on a fresh install and pinned
+ * to the top of the library in this order.
+ */
+export const RESERVED_ORDER = ["history", "favorites", "liked", "listenLater"];
+
+/** Reserved collections always render with a fixed icon and translated label. */
+export const RESERVED_COLLECTIONS: Record<
+  string,
+  readonly [icon: string, label: TranslationKeys]
+> = {
+  history: ["ri-memories-fill", "library_history"],
+  favorites: ["ri-heart-fill", "library_favorites"],
+  listenLater: ["ri-calendar-schedule-fill", "library_listen_later"],
+  liked: ["ri-thumb-up-fill", "library_liked"],
+  cached: ["ri-thunderstorms-fill", "hub_cached"],
+  discovery: ["ri-compass-3-fill", "hub_discovery"],
+};
 
 export const syncLibrary = (
   action: "add" | "remove" | "schedule" | "init",
@@ -54,29 +109,27 @@ export const getMeta = (): Meta => {
   return newMeta;
 };
 
+/**
+ * User-managed collection keys, reserved ones first. The `cached` and `discovery`
+ * pseudo-collections are deliberately excluded: they render from their own
+ * entries rather than from this list.
+ */
 export const getCollectionsKeys = () => {
   const allKeys = Object.keys(localStorage)
     .filter((key) => key.startsWith("library_"))
     .map((key) => key.slice(8))
     .filter(
       (key) =>
-        ![
-          "channels",
-          "playlists",
-          "tracks",
-          "meta",
-          "albums",
-          "frequently_played",
-        ].includes(key),
+        !NON_COLLECTION_KEYS.includes(key) &&
+        !PSEUDO_COLLECTIONS.includes(key),
     );
 
-  const reservedOrder = ["history", "favorites", "liked", "listenLater"];
   const meta = JSON.parse(localStorage.getItem("library_meta") || "{}");
 
   return [
-    ...reservedOrder.filter((key) => allKeys.includes(key)),
+    ...RESERVED_ORDER.filter((key) => allKeys.includes(key)),
     ...allKeys
-      .filter((key) => !reservedOrder.includes(key))
+      .filter((key) => !RESERVED_ORDER.includes(key))
       .sort((a, b) => (meta[a] || 0) - (meta[b] || 0)),
   ];
 };
@@ -98,7 +151,8 @@ export const getLibraryAlbums = (): LibraryAlbums =>
 export function getCollectionItems(
   collectionId: string,
 ): (TrackItem & { type?: "video" | "song" })[] {
-  if (collectionId === "cached") {
+  if (collectionId === CACHED_COLLECTION) {
+    if (cachingMode() === "off") return [];
     const tracks = getTracksMap();
     const cachedIds = getCachedTrackIdsSync();
     return cachedIds
@@ -106,17 +160,17 @@ export function getCollectionItems(
       .map((id) => ({
         ...tracks[id],
         type: "video" as const,
-        context: { src: "collection" as const, id: "cached" },
+        context: { src: "collection" as const, id: CACHED_COLLECTION },
       }))
       .filter((item) => item.id);
   }
 
-  if (collectionId === "discovery") {
+  if (collectionId === DISCOVERY_COLLECTION) {
     return ((drawer.discovery || []) as (YTItem & { frequency: number })[]).map(
       (item) => ({
         ...item,
         type: (item.type || "video") as "video" | "song",
-        context: { src: "collection" as const, id: "discovery" },
+        context: { src: "collection" as const, id: DISCOVERY_COLLECTION },
       }),
     );
   }
@@ -131,6 +185,37 @@ export function getCollectionItems(
     }))
     .filter((item) => item.id);
 }
+
+/**
+ * Track ids held by any collection other than `exclude`, including the
+ * OPFS-backed cached collection. Used for reference counting before pruning.
+ */
+const getReferencedTrackIds = (exclude?: string) => {
+  const referenced = new Set<string>();
+  for (const key of getCollectionsKeys()) {
+    if (key === exclude) continue;
+    getCollection(key).forEach((id) => referenced.add(id));
+  }
+  getCachedTrackIdsSync().forEach((id) => referenced.add(id));
+  return referenced;
+};
+
+/** Drops library metadata for the given tracks once nothing references them. */
+const pruneOrphanTracks = (ids: string[]) => {
+  const tracks = getTracksMap();
+  const referenced = getReferencedTrackIds();
+  let pruned = false;
+
+  for (const id of ids) {
+    if (referenced.has(id)) continue;
+    if (tracks[id]) {
+      delete tracks[id];
+      pruned = true;
+    }
+  }
+
+  if (pruned) saveTracksMap(tracks);
+};
 
 export function saveTracksMap(tracks: Collection) {
   localStorage.setItem("library_tracks", JSON.stringify(tracks));
@@ -188,20 +273,66 @@ export function recordTrackPlay(track: TrackItem) {
     saveTracksMap(tracks);
   }
 
-  cacheHighestQualityOpus(id);
+  if (cachingMode() === "auto") syncAudioCache([id]);
 
-  const cachedTracks = getCollection("cached");
-  if (!cachedTracks.includes(id)) {
-    saveCollection("cached", [id, ...cachedTracks]);
+  setStore("libraryUpdated", (c) => (c || 0) + 1);
+}
+
+/**
+ * Writes audio for the given tracks into the OPFS cache, then trims the cache
+ * back within the configured limit. With no ids it only enforces the limit.
+ */
+async function syncAudioCache(ids: string[]) {
+  if (cachingMode() === "off") return;
+
+  const evicted = ids.length
+    ? await cacheTracks(ids)
+    : await enforceCacheLimit();
+
+  if (evicted.length) pruneOrphanTracks(evicted);
+  if (listStore.id === CACHED_COLLECTION) rehydrateStores();
+}
+
+/**
+ * Switches the caching mode. Turning caching off drops the OPFS contents and
+ * the cached collection, and the Cached view is closed if it is open.
+ */
+export function setCachingMode(mode: CachingMode) {
+  if (mode === cachingMode()) return;
+
+  setCachingModeSignal(mode);
+  setConfig("cachingMode", mode);
+
+  if (mode === "off") {
+    const ids = getCollection(CACHED_COLLECTION);
+    localStorage.removeItem("library_cached");
+    clearOpusCache();
+    pruneOrphanTracks(ids);
+  } else syncAudioCache([]);
+
+  if (listStore.id === CACHED_COLLECTION) {
+    resetList();
+    updateParam("collection");
   }
 
   setStore("libraryUpdated", (c) => (c || 0) + 1);
+  if (navStore.active === "library") setNavStore("active", "library");
+}
+
+/** Persists a new audio cache ceiling and evicts down to it. */
+export function setCacheLimit(megabytes: number) {
+  if (!CACHE_LIMIT_PRESETS.includes(megabytes)) return;
+
+  setCacheLimitSignal(megabytes);
+  setConfig("cacheLimit", megabytes);
+  syncAudioCache([]);
 }
 
 export function addToCollection(name: string, data: TrackItem[]) {
   const collection = getCollection(name);
   const tracks = getTracksMap();
   const prepend = ["history", "favorites", "liked"].includes(name);
+  const deviceLocal = name === CACHED_COLLECTION;
   const now = Date.now();
 
   for (const item of data) {
@@ -220,74 +351,82 @@ export function addToCollection(name: string, data: TrackItem[]) {
 
     tracks[id].modified = tracks[id].modified || now;
 
-    syncLibrary("add", id);
+    if (!deviceLocal) syncLibrary("add", id);
   }
 
   saveCollection(name, collection);
   saveTracksMap(tracks);
   metaUpdater(name);
+
+  if (deviceLocal) syncAudioCache(data.map((item) => item?.id).filter(Boolean));
 
   if (listStore.id === name) rehydrateStores();
 }
 
 export function removeFromCollection(name: string, ids: string[]) {
   const collection = getCollection(name);
-  const collections = getCollectionsKeys().filter((k) => k !== name);
   const tracks = getTracksMap();
+  const deviceLocal = name === CACHED_COLLECTION;
+  const removed = ids.filter((id) => collection.includes(id));
 
-  for (const id of ids) {
+  for (const id of removed) {
     const idx = collection.indexOf(id);
     if (idx !== -1) collection.splice(idx, 1);
-
-    let isReferenced = false;
-    for (const key of collections)
-      if (getCollection(key).includes(id)) {
-        isReferenced = true;
-        break;
-      }
-
-    if (!isReferenced) {
-      delete tracks[id];
-      syncLibrary("remove", id);
-    }
   }
 
   saveCollection(name, collection);
+
+  // Counted after the write so the collection no longer vouches for its own ids.
+  const references = getReferencedTrackIds(name);
+
+  for (const id of removed) {
+    if (references.has(id)) continue;
+
+    delete tracks[id];
+    if (!deviceLocal) syncLibrary("remove", id);
+  }
+
   saveTracksMap(tracks);
   metaUpdater(name);
+
+  if (deviceLocal) removed.forEach((id) => deleteCachedOpus(id));
 
   if (listStore.id === name) rehydrateStores();
 }
 
 export function deleteCollection(name: string) {
   const ids = getCollection(name);
-  const collections = getCollectionsKeys().filter((k) => k !== name);
+  const deviceLocal = name === CACHED_COLLECTION;
+
+  localStorage.removeItem("library_" + name);
+  if (deviceLocal) clearOpusCache();
+
+  const references = getReferencedTrackIds(name);
   const tracks = getTracksMap();
 
   for (const id of ids) {
-    let isReferenced = false;
-    for (const key of collections)
-      if (getCollection(key).includes(id)) {
-        isReferenced = true;
-        break;
-      }
+    if (references.has(id)) continue;
 
-    if (!isReferenced) {
-      delete tracks[id];
-      syncLibrary("remove", id);
-    }
+    delete tracks[id];
+    if (!deviceLocal) syncLibrary("remove", id);
   }
 
-  localStorage.removeItem("library_" + name);
   saveTracksMap(tracks);
-  if (config.dbsync) {
-    import("@modules/cloudSync").then((m) => m.addDeletedCollection(name));
+
+  if (!deviceLocal) {
+    if (config.dbsync) {
+      import("@modules/cloudSync").then((m) => m.addDeletedCollection(name));
+    }
+    metaUpdater(name, true);
   }
-  metaUpdater(name, true);
+
   rehydrateStores();
 }
 
 export const metaUpdater = (key: string, remove?: boolean) => {
+  // The cached collection is device-local, so it is neither synced nor tracked.
+  if (key === CACHED_COLLECTION) return;
+
   const meta = getMeta();
   const timestamp = Date.now();
 
@@ -300,8 +439,9 @@ export const metaUpdater = (key: string, remove?: boolean) => {
 };
 
 export function createCollection(title: string) {
-  const exists = getCollectionsKeys().includes(title);
-  if (exists) {
+  const taken =
+    getCollectionsKeys().includes(title) || title in RESERVED_COLLECTIONS;
+  if (taken) {
     setStore("snackbar", t("list_already_exists"));
     return;
   }
@@ -315,7 +455,7 @@ export function renameCollection(oldName: string, newName: string) {
   if (oldName === newName) return;
 
   const collections = getCollectionsKeys();
-  if (collections.includes(newName)) {
+  if (collections.includes(newName) || newName in RESERVED_COLLECTIONS) {
     setStore("snackbar", t("list_already_exists"));
     return;
   }
@@ -344,14 +484,20 @@ export async function fetchCollection(
 ) {
   if (!id) return;
 
+  if (id === CACHED_COLLECTION && cachingMode() === "off") {
+    resetList();
+    openSubView("library");
+    return;
+  }
+
   openSubView("list");
 
   setListStore("isLoading", true);
 
   const display =
-    id === "cached"
+    id === CACHED_COLLECTION
       ? t("hub_cached")
-      : id === "discovery"
+      : id === DISCOVERY_COLLECTION
         ? t("hub_discovery")
         : shared
           ? "Shared Collection"
@@ -364,7 +510,7 @@ export async function fetchCollection(
     id: id,
     type: "collection",
     isReversed: isReserved,
-    isShared: shared || id === "cached" || id === "discovery",
+    isShared: shared,
   });
 
   if (shared) {
@@ -399,8 +545,8 @@ function setObserver(callback: () => number) {
 }
 
 function getLocalCollection(collection: string) {
-  const isCached = collection === "cached";
-  const isDiscovery = collection === "discovery";
+  const isCached = collection === CACHED_COLLECTION;
+  const isDiscovery = collection === DISCOVERY_COLLECTION;
 
   if (isCached || isDiscovery) {
     const rawItems = getCollectionItems(collection);
@@ -409,27 +555,29 @@ function getLocalCollection(collection: string) {
       type: (item.type || "video") as "video" | "song",
     }));
     const displayName = isCached ? t("hub_cached") : t("hub_discovery");
+    // Both are local and already ordered, so neither is shared nor re-sorted.
+    const flags = {
+      type: "collection" as const,
+      isShared: false,
+      isReversed: true,
+    };
 
     if (items.length === 0) {
       setStore("snackbar", "No items found");
       setListStore({
+        ...flags,
         list: [],
         length: 0,
         name: displayName,
         id: collection,
-        type: "collection",
-        isShared: true,
-        isReversed: true,
       });
       return;
     }
 
     setListStore({
+      ...flags,
       name: displayName,
       id: collection,
-      type: "collection",
-      isShared: true,
-      isReversed: true,
       length: items.length,
       list: items,
     });
@@ -575,15 +723,7 @@ export function cleanseLibraryData() {
 
   // 2. Identify all valid track IDs by checking all collections and cached tracks
   const collections = getCollectionsKeys();
-  const referencedTrackIds = new Set<string>();
-
-  collections.forEach((c) => {
-    const ids = getCollection(c);
-    ids.forEach((tId) => referencedTrackIds.add(tId));
-  });
-
-  const cachedIds = getCachedTrackIdsSync();
-  cachedIds.forEach((cId) => referencedTrackIds.add(cId));
+  const referencedTrackIds = getReferencedTrackIds();
 
   // 3. Cleanse library_tracks: Only keep tracks that are referenced and strip extra properties
   const cleanedTracks: Collection = {};
@@ -617,7 +757,7 @@ export function cleanseLibraryData() {
   if (tracksCleaned) saveTracksMap(cleanedTracks);
 
   // 4. Cleanse all other collections from empty or missing IDs
-  for (const key of collections) {
+  for (const key of [...collections, CACHED_COLLECTION]) {
     const collection = JSON.parse(
       localStorage.getItem("library_" + key) || "[]",
     ) as string[];

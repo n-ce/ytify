@@ -1,5 +1,7 @@
 import {
   addToCollection,
+  CACHED_COLLECTION,
+  config,
   createCollection,
   getCollection,
   getCollectionsKeys,
@@ -37,16 +39,26 @@ export default function (_: { close?: () => void; data: TrackItem[] }) {
     e.target.selectedIndex = 0;
   };
 
+  // The cached collection is stored under its own key, so it is offered
+  // alongside the user collections whenever caching is enabled.
   const getKeys = (add: boolean) => {
     if (!_.data || _.data.length === 0) {
       return [];
     }
-    return getCollectionsKeys().filter((k) => {
-      const itemIsIncluded = getCollection(k).includes(_.data[0].id);
 
+    const keys =
+      config.cachingMode === "off"
+        ? getCollectionsKeys()
+        : [...getCollectionsKeys(), CACHED_COLLECTION];
+
+    return keys.filter((k) => {
+      const itemIsIncluded = getCollection(k).includes(_.data[0].id);
       return add ? !itemIsIncluded : itemIsIncluded;
     });
   };
+
+  const label = (key: string) =>
+    key === CACHED_COLLECTION ? t("hub_cached") : key;
 
   return (
     <select
@@ -62,14 +74,14 @@ export default function (_: { close?: () => void; data: TrackItem[] }) {
       <Show when={getKeys(true).length}>
         <optgroup label="Add to Collection">
           <For each={getKeys(true)}>
-            {(v) => <option value={v}>{v}</option>}
+            {(v) => <option value={v}>{label(v)}</option>}
           </For>
         </optgroup>
       </Show>
       <Show when={getKeys(false).length}>
         <optgroup label="Remove from Collection">
           <For each={getKeys(false)}>
-            {(v) => <option value={"-cl" + v}>{v}</option>}
+            {(v) => <option value={"-cl" + v}>{label(v)}</option>}
           </For>
         </optgroup>
       </Show>

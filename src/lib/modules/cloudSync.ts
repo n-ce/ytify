@@ -1,4 +1,5 @@
 import {
+  CACHED_COLLECTION,
   getTracksMap,
   getMeta,
   metaUpdater,
@@ -6,6 +7,13 @@ import {
   config,
 } from "@utils";
 import { store, setStore, t } from "@stores";
+
+/**
+ * The cached collection indexes audio held in this device's OPFS, so it must
+ * never be pushed to or overwritten from another device.
+ */
+const isDeviceLocalKey = (storageKey: string) =>
+  storageKey === `library_${CACHED_COLLECTION}`;
 
 // --- Type Definitions ---
 
@@ -99,11 +107,13 @@ export async function pullFullLibrary(userId: string): Promise<void> {
   const snapshot = (await response.json()) as LibrarySnapshot;
 
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("library_")) localStorage.removeItem(key);
+    if (key.startsWith("library_") && !isDeviceLocalKey(key))
+      localStorage.removeItem(key);
   });
 
   for (const key in snapshot) {
     if (key === "deletedCollections" || key === "deletedTracks") continue;
+    if (isDeviceLocalKey(`library_${key}`)) continue;
     const value = snapshot[key];
     if (value !== undefined) {
       const storageKey = key.startsWith("library_") ? key : `library_${key}`;
@@ -117,7 +127,7 @@ export async function pushFullLibrary(userId: string): Promise<void> {
   const now = Date.now();
 
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("library_")) {
+    if (key.startsWith("library_") && !isDeviceLocalKey(key)) {
       try {
         const val = localStorage.getItem(key);
         if (val) {
@@ -271,6 +281,7 @@ export async function runSync(
     // Compare post-sync local meta vs remote meta to determine which collections to push
     for (const key in postSyncMeta) {
       if (key === "version" || key === "tracks") continue;
+      if (isDeviceLocalKey(`library_${key}`)) continue;
       if ((postSyncMeta[key] || 0) > (remoteMeta[key] || 0)) {
         const rawData = localStorage.getItem(`library_${key}`);
         if (rawData) {
@@ -392,6 +403,7 @@ function applyDelta(
 
   // Process updated collections with intelligent merging
   for (const [key, remoteData] of Object.entries(delta.updatedCollections)) {
+    if (isDeviceLocalKey(`library_${key}`)) continue;
     const localRaw = localStorage.getItem(`library_${key}`);
     if (!localRaw) {
       localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));

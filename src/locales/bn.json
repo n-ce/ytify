@@ -224,5 +224,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "YouTube প্লেলিস্ট ইমপোর্ট করুন",
+  "library_import_yt_playlist_prompt": "YouTube প্লেলিস্ট URL বা ID লিখুন:",
+  "library_import_yt_playlist_invalid": "অবৈধ YouTube প্লেলিস্ট URL বা ID",
+  "library_import_yt_playlist_success": "প্লেলিস্ট \"$\" ইমপোর্ট করা হয়েছে"
 }

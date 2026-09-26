@@ -3,17 +3,17 @@ import { queueStore, setQueueStore, groupQueueByAuthor } from "@stores";
 import { config } from "@utils";
 import StreamItem from "@components/StreamItem";
 
-const Sortable = lazy(() => import("solid-sortablejs"));
+const SortableList = lazy(() => import("@modules/sortable"));
 
-export default function() {
+export default function () {
   return (
     <div id="queuelist">
-      <Sortable
+      <SortableList
         items={queueStore.list}
         setItems={(items: TrackItem[]) => {
           let newList = items;
           if (config.authorGrouping) newList = groupQueueByAuthor(newList);
-          setQueueStore('list', newList);
+          setQueueStore("list", newList);
         }}
         idField="id"
         animation={150}
@@ -33,7 +33,7 @@ export default function() {
             inQueue={true}
           />
         )}
-      </Sortable>
+      </SortableList>
     </div>
-  )
+  );
 }

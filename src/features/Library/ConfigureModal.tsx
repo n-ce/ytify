@@ -1,7 +1,12 @@
 import { For, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import { t } from "@stores";
-import { librarySections, setLibrarySection, LibrarySectionKey } from "@utils";
+import {
+  cachingMode,
+  librarySections,
+  setLibrarySection,
+  LibrarySectionKey,
+} from "@utils";
 
 interface SectionConfigItem {
   key: LibrarySectionKey;
@@ -12,6 +17,7 @@ interface SectionConfigItem {
 const SECTIONS: SectionConfigItem[] = [
   { key: "subfeed", label: "hub_subfeed", icon: "ri-tv-line" },
   { key: "gallery", label: "hub_gallery", icon: "ri-user-heart-line" },
+  { key: "featured", label: "hub_featured", icon: "ri-star-line" },
   {
     key: "listenLater",
     label: "library_listen_later",
@@ -20,13 +26,15 @@ const SECTIONS: SectionConfigItem[] = [
   { key: "history", label: "library_history", icon: "ri-memories-fill" },
   { key: "favorites", label: "library_favorites", icon: "ri-heart-fill" },
   { key: "liked", label: "library_liked", icon: "ri-thumb-up-fill" },
-  {
-    key: "cached",
-    label: "hub_cached",
-    icon: "ri-thunderstorms-fill",
-  },
+  { key: "cached", label: "hub_cached", icon: "ri-thunderstorms-fill" },
   { key: "discovery", label: "hub_discovery", icon: "ri-compass-3-fill" },
 ];
+
+/** The Cached section only exists while caching is enabled. */
+const visibleSections = () =>
+  cachingMode() === "off"
+    ? SECTIONS.filter((item) => item.key !== "cached")
+    : SECTIONS;
 
 export default function ConfigureModal(props: { close: () => void }) {
   let dialogRef!: HTMLDialogElement;
@@ -69,7 +77,7 @@ export default function ConfigureModal(props: { close: () => void }) {
         </div>
 
         <div class="configure-modal-list">
-          <For each={SECTIONS}>
+          <For each={visibleSections()}>
             {(item) => {
               const isChecked = () => librarySections()[item.key];
               return (

@@ -200,7 +200,8 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
 
   if (node.is(YTNodes.LockupView)) {
     const lockup = node.as(YTNodes.LockupView);
-    if (lockup.content_id && lockup.content_type === "VIDEO") {
+    // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
+    if (lockup.content_id && (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")) {
       const { views, published, duration, author, authorId } =
         getLockupMeta(lockup);
       const subtext = (views || "") + (published ? " • " + published : "");
@@ -263,24 +264,27 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
 
     if (lockup.content_id?.startsWith("RD")) return null;
 
-    const metadata = lockup.metadata?.as(YTNodes.LockupMetadataView);
-    const contentImage = lockup.content_image?.as(
-      YTNodes.CollectionThumbnailView,
-    );
-    const thumbUrl = contentImage?.primary_thumbnail?.image?.[0]?.url || "";
-    const videoCountBadge =
-      contentImage?.primary_thumbnail?.overlays
-        ?.find((o) => o.is(YTNodes.ThumbnailOverlayBadgeView))
-        ?.as(YTNodes.ThumbnailOverlayBadgeView)?.badges?.[0]?.text ||
-      "0 videos";
+    // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
+    if (lockup.content_id && (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")) {
+      const metadata = lockup.metadata?.as(YTNodes.LockupMetadataView);
+      const contentImage = lockup.content_image?.as(
+        YTNodes.CollectionThumbnailView,
+      );
+      const thumbUrl = contentImage?.primary_thumbnail?.image?.[0]?.url || "";
+      const videoCountBadge =
+        contentImage?.primary_thumbnail?.overlays
+          ?.find((o) => o.is(YTNodes.ThumbnailOverlayBadgeView))
+          ?.as(YTNodes.ThumbnailOverlayBadgeView)?.badges?.[0]?.text ||
+        "0 videos";
 
-    return {
-      id: lockup.content_id,
-      name: metadata?.title?.toString() || "Unknown Playlist",
-      videoCount: videoCountBadge,
-      img: getThumbnailId(thumbUrl),
-      type: "playlist",
-    };
+      return {
+        id: lockup.content_id,
+        name: metadata?.title?.toString() || "Unknown Playlist",
+        videoCount: videoCountBadge,
+        img: getThumbnailId(thumbUrl),
+        type: "playlist",
+      };
+    }
   }
 
   if (node.is(YTNodes.Playlist)) {

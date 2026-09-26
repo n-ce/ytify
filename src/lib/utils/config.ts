@@ -2,6 +2,20 @@ import { createSignal } from "solid-js";
 
 export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
 
+/**
+ * auto: plays are cached to OPFS as they are played.
+ * on-demand: audio is only cached when the user adds a track to the Cached collection.
+ * off: OPFS is unused, the Cached collection is hidden and any cache is cleared.
+ */
+export type CachingMode = "auto" | "on-demand" | "off";
+
+export const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
+
+/** Selectable audio cache ceilings, in megabytes. */
+export const CACHE_LIMIT_PRESETS = [250, 500, 1000, 2000];
+
+export const DEFAULT_CACHE_LIMIT_MB = 500;
+
 export interface LibrarySections {
   subfeed: boolean;
   gallery: boolean;
@@ -53,6 +67,8 @@ export let config = {
   dbsync: "",
   sortBy: "modified" as "modified" | "name" | "artist" | "duration",
   sortOrder: "desc" as "asc" | "desc",
+  cachingMode: "auto" as CachingMode,
+  cacheLimit: DEFAULT_CACHE_LIMIT_MB as number,
   librarySections: { ...defaultLibrarySections },
 };
 
@@ -85,6 +101,11 @@ if (savedStore) {
   }
 }
 
+// Guard against hand-edited or stale values before they can drive cache writes.
+if (!CACHING_MODES.includes(config.cachingMode))
+  config.cachingMode = "auto";
+if (!(config.cacheLimit > 0)) config.cacheLimit = DEFAULT_CACHE_LIMIT_MB;
+
 export function setConfig<K extends keyof AppConfig>(
   key: K,
   val: AppConfig[K],
@@ -107,6 +128,15 @@ export function setLibrarySection(key: LibrarySectionKey, val: boolean) {
   setLibrarySectionsSignal(updated);
   setConfig("librarySections", updated);
 }
+
+/* Audio caching */
+
+export const [cachingMode, setCachingModeSignal] =
+  createSignal<CachingMode>(config.cachingMode);
+
+export const [cacheLimit, setCacheLimitSignal] = createSignal<number>(
+  config.cacheLimit,
+);
 
 /* Transitory local saves thats not supposed to be transferrable */
 

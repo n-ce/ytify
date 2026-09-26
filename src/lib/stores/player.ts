@@ -18,9 +18,10 @@ import {
   addToCollection,
   recordTrackPlay,
   player,
+  applyAudioStreams,
   shuffle,
-  streamCache,
 } from "@utils";
+import { streamCache } from "@modules/audioCache";
 import { isQueuePrefetchActive } from "@modules/queuePrefetch";
 
 const blankImage =
@@ -292,9 +293,7 @@ createRoot(() => {
       const formats = (data as Invidious).adaptiveFormats
         .filter((f) => f.type.startsWith("audio"))
         .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
-      import("../modules/setAudioStreams").then((mod) =>
-        mod.default(formats, prefetchRef),
-      );
+      applyAudioStreams(formats, prefetchRef);
     }
   };
 

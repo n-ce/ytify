@@ -224,5 +224,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "YouTubeプレイリストをインポート",
+  "library_import_yt_playlist_prompt": "YouTubeプレイリストのURLまたはIDを入力:",
+  "library_import_yt_playlist_invalid": "無効なYouTubeプレイリストURLまたはID",
+  "library_import_yt_playlist_success": "プレイリスト「$」をインポートしました"
 }

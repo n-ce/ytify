@@ -3,7 +3,7 @@ import { listStore, loadAll, setListStore, t } from "@stores";
 import StreamItem from "@components/StreamItem";
 import { getCollection, metaUpdater, saveCollection } from "@utils";
 
-const Sortable = lazy(() => import("solid-sortablejs"));
+const SortableList = lazy(() => import("@modules/sortable"));
 
 export default function Results(_: {
   draggable: boolean;
@@ -60,7 +60,7 @@ export default function Results(_: {
             </For>
           }
         >
-          <Sortable
+          <SortableList
             items={items()}
             setItems={handleReorder}
             idField="id"
@@ -81,7 +81,7 @@ export default function Results(_: {
                 mark={_.mark}
               />
             )}
-          </Sortable>
+          </SortableList>
         </Show>
         <Show
           when={listStore.type === "playlists" && listStore.hasContinuation}

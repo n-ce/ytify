@@ -1,26 +1,38 @@
-import { LikeButton, PlayButton, PlayNextButton } from "@components/MediaPartials";
-import { params, playerStore, playPrev, queueStore, setPlayerStore, updateParam, t } from "@stores";
+import {
+  LikeButton,
+  PlayButton,
+  PlayNextButton,
+} from "@components/MediaPartials";
+import {
+  params,
+  playerStore,
+  playPrev,
+  queueStore,
+  setPlayerStore,
+  updateParam,
+  t,
+} from "@stores";
 import { convertSStoHHMMSS, setConfig } from "@utils";
 import { Accessor, createSignal, onMount, Setter, Show } from "solid-js";
 
-export default function(_: {
-  showLyrics: Accessor<boolean>,
-  setShowLyrics: Setter<boolean>
+export default function (_: {
+  showLyrics: Accessor<boolean>;
+  setShowLyrics: Setter<boolean>;
 }) {
-
-  const [isPointed, setPointed] = createSignal(params.has('t'));
+  const [isPointed, setPointed] = createSignal(params.has("t"));
   let slider!: HTMLInputElement;
 
-
   onMount(() => {
-    ['touchstart', 'touchmove', 'touchend'].forEach(type => {
+    ["touchstart", "touchmove", "touchend"].forEach((type) => {
       slider.addEventListener(type, (e) => e.stopPropagation());
     });
-  })
+  });
 
   function updatePositionState() {
-    if ('mediaSession' in navigator)
-      import('@modules/mediaSession').then(m => m.updateMediaSessionPosition());
+    if ("mediaSession" in navigator)
+      import("@modules/mediaSession").then((m) =>
+        m.updateMediaSessionPosition(),
+      );
   }
 
   return (
@@ -36,16 +48,17 @@ export default function(_: {
           }}
         />
         <div>
-          <p id="currentDuration">{convertSStoHHMMSS(playerStore.currentTime)}</p>
+          <p id="currentDuration">
+            {convertSStoHHMMSS(playerStore.currentTime)}
+          </p>
           <p id="fullDuration">{convertSStoHHMMSS(playerStore.fullDuration)}</p>
         </div>
       </span>
 
       <div class="mainShelf">
-
         <Show when={queueStore.history.length}>
           <button
-            aria-label={t('player_play_previous')}
+            aria-label={t("player_play_previous")}
             class="ri-skip-back-fill"
             id="playPrevButton"
             onclick={playPrev}
@@ -53,7 +66,7 @@ export default function(_: {
         </Show>
 
         <button
-          aria-label={t('player_seek_backward')}
+          aria-label={t("player_seek_backward")}
           class="ri-replay-15-line"
           id="seekBwdButton"
           onclick={() => {
@@ -64,7 +77,7 @@ export default function(_: {
         <PlayButton />
 
         <button
-          aria-label={t('player_seek_forward')}
+          aria-label={t("player_seek_forward")}
           class="ri-forward-15-line"
           id="seekFwdButton"
           onclick={() => {
@@ -74,19 +87,17 @@ export default function(_: {
         <Show when={queueStore.list.length}>
           <PlayNextButton />
         </Show>
-
       </div>
 
       <div class="bottomShelf">
-
         <select
           id="playSpeed"
           value={playerStore.playbackRate.toFixed(2)}
-          onchange={e => {
+          onchange={(e) => {
             const ref = e.target;
             const speed = parseFloat(ref.value);
             playerStore.audio.playbackRate = speed;
-            setPlayerStore('playbackRate', speed);
+            setPlayerStore("playbackRate", speed);
             updatePositionState();
             ref.blur();
           }}
@@ -109,15 +120,14 @@ export default function(_: {
 
         <Show when={playerStore.isMusic}>
           <i
-            aria-label={t('player_lyrics')}
+            aria-label={t("player_lyrics")}
             class="ri-music-2-line"
             classList={{
-              on: _.showLyrics()
+              on: _.showLyrics(),
             }}
             onclick={() => _.setShowLyrics(!_.showLyrics())}
           ></i>
         </Show>
-
 
         <LikeButton />
 
@@ -128,20 +138,25 @@ export default function(_: {
           onclick={() => {
             const newLoopState = !playerStore.loop;
             playerStore.audio.loop = newLoopState;
-            setPlayerStore('loop', newLoopState);
+            setPlayerStore("loop", newLoopState);
           }}
         ></i>
         <Show when={!playerStore.isMusic}>
           <i
-            aria-label={t('player_save_progress')}
-            class={`ri-signpost-${isPointed() ? 'fill' : 'line'}`}
+            aria-label={t("actions_menu_watch_video")}
+            class="ri-video-line"
+            onclick={() => setPlayerStore("isWatching", true)}
+          ></i>
+
+          <i
+            aria-label={t("player_save_progress")}
+            class={`ri-signpost-${isPointed() ? "fill" : "line"}`}
             onclick={() => {
               if (isPointed()) {
-                updateParam('t');
+                updateParam("t");
                 setPointed(false);
-              }
-              else {
-                updateParam('t', playerStore.currentTime.toString());
+              } else {
+                updateParam("t", playerStore.currentTime.toString());
                 setPointed(true);
               }
             }}
@@ -151,12 +166,12 @@ export default function(_: {
         <select
           id="volumeChanger"
           value={playerStore.volume}
-          onchange={e => {
+          onchange={(e) => {
             const ref = e.target;
             const vol = parseFloat(ref.value);
             playerStore.audio.volume = vol;
-            setConfig('volume', (vol * 100).toString());
-            setPlayerStore('volume', vol);
+            setConfig("volume", (vol * 100).toString());
+            setPlayerStore("volume", vol);
             ref.blur();
           }}
         >
@@ -174,9 +189,7 @@ export default function(_: {
           <option value="0.75">75%</option>
           <option value="1">100%</option>
         </select>
-
       </div>
-
     </>
   );
 }

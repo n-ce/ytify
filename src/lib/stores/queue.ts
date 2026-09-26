@@ -1,5 +1,10 @@
 import { createStore } from "solid-js/store";
-import { config, convertSStoHHMMSS, parseDuration, shuffle } from "@utils";
+import {
+  config,
+  convertSStoHHMMSS,
+  parseDuration,
+  shuffle,
+} from "@utils";
 import { playerStore } from "./player";
 
 export const [queueStore, setQueueStore] = createStore({

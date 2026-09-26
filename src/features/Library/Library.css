@@ -3,20 +3,119 @@
     width: 100%;
 
     .subfeed-article {
-        &:has(.subfeed-list) .list-carousel {
-            border-bottom: 0;
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
-            margin-bottom: 0;
+        .subfeed-list {
+            max-height: 260px;
+            overflow-y: auto;
         }
 
-        .subfeed-list {
-            border-top: 0;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            margin-top: 0;
-            max-height: 380px;
-            overflow-y: auto;
+        @media (orientation: portrait) {
+            &:has(.subfeed-list) .list-carousel {
+                border-bottom: 0;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                margin-bottom: 0;
+            }
+
+            .subfeed-list {
+                border-top: 0;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                margin-top: 0;
+            }
+        }
+
+        @media (orientation: landscape) {
+            &:has(.subfeed-list) {
+                display: grid;
+                grid-template-columns: clamp(160px, 25%, 220px) 1fr;
+                grid-template-rows: auto 1fr;
+                row-gap: var(--size-2);
+
+                > p {
+                    grid-column: 1 / -1;
+                    grid-row: 1;
+                }
+
+                .list-carousel {
+                    grid-column: 1;
+                    grid-row: 2;
+                    flex-direction: column;
+                    overflow-x: hidden;
+                    overflow-y: auto;
+                    max-height: 260px;
+                    height: 100%;
+                    margin: 0;
+                    border-right: var(--border);
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 0;
+                    padding: var(--size-1);
+                    gap: var(--size-1);
+
+                    .listItem {
+                        width: 100%;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        padding: var(--size-1) var(--size-2);
+                        gap: var(--size-2);
+                        border-radius: var(--roundness);
+                        text-align: left;
+
+                        &:hover {
+                            background-color: var(--onBg2);
+                        }
+
+                        img {
+                            width: var(--size-7);
+                            height: var(--size-7);
+                            max-width: var(--size-7);
+                            aspect-ratio: 1 / 1;
+                            border-radius: var(--radius-round);
+                            object-fit: cover;
+                            flex-shrink: 0;
+                            margin: 0;
+                            box-shadow: none;
+                        }
+
+                        div {
+                            text-align: left;
+                            padding: 0;
+                            min-width: 0;
+                            flex: 1;
+                        }
+
+                        p.title {
+                            font-size: var(--font-size-1);
+                            margin: 0;
+                            line-height: var(--size-4);
+                        }
+
+                        p.stats {
+                            font-size: var(--font-size-0);
+                            margin: 0;
+                            opacity: 0.7;
+                        }
+
+                        p.uData {
+                            display: none;
+                        }
+                    }
+                }
+
+                .subfeed-list {
+                    grid-column: 2;
+                    grid-row: 2;
+                    margin: 0;
+                    border-left: 0;
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
+                    height: 100%;
+
+                    .loading-container {
+                        height: 100%;
+                    }
+                }
+            }
         }
     }
 

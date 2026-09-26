@@ -224,5 +224,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "استيراد قائمة تشغيل YouTube",
+  "library_import_yt_playlist_prompt": "أدخل عنوان URL أو معرف قائمة تشغيل YouTube:",
+  "library_import_yt_playlist_invalid": "عنوان URL أو معرف قائمة تشغيل YouTube غير صالح",
+  "library_import_yt_playlist_success": "تم استيراد قائمة التشغيل \"$\""
 }

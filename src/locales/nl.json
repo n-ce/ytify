@@ -224,5 +224,9 @@
   "queue_reload_notification": "De wijzigingen worden vanaf de volgende sessie zichtbaar",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "YouTube-afspeellijst importeren",
+  "library_import_yt_playlist_prompt": "Voer YouTube-afspeellijst-URL of -ID in:",
+  "library_import_yt_playlist_invalid": "Ongeldige YouTube-afspeellijst-URL of -ID",
+  "library_import_yt_playlist_success": "Afspeellijst \"$\" geïmporteerd"
 }

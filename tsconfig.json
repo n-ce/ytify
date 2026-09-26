@@ -7,15 +7,8 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "types": [
-      "vite/client",
-      "node"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "node"],
     "noEmit": true,
     "isolatedModules": true,
     "skipLibCheck": true,
@@ -30,12 +23,8 @@
       "@utils": ["./src/lib/utils"],
       "@modules/*": ["./src/lib/modules/*"],
       "@components/*": ["./src/components/*"],
-      "@features/*": ["./src/features/*"]
-    }
+      "@features/*": ["./src/features/*"],
+    },
   },
-  "include": [
-    "src",
-    "netlify",
-    "api"
-  ]
+  "include": ["src", "netlify", "api"],
 }

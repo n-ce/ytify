@@ -123,6 +123,17 @@ export default function Dropdown() {
             />
           </li>
 
+          <li
+            id="importYTPlaylistBtn"
+            onclick={async () => {
+              detailsRef?.removeAttribute("open");
+              (await import("@modules/importYouTubePlaylist")).default();
+            }}
+          >
+            <i class="ri-youtube-fill youtube-icon"></i>&nbsp;
+            {t("library_import_yt_playlist")}
+          </li>
+
           <Show
             when={config.dbsync}
             fallback={

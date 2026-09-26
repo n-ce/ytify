@@ -10,6 +10,7 @@ import {
   openSubView,
 } from "@stores";
 import {
+  DISCOVERY_COLLECTION,
   fetchCollection,
   removeFromCollection,
   setConfig,
@@ -107,6 +108,13 @@ export default function () {
     const currentList = () =>
       searchQuery().trim() ? filteredItems() : getSourceItems();
 
+    // Every local collection is removable, including the reserved ones. Shared
+    // views and the virtual discovery feed have nothing to remove from.
+    const canRemoveFrom = () =>
+      listStore.type === "collection" &&
+      !listStore.isShared &&
+      listStore.id !== DISCOVERY_COLLECTION;
+
     return (
       <div class="markBar">
         <i
@@ -120,7 +128,7 @@ export default function () {
           }}
         ></i>
 
-        <Show when={listStore.type === "collection" && !listStore.isShared}>
+        <Show when={canRemoveFrom()}>
           <i
             aria-label={t("list_remove_marked")}
             class="ri-indeterminate-circle-line"

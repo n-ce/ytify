@@ -226,5 +226,9 @@
   "updating": "Mise à jour en cours...",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "Importer une playlist YouTube",
+  "library_import_yt_playlist_prompt": "Entrez l'URL ou l'identifiant de la playlist YouTube :",
+  "library_import_yt_playlist_invalid": "URL ou identifiant de playlist YouTube invalide",
+  "library_import_yt_playlist_success": "Playlist \"$\" importée"
 }

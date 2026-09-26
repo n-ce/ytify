@@ -224,5 +224,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "YouTube Çalma Listesini İçe Aktar",
+  "library_import_yt_playlist_prompt": "YouTube Çalma Listesi URL veya Kimliğini girin:",
+  "library_import_yt_playlist_invalid": "Geçersiz YouTube Çalma Listesi URL veya Kimliği",
+  "library_import_yt_playlist_success": "\"$\" çalma listesi içe aktarıldı"
 }

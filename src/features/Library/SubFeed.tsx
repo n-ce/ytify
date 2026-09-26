@@ -5,9 +5,11 @@ import ListItem from "@components/ListItem";
 import { t, store } from "@stores";
 
 export default function () {
-  const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(false);
-  const [subfeed, setSubfeed] = createSignal<YTItem[]>([]);
   const channels = getLists("channels");
+  const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(
+    Boolean(channels && channels.length > 0),
+  );
+  const [subfeed, setSubfeed] = createSignal<YTItem[]>([]);
 
   const updateSubfeed = async () => {
     if (!channels || channels.length === 0) {
@@ -40,7 +42,11 @@ export default function () {
       </p>
       <Show
         when={channels && channels.length > 0}
-        fallback={<p class="fallback">{t("hub_subfeed_fallback")}</p>}
+        fallback={
+          <div>
+            <p class="fallback">{t("hub_subfeed_fallback")}</p>
+          </div>
+        }
       >
         <div class="list-carousel">
           <For each={channels}>

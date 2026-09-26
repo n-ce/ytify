@@ -1,12 +1,76 @@
-import { playerStore, setPlayerStore, setStore, store } from "@stores";
+import { playerStore, setPlayerStore, setStore, store, t } from "@stores";
 import {
   config,
   convertSStoHHMMSS,
-  streamCache,
-  getCachedOpusUrl,
   getTracksMap,
+  handleXtags,
+  preferredStream,
+  proxyHandler,
+  generateImageUrl,
 } from "@utils";
+import { getCachedOpusUrl, streamCache } from "@modules/audioCache";
 import { isQueuePrefetchActive } from "../modules/queuePrefetch";
+
+export async function applyMetadata(data: TrackItem) {
+  setPlayerStore("stream", data);
+
+  let music = false;
+  let authorText = playerStore.stream.author || "";
+  if (data.author?.endsWith(" - Topic")) {
+    music = true;
+    authorText = data.author.slice(0, -8);
+  }
+
+  setPlayerStore("isMusic", music);
+
+  const metadataObj: MediaMetadataInit = {
+    title: data.title,
+    artist: authorText,
+    album: playerStore.context.src,
+  };
+
+  const img = generateImageUrl(data.id, "maxres", music);
+  if (config.loadImage) {
+    setPlayerStore("mediaArtwork", img);
+    metadataObj.artwork = [
+      { src: img, sizes: "96x96" },
+      { src: img, sizes: "128x128" },
+      { src: img, sizes: "192x192" },
+      { src: img, sizes: "256x256" },
+      { src: img, sizes: "384x384" },
+      { src: img, sizes: "512x512" },
+    ];
+  }
+
+  document.title = data.title + " - ytify";
+
+  if ("mediaSession" in navigator) {
+    const { updateMediaSessionPosition } =
+      await import("@modules/mediaSession");
+    updateMediaSessionPosition();
+    navigator.mediaSession.metadata = new MediaMetadata(metadataObj);
+  }
+}
+
+export async function applyAudioStreams(
+  audioStreams: AudioStream[],
+  prefetchNode?: HTMLAudioElement,
+) {
+  if (!prefetchNode) setPlayerStore("status", t("player_audiostreams_setup"));
+
+  const noOfBitrates = audioStreams.length;
+
+  if (!noOfBitrates) {
+    setPlayerStore("status", t("player_audiostreams_null"));
+    setPlayerStore("playbackState", "none");
+    return;
+  }
+
+  const stream = await preferredStream(handleXtags(audioStreams));
+  const target = prefetchNode || playerStore.audio;
+  delete target.dataset.retried;
+  target.src = proxyHandler(stream.url, Boolean(prefetchNode));
+}
 
 let playerAbortController: AbortController;
 export async function player(id?: string) {
@@ -20,15 +84,13 @@ export async function player(id?: string) {
 
   if (!enforceVideo) {
     try {
+      // getCachedOpusUrl is a no-op while caching is off.
       const cachedUrl = await getCachedOpusUrl(id);
       if (cachedUrl) {
         const tracks = getTracksMap();
         const track = tracks[id] || playerStore.stream;
         if (track?.title) {
-          const setMetadata = await import("@modules/setMetadata").then(
-            (mod) => mod.default,
-          );
-          await setMetadata({
+          await applyMetadata({
             id,
             title: track.title,
             author: track.author,
@@ -85,22 +147,18 @@ export async function player(id?: string) {
 
   const invidiousData = data as Invidious;
 
-  await import("../modules/setMetadata").then((mod) =>
-    mod.default({
-      id,
-      title: invidiousData.title,
-      author: invidiousData.author,
-      duration: convertSStoHHMMSS(invidiousData.lengthSeconds),
-      authorId: invidiousData.authorId,
-    }),
-  );
+  await applyMetadata({
+    id,
+    title: invidiousData.title,
+    author: invidiousData.author,
+    duration: convertSStoHHMMSS(invidiousData.lengthSeconds),
+    authorId: invidiousData.authorId,
+  });
 
-  import("../modules/setAudioStreams").then((mod) =>
-    mod.default(
-      invidiousData.adaptiveFormats
-        .filter((f) => f.type.startsWith("audio"))
-        .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate)),
-    ),
+  await applyAudioStreams(
+    invidiousData.adaptiveFormats
+      .filter((f) => f.type.startsWith("audio"))
+      .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate)),
   );
 
   if (config.similarContent && !enforceVideo && !isQueuePrefetchActive())

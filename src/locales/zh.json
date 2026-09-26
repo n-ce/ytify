@@ -225,5 +225,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "导入 YouTube 播放列表",
+  "library_import_yt_playlist_prompt": "输入 YouTube 播放列表 URL 或 ID：",
+  "library_import_yt_playlist_invalid": "无效的 YouTube 播放列表 URL 或 ID",
+  "library_import_yt_playlist_success": "已导入播放列表“$”"
 }

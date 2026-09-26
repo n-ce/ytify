@@ -93,6 +93,32 @@ export default {
         });
       }
 
+      // Optional external deliverability check. Fail-open: only an explicit
+      // INVALID verdict rejects, so outages/timeouts never block a login.
+      const validatorUrl = `https://rapid-email-verifier.fly.dev/api/validate?email=${encodeURIComponent(trimmedEmail)}`;
+      const validatorAbort = new AbortController();
+      const validatorTimeout = setTimeout(() => validatorAbort.abort(), 3000);
+      try {
+        const emailResponse = await fetch(validatorUrl, {
+          signal: validatorAbort.signal,
+        });
+        if (emailResponse.ok) {
+          const emailData = (await emailResponse.json()) as {
+            status?: string;
+          };
+          if (emailData.status === "INVALID") {
+            return new Response("Email is not valid", {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "text/plain" },
+            });
+          }
+        }
+      } catch (error) {
+        console.warn("Optional email validator check skipped/timed out:", error);
+      } finally {
+        clearTimeout(validatorTimeout);
+      }
+
       const normalizedEmail = trimmedEmail.toLowerCase();
       const combinedString = `${normalizedEmail}|${password}`;
       const msgBuffer = new TextEncoder().encode(combinedString);

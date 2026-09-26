@@ -1,9 +1,15 @@
 import { createSignal, For, Show, createMemo } from "solid-js";
 import {
+  CACHED_COLLECTION,
+  DISCOVERY_COLLECTION,
   fetchCollection,
   getCollectionsKeys,
   getTracksMap,
   librarySections,
+  RESERVED_COLLECTIONS,
+  RESERVED_ORDER,
+  cachingMode,
+  type LibrarySectionKey,
 } from "@utils";
 import { t, store } from "@stores";
 import StreamItem from "@components/StreamItem";
@@ -41,31 +47,19 @@ export default function () {
     setSearchText(searchBar.value);
   };
 
-  if (localStorage.getItem("library")) {
-    import("@modules/libraryMigrator").then((m) => m.default());
-    return t("library_migration_in_place");
-  }
-
-  const reservedCollections = {
-    history: ["ri-memories-fill", "library_history"],
-    favorites: ["ri-heart-fill", "library_favorites"],
-    listenLater: ["ri-calendar-schedule-fill", "library_listen_later"],
-    liked: ["ri-thumb-up-fill", "library_liked"],
-  };
-
   if (getCollectionsKeys().length === 0) {
-    for (const collection in reservedCollections) {
+    for (const collection of RESERVED_ORDER) {
       localStorage.setItem("library_" + collection, "[]");
     }
   }
 
+  // Reserved collection names match their librarySections key, so the
+  // per-section toggles in the configure modal drive visibility directly.
   const isCollectionVisible = (item: string) => {
-    const s = librarySections();
-    if (item === "history") return s.history;
-    if (item === "favorites") return s.favorites;
-    if (item === "listenLater") return s.listenLater;
-    if (item === "liked") return s.liked;
-    return true;
+    const sections = librarySections();
+    return item in sections
+      ? Boolean(sections[item as LibrarySectionKey])
+      : true;
   };
 
   const visibleCollections = createMemo(() => {
@@ -73,10 +67,14 @@ export default function () {
     return getCollectionsKeys().filter(isCollectionVisible);
   });
 
+  const showCached = createMemo(
+    () => cachingMode() !== "off" && librarySections().cached,
+  );
+
   const hasVisibleItems = createMemo(
     () =>
       visibleCollections().length > 0 ||
-      librarySections().cached ||
+      showCached() ||
       librarySections().discovery,
   );
 
@@ -131,7 +129,7 @@ export default function () {
                 }}
               >
                 <Show
-                  when={item in reservedCollections}
+                  when={item in RESERVED_COLLECTIONS}
                   fallback={
                     <>
                       <i class="ri-play-list-2-fill"></i>
@@ -139,40 +137,36 @@ export default function () {
                     </>
                   }
                 >
-                  <i class={reservedCollections[item as "history"][0]}></i>
-                  {t(
-                    reservedCollections[
-                      item as "history"
-                    ][1] as "library_history",
-                  )}
+                  <i class={RESERVED_COLLECTIONS[item][0]}></i>
+                  {t(RESERVED_COLLECTIONS[item][1])}
                 </Show>
               </a>
             )}
           </For>
-          <Show when={librarySections().cached}>
+          <Show when={showCached()}>
             <a
-              href="?collection=cached"
+              href={"?collection=" + CACHED_COLLECTION}
               class="clxn_item"
               onclick={(e) => {
                 e.preventDefault();
-                fetchCollection("cached");
+                fetchCollection(CACHED_COLLECTION);
               }}
             >
-              <i class="ri-thunderstorms-fill"></i>
-              {t("hub_cached")}
+              <i class={RESERVED_COLLECTIONS[CACHED_COLLECTION][0]}></i>
+              {t(RESERVED_COLLECTIONS[CACHED_COLLECTION][1])}
             </a>
           </Show>
           <Show when={librarySections().discovery}>
             <a
-              href="?collection=discovery"
+              href={"?collection=" + DISCOVERY_COLLECTION}
               class="clxn_item"
               onclick={(e) => {
                 e.preventDefault();
-                fetchCollection("discovery");
+                fetchCollection(DISCOVERY_COLLECTION);
               }}
             >
-              <i class="ri-compass-3-fill"></i>
-              {t("hub_discovery")}
+              <i class={RESERVED_COLLECTIONS[DISCOVERY_COLLECTION][0]}></i>
+              {t(RESERVED_COLLECTIONS[DISCOVERY_COLLECTION][1])}
             </a>
           </Show>
         </Show>

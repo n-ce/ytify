@@ -141,7 +141,8 @@ export default async function (
         });
       } else if (item.is(YTNodes.LockupView)) {
         const lockup = item.as(YTNodes.LockupView);
-        if (lockup.content_id && lockup.content_type === "VIDEO") {
+        // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
+        if (lockup.content_id && (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")) {
           const {
             views,
             published,

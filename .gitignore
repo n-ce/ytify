@@ -2,3 +2,5 @@
 .idea
 dist
 package-lock.json
+bun.lock
+dist/

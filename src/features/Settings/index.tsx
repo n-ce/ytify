@@ -3,7 +3,12 @@ import "./Settings.css";
 import { setNavStore, t, setStore, updateLang, closeSubView } from "@stores";
 import { Selector } from "@components/Selector.tsx";
 import {
+  cacheLimit,
+  cachingMode,
+  CACHE_LIMIT_PRESETS,
   config,
+  setCacheLimit,
+  setCachingMode,
   setConfig,
   themer,
   quickSwitch,
@@ -11,6 +16,7 @@ import {
   getCollection,
   PanelRatio,
   applyPanelRatio,
+  type CachingMode,
 } from "@utils";
 import Dropdown from "./Dropdown";
 
@@ -160,6 +166,33 @@ export default function () {
             setConfig("history", configVal);
           }}
         />
+
+        {/* Caching Settings */}
+        <Selector
+          label="settings_caching_mode"
+          id="cachingModeSelector"
+          onchange={(e) => setCachingMode(e.target.value as CachingMode)}
+          value={cachingMode()}
+        >
+          <option value="auto">{t("settings_caching_mode_auto")}</option>
+          <option value="on-demand">
+            {t("settings_caching_mode_on_demand")}
+          </option>
+          <option value="off">{t("settings_caching_mode_off")}</option>
+        </Selector>
+
+        <Show when={cachingMode() !== "off"}>
+          <Selector
+            label="settings_cache_limit"
+            id="cacheLimitSelector"
+            onchange={(e) => setCacheLimit(Number(e.target.value))}
+            value={cacheLimit().toString()}
+          >
+            <For each={CACHE_LIMIT_PRESETS}>
+              {(preset) => <option value={preset}>{preset} MB</option>}
+            </For>
+          </Selector>
+        </Show>
 
         {/* Search Settings */}
         <Toggle

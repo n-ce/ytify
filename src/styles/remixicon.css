@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
 * Total icons: 65
-* Generated at: 2026-09-19T20:23:32.102Z
+* Generated at: 2026-09-26T13:34:33.099Z
 */
 
 @font-face {
@@ -76,10 +76,6 @@
 
 .ri-delete-bin-2-line:before {
   content: "\ec1e";
-}
-
-.ri-download-2-fill:before {
-  content: "\ec53";
 }
 
 .ri-draggable:before {
@@ -272,6 +268,10 @@
 
 .ri-user-heart-line:before {
   content: "\f263";
+}
+
+.ri-video-line:before {
+  content: "\f282";
 }
 
 .ri-youtube-fill:before {

@@ -175,6 +175,11 @@
   "settings_clear_discoveries": "This will clear your existing $ discoveries, continue?",
   "settings_store_history": "Enable Playback History",
   "settings_clear_history": "This will clear $ items from your history, continue?",
+  "settings_caching_mode": "Audio Caching",
+  "settings_caching_mode_auto": "Cache on play",
+  "settings_caching_mode_on_demand": "Cache on demand",
+  "settings_caching_mode_off": "Off",
+  "settings_cache_limit": "Cache Size Limit",
   "settings_panel_ratio": "Landscape Panel Ratio",
   "settings_load_images": "Load Images",
   "settings_roundness": "Roundness",
@@ -235,5 +240,9 @@
   "queue_prefetch_ready": "Listening Session is Ready. Queue has been Locked. Clear Queue to Reset.",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "Import YouTube Playlist",
+  "library_import_yt_playlist_prompt": "Enter YouTube Playlist URL or ID:",
+  "library_import_yt_playlist_invalid": "Invalid YouTube Playlist URL or ID",
+  "library_import_yt_playlist_success": "Imported playlist \"$\""
 }

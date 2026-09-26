@@ -224,5 +224,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "यूट्यूब प्लेलिस्ट आयात करें",
+  "library_import_yt_playlist_prompt": "यूट्यूब प्लेलिस्ट URL या ID दर्ज करें:",
+  "library_import_yt_playlist_invalid": "अमान्य यूट्यूब प्लेलिस्ट URL या ID",
+  "library_import_yt_playlist_success": "प्लेलिस्ट \"$\" आयात की गई"
 }

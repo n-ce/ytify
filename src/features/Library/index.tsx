@@ -5,7 +5,6 @@ import Collections from "./Collections";
 import {
   getLibraryAlbums,
   config,
-  getMeta,
   getLists,
   librarySections,
 } from "@utils";
@@ -21,13 +20,10 @@ export default function () {
   let libraryRef!: HTMLElement;
   let syncBtn!: HTMLElement;
 
-  if (getMeta().version === 4)
-    import("@modules/libraryMigratorV5").then((m) => m.default());
-  else
-    onMount(() => {
-      setNavStore("library", "ref", libraryRef);
-      libraryRef.scrollIntoView();
-    });
+  onMount(() => {
+    setNavStore("library", "ref", libraryRef);
+    libraryRef.scrollIntoView();
+  });
 
   const libraryAlbums = createMemo(() => {
     store.libraryUpdated;

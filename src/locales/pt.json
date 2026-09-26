@@ -224,5 +224,9 @@
   "queue_reload_notification": "",
   "hub_featured": "Featured",
   "hub_featured_desc": "Featured Playlists based on ur listening history.",
-  "hub_featured_fallback": "Listen to music to get featured playlists here."
+  "hub_featured_fallback": "Listen to music to get featured playlists here.",
+  "library_import_yt_playlist": "Importar playlist do YouTube",
+  "library_import_yt_playlist_prompt": "Insira a URL ou ID da playlist do YouTube:",
+  "library_import_yt_playlist_invalid": "URL ou ID de playlist do YouTube inválido",
+  "library_import_yt_playlist_success": "Playlist \"$\" importada"
 }
