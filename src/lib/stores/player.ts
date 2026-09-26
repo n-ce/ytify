@@ -14,6 +14,7 @@ import {
 import {
   config,
   cssVar,
+  playerBackground,
   themer,
   addToCollection,
   recordTrackPlay,
@@ -44,7 +45,6 @@ type PlayerStore = {
   mediaArtwork: string;
   supportsOpus: Promise<boolean>;
   data: {};
-  immersive: boolean;
   isMusic: boolean;
   audioURL: string;
   videoURL: string;
@@ -80,7 +80,6 @@ const createInitialState = (): PlayerStore => ({
     })
     .then((res) => res.supported),
   data: {},
-  immersive: false,
   isMusic: true,
   audioURL: "",
   videoURL: "",
@@ -237,14 +236,14 @@ createRoot(() => {
 
     setPlayerStore("currentTime", seconds);
 
-    // Immersive Mode
-    const { ref } = navStore.player;
-    if (ref) {
-      const { offsetHeight, offsetWidth } = ref;
-      const diff = isMusic ? offsetHeight - offsetWidth : offsetWidth;
-      const scale = seconds / fullDuration;
-      const shift = Math.floor(scale * diff);
-      cssVar("--player-bp", `-${shift}px 0`);
+    // Artwork background pans with the progress, motion backgrounds only.
+    if (isMusic && playerBackground().endsWith("-motion") && fullDuration > 0) {
+      const { ref } = navStore.player;
+      if (ref) {
+        const diff = ref.offsetHeight - ref.offsetWidth;
+        const shift = Math.floor((seconds / fullDuration) * diff);
+        cssVar("--player-bp", `-${shift}px 0`);
+      }
     }
 
     const t = params.get("t");

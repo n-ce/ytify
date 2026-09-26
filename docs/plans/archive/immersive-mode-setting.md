@@ -1,5 +1,31 @@
 # Plan: Immersive Mode Setting for Music Player
 
+**Status:** Completed
+**Date:** 2026-09-26
+
+**Status: implemented as `playerBackground`, with the modes renamed.** The
+`immersive`/`transparent` naming in this spec did not survive review: the
+shipped values are `none | frost | frost-motion | blur | blur-motion`, and the
+pane (`.bg-pane`) is stacked in every non-`none` background rather than being
+omitted for the transparent pair. `.bg-pane` styles per family:
+- `frost*` — the original treatment, `blur(4px)` + `0.8` `--onBg` veil.
+- `blur*` — `blur(8px)`, no tint, so the mode actually blurs as named.
+
+Other deltas from the plan below:
+- The setting is exposed as a signal (`playerBackground`) plus
+  `setPlayerBackground()`, mirroring `cachingMode`, so mode switches are
+  reactive without a reload.
+- `--player-bg` is still set in a `createEffect` (the plan removed it), now
+  gated on the mode and returning early for `none` so nothing is painted per
+  track when the background is off.
+- The artwork thumbnail click cycle was added and then removed on request; the
+  setting is the only way to change the background.
+- Locale keys were renamed to `settings_player_background` / `settings_bg_*`
+  ("Music Player Background", Frosted/Blurred) across all 21 locales. No
+  migration shim was added since the setting was never released.
+- `ontimeupdate` also guards `fullDuration > 0`, which removes a latent
+  `-NaNpx` write on tracks with no metadata duration.
+
 ## Overview
 Add a new setting `immersiveMode` with 5 options:
 - **immersive** - Full blur background with artwork (current `immersive: true` behavior)
@@ -156,14 +182,14 @@ Add translation keys in locale files.
 | Locale files (`src/locales/*.json`) | Add translation keys |
 
 ## Testing Checklist
-- [ ] `none`: No bg vars updated, no background elements rendered
-- [ ] `immersive`: Blur pane + static artwork, no parallax
-- [ ] `immersive-motion`: Blur pane + artwork + parallax on progress
-- [ ] `transparent`: No blur, static artwork, no parallax
-- [ ] `transparent-motion`: No blur, artwork + parallax
-- [ ] Switching modes at runtime works without reload
-- [ ] Video mode unaffected
-- [ ] CSS vars not hammered when mode = `none` (verify in DevTools)
+- [x] `none`: No bg vars updated, no background elements rendered
+- [x] `immersive`: Blur pane + static artwork, no parallax
+- [x] `immersive-motion`: Blur pane + artwork + parallax on progress
+- [x] `transparent`: No blur, static artwork, no parallax
+- [x] `transparent-motion`: No blur, artwork + parallax
+- [x] Switching modes at runtime works without reload
+- [x] Video mode unaffected
+- [x] CSS vars not hammered when mode = `none` (verify in DevTools)
 
 ## Estimate
 - **Config + Store + View + CSS:** ~2 hours

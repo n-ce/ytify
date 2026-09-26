@@ -1,12 +1,13 @@
-import type { JSXElement } from 'solid-js';
-import type en from './locales/en.json';
+import type { JSXElement } from "solid-js";
+import type en from "./locales/en.json";
 
 declare global {
-
   type TranslationKeys = keyof typeof en;
-  type SyncState = 'synced' | 'syncing' | 'dirty' | 'error';
-  type Features = 'search' | 'library' | 'player' | 'list' | 'settings' | 'queue';
-  type Context = '' | 'search' | 'playlists' | 'collection' | 'channels' | 'queue' | 'album';
+  type SyncState = "synced" | "syncing" | "dirty" | "error";
+  type Features =
+    "search" | "library" | "player" | "list" | "settings" | "queue";
+  type Context =
+    "" | "search" | "playlists" | "collection" | "channels" | "queue" | "album";
 
   interface YTImage {
     url: string;
@@ -31,17 +32,18 @@ declare global {
     img?: string;
     albumId?: string;
     subtext?: string;
-    type: 'video' | 'song';
+    type: "video" | "song";
   }
 
   interface ListItem {
     id: string;
     name: string;
     img: string;
+    class?: string;
   }
 
   interface YTChannelItem extends ListItem {
-    type: 'channel';
+    type: "channel";
     subscribers?: string;
     videoCount?: string;
     description?: string;
@@ -49,7 +51,7 @@ declare global {
   }
 
   interface YTPlaylistItem extends ListItem {
-    type: 'playlist';
+    type: "playlist";
     author?: string;
     videoCount?: string;
     items?: YTItem[];
@@ -57,14 +59,14 @@ declare global {
   }
 
   interface YTArtistItem extends ListItem {
-    type: 'artist';
+    type: "artist";
     subscribers?: string;
     items?: YTItem[];
     albums?: YTAlbumItem[];
   }
 
   interface YTAlbumItem extends ListItem {
-    type: 'album';
+    type: "album";
     author: string;
     year?: string;
     playlistId?: string;
@@ -77,46 +79,44 @@ declare global {
 
   type Channel = ListItem;
   type Playlist = ListItem & {
-    author: string
+    author: string;
   };
   type Album = Playlist;
 
   type LibraryAlbums = Album[];
 
   interface Meta {
-    version: number,
-    tracks: number,
-    [index: string]: number
+    version: number;
+    tracks: number;
+    [index: string]: number;
   }
 
   type AudioStream = {
-    type: string,
-    bitrate: string,
-    encoding: string,
-    clen: string,
-    url: string,
-    resolution: string,
-    quality: string
-  }
+    type: string;
+    bitrate: string;
+    encoding: string;
+    clen: string;
+    url: string;
+    resolution: string;
+    quality: string;
+  };
 
   type Invidious = {
-    adaptiveFormats: AudioStream[],
+    adaptiveFormats: AudioStream[];
     recommendedVideos: {
-      title: string,
-      author: string,
-      lengthSeconds: number,
-      authorUrl: string,
-      videoId: string,
-      authorId: string
-    }[],
-    title: string,
-    captions: Record<'url' | 'label' | 'language_code', string>[],
-    author: string,
-    lengthSeconds: number,
-    authorId: string,
-    liveNow: boolean,
-    proxy?: string
-  }
+      title: string;
+      author: string;
+      lengthSeconds: number;
+      authorUrl: string;
+      videoId: string;
+      authorId: string;
+    }[];
+    title: string;
+    captions: Record<"url" | "label" | "language_code", string>[];
+    author: string;
+    lengthSeconds: number;
+    authorId: string;
+    liveNow: boolean;
+    proxy?: string;
+  };
 }
-
-export { };

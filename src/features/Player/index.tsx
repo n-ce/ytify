@@ -1,5 +1,6 @@
 import {
   createEffect,
+  createMemo,
   createSignal,
   lazy,
   onCleanup,
@@ -8,7 +9,12 @@ import {
 } from "solid-js";
 import "./Player.css";
 import { MediaDetails } from "@components/MediaPartials";
-import { config, cssVar } from "@utils";
+import {
+  config,
+  cssVar,
+  playerBackground,
+  type PlayerBackground,
+} from "@utils";
 import { playerStore, setNavStore, setStore, t, updateParam } from "@stores";
 
 const MediaArtwork = lazy(
@@ -34,9 +40,18 @@ export default function () {
     updateParam("s");
   });
 
+  // Background layers are a music-only feature, videos always stay bare.
+  const background = createMemo<PlayerBackground>(() =>
+    playerStore.isMusic ? playerBackground() : "none",
+  );
+  const showBg = () => background() !== "none";
+
   createEffect(() => {
-    const { immersive, mediaArtwork } = playerStore;
-    if (immersive) cssVar("--player-bg", `url(${mediaArtwork})`);
+    const current = background();
+    // Leaves --player-bg untouched while idle so nothing is painted per track.
+    if (current === "none") return;
+    cssVar("--player-bg", `url(${playerStore.mediaArtwork})`);
+    if (!current.endsWith("-motion")) cssVar("--player-bp", "0 0");
   });
 
   function getContext() {
@@ -45,10 +60,14 @@ export default function () {
   }
 
   return (
-    <section id="playerSection" ref={playerSection}>
-      <Show when={playerStore.immersive}>
-        <div class="bg-pane" />
+    <section
+      id="playerSection"
+      class={`bg-${background()}`}
+      ref={playerSection}
+    >
+      <Show when={showBg()}>
         <div class="bg-image" />
+        <div class="bg-pane" />
       </Show>
 
       <header class="topShelf">

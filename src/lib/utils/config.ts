@@ -11,6 +11,27 @@ export type CachingMode = "auto" | "on-demand" | "off";
 
 export const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
 
+/**
+ * Artwork background of the music player.
+ * frost / frost-motion: artwork behind a pane that blurs and veils it.
+ * blur / blur-motion: artwork behind a pane that only blurs.
+ * The -motion variants pan the artwork with the playback progress.
+ */
+export type PlayerBackground =
+  | "none"
+  | "frost"
+  | "frost-motion"
+  | "blur"
+  | "blur-motion";
+
+export const PLAYER_BACKGROUNDS: PlayerBackground[] = [
+  "none",
+  "frost",
+  "frost-motion",
+  "blur",
+  "blur-motion",
+];
+
 /** Selectable audio cache ceilings, in megabytes. */
 export const CACHE_LIMIT_PRESETS = [250, 500, 1000, 2000];
 
@@ -54,6 +75,7 @@ export let config = {
   searchSuggestions: true,
   saveRecentSearches: true,
   loadImage: true,
+  playerBackground: "none" as PlayerBackground,
   panelRatio: "2:5" as PanelRatio,
   roundness: "0.4rem",
   theme: "auto" as "auto" | "light" | "dark",
@@ -104,6 +126,8 @@ if (savedStore) {
 // Guard against hand-edited or stale values before they can drive cache writes.
 if (!CACHING_MODES.includes(config.cachingMode))
   config.cachingMode = "auto";
+if (!PLAYER_BACKGROUNDS.includes(config.playerBackground))
+  config.playerBackground = "none";
 if (!(config.cacheLimit > 0)) config.cacheLimit = DEFAULT_CACHE_LIMIT_MB;
 
 export function setConfig<K extends keyof AppConfig>(
@@ -137,6 +161,17 @@ export const [cachingMode, setCachingModeSignal] =
 export const [cacheLimit, setCacheLimitSignal] = createSignal<number>(
   config.cacheLimit,
 );
+
+/* Player artwork background */
+
+export const [playerBackground, setPlayerBackgroundSignal] =
+  createSignal<PlayerBackground>(config.playerBackground);
+
+export function setPlayerBackground(background: PlayerBackground) {
+  if (!PLAYER_BACKGROUNDS.includes(background)) return;
+  setPlayerBackgroundSignal(background);
+  setConfig("playerBackground", background);
+}
 
 /* Transitory local saves thats not supposed to be transferrable */
 

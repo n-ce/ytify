@@ -136,10 +136,13 @@
 
         .featuredPlaylists {
             img {
-                border-top-left-radius: var(--radius-4);
-                border-bottom-right-radius: var(--radius-4);
+                border-radius: var(--radius-2);
                 aspect-ratio: 1 / 1;
                 object-fit: cover;
+            }
+
+            .featured-playlist img {
+                border-top-left-radius: var(--radius-4);
             }
 
             .listItem {

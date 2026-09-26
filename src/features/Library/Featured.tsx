@@ -95,21 +95,29 @@ export default function () {
             fallback={<p class="fallback">{t("hub_featured_fallback")}</p>}
           >
             <For each={playlists()}>
-              {(item) => (
-                <ListItem
-                  name={item.name}
-                  id={item.id}
-                  img={
-                    item.thumbnailId
-                      ? item.thumbnailId.startsWith("/")
-                        ? item.thumbnailId
-                        : `/${item.thumbnailId}`
-                      : ""
-                  }
-                  author={item.section || "YouTube Music"}
-                  type="playlist"
-                />
-              )}
+              {(item) => {
+                const isFeatured =
+                  item.section?.trim().toLowerCase() === "featured playlists" ||
+                  item.section?.toLowerCase().includes("featured") ||
+                  item.categorySlug?.toLowerCase() === "featured" ||
+                  item.categoryType?.toLowerCase() === "featured";
+                return (
+                  <ListItem
+                    name={item.name}
+                    id={item.id}
+                    img={
+                      item.thumbnailId
+                        ? item.thumbnailId.startsWith("/")
+                          ? item.thumbnailId
+                          : `/${item.thumbnailId}`
+                        : ""
+                    }
+                    author={item.section || "YouTube Music"}
+                    type="playlist"
+                    class={isFeatured ? "featured-playlist" : ""}
+                  />
+                );
+              }}
             </For>
           </Show>
         </div>

@@ -10,6 +10,8 @@ import {
   setCacheLimit,
   setCachingMode,
   setConfig,
+  setPlayerBackground,
+  playerBackground,
   themer,
   quickSwitch,
   deleteCollection,
@@ -17,6 +19,7 @@ import {
   PanelRatio,
   applyPanelRatio,
   type CachingMode,
+  type PlayerBackground,
 } from "@utils";
 import Dropdown from "./Dropdown";
 
@@ -229,6 +232,21 @@ export default function () {
             setStore("snackbar", t("settings_reload"));
           }}
         />
+
+        <Selector
+          label="settings_player_background"
+          id="playerBackgroundSelector"
+          onchange={(e) =>
+            setPlayerBackground(e.target.value as PlayerBackground)
+          }
+          value={playerBackground()}
+        >
+          <option value="none">{t("settings_bg_none")}</option>
+          <option value="frost">{t("settings_bg_frost")}</option>
+          <option value="frost-motion">{t("settings_bg_frost_motion")}</option>
+          <option value="blur">{t("settings_bg_blur")}</option>
+          <option value="blur-motion">{t("settings_bg_blur_motion")}</option>
+        </Selector>
 
         <Selector
           label="settings_panel_ratio"

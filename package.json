@@ -13,12 +13,12 @@
     "solid-js": "^1.9.15"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260925.1",
+    "@cloudflare/workers-types": "^5.20260926.1",
     "@netlify/blobs": "^11.1.1",
     "@netlify/edge-functions": "^4.0.0",
     "@netlify/functions": "^6.0.0",
     "@types/bun": "^1.4.2",
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.3",
     "@types/subset-font": "^2.3.0",
     "autoprefixer": "^10.6.1",
     "eruda": "^3.4.3",

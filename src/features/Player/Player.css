@@ -12,14 +12,26 @@
     }
 
     & div.bg-pane {
-        background-color: hsl(from var(--onBg) h s l / 0.8);
-        backdrop-filter: blur(var(--size-px-1));
         z-index: 1;
         position: absolute;
         width: 100%;
         height: 100%;
         top: 0;
         left: 0;
+    }
+
+    /* Frost: the pane blurs the artwork and veils it with the bg tint. */
+    &.bg-frost div.bg-pane,
+    &.bg-frost-motion div.bg-pane {
+        background-color: hsl(from var(--onBg) h s l / 0.8);
+        backdrop-filter: blur(var(--size-px-1));
+    }
+
+    /* Blur: the pane only softens the artwork, no tint. */
+    &.bg-blur div.bg-pane,
+    &.bg-blur-motion div.bg-pane {
+        background-color: transparent;
+        backdrop-filter: blur(var(--size-px-2));
     }
 
     & div.bg-image {
@@ -33,8 +45,13 @@
         background-attachment: fixed;
         background-size: auto 100%;
         background-position: var(--player-bp);
-        transition: background-position 0.3s ease;
         z-index: 0;
+    }
+
+    /* Only the motion backgrounds drive --player-bp, so only they smooth it. */
+    &.bg-frost-motion div.bg-image,
+    &.bg-blur-motion div.bg-image {
+        transition: background-position 0.3s ease;
     }
 
     > header {

@@ -20,10 +20,6 @@ export default function () {
       src={playerStore.mediaArtwork}
       crossorigin="anonymous"
       alt={"Media Artwork for " + playerStore.stream.title}
-      onclick={() => {
-        if (playerStore.isMusic)
-          setPlayerStore("immersive", !playerStore.immersive);
-      }}
       onload={() => {
         if (imgRef.naturalWidth === 120) handler();
       }}
