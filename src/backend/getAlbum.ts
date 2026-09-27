@@ -1,5 +1,5 @@
 import { YTNodes } from 'youtubei.js';
-import { getClient, getThumbnail, formatDuration, getThumbnailId, getVideoId } from './utils.js';
+import { getClient, getThumbnail, formatDuration, formatThumbnailId, getVideoId } from './utils.js';
 
 export default async function(id: string) {
   const yt = await getClient();
@@ -153,7 +153,7 @@ export default async function(id: string) {
     name,
     author,
     year,
-    img: '/' + getThumbnailId(getThumbnail(thumbnails)),
+    img: formatThumbnailId(getThumbnail(thumbnails)),
     items: finalItems,
     type: 'album' as const
   };

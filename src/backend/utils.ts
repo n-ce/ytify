@@ -14,42 +14,39 @@ export async function getClient(): Promise<Innertube> {
   return youtube;
 }
 
+// Avatars are served from interchangeable hosts (yt3/lh3.googleusercontent.com,
+// yt3.ggpht.com) but each avatar lives in a mandatory path bucket, e.g. "/ytc/",
+// "/a-/a/". Dropping the bucket yields a 404, so only the host is discarded.
+const AVATAR_HOST = /(^|\.)(googleusercontent\.com|ggpht\.com)$/;
+
 export function getThumbnailId(url?: string): string {
   if (!url) return "";
 
   const fullUrl = url.startsWith("//") ? `https:${url}` : url;
 
+  // Video thumbnails live under /vi/<id>/ and are rebuilt by the client as such.
   if (fullUrl.includes("/vi/")) {
     return fullUrl.split("/vi/")[1]?.split("/")[0] || "";
   }
 
   try {
     const urlObj = new URL(fullUrl);
+
+    // Placeholder art (e.g. www.gstatic.com/.../ytm/images/) is not resolvable.
+    if (!AVATAR_HOST.test(urlObj.hostname)) return "";
+
     const segments = urlObj.pathname.split("/").filter(Boolean); // Remove empty strings
+    const id = segments.pop()?.split("=")[0] || ""; // Strip sizing params (=w544 etc)
+    if (!id) return "";
 
-    // 2. Handle Google "a-" style prefixes
-    // If the second to last segment starts with 'a-' or is '-a',
-    // we need to prepend it to the ID.
-    const last = segments[segments.length - 1] || "";
-    const secondLast = segments[segments.length - 2] || "";
-
-    let id = last.split(/[=]/)[0]; // Strip sizing params (=w544 etc)
-
-    if (secondLast.startsWith("a-") || secondLast === "-a") {
-      return `${secondLast}/${id}`;
-    }
-
-    // 3. Special case for profile/picture/0 logic
-    if (secondLast === "picture" && segments.includes("profile")) {
-      return id; // returns "0"
-    }
-
-    return id;
+    return segments.length ? "/" + [...segments, id].join("/") : id;
   } catch (e) {
     return fullUrl.split("/").pop()?.split("=")[0] || "";
   }
 }
 
+// Single normalizer for the `img` field the client re-expands: bare 11-char video
+// id, otherwise a "/"-prefixed avatar path with its bucket intact.
 export function formatThumbnailId(rawUrl?: string): string {
   if (!rawUrl) return "";
   const id = getThumbnailId(rawUrl);
@@ -249,7 +246,7 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
       authorId: song.artists?.[0]?.channel_id || "",
       albumId: playlistId,
       duration: formatDuration(song.duration?.text),
-      img: "/" + getThumbnailId(song.thumbnail?.contents?.[0]?.url),
+      img: formatThumbnailId(song.thumbnail?.contents?.[0]?.url),
       subtext,
       type: "song",
     };
@@ -281,7 +278,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
         id: lockup.content_id,
         name: metadata?.title?.toString() || "Unknown Playlist",
         videoCount: videoCountBadge,
-        img: getThumbnailId(thumbUrl),
+        img: formatThumbnailId(thumbUrl),
         type: "playlist",
       };
     }
@@ -323,7 +320,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
       id: channel.id,
       name: channel.author?.name || "Unknown",
       subscribers: subscribers || "0 subscribers",
-      img: "/" + getThumbnailId(channel.author?.thumbnails?.[0]?.url),
+      img: formatThumbnailId(channel.author?.thumbnails?.[0]?.url),
       description: description,
       videoCount: videoCount,
       type: "channel",
@@ -345,7 +342,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
         id: item.id || "",
         name: item.name || "Unknown",
         subscribers: subscribers,
-        img: "/" + getThumbnailId(item.thumbnail?.contents?.[0]?.url),
+        img: formatThumbnailId(item.thumbnail?.contents?.[0]?.url),
         type: "artist",
       };
     }
@@ -384,7 +381,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
             (r: any) => r.text && /^\d{4}$/.test(r.text),
           )?.text ||
           "",
-        img: "/" + getThumbnailId(item.thumbnail?.contents?.[0]?.url),
+        img: formatThumbnailId(item.thumbnail?.contents?.[0]?.url),
         type: "album",
       };
     }

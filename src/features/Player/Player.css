@@ -27,10 +27,14 @@
         backdrop-filter: blur(var(--size-px-1));
     }
 
-    /* Blur: the pane only softens the artwork, no tint. */
+    /* Blur: the pane softens the artwork with a gradient that becomes more opaque toward the bottom. */
     &.bg-blur div.bg-pane,
     &.bg-blur-motion div.bg-pane {
-        background-color: transparent;
+        background: linear-gradient(
+            to bottom,
+            transparent 70%,
+            rgb(from var(--trueBg) r g b / 1) 80%
+        );
         backdrop-filter: blur(var(--size-px-2));
     }
 

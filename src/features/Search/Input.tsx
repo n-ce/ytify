@@ -1,5 +1,6 @@
 import { For, onMount, Show } from "solid-js";
 import {
+  clearSuggestions,
   getSearchResults,
   getSearchSuggestions,
   playerStore,
@@ -11,6 +12,7 @@ import { config, drawer, idFromURL, player } from "@utils";
 
 export default function () {
   let superInput!: HTMLInputElement;
+  let blurTimeout: ReturnType<typeof setTimeout> | undefined;
 
   onMount(() => {
     getSearchResults();
@@ -18,7 +20,7 @@ export default function () {
 
   function textToSearch(text: string) {
     superInput.blur();
-    setSearchStore("suggestions", "data", []);
+    clearSuggestions();
     setSearchStore("page", 1);
     setSearchStore("results", []);
     setSearchStore("query", text);
@@ -63,11 +65,13 @@ export default function () {
           }
         }}
         onblur={() => {
-          setTimeout(() => {
-            setSearchStore("suggestions", "data", []);
-          }, 150);
+          // Deferred so a mousedown on a suggestion still lands, but cancelled by
+          // onfocus so refocusing cannot be wiped by a stale timer.
+          clearTimeout(blurTimeout);
+          blurTimeout = setTimeout(clearSuggestions, 150);
         }}
         onfocus={() => {
+          clearTimeout(blurTimeout);
           if (searchStore.query) return;
           setSearchStore(
             "suggestions",
@@ -80,6 +84,7 @@ export default function () {
           setSearchStore("query", value);
 
           if (!value) {
+            clearSuggestions();
             setSearchStore(
               "suggestions",
               "data",

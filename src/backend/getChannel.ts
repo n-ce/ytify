@@ -1,5 +1,5 @@
 import { YTNodes } from 'youtubei.js';
-import { getClient, getThumbnail, formatDuration, getThumbnailId, getLockupMeta } from './utils.js';
+import { getClient, getThumbnail, formatDuration, formatThumbnailId, getLockupMeta } from './utils.js';
 
 export default async function(id: string) {
   const yt = await getClient();
@@ -7,7 +7,7 @@ export default async function(id: string) {
   const metadata = channel.metadata;
 
   const name = metadata.title?.toString() || '';
-  const img = '/' + getThumbnailId(getThumbnail(metadata.avatar || []));
+  const img = formatThumbnailId(getThumbnail(metadata.avatar || []));
 
   let videos;
   try {

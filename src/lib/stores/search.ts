@@ -28,9 +28,24 @@ export function resetSearch() {
   updateParam('f');
 }
 
-export function getSearchSuggestions(text: string) {
-  searchStore.suggestions.controller.abort();
+function cancelPendingSuggestions() {
   clearTimeout(suggestionTimeout);
+  searchStore.suggestions.controller.abort();
+}
+
+/**
+ * Drops the dropdown for good. Aborting alone is not enough: the debounced fetch
+ * may not have started yet, so a pending timer would repopulate the list after a
+ * search has already been submitted.
+ */
+export function clearSuggestions() {
+  cancelPendingSuggestions();
+  lastQuery = '';
+  setSearchStore('suggestions', { data: [], index: -1 });
+}
+
+export function getSearchSuggestions(text: string) {
+  cancelPendingSuggestions();
 
   if (text.length < 3) {
     setSearchStore('suggestions', 'data', []);
@@ -54,6 +69,9 @@ export function getSearchSuggestions(text: string) {
     fetch(url, { signal: newController.signal })
       .then(res => res.json() as Promise<string[]>)
       .then(data => {
+        // A resolved-but-aborted response can still land here, so confirm this
+        // is still the active request before repopulating the dropdown.
+        if (searchStore.suggestions.controller !== newController) return;
         setSearchStore('suggestions', 'data', data);
       })
       .catch(e => {
@@ -72,8 +90,7 @@ export async function getSearchResults(force = false) {
   if (!force && results.length > 0) return;
 
   setSearchStore('isLoading', true);
-  searchStore.suggestions.controller.abort();
-  setSearchStore('suggestions', 'data', []);
+  clearSuggestions();
   searchStore.observer.disconnect();
 
   const { recentSearches } = drawer;

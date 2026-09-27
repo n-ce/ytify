@@ -1,5 +1,5 @@
 import { YTNodes, type Helpers } from 'youtubei.js';
-import { getClient, getThumbnail, getThumbnailId, formatDuration, getVideoId } from './utils.js';
+import { getClient, getThumbnail, formatThumbnailId, formatDuration, getVideoId } from './utils.js';
 
 export default async function(id: string) {
   const yt = await getClient();
@@ -79,7 +79,7 @@ export default async function(id: string) {
       return {
         id: musicItem.id || '',
         name: musicItem.title.toString() || '',
-        img: '/' + getThumbnailId(getThumbnail(musicItem.thumbnail || [])),
+        img: formatThumbnailId(getThumbnail(musicItem.thumbnail || [])),
         year: musicItem.year || '',
         type: 'album' as const,
         author: name
@@ -94,7 +94,7 @@ export default async function(id: string) {
   return {
     id,
     name,
-    img: '/' + getThumbnailId(getThumbnail(thumbnails)),
+    img: formatThumbnailId(getThumbnail(thumbnails)),
     items,
     albums: [...albumList, ...epList],
     type: 'artist' as const

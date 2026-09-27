@@ -1,5 +1,5 @@
 import { Helpers, YTNodes, type Innertube } from 'youtubei.js';
-import { getClient, getThumbnail, getThumbnailId } from './utils.js';
+import { getClient, getThumbnail, formatThumbnailId } from './utils.js';
 
 async function fetchFullArtistData(yt: Innertube, id: string) {
   try {
@@ -45,7 +45,7 @@ async function fetchFullArtistData(yt: Innertube, id: string) {
           return {
             id: musicItem.id || '',
             name: musicItem.title?.toString() || '',
-            img: '/' + getThumbnailId(getThumbnail(musicItem.thumbnail || [])),
+            img: formatThumbnailId(getThumbnail(musicItem.thumbnail || [])),
             author: title,
             type: 'playlist' as const
           };
@@ -61,7 +61,7 @@ async function fetchFullArtistData(yt: Innertube, id: string) {
           return {
             id: musicItem.id || '',
             name: musicItem.title?.toString() || '',
-            img: '/' + getThumbnailId(getThumbnail(musicItem.thumbnail || [])),
+            img: formatThumbnailId(getThumbnail(musicItem.thumbnail || [])),
             type: 'artist' as const
           };
         }
@@ -74,7 +74,7 @@ async function fetchFullArtistData(yt: Innertube, id: string) {
     return {
       id,
       title,
-      img: '/' + getThumbnailId(getThumbnail(thumbnails)),
+      img: formatThumbnailId(getThumbnail(thumbnails)),
       featuredOnPlaylists,
       recommendedArtists
     };

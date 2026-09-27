@@ -147,9 +147,11 @@ export async function getClient(): Promise<Innertube>
 - `retrieve_player: false` - don't fetch player config
 
 #### Thumbnail Utilities
-- `getThumbnailId(url)` - Extract video/playlist ID from multiple URL formats
-- `formatThumbnailId(rawUrl)` - Normalize for client (empty for maxresdefault, 11-char IDs direct, `/` prefix for others)
+- `getThumbnailId(url)` - Extract the ID/path from multiple URL formats. Avatar URLs keep their CDN path bucket (`/ytc/ID`, `/a-/a/ID`) because dropping it yields a 404; the host is discarded since `yt3`/`lh3.googleusercontent.com` and `yt3.ggpht.com` serve identical IDs. Non-avatar hosts (e.g. `gstatic.com` placeholder art) return `""`.
+- `formatThumbnailId(rawUrl)` - Single normalizer for the `img` field (empty for missing/`maxresdefault`, bare 11-char video id, otherwise `/`-prefixed avatar path)
 - `getThumbnail(thumbnails)` - Pick highest resolution by width
+
+> `img` is an ID, never a URL. The client re-expands it in `generateImageUrl()` (`src/lib/utils/image.ts`): `/`-prefixed values become `yt3.googleusercontent.com<path>=s720-…`, bare 11-char values become `i.ytimg.com/vi_webp/<id>/…`. Always route new thumbnail call sites through `formatThumbnailId` rather than hand-concatenating a `/` prefix.
 
 #### Duration/Formatting
 - `formatDuration(text)` - Pad single-digit minutes ("4:30" → "04:30")
