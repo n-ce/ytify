@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 65
-* Generated at: 2026-09-26T17:02:17.713Z
+* Total icons: 66
+* Generated at: 2026-09-27T16:56:09.572Z
 */
 
 @font-face {
@@ -188,6 +188,10 @@
 
 .ri-settings-line:before {
   content: "\f0ee";
+}
+
+.ri-share-forward-line:before {
+  content: "\f0fd";
 }
 
 .ri-shuffle-line:before {

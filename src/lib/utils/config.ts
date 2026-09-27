@@ -18,11 +18,7 @@ export const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
  * The -motion variants pan the artwork with the playback progress.
  */
 export type PlayerBackground =
-  | "none"
-  | "frost"
-  | "frost-motion"
-  | "blur"
-  | "blur-motion";
+  "none" | "frost" | "frost-motion" | "blur" | "blur-motion";
 
 export const PLAYER_BACKGROUNDS: PlayerBackground[] = [
   "none",
@@ -65,7 +61,7 @@ export const defaultLibrarySections: LibrarySections = {
 
 export let config = {
   language: "",
-  shareAction: "play" as "play" | "watch" | "download",
+  shareAction: "play" as "play" | "watch",
   quality: "medium" as "low" | "medium" | "high" | "worst",
   stableVolume: false,
   watchMode: "",
@@ -124,10 +120,11 @@ if (savedStore) {
 }
 
 // Guard against hand-edited or stale values before they can drive cache writes.
-if (!CACHING_MODES.includes(config.cachingMode))
-  config.cachingMode = "auto";
+if (!CACHING_MODES.includes(config.cachingMode)) config.cachingMode = "auto";
 if (!PLAYER_BACKGROUNDS.includes(config.playerBackground))
   config.playerBackground = "none";
+if (config.shareAction !== "play" && config.shareAction !== "watch")
+  config.shareAction = "play";
 if (!(config.cacheLimit > 0)) config.cacheLimit = DEFAULT_CACHE_LIMIT_MB;
 
 export function setConfig<K extends keyof AppConfig>(
@@ -155,8 +152,9 @@ export function setLibrarySection(key: LibrarySectionKey, val: boolean) {
 
 /* Audio caching */
 
-export const [cachingMode, setCachingModeSignal] =
-  createSignal<CachingMode>(config.cachingMode);
+export const [cachingMode, setCachingModeSignal] = createSignal<CachingMode>(
+  config.cachingMode,
+);
 
 export const [cacheLimit, setCacheLimitSignal] = createSignal<number>(
   config.cacheLimit,

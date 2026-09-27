@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.Shashwat.Muzo",
+      "sha256_cert_fingerprints": [
+        "22:35:7B:8E:39:EC:79:6E:36:6E:57:25:1B:49:2B:C7:4B:47:A0:C9:D7:66:50:50:70:71:5E:BD:0F:CA:DA:56"
+      ]
+    }
+  }
+]

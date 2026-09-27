@@ -188,6 +188,43 @@ export default function Dropdown() {
             <i class="ri-youtube-fill"></i>
             {t("actions_menu_yt_link")}
           </li>
+
+          <li
+            onclick={() => {
+              const { type, id, name, author } = listStore;
+              let path = "";
+              let displayName = name;
+
+              if (id.startsWith("MPREb") && type === "channels") {
+                path = "artist/" + id;
+                displayName = name.replace("Artist - ", "");
+              } else if (type === "channels") {
+                path = "channel/" + id;
+              } else if (type === "album" || id.startsWith("MPREb")) {
+                path = "album/" + id;
+              } else if (type === "playlists") {
+                path = "playlist/" + id;
+              }
+
+              if (path) {
+                const shareUrl = location.origin + "/" + path;
+                if (navigator.share) {
+                  navigator
+                    .share({
+                      title: displayName + (author ? " by " + author : ""),
+                      url: shareUrl,
+                    })
+                    .catch(console.error);
+                } else {
+                  navigator.clipboard.writeText(shareUrl);
+                  setStore("snackbar", "Link copied to clipboard");
+                }
+              }
+            }}
+          >
+            <i class="ri-share-forward-line"></i>
+            {t("list_share_link")}
+          </li>
         </Show>
 
         <Show when={listStore.type === "collection" && listStore.isReversed}>

@@ -10,7 +10,6 @@ import {
 } from "@stores";
 import {
   config,
-  getDownloadLink,
   idFromURL,
   fetchCollection,
   player,
@@ -19,18 +18,23 @@ import {
 } from "@utils";
 
 export default async function () {
-  if (!params.size) {
-    setNavStore("active", "search");
+  // Handle /s/:id, /album/:id, /artist/:id, /channel/:id, /playlist/:id URLs by transforming them internally
+  const pathParts = location.pathname.split("/");
+  if (pathParts.length === 3) {
+    const [, type, id] = pathParts;
+    if (id) {
+      if (type === "s") {
+        params.set("s", id);
+        history.replaceState({}, "", `/?s=${id}`);
+      } else if (["album", "artist", "channel", "playlist"].includes(type)) {
+        params.set(type, id);
+        history.replaceState({}, "", `/?${type}=${id}`);
+      }
+    }
   }
 
-  // Handle /s/:id URLs by transforming them to /?s=id internally
-  const pathParts = location.pathname.split("/");
-  if (pathParts.length === 3 && pathParts[1] === "s") {
-    const id = pathParts[2];
-    if (id) {
-      params.set("s", id);
-      history.replaceState({}, "", `/?s=${id}`);
-    }
+  if (!params.size) {
+    setNavStore("active", "search");
   }
 
   const { shareAction } = config;
@@ -64,8 +68,6 @@ export default async function () {
     if (isPWA && shareAction === "watch") {
       setPlayerStore("stream", "id", id);
       setPlayerStore("isWatching", true);
-    } else if (isPWA && shareAction === "download") {
-      getDownloadLink(id);
     } else {
       if (params.size === 1) setNavStore("player", "state", true);
       await player(id);

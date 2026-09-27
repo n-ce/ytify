@@ -285,7 +285,7 @@ export default function () {
             closeDialog();
           }}
         >
-          <i class="ri-link"></i>
+          <i class="ri-share-forward-line"></i>
           {t("actions_menu_share")}
         </li>
 

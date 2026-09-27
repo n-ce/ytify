@@ -1,4 +1,4 @@
-import { setStore, playerStore, setPlayerStore, t } from "@stores";
+import { playerStore, setPlayerStore, t } from "@stores";
 import { config, player } from "@utils";
 
 export function proxyHandler(url: string, prefetch?: boolean) {
@@ -66,72 +66,4 @@ export function handleXtags(audioStreams: AudioStream[]) {
   return audioStreams
     .filter((a) => (useDRC ? isDRC(a.url) : !isDRC(a.url)))
     .filter(isOriginal);
-}
-
-type ErrorResponse = Record<"error" | "message", string>;
-
-function isErrorResponse(
-  data: Invidious | ErrorResponse,
-): data is ErrorResponse {
-  return "error" in data || "message" in data;
-}
-
-export async function getDownloadLink(id: string): Promise<void> {
-  setStore("snackbar", t("actions_menu_downloading"));
-
-  const getStreamData = await import("@modules/getStreamData").then(
-    (mod) => mod.default,
-  );
-
-  return getStreamData(id)
-    .then(async (data) => {
-      if (isErrorResponse(data)) {
-        throw new Error(data.error || data.message || "Unknown error");
-      }
-
-      const { adaptiveFormats, title } = data;
-      const audioStreams = adaptiveFormats.filter((s) =>
-        s.type.startsWith("audio/"),
-      );
-
-      if (audioStreams.length === 0) throw new Error("No audio streams found");
-
-      // Always prefer opus and highest bitrate (itag 251)
-      let selectedStream = audioStreams.find((s) => s.url.includes("itag=251"));
-      if (!selectedStream) {
-        selectedStream =
-          audioStreams.find((s) => s.type.includes("opus")) || audioStreams[0];
-      }
-
-      const downloadUrl = proxyHandler(selectedStream.url, true);
-
-      return fetch(downloadUrl)
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch stream");
-          return res.blob();
-        })
-        .then((blob) => {
-          const url = URL.createObjectURL(blob);
-          const ext =
-            selectedStream.type.includes("webm") ||
-            selectedStream.type.includes("opus")
-              ? "opus"
-              : "m4a";
-          const filename = `${title.replace(/[/\\?%*:|"<>]/g, "-")}.${ext}`;
-
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(() => URL.revokeObjectURL(url), 100);
-
-          setStore("snackbar", t("actions_menu_download_success"));
-        });
-    })
-    .catch((e) => {
-      const message = e instanceof Error ? e.message : "Download failed";
-      setStore("snackbar", message);
-    });
 }
