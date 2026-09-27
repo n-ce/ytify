@@ -1,9 +1,13 @@
 import { proxyHandler } from "../utils/helpers";
 import { config } from "../utils/config";
+import { generateImageUrl } from "../utils/image";
 
 const OPFS_DIR = "opus_cache";
 const CACHED_STORAGE_KEY = "library_cached";
 const BYTES_PER_MB = 1024 * 1024;
+
+// In-memory cache for Object URLs to avoid duplicate createObjectURL allocations
+const thumbnailObjectUrls = new Map<string, string>();
 
 function readCachedIds(): string[] {
   try {
@@ -123,13 +127,118 @@ export async function isTrackCached(id: string): Promise<boolean> {
 }
 
 /**
+ * Checks whether a track's thumbnail image is cached in OPFS.
+ */
+export async function isThumbnailCached(id: string): Promise<boolean> {
+  if (!id) return false;
+  try {
+    const dir = await getOpfsAudioDir();
+    if (!dir) return false;
+    const fileHandle = await dir.getFileHandle(`${id}.thumb`);
+    const file = await fileHandle.getFile();
+    return Boolean(file && file.size > 0);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Retrieves an Object URL for a cached track thumbnail, or null if not found.
+ */
+export async function getCachedThumbnailUrl(
+  id: string,
+): Promise<string | null> {
+  if (!id || config.cachingMode === "off") return null;
+  if (thumbnailObjectUrls.has(id)) {
+    return thumbnailObjectUrls.get(id)!;
+  }
+  try {
+    const dir = await getOpfsAudioDir();
+    if (!dir) return null;
+    const fileHandle = await dir.getFileHandle(`${id}.thumb`);
+    const file = await fileHandle.getFile();
+    if (!file || file.size === 0) return null;
+    const blob = file.type ? file : file.slice(0, file.size, "image/webp");
+    const url = URL.createObjectURL(blob);
+    thumbnailObjectUrls.set(id, url);
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetches and saves the track's thumbnail directly to OPFS as part of the audio cache.
+ */
+export async function cacheTrackThumbnail(id: string): Promise<boolean> {
+  if (!id || config.cachingMode === "off") return false;
+  if (await isThumbnailCached(id)) return true;
+
+  try {
+    const dir = await getOpfsAudioDir();
+    if (!dir) return false;
+
+    // 1. Try generateImageUrl (wsrv proxy)
+    const primaryUrl = generateImageUrl(id, "mq");
+    let res: Response | null = null;
+    try {
+      if (primaryUrl) {
+        res = await fetch(primaryUrl);
+      }
+    } catch {}
+
+    // 2. Fallback to direct YouTube mqdefault / hqdefault
+    if (!res || !res.ok || !res.body) {
+      try {
+        res = await fetch(`https://i.ytimg.com/vi/${id}/mqdefault.jpg`);
+      } catch {}
+    }
+
+    if (!res || !res.ok || !res.body) return false;
+
+    const fileHandle = await dir.getFileHandle(`${id}.thumb`, { create: true });
+    const writable = await fileHandle.createWritable();
+    await res.body.pipeTo(writable);
+
+    console.log(`[OPFS] Successfully cached thumbnail for: ${id}`);
+    return true;
+  } catch (err) {
+    console.warn(`[OPFS] Failed to cache thumbnail for ${id}:`, err);
+    return false;
+  }
+}
+
+/**
+ * Deletes a cached thumbnail from OPFS and revokes its memory URL.
+ */
+export async function deleteCachedThumbnail(id: string): Promise<boolean> {
+  if (!id) return false;
+  try {
+    const dir = await getOpfsAudioDir();
+    if (!dir) return false;
+    await dir.removeEntry(`${id}.thumb`);
+    if (thumbnailObjectUrls.has(id)) {
+      URL.revokeObjectURL(thumbnailObjectUrls.get(id)!);
+      thumbnailObjectUrls.delete(id);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Fetches and saves the highest-quality Opus audio stream directly to OPFS.
  * Prioritizes itag 251 (~160 kbps Opus), with fallbacks to other Opus bitrates.
+ * Also caches the track thumbnail alongside the audio track.
  */
 export async function cacheHighestQualityOpus(id: string): Promise<boolean> {
   if (!id || config.cachingMode === "off") return false;
   if (await isTrackCached(id)) {
     touchCachedTrack(id);
+    if (!(await isThumbnailCached(id))) {
+      cacheTrackThumbnail(id).catch(() => {});
+    }
     return true;
   }
 
@@ -193,7 +302,12 @@ export async function cacheHighestQualityOpus(id: string): Promise<boolean> {
 
     touchCachedTrack(id);
 
-    console.log(`[OPFS] Successfully cached highest quality Opus for: ${id}`);
+    // Cache thumbnail alongside the opus audio track
+    await cacheTrackThumbnail(id).catch(() => {});
+
+    console.log(
+      `[OPFS] Successfully cached highest quality Opus and thumbnail for: ${id}`,
+    );
     return true;
   } catch (err) {
     console.warn(`[OPFS] Failed to cache track ${id}:`, err);
@@ -228,8 +342,14 @@ export async function enforceCacheLimit(): Promise<string[]> {
   const sizes = new Map<string, number>();
   // @ts-ignore - values() iterator exists on modern FileSystemDirectoryHandle
   for await (const entry of dir.values()) {
-    if (entry.kind === "file" && entry.name.endsWith(".opus")) {
-      sizes.set(entry.name.replace(/\.opus$/, ""), (await entry.getFile()).size);
+    if (entry.kind === "file") {
+      if (entry.name.endsWith(".opus")) {
+        const id = entry.name.replace(/\.opus$/, "");
+        sizes.set(id, (sizes.get(id) || 0) + (await entry.getFile()).size);
+      } else if (entry.name.endsWith(".thumb")) {
+        const id = entry.name.replace(/\.thumb$/, "");
+        sizes.set(id, (sizes.get(id) || 0) + (await entry.getFile()).size);
+      }
     }
   }
 
@@ -250,8 +370,13 @@ export async function enforceCacheLimit(): Promise<string[]> {
     if (totalBytes <= limitBytes) break;
     try {
       await dir.removeEntry(`${id}.opus`);
-    } catch {
-      continue;
+    } catch {}
+    try {
+      await dir.removeEntry(`${id}.thumb`);
+    } catch {}
+    if (thumbnailObjectUrls.has(id)) {
+      URL.revokeObjectURL(thumbnailObjectUrls.get(id)!);
+      thumbnailObjectUrls.delete(id);
     }
     totalBytes -= sizes.get(id) || 0;
     evicted.push(id);
@@ -268,14 +393,19 @@ export async function enforceCacheLimit(): Promise<string[]> {
 }
 
 /**
- * Deletes a cached Opus track from OPFS.
+ * Deletes a cached Opus track and its thumbnail from OPFS.
  */
 export async function deleteCachedOpus(id: string): Promise<boolean> {
   if (!id) return false;
   try {
     const dir = await getOpfsAudioDir();
     if (!dir) return false;
-    await dir.removeEntry(`${id}.opus`);
+    await dir.removeEntry(`${id}.opus`).catch(() => {});
+    await dir.removeEntry(`${id}.thumb`).catch(() => {});
+    if (thumbnailObjectUrls.has(id)) {
+      URL.revokeObjectURL(thumbnailObjectUrls.get(id)!);
+      thumbnailObjectUrls.delete(id);
+    }
     writeCachedIds(readCachedIds().filter((item) => item !== id));
     return true;
   } catch {
@@ -284,12 +414,16 @@ export async function deleteCachedOpus(id: string): Promise<boolean> {
 }
 
 /**
- * Clears all cached Opus audio files in OPFS.
+ * Clears all cached Opus audio files and thumbnails in OPFS.
  */
 export async function clearOpusCache(): Promise<void> {
   try {
     const root = await navigator.storage.getDirectory();
     await root.removeEntry(OPFS_DIR, { recursive: true });
+    for (const url of thumbnailObjectUrls.values()) {
+      URL.revokeObjectURL(url);
+    }
+    thumbnailObjectUrls.clear();
     writeCachedIds([]);
   } catch (err) {
     console.warn("[OPFS] Failed to clear opus cache:", err);
@@ -313,7 +447,7 @@ export async function getOpusCacheStats(): Promise<{
     // @ts-ignore - values() iterator exists on modern FileSystemDirectoryHandle
     for await (const entry of dir.values()) {
       if (entry.kind === "file") {
-        count++;
+        if (entry.name.endsWith(".opus")) count++;
         const file = await entry.getFile();
         totalBytes += file.size;
       }
@@ -331,7 +465,7 @@ export const streamCache = {
       const data = sessionStorage.getItem(`streamData_${id}`);
       return data ? JSON.parse(data) : null;
     } catch (e) {
-      console.error('Failed to parse stream data from cache', e);
+      console.error("Failed to parse stream data from cache", e);
       return null;
     }
   },
@@ -339,17 +473,20 @@ export const streamCache = {
     try {
       sessionStorage.setItem(`streamData_${id}`, JSON.stringify(data));
     } catch (e) {
-      console.warn('Failed to save stream data to cache (possibly storage limit reached)', e);
+      console.warn(
+        "Failed to save stream data to cache (possibly storage limit reached)",
+        e,
+      );
     }
   },
   remove: (id: string) => {
     sessionStorage.removeItem(`streamData_${id}`);
   },
   clear: () => {
-    Object.keys(sessionStorage).forEach(key => {
-      if (key.startsWith('streamData_')) {
+    Object.keys(sessionStorage).forEach((key) => {
+      if (key.startsWith("streamData_")) {
         sessionStorage.removeItem(key);
       }
     });
-  }
+  },
 };

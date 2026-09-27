@@ -32,7 +32,7 @@ export default function () {
           }
           extra={
             <Show when={queueStore.list.length > 0}>
-              <span class="header-nav-badge">
+              <span class="header-nav-badge queue-duration-badge">
                 {totalQueueDuration(queueStore.list)}
               </span>
             </Show>

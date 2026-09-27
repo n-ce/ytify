@@ -1,5 +1,12 @@
 import { JSX, Show } from "solid-js";
-import { navStore, openSubView, t, getList, listStore } from "@stores";
+import {
+  navStore,
+  openSubView,
+  t,
+  getList,
+  listStore,
+  setListStore,
+} from "@stores";
 import { drawer, fetchCollection } from "@utils";
 
 interface HeaderNavProps {
@@ -26,6 +33,14 @@ export function handleNavClick(
 }
 
 export default function HeaderNav(props: HeaderNavProps) {
+  const listDisplayName = () => {
+    if (listStore.showStreamsNumber) {
+      const count = listStore.length || listStore.list?.length || 0;
+      return t("list_streams_count", count.toString());
+    }
+    return listStore.name || t("nav_list");
+  };
+
   return (
     <>
       <div class="header-title">{props.title}</div>
@@ -52,14 +67,18 @@ export default function HeaderNav(props: HeaderNavProps) {
         >
           {t("nav_library")}
         </span>
-        <span
-          class="header-nav-item header-nav-list"
-          classList={{ active: navStore.active === "list" }}
-          onclick={() => handleNavClick("list")}
-          title={listStore.name || t("nav_list")}
-        >
-          {listStore.name || t("nav_list")}
-        </span>
+        <Show when={navStore.active === "list"}>
+          <span
+            class="header-nav-item header-nav-list"
+            classList={{ active: navStore.active === "list" }}
+            onclick={() => {
+              setListStore("showStreamsNumber", (prev) => !prev);
+            }}
+            title={listDisplayName()}
+          >
+            {listDisplayName()}
+          </span>
+        </Show>
 
         <Show when={props.extra}>
           <div class="header-nav-extra">{props.extra}</div>

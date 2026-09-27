@@ -50,7 +50,7 @@ export default function NavBar() {
 
       <i
         aria-label={t("nav_list")}
-        class="ri-play-list-2-fill"
+        class="ri-play-list-2-fill nav-list-btn"
         classList={{ on: navStore.active === "list" }}
         onclick={() => {
           if (navStore.active === "list") {

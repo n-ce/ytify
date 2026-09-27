@@ -9,7 +9,11 @@ import {
   proxyHandler,
   generateImageUrl,
 } from "@utils";
-import { getCachedOpusUrl, streamCache } from "@modules/audioCache";
+import {
+  getCachedOpusUrl,
+  getCachedThumbnailUrl,
+  streamCache,
+} from "@modules/audioCache";
 import { isQueuePrefetchActive } from "../modules/queuePrefetch";
 
 export async function applyMetadata(data: TrackItem) {
@@ -30,7 +34,12 @@ export async function applyMetadata(data: TrackItem) {
     album: playerStore.context.src,
   };
 
-  const img = generateImageUrl(data.id, "maxres", music);
+  let img = generateImageUrl(data.id, "maxres", music);
+  try {
+    const cachedThumb = await getCachedThumbnailUrl(data.id);
+    if (cachedThumb) img = cachedThumb;
+  } catch {}
+
   if (config.loadImage) {
     setPlayerStore("mediaArtwork", img);
     metadataObj.artwork = [

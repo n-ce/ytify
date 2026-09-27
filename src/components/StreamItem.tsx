@@ -19,6 +19,7 @@ import {
   playerStore,
   setPlayerStore,
 } from "@stores";
+import { getCachedThumbnailUrl } from "@modules/audioCache";
 
 export default function (
   data: YTItem & {
@@ -41,8 +42,13 @@ export default function (
   let parent!: HTMLAnchorElement;
 
   function handleThumbnailLoad(e: Event) {
-    const img = e.target as HTMLImageElement;
     const src = getImage();
+    if (src.startsWith("blob:")) {
+      parent.classList.remove("ravel");
+      return;
+    }
+
+    const img = e.target as HTMLImageElement;
 
     if (img.naturalWidth !== 120) {
       parent.classList.remove("ravel");
@@ -57,15 +63,20 @@ export default function (
   }
 
   function handleThumbnailError() {
-    const src = getImage();
-
-    setImage(
-      src.includes("vi_webp")
-        ? src.replace(".webp", ".jpg").replace("vi_webp", "vi")
-        : "/logo192.png",
-    );
-
-    parent.classList.remove("ravel");
+    getCachedThumbnailUrl(data.id).then((cached) => {
+      if (cached) {
+        setImage(cached);
+        parent.classList.remove("ravel");
+        return;
+      }
+      const src = getImage();
+      setImage(
+        src.includes("vi_webp")
+          ? src.replace(".webp", ".jpg").replace("vi_webp", "vi")
+          : "/logo192.png",
+      );
+      parent.classList.remove("ravel");
+    });
   }
 
   const isAlbum =
@@ -73,7 +84,7 @@ export default function (
   const isFromArtist = data.context?.id?.startsWith("Artist - ");
   const isMusic = data.author?.endsWith("- Topic");
 
-  if (config.loadImage && !isAlbum)
+  if (config.loadImage && !isAlbum) {
     setImage(
       generateImageUrl(
         data.img || data.id,
@@ -83,6 +94,10 @@ export default function (
           (data.context?.src === "queue" && isMusic),
       ),
     );
+    getCachedThumbnailUrl(data.id).then((cached) => {
+      if (cached) setImage(cached);
+    });
+  }
 
   return (
     <a
@@ -174,8 +189,7 @@ export default function (
 
               while (left >= 0 || right < len) {
                 if (right < len) {
-                  const item = collectionItems[right++];
-                  if (!historyIds.has(item.id)) zigzagQueue.push(item);
+                  const item = collectionItems[right++];               if (!historyIds.has(item.id)) zigzagQueue.push(item);
                 }
                 if (left >= 0) {
                   const item = collectionItems[left--];

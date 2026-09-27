@@ -14,7 +14,6 @@ export default function () {
 
   onMount(() => {
     getSearchResults();
-    superInput?.focus();
   });
 
   function textToSearch(text: string) {
@@ -29,7 +28,6 @@ export default function () {
   return (
     <>
       <input
-        autofocus
         value={searchStore.query}
         placeholder={t("search_placeholder")}
         type="search"

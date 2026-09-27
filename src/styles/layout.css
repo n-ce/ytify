@@ -234,12 +234,9 @@ section > header {
 .header-nav-badge {
     display: inline-flex;
     align-items: center;
-    padding: var(--size-0) var(--size-2);
-    border-radius: var(--roundness);
-    background: var(--onBg2);
-    font-size: var(--font-size-1);
+    font-size: var(--font-size-2);
     font-weight: var(--font-weight-5);
-    color: var(--text2);
+    color: var(--text);
     max-width: 250px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -341,12 +338,23 @@ main {
         overflow: hidden;
     }
 
+    nav.app-navbar {
+        display: none !important;
+    }
+
     .header-title {
         display: none !important;
     }
 
     .header-nav {
         display: flex;
+    }
+
+    /* Only in landscape, align queue duration text to right */
+    .queueSection .header-nav-extra,
+    .header-nav-extra:has(.queue-duration-badge) {
+        margin-left: auto;
+        margin-right:var(--size-3);
     }
 
     .left-panel {
@@ -448,6 +456,17 @@ main {
         display: flex;
     }
 
+    /* Hide list nav button in portrait mode */
+    .app-navbar .nav-list-btn {
+        display: none !important;
+    }
+
+    /* Hide navbar when list is opened */
+    body:has(#listSection) .app-navbar,
+    main:has(#listSection) .app-navbar {
+        display: none !important;
+    }
+
     .left-panel,
     .right-panel {
         flex: 0 0 100vw;
@@ -496,8 +515,7 @@ dialog {
     box-shadow: none;
 
     @media (orientation: landscape) {
-        width: calc(100dvw / 1.5);
-        margin-left: calc(100dvw / 3);
+        width: calc(100dvw / 1.5);        margin-left: calc(100dvw / 3);
     }
 
     &::backdrop {

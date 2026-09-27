@@ -3,6 +3,7 @@ import "./List.css";
 import {
   addToQueue,
   listStore,
+  setListStore,
   resetList,
   setNavStore,
   t,
@@ -34,7 +35,6 @@ export default function () {
   const [markMode, setMarkMode] = createSignal(false);
   const [isSearching, setIsSearching] = createSignal(false);
   const [markList, setMarkList] = createSignal<string[]>([]);
-  const [showStreamsNumber, setShowStreamsNumber] = createSignal(false);
   const [localSortBy, setLocalSortBy] = createSignal<SortBy>(config.sortBy);
   const [localSortOrder, setLocalSortOrder] = createSignal<"asc" | "desc">(
     config.sortOrder,
@@ -119,6 +119,11 @@ export default function () {
     return (
       <div class="markBar">
         <i
+          aria-label={t("close")}
+          class="ri-close-large-line"
+          onclick={() => setMarkMode(false)}
+        ></i>
+        <i
           aria-label={t("list_mark_all")}
           class={"ri-checkbox-multiple-fill"}
           onclick={() => {
@@ -201,11 +206,20 @@ export default function () {
             <Show when={!markMode()} fallback={<MarkBar />}>
               <Show when={!isSearching()} fallback={<SearchInput />}>
                 <p
-                  onclick={() => setShowStreamsNumber(!showStreamsNumber())}
+                  onclick={() =>
+                    setListStore("showStreamsNumber", (prev) => !prev)
+                  }
                   id="listTitle"
                 >
-                  {showStreamsNumber()
-                    ? t("list_streams_count", listStore.length.toString())
+                  {listStore.showStreamsNumber
+                    ? t(
+                        "list_streams_count",
+                        (
+                          listStore.length ||
+                          listStore.list?.length ||
+                          0
+                        ).toString(),
+                      )
                     : listStore.name}
                 </p>
               </Show>

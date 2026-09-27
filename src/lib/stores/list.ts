@@ -8,6 +8,7 @@ const initialState = () => ({
   isSortable: false,
   isReversed: false,
   isShared: false,
+  showStreamsNumber: false,
   list: [] as YTItem[],
   length: 0,
   reservedCollections: [
