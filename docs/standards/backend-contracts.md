@@ -80,6 +80,7 @@ interface YTArtistItem extends ListItem {
   subscribers?: string;
   items?: YTItem[];
   albums?: YTAlbumItem[];
+  eps?: YTAlbumItem[];
 }
 
 interface YTAlbumItem extends ListItem {
@@ -101,7 +102,7 @@ interface YTAlbumItem extends ListItem {
 | `GET /api/suggestions` | `string[]` |
 | `GET /api/playlist` | `YTPlaylistItem` with `items`, `hasContinuation` |
 | `GET /api/album` | `YTAlbumItem` with `items` |
-| `GET /api/artist` | `YTArtistItem` with `items` (songs), `albums` |
+| `GET /api/artist` | `YTArtistItem` with `items` (songs), `albums`, `eps` |
 | `GET /api/channel` | `YTChannelItem` with `items` |
 | `GET /api/gallery` | `{ userArtists, relatedArtists, relatedPlaylists }` |
 | `GET /api/subfeed` | `YTItem[]` with `publishedMs` |
@@ -254,12 +255,40 @@ LockupView
 | `getSearch` | Music vs regular search, upload date sort via `parsePublished()` |
 | `getPlaylist` | Music playlists (RD*, OLAK*) via `yt.music.getPlaylist()`, continuation loop |
 | `getAlbum` | Header parsing (MusicDetailHeader/MusicResponsiveHeader), playlistId extraction |
-| `getArtist` | Header (MusicImmersiveHeader/MusicVisualHeader), albums via carousel shelves |
+| `getArtist` | Header (MusicImmersiveHeader/MusicVisualHeader), songs via `getAllSongs()`, albums/EPs from the discography page (see below) |
 | `getChannel` | Videos via `channel.getVideos()` |
 | `getGallery` | Batch fetch artists, aggregate "Featured on" + "Fans might also like", deduplicate |
 | `getSubFeed` | Parallel channel fetch, filter >90s, sort by publishedMs desc |
 | `getSimilar` | Last.fm API → YouTube Music search, strip subtext/albumId/img |
 | `getSearchSuggestions` | Music: `yt.music.getSearchSuggestions()`, Regular: `yt.getSearchSuggestions()` |
+
+### Artist Discography
+
+The artist page's `Albums` and `Singles & EPs` carousels are hard-capped at 10 items
+and carry **no continuation token**, so they cannot be paginated. Long discographies
+are silently truncated, and EPs older than the 10 most recent releases are absent
+altogether. The complete list is only reachable via the discography page:
+
+1. `browseId: "UC<channel>"` → locate the `browseEndpoint` whose
+   `browseEndpointContextMusicConfig.pageType` is `MUSIC_PAGE_TYPE_ARTIST_DISCOGRAPHY`.
+   It is **not** always on the `Albums` header — when the artist has ≤10 albums the
+   `Albums` carousel has no "More" button and only `Singles & EPs` does.
+2. Browse that `browseId` + `params` → a `sectionListRenderer` whose header holds
+   `chipCloudRenderer` chips: `Albums` and `Singles & EPs` (there is no EPs chip;
+   EPs are mixed into `Singles & EPs`). Each chip carries its own
+   `browseSectionListReloadEndpoint` continuation.
+3. Fetch both chip continuations in parallel. Each returns a complete `gridRenderer`
+   in a single request — no further continuation needed.
+
+Discography rows differ from carousel items: they carry **no `year` field**, and their
+subtitle states the release type (`Album • 2018`, `EP • 2020`, `Single • 2025`). The
+year must be parsed out of the subtitle. `albums` comes from the `Albums` chip and
+`eps` from the `EP`-labelled rows of the `Singles & EPs` chip; singles are dropped.
+
+Neither the discography endpoint nor the chips are modelled by `youtubei.js`, so these
+are raw `/browse` calls (`yt.actions.execute('/browse', { client: 'YTMUSIC', parse: false })`).
+If the discography lookup fails, `getArtist` falls back to scraping the carousels,
+which under-reports but never breaks.
 
 ---
 

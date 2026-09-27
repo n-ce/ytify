@@ -32,8 +32,8 @@
     &.bg-blur-motion div.bg-pane {
         background: linear-gradient(
             to bottom,
-            transparent 70%,
-            rgb(from var(--trueBg) r g b / 1) 80%
+            transparent 60%,
+            var(--trueBg) 80%
         );
         backdrop-filter: blur(var(--size-px-2));
     }

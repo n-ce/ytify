@@ -63,6 +63,7 @@ declare global {
     subscribers?: string;
     items?: YTItem[];
     albums?: YTAlbumItem[];
+    eps?: YTAlbumItem[];
   }
 
   interface YTAlbumItem extends ListItem {

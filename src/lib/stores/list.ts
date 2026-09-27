@@ -30,6 +30,7 @@ const initialState = () => ({
   img: "",
   hasContinuation: false,
   artistAlbums: [] as YTAlbumItem[],
+  artistEps: [] as YTAlbumItem[],
   observer: { disconnect() {} } as IntersectionObserver,
 });
 
@@ -90,7 +91,8 @@ export async function getList(
               context: { src: "channels" as const, id: contextId },
             }) as YTItem,
         ),
-        artistAlbums: artist.albums,
+        artistAlbums: artist.albums || [],
+        artistEps: artist.eps || [],
       });
     } else {
       const listData = data as YTPlaylistItem | YTChannelItem | YTAlbumItem;
@@ -125,6 +127,8 @@ export async function getList(
           "hasContinuation" in listData
             ? (listData as YTPlaylistItem).hasContinuation
             : false,
+        artistAlbums: [],
+        artistEps: [],
         list: (listData.items || []).map(
           (v) =>
             ({

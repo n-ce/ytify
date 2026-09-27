@@ -28,7 +28,14 @@ const TEST_IDS = {
 	video: "dQw4w9WgXcQ", // Rick Astley - Never Gonna Give You Up
 	playlist: "PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI", // YouTube Music playlist
 	album: "MPREb_Q9V7w4yK8l", // Rick Astley - 50 (YouTube Music album)
-	artist: "UC2PMxyoN2CZ3iaJ6NO-C19g", // Rick Astley official
+	// Must be a channel that resolves as a YouTube Music artist: the previous
+	// fixture (Rick Astley, UC2PMxyoN2CZ3iaJ6NO-C19g) returns an empty name and
+	// no sections, which made these assertions pass vacuously.
+	artist: "UCgI0KusPV2kAfsflrsAunUw", // Sigur Rós - 19 albums, 4 EPs
+	// Regression fixture: the Albums carousel holds no "More" button for this
+	// artist and Young Mountain (2006) sits past the 10-item Singles & EPs cap,
+	// so it is only reachable via the discography page.
+	artistDeepEp: "UCkQijoKtzS4B9IsXJUCcQow", // This Will Destroy You
 	channel: "UCBR8-60-B28hp2BmDPdntcQ", // Random channel
 };
 
@@ -175,14 +182,72 @@ async function main() {
 	results.push(await runTest("getArtist", async () => {
 		const data = await getArtist(TEST_IDS.artist);
 		assert(typeof data === "object", "should return object");
-		assert(typeof data.name === "string", "should have name");
+		assert(typeof data.name === "string" && data.name.length > 0, "should have a name");
 		assert(Array.isArray(data.items), "should have songs");
 		assert(Array.isArray(data.albums), "should have albums");
+		assert(Array.isArray(data.eps), "should have eps");
+		assert(data.items.length > 0, "should have at least one song");
+		assert(data.albums.length > 0, "should have at least one album");
+		assert(data.eps.length > 0, "should have at least one EP");
+
+		// Discography rows carry no `year` field; it is parsed from the subtitle,
+		// so a missing year means the release label was not recognised.
+		[...data.albums, ...data.eps].forEach((album, idx) => {
+			validateYTListItem(album, `getArtist.releases[${idx}]`);
+			assert(album.type === "album", "artist releases should be albums");
+			assert(!!album.id, "artist releases should have an id");
+			assert(!!album.year, `artist release should have a year: ${album.name}`);
+		});
+
+		// The artist page's carousels are hard-capped at 10 items with no
+		// continuation, so anything past that only comes from the discography
+		// page. Dropping below the cap means the fallback kicked in.
+		assert(
+			data.albums.length > 10,
+			`expected more than the 10-item carousel cap, got ${data.albums.length}`
+		);
+		// Canaries beyond the carousel cap, so a silent fallback cannot pass.
+		const albumIds = data.albums.map((album) => album.id);
+		assert(albumIds.includes("MPREb_m66VrCVOY5u"), "missing Ágætis byrjun (19th album, past the cap)");
+
 		data.items.slice(0, 3).forEach((item, idx) => {
 			validateYTItem(item, `getArtist.items[${idx}]`);
 			assert(item.type === "song", `artist items should be songs`);
 		});
-		return { id: data.id, name: data.name, songCount: data.items.length, albumCount: data.albums.length };
+		return {
+			id: data.id,
+			name: data.name,
+			songCount: data.items.length,
+			albumCount: data.albums.length,
+			epCount: data.eps.length,
+		};
+	}));
+
+	// --- getArtist (discography) ---
+	results.push(await runTest("getArtist (discography EP)", async () => {
+		const data = await getArtist(TEST_IDS.artistDeepEp);
+		assert(typeof data.name === "string" && data.name.length > 0, "should have a name");
+		assert(data.albums.length > 0, "should have albums");
+		assert(data.eps.length > 0, "should have eps");
+
+		// Young Mountain is the reported regression: an EP from 2006 that the
+		// 10-item Singles & EPs carousel never exposed.
+		const youngMountain = data.eps.find((ep) => ep.id === "MPREb_j48YxzcCJQs");
+		assert(!!youngMountain, "should include Young Mountain (MPREb_j48YxzcCJQs) in eps");
+		assert(youngMountain.year === "2006", `Young Mountain year should be 2006, got ${youngMountain.year}`);
+
+		// Albums and EPs come from disjoint discography chips and must not overlap.
+		const albumIds = new Set(data.albums.map((album) => album.id));
+		const overlap = data.eps.filter((ep) => albumIds.has(ep.id));
+		assert(overlap.length === 0, `albums and eps overlap: ${overlap.map((ep) => ep.name).join(", ")}`);
+
+		return {
+			id: data.id,
+			name: data.name,
+			albumCount: data.albums.length,
+			epCount: data.eps.length,
+			eps: data.eps.map((ep) => `${ep.year} ${ep.name}`),
+		};
 	}));
 
 	// --- getChannel ---

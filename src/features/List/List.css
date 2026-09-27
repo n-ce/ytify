@@ -20,6 +20,29 @@
     margin-bottom: var(--size-fluid-6);
 }
 
+/*
+ * Albums and EPs share one card: the wrapper owns the chrome so the rows meet
+ * flush instead of reading as two separate carousels.
+ */
+.list-carousels {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--onBg);
+    border-radius: var(--roundness);
+    border: var(--border);
+    padding: var(--size-1);
+    margin-bottom: var(--size-2);
+
+    .list-carousel {
+        flex: 0 0 auto;
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        margin-bottom: 0;
+        padding: 0;
+    }
+}
+
 .listSearchInput {
     display: block;
     border: none;

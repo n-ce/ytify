@@ -29,6 +29,25 @@ import HeaderNav from "@components/HeaderNav";
 
 type SortBy = "modified" | "name" | "artist" | "duration";
 
+function AlbumRow(props: { albums: YTAlbumItem[] }) {
+  return (
+    <div class="list-carousel">
+      <For each={props.albums}>
+        {(album) => (
+          <ListItem
+            name={album.name}
+            year={album.year}
+            img={album.img}
+            author={album.author}
+            id={album.id}
+            type="album"
+          />
+        )}
+      </For>
+    </div>
+  );
+}
+
 export default function () {
   let listSection!: HTMLElement;
 
@@ -307,23 +326,16 @@ export default function () {
       </Show>
 
       <Show
-        when={
-          listStore.name.startsWith("Artist") && listStore.artistAlbums?.length
-        }
+        when={listStore.artistAlbums.length > 0 || listStore.artistEps.length > 3}
       >
-        <div class="list-carousel">
-          <For each={listStore.artistAlbums}>
-            {(album) => (
-              <ListItem
-                name={album.name}
-                year={album.year}
-                img={album.img}
-                author={album.author}
-                id={album.id}
-                type="album"
-              />
-            )}
-          </For>
+        <div class="list-carousels">
+          <Show when={listStore.artistAlbums.length}>
+            <AlbumRow albums={listStore.artistAlbums} />
+          </Show>
+
+          <Show when={listStore.artistEps.length > 3}>
+            <AlbumRow albums={listStore.artistEps} />
+          </Show>
         </div>
       </Show>
 
