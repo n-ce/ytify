@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 66
-* Generated at: 2026-09-27T18:59:40.641Z
+* Total icons: 65
+* Generated at: 2026-09-30T08:30:36.924Z
 */
 
 @font-face {
@@ -92,10 +92,6 @@
 
 .ri-forward-15-line:before {
   content: "\f32d";
-}
-
-.ri-fullscreen-line:before {
-  content: "\ed9c";
 }
 
 .ri-heart-fill:before {

@@ -14,7 +14,7 @@ section > header {
     align-items: center;
     position: relative;
     width: 100%;
-    padding: var(--gap) 0;
+    padding: var(--size-fluid-1) 0;
     color: var(--text);
 
     > p {
@@ -461,10 +461,19 @@ main {
         display: none !important;
     }
 
-    /* Hide navbar when list is opened */
+    /* Hide navbar when list or settings is opened */
     body:has(#listSection) .app-navbar,
-    main:has(#listSection) .app-navbar {
+    main:has(#listSection) .app-navbar,
+    body:has(.settingsSection) .app-navbar,
+    main:has(.settingsSection) .app-navbar {
         display: none !important;
+    }
+
+    /* Safe area inset support for navigation bar in portrait mode */
+    nav.app-navbar {
+        padding-bottom: calc(var(--size-1) + env(safe-area-inset-bottom, 0px));
+        padding-left: env(safe-area-inset-left, 0px);
+        padding-right: env(safe-area-inset-right, 0px);
     }
 
     .left-panel,

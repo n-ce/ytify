@@ -124,7 +124,7 @@ export function getLockupMeta(lockup: YTNodes.LockupView): {
         const textObj = p.text as any;
         authorId =
           textObj?.endpoint?.payload?.browseId ||
-          textObj?.runs?.find((r: any) => r.endpoint?.payload?.browseId)
+          textObj?.runs?.find((r: any) => (r as any)?.endpoint?.payload?.browseId)
             ?.endpoint?.payload?.browseId ||
           "";
       }
@@ -237,13 +237,40 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
       song.album?.id ||
       "";
 
+    const browseAuthorRun = song.flex_columns?.[1]?.title?.runs?.find((r: any) =>
+      r?.endpoint?.payload?.browseId?.startsWith("UC"),
+    ) as any;
+
+    const rawAuthor =
+      song.artists?.[0]?.name ||
+      song.authors?.[0]?.name ||
+      song.author?.name ||
+      browseAuthorRun?.text ||
+      (song.flex_columns?.[1]?.title?.runs?.[0]?.text &&
+      song.flex_columns?.[1]?.title?.runs?.[0]?.text !== " • "
+        ? song.flex_columns[1].title.runs[0].text
+        : undefined);
+
+    const author = rawAuthor
+      ? rawAuthor.endsWith(" - Topic")
+        ? rawAuthor
+        : rawAuthor.endsWith("- Topic")
+          ? rawAuthor.replace(/- Topic$/, " - Topic")
+          : `${rawAuthor} - Topic`
+      : "Unknown";
+
+    const authorId =
+      song.artists?.[0]?.channel_id ||
+      song.authors?.[0]?.channel_id ||
+      song.author?.channel_id ||
+      browseAuthorRun?.endpoint?.payload?.browseId ||
+      "";
+
     return {
       id: videoId,
       title: song.title?.toString() || "Unknown",
-      author: song.artists?.[0]?.name
-        ? `${song.artists[0].name} - Topic`
-        : "Unknown",
-      authorId: song.artists?.[0]?.channel_id || "",
+      author,
+      authorId,
       albumId: playlistId,
       duration: formatDuration(song.duration?.text),
       img: formatThumbnailId(song.thumbnail?.contents?.[0]?.url),
@@ -366,7 +393,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
         item.author?.name ||
         item.artists?.[0]?.name ||
         item.subtitle?.runs?.find((r: any) =>
-          r.endpoint?.payload?.browseId?.startsWith("UC"),
+          (r as any)?.endpoint?.payload?.browseId?.startsWith("UC"),
         )?.text ||
         "Unknown Artist";
 

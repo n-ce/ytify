@@ -154,7 +154,7 @@ export default function App() {
             >
               <MiniPlayer />
             </Show>
-            <Show when={navStore.active !== "list"}>
+            <Show when={navStore.active !== "list" && navStore.active !== "settings"}>
               <NavBar />
             </Show>
           </Show>

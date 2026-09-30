@@ -1,4 +1,5 @@
-import { getTracksMap, setConfig, config } from "@utils";
+import { CACHED_COLLECTION, getTracksMap, setConfig, config } from "@utils";
+import { clearOpusCache } from "@modules/audioCache";
 import { setStore, t } from "@stores";
 import { createSignal, lazy, Show } from "solid-js";
 import { render } from "solid-js/web";
@@ -19,6 +20,8 @@ export default function Dropdown() {
       // Deconsolidate V2 library
       for (const key in importedData) {
         if (importedData.hasOwnProperty(key)) {
+          // Device-local: it indexes OPFS audio that never travels with the file.
+          if (key === CACHED_COLLECTION) continue;
           localStorage.setItem(
             "library_" + key,
             JSON.stringify(importedData[key]),
@@ -44,7 +47,10 @@ export default function Dropdown() {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith("library_")) {
-        exportedData[key.slice(8)] = JSON.parse(localStorage.getItem(key)!);
+        const name = key.slice(8);
+        // Device-local: the cached ids point at audio absent on any other device.
+        if (name === CACHED_COLLECTION) continue;
+        exportedData[name] = JSON.parse(localStorage.getItem(key)!);
       }
     }
 
@@ -52,7 +58,7 @@ export default function Dropdown() {
     link.click();
   }
 
-  function cleanLibrary() {
+  async function cleanLibrary() {
     // Count items in V2 library
     let count = 0;
     const tracksMap = getTracksMap();
@@ -72,6 +78,9 @@ export default function Dropdown() {
       for (const key of keysToRemove) {
         localStorage.removeItem(key);
       }
+
+      // Cached audio lives in OPFS, which a localStorage wipe does not touch.
+      await clearOpusCache();
 
       location.reload();
     }
@@ -101,7 +110,7 @@ export default function Dropdown() {
           <li id="exportBtn" onclick={exportLibrary}>
             <i class="ri-export-line"></i>&nbsp;{t("library_export")}
           </li>
-          <li id="cleanLibraryBtn" onclick={cleanLibrary}>
+          <li id="cleanLibraryBtn" onclick={() => cleanLibrary()}>
             <i class="ri-delete-bin-2-line"></i>&nbsp;{t("library_clean")}
           </li>
 

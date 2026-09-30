@@ -8,10 +8,17 @@ export function generateImageUrl(id: string, res: string, music?: boolean) {
   const proxy = "https://wsrv.nl?url=https://";
   let suffix = "";
   let prefix = "";
-  const cleanId = id.startsWith("/") && /^\/[a-zA-Z0-9_-]{11}$/.test(id) ? id.slice(1) : id;
+  const cleanId =
+    id.startsWith("/") && /^\/[a-zA-Z0-9_-]{11}$/.test(id) ? id.slice(1) : id;
   if (cleanId.startsWith("/")) {
-    prefix = `yt3.googleusercontent.com${cleanId}=s720-c-k-c0x00ffffff-no-rj`;
-    suffix = `&output=webp&w=${res === "mq" ? "180" : res || "360"}`;
+    if (music) {
+      prefix = `yt3.googleusercontent.com${cleanId}=s720`;
+      const s = res === "mq" ? "180" : res || "360";
+      suffix = `&output=webp&w=${s}&h=${s}&fit=cover`;
+    } else {
+      prefix = `yt3.googleusercontent.com${cleanId}=s720-c-k-c0x00ffffff-no-rj`;
+      suffix = `&output=webp&w=${res === "mq" ? "180" : res || "360"}`;
+    }
   } else {
     prefix = `i.ytimg.com/vi_webp/${cleanId}/${res}default.webp`;
     if (music) {
@@ -20,6 +27,12 @@ export function generateImageUrl(id: string, res: string, music?: boolean) {
     }
   }
   return proxy + prefix + suffix;
+}
+
+// Artwork the player renders, and therefore what the OPFS thumbnail cache stores
+// so the cached blob and the live url stay byte-identical.
+export function generateArtworkUrl(id: string, music?: boolean) {
+  return generateImageUrl(id, "maxres", music);
 }
 
 export function getThumbIdFromLink(url: string) {

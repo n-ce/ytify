@@ -81,7 +81,7 @@ export async function resolveTrackMetadataViaSearch(
       for (const node of contents) {
         if (node.is(YTNodes.MusicResponsiveListItem)) {
           const item = node.as(YTNodes.MusicResponsiveListItem);
-          const artistName = item.artists?.[0]?.name;
+          const artistName = item.artists?.[0]?.name || (item as any).authors?.[0]?.name;
           if (artistName && !isCorruptedArtist(artistName)) {
             matchedSong = item;
             break;
@@ -92,10 +92,10 @@ export async function resolveTrackMetadataViaSearch(
 
     if (!matchedSong) return null;
 
-    const rawArtist = matchedSong.artists?.[0]?.name?.trim();
+    const rawArtist = (matchedSong.artists?.[0]?.name || (matchedSong as any).authors?.[0]?.name)?.trim();
     if (!rawArtist || isCorruptedArtist(rawArtist)) return null;
 
-    const authorId = matchedSong.artists?.[0]?.channel_id || "";
+    const authorId = matchedSong.artists?.[0]?.channel_id || (matchedSong as any).authors?.[0]?.channel_id || "";
     const cleanTitle = matchedSong.title?.toString() || target.title;
     const author = rawArtist.endsWith(" - Topic") ? rawArtist : `${rawArtist} - Topic`;
 

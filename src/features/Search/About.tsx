@@ -36,8 +36,6 @@ export default function() {
       <br />
       <span>
         <a href="https://t.me/ytifytg" target="_blank">[Join Our Community <i class="ri-user-heart-fill"></i> on Telegram]</a>
-        <a href="https://github.com/n-ce/ytify/commits"
-          target="_blank">[Changelog]</a>
 
         <a href="https://github.com/n-ce/ytify" target="_blank">[Github]</a>
       </span>

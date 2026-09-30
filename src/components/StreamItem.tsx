@@ -43,38 +43,57 @@ export default function (
 
   function handleThumbnailLoad(e: Event) {
     const src = getImage();
-    if (src.startsWith("blob:")) {
+    if (src.startsWith("blob:") || src.includes("/logo192.png")) {
       parent.classList.remove("ravel");
       return;
     }
 
     const img = e.target as HTMLImageElement;
 
-    if (img.naturalWidth !== 120) {
-      parent.classList.remove("ravel");
+    // YouTube returns a 120x90 image for deleted/unavailable video thumbnails on i.ytimg.com
+    if (
+      src.includes("i.ytimg.com") &&
+      img.naturalWidth === 120 &&
+      img.naturalHeight === 90
+    ) {
+      if (src.includes("vi_webp")) {
+        setImage(src.replace(".webp", ".jpg").replace("vi_webp", "vi"));
+        return;
+      }
+      if (data.context?.src) {
+        removeFromCollection(data.context?.id, [data.id]);
+      }
       return;
     }
-    if (src.includes("webp"))
-      setImage(src.replace(".webp", ".jpg").replace("vi_webp", "vi"));
-    else {
-      // most likely been removed from yt so remove it
-      if (data.context?.src) removeFromCollection(data.context?.id, [data.id]);
-    }
+
+    parent.classList.remove("ravel");
   }
 
   function handleThumbnailError() {
-    getCachedThumbnailUrl(data.id).then((cached) => {
+    getCachedThumbnailUrl(data.id, music).then((cached) => {
       if (cached) {
         setImage(cached);
         parent.classList.remove("ravel");
         return;
       }
       const src = getImage();
-      setImage(
-        src.includes("vi_webp")
-          ? src.replace(".webp", ".jpg").replace("vi_webp", "vi")
-          : "/logo192.png",
-      );
+      // 1. If custom data.img failed, try the video's YouTube thumbnail via proxy
+      if (data.img && src.includes(data.img) && data.id) {
+        setImage(generateImageUrl(data.id, "mq", music));
+        return;
+      }
+      // 2. If webp via proxy failed, try jpg via proxy
+      if (src.includes("vi_webp")) {
+        setImage(src.replace(".webp", ".jpg").replace("vi_webp", "vi"));
+        return;
+      }
+      // 3. If proxy failed or jpg via proxy failed, try direct i.ytimg.com
+      if (src.includes("wsrv.nl") && data.id) {
+        setImage(`https://i.ytimg.com/vi/${data.id}/mqdefault.jpg`);
+        return;
+      }
+      // 4. Final fallback to logo
+      setImage("/logo192.png");
       parent.classList.remove("ravel");
     });
   }
@@ -83,18 +102,15 @@ export default function (
     data.context?.id.startsWith("MPREb") || listStore.type === "album";
   const isFromArtist = data.context?.id?.startsWith("Artist - ");
   const isMusic = data.author?.endsWith("- Topic");
+  const music =
+    data.type === "song" ||
+    data.context?.id === "favorites" ||
+    isFromArtist ||
+    (data.context?.src === "queue" && isMusic);
 
   if (config.loadImage && !isAlbum) {
-    setImage(
-      generateImageUrl(
-        data.img || data.id,
-        "mq",
-        data.context?.id === "favorites" ||
-          isFromArtist ||
-          (data.context?.src === "queue" && isMusic),
-      ),
-    );
-    getCachedThumbnailUrl(data.id).then((cached) => {
+    setImage(generateImageUrl(data.img || data.id, "mq", music));
+    getCachedThumbnailUrl(data.id, music).then((cached) => {
       if (cached) setImage(cached);
     });
   }
@@ -189,7 +205,8 @@ export default function (
 
               while (left >= 0 || right < len) {
                 if (right < len) {
-                  const item = collectionItems[right++];               if (!historyIds.has(item.id)) zigzagQueue.push(item);
+                  const item = collectionItems[right++];
+                  if (!historyIds.has(item.id)) zigzagQueue.push(item);
                 }
                 if (left >= 0) {
                   const item = collectionItems[left--];

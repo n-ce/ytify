@@ -6,6 +6,7 @@ import {
   rehydrateStores,
   config,
 } from "@utils";
+import { getCachedTrackIdsSync } from "@modules/audioCache";
 import { store, setStore, t } from "@stores";
 
 /**
@@ -373,6 +374,12 @@ function applyDelta(
     }
   }
 
+  // Tracks this device holds audio for must survive any remote or pending
+  // delete. The cached collection indexes OPFS bytes no other device can
+  // supply, and losing the metadata would strand the audio.
+  const cachedIds = getCachedTrackIdsSync();
+  const isCacheOnly = (id: string) => cachedIds.includes(id);
+
   if (isFullTrackSync) {
     const mergedTracks: Collection = { ...delta.addedOrUpdatedTracks };
 
@@ -387,6 +394,7 @@ function applyDelta(
     }
 
     dirtyTracks.deleted.forEach((id) => {
+      if (isCacheOnly(id)) return;
       delete mergedTracks[id];
     });
 
@@ -394,7 +402,10 @@ function applyDelta(
     localTracks = mergedTracks;
   } else {
     Object.assign(localTracks, delta.addedOrUpdatedTracks);
-    delta.deletedTrackIds.forEach((id) => delete localTracks[id]);
+    delta.deletedTrackIds.forEach((id) => {
+      if (isCacheOnly(id)) return;
+      delete localTracks[id];
+    });
   }
 
   localStorage.setItem("library_tracks", JSON.stringify(localTracks));
@@ -469,6 +480,7 @@ function applyDelta(
 
   // Handle deleted collections from server
   for (const key of delta.deletedCollectionNames) {
+    if (isDeviceLocalKey(`library_${key}`)) continue;
     localStorage.removeItem(`library_${key}`);
     delete currentMeta[key];
   }

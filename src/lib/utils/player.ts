@@ -7,7 +7,7 @@ import {
   handleXtags,
   preferredStream,
   proxyHandler,
-  generateImageUrl,
+  generateArtworkUrl,
 } from "@utils";
 import {
   getCachedOpusUrl,
@@ -34,9 +34,9 @@ export async function applyMetadata(data: TrackItem) {
     album: playerStore.context.src,
   };
 
-  let img = generateImageUrl(data.id, "maxres", music);
+  let img = generateArtworkUrl(data.id, music);
   try {
-    const cachedThumb = await getCachedThumbnailUrl(data.id);
+    const cachedThumb = await getCachedThumbnailUrl(data.id, music);
     if (cachedThumb) img = cachedThumb;
   } catch {}
 

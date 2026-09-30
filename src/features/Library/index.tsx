@@ -2,10 +2,10 @@ import { For, Show, lazy, onMount, createMemo } from "solid-js";
 import "./Library.css";
 import Collections from "./Collections";
 
-import { getLibraryAlbums, config, getLists, librarySections } from "@utils";
+import { getLibraryAlbums, getLists, librarySections } from "@utils";
 import { t, setNavStore, store } from "@stores";
 import ListItem from "@components/ListItem";
-import Dropdown from "./Dropdown";
+import HeaderActions from "@components/HeaderActions";
 import HeaderNav from "@components/HeaderNav";
 
 const Gallery = lazy(() => import("./Gallery"));
@@ -14,7 +14,6 @@ const Featured = lazy(() => import("./Featured"));
 
 export default function () {
   let libraryRef!: HTMLElement;
-  let syncBtn!: HTMLElement;
 
   onMount(() => {
     setNavStore("library", "ref", libraryRef);
@@ -35,37 +34,7 @@ export default function () {
     <section class="library" ref={libraryRef}>
       <header class="sticky-bar">
         <HeaderNav title={<p>{t("nav_library")}</p>} />
-
-        <div class="right-group">
-          <Show when={config.dbsync}>
-            <i
-              id="syncNow"
-              classList={{
-                "ri-cloud-fill": store.syncState === "synced",
-                "ri-loader-3-line loading-spinner":
-                  store.syncState === "syncing",
-                "ri-cloud-off-fill":
-                  store.syncState === "dirty" || store.syncState === "error",
-                error: store.syncState === "error",
-              }}
-              aria-label={
-                store.syncState === "dirty" || store.syncState === "error"
-                  ? "Save to Cloud"
-                  : store.syncState === "synced"
-                    ? "Import from Cloud"
-                    : "Syncing"
-              }
-              ref={syncBtn}
-              onclick={() => {
-                import("@modules/cloudSync").then(({ runSync }) => {
-                  runSync(config.dbsync);
-                });
-              }}
-            ></i>
-          </Show>
-        </div>
-
-        <Dropdown />
+        <HeaderActions />
       </header>
 
       <Show when={librarySections().gallery}>

@@ -5,7 +5,7 @@ import { getList, setListStore } from "@stores";
 
 export default function (data: YTListItem) {
   const [getThumbnail, setThumbnail] = createSignal(
-    generateImageUrl(data.img, ""),
+    generateImageUrl(data.img, "", data.type === "album"),
   );
   let img!: HTMLImageElement;
 

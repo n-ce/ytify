@@ -1,9 +1,5 @@
 .search {
-    header {
-        .right-group {
-            margin-right: var(--size-000);
-        }
-    }
+    
 
     --inputround: var(--roundness);
 

@@ -16,6 +16,7 @@ import {
   setConfig,
   cleanseLibraryData,
 } from "@utils";
+import { getCachedTrackIds } from "@modules/audioCache";
 
 export default async function () {
   // Handle /s/:id, /album/:id, /artist/:id, /channel/:id, /playlist/:id URLs by transforming them internally
@@ -98,6 +99,10 @@ export default async function () {
     });
 
   cleanseLibraryData();
+
+  // Must follow cleanseLibraryData, which can strip ids from the cached list.
+  // Deletes OPFS files the cached collection no longer lists.
+  getCachedTrackIds().catch(() => {});
 
   import("@modules/metadataFixer").then((m) => m.runMetadataFixer());
 

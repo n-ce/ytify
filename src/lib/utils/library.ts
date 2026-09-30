@@ -273,7 +273,8 @@ export function recordTrackPlay(track: TrackItem) {
     saveTracksMap(tracks);
   }
 
-  if (cachingMode() === "auto") syncAudioCache([id]);
+  if (cachingMode() === "auto")
+    syncAudioCache([id], Boolean(track.author?.endsWith(" - Topic")));
 
   setStore("libraryUpdated", (c) => (c || 0) + 1);
 }
@@ -282,11 +283,11 @@ export function recordTrackPlay(track: TrackItem) {
  * Writes audio for the given tracks into the OPFS cache, then trims the cache
  * back within the configured limit. With no ids it only enforces the limit.
  */
-async function syncAudioCache(ids: string[]) {
+async function syncAudioCache(ids: string[], music?: boolean) {
   if (cachingMode() === "off") return;
 
   const evicted = ids.length
-    ? await cacheTracks(ids)
+    ? await cacheTracks(ids, music)
     : await enforceCacheLimit();
 
   if (evicted.length) pruneOrphanTracks(evicted);
