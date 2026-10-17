@@ -437,11 +437,13 @@ async function callGate(
 async function acquireLease(
   ip: string,
   sessionId: string,
+  keyCount: number,
 ): Promise<LeaseResult> {
   const remote = await callGate("acquire", {
     key: sessionId,
     ip,
     ttlMs: LEASE_TTL_MS,
+    keyCount,
   });
 
   if (!remote) {
@@ -590,10 +592,11 @@ export default async (request: Request, context: Context) => {
   if (!allKeys.length) {
     return new Response(JSON.stringify({ error: "No API keys configured" }), {
       status: 500,
+      headers: { "content-type": "application/json" },
     });
   }
 
-  const lease = await acquireLease(clientIp, sessionId);
+  const lease = await acquireLease(clientIp, sessionId, allKeys.length);
 
   if (!lease.ok) {
     if (lease.status === 403) {
@@ -611,106 +614,132 @@ export default async (request: Request, context: Context) => {
     return leaseConflictResponse(lease.retryAfterMs);
   }
 
-  const selectedIndex = lease.keyIndex % allKeys.length;
-  const selectedKey = allKeys[selectedIndex];
-  let released = false;
-
-  const release = (remaining: number, resetAt: number) => {
-    if (released) return;
-    released = true;
-    void releaseLease(
-      clientIp,
-      sessionId,
-      selectedIndex,
-      remaining,
-      resetAt,
-    ).catch((e) => console.error("Lease release failed:", e));
-  };
-
   const upstreamAbort = new AbortController();
   const upstreamTimeout = setTimeout(() => upstreamAbort.abort(), LEASE_TTL_MS);
 
   try {
-    const res = await fetch(
-      `https://yt-api.p.rapidapi.com/dl?id=${id}&cgeo=${cgeo}`,
-      {
-        headers: {
-          "X-RapidAPI-Key": selectedKey,
-          "X-RapidAPI-Host": "yt-api.p.rapidapi.com",
-        },
-        signal: upstreamAbort.signal,
-      },
-    );
+    const maxAttempts = Math.min(allKeys.length, 3);
+    let lastError: Error | null = null;
+    let successResponse: Response | null = null;
 
-    const remaining = parseInt(
-      res.headers.get("x-ratelimit-requests-remaining") || "0",
-    );
-    const resetSec = parseInt(
-      res.headers.get("x-ratelimit-requests-reset") || "0",
-    );
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const keyIdx = (lease.keyIndex + attempt) % allKeys.length;
+      const currentKey = allKeys[keyIdx];
 
-    const rawResponseText = await res.text();
+      try {
+        const res = await fetch(
+          `https://yt-api.p.rapidapi.com/dl?id=${id}&cgeo=${cgeo}`,
+          {
+            headers: {
+              "X-RapidAPI-Key": currentKey,
+              "X-RapidAPI-Host": "yt-api.p.rapidapi.com",
+            },
+            signal: upstreamAbort.signal,
+          },
+        );
 
-    // Always release, even on an error, so the next request is never blocked by
-    // a failed call. Key telemetry is stored by the gate, not in edge state.
-    release(remaining, Date.now() + resetSec * 1000);
+        const remainingHeader = res.headers.get(
+          "x-ratelimit-requests-remaining",
+        );
+        const resetHeader = res.headers.get("x-ratelimit-requests-reset");
+        const remaining =
+          remainingHeader !== null
+            ? parseInt(remainingHeader, 10)
+            : res.ok
+              ? 500
+              : 0;
+        const resetSec = resetHeader !== null ? parseInt(resetHeader, 10) : 0;
 
-    if (!res.ok) {
-      console.error(
-        `[RAPIDAPI ERROR] Key Index: ${selectedIndex}, Status: ${res.status}. Raw Payload: ${rawResponseText}`,
-      );
-      throw new Error(`RapidAPI HTTP Error: ${res.status}`);
+        // Release lease telemetry for this key
+        void releaseLease(
+          clientIp,
+          sessionId,
+          keyIdx,
+          remaining,
+          Date.now() + resetSec * 1000,
+        ).catch((e) => console.error("Lease release failed:", e));
+
+        if (res.status === 403 || res.status === 429) {
+          console.warn(
+            `[RAPIDAPI QUOTA] Key Index ${keyIdx} returned ${res.status}. Rotating key if available...`,
+          );
+          lastError = new Error(`RapidAPI HTTP Error: ${res.status}`);
+          continue;
+        }
+
+        if (!res.ok) {
+          throw new Error(`RapidAPI HTTP Error: ${res.status}`);
+        }
+
+        const rawResponseText = await res.text();
+        let data: any;
+        try {
+          data = JSON.parse(rawResponseText);
+        } catch {
+          throw new Error(
+            "Received malformed JSON data payload from source API.",
+          );
+        }
+
+        if (!data || !data.adaptiveFormats) {
+          console.error(`[VALIDATION ERROR] Missing payload properties.`);
+        }
+
+        const expireSeconds = parseInt(data?.expiresInSeconds || "21600");
+
+        successResponse = new Response(
+          JSON.stringify({
+            title: data?.title || "Unknown Title",
+            author: data?.channelTitle || "Unknown Author",
+            authorId: data?.authorId || data?.channelId || "",
+            lengthSeconds: parseInt(data?.lengthSeconds || "0"),
+            adaptiveFormats: data?.adaptiveFormats
+              ? data.adaptiveFormats.map((f: any) => ({
+                  ...f,
+                  type: f.mimeType,
+                  bitrate: f.bitrate?.toString() || "",
+                  clen: f.contentLength,
+                  url: f.url + "&fallback",
+                }))
+              : [],
+            recommendedVideos: [],
+            captions: [],
+            liveNow: data?.isLiveContent || false,
+          }),
+          {
+            headers: {
+              "content-type": "application/json",
+              "Cache-Control": `public, s-maxage=${expireSeconds}`,
+              Vary: "Accept, x-nf-country",
+            },
+          },
+        );
+        break;
+      } catch (e: any) {
+        lastError = e;
+        if (
+          e?.message?.includes("RapidAPI HTTP Error: 403") ||
+          e?.message?.includes("RapidAPI HTTP Error: 429")
+        ) {
+          continue;
+        }
+        break;
+      }
     }
 
-    let data: any;
-    try {
-      data = JSON.parse(rawResponseText);
-    } catch (e) {
-      console.error(
-        `[PARSE ERROR] Invalid JSON payload from RapidAPI: ${rawResponseText}`,
-      );
-      throw new Error("Received malformed JSON data payload from source API.");
+    if (successResponse) {
+      return successResponse;
     }
 
-    if (!data || !data.adaptiveFormats) {
-      console.error(
-        `[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`,
-      );
-    }
-
-    const expireSeconds = parseInt(data?.expiresInSeconds || "21600");
-
-    return new Response(
-      JSON.stringify({
-        title: data?.title || "Unknown Title",
-        author: data?.channelTitle || "Unknown Author",
-        authorId: data?.authorId || data?.channelId || "",
-        lengthSeconds: parseInt(data?.lengthSeconds || "0"),
-        adaptiveFormats: data?.adaptiveFormats
-          ? data.adaptiveFormats.map((f: any) => ({
-              ...f,
-              type: f.mimeType,
-              bitrate: f.bitrate?.toString() || "",
-              clen: f.contentLength,
-              url: f.url + "&fallback",
-            }))
-          : [],
-        recommendedVideos: [],
-        captions: [],
-        liveNow: data?.isLiveContent || false,
-      }),
-      {
-        headers: {
-          "content-type": "application/json",
-          "Cache-Control": `public, s-maxage=${expireSeconds}`,
-          Vary: "Accept, x-nf-country",
-        },
-      },
-    );
+    throw lastError || new Error("Stream resolution failed");
   } catch (err) {
-    release(0, 0);
     console.error("Stream Edge Function failed:", err);
-    return new Response(JSON.stringify({ error: "Stream resolution failed" }), {
+    let msg = err instanceof Error ? err.message : "Stream resolution failed";
+    // Never leak key material externally
+    for (const k of allKeys) {
+      if (k && msg.includes(k)) msg = msg.replaceAll(k, "[REDACTED]");
+    }
+    return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { "content-type": "application/json" },
     });

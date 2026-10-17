@@ -36,6 +36,7 @@ type AcquireBody = {
   key?: string;
   ip?: string;
   ttlMs?: number;
+  keyCount?: number;
 };
 
 type ReleaseBody = {
@@ -119,22 +120,37 @@ export class StreamGateDO {
   }
 
   /**
-   * Picks the RapidAPI key with the most remaining quota, treating keys past
-   * their reset timestamp as fully replenished.
+   * Picks the RapidAPI key with the most remaining quota, considering all
+   * available keys up to `keyCount` and treating keys past their reset timestamp
+   * as fully replenished.
    */
-  private bestKey(): KeyRow {
+  private bestKey(keyCount = 1): KeyRow {
     const now = Date.now();
     const rows = this.sql
       .exec<KeyRow>("SELECT idx, remaining, reset_at FROM rapidapi_keys")
       .toArray();
-    const available: KeyRow[] =
-      rows.length > 0
-        ? rows.map((r) =>
-            now > r.reset_at
-              ? { idx: r.idx, remaining: KEY_QUOTA, reset_at: 0 }
-              : r,
-          )
-        : [{ idx: 0, remaining: KEY_QUOTA, reset_at: 0 }];
+
+    const map = new Map<number, KeyRow>();
+    for (const r of rows) {
+      map.set(
+        r.idx,
+        now > r.reset_at
+          ? { idx: r.idx, remaining: KEY_QUOTA, reset_at: 0 }
+          : r,
+      );
+    }
+
+    const available: KeyRow[] = [];
+    const count = Math.max(1, Math.min(keyCount, MAX_KEY_SLOTS));
+    for (let i = 0; i < count; i++) {
+      const entry = map.get(i);
+      if (entry) {
+        available.push(entry);
+      } else {
+        available.push({ idx: i, remaining: KEY_QUOTA, reset_at: 0 });
+      }
+    }
+
     available.sort(
       (a, b) => b.remaining - a.remaining || a.reset_at - b.reset_at,
     );
@@ -199,7 +215,7 @@ export class StreamGateDO {
       }
     });
 
-    const best = this.bestKey();
+    const best = this.bestKey(body.keyCount || 1);
     return {
       granted: true,
       leaseUntil: now + ttl,
@@ -308,6 +324,20 @@ export class StreamGateDO {
           status: 200,
           headers: JSON_HEADER,
         });
+      }
+
+      if (
+        path === "reset-keys" &&
+        (request.method === "POST" || request.method === "GET")
+      ) {
+        this.sql.exec("DELETE FROM rapidapi_keys");
+        return new Response(
+          JSON.stringify({ ok: true, message: "Keys reset" }),
+          {
+            status: 200,
+            headers: JSON_HEADER,
+          },
+        );
       }
 
       return new Response("Not Found", { status: 404 });

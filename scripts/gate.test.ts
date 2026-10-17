@@ -97,6 +97,50 @@ describe("StreamGateDO", () => {
     expect(reacquireBody.keyRemaining).toBe(450);
   });
 
+  test("picks a fresh key when key 0 is exhausted and keyCount > 1", async () => {
+    const gate = new StreamGateDO(fakeDurableState() as any);
+    // Mark key 0 as completely exhausted with reset far in future
+    await postJson(gate, "/release", {
+      keyIndex: 0,
+      remaining: 0,
+      resetAt: Date.now() + 864000000,
+    });
+
+    // Acquire with keyCount: 3 should pick key 1 because key 0 has 0 remaining
+    const acquireRes = await postJson(gate, "/acquire", {
+      key: "session-multi-key",
+      ip: "192.0.2.10",
+      keyCount: 3,
+    });
+    const body = await acquireRes.json();
+    expect(body.granted).toBe(true);
+    expect(body.keyIndex).toBe(1);
+    expect(body.keyRemaining).toBe(500);
+  });
+
+  test("resets keys on reset-keys request", async () => {
+    const gate = new StreamGateDO(fakeDurableState() as any);
+    await postJson(gate, "/release", {
+      keyIndex: 0,
+      remaining: 0,
+      resetAt: Date.now() + 864000000,
+    });
+
+    const resetRes = await postJson(gate, "/reset-keys", {});
+    expect(resetRes.status).toBe(200);
+    expect(await resetRes.json()).toEqual({ ok: true, message: "Keys reset" });
+
+    // Key 0 is replenished
+    const acquireRes = await postJson(gate, "/acquire", {
+      key: "session-after-reset",
+      ip: "192.0.2.11",
+      keyCount: 1,
+    });
+    const body = await acquireRes.json();
+    expect(body.keyIndex).toBe(0);
+    expect(body.keyRemaining).toBe(500);
+  });
+
   test("exposes state endpoint with leases, keys, and cooldowns", async () => {
     const gate = new StreamGateDO(fakeDurableState() as any);
     await postJson(gate, "/acquire", {
