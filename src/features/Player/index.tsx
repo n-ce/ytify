@@ -15,7 +15,14 @@ import {
   playerBackground,
   type PlayerBackground,
 } from "@utils";
-import { playerStore, setNavStore, setStore, t, updateParam } from "@stores";
+import {
+  params,
+  playerStore,
+  setNavStore,
+  setStore,
+  t,
+  updateParam,
+} from "@stores";
 
 const MediaArtwork = lazy(
   () => import("../../components/MediaPartials/MediaArtwork"),
@@ -56,11 +63,17 @@ export default function () {
   });
 
   createEffect(() => {
-    if (playerStore.stream.id) updateParam("s", playerStore.stream.id);
+    if (playerStore.saveProgress && playerStore.stream.id) {
+      updateParam("s", playerStore.stream.id);
+    } else if (!playerStore.saveProgress && params.has("s")) {
+      updateParam("s");
+    }
   });
 
   onCleanup(() => {
-    updateParam("s");
+    if (!playerStore.saveProgress) {
+      updateParam("s");
+    }
   });
 
   // Background layers are a music-only feature, videos always stay bare.

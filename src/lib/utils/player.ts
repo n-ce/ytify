@@ -1,4 +1,11 @@
-import { playerStore, setPlayerStore, setStore, store, t } from "@stores";
+import {
+  playerStore,
+  setPlayerStore,
+  setStore,
+  store,
+  t,
+  updateParam,
+} from "@stores";
 import {
   config,
   convertSStoHHMMSS,
@@ -28,6 +35,12 @@ export async function applyMetadata(data: TrackItem) {
   }
 
   setPlayerStore("isMusic", music);
+
+  if (music && playerStore.saveProgress) {
+    setPlayerStore("saveProgress", false);
+    updateParam("t");
+    updateParam("s");
+  }
 
   if (config.sponsorblock && data.id) {
     fetchSponsorSegments(data.id);

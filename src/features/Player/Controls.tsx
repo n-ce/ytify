@@ -4,7 +4,6 @@ import {
   PlayNextButton,
 } from "@components/MediaPartials";
 import {
-  params,
   playerStore,
   playPrev,
   queueStore,
@@ -13,13 +12,12 @@ import {
   t,
 } from "@stores";
 import { convertSStoHHMMSS, setConfig } from "@utils";
-import { Accessor, createSignal, onMount, Setter, Show } from "solid-js";
+import { Accessor, onMount, Setter, Show } from "solid-js";
 
 export default function (_: {
   showLyrics: Accessor<boolean>;
   setShowLyrics: Setter<boolean>;
 }) {
-  const [isPointed, setPointed] = createSignal(params.has("t"));
   let slider!: HTMLInputElement;
 
   onMount(() => {
@@ -150,14 +148,17 @@ export default function (_: {
 
           <i
             aria-label={t("player_save_progress")}
-            class={`ri-signpost-${isPointed() ? "fill" : "line"}`}
+            class={`ri-signpost-${playerStore.saveProgress ? "fill" : "line"}`}
             onclick={() => {
-              if (isPointed()) {
+              if (playerStore.saveProgress) {
+                setPlayerStore("saveProgress", false);
                 updateParam("t");
-                setPointed(false);
+                updateParam("s");
               } else {
+                setPlayerStore("saveProgress", true);
+                if (playerStore.stream.id)
+                  updateParam("s", playerStore.stream.id);
                 updateParam("t", playerStore.currentTime.toString());
-                setPointed(true);
               }
             }}
           ></i>

@@ -51,6 +51,7 @@ type PlayerStore = {
   audioURL: string;
   videoURL: string;
   isWatching: boolean;
+  saveProgress: boolean;
   proxy: string;
   lrcSync?: (d: number) => void;
 };
@@ -105,6 +106,7 @@ const createInitialState = (): PlayerStore => ({
   audioURL: "",
   videoURL: "",
   isWatching: Boolean(config.watchMode),
+  saveProgress: Boolean(params.get("t")),
   proxy: "",
 });
 
@@ -166,6 +168,8 @@ createRoot(() => {
     if (queueStore.list.length) playNext();
     else {
       updateParam("s");
+      updateParam("t");
+      setPlayerStore("saveProgress", false);
       setPlayerStore("playbackState", "none");
       clearSponsorSegments();
       if (typeof navigator !== "undefined" && "mediaSession" in navigator)
@@ -279,8 +283,13 @@ createRoot(() => {
     const t = params.get("t");
 
     if (t) {
-      if (isMusic) updateParam("t");
-      else {
+      if (isMusic) {
+        updateParam("t");
+        if (playerStore.saveProgress) {
+          setPlayerStore("saveProgress", false);
+          updateParam("s");
+        }
+      } else {
         if (seconds % 5 === 0) {
           const str = seconds.toString();
           if (t !== str) updateParam("t", str);

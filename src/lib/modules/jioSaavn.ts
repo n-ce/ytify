@@ -38,7 +38,9 @@ export default function () {
 
       delete audio.dataset.retried;
       audio.src = fullDownloadUrl;
-      updateParam("s", id);
+      if (playerStore.saveProgress) {
+        updateParam("s", id);
+      }
     })
     .catch((e) => {
       setPlayerStore(
