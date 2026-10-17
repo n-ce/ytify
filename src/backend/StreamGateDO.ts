@@ -82,8 +82,7 @@ export class StreamGateDO {
   private initSchema(): void {
     if (this.initialized) return;
     this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS stream_lease (
-        lease_key TEXT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS stream_lease (\n        lease_key TEXT PRIMARY KEY,
         active_session TEXT,
         in_flight_until INTEGER NOT NULL DEFAULT 0,
         last_completed_at INTEGER NOT NULL DEFAULT 0
@@ -102,14 +101,15 @@ export class StreamGateDO {
   }
 
   private readLease(key: string): LeaseRow {
+    // Note: Cloudflare DO SQL's cursor `.one()` throws if 0 rows are returned.
+    // `.toArray()[0]` safely yields undefined when no lease row exists yet.
     const row = this.sql
       .exec<LeaseRow>(
         "SELECT lease_key, active_session, in_flight_until, last_completed_at FROM stream_lease WHERE lease_key = ?",
         key,
       )
-      .one();
-    // `.one()` yields nothing for an absent row (and adapters may hand back a
-    // placeholder object), so every field is defaulted explicitly.
+      .toArray()[0];
+
     return {
       lease_key: key,
       active_session: row?.active_session || "",
@@ -167,7 +167,7 @@ export class StreamGateDO {
           "SELECT last_seen FROM ip_cooldown WHERE ip = ?",
           ip,
         )
-        .one();
+        .toArray()[0];
       if (row && now - row.last_seen <= IP_COOLDOWN_MS) {
         return {
           granted: false,
@@ -265,7 +265,9 @@ export class StreamGateDO {
       )
       .toArray();
     const keys = this.sql
-      .exec<KeyRow>("SELECT idx, remaining, reset_at FROM rapidapi_keys ORDER BY idx")
+      .exec<KeyRow>(
+        "SELECT idx, remaining, reset_at FROM rapidapi_keys ORDER BY idx",
+      )
       .toArray();
     const cooldowns = this.sql
       .exec<{ ip: string; last_seen: number }>(
@@ -281,32 +283,40 @@ export class StreamGateDO {
   }
 
   async fetch(request: Request): Promise<Response> {
-    this.initSchema();
-    const path = new URL(request.url).pathname.replace(/^\/+/, "");
+    try {
+      this.initSchema();
+      const path = new URL(request.url).pathname.replace(/^\/+/, "");
 
-    if (path === "acquire") {
-      const body = (await request.json().catch(() => ({}))) as AcquireBody;
-      return new Response(JSON.stringify(this.acquire(body)), {
-        status: 200,
-        headers: JSON_HEADER,
-      });
+      if (path === "acquire") {
+        const body = (await request.json().catch(() => ({}))) as AcquireBody;
+        return new Response(JSON.stringify(this.acquire(body)), {
+          status: 200,
+          headers: JSON_HEADER,
+        });
+      }
+
+      if (path === "release") {
+        const body = (await request.json().catch(() => ({}))) as ReleaseBody;
+        return new Response(JSON.stringify(this.release(body)), {
+          status: 200,
+          headers: JSON_HEADER,
+        });
+      }
+
+      if (path === "state" && request.method === "GET") {
+        return new Response(JSON.stringify(this.readState()), {
+          status: 200,
+          headers: JSON_HEADER,
+        });
+      }
+
+      return new Response("Not Found", { status: 404 });
+    } catch (err: any) {
+      console.error("[StreamGateDO] Error handling request:", err);
+      return new Response(
+        JSON.stringify({ error: err?.message || "Internal gate error" }),
+        { status: 500, headers: JSON_HEADER },
+      );
     }
-
-    if (path === "release") {
-      const body = (await request.json().catch(() => ({}))) as ReleaseBody;
-      return new Response(JSON.stringify(this.release(body)), {
-        status: 200,
-        headers: JSON_HEADER,
-      });
-    }
-
-    if (path === "state" && request.method === "GET") {
-      return new Response(JSON.stringify(this.readState()), {
-        status: 200,
-        headers: JSON_HEADER,
-      });
-    }
-
-    return new Response("Not Found", { status: 404 });
   }
 }

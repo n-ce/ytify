@@ -28,7 +28,10 @@ type PlaylistRow = {
 };
 
 /** Maps a DB row onto the public shape so every route speaks the same dialect. */
-function toCuratedPlaylist(row: PlaylistRow, trackIds: string[]): CuratedPlaylist {
+function toCuratedPlaylist(
+  row: PlaylistRow,
+  trackIds: string[],
+): CuratedPlaylist {
   return {
     id: row.id,
     categorySlug: row.category_slug,
@@ -62,8 +65,7 @@ export class CatalogDO {
   private initSchema(): void {
     if (this.initialized) return;
     this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS canonical_tracks (
-        id TEXT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS canonical_tracks (\n        id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
         author TEXT NOT NULL,
         author_id TEXT,
@@ -265,11 +267,11 @@ export class CatalogDO {
     }));
   }
 
-  private upsertCategories(categories: Category[]): number {    this.ctx.storage.transactionSync(() => {
+  private upsertCategories(categories: Category[]): number {
+    this.ctx.storage.transactionSync(() => {
       for (const c of categories) {
         this.sql.exec(
-          `INSERT INTO categories (slug, type, title, params) VALUES (?, ?, ?, ?)
-           ON CONFLICT(slug, type) DO UPDATE SET title = excluded.title, params = excluded.params`,
+          `INSERT INTO categories (slug, type, title, params) VALUES (?, ?, ?, ?)\n           ON CONFLICT(slug, type) DO UPDATE SET title = excluded.title, params = excluded.params`,
           c.slug,
           c.type,
           c.title,
@@ -303,7 +305,10 @@ export class CatalogDO {
           p.thumbnailId,
           p.updatedAt,
         );
-        this.sql.exec("DELETE FROM playlist_tracks WHERE playlist_id = ?", p.id);
+        this.sql.exec(
+          "DELETE FROM playlist_tracks WHERE playlist_id = ?",
+          p.id,
+        );
         p.trackIds.forEach((trackId, position) => {
           this.sql.exec(
             "INSERT OR REPLACE INTO playlist_tracks (playlist_id, track_id, position) VALUES (?, ?, ?)",
@@ -343,7 +348,10 @@ export class CatalogDO {
     const previewIds: string[] = [];
     for (const match of matches.slice(0, MAX_TRACK_PREVIEW)) {
       previewIds.push(
-        ...(orderedIds.get(match.playlist_id) || []).slice(0, MAX_TRACK_PREVIEW),
+        ...(orderedIds.get(match.playlist_id) || []).slice(
+          0,
+          MAX_TRACK_PREVIEW,
+        ),
       );
     }
     const tracks = this.readTracks([...new Set(previewIds)]);
@@ -443,10 +451,13 @@ export class CatalogDO {
           parseInt(url.searchParams.get("limit") || "200", 10) || 200,
           500,
         );
-        return new Response(JSON.stringify(this.readTracksSince(since, limit)), {
-          status: 200,
-          headers: JSON_HEADER,
-        });
+        return new Response(
+          JSON.stringify(this.readTracksSince(since, limit)),
+          {
+            status: 200,
+            headers: JSON_HEADER,
+          },
+        );
       }
 
       case "categories": {
@@ -517,7 +528,9 @@ export class CatalogDO {
           const trackIds = this.readPlaylistTrackIds(rows.map((r) => r.id));
           return new Response(
             JSON.stringify(
-              rows.map((row) => toCuratedPlaylist(row, trackIds.get(row.id) || [])),
+              rows.map((row) =>
+                toCuratedPlaylist(row, trackIds.get(row.id) || []),
+              ),
             ),
             { status: 200, headers: JSON_HEADER },
           );
@@ -569,7 +582,10 @@ export class CatalogDO {
         if (request.method === "GET") {
           const alarmAt = await this.ctx.storage.getAlarm();
           return new Response(
-            JSON.stringify({ pending: this.countPending(), alarmAt: alarmAt ?? null }),
+            JSON.stringify({
+              pending: this.countPending(),
+              alarmAt: alarmAt ?? null,
+            }),
             { status: 200, headers: JSON_HEADER },
           );
         }
@@ -697,13 +713,16 @@ export class CatalogDO {
           "SELECT attempts FROM pending_scrape WHERE slug = ?",
           category.slug,
         )
-        .one();
+        .toArray()[0];
       if ((attempts?.attempts || 0) >= SCRAPE_MAX_ATTEMPTS) {
         console.error(
           `[scraper] ${category.slug} failed ${SCRAPE_MAX_ATTEMPTS} times, dropping`,
           err,
         );
-        this.sql.exec("DELETE FROM pending_scrape WHERE slug = ?", category.slug);
+        this.sql.exec(
+          "DELETE FROM pending_scrape WHERE slug = ?",
+          category.slug,
+        );
       } else {
         console.warn(`[scraper] ${category.slug} failed:`, err);
       }

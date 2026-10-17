@@ -9,7 +9,7 @@ import { DatabaseSync } from "node:sqlite";
  * Durable Objects are backed by embedded SQLite plus a small KV surface, which
  * node:sqlite and a Map reproduce closely enough for local development. Alarms
  * are the one extra piece: they are stored and fired on a real timer so the
- * alarm-driven scraper can be exercised with `vite dev`.
+ * alarm-driven scraper can be exercised with `vite dev``.
  */
 function createFakeState() {
   const db = new DatabaseSync(":memory:");
@@ -33,7 +33,14 @@ function createFakeState() {
               const rows = db.prepare(query).all(...bindings) as any[];
               return {
                 toArray: () => rows,
-                one: () => rows[0] || { c: 0, count: 0 },
+                one: () => {
+                  if (rows.length !== 1) {
+                    throw new Error(
+                      `SqlStorageCursor.one() expected exactly 1 row, got ${rows.length}`,
+                    );
+                  }
+                  return rows[0];
+                },
               };
             }
             if (bindings.length > 0) db.prepare(query).run(...bindings);
@@ -96,11 +103,12 @@ const localDODatabases = new Map<string, LocalDurableObject>();
 
 type DOClassName = "UserSyncDO" | "CatalogDO" | "StreamGateDO";
 
-const DO_CLASSES: Record<DOClassName, new (state: any) => LocalDurableObject> = {
-  UserSyncDO,
-  CatalogDO,
-  StreamGateDO,
-};
+const DO_CLASSES: Record<DOClassName, new (state: any) => LocalDurableObject> =
+  {
+    UserSyncDO,
+    CatalogDO,
+    StreamGateDO,
+  };
 
 function getLocalDO(name: string, className: DOClassName) {
   const key = `${className}:${name}`;

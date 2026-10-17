@@ -18,7 +18,17 @@ export function fakeDurableState() {
           const trimmed = query.trim();
           if (trimmed.toUpperCase().startsWith("SELECT")) {
             const rows = db.prepare(query).all(...bindings) as any[];
-            return { toArray: () => rows, one: () => rows[0] };
+            return {
+              toArray: () => rows,
+              one: () => {
+                if (rows.length !== 1) {
+                  throw new Error(
+                    `SqlStorageCursor.one() expected exactly 1 row, got ${rows.length}`,
+                  );
+                }
+                return rows[0];
+              },
+            };
           }
           if (bindings.length > 0) db.prepare(query).run(...bindings);
           else db.exec(query);
@@ -56,11 +66,8 @@ export function fakeDurableState() {
 }
 
 // Normalises the join: a leading slash in `path` must not produce `//route`.
-export const doFetch = (
-  instance: any,
-  path: string,
-  init?: RequestInit,
-) => instance.fetch(new Request(`http://do/${path.replace(/^\/+/, "")}`, init));
+export const doFetch = (instance: any, path: string, init?: RequestInit) =>
+  instance.fetch(new Request(`http://do/${path.replace(/^\/+/, "")}`, init));
 
 export const postJson = (instance: any, path: string, body: unknown) =>
   doFetch(instance, path, {

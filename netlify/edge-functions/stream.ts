@@ -41,7 +41,9 @@ function getClientIp(request: Request, context: Context): string {
   if (xForwardedFor) {
     return xForwardedFor.split(",")[0].trim();
   }
-  return request.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
+  return (
+    request.headers.get("x-nf-client-connection-ip") || context.ip || "unknown"
+  );
 }
 
 function readSessionId(request: Request): string | null {
@@ -79,7 +81,10 @@ function sessionSecret(): string | null {
 function toBase64Url(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
 function fromBase64Url(value: string): Uint8Array<ArrayBuffer> | null {
@@ -178,7 +183,9 @@ async function verifySession(request: Request, ip: string): Promise<boolean> {
   let record: SessionRecord | null = null;
 
   try {
-    record = (await store.get(`${SESSION_PREFIX}${sessionId}`, { type: "json" })) as SessionRecord | null;
+    record = (await store.get(`${SESSION_PREFIX}${sessionId}`, {
+      type: "json",
+    })) as SessionRecord | null;
   } catch (e) {
     console.error("Session lookup failed:", e);
     return false;
@@ -207,8 +214,14 @@ async function sweepExpiredSessions(): Promise<void> {
     for (const blob of blobs) {
       if (swept >= 10) break;
 
-      const record = (await store.get(blob.key, { type: "json" })) as SessionRecord | null;
-      if (!record || typeof record.createdAt !== "number" || record.createdAt < cutoff) {
+      const record = (await store.get(blob.key, {
+        type: "json",
+      })) as SessionRecord | null;
+      if (
+        !record ||
+        typeof record.createdAt !== "number" ||
+        record.createdAt < cutoff
+      ) {
         await store.delete(blob.key);
         swept++;
       }
@@ -241,7 +254,8 @@ function previewHtml(id: string, preview: CatalogPreview | null): Response {
   const author = (preview?.author || "").replace(/ - Topic$/, "");
   const description = author ? `By ${author}` : "Listen on ytify";
 
-  return new Response(`<!doctype html>
+  return new Response(
+    `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -254,16 +268,18 @@ function previewHtml(id: string, preview: CatalogPreview | null): Response {
   <script>location.replace('/?s=${encodeURIComponent(id)}')</script>
 </head>
 <body>Redirecting...</body>
-</html>`, {
-    headers: {
-      "content-type": "text/html; charset=utf-8",
-      // Crawlers refetch the same link for days, but a fresh link can be hit by
-      // dozens of them at once, so the edge caches briefly and revalidates in
-      // the background rather than every bot reaching this function.
-      "Cache-Control": `public, s-maxage=${PREVIEW_S_MAXAGE}, stale-while-revalidate=${PREVIEW_STALE}`,
-      "Vary": "Accept"
-    }
-  });
+</html>`,
+    {
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        // Crawlers refetch the same link for days, but a fresh link can be hit by
+        // dozens of them at once, so the edge caches briefly and revalidates in
+        // the background rather than every bot reaching this function.
+        "Cache-Control": `public, s-maxage=${PREVIEW_S_MAXAGE}, stale-while-revalidate=${PREVIEW_STALE}`,
+        Vary: "Accept",
+      },
+    },
+  );
 }
 
 /** Tier 1: the shared global catalog, in <5ms and at zero upstream cost. */
@@ -275,7 +291,10 @@ async function readCatalogPreview(id: string): Promise<CatalogPreview | null> {
     );
     if (!res.ok) return null;
 
-    const map = (await res.json()) as Record<string, { title?: string; author?: string }>;
+    const map = (await res.json()) as Record<
+      string,
+      { title?: string; author?: string }
+    >;
     const track = map?.[id];
     if (!track?.title) return null;
 
@@ -306,7 +325,10 @@ async function readOEmbedPreview(id: string): Promise<CatalogPreview | null> {
  * track is a Tier 1 hit. Best-effort: a failure only costs the next preview a
  * single free oEmbed request.
  */
-function writeThroughToCatalog(id: string, preview: CatalogPreview): Promise<void> {
+function writeThroughToCatalog(
+  id: string,
+  preview: CatalogPreview,
+): Promise<void> {
   return fetch(`${apiBase()}/api/catalog/tracks`, {
     method: "POST",
     headers: {
@@ -315,22 +337,24 @@ function writeThroughToCatalog(id: string, preview: CatalogPreview): Promise<voi
       ...internalHeaders(),
     },
     body: JSON.stringify({
-      tracks: [{
-        id,
-        title: preview.title,
-        author: preview.author,
-        authorId: "",
-        duration: 0,
-        durationStr: "",
-        isSong: true,
-        thumbnailId: id,
-        source: "oembed",
-        updatedAt: Date.now(),
-      }],
+      tracks: [
+        {
+          id,
+          title: preview.title,
+          author: preview.author,
+          authorId: "",
+          duration: 0,
+          durationStr: "",
+          isSong: true,
+          thumbnailId: id,
+          source: "oembed",
+          updatedAt: Date.now(),
+        },
+      ],
     }),
   })
     .then(() => undefined)
-    .catch(e => console.warn("Catalog write-through failed:", e));
+    .catch((e) => console.warn("Catalog write-through failed:", e));
 }
 
 /**
@@ -378,7 +402,10 @@ type GateResponse = {
   keyIndex?: number;
 };
 
-async function callGate(path: string, body: unknown): Promise<GateResponse | null> {
+async function callGate(
+  path: string,
+  body: unknown,
+): Promise<GateResponse | null> {
   const abort = new AbortController();
   const timeout = setTimeout(() => abort.abort(), GATE_TIMEOUT_MS);
 
@@ -418,7 +445,9 @@ async function acquireLease(
   });
 
   if (!remote) {
-    console.warn(`[GATE-UNREACHABLE] No lease for ${sessionId}; failing closed.`);
+    console.warn(
+      `[GATE-UNREACHABLE] No lease for ${sessionId}; failing closed.`,
+    );
     return { ok: false, status: 503, retryAfterMs: GATE_TIMEOUT_MS };
   }
 
@@ -440,9 +469,13 @@ function releaseLease(
   remaining: number,
   resetAt: number,
 ): Promise<void> {
-  return callGate("release", { key: sessionId, ip, keyIndex, remaining, resetAt }).then(
-    () => undefined,
-  );
+  return callGate("release", {
+    key: sessionId,
+    ip,
+    keyIndex,
+    remaining,
+    resetAt,
+  }).then(() => undefined);
 }
 
 function cooldownResponse(): Response {
@@ -450,36 +483,40 @@ function cooldownResponse(): Response {
     status: 403,
     headers: {
       "Cache-Control": "public, s-maxage=86400",
-      "Vary": "x-forwarded-for"
-    }
+      Vary: "x-forwarded-for",
+    },
   });
 }
 
 function leaseConflictResponse(retryAfterMs: number): Response {
   return new Response(
-    JSON.stringify({ error: "A stream request is already in flight. Retry shortly." }),
+    JSON.stringify({
+      error: "A stream request is already in flight. Retry shortly.",
+    }),
     {
       status: 429,
       headers: {
         "content-type": "application/json",
         "Cache-Control": "no-store",
-        "Retry-After": String(Math.max(1, Math.ceil(retryAfterMs / 1000)))
-      }
-    }
+        "Retry-After": String(Math.max(1, Math.ceil(retryAfterMs / 1000))),
+      },
+    },
   );
 }
 
 function gateUnavailableResponse(retryAfterMs: number): Response {
   return new Response(
-    JSON.stringify({ error: "Stream gateway temporarily unavailable. Please retry." }),
+    JSON.stringify({
+      error: "Stream gateway temporarily unavailable. Please retry.",
+    }),
     {
       status: 503,
       headers: {
         "content-type": "application/json",
         "Cache-Control": "no-store",
-        "Retry-After": String(Math.max(1, Math.ceil(retryAfterMs / 1000)))
-      }
-    }
+        "Retry-After": String(Math.max(1, Math.ceil(retryAfterMs / 1000))),
+      },
+    },
   );
 }
 
@@ -502,15 +539,18 @@ export default async (request: Request, context: Context) => {
       return new Response(JSON.stringify({ sessionId }), {
         headers: {
           "content-type": "application/json",
-          "Cache-Control": "no-store"
-        }
+          "Cache-Control": "no-store",
+        },
       });
     } catch (e) {
       console.error("Session issuance failed:", e);
-      return new Response(JSON.stringify({ error: "Failed to create session" }), {
-        status: 500,
-        headers: { "content-type": "application/json" }
-      });
+      return new Response(
+        JSON.stringify({ error: "Failed to create session" }),
+        {
+          status: 500,
+          headers: { "content-type": "application/json" },
+        },
+      );
     }
   }
 
@@ -529,32 +569,45 @@ export default async (request: Request, context: Context) => {
   }
 
   if (!(await verifySession(request, clientIp))) {
-    return new Response(JSON.stringify({ error: "Invalid or expired session" }), {
-      status: 403,
-      headers: {
-        "content-type": "application/json",
-        "Cache-Control": "no-store"
-      }
-    });
+    return new Response(
+      JSON.stringify({ error: "Invalid or expired session" }),
+      {
+        status: 403,
+        headers: {
+          "content-type": "application/json",
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   }
 
   const rawKeys = Netlify.env.get("rkeys") || "";
-  const allKeys = rawKeys.split(",").map(k => k.trim()).filter(Boolean);
+  const allKeys = rawKeys
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
 
   if (!allKeys.length) {
-    return new Response(JSON.stringify({ error: "No API keys configured" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "No API keys configured" }), {
+      status: 500,
+    });
   }
 
   const lease = await acquireLease(clientIp, sessionId);
 
   if (!lease.ok) {
     if (lease.status === 403) {
-      console.warn(`[COOLDOWN] IP ${clientIp} requested within the cooldown window.`);
+      console.warn(
+        `[COOLDOWN] IP ${clientIp} requested within the cooldown window.`,
+      );
       return cooldownResponse();
     }
-    if (lease.status === 503) return gateUnavailableResponse(lease.retryAfterMs);
+    if (lease.status === 503)
+      return gateUnavailableResponse(lease.retryAfterMs);
 
-    console.warn(`[LEASE-CONFLICT] Key ${sessionId} already has a call in flight.`);
+    console.warn(
+      `[LEASE-CONFLICT] Key ${sessionId} already has a call in flight.`,
+    );
     return leaseConflictResponse(lease.retryAfterMs);
   }
 
@@ -565,24 +618,36 @@ export default async (request: Request, context: Context) => {
   const release = (remaining: number, resetAt: number) => {
     if (released) return;
     released = true;
-    void releaseLease(clientIp, sessionId, selectedIndex, remaining, resetAt)
-      .catch(e => console.error("Lease release failed:", e));
+    void releaseLease(
+      clientIp,
+      sessionId,
+      selectedIndex,
+      remaining,
+      resetAt,
+    ).catch((e) => console.error("Lease release failed:", e));
   };
 
   const upstreamAbort = new AbortController();
   const upstreamTimeout = setTimeout(() => upstreamAbort.abort(), LEASE_TTL_MS);
 
   try {
-    const res = await fetch(`https://yt-api.p.rapidapi.com/dl?id=${id}&cgeo=${cgeo}`, {
-      headers: {
-        "X-RapidAPI-Key": selectedKey,
-        "X-RapidAPI-Host": "yt-api.p.rapidapi.com"
+    const res = await fetch(
+      `https://yt-api.p.rapidapi.com/dl?id=${id}&cgeo=${cgeo}`,
+      {
+        headers: {
+          "X-RapidAPI-Key": selectedKey,
+          "X-RapidAPI-Host": "yt-api.p.rapidapi.com",
+        },
+        signal: upstreamAbort.signal,
       },
-      signal: upstreamAbort.signal
-    });
+    );
 
-    const remaining = parseInt(res.headers.get("x-ratelimit-requests-remaining") || "0");
-    const resetSec = parseInt(res.headers.get("x-ratelimit-requests-reset") || "0");
+    const remaining = parseInt(
+      res.headers.get("x-ratelimit-requests-remaining") || "0",
+    );
+    const resetSec = parseInt(
+      res.headers.get("x-ratelimit-requests-reset") || "0",
+    );
 
     const rawResponseText = await res.text();
 
@@ -591,7 +656,9 @@ export default async (request: Request, context: Context) => {
     release(remaining, Date.now() + resetSec * 1000);
 
     if (!res.ok) {
-      console.error(`[RAPIDAPI ERROR] Key Index: ${selectedIndex}, Status: ${res.status}. Raw Payload: ${rawResponseText}`);
+      console.error(
+        `[RAPIDAPI ERROR] Key Index: ${selectedIndex}, Status: ${res.status}. Raw Payload: ${rawResponseText}`,
+      );
       throw new Error(`RapidAPI HTTP Error: ${res.status}`);
     }
 
@@ -599,44 +666,53 @@ export default async (request: Request, context: Context) => {
     try {
       data = JSON.parse(rawResponseText);
     } catch (e) {
-      console.error(`[PARSE ERROR] Invalid JSON payload from RapidAPI: ${rawResponseText}`);
+      console.error(
+        `[PARSE ERROR] Invalid JSON payload from RapidAPI: ${rawResponseText}`,
+      );
       throw new Error("Received malformed JSON data payload from source API.");
     }
 
     if (!data || !data.adaptiveFormats) {
-      console.error(`[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`);
+      console.error(
+        `[VALIDATION ERROR] Missing payload properties. Raw Output: ${rawResponseText}`,
+      );
     }
 
     const expireSeconds = parseInt(data?.expiresInSeconds || "21600");
 
-    return new Response(JSON.stringify({
-      title: data?.title || "Unknown Title",
-      author: data?.channelTitle || "Unknown Author",
-      authorId: data?.authorId || data?.channelId || "",
-      lengthSeconds: parseInt(data?.lengthSeconds || "0"),
-      adaptiveFormats: data?.adaptiveFormats ? data.adaptiveFormats.map((f: any) => ({
-        ...f,
-        type: f.mimeType,
-        bitrate: f.bitrate?.toString() || "",
-        clen: f.contentLength,
-        url: f.url + "&fallback"
-      })) : [],
-      recommendedVideos: [],
-      captions: [],
-      liveNow: data?.isLiveContent || false
-    }), {
-      headers: {
-        "content-type": "application/json",
-        "Cache-Control": `public, s-maxage=${expireSeconds}`,
-        "Vary": "Accept, x-nf-country"
-      }
-    });
+    return new Response(
+      JSON.stringify({
+        title: data?.title || "Unknown Title",
+        author: data?.channelTitle || "Unknown Author",
+        authorId: data?.authorId || data?.channelId || "",
+        lengthSeconds: parseInt(data?.lengthSeconds || "0"),
+        adaptiveFormats: data?.adaptiveFormats
+          ? data.adaptiveFormats.map((f: any) => ({
+              ...f,
+              type: f.mimeType,
+              bitrate: f.bitrate?.toString() || "",
+              clen: f.contentLength,
+              url: f.url + "&fallback",
+            }))
+          : [],
+        recommendedVideos: [],
+        captions: [],
+        liveNow: data?.isLiveContent || false,
+      }),
+      {
+        headers: {
+          "content-type": "application/json",
+          "Cache-Control": `public, s-maxage=${expireSeconds}`,
+          Vary: "Accept, x-nf-country",
+        },
+      },
+    );
   } catch (err) {
     release(0, 0);
     console.error("Stream Edge Function failed:", err);
-    return new Response(JSON.stringify({ error: (err as Error).message }), {
+    return new Response(JSON.stringify({ error: "Stream resolution failed" }), {
       status: 500,
-      headers: { "content-type": "application/json" }
+      headers: { "content-type": "application/json" },
     });
   } finally {
     clearTimeout(upstreamTimeout);

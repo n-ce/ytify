@@ -153,7 +153,7 @@ export default {
     const path = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
     const searchParams = url.searchParams;
 
-    // --- Sync Hash Route (Stateless SHA-256) ---\
+    // --- Sync Hash Route (Stateless SHA-256) ---
     if (path === "syncHash" || path === "hash") {
       if (request.method !== "POST") {
         return new Response("Method Not Allowed", {
@@ -248,22 +248,36 @@ export default {
       // which runtimes disagree about.
       const gateBody = request.body ? await request.text() : undefined;
 
-      const doResponse = (await stub.fetch(
-        new Request(`http://do/${path.replace(/^stream-gate\/?/, "")}`, {
-          method: request.method,
-          headers: request.headers,
-          body: gateBody,
-        }) as any,
-      )) as any;
+      try {
+        const doResponse = (await stub.fetch(
+          new Request(`http://do/${path.replace(/^stream-gate\/?/, "")}`, {
+            method: request.method,
+            headers: request.headers,
+            body: gateBody,
+          }) as any,
+        )) as any;
 
-      const headers = new Headers(doResponse.headers);
-      for (const [key, value] of Object.entries(corsHeaders)) {
-        headers.set(key, value);
+        const headers = new Headers(doResponse.headers);
+        for (const [key, value] of Object.entries(corsHeaders)) {
+          headers.set(key, value);
+        }
+        return new Response(doResponse.body, {
+          status: doResponse.status,
+          headers,
+        });
+      } catch (err: any) {
+        console.error("[stream-gate] DO invocation error:", err);
+        return new Response(
+          JSON.stringify({
+            error: "Stream gate DO error",
+            details: err?.message,
+          }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
       }
-      return new Response(doResponse.body, {
-        status: doResponse.status,
-        headers,
-      });
     }
 
     // --- Durable Object Sync & Library Routes ---
@@ -331,7 +345,10 @@ export default {
               headers: { ...corsHeaders, "Content-Type": "application/json" },
             });
           }
-          await upsertTracks(env, body.tracks.filter((t) => t && t.id));
+          await upsertTracks(
+            env,
+            body.tracks.filter((t) => t && t.id),
+          );
           return jsonResponse({ ok: true }, corsHeaders);
         }
       }
@@ -342,7 +359,11 @@ export default {
             env,
             searchParams.get("type"),
           );
-          return jsonResponse(categories, corsHeaders, "public, s-maxage=86400");
+          return jsonResponse(
+            categories,
+            corsHeaders,
+            "public, s-maxage=86400",
+          );
         }
         if (request.method === "POST") {
           if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
@@ -352,7 +373,10 @@ export default {
           if (!Array.isArray(body?.categories)) {
             return new Response(
               JSON.stringify({ error: "Missing categories" }),
-              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
             );
           }
           await upsertCategories(
@@ -379,7 +403,10 @@ export default {
           if (!Array.isArray(body?.playlists)) {
             return new Response(
               JSON.stringify({ error: "Missing playlists" }),
-              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
             );
           }
           await upsertPlaylists(
@@ -407,7 +434,8 @@ export default {
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
-          "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+          "Cache-Control":
+            "public, s-maxage=86400, stale-while-revalidate=3600",
         },
       });
     }
@@ -466,7 +494,10 @@ export default {
         }
         return new Response(
           JSON.stringify({ scraped: slice.map((c) => c.slug) }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
         );
       }
 
@@ -482,10 +513,10 @@ export default {
           },
         );
       }
-      return new Response(
-        JSON.stringify({ queued, runner: "catalog-alarm" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ queued, runner: "catalog-alarm" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     try {
