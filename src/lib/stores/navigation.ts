@@ -54,11 +54,13 @@ export function openSubView(feature: MainFeature) {
   }
   if (navStore.active !== feature) {
     if (typeof history !== "undefined") {
-      history.pushState(
-        { panel: feature },
-        "",
-        typeof location !== "undefined" ? location.href : "",
-      );
+      let href = typeof location !== "undefined" ? location.href : "";
+      if (feature === "library" && typeof location !== "undefined") {
+        const url = new URL(location.href);
+        url.searchParams.set("library", "");
+        href = url.toString();
+      }
+      history.pushState({ panel: feature }, "", href);
     }
     setNavStore("active", feature);
   }

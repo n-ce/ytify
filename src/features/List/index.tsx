@@ -12,6 +12,7 @@ import {
   store,
 } from "@stores";
 import {
+  librarySections,
   DISCOVERY_COLLECTION,
   fetchCollection,
   removeFromCollection,
@@ -83,6 +84,12 @@ export default function () {
 
   createEffect(() => {
     if (listStore.id === "favorites" && listStore.type === "collection") {
+      // Gate artist shelf behind librarySections().featured
+      if (!librarySections().featured) {
+        setFavoriteArtists([]);
+        return;
+      }
+
       const source = getSourceItems();
       const artistCounts: Record<string, { count: number; name: string; img?: string }> = {};
       source.forEach((track) => {
@@ -103,23 +110,37 @@ export default function () {
         return;
       }
 
-      setFavoriteArtists(
-        sorted.slice(0, 15).map(([id, info]) => ({
-          id,
-          name: info.name,
-          img: info.img || "",
-          type: "artist",
-        }))
-      );
+      // Check session cache first
+      let cachedArtists: Channel[] = [];
+      try {
+        const stored = sessionStorage.getItem("featured_artists");
+        if (stored) cachedArtists = JSON.parse(stored);
+      } catch {}
 
-      fetch(`${store.api}/gallery?id=${artistIds.slice(0, 10).join(",")}`)
-        .then((res) => res.json())
-        .then((data: any) => {
-          if (Array.isArray(data?.userArtists) && data.userArtists.length > 0) {
-            setFavoriteArtists(data.userArtists);
-          }
-        })
-        .catch(() => {});
+      if (cachedArtists.length > 0) {
+        setFavoriteArtists(cachedArtists);
+      } else {
+        setFavoriteArtists(
+          sorted.slice(0, 15).map(([id, info]) => ({
+            id,
+            name: info.name,
+            img: info.img || "",
+            type: "artist",
+          }))
+        );
+
+        fetch(`${store.api}/featured?artistIds=${encodeURIComponent(artistIds.slice(0, 5).join(","))}`)
+          .then((res) => res.json())
+          .then((data: any) => {
+            if (Array.isArray(data?.artists) && data.artists.length > 0) {
+              setFavoriteArtists(data.artists);
+              try {
+                sessionStorage.setItem("featured_artists", JSON.stringify(data.artists));
+              } catch {}
+            }
+          })
+          .catch(() => {});
+      }
     } else {
       setFavoriteArtists([]);
     }
@@ -404,7 +425,7 @@ export default function () {
         </div>
       </Show>
 
-      <Show when={listStore.id === "favorites" && listStore.type === "collection" && favoriteArtists().length > 0}>
+      <Show when={librarySections().featured && listStore.id === "favorites" && listStore.type === "collection" && favoriteArtists().length > 0}>
         <div class="list-carousels">
           <ArtistRow artists={favoriteArtists()} />
         </div>

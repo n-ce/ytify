@@ -40,7 +40,6 @@ export const VOLUME_PRESETS = [
 
 export interface LibrarySections {
   subfeed: boolean;
-  gallery: boolean;
   featured: boolean;
   listenLater: boolean;
   history: boolean;
@@ -54,7 +53,6 @@ export type LibrarySectionKey = keyof LibrarySections;
 
 export const defaultLibrarySections: LibrarySections = {
   subfeed: true,
-  gallery: true,
   featured: true,
   listenLater: true,
   history: true,
@@ -112,6 +110,7 @@ if (savedStore) {
         ) {
           const sections = parsed[key] as Record<string, unknown>;
           delete sections.frequentlyPlayed;
+          delete sections.gallery;
           config.librarySections = {
             ...defaultLibrarySections,
             ...(sections as Partial<LibrarySections>),
@@ -234,6 +233,9 @@ export function applyPanelRatio(ratio: PanelRatio | string) {
   const [left, right] = (ratio || "2:5").split(":");
   if (typeof document !== "undefined" && document.documentElement) {
     document.documentElement.style.setProperty("--panelRatioLeft", left || "2");
-    document.documentElement.style.setProperty("--panelRatioRight", right || "5");
+    document.documentElement.style.setProperty(
+      "--panelRatioRight",
+      right || "5",
+    );
   }
 }

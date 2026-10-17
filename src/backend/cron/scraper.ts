@@ -54,7 +54,7 @@ function gridType(grid: unknown): CategoryType {
  * Walks Explore into the Moods & Genres landing page and flattens its category
  * chips. Each grid's header is the only place the mood/genre distinction is
  * exposed, and each chip carries its own browse target, so both are kept.
- */export async function discoverCategories(): Promise<Category[]> {
+ */ export async function discoverCategories(): Promise<Category[]> {
   const yt = await getClient();
 
   const explore = await yt.music.getExplore();
@@ -111,7 +111,9 @@ function gridType(grid: unknown): CategoryType {
   }
 
   // Some layouts surface chips without a wrapping grid.
-  for (const chip of page.contents_memo?.getType(YTNodes.MusicNavigationButton) || []) {
+  for (const chip of page.contents_memo?.getType(
+    YTNodes.MusicNavigationButton,
+  ) || []) {
     add(chip.button_text, chip.endpoint, "mood", "");
   }
 
@@ -121,7 +123,11 @@ function gridType(grid: unknown): CategoryType {
 async function fetchPlaylist(
   yt: Innertube,
   id: string,
-): Promise<{ title: string; thumbnailId: string; tracks: CanonicalTrack[] } | null> {
+): Promise<{
+  title: string;
+  thumbnailId: string;
+  tracks: CanonicalTrack[];
+} | null> {
   try {
     const playlist = await yt.music.getPlaylist(id);
     const items = (playlist.items || []).filter((item) =>
@@ -154,7 +160,9 @@ async function fetchPlaylist(
  * they reference. Every failure is contained to a single playlist so one bad
  * reference cannot fail the whole category job.
  */
-export async function scrapeCategory(category: Category): Promise<ScrapedCategory> {
+export async function scrapeCategory(
+  category: Category,
+): Promise<ScrapedCategory> {
   const yt = await getClient();
 
   // Browsing the landing page's id with a category's params silently returns the
@@ -167,15 +175,36 @@ export async function scrapeCategory(category: Category): Promise<ScrapedCategor
   });
 
   const memo = page.contents_memo;
-  const playlistIds: string[] = [];
-  const pushId = (id?: string) => {
-    if (id && !playlistIds.includes(id)) playlistIds.push(id);
+  const playlistItems: { id: string; sectionTitle: string }[] = [];
+  const seenPlaylistIds = new Set<string>();
+
+  const pushItem = (id?: string, section?: string) => {
+    if (id && !seenPlaylistIds.has(id)) {
+      seenPlaylistIds.add(id);
+      playlistItems.push({
+        id,
+        sectionTitle: section || category.sectionTitle || category.type,
+      });
+    }
   };
 
-  // A category page is a wall of playlist tiles.
-  for (const item of memo?.getType(YTNodes.MusicTwoRowItem) || []) {
-    if (item.item_type && item.item_type !== "playlist") continue;
-    pushId(item.id || item.endpoint?.payload?.playlistId);
+  // Inspect shelves to capture carousel headers ("Featured playlists", "Community playlists", etc.)
+  for (const shelf of memo?.getType(YTNodes.MusicCarouselShelf) || []) {
+    const shelfTitle = headerTitle(shelf.header);
+    for (const item of shelf.contents || []) {
+      if (item.is(YTNodes.MusicTwoRowItem)) {
+        if (item.item_type && item.item_type !== "playlist") continue;
+        pushItem(item.id || item.endpoint?.payload?.playlistId, shelfTitle);
+      }
+    }
+  }
+
+  // Fallback to top-level TwoRowItem if no shelves were mapped
+  if (playlistItems.length === 0) {
+    for (const item of memo?.getType(YTNodes.MusicTwoRowItem) || []) {
+      if (item.item_type && item.item_type !== "playlist") continue;
+      pushItem(item.id || item.endpoint?.payload?.playlistId);
+    }
   }
 
   // Older layouts render the same tiles as responsive list items.
@@ -187,24 +216,23 @@ export async function scrapeCategory(category: Category): Promise<ScrapedCategor
     ) {
       continue;
     }
-    pushId(item.id || item.endpoint?.payload?.playlistId);
+    pushItem(item.id || item.endpoint?.payload?.playlistId);
   }
 
   const playlists: CuratedPlaylist[] = [];
   const tracks: CanonicalTrack[] = [];
   const seenTracks = new Set<string>();
   const now = Date.now();
-  const sectionTitle = category.sectionTitle || category.type;
 
-  for (const id of playlistIds.slice(0, MAX_PLAYLISTS_PER_CATEGORY)) {
-    const playlist = await fetchPlaylist(yt, id);
+  for (const item of playlistItems.slice(0, MAX_PLAYLISTS_PER_CATEGORY)) {
+    const playlist = await fetchPlaylist(yt, item.id);
     if (!playlist) continue;
 
     playlists.push({
-      id,
+      id: item.id,
       categorySlug: category.slug,
       categoryType: category.type,
-      sectionTitle,
+      sectionTitle: item.sectionTitle,
       title: playlist.title || "Unknown Playlist",
       thumbnailId: playlist.thumbnailId,
       trackIds: playlist.tracks.map((track) => track.id),

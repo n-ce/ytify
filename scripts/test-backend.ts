@@ -10,7 +10,7 @@
 import getAlbum from "../src/backend/getAlbum.js";
 import getArtist from "../src/backend/getArtist.js";
 import getChannel from "../src/backend/getChannel.js";
-import getGallery from "../src/backend/getGallery.js";
+import getFeatured from "../src/backend/getFeatured.js";
 import getPlaylist from "../src/backend/getPlaylist.js";
 import getSearch from "../src/backend/getSearch.js";
 import getSearchSuggestions from "../src/backend/getSearchSuggestions.js";
@@ -392,31 +392,34 @@ async function main() {
     }),
   );
 
-  // --- getGallery ---
+  // --- getFeatured ---
   results.push(
-    await runTest("getGallery", async () => {
-      const data = await getGallery([TEST_IDS.artist]);
+    await runTest("getFeatured", async () => {
+      const data = await getFeatured(undefined, [], [TEST_IDS.artist]);
       assert(typeof data === "object", "should return object");
-      assert(Array.isArray(data.userArtists), "should have userArtists");
-      assert(Array.isArray(data.relatedArtists), "should have relatedArtists");
       assert(
-        Array.isArray(data.relatedPlaylists),
-        "should have relatedPlaylists",
+        Array.isArray(data.featuredPlaylists),
+        "should have featuredPlaylists",
       );
-      data.relatedArtists
+      assert(
+        Array.isArray(data.communityPlaylists),
+        "should have communityPlaylists",
+      );
+      assert(Array.isArray(data.artists), "should have artists");
+      data.featuredPlaylists
         .slice(0, 3)
         .forEach((item: unknown, idx: number) =>
-          validateYTListItem(item, `getGallery.relatedArtists[${idx}]`),
+          validateYTListItem(item, `getFeatured.featuredPlaylists[${idx}]`),
         );
-      data.relatedPlaylists
+      data.artists
         .slice(0, 3)
         .forEach((item: unknown, idx: number) =>
-          validateYTListItem(item, `getGallery.relatedPlaylists[${idx}]`),
+          validateYTListItem(item, `getFeatured.artists[${idx}]`),
         );
       return {
-        userArtists: data.userArtists.length,
-        relatedArtists: data.relatedArtists.length,
-        relatedPlaylists: data.relatedPlaylists.length,
+        featuredPlaylists: data.featuredPlaylists.length,
+        communityPlaylists: data.communityPlaylists.length,
+        artists: data.artists.length,
       };
     }),
   );

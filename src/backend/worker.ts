@@ -1,7 +1,7 @@
 import getAlbum from "./getAlbum.js";
 import getArtist from "./getArtist.js";
 import getChannel from "./getChannel.js";
-import getGallery from "./getGallery.js";
+import getFeatured from "./getFeatured.js";
 import getPlaylist from "./getPlaylist.js";
 import getSearch from "./getSearch.js";
 import getSearchSuggestions from "./getSearchSuggestions.js";
@@ -418,6 +418,32 @@ export default {
       }
     }
 
+    // --- Featured endpoint (two-row shelf: featured + community playlists + artists) ---
+    if (path === "featured") {
+      const ids = (searchParams.get("ids") || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const artistIds = (searchParams.get("artistIds") || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const limit = Math.min(
+        parseInt(searchParams.get("limit") || "20", 10) || 20,
+        30,
+      );
+      const result = await getFeatured(env, ids, artistIds, limit);
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "Cache-Control":
+            "public, s-maxage=3600, stale-while-revalidate=1800",
+        },
+      });
+    }
+
     // --- Recommendation endpoint (moods & genres overlap scoring) ---
     if (path === "recommend") {
       const ids = (searchParams.get("ids") || "")
@@ -571,12 +597,6 @@ export default {
           }
 
           data = await handleFixMetadata(targets, env);
-          break;
-        }
-        case "gallery": {
-          const id = searchParams.get("id");
-          if (!id) throw new Error("Missing id parameter");
-          data = await getGallery(id.split(","));
           break;
         }
         case "playlist": {

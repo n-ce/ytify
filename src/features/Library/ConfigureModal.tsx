@@ -16,7 +16,6 @@ interface SectionConfigItem {
 
 const SECTIONS: SectionConfigItem[] = [
   { key: "subfeed", label: "hub_subfeed", icon: "ri-tv-line" },
-  { key: "gallery", label: "hub_gallery", icon: "ri-user-heart-line" },
   { key: "featured", label: "hub_featured", icon: "ri-star-line" },
   {
     key: "listenLater",

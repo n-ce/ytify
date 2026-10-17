@@ -38,6 +38,10 @@ export default async function () {
     setNavStore("active", "search");
   }
 
+  if (params.has("library")) {
+    setNavStore("active", "library");
+  }
+
   const { shareAction } = config;
 
   const collection = params.get("collection");

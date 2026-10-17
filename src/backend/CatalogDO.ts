@@ -556,6 +556,7 @@ export class CatalogDO {
         break;
       }
 
+      case "featured":
       case "recommend": {
         const ids = (url.searchParams.get("ids") || "")
           .split(",")

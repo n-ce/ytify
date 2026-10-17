@@ -1,6 +1,7 @@
 # Backend API Contracts & Parsing
 
 ## Overview
+
 This document describes the ytify backend API: response formats, parsing mechanisms, and data structure contracts. It consolidates the API contract (what clients receive) and parsing implementation (how we transform YouTube data).
 
 ---
@@ -10,21 +11,22 @@ This document describes the ytify backend API: response formats, parsing mechani
 ### 1. Track Items (`YTItem`)
 
 **Type Definition:**
+
 ```typescript
 interface YTItem extends TrackItem {
-  img?: string;           // Thumbnail ID (for songs)
-  albumId?: string;       // Playlist ID (OLAK...) for songs
-  subtext?: string;       // "views • published" or "album • views"
-  type: 'video' | 'song';
+  img?: string; // Thumbnail ID (for songs)
+  albumId?: string; // Playlist ID (OLAK...) for songs
+  subtext?: string; // "views • published" or "album • views"
+  type: "video" | "song";
 }
 
 interface TrackItem {
-  id: string;             // Video ID (11 chars)
+  id: string; // Video ID (11 chars)
   title: string;
-  duration: string;       // MM:SS or HH:MM:SS
+  duration: string; // MM:SS or HH:MM:SS
   author: string;
-  authorId: string;       // Channel ID (UC...)
-  modified?: number;      // Timestamp for sync
+  authorId: string; // Channel ID (UC...)
+  modified?: number; // Timestamp for sync
   context?: {
     src: Context;
     id: string;
@@ -34,22 +36,23 @@ interface TrackItem {
 
 **Availability by Source:**
 
-| Source | type | img | albumId | subtext format |
-|--------|------|-----|---------|----------------|
-| Regular search (video) | "video" | ❌ | ❌ | "views • published" |
-| Music search (song) | "song" | ✅ | ✅ | "album • views" |
-| Playlist tracks | "video" | ❌ | ❌ | "views • published" |
-| Album tracks | "song" | ✅ | ✅ | album name |
-| Artist songs | "song" | ✅ | ✅ | "album • views" |
-| Channel videos | "video" | ❌ | ❌ | "views • published" |
-| SubFeed | "video" | ❌ | ❌ | "views • published" |
-| Similar tracks | "song"→"video" | ❌ (stripped) | ❌ (stripped) | N/A |
+| Source                 | type           | img           | albumId       | subtext format      |
+| ---------------------- | -------------- | ------------- | ------------- | ------------------- |
+| Regular search (video) | "video"        | ❌            | ❌            | "views • published" |
+| Music search (song)    | "song"         | ✅            | ✅            | "album • views"     |
+| Playlist tracks        | "video"        | ❌            | ❌            | "views • published" |
+| Album tracks           | "song"         | ✅            | ✅            | album name          |
+| Artist songs           | "song"         | ✅            | ✅            | "album • views"     |
+| Channel videos         | "video"        | ❌            | ❌            | "views • published" |
+| SubFeed                | "video"        | ❌            | ❌            | "views • published" |
+| Similar tracks         | "song"→"video" | ❌ (stripped) | ❌ (stripped) | N/A                 |
 
 ---
 
 ### 2. Collection Items (`YTListItem`)
 
 **Type Definition:**
+
 ```typescript
 type YTListItem = YTChannelItem | YTPlaylistItem | YTArtistItem | YTAlbumItem;
 
@@ -60,7 +63,7 @@ interface ListItem {
 }
 
 interface YTChannelItem extends ListItem {
-  type: 'channel';
+  type: "channel";
   subscribers?: string;
   videoCount?: string;
   description?: string;
@@ -68,7 +71,7 @@ interface YTChannelItem extends ListItem {
 }
 
 interface YTPlaylistItem extends ListItem {
-  type: 'playlist';
+  type: "playlist";
   author?: string;
   videoCount?: string;
   items?: YTItem[];
@@ -76,7 +79,7 @@ interface YTPlaylistItem extends ListItem {
 }
 
 interface YTArtistItem extends ListItem {
-  type: 'artist';
+  type: "artist";
   subscribers?: string;
   items?: YTItem[];
   albums?: YTAlbumItem[];
@@ -84,7 +87,7 @@ interface YTArtistItem extends ListItem {
 }
 
 interface YTAlbumItem extends ListItem {
-  type: 'album';
+  type: "album";
   author: string;
   year?: string;
   playlistId?: string;
@@ -96,36 +99,37 @@ interface YTAlbumItem extends ListItem {
 
 ### 3. Specific API Responses
 
-| Endpoint | Response |
-|----------|----------|
-| `GET /api/search` | `(YTItem \| YTListItem)[]` - mixed by filter |
-| `GET /api/suggestions` | `string[]` |
-| `GET /api/playlist` | `YTPlaylistItem` with `items`, `hasContinuation` |
-| `GET /api/album` | `YTAlbumItem` with `items` |
-| `GET /api/artist` | `YTArtistItem` with `items` (songs), `albums`, `eps` |
-| `GET /api/channel` | `YTChannelItem` with `items` |
-| `GET /api/gallery` | `{ userArtists, relatedArtists, relatedPlaylists }` |
-| `GET /api/subfeed` | `YTItem[]` with `publishedMs` |
-| `GET /api/similar` | `YTItem[]` (stripped fields) |
+| Endpoint                                   | Response                                                                                            |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `GET /api/search`                          | `(YTItem \| YTListItem)[]` - mixed by filter                                                        |
+| `GET /api/suggestions`                     | `string[]`                                                                                          |
+| `GET /api/playlist`                        | `YTPlaylistItem` with `items`, `hasContinuation`                                                    |
+| `GET /api/album`                           | `YTAlbumItem` with `items`                                                                          |
+| `GET /api/artist`                          | `YTArtistItem` with `items` (songs), `albums`, `eps`                                                |
+| `GET /api/channel`                         | `YTChannelItem` with `items`                                                                        |
+| `GET /api/featured?ids=&artistIds=&limit=` | `{ featuredPlaylists: YTPlaylistItem[], communityPlaylists: YTPlaylistItem[], artists: Channel[] }` |
+| `GET /api/subfeed`                         | `YTItem[]` with `publishedMs`                                                                       |
+| `GET /api/similar`                         | `YTItem[]` (stripped fields)                                                                        |
 
 ### 3a. Global Catalog & Gate Endpoints
 
 These are backed by Durable Objects rather than InnerTube, so they are cheap and
 always available. See `docs/systems/catalog.md` for the storage contract.
 
-| Endpoint | Response |
-|----------|----------|
-| `GET /api/catalog/tracks?ids=a,b` | `Record<trackId, CanonicalTrack>` |
-| `GET /api/catalog/track?id=` | `CanonicalTrack` or 404 |
-| `POST /api/catalog/tracks` | `{ ok: true }` - batch upsert, token-gated |
-| `GET /api/catalog/categories?type=` | `Category[]` |
-| `GET /api/catalog/playlists?category=` | `CuratedPlaylist[]` (public shape, with `trackIds`) |
-| `GET /api/recommend?ids=a,b&limit=10` | `{ playlists: Recommendation[] }` |
-| `POST /api/stream-gate/acquire` | `{ granted, keyIndex, ... }` or a rejection |
-| `POST /api/stream-gate/release` | `{ ok: true }` + key telemetry |
-| `GET /api/stream-gate/state` | Lease, key and cooldown diagnostics |
-| `POST /api/cron/scrape?mode=direct\|schedule` | Manual scraper trigger |
-| `GET /api/cron/status` | `{ pending, alarmAt }` for the alarm-driven scraper |
+| Endpoint                                           | Response                                                            |
+| -------------------------------------------------- | ------------------------------------------------------------------- |
+| `GET /api/catalog/tracks?ids=a,b`                  | `Record<trackId, CanonicalTrack>`                                   |
+| `GET /api/catalog/track?id=`                       | `CanonicalTrack` or 404                                             |
+| `POST /api/catalog/tracks`                         | `{ ok: true }` - batch upsert, token-gated                          |
+| `GET /api/catalog/categories?type=`                | `Category[]`                                                        |
+| `GET /api/catalog/playlists?category=`             | `CuratedPlaylist[]` (public shape, with `trackIds`)                 |
+| `GET /api/featured?ids=a,b&artistIds=c,d&limit=20` | `{ featuredPlaylists, communityPlaylists, artists }`                |
+| `GET /api/recommend?ids=a,b&limit=10`              | `{ playlists: Recommendation[] }` (legacy alias to catalog scoring) |
+| `POST /api/stream-gate/acquire`                    | `{ granted, keyIndex, ... }` or a rejection                         |
+| `POST /api/stream-gate/release`                    | `{ ok: true }` + key telemetry                                      |
+| `GET /api/stream-gate/state`                       | Lease, key and cooldown diagnostics                                 |
+| `POST /api/cron/scrape?mode=direct\|schedule`      | Manual scraper trigger                                              |
+| `GET /api/cron/status`                             | `{ pending, alarmAt }` for the alarm-driven scraper                 |
 
 `CanonicalTrack` is `{ id, title, author, authorId, duration, durationStr,
 isSong, thumbnailId, source, updatedAt }`; `Recommendation` adds `score` (10 per
@@ -151,6 +155,7 @@ every consumer.
 ## Part 2: Parsing Implementation
 
 ### Architecture
+
 ```
 HTTP Request → Worker → Backend Function → youtubei.js (InnerTube)
                                       │
@@ -177,15 +182,18 @@ HTTP Request → Worker → Backend Function → youtubei.js (InnerTube)
 ### Core Parsing Functions
 
 #### `getClient()` - InnerTube Singleton
+
 ```typescript
-export async function getClient(): Promise<Innertube>
+export async function getClient(): Promise<Innertube>;
 ```
+
 - Singleton Innertube instance
 - `UniversalCache(false)` - no persistence
 - `generate_session_locally: true` - no PoToken needed
 - `retrieve_player: false` - don't fetch player config
 
 #### Thumbnail Utilities
+
 - `getThumbnailId(url)` - Extract the ID/path from multiple URL formats. Avatar URLs keep their CDN path bucket (`/ytc/ID`, `/a-/a/ID`) because dropping it yields a 404; the host is discarded since `yt3`/`lh3.googleusercontent.com` and `yt3.ggpht.com` serve identical IDs. Non-avatar hosts (e.g. `gstatic.com` placeholder art) return `""`.
 - `formatThumbnailId(rawUrl)` - Single normalizer for the `img` field (empty for missing/`maxresdefault`, bare 11-char video id, otherwise `/`-prefixed avatar path)
 - `getThumbnail(thumbnails)` - Pick highest resolution by width
@@ -193,6 +201,7 @@ export async function getClient(): Promise<Innertube>
 > `img` is an ID, never a URL. The client re-expands it in `generateImageUrl()` (`src/lib/utils/image.ts`): `/`-prefixed values become `yt3.googleusercontent.com<path>=s720-…`, bare 11-char values become `i.ytimg.com/vi_webp/<id>/…`. Always route new thumbnail call sites through `formatThumbnailId` rather than hand-concatenating a `/` prefix.
 
 #### Duration/Formatting
+
 - `formatDuration(text)` - Pad single-digit minutes ("4:30" → "04:30")
 - `parsePublished(text)` - Relative time to Unix timestamp (ms)
 
@@ -202,16 +211,16 @@ export async function getClient(): Promise<Innertube>
 
 Transforms youtubei.js nodes → `YTItem`
 
-| Node Type | Source | Output Type |
-|-----------|--------|-------------|
-| `Video` | Regular search, channel videos | `video` |
-| `LockupView` | Modern YouTube layout, music search | `video` |
-| `MusicResponsiveListItem` | YouTube Music search/album/artist | `song` |
+| Node Type                 | Source                              | Output Type |
+| ------------------------- | ----------------------------------- | ----------- |
+| `Video`                   | Regular search, channel videos      | `video`     |
+| `LockupView`              | Modern YouTube layout, music search | `video`     |
+| `MusicResponsiveListItem` | YouTube Music search/album/artist   | `song`      |
 
 **Video Node:**
+
 ```typescript
-{
-  id: video.id,
+{\n  id: video.id,
   title: video.title,
   author: video.author.name,
   authorId: video.author.id,
@@ -220,10 +229,12 @@ Transforms youtubei.js nodes → `YTItem`
   type: "video"
 }
 ```
+
 - Filters out Shorts (< 90 seconds)
 
 **LockupView (Modern Layout):**
 Uses `getLockupMeta()` to extract:
+
 - `views` - from metadata rows
 - `published` - relative time string
 - `duration` - from thumbnail overlay badge
@@ -231,6 +242,7 @@ Uses `getLockupMeta()` to extract:
 - `authorId` - from endpoint payload browseId
 
 **MusicResponsiveListItem (YouTube Music):**
+
 ```typescript
 {
   id: videoId (from overlay or menu),
@@ -251,18 +263,19 @@ Uses `getLockupMeta()` to extract:
 
 Transforms youtubei.js nodes → `YTListItem`
 
-| Node Type | Source | Output Type |
-|-----------|--------|-------------|
-| `LockupView` | Search results, grid items | `playlist` |
-| `Playlist` | Direct playlist fetch | `playlist` |
-| `Channel` | Channel search, subscriptions | `channel` |
-| `MusicResponsiveListItem` (artist/album) | Music search | `artist`/`album` |
+| Node Type                                | Source                        | Output Type      |
+| ---------------------------------------- | ----------------------------- | ---------------- |
+| `LockupView`                             | Search results, grid items    | `playlist`       |
+| `Playlist`                               | Direct playlist fetch         | `playlist`       |
+| `Channel`                                | Channel search, subscriptions | `channel`        |
+| `MusicResponsiveListItem` (artist/album) | Music search                  | `artist`/`album` |
 
 ---
 
 ### Lockup Metadata Extraction (`getLockupMeta`)
 
 Parses modern `LockupView` metadata layout:
+
 ```
 LockupView
 ├── metadata → LockupMetadataView
@@ -278,6 +291,7 @@ LockupView
 ```
 
 **Extraction Logic:**
+
 1. **Author**: First metadata row, first part
 2. **AuthorId**: From text endpoint payload OR image renderer context
 3. **Views**: Part matching `^\d*\.?\d+[KMB]?\s+views?$`
@@ -288,17 +302,17 @@ LockupView
 
 ### API-Specific Parsing
 
-| Endpoint | Key Details |
-|----------|-------------|
-| `getSearch` | Music vs regular search, upload date sort via `parsePublished()` |
-| `getPlaylist` | Music playlists (RD*, OLAK*) via `yt.music.getPlaylist()`, continuation loop |
-| `getAlbum` | Header parsing (MusicDetailHeader/MusicResponsiveHeader), playlistId extraction |
-| `getArtist` | Header (MusicImmersiveHeader/MusicVisualHeader), songs via `getAllSongs()`, albums/EPs from the discography page (see below) |
-| `getChannel` | Videos via `channel.getVideos()` |
-| `getGallery` | Batch fetch artists, aggregate "Featured on" + "Fans might also like", deduplicate |
-| `getSubFeed` | Parallel channel fetch, filter >90s, sort by publishedMs desc |
-| `getSimilar` | Last.fm API → YouTube Music search, strip subtext/albumId/img |
-| `getSearchSuggestions` | Music: `yt.music.getSearchSuggestions()`, Regular: `yt.getSearchSuggestions()` |
+| Endpoint               | Key Details                                                                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `getSearch`            | Music vs regular search, upload date sort via `parsePublished()`                                                             |
+| `getPlaylist`          | Music playlists (RD*, OLAK*) via `yt.music.getPlaylist()`, continuation loop                                                 |
+| `getAlbum`             | Header parsing (MusicDetailHeader/MusicResponsiveHeader), playlistId extraction                                              |
+| `getArtist`            | Header (MusicImmersiveHeader/MusicVisualHeader), songs via `getAllSongs()`, albums/EPs from the discography page (see below) |
+| `getChannel`           | Videos via `channel.getVideos()`                                                                                             |
+| `getFeatured`          | Parallel catalog matching + artist "Featured on" playlists & avatars resolution                                              |
+| `getSubFeed`           | Parallel channel fetch, filter >90s, sort by publishedMs desc                                                                |
+| `getSimilar`           | Last.fm API → YouTube Music search, strip subtext/albumId/img                                                                |
+| `getSearchSuggestions` | Music: `yt.music.getSearchSuggestions()`, Regular: `yt.getSearchSuggestions()`                                               |
 
 ### Artist Discography
 
@@ -333,34 +347,38 @@ which under-reports but never breaks.
 ## Part 3: Known Issues & Data Structure Problems
 
 ### 1. Inconsistent Track Properties
-| Property | Video | Song | Similar | SubFeed |
-|----------|-------|------|---------|---------|
-| `img` | ❌ | ✅ | ❌ | ❌ |
-| `albumId` | ❌ | ✅ | ❌ | ❌ |
-| `subtext` | ✅ | ✅ | ❌ | ✅ |
-| `type` | "video" | "song" | "song"→"video" | "video" |
+
+| Property  | Video   | Song   | Similar        | SubFeed |
+| --------- | ------- | ------ | -------------- | ------- |
+| `img`     | ❌      | ✅     | ❌             | ❌      |
+| `albumId` | ❌      | ✅     | ❌             | ❌      |
+| `subtext` | ✅      | ✅     | ❌             | ✅      |
+| `type`    | "video" | "song" | "song"→"video" | "video" |
 
 **Problem:** Client must handle optional fields differently per source.
 
 ### 2. Duplicate Collection Structures
+
 - 4 interfaces share `id`, `name`, `img`, `type` with slightly different optionals
 - `items` array inconsistent
 
 ### 3. Inconsistent Naming
+
 - `videoCount` (playlist) vs `subscribers` (channel) vs `videoCount` (channel)
 - `author` (playlist) vs `author` (album) - different meanings
 
 ### 4. Mixed Arrays
+
 - `getSearch` returns `(YTItem \| YTListItem)[]` - requires type guards
-- `getGallery` returns separate arrays
 
 ---
 
 ## Part 4: Proposed Unified Structure (from DATA_STRUCTURE_SIMPLIFICATION)
 
 ### Discriminated Union Approach
+
 ```typescript
-type MediaKind = 'track' | 'collection';
+type MediaKind = "track" | "collection";
 
 interface MediaBase {
   kind: MediaKind;
@@ -370,11 +388,11 @@ interface MediaBase {
   type: MediaType;
 }
 
-type MediaType = 'video' | 'song' | 'playlist' | 'channel' | 'artist' | 'album';
+type MediaType = "video" | "song" | "playlist" | "channel" | "artist" | "album";
 
 interface TrackMedia extends MediaBase {
-  kind: 'track';
-  type: 'video' | 'song';
+  kind: "track";
+  type: "video" | "song";
   author: string;
   authorId: string;
   duration: string;
@@ -384,8 +402,8 @@ interface TrackMedia extends MediaBase {
 }
 
 interface CollectionMedia extends MediaBase {
-  kind: 'collection';
-  type: 'playlist' | 'channel' | 'artist' | 'album';
+  kind: "collection";
+  type: "playlist" | "channel" | "artist" | "album";
   owner?: string;
   count: number;
   metadata: CollectionMetadata;
@@ -396,6 +414,7 @@ type MediaItem = TrackMedia | CollectionMedia;
 ```
 
 ### Migration Phases
+
 1. **Backend Normalization** - Populate all optional fields with defaults, add `kind` discriminator
 2. **Type Unification** - Introduce `MediaItem` union, update mappers
 3. **Client Migration** - Update components, remove type guards
@@ -404,8 +423,10 @@ type MediaItem = TrackMedia | CollectionMedia;
 ---
 
 ## Test Coverage
+
 Backend test suite (`scripts/test-backend.ts`) validates:
-- All 12 API endpoints return expected structure
+
+- All 13 API endpoints return expected structure
 - Required fields present on all item types
 - Optional fields handled gracefully
 - Type discriminators work correctly
@@ -415,12 +436,14 @@ Run: `bun run backend`
 ---
 
 ## Related Files
+
 - `src/backend/utils.ts` - Core parsing (`streamMapper`, `listMapper`, `getLockupMeta`)
-- `src/backend/get*.ts` - 8 endpoint handlers
+- `src/backend/get*.ts` - 9 endpoint handlers
 - `src/backend/worker.ts` - Routing
 - `src/types.d.ts` - TypeScript interfaces
 
 ## Non-Goals
+
 - Documenting youtubei.js internals beyond what we use
 - Specifying InnerTube API (external dependency)
 - Client-side data transformations (see feature specs)

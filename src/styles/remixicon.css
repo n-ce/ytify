@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 66
-* Generated at: 2026-10-17T17:41:10.305Z
+* Total icons: 65
+* Generated at: 2026-10-17T21:01:00.830Z
 */
 
 @font-face {
@@ -268,10 +268,6 @@
 
 .ri-user-heart-fill:before {
   content: "\f262";
-}
-
-.ri-user-heart-line:before {
-  content: "\f263";
 }
 
 .ri-video-line:before {

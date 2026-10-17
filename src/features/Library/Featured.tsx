@@ -1,39 +1,27 @@
 import { For, Show, createSignal, onMount } from "solid-js";
 import { getCollection, getTracksMap } from "@utils";
 import ListItem from "@components/ListItem";
-import { t, store, queueStore } from "@stores";
+import { t, store } from "@stores";
 
-interface RecommendedPlaylist {
-  id: string;
-  title: string;
-  thumbnailId: string;
-  categorySlug: string;
-  categoryType: string;
-  sectionTitle: string;
-  score: number;
-  trackCount: number;
-}
-
-interface ApiResponse {
-  playlists?: RecommendedPlaylist[];
-  error?: string;
+interface FeaturedResponse {
+  featuredPlaylists?: YTPlaylistItem[];
+  communityPlaylists?: YTPlaylistItem[];
+  artists?: Channel[];
 }
 
 export default function () {
-  const [officialPlaylists, setOfficialPlaylists] = createSignal<
-    RecommendedPlaylist[]
+  const [featuredPlaylists, setFeaturedPlaylists] = createSignal<
+    YTPlaylistItem[]
   >([]);
-  const [communityPlaylists, setCommunityPlaylists] = createSignal<Playlist[]>(
-    [],
-  );
+  const [communityPlaylists, setCommunityPlaylists] = createSignal<
+    YTPlaylistItem[]
+  >([]);
   const [isLoading, setIsLoading] = createSignal(false);
 
   const updateFeatured = async () => {
+    // Strictly persistent history IDs
     const history = getCollection("history");
-    const queueHistory = queueStore.history.map((t) => t.id);
-    const historyIds = Array.from(
-      new Set([...history, ...queueHistory]),
-    ).filter(Boolean);
+    const historyIds = Array.from(new Set(history)).filter(Boolean);
 
     const tracksMap = getTracksMap();
     const favorites = getCollection("favorites")
@@ -52,35 +40,34 @@ export default function () {
     const artistIds = Object.keys(artistCounts).slice(0, 5);
 
     if (historyIds.length === 0 && artistIds.length === 0) {
-      setOfficialPlaylists([]);
+      setFeaturedPlaylists([]);
       setCommunityPlaylists([]);
       return;
     }
 
     setIsLoading(true);
     try {
-      if (historyIds.length > 0) {
-        const idsParam = historyIds.slice(0, 25).join(",");
-        const res = await fetch(
-          `${store.api}/recommend?ids=${encodeURIComponent(idsParam)}&limit=20`,
+      const idsParam = historyIds.slice(0, 25).join(",");
+      const artistParam = artistIds.join(",");
+      const res = await fetch(
+        `${store.api}/featured?ids=${encodeURIComponent(idsParam)}&artistIds=${encodeURIComponent(artistParam)}&limit=20`,
+      );
+      if (res.ok) {
+        const data = (await res.json()) as FeaturedResponse;
+        setFeaturedPlaylists(
+          Array.isArray(data.featuredPlaylists) ? data.featuredPlaylists : [],
         );
-        if (res.ok) {
-          const data = (await res.json()) as ApiResponse;
-          setOfficialPlaylists(
-            Array.isArray(data.playlists) ? data.playlists : [],
-          );
-        }
-      }
+        setCommunityPlaylists(
+          Array.isArray(data.communityPlaylists) ? data.communityPlaylists : [],
+        );
 
-      if (artistIds.length > 0) {
-        const res = await fetch(
-          `${store.api}/gallery?id=${artistIds.join(",")}`,
-        );
-        if (res.ok) {
-          const data = (await res.json()) as { relatedPlaylists?: Playlist[] };
-          setCommunityPlaylists(
-            Array.isArray(data.relatedPlaylists) ? data.relatedPlaylists : [],
-          );
+        if (Array.isArray(data.artists) && data.artists.length > 0) {
+          try {
+            sessionStorage.setItem(
+              "featured_artists",
+              JSON.stringify(data.artists),
+            );
+          } catch {}
         }
       }
     } catch (e) {
@@ -91,7 +78,7 @@ export default function () {
   };
 
   onMount(() => {
-    if (officialPlaylists().length === 0 && communityPlaylists().length === 0) {
+    if (featuredPlaylists().length === 0 && communityPlaylists().length === 0) {
       updateFeatured();
     }
   });
@@ -112,7 +99,7 @@ export default function () {
       >
         <Show
           when={
-            officialPlaylists().length > 0 || communityPlaylists().length > 0
+            featuredPlaylists().length > 0 || communityPlaylists().length > 0
           }
           fallback={
             <div>
@@ -120,38 +107,20 @@ export default function () {
             </div>
           }
         >
-          {/* Shelf 1: Official YT Playlists */}
-          <Show when={officialPlaylists().length > 0}>
+          {/* Shelf 1: Featured Playlists */}
+          <Show when={featuredPlaylists().length > 0}>
             <div class="official-shelf">
-              <p class="shelf-label">
-                <i class="ri-youtube-fill"></i>&nbsp;Official Playlists
-              </p>
               <div class="list-carousel">
-                <For each={officialPlaylists()}>
-                  {(item) => {
-                    const section = item.sectionTitle || "";
-                    const isFeatured =
-                      section.trim().toLowerCase() === "featured playlists" ||
-                      section.toLowerCase().includes("featured") ||
-                      item.categorySlug?.toLowerCase() === "featured" ||
-                      item.categoryType?.toLowerCase() === "featured";
-                    return (
-                      <ListItem
-                        name={item.title}
-                        id={item.id}
-                        img={
-                          item.thumbnailId
-                            ? item.thumbnailId.startsWith("/")
-                              ? item.thumbnailId
-                              : `/${item.thumbnailId}`
-                            : ""
-                        }
-                        author={section || "YouTube Music"}
-                        type="playlist"
-                        class={isFeatured ? "featured-playlist" : ""}
-                      />
-                    );
-                  }}
+                <For each={featuredPlaylists()}>
+                  {(item) => (
+                    <ListItem
+                      name={item.name}
+                      id={item.id}
+                      img={item.img}
+                      author={item.author || "YouTube Music"}
+                      type="playlist"
+                    />
+                  )}
                 </For>
               </div>
             </div>
@@ -160,9 +129,6 @@ export default function () {
           {/* Shelf 2: Community Playlists */}
           <Show when={communityPlaylists().length > 0}>
             <div class="community-shelf">
-              <p class="shelf-label">
-                <i class="ri-compass-3-line"></i>&nbsp;Community Playlists
-              </p>
               <div class="list-carousel">
                 <For each={communityPlaylists()}>
                   {(item) => (
@@ -170,7 +136,7 @@ export default function () {
                       name={item.name}
                       id={item.id}
                       img={item.img}
-                      author={item.author}
+                      author={item.author || "YouTube Music"}
                       type="playlist"
                     />
                   )}

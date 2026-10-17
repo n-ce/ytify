@@ -123,16 +123,24 @@ export async function readPlaylists(
   }
 }
 
-export function upsertTracks(env: Env, tracks: CanonicalTrack[]): Promise<boolean> {
+export function upsertTracks(
+  env: Env,
+  tracks: CanonicalTrack[],
+): Promise<boolean> {
   if (tracks.length === 0) return Promise.resolve(true);
   const stub = getCatalogStub(env);
   return stub ? post(stub, "/tracks", { tracks }) : Promise.resolve(false);
 }
 
-export function upsertCategories(env: Env, categories: Category[]): Promise<boolean> {
+export function upsertCategories(
+  env: Env,
+  categories: Category[],
+): Promise<boolean> {
   if (categories.length === 0) return Promise.resolve(true);
   const stub = getCatalogStub(env);
-  return stub ? post(stub, "/categories", { categories }) : Promise.resolve(false);
+  return stub
+    ? post(stub, "/categories", { categories })
+    : Promise.resolve(false);
 }
 
 export function upsertPlaylists(
@@ -141,7 +149,9 @@ export function upsertPlaylists(
 ): Promise<boolean> {
   if (playlists.length === 0) return Promise.resolve(true);
   const stub = getCatalogStub(env);
-  return stub ? post(stub, "/playlists", { playlists }) : Promise.resolve(false);
+  return stub
+    ? post(stub, "/playlists", { playlists })
+    : Promise.resolve(false);
 }
 
 export async function readScrapeStatus(
@@ -160,7 +170,7 @@ export async function readScrapeStatus(
   }
 }
 
-export async function recommend(
+export async function readFeatured(
   env: Env,
   ids: string[],
   limit = 10,
@@ -171,14 +181,16 @@ export async function recommend(
   try {
     const res = await stub.fetch(
       durableRequest(
-        `/recommend?ids=${encodeURIComponent(ids.join(","))}&limit=${limit}`,
+        `/featured?ids=${encodeURIComponent(ids.join(","))}&limit=${limit}`,
       ),
     );
     if (!res.ok) return [];
     const data = (await res.json()) as { playlists: Recommendation[] };
     return data.playlists || [];
   } catch (err) {
-    console.warn("[catalog] recommend failed:", err);
+    console.warn("[catalog] featured failed:", err);
     return [];
   }
 }
+
+export const recommend = readFeatured;

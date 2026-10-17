@@ -119,18 +119,6 @@
         }
     }
 
-    .gallery-article {
-        grid-column: span 2;
-
-        > div {
-            .listItem {
-                p.title {
-                    max-height: var(--size-4) !important;
-                }
-            }
-        }
-    }
-
     .featured-article {
         grid-column: span 2;
 
@@ -144,18 +132,6 @@
             background-color: var(--onBg);
             border: var(--border);
             overflow: hidden;
-
-            .shelf-label {
-                font-size: var(--font-size-1);
-                font-weight: var(--font-weight-5);
-                color: var(--text2);
-                opacity: 0.8;
-                padding: var(--size-2) var(--size-2) 0;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                gap: var(--size-1);
-            }
 
             .list-carousel {
                 display: flex;
@@ -245,18 +221,6 @@
             color: var(--text2);
             opacity: 0.7;
             width: calc(100% - var(--size-8));
-        }
-
-        &.gallery-article {
-            > .loading {
-                display: inline-block;
-                animation: spinner 1s cubic-bezier(0.645, 0.045, 0.355, 1)
-                    infinite !important;
-
-                &::after {
-                    display: none;
-                }
-            }
         }
 
         > i {
