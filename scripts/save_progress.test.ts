@@ -60,6 +60,7 @@ describe("player save progress and URL params", () => {
       id: "video123",
       title: "Podcast Ep 1",
       author: "Creator",
+      authorId: "creator123",
       duration: "10:00",
     });
     setPlayerStore("currentTime", 42);
@@ -103,6 +104,7 @@ describe("player save progress and URL params", () => {
       id: "music456",
       title: "Song Title",
       author: "Artist - Topic",
+      authorId: "artist456",
       duration: "03:30",
     });
 

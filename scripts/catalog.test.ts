@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { DatabaseSync } from "node:sqlite";
 import { CatalogDO } from "../src/backend/CatalogDO";
 import { StreamGateDO } from "../src/backend/StreamGateDO";
 import { UserSyncDO } from "../src/backend/UserSyncDO";
@@ -328,7 +327,7 @@ describe("user sync/relations and hydration", () => {
         get: () => ({ fetch: (req: Request) => catalog.fetch(req) }),
       },
     };
-    return { catalog, userDO: new UserSyncDO({ ...fakeDurableState(), env }) };
+    return { catalog, userDO: new UserSyncDO({ ...fakeDurableState(), env } as any) };
   }
 
   test("a full snapshot records relations and projects into the catalog", async () => {
@@ -356,9 +355,7 @@ describe("user sync/relations and hydration", () => {
     );
 
     const rows = (userDO as any).sql
-      .exec<{ track_id: string; added_at: number }>(
-        "SELECT track_id, added_at FROM user_tracks",
-      )
+      ["exec"]("SELECT track_id, added_at FROM user_tracks")
       .toArray();
     expect(rows).toEqual([{ track_id: "aaaaaaaaaaa", added_at: now }]);
 
@@ -558,7 +555,7 @@ describe("user sync/relations and hydration", () => {
     );
 
     const rows = (userDO as any).sql
-      .exec<{ c: number }>("SELECT count(*) as c FROM user_tracks")
+      ["exec"]("SELECT count(*) as c FROM user_tracks")
       .one().c;
     expect(rows).toBe(0);
 

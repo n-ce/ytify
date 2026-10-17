@@ -1,11 +1,12 @@
 #!/usr/bin/env bun
+/// <reference path="../src/types.d.ts" />
+/// <reference types="node" />
 /**
  * Backend API Test Suite
  * Tests each backend function for correct ytify response format
  * Run with: bun scripts/test-backend.ts
  */
 
-import { getClient } from "../src/backend/utils.js";
 import getAlbum from "../src/backend/getAlbum.js";
 import getArtist from "../src/backend/getArtist.js";
 import getChannel from "../src/backend/getChannel.js";
@@ -17,317 +18,479 @@ import getSimilar from "../src/backend/getSimilar.js";
 import getSubFeed from "../src/backend/getSubFeed.js";
 
 interface TestResult {
-	name: string;
-	passed: boolean;
-	error?: string;
-	sample?: unknown;
-	duration: number;
+  name: string;
+  passed: boolean;
+  error?: string;
+  sample?: unknown;
+  duration: number;
 }
 
 const TEST_IDS = {
-	video: "dQw4w9WgXcQ", // Rick Astley - Never Gonna Give You Up
-	playlist: "PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI", // YouTube Music playlist
-	album: "MPREb_Q9V7w4yK8l", // Rick Astley - 50 (YouTube Music album)
-	// Must be a channel that resolves as a YouTube Music artist: the previous
-	// fixture (Rick Astley, UC2PMxyoN2CZ3iaJ6NO-C19g) returns an empty name and
-	// no sections, which made these assertions pass vacuously.
-	artist: "UCgI0KusPV2kAfsflrsAunUw", // Sigur Rós - 19 albums, 4 EPs
-	// Regression fixture: the Albums carousel holds no "More" button for this
-	// artist and Young Mountain (2006) sits past the 10-item Singles & EPs cap,
-	// so it is only reachable via the discography page.
-	artistDeepEp: "UCkQijoKtzS4B9IsXJUCcQow", // This Will Destroy You
-	channel: "UCBR8-60-B28hp2BmDPdntcQ", // Random channel
+  video: "dQw4w9WgXcQ", // Rick Astley - Never Gonna Give You Up
+  playlist: "PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI", // YouTube Music playlist
+  album: "MPREb_Q9V7w4yK8l", // Rick Astley - 50 (YouTube Music album)
+  // Must be a channel that resolves as a YouTube Music artist: the previous
+  // fixture (Rick Astley, UC2PMxyoN2CZ3iaJ6NO-C19g) returns an empty name and
+  // no sections, which made these assertions pass vacuously.
+  artist: "UCgI0KusPV2kAfsflrsAunUw", // Sigur Rós - 19 albums, 4 EPs
+  // Regression fixture: the Albums carousel holds no "More" button for this
+  // artist and Young Mountain (2006) sits past the 10-item Singles & EPs cap,
+  // so it is only reachable via the discography page.
+  artistDeepEp: "UCkQijoKtzS4B9IsXJUCcQow", // This Will Destroy You
+  channel: "UCBR8-60-B28hp2BmDPdntcQ", // Random channel
 };
 
 const TEST_QUERIES = {
-	search: "never gonna give you up",
-	searchMusic: "rick astley",
+  search: "never gonna give you up",
+  searchMusic: "rick astley",
 };
 
 function assert(condition: boolean, message: string): void {
-	if (!condition) throw new Error(message);
+  if (!condition) throw new Error(message);
 }
 
 function validateYTItem(item: unknown, context: string): void {
-	const i = item as Record<string, unknown>;
-	assert(typeof i.id === "string" && i.id.length > 0, `${context}: missing id`);
-	assert(typeof i.title === "string", `${context}: missing title`);
-	assert(typeof i.author === "string", `${context}: missing author`);
-	assert(typeof i.duration === "string", `${context}: missing duration`);
-	assert(i.type === "video" || i.type === "song", `${context}: invalid type`);
-	if (i.type === "song") {
-		// albumId and img may be missing for some sources (e.g., getSimilar strips them)
-		if (i.albumId) assert(typeof i.albumId === "string", `${context}: song albumId not string`);
-		if (i.img) assert(typeof i.img === "string", `${context}: song img not string`);
-	}
+  const i = item as Record<string, unknown>;
+  assert(typeof i.id === "string" && i.id.length > 0, `${context}: missing id`);
+  assert(typeof i.title === "string", `${context}: missing title`);
+  assert(typeof i.author === "string", `${context}: missing author`);
+  assert(typeof i.duration === "string", `${context}: missing duration`);
+  assert(i.type === "video" || i.type === "song", `${context}: invalid type`);
+  if (i.type === "song") {
+    // albumId and img may be missing for some sources (e.g., getSimilar strips them)
+    if (i.albumId)
+      assert(
+        typeof i.albumId === "string",
+        `${context}: song albumId not string`,
+      );
+    if (i.img)
+      assert(typeof i.img === "string", `${context}: song img not string`);
+  }
 }
 
 function validateYTListItem(item: unknown, context: string): void {
-	const i = item as Record<string, unknown>;
-	assert(typeof i.id === "string" && i.id.length > 0, `${context}: missing id`);
-	assert(typeof i.name === "string", `${context}: missing name`);
-	assert(typeof i.img === "string", `${context}: missing img`);
-	assert(
-		["playlist", "channel", "artist", "album"].includes(i.type as string),
-		`${context}: invalid type`
-	);
-	if (i.type === "playlist") {
-		// videoCount and author may be empty for some playlists
-		if (i.videoCount) assert(typeof i.videoCount === "string", `${context}: playlist videoCount not string`);
-		if (i.author) assert(typeof i.author === "string", `${context}: playlist author not string`);
-	}
-	if (i.type === "channel") {
-		if (i.subscribers) assert(typeof i.subscribers === "string", `${context}: channel subscribers not string`);
-	}
-	if (i.type === "album") {
-		if (i.author) assert(typeof i.author === "string", `${context}: album author not string`);
-	}
+  const i = item as Record<string, unknown>;
+  assert(typeof i.id === "string" && i.id.length > 0, `${context}: missing id`);
+  assert(typeof i.name === "string", `${context}: missing name`);
+  assert(typeof i.img === "string", `${context}: missing img`);
+  assert(
+    ["playlist", "channel", "artist", "album"].includes(i.type as string),
+    `${context}: invalid type`,
+  );
+  if (i.type === "playlist") {
+    // videoCount and author may be empty for some playlists
+    if (i.videoCount)
+      assert(
+        typeof i.videoCount === "string",
+        `${context}: playlist videoCount not string`,
+      );
+    if (i.author)
+      assert(
+        typeof i.author === "string",
+        `${context}: playlist author not string`,
+      );
+  }
+  if (i.type === "channel") {
+    if (i.subscribers)
+      assert(
+        typeof i.subscribers === "string",
+        `${context}: channel subscribers not string`,
+      );
+  }
+  if (i.type === "album") {
+    if (i.author)
+      assert(
+        typeof i.author === "string",
+        `${context}: album author not string`,
+      );
+  }
 }
 
-async function runTest(name: string, fn: () => Promise<unknown>): Promise<TestResult> {
-	const start = Date.now();
-	try {
-		const result = await fn();
-		return { name, passed: true, sample: result, duration: Date.now() - start };
-	} catch (e) {
-		return { name, passed: false, error: (e as Error).message, duration: Date.now() - start };
-	}
+async function runTest(
+  name: string,
+  fn: () => Promise<unknown>,
+): Promise<TestResult> {
+  const start = Date.now();
+  try {
+    const result = await fn();
+    return { name, passed: true, sample: result, duration: Date.now() - start };
+  } catch (e) {
+    return {
+      name,
+      passed: false,
+      error: (e as Error).message,
+      duration: Date.now() - start,
+    };
+  }
 }
 
 async function main() {
-	console.log("🧪 Starting Backend API Tests\n");
-	console.log("=" .repeat(60));
+  console.log("🧪 Starting Backend API Tests\n");
+  console.log("=".repeat(60));
 
-	const results: TestResult[] = [];
+  const results: TestResult[] = [];
 
-	// --- getSearch ---
-	results.push(await runTest("getSearch (regular)", async () => {
-		const data = await getSearch({ q: TEST_QUERIES.search, f: "all" });
-		assert(Array.isArray(data), "should return array");
-		assert(data.length > 0, "should have results");
-		data.slice(0, 3).forEach((item, idx) => validateYTItem(item, `getSearch[${idx}]`));
-		return data.slice(0, 3);
-	}));
+  // --- getSearch ---
+  results.push(
+    await runTest("getSearch (regular)", async () => {
+      const data = await getSearch({ q: TEST_QUERIES.search, f: "all" });
+      assert(Array.isArray(data), "should return array");
+      assert(data.length > 0, "should have results");
+      data
+        .slice(0, 3)
+        .forEach((item, idx) => validateYTItem(item, `getSearch[${idx}]`));
+      return data.slice(0, 3);
+    }),
+  );
 
-	results.push(await runTest("getSearch (song filter)", async () => {
-		const data = await getSearch({ q: TEST_QUERIES.searchMusic, f: "song" });
-		assert(Array.isArray(data), "should return array");
-		data.slice(0, 3).forEach((item, idx) => {
-			validateYTItem(item, `getSearch(song)[${idx}]`);
-			assert(item.type === "song", `should be song type`);
-		});
-		return data.slice(0, 3);
-	}));
+  results.push(
+    await runTest("getSearch (song filter)", async () => {
+      const data = await getSearch({ q: TEST_QUERIES.searchMusic, f: "song" });
+      assert(Array.isArray(data), "should return array");
+      data.slice(0, 3).forEach((item: unknown, idx: number) => {
+        validateYTItem(item, `getSearch(song)[${idx}]`);
+        assert(
+          (item as { type: string }).type === "song",
+          `should be song type`,
+        );
+      });
+      return data.slice(0, 3);
+    }),
+  );
 
-	results.push(await runTest("getSearch (playlist filter)", async () => {
-		const data = await getSearch({ q: TEST_QUERIES.search, f: "playlist" });
-		assert(Array.isArray(data), "should return array");
-		data.slice(0, 3).forEach((item, idx) => validateYTListItem(item, `getSearch(playlist)[${idx}]`));
-		return data.slice(0, 3);
-	}));
+  results.push(
+    await runTest("getSearch (playlist filter)", async () => {
+      const data = await getSearch({ q: TEST_QUERIES.search, f: "playlist" });
+      assert(Array.isArray(data), "should return array");
+      data
+        .slice(0, 3)
+        .forEach((item: unknown, idx: number) =>
+          validateYTListItem(item, `getSearch(playlist)[${idx}]`),
+        );
+      return data.slice(0, 3);
+    }),
+  );
 
-	// --- getSearchSuggestions ---
-	results.push(await runTest("getSearchSuggestions (regular)", async () => {
-		const data = await getSearchSuggestions({ q: "rick", music: false });
-		assert(Array.isArray(data), "should return array");
-		assert(data.every(s => typeof s === "string"), "all items should be strings");
-		return data.slice(0, 5);
-	}));
+  // --- getSearchSuggestions ---
+  results.push(
+    await runTest("getSearchSuggestions (regular)", async () => {
+      const data = await getSearchSuggestions({ q: "rick", music: false });
+      assert(Array.isArray(data), "should return array");
+      assert(
+        data.every((s) => typeof s === "string"),
+        "all items should be strings",
+      );
+      return data.slice(0, 5);
+    }),
+  );
 
-	results.push(await runTest("getSearchSuggestions (music)", async () => {
-		const data = await getSearchSuggestions({ q: "rick", music: true });
-		assert(Array.isArray(data), "should return array");
-		assert(data.every(s => typeof s === "string"), "all items should be strings");
-		return data.slice(0, 5);
-	}));
+  results.push(
+    await runTest("getSearchSuggestions (music)", async () => {
+      const data = await getSearchSuggestions({ q: "rick", music: true });
+      assert(Array.isArray(data), "should return array");
+      assert(
+        data.every((s) => typeof s === "string"),
+        "all items should be strings",
+      );
+      return data.slice(0, 5);
+    }),
+  );
 
-	// --- getPlaylist ---
-	results.push(await runTest("getPlaylist (regular)", async () => {
-		const data = await getPlaylist(TEST_IDS.playlist, false);
-		assert(typeof data === "object", "should return object");
-		validateYTListItem(data, "getPlaylist");
-		assert(Array.isArray(data.items), "should have items array");
-		data.items.slice(0, 3).forEach((item, idx) => validateYTItem(item, `getPlaylist.items[${idx}]`));
-		return { id: data.id, name: data.name, itemCount: data.items.length };
-	}));
+  // --- getPlaylist ---
+  results.push(
+    await runTest("getPlaylist (regular)", async () => {
+      const data = await getPlaylist(TEST_IDS.playlist, false);
+      assert(typeof data === "object", "should return object");
+      validateYTListItem(data, "getPlaylist");
+      assert(Array.isArray(data.items), "should have items array");
+      data.items
+        ?.slice(0, 3)
+        .forEach((item: unknown, idx: number) =>
+          validateYTItem(item, `getPlaylist.items[${idx}]`),
+        );
+      return {
+        id: data.id,
+        name: data.name,
+        itemCount: data.items?.length ?? 0,
+      };
+    }),
+  );
 
-	// --- getAlbum ---
-	results.push(await runTest("getAlbum", async () => {
-		try {
-			const data = await getAlbum(TEST_IDS.album);
-			console.log("getAlbum result:", JSON.stringify({ id: data.id, name: data.name, itemCount: data.items?.length }).slice(0, 200));
-			assert(typeof data === "object", "should return object");
-			assert(typeof data.name === "string", "should have name");
-			assert(typeof data.author === "string", "should have author");
-			// items may be empty for some albums - that's valid
-			if (data.items && data.items.length > 0) {
-				data.items.slice(0, 3).forEach((item, idx) => {
-					validateYTItem(item, `getAlbum.items[${idx}]`);
-					assert(item.type === "song", `album items should be songs`);
-				});
-			}
-			return { id: data.id, name: data.name, itemCount: data.items?.length || 0 };
-		} catch (e) {
-			const msg = (e as Error).message;
-			// Some album IDs may not be accessible - treat as valid "not found" case
-			if (msg.includes("No contents found in the response")) {
-				return { id: TEST_IDS.album, name: "unavailable", itemCount: 0, skipped: true };
-			}
-			console.error("getAlbum error:", e);
-			throw e;
-		}
-	}));
+  // --- getAlbum ---
+  results.push(
+    await runTest("getAlbum", async () => {
+      try {
+        const data = await getAlbum(TEST_IDS.album);
+        console.log(
+          "getAlbum result:",
+          JSON.stringify({
+            id: data.id,
+            name: data.name,
+            itemCount: data.items?.length,
+          }).slice(0, 200),
+        );
+        assert(typeof data === "object", "should return object");
+        assert(typeof data.name === "string", "should have name");
+        assert(typeof data.author === "string", "should have author");
+        // items may be empty for some albums - that's valid
+        if (data.items && data.items.length > 0) {
+          data.items.slice(0, 3).forEach((item: unknown, idx: number) => {
+            validateYTItem(item, `getAlbum.items[${idx}]`);
+            assert(
+              (item as { type: string }).type === "song",
+              `album items should be songs`,
+            );
+          });
+        }
+        return {
+          id: data.id,
+          name: data.name,
+          itemCount: data.items?.length || 0,
+        };
+      } catch (e) {
+        const msg = (e as Error).message;
+        // Some album IDs may not be accessible - treat as valid "not found" case
+        if (msg.includes("No contents found in the response")) {
+          return {
+            id: TEST_IDS.album,
+            name: "unavailable",
+            itemCount: 0,
+            skipped: true,
+          };
+        }
+        console.error("getAlbum error:", e);
+        throw e;
+      }
+    }),
+  );
 
-	// --- getArtist ---
-	results.push(await runTest("getArtist", async () => {
-		const data = await getArtist(TEST_IDS.artist);
-		assert(typeof data === "object", "should return object");
-		assert(typeof data.name === "string" && data.name.length > 0, "should have a name");
-		assert(Array.isArray(data.items), "should have songs");
-		assert(Array.isArray(data.albums), "should have albums");
-		assert(Array.isArray(data.eps), "should have eps");
-		assert(data.items.length > 0, "should have at least one song");
-		assert(data.albums.length > 0, "should have at least one album");
-		assert(data.eps.length > 0, "should have at least one EP");
+  // --- getArtist ---
+  results.push(
+    await runTest("getArtist", async () => {
+      const data = await getArtist(TEST_IDS.artist);
+      assert(typeof data === "object", "should return object");
+      assert(
+        typeof data.name === "string" && data.name.length > 0,
+        "should have a name",
+      );
+      assert(Array.isArray(data.items), "should have songs");
+      assert(Array.isArray(data.albums), "should have albums");
+      assert(Array.isArray(data.eps), "should have eps");
+      assert(data.items.length > 0, "should have at least one song");
+      assert(data.albums.length > 0, "should have at least one album");
+      assert(data.eps.length > 0, "should have at least one EP");
 
-		// Discography rows carry no `year` field; it is parsed from the subtitle,
-		// so a missing year means the release label was not recognised.
-		[...data.albums, ...data.eps].forEach((album, idx) => {
-			validateYTListItem(album, `getArtist.releases[${idx}]`);
-			assert(album.type === "album", "artist releases should be albums");
-			assert(!!album.id, "artist releases should have an id");
-			assert(!!album.year, `artist release should have a year: ${album.name}`);
-		});
+      // Discography rows carry no `year` field; it is parsed from the subtitle,
+      // so a missing year means the release label was not recognised.
+      [...data.albums, ...data.eps].forEach((album: unknown, idx: number) => {
+        validateYTListItem(album, `getArtist.releases[${idx}]`);
+        const alb = album as {
+          type: string;
+          id: string;
+          year?: string;
+          name: string;
+        };
+        assert(alb.type === "album", "artist releases should be albums");
+        assert(!!alb.id, "artist releases should have an id");
+        assert(!!alb.year, `artist release should have a year: ${alb.name}`);
+      });
 
-		// The artist page's carousels are hard-capped at 10 items with no
-		// continuation, so anything past that only comes from the discography
-		// page. Dropping below the cap means the fallback kicked in.
-		assert(
-			data.albums.length > 10,
-			`expected more than the 10-item carousel cap, got ${data.albums.length}`
-		);
-		// Canaries beyond the carousel cap, so a silent fallback cannot pass.
-		const albumIds = data.albums.map((album) => album.id);
-		assert(albumIds.includes("MPREb_m66VrCVOY5u"), "missing Ágætis byrjun (19th album, past the cap)");
+      // The artist page's carousels are hard-capped at 10 items with no
+      // continuation, so anything past that only comes from the discography
+      // page. Dropping below the cap means the fallback kicked in.
+      assert(
+        data.albums.length > 10,
+        `expected more than the 10-item carousel cap, got ${data.albums.length}`,
+      );
+      // Canaries beyond the carousel cap, so a silent fallback cannot pass.
+      const albumIds = data.albums.map((album: { id: string }) => album.id);
+      assert(
+        albumIds.includes("MPREb_m66VrCVOY5u"),
+        "missing Ágætis byrjun (19th album, past the cap)",
+      );
 
-		data.items.slice(0, 3).forEach((item, idx) => {
-			validateYTItem(item, `getArtist.items[${idx}]`);
-			assert(item.type === "song", `artist items should be songs`);
-		});
-		return {
-			id: data.id,
-			name: data.name,
-			songCount: data.items.length,
-			albumCount: data.albums.length,
-			epCount: data.eps.length,
-		};
-	}));
+      data.items.slice(0, 3).forEach((item: unknown, idx: number) => {
+        validateYTItem(item, `getArtist.items[${idx}]`);
+        assert(
+          (item as { type: string }).type === "song",
+          `artist items should be songs`,
+        );
+      });
+      return {
+        id: data.id,
+        name: data.name,
+        songCount: data.items.length,
+        albumCount: data.albums.length,
+        epCount: data.eps.length,
+      };
+    }),
+  );
 
-	// --- getArtist (discography) ---
-	results.push(await runTest("getArtist (discography EP)", async () => {
-		const data = await getArtist(TEST_IDS.artistDeepEp);
-		assert(typeof data.name === "string" && data.name.length > 0, "should have a name");
-		assert(data.albums.length > 0, "should have albums");
-		assert(data.eps.length > 0, "should have eps");
+  // --- getArtist (discography) ---
+  results.push(
+    await runTest("getArtist (discography EP)", async () => {
+      const data = await getArtist(TEST_IDS.artistDeepEp);
+      assert(
+        typeof data.name === "string" && data.name.length > 0,
+        "should have a name",
+      );
+      assert(data.albums.length > 0, "should have albums");
+      assert(data.eps.length > 0, "should have eps");
 
-		// Young Mountain is the reported regression: an EP from 2006 that the
-		// 10-item Singles & EPs carousel never exposed.
-		const youngMountain = data.eps.find((ep) => ep.id === "MPREb_j48YxzcCJQs");
-		assert(!!youngMountain, "should include Young Mountain (MPREb_j48YxzcCJQs) in eps");
-		assert(youngMountain.year === "2006", `Young Mountain year should be 2006, got ${youngMountain.year}`);
+      // Young Mountain is the reported regression: an EP from 2006 that the
+      // 10-item Singles & EPs carousel never exposed.
+      const youngMountain = data.eps.find(
+        (ep: { id: string; year?: string; name: string }) =>
+          ep.id === "MPREb_j48YxzcCJQs",
+      );
+      assert(
+        !!youngMountain,
+        "should include Young Mountain (MPREb_j48YxzcCJQs) in eps",
+      );
+      assert(
+        youngMountain?.year === "2006",
+        `Young Mountain year should be 2006, got ${youngMountain?.year}`,
+      );
 
-		// Albums and EPs come from disjoint discography chips and must not overlap.
-		const albumIds = new Set(data.albums.map((album) => album.id));
-		const overlap = data.eps.filter((ep) => albumIds.has(ep.id));
-		assert(overlap.length === 0, `albums and eps overlap: ${overlap.map((ep) => ep.name).join(", ")}`);
+      // Albums and EPs come from disjoint discography chips and must not overlap.
+      const albumIds = new Set(
+        data.albums.map((album: { id: string }) => album.id),
+      );
+      const overlap = data.eps.filter((ep: { id: string; name: string }) =>
+        albumIds.has(ep.id),
+      );
+      assert(
+        overlap.length === 0,
+        `albums and eps overlap: ${overlap.map((ep: { name: string }) => ep.name).join(", ")}`,
+      );
 
-		return {
-			id: data.id,
-			name: data.name,
-			albumCount: data.albums.length,
-			epCount: data.eps.length,
-			eps: data.eps.map((ep) => `${ep.year} ${ep.name}`),
-		};
-	}));
+      return {
+        id: data.id,
+        name: data.name,
+        albumCount: data.albums.length,
+        epCount: data.eps.length,
+        eps: data.eps.map(
+          (ep: { year?: string; name: string }) => `${ep.year} ${ep.name}`,
+        ),
+      };
+    }),
+  );
 
-	// --- getChannel ---
-	results.push(await runTest("getChannel", async () => {
-		const data = await getChannel(TEST_IDS.channel);
-		assert(typeof data === "object", "should return object");
-		assert(typeof data.name === "string", "should have name");
-		assert(Array.isArray(data.items), "should have videos");
-		data.items.slice(0, 3).forEach((item, idx) => validateYTItem(item, `getChannel.items[${idx}]`));
-		return { id: data.id, name: data.name, videoCount: data.items.length };
-	}));
+  // --- getChannel ---
+  results.push(
+    await runTest("getChannel", async () => {
+      const data = await getChannel(TEST_IDS.channel);
+      assert(typeof data === "object", "should return object");
+      assert(typeof data.name === "string", "should have name");
+      assert(Array.isArray(data.items), "should have videos");
+      data.items
+        .slice(0, 3)
+        .forEach((item: unknown, idx: number) =>
+          validateYTItem(item, `getChannel.items[${idx}]`),
+        );
+      return { id: data.id, name: data.name, videoCount: data.items.length };
+    }),
+  );
 
-	// --- getGallery ---
-	results.push(await runTest("getGallery", async () => {
-		const data = await getGallery([TEST_IDS.artist]);
-		assert(typeof data === "object", "should return object");
-		assert(Array.isArray(data.userArtists), "should have userArtists");
-		assert(Array.isArray(data.relatedArtists), "should have relatedArtists");
-		assert(Array.isArray(data.relatedPlaylists), "should have relatedPlaylists");
-		data.relatedArtists.slice(0, 3).forEach((item, idx) => validateYTListItem(item, `getGallery.relatedArtists[${idx}]`));
-		data.relatedPlaylists.slice(0, 3).forEach((item, idx) => validateYTListItem(item, `getGallery.relatedPlaylists[${idx}]`));
-		return {
-			userArtists: data.userArtists.length,
-			relatedArtists: data.relatedArtists.length,
-			relatedPlaylists: data.relatedPlaylists.length,
-		};
-	}));
+  // --- getGallery ---
+  results.push(
+    await runTest("getGallery", async () => {
+      const data = await getGallery([TEST_IDS.artist]);
+      assert(typeof data === "object", "should return object");
+      assert(Array.isArray(data.userArtists), "should have userArtists");
+      assert(Array.isArray(data.relatedArtists), "should have relatedArtists");
+      assert(
+        Array.isArray(data.relatedPlaylists),
+        "should have relatedPlaylists",
+      );
+      data.relatedArtists
+        .slice(0, 3)
+        .forEach((item: unknown, idx: number) =>
+          validateYTListItem(item, `getGallery.relatedArtists[${idx}]`),
+        );
+      data.relatedPlaylists
+        .slice(0, 3)
+        .forEach((item: unknown, idx: number) =>
+          validateYTListItem(item, `getGallery.relatedPlaylists[${idx}]`),
+        );
+      return {
+        userArtists: data.userArtists.length,
+        relatedArtists: data.relatedArtists.length,
+        relatedPlaylists: data.relatedPlaylists.length,
+      };
+    }),
+  );
 
-	// --- getSimilar ---
-	results.push(await runTest("getSimilar", async () => {
-		const data = await getSimilar({ title: "Never Gonna Give You Up", artist: "Rick Astley", limit: "5" });
-		assert(Array.isArray(data), "should return array");
-		data.slice(0, 3).forEach((item, idx) => {
-			validateYTItem(item, `getSimilar[${idx}]`);
-			// getSimilar uses music search (type="song") but strips albumId/img
-			assert(item.type === "song" || item.type === "video", `should be song or video`);
-		});
-		return data.slice(0, 3);
-	}));
+  // --- getSimilar ---
+  results.push(
+    await runTest("getSimilar", async () => {
+      const data = await getSimilar({
+        title: "Never Gonna Give You Up",
+        artist: "Rick Astley",
+        limit: "5",
+      });
+      assert(Array.isArray(data), "should return array");
+      data.slice(0, 3).forEach((item: unknown, idx: number) => {
+        validateYTItem(item, `getSimilar[${idx}]`);
+        const ytItem = item as { type: string };
+        // getSimilar uses music search (type="song") but strips albumId/img
+        assert(
+          ytItem.type === "song" || ytItem.type === "video",
+          `should be song or video`,
+        );
+      });
+      return data.slice(0, 3);
+    }),
+  );
 
-	// --- getSubFeed ---
-	results.push(await runTest("getSubFeed", async () => {
-		const data = await getSubFeed([TEST_IDS.channel]);
-		assert(Array.isArray(data), "should return array");
-		data.slice(0, 3).forEach((item, idx) => validateYTItem(item, `getSubFeed[${idx}]`));
-		return data.slice(0, 3);
-	}));
+  // --- getSubFeed ---
+  results.push(
+    await runTest("getSubFeed", async () => {
+      const data = await getSubFeed([TEST_IDS.channel]);
+      assert(Array.isArray(data), "should return array");
+      data
+        .slice(0, 3)
+        .forEach((item: unknown, idx: number) =>
+          validateYTItem(item, `getSubFeed[${idx}]`),
+        );
+      return data.slice(0, 3);
+    }),
+  );
 
-	// --- Summary ---
-	console.log("\n" + "=" .repeat(60));
-	console.log("📊 TEST RESULTS\n");
+  // --- Summary ---
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 TEST RESULTS\n");
 
-	let passed = 0;
-	let failed = 0;
+  let passed = 0;
+  let failed = 0;
 
-	for (const r of results) {
-		const icon = r.passed ? "✅" : "❌";
-		const time = `${r.duration}ms`;
-		console.log(`${icon} ${r.name.padEnd(35)} ${time.padStart(10)}`);
-		if (!r.passed) {
-			console.log(`    Error: ${r.error}`);
-			failed++;
-		} else {
-			passed++;
-		}
-	}
+  for (const r of results) {
+    const icon = r.passed ? "✅" : "❌";
+    const time = `${r.duration}ms`;
+    console.log(`${icon} ${r.name.padEnd(35)} ${time.padStart(10)}`);
+    if (!r.passed) {
+      console.log(`    Error: ${r.error}`);
+      failed++;
+    } else {
+      passed++;
+    }
+  }
 
-	console.log("\n" + "-".repeat(60));
-	console.log(`Total: ${results.length} | Passed: ${passed} | Failed: ${failed}`);
+  console.log("\n" + "-".repeat(60));
+  console.log(
+    `Total: ${results.length} | Passed: ${passed} | Failed: ${failed}`,
+  );
 
-	if (failed > 0) {
-		console.log("\n❌ Some tests failed");
-		process.exit(1);
-	} else {
-		console.log("\n✅ All tests passed");
-		process.exit(0);
-	}
+  if (failed > 0) {
+    console.log("\n❌ Some tests failed");
+    process.exit(1);
+  } else {
+    console.log("\n✅ All tests passed");
+    process.exit(0);
+  }
 }
 
 main().catch((e) => {
-	console.error("Fatal error:", e);
-	process.exit(1);
+  console.error("Fatal error:", e);
+  process.exit(1);
 });
