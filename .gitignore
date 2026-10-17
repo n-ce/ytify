@@ -4,3 +4,4 @@ dist
 package-lock.json
 bun.lock
 dist/
+.kilo/plans/

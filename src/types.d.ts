@@ -22,6 +22,8 @@ declare global {
     author: string;
     authorId: string;
     modified?: number;
+    albumId?: string;
+    albumTitle?: string;
     context?: {
       src: Context;
       id: string;
@@ -31,6 +33,7 @@ declare global {
   interface YTItem extends TrackItem {
     img?: string;
     albumId?: string;
+    albumTitle?: string;
     subtext?: string;
     type: "video" | "song";
   }

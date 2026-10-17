@@ -1,0 +1,639 @@
+import { describe, expect, test } from "bun:test";
+import { DatabaseSync } from "node:sqlite";
+import { CatalogDO } from "../src/backend/CatalogDO";
+import { StreamGateDO } from "../src/backend/StreamGateDO";
+import { UserSyncDO } from "../src/backend/UserSyncDO";
+import { tracksToCanonical } from "../src/backend/catalog";
+import { fakeDurableState, doFetch, postJson, readJson } from "./durableFixture";
+
+describe("catalog/canonical_tracks", () => {
+  test("upserts and reads tracks by id", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    const res = await postJson(catalog, "/tracks", {
+      tracks: [
+        canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A", now),
+        canonicalTrack("bbbbbbbbbbb", "Song B", "Artist B", now),
+      ],
+    });
+    expect(await res.json()).toEqual({ written: 2 });
+
+    // A body without a tracks array is rejected.
+    const badBody = await postJson(catalog, "/tracks", {});
+    expect(badBody.status).toBe(400);
+
+    const body = await readJson(catalog, "/tracks?ids=aaaaaaaaaaa,missing");
+    expect(Object.keys(body)).toEqual(["aaaaaaaaaaa"]);
+    expect(body.aaaaaaaaaaa).toMatchObject({
+      title: "Song A",
+      author: "Artist A",
+      duration: 180,
+    });
+
+    const missingResponse = await doFetch(catalog, "/track?id=missing");
+    expect(missingResponse.status).toBe(404);
+  });
+
+  test("an older write never regresses a newer record", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    await postJson(catalog, "/tracks", {
+      tracks: [canonicalTrack("aaaaaaaaaaa", "Fresh", "Artist A", now)],
+    });
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        { ...canonicalTrack("aaaaaaaaaaa", "Stale", "Old", now - 60_000) },
+      ],
+    });
+
+    const track = await readJson(catalog, "/track?id=aaaaaaaaaaa");
+    expect(track.title).toBe("Fresh");
+    expect(track.author).toBe("Artist A");
+  });
+
+  test("a newer partial record merges without zeroing existing fields", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    await postJson(catalog, "/tracks", {
+      tracks: [canonicalTrack("aaaaaaaaaaa", "Song A", "Topic", now)],
+    });
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        {
+          ...canonicalTrack("aaaaaaaaaaa", "Song A", "Real Artist", now + 1000),
+          duration: 0,
+        },
+      ],
+    });
+
+    const track = await readJson(catalog, "/track?id=aaaaaaaaaaa");
+    expect(track.author).toBe("Real Artist");
+    expect(track.duration).toBe(180);
+  });
+});
+
+describe("catalog/recommend", () => {
+  test("scores curated playlists at +10 per shared track", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+    const [a, b, c, d] = ["aaaaaaaaaaa", "bbbbbbbbbbb", "ccccccccccc", "ddddddddddd"];
+
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        canonicalTrack(a, "Song A", "Artist A", now),
+        canonicalTrack(b, "Song B", "Artist B", now),
+        canonicalTrack(c, "Song C", "Artist C", now),
+      ],
+    });
+    await postJson(catalog, "/playlists", {
+      playlists: [
+        playlist("PL1", "One match", [a, b], now),
+        playlist("PL2", "Two matches", [c, a], now),
+        playlist("PL3", "No match", [d], now),
+      ],
+    });
+
+    const { playlists } = await readJson(
+      catalog,
+      `/recommend?ids=${a},${c}&limit=10`,
+    );
+
+    expect(playlists.map((p: any) => p.id)).toEqual(["PL2", "PL1"]);
+    expect(playlists[0].score).toBe(20);
+    expect(playlists[1].score).toBe(10);
+    expect(
+      playlists.every((p: any) => p.tracks.length > 0 && p.trackCount > 0),
+    ).toBe(true);
+    expect(playlists[0].trackCount).toBe(2);
+    expect(playlists[0].tracks[0]).toMatchObject({ id: c, author: "Artist C" });
+
+    const empty = await readJson(catalog, "/recommend?ids=");
+    expect(empty.playlists).toEqual([]);
+  });
+
+  test("tracks-since returns only records changed after the watermark", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        canonicalTrack("aaaaaaaaaaa", "Old", "Old Artist", now),
+        canonicalTrack("bbbbbbbbbbb", "New", "New Artist", now + 10_000),
+      ],
+    });
+
+    const since = await readJson(catalog, `/tracks-since?since=${now + 5_000}`);
+    expect(since.map((t: any) => t.id)).toEqual(["bbbbbbbbbbb"]);
+
+    const all = await readJson(catalog, "/tracks-since?since=0");
+    expect(all).toHaveLength(2);
+
+    const none = await readJson(catalog, `/tracks-since?since=${now + 20_000}`);
+    expect(none).toEqual([]);
+  });
+});
+
+describe("catalog/scrape queue (queue-free deployments)", () => {
+  const category = {
+    slug: "chill",
+    type: "mood" as const,
+    title: "Chill",
+    params: "P1",
+  };
+
+  test("categories can be listed and filtered by type", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+
+    const written = await postJson(catalog, "/categories", {
+      categories: [
+        { slug: "chill", type: "mood", title: "Chill", params: "P1" },
+        { slug: "rock", type: "genre", title: "Rock", params: "P2" },
+      ],
+    });
+    expect(await written.json()).toEqual({ written: 2 });
+
+    const all = await readJson(catalog, "/categories");
+    expect(all).toHaveLength(2);
+    expect(await readJson(catalog, "/categories?type=mood")).toEqual([
+      { slug: "chill", type: "mood", title: "Chill", params: "P1" },
+    ]);
+    expect(await readJson(catalog, "/categories?type=genre")).toHaveLength(1);
+    expect(await readJson(catalog, "/categories?type=nope")).toEqual([]);
+  });
+
+  test("curated playlists are returned in the public (camelCase) shape", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    await postJson(catalog, "/tracks", {
+      tracks: [canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A", now)],
+    });
+    await postJson(catalog, "/playlists", {
+      playlists: [
+        playlist("PL1", "Chill Mix", ["aaaaaaaaaaa"], now),
+        playlist("PL2", "Chill Nights", [], now),
+      ],
+    });
+
+    const byCategory = await readJson(catalog, "/playlists?category=chill");
+    expect(byCategory).toHaveLength(2);
+    expect(byCategory[0]).toMatchObject({
+      id: "PL1",
+      categorySlug: "chill",
+      categoryType: "mood",
+      sectionTitle: "Chill",
+      title: "Chill Mix",
+      trackIds: ["aaaaaaaaaaa"],
+      updatedAt: now,
+    });
+    // No DB column names may leak through the public shape.
+    expect(Object.keys(byCategory[0]).some((k) => k.includes("_"))).toBe(false);
+
+    expect(await readJson(catalog, "/playlists?category=other")).toEqual([]);
+    expect(await readJson(catalog, "/playlists")).toHaveLength(2);
+  });
+
+  test("categories can be parked in SQLite for alarm-driven scraping", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+
+    const queued = await postJson(catalog, "/scrape-jobs", {
+      categories: [category, { ...category, slug: "workout" }],
+    });
+    expect(await queued.json()).toEqual({ queued: 2 });
+
+    // Re-queueing the same slug refreshes it instead of duplicating.
+    await postJson(catalog, "/scrape-jobs", { categories: [category] });
+    const status = await readJson(catalog, "/scrape-jobs");
+    expect(status.pending).toBe(2);
+
+    // An empty batch is a no-op, not an error.
+    const empty = await postJson(catalog, "/scrape-jobs", { categories: [] });
+    expect(empty.status).toBe(200);
+    expect(await empty.json()).toEqual({ queued: 0 });
+
+    const malformed = await postJson(catalog, "/scrape-jobs", {});
+    expect(malformed.status).toBe(400);
+  });
+
+  test("a drained category is removed and its results are ingested", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    await postJson(catalog, "/scrape-jobs", { categories: [category] });
+
+    await (catalog as any).processScrapeJob(category, async () => ({
+      playlists: [playlist("PL1", "Chill Mix", ["aaaaaaaaaaa"], Date.now())],
+      tracks: [canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A", Date.now())],
+    }));
+
+    expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(0);
+    expect((await readJson(catalog, "/track?id=aaaaaaaaaaa")).title).toBe("Song A");
+    const playlists = await readJson(catalog, "/playlists?category=chill");
+    expect(playlists[0].title).toBe("Chill Mix");
+  });
+
+  test("a failing category is retried, then dropped", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    await postJson(catalog, "/scrape-jobs", { categories: [category] });
+
+    const failing = async () => {
+      throw new Error("InnerTube layout changed");
+    };
+
+    await (catalog as any).processScrapeJob(category, failing);
+    expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(1);
+
+    await (catalog as any).processScrapeJob(category, failing);
+    await (catalog as any).processScrapeJob(category, failing);
+
+    // Third failure crosses the attempt budget, so the category is dropped
+    // instead of being retried forever on every weekly cycle.
+    expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(0);
+  });
+});
+
+describe("stream gate/lease", () => {
+  const post = (gate: any, path: string, body: unknown) =>
+    postJson(gate, `/${path}`, body);
+
+  test("a lease is single-writer: the second acquire is rejected", async () => {
+    const gate = new StreamGateDO(fakeDurableState() as any);
+
+    expect(await (await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })).json())
+      .toMatchObject({ granted: true });
+
+    const second = await (
+      await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })
+    ).json();
+    expect(second.granted).toBe(false);
+    expect(second.reason).toBe("leased");
+    expect(second.retryAfterMs).toBeGreaterThan(0);
+  });
+
+  test("an unrelated key is independent, but the ip cooldown still applies", async () => {
+    const gate = new StreamGateDO(fakeDurableState() as any);
+
+    await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" });
+    expect(
+      await (await post(gate, "acquire", { key: "sess-2", ip: "2.2.2.2" })).json(),
+    ).toMatchObject({ granted: true });
+
+    // A fresh session from the same IP is still held back: one call per IP per
+    // window, so pre-opening sessions cannot multiply quota burn.
+    const sameIp = await (
+      await post(gate, "acquire", { key: "sess-3", ip: "1.1.1.1" })
+    ).json();
+    expect(sameIp.granted).toBe(false);
+    expect(sameIp.reason).toBe("cooldown");
+  });
+
+  test("release frees the lease and stores key telemetry", async () => {
+    const gate = new StreamGateDO(fakeDurableState() as any);
+    const resetAt = Date.now() + 3_600_000;
+
+    await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" });
+    await post(gate, "release", {
+      key: "sess-1",
+      ip: "3.3.3.3",
+      keyIndex: 1,
+      remaining: 421,
+      resetAt,
+    });
+
+    const afterRelease = await readJson(gate, "/state");
+    expect(afterRelease.leases[0]).toMatchObject({
+      lease_key: "sess-1",
+      active_session: null,
+      in_flight_until: 0,
+    });
+    expect(afterRelease.keys).toEqual([{ idx: 1, remaining: 421, reset_at: resetAt }]);
+
+    const admitted = await (
+      await post(gate, "acquire", { key: "sess-1", ip: "4.4.4.4" })
+    ).json();
+    expect(admitted.granted).toBe(true);
+  });
+});
+
+describe("user sync/relations and hydration", () => {
+  const user = "a".repeat(64);
+
+  /** A catalog instance shared with the user DO, wired through a fake binding. */
+  function linkedCatalog() {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const env: any = {
+      CATALOG_DO: {
+        idFromName: () => "global",
+        get: () => ({ fetch: (req: Request) => catalog.fetch(req) }),
+      },
+    };
+    return { catalog, userDO: new UserSyncDO({ ...fakeDurableState(), env }) };
+  }
+
+  test("a full snapshot records relations and projects into the catalog", async () => {
+    const { catalog, userDO } = linkedCatalog();
+    const now = Date.now();
+
+    await userDO.fetch(
+      new Request(`http://do/library/${user}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meta: { version: 5, tracks: now },
+          tracks: {
+            aaaaaaaaaaa: {
+              id: "aaaaaaaaaaa",
+              title: "Song A",
+              duration: "03:00",
+              author: "Artist A - Topic",
+              authorId: "UC_A",
+              modified: now,
+            },
+          },
+        }),
+      }),
+    );
+
+    const rows = (userDO as any).sql
+      .exec<{ track_id: string; added_at: number }>(
+        "SELECT track_id, added_at FROM user_tracks",
+      )
+      .toArray();
+    expect(rows).toEqual([{ track_id: "aaaaaaaaaaa", added_at: now }]);
+
+    // The write-through runs in waitUntil; a real runtime flushes it before the
+    // next request, so drain it here.
+    await new Promise((r) => setTimeout(r, 10));
+    expect((await readJson(catalog, "/track?id=aaaaaaaaaaa")).author).toBe(
+      "Artist A - Topic",
+    );
+  });
+
+  test("reads are hydrated from the catalog so repairs reach every user", async () => {
+    const { catalog, userDO } = linkedCatalog();
+    const now = Date.now();
+
+    await userDO.fetch(
+      new Request(`http://do/library/${user}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meta: { version: 5, tracks: now },
+          tracks: {
+            aaaaaaaaaaa: {
+              id: "aaaaaaaaaaa",
+              title: "Song A",
+              duration: "03:00",
+              author: "Release - Topic",
+              authorId: "",
+              modified: now,
+              context: { src: "search", id: "q" },
+            },
+          },
+        }),
+      }),
+    );
+    // Let the write-through land so the user's own row exists in the catalog.
+    await new Promise((r) => setTimeout(r, 10));
+
+    // fixMetadata repairs the corrupted artist.
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A - Topic", now + 5_000),
+      ],
+    });
+
+    const snapshot = await readJson(userDO, `/library/${user}`);
+    expect(snapshot.tracks.aaaaaaaaaaa).toMatchObject({
+      title: "Song A",
+      author: "Artist A - Topic",
+      // Client-only fields survive the overlay.
+      context: { src: "search", id: "q" },
+    });
+
+    // A delta pull hydrates the same way.
+    const delta = await (
+      await userDO.fetch(
+        new Request(`http://do/sync/${user}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ meta: { version: 5, tracks: now + 1 } }),
+        }),
+      )
+    ).json();
+    expect(delta.delta.addedOrUpdatedTracks.aaaaaaaaaaa.author).toBe(
+      "Artist A - Topic",
+    );
+  });
+
+  test("a relation with no catalog row is backfilled from the local snapshot", async () => {
+    const { catalog, userDO } = linkedCatalog();
+    const now = Date.now();
+
+    await userDO.fetch(
+      new Request(`http://do/library/${user}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meta: { version: 5, tracks: now },
+          tracks: {
+            zzzzzzzzzzz: {
+              id: "zzzzzzzzzzz",
+              title: "Legacy Song",
+              duration: "04:00",
+              author: "Legacy Artist",
+              authorId: "UC_L",
+              modified: now,
+            },
+          },
+        }),
+      }),
+    );
+
+    // Simulate a catalog that lost the record (reset, first deploy after the
+    // write-through existed). The read must fall back to the local snapshot and
+    // reseed the catalog rather than dropping the track.
+    (catalog as any).sql.exec("DELETE FROM canonical_tracks");
+
+    const snapshot = await userDO
+      .fetch(new Request(`http://do/library/${user}`))
+      .then((r: Response) => r.json());
+    expect(snapshot.tracks.zzzzzzzzzzz).toMatchObject({
+      title: "Legacy Song",
+      author: "Legacy Artist",
+    });
+
+    await new Promise((r) => setTimeout(r, 10));
+    expect((await readJson(catalog, "/track?id=zzzzzzzzzzz")).title).toBe(
+      "Legacy Song",
+    );
+  });
+
+  test("a repair from another user's library is never delivered to this user", async () => {
+    const { catalog, userDO } = linkedCatalog();
+    const now = Date.now();
+
+    await userDO.fetch(
+      new Request(`http://do/library/${user}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meta: { version: 5, tracks: now },
+          tracks: {
+            aaaaaaaaaaa: {
+              id: "aaaaaaaaaaa",
+              title: "Song A",
+              duration: "03:00",
+              author: "Release - Topic",
+              authorId: "",
+              modified: now,
+            },
+          },
+        }),
+      }),
+    );
+
+    // The catalog is global: another user's favorite track and a repair for it
+    // must not appear in this user's delta.
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A - Topic", now + 5_000),
+        canonicalTrack("privatesong", "Someone Else's Song", "Private Artist", now + 6_000),
+      ],
+    });
+
+    const delta = await (
+      await userDO.fetch(
+        new Request(`http://do/sync/${user}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ meta: { version: 5, tracks: now + 1 } }),
+        }),
+      )
+    ).json();
+
+    expect(delta.delta.addedOrUpdatedTracks.aaaaaaaaaaa.author).toBe(
+      "Artist A - Topic",
+    );
+    expect(delta.delta.addedOrUpdatedTracks.privatesong).toBeUndefined();
+  });
+
+  test("deleting a track removes its relation", async () => {
+    const { userDO } = linkedCatalog();
+    const now = Date.now();
+
+    await userDO.fetch(
+      new Request(`http://do/library/${user}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meta: { version: 5, tracks: now },
+          tracks: {
+            aaaaaaaaaaa: {
+              id: "aaaaaaaaaaa",
+              title: "Song A",
+              duration: "03:00",
+              author: "Artist A - Topic",
+              authorId: "UC_A",
+              modified: now,
+            },
+          },
+        }),
+      }),
+    );
+
+    await userDO.fetch(
+      new Request(`http://do/sync/${user}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meta: {},
+          addedOrUpdatedTracks: {},
+          deletedTrackIds: ["aaaaaaaaaaa"],
+          updatedCollections: {},
+          deletedCollectionNames: [],
+        }),
+      }),
+    );
+
+    const rows = (userDO as any).sql
+      .exec<{ c: number }>("SELECT count(*) as c FROM user_tracks")
+      .one().c;
+    expect(rows).toBe(0);
+
+    const snapshot = await userDO
+      .fetch(new Request(`http://do/library/${user}`))
+      .then((r: Response) => r.json());
+    expect(snapshot.tracks.aaaaaaaaaaa).toBeUndefined();
+  });
+});
+
+describe("catalog/tracksToCanonical", () => {
+  test("projects library rows onto the canonical schema", () => {
+    const records = tracksToCanonical([
+      {
+        id: "aaaaaaaaaaa",
+        title: "Song A",
+        duration: "03:30",
+        author: "Artist A - Topic",
+        authorId: "UC_A",
+        modified: 1000,
+      },
+      { id: "bbbbbbbbbbb", title: "Song B", duration: "04:00", author: "Artist B", authorId: "UC_B" },
+      { id: "bbbbbbbbbbb", title: "Duplicate", duration: "1:00", author: "Dup", authorId: "UC_D" },
+      { title: "No id", duration: "1:00", author: "Ghost", authorId: "UC_G" },
+    ]);
+
+    expect(records).toHaveLength(2);
+    expect(records[0]).toMatchObject({
+      id: "aaaaaaaaaaa",
+      duration: 210,
+      isSong: true,
+      source: "user_sync",
+      updatedAt: 1000,
+    });
+    expect(records[1]).toMatchObject({ id: "bbbbbbbbbbb", isSong: false });
+    expect(typeof records[1].updatedAt).toBe("number");
+  });
+});
+
+// --- fixtures -------------------------------------------------------------
+
+function canonicalTrack(
+  id: string,
+  title: string,
+  author: string,
+  updatedAt: number,
+) {
+  return {
+    id,
+    title,
+    author,
+    authorId: `UC_${author}`,
+    duration: 180,
+    durationStr: "03:00",
+    isSong: true,
+    thumbnailId: id,
+    source: "innertube_scrape" as const,
+    updatedAt,
+  };
+}
+
+function playlist(
+  id: string,
+  title: string,
+  trackIds: string[],
+  updatedAt: number,
+) {
+  return {
+    id,
+    categorySlug: "chill",
+    categoryType: "mood",
+    sectionTitle: "Chill",
+    title,
+    thumbnailId: "",
+    trackIds,
+    updatedAt,
+  };
+}

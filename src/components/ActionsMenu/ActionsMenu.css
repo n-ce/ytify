@@ -7,7 +7,8 @@
     border-radius: var(--roundness);
     background: rgb(from var(--onBg) r g b / 0.8);
     backdrop-filter: blur(var(--size-px-2));
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     box-sizing: border-box;
 
     > .streamItem {
@@ -47,6 +48,13 @@
         }
     }
 
+    &.is-music > .streamItem span img {
+        width: var(--size-9);
+        height: var(--size-9);
+        aspect-ratio: 1;
+        object-fit: cover;
+    }
+
     &[open],
     &:open {
         animation: var(--animation-slide-in-up);
@@ -59,7 +67,7 @@
 
     @media (orientation: landscape) {
         margin-right: var(--size-fluid-2);
-        width: max-content;
+        width: 100%;
         max-width: min(24rem, calc(100dvw - var(--size-fluid-4)));
 
         &[open],
@@ -76,7 +84,10 @@
     ul {
         list-style: none;
         padding: 0;
+        margin: 0;
         display: grid;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     li {
@@ -91,6 +102,9 @@
         padding: var(--size-1) var(--size-5);
         border-top: var(--border);
         transition: background-color 0.2s;
+        box-sizing: border-box;
+        max-width: 100%;
+        min-width: 0;
 
         &:hover {
             background: var(--onBg2);
@@ -100,6 +114,7 @@
         & i {
             font-size: var(--font-size-3);
             font-weight: var(--font-weight-3);
+            flex-shrink: 0;
         }
     }
 
@@ -107,6 +122,8 @@
         display: flex;
         cursor: initial;
         border: none;
+        width: 100%;
+        box-sizing: border-box;
 
         i {
             max-width: 34%;
@@ -121,7 +138,7 @@
                 appearance: none;
                 margin: 0 !important;
                 padding: 0 !important;
-                max-width: 33%;
+                max-width: 100%;
                 text-align: right;
                 color: inherit !important;
             }

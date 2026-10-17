@@ -148,10 +148,10 @@ section > header {
 .header-title {
     display: flex;
     align-items: center;
-    flex: 1;
     min-width: 0;
+    flex: 1;
 
-    > p {
+    p {
         font-size: var(--font-size-3);
         letter-spacing: var(--font-letterspacing-1);
         font-weight: var(--font-weight-5);
@@ -161,42 +161,41 @@ section > header {
         user-select: none;
         opacity: 0.8;
         margin: 0;
-        width: 100%;
     }
 }
 
 .header-nav {
-    display: none;
+    display: flex;
     align-items: center;
-    gap: var(--size-4);
-    user-select: none;
-    flex: 1;
+    gap: var(--size-3);
     min-width: 0;
+    flex-wrap: nowrap;
 }
 
 .header-nav-item {
-    font-size: var(--font-size-3);
-    letter-spacing: var(--font-letterspacing-1);
+    font-size: var(--font-size-2);
     font-weight: var(--font-weight-5);
     color: var(--text);
-    opacity: 0.55;
+    opacity: 0.7;
     cursor: pointer;
+    user-select: none;
     transition:
         opacity 0.2s ease,
         color 0.2s ease;
     white-space: nowrap;
-    padding: var(--size-1) 0;
     position: relative;
+    padding: var(--size-1) 0;
+    text-decoration: none;
 
     &:hover {
-        opacity: 0.85;
+        opacity: 1;
         color: var(--text);
     }
 
     &.active {
         opacity: 1;
         font-weight: var(--font-weight-6);
-        color: var(--text2);
+        color: var(--text);
     }
 
     &.active::after {
@@ -282,44 +281,6 @@ nav.app-navbar {
     }
 }
 
-/* Tooltips */
-i[aria-label] {
-    position: relative;
-
-    &::after {
-        opacity: 0;
-        visibility: hidden;
-        content: attr(aria-label);
-        position: absolute;
-        top: calc(-100% - var(--size-1));
-        right: 50%;
-        transform: translateX(50%) translateY(var(--size-1));
-        white-space: nowrap;
-        padding: var(--size-1) var(--size-2);
-        background: var(--onBg2);
-        color: var(--text2);
-        border-radius: var(--roundness);
-        font-size: var(--font-size-0);
-        font-family: var(--font-family);
-        font-style: normal;
-        font-weight: var(--font-weight-4);
-        letter-spacing: 0;
-        box-shadow: var(--shadow-2);
-        pointer-events: none;
-        transition:
-            opacity 0.2s ease,
-            transform 0.2s ease,
-            visibility 0.2s ease;
-        z-index: 20;
-    }
-
-    &:hover:not(:active)::after {
-        opacity: 0.8;
-        visibility: visible;
-        transform: translateX(50%) translateY(0);
-    }
-}
-
 /* --- Main content area & Dual-Panel Shell --- */
 main {
     color: color-mix(
@@ -354,7 +315,7 @@ main {
     .queueSection .header-nav-extra,
     .header-nav-extra:has(.queue-duration-badge) {
         margin-left: auto;
-        margin-right:var(--size-3);
+        margin-right: var(--size-3);
     }
 
     .left-panel {
@@ -524,7 +485,8 @@ dialog {
     box-shadow: none;
 
     @media (orientation: landscape) {
-        width: calc(100dvw / 1.5);        margin-left: calc(100dvw / 3);
+        width: calc(100dvw / 1.5);
+        margin-left: calc(100dvw / 3);
     }
 
     &::backdrop {

@@ -108,6 +108,44 @@ interface YTAlbumItem extends ListItem {
 | `GET /api/subfeed` | `YTItem[]` with `publishedMs` |
 | `GET /api/similar` | `YTItem[]` (stripped fields) |
 
+### 3a. Global Catalog & Gate Endpoints
+
+These are backed by Durable Objects rather than InnerTube, so they are cheap and
+always available. See `docs/systems/catalog.md` for the storage contract.
+
+| Endpoint | Response |
+|----------|----------|
+| `GET /api/catalog/tracks?ids=a,b` | `Record<trackId, CanonicalTrack>` |
+| `GET /api/catalog/track?id=` | `CanonicalTrack` or 404 |
+| `POST /api/catalog/tracks` | `{ ok: true }` - batch upsert, token-gated |
+| `GET /api/catalog/categories?type=` | `Category[]` |
+| `GET /api/catalog/playlists?category=` | `CuratedPlaylist[]` (public shape, with `trackIds`) |
+| `GET /api/recommend?ids=a,b&limit=10` | `{ playlists: Recommendation[] }` |
+| `POST /api/stream-gate/acquire` | `{ granted, keyIndex, ... }` or a rejection |
+| `POST /api/stream-gate/release` | `{ ok: true }` + key telemetry |
+| `GET /api/stream-gate/state` | Lease, key and cooldown diagnostics |
+| `POST /api/cron/scrape?mode=direct\|schedule` | Manual scraper trigger |
+| `GET /api/cron/status` | `{ pending, alarmAt }` for the alarm-driven scraper |
+
+`CanonicalTrack` is `{ id, title, author, authorId, duration, durationStr,
+isSong, thumbnailId, source, updatedAt }`; `Recommendation` adds `score` (10 per
+shared track), `trackCount` and the first three resolved `tracks`; `CuratedPlaylist`
+adds `trackIds` (ordered). Every catalog route answers in this camelCase public
+dialect — DB column names never leak through an endpoint.
+
+The write routes (`POST /api/catalog/tracks`, `/api/stream-gate/*`,
+`/api/cron/*`) require `x-ytify-token` to match `INTERNAL_TOKEN` when that
+secret is configured. Reads are always public.
+
+`POST /api/cron/scrape` parks the discovered categories in `pending_scrape`
+inside `CatalogDO`, whose alarm drains them one at a time — no Cloudflare Queues
+binding, so nothing here needs a paid add-on. `GET /api/cron/status` reports the
+backlog and the next alarm tick.
+
+The `metadata-fix` routes that used to live on `UserSyncDO` are gone: metadata
+repairs now read and write the shared catalog, so there is a single cache for
+every consumer.
+
 ---
 
 ## Part 2: Parsing Implementation

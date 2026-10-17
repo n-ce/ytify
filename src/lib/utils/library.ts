@@ -273,10 +273,14 @@ export function recordTrackPlay(track: TrackItem) {
     saveTracksMap(tracks);
   }
 
-  if (cachingMode() === "auto")
-    syncAudioCache([id], Boolean(track.author?.endsWith(" - Topic")));
-
   setStore("libraryUpdated", (c) => (c || 0) + 1);
+}
+
+export function cacheTrackOnFinished(track: TrackItem) {
+  if (!track?.id) return;
+  if (cachingMode() === "auto") {
+    syncAudioCache([track.id], Boolean(track.author?.endsWith(" - Topic")));
+  }
 }
 
 /**

@@ -8,7 +8,6 @@ import ListItem from "@components/ListItem";
 import HeaderActions from "@components/HeaderActions";
 import HeaderNav from "@components/HeaderNav";
 
-const Gallery = lazy(() => import("./Gallery"));
 const SubFeed = lazy(() => import("./SubFeed"));
 const Featured = lazy(() => import("./Featured"));
 
@@ -37,9 +36,6 @@ export default function () {
         <HeaderActions />
       </header>
 
-      <Show when={librarySections().gallery}>
-        <Gallery />
-      </Show>
       <Show when={librarySections().subfeed}>
         <SubFeed />
       </Show>

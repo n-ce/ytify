@@ -18,8 +18,11 @@ import {
   navStore,
   setNavStore,
   playerStore,
+  playNext,
+  playPrev,
   params,
 } from "@stores";
+import { handleNavClick } from "@components/HeaderNav";
 import NavBar from "@components/NavBar";
 import "./styles/global.css";
 
@@ -91,6 +94,84 @@ export default function App() {
       mainRef?.removeEventListener("scrollend", checkScrollCompletion);
     });
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT" ||
+        target?.isContentEditable ||
+        document.querySelector("dialog[open]")
+      ) {
+        return;
+      }
+
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (playerStore.audio.paused) {
+          playerStore.audio.play().catch(() => {});
+        } else {
+          playerStore.audio.pause();
+        }
+      } else if (e.key === "ArrowLeft" && !e.shiftKey) {
+        e.preventDefault();
+        playerStore.audio.currentTime = Math.max(
+          0,
+          playerStore.audio.currentTime - 5,
+        );
+      } else if (e.key === "ArrowRight" && !e.shiftKey) {
+        e.preventDefault();
+        playerStore.audio.currentTime = Math.min(
+          playerStore.fullDuration || Infinity,
+          playerStore.audio.currentTime + 5,
+        );
+      } else if (
+        (e.shiftKey && e.key === "ArrowRight") ||
+        (e.shiftKey && (e.key === "N" || e.key === "n")) ||
+        e.key === "]"
+      ) {
+        e.preventDefault();
+        playNext();
+      } else if (
+        (e.shiftKey && e.key === "ArrowLeft") ||
+        (e.shiftKey && (e.key === "P" || e.key === "p")) ||
+        e.key === "["
+      ) {
+        e.preventDefault();
+        playPrev();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        playerStore.audio.volume = Math.min(1, playerStore.audio.volume + 0.05);
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        playerStore.audio.volume = Math.max(0, playerStore.audio.volume - 0.05);
+      } else if (e.key === "m" || e.key === "M") {
+        e.preventDefault();
+        playerStore.audio.muted = !playerStore.audio.muted;
+      } else if (e.key === "1") {
+        e.preventDefault();
+        handleNavClick("queue");
+      } else if (e.key === "2") {
+        e.preventDefault();
+        handleNavClick("search");
+      } else if (e.key === "3") {
+        e.preventDefault();
+        handleNavClick("library");
+      } else if (e.key === "/") {
+        e.preventDefault();
+        handleNavClick("search");
+        const searchInput = document.querySelector(
+          ".searchSection input, input#searchBar, input[type='text']",
+        ) as HTMLInputElement | null;
+        searchInput?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    onCleanup(() => {
+      window.removeEventListener("keydown", onKeyDown);
+    });
+
     await import("@modules/start.ts").then((mod) => mod.default());
 
     if (params.has("s")) {
@@ -154,7 +235,11 @@ export default function App() {
             >
               <MiniPlayer />
             </Show>
-            <Show when={navStore.active !== "list" && navStore.active !== "settings"}>
+            <Show
+              when={
+                navStore.active !== "list" && navStore.active !== "settings"
+              }
+            >
               <NavBar />
             </Show>
           </Show>

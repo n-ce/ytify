@@ -26,10 +26,33 @@ const Controls = lazy(() => import("./Controls"));
 
 export default function () {
   let playerSection!: HTMLDivElement;
+  let headerRef!: HTMLElement;
   const [showLyrics, setShowLyrics] = createSignal(false);
+
+  function updateStaticBackgroundPosition() {
+    if (!playerSection) return;
+    const { offsetHeight, offsetWidth } = playerSection;
+    if (offsetHeight === 0) {
+      requestAnimationFrame(updateStaticBackgroundPosition);
+      return;
+    }
+    const diff = offsetHeight - offsetWidth;
+    const shift = Math.floor(diff / 2);
+    cssVar("--player-bp", `-${shift}px 0`);
+  }
 
   onMount(() => {
     setNavStore("player", "ref", playerSection);
+    const updateStatic = () => {
+      const current = background();
+      if (current !== "none" && !current.endsWith("-motion")) {
+        updateStaticBackgroundPosition();
+      }
+    };
+    updateStatic();
+    const ro = new ResizeObserver(updateStatic);
+    ro.observe(playerSection);
+    onCleanup(() => ro.disconnect());
   });
 
   createEffect(() => {
@@ -51,7 +74,11 @@ export default function () {
     // Leaves --player-bg untouched while idle so nothing is painted per track.
     if (current === "none") return;
     cssVar("--player-bg", `url(${playerStore.mediaArtwork})`);
-    if (!current.endsWith("-motion")) cssVar("--player-bp", "0 0");
+    if (!current.endsWith("-motion")) {
+      updateStaticBackgroundPosition();
+    } else {
+      cssVar("--player-bp", "0 0");
+    }
   });
 
   function getContext() {
@@ -70,7 +97,7 @@ export default function () {
         <div class="bg-pane" />
       </Show>
 
-      <header class="topShelf">
+      <header class="topShelf" ref={headerRef}>
         <p>
           <Show when={playerStore.context.src}>
             <Show

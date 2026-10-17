@@ -21,6 +21,7 @@ The system MUST cache audio streams in Origin Private File System.
 - **Trigger**: Configurable — see REQ-CCH-001 (`auto`, `on-demand`, `off`)
 - **Format**: Opus/WebM blob
 - **Key**: Track ID
+- **Artwork**: `<id>.thumb` (16:9) and `<id>.sq.thumb` (square) — see REQ-CCH-008
 - **Eviction**: LRU against `config.cacheLimit` (default 500MB)
 - **Index**: `library_cached` tracks file presence and doubles as LRU order
 
@@ -111,10 +112,13 @@ The system MUST play cached audio without a network round trip.
 ### REQ-CCH-006: Device-Local Data
 The Cached collection indexes audio in this device's OPFS and MUST NOT sync.
 - `pushFullLibrary`, `pullFullLibrary`, the delta push and the delta apply all
-  skip `library_cached`
+  skip `library_cached`, as does the apply of `deletedCollectionNames`
 - `metaUpdater` ignores the `cached` key, so it never marks the library dirty
 - Track metadata is still written to `library_tracks` so the Cached list can
   render titles offline
+- Sync must additionally leave that track metadata alone on the receiving device —
+  see `docs/systems/cloud-sync.md` REQ-CS-011, which is the other half of this
+  contract
 
 ### REQ-CCH-007: Immediate Mode Application
 The system MUST apply a mode or limit change without a reload.
@@ -122,6 +126,78 @@ The system MUST apply a mode or limit change without a reload.
   `off` clears OPFS, empties `library_cached`, and closes an open Cached view
 - Lowering `config.cacheLimit` evicts immediately
 - `getCachedOpusUrl` is the authoritative runtime gate for `off`
+
+### REQ-CCH-008: Artwork Variants
+The system MUST cache the same image the player renders, in the shape it is displayed.
+- `- Topic` (music) tracks render square; everything else renders 16:9
+- One track id therefore needs two files — `<id>.thumb` and `<id>.sq.thumb`. A
+  single file per id cannot satisfy both consumers, and serving a landscape blob
+  to a square frame is the defect this requirement exists to prevent
+- `generateArtworkUrl(id, music)` is the single source of truth for the player's
+  image. The cache writes that exact URL, so the cached blob and the live URL
+  cannot drift apart
+- `getCachedThumbnailUrl`, `isThumbnailCached` and `cacheTrackThumbnail` are all
+  variant-aware. Callers MUST pass the same `music` flag they used to build the
+  URL they are about to render
+- **Origin of the flag**: the player derives it from `data.author` ending in
+  `" - Topic"`; `StreamItem` derives it from its render context. They are
+  independent, which is why both variants are stored rather than one guessed at
+- Write order: artwork (`maxres`) → `hq` → `mq`, all via the weserv proxy, then a
+  direct ytimg fallback for resilience
+- Object URLs are memoised by file name, not by track id, so both variants can be
+  live in memory at once
+- Artwork shares the LRU budget with audio and is evicted with it
+
+### REQ-CCH-009: Cached Collection Lifecycle
+The Cached collection and the OPFS directory MUST stay in correspondence.
+
+**1. Removing a track from the Cached collection deletes its audio and both artwork variants.**
+- `removeFromCollection` routes removals to `deleteCachedOpus` when the target is
+  the `cached` key; that clears `<id>.opus`, both `.thumb` variants, and their
+  object URLs
+- Membership and file presence share one storage key (`library_cached`), so what
+  the list renders is exactly what removal filters against — no second index to
+  drift
+
+**2. Cleaning the library clears the OPFS cache.**
+- `cleanLibrary` removes every `library*` localStorage key, then awaits
+  `clearOpusCache()` before reloading
+- OPFS is a separate origin-private filesystem and survives a localStorage wipe.
+  Without the explicit clear, the entire cache would be stranded: invisible,
+  undeletable from the UI, and held by the origin
+- `config` is not a `library*` key, so the caching mode survives and stays
+  consistent with a genuinely empty cache
+
+**3. Mutating any other collection leaves the Cached collection untouched.**
+- `getReferencedTrackIds()` folds the cached ids into its reference set, so a
+  cached track's metadata is never deleted as a side effect of editing an
+  unrelated collection
+- `removeFromCollection`, `deleteCollection` and `renameCollection` gate every
+  OPFS and `library_cached` write on the device-local check
+- `markCollectionDeleted` is only reachable from inside that gate, so `cached`
+  can never enter `dbsync_dirty_collections`
+- Library import and export skip `cached`; it indexes OPFS bytes that never
+  travel with the file. Exporting it would populate another device's Cached list
+  with entries that have no audio
+
+### REQ-CCH-010: Startup Reconciliation
+The system MUST reconcile OPFS against `library_cached` on every launch.
+- `getCachedTrackIds()` treats the list as authoritative
+- **Dropped**: list entries with no `.opus` file (the list rendering a track the
+  cache does not hold)
+- **Deleted**: files no list entry vouches for, including thumb-only leftovers.
+  Orphan `.opus` files are the ones a wiped or re-synced library strands, and the
+  browser would otherwise hold them indefinitely
+- **Ordering**: must run after `cleanseLibraryData()`, which can itself strip ids
+  from `library_cached` when `library_tracks` has no metadata for them — a state a
+  cloud pull produces by rewriting `library_tracks`
+- Fire-and-forget: reconciliation never blocks startup
+- An `inFlight` set guards ids with a cache write in progress, so reconciliation
+  cannot delete a file out from under an in-flight `pipeTo`
+- **Consequence, intended**: the list is authoritative and therefore destructive.
+  If `library_cached` is lost or truncated while OPFS survives, the next launch
+  discards the audio rather than re-adopting it. The audio is re-downloadable;
+  the alternative is unreachable storage with no UI to remove it
 
 ## Completeness Criteria
 | Criterion | Status |
@@ -141,20 +217,30 @@ The system MUST apply a mode or limit change without a reload.
 | Cached renders exactly once | ✅ |
 | Remove Marked works on reserved collections | ✅ |
 | Cached never syncs to other devices | ✅ |
+| Artwork cached matches the player render (square vs 16:9) | ✅ |
+| Remove from Cached deletes audio + both artwork variants | ✅ |
+| Clean library clears OPFS | ✅ |
+| Other collections leave the Cached collection untouched | ✅ |
+| Startup reconciliation prunes orphaned files | ✅ |
 | Works on iOS Safari (limited) | ⬜ |
 | Integration test offline flow | ⬜ |
 
 Caching criteria are code-verified (typecheck, build, unit tests). The OPFS
 paths that need a real browser — eviction, offline playback and the mode switch
-side effects — have not been exercised at runtime.
+side effects — have not been exercised at runtime. Startup reconciliation
+(REQ-CCH-010) has likewise only been verified by reading the code paths, not by
+observing a real OPFS directory.
 
 ## Related Files
 - `vite.config.ts` - PWA plugin config
-- `src/lib/modules/audioCache.ts` - OPFS audio caching, LRU order, eviction + sessionStorage stream metadata cache
+- `src/lib/modules/audioCache.ts` - OPFS audio caching, artwork variants, LRU order, eviction, startup reconciliation + sessionStorage stream metadata cache
 - `src/lib/utils/config.ts` - `CachingMode`, `cachingMode`, `cacheLimit`
+- `src/lib/utils/image.ts` - `generateArtworkUrl`, the player's image source of truth
 - `src/lib/utils/library.ts` - reserved collection registry, mode orchestration
+- `src/lib/modules/start.ts` - invokes reconciliation after `cleanseLibraryData`
 - `src/lib/modules/cloudSync.ts` - device-local `library_cached` guards
 - `src/features/Library/Collections.tsx` - single Cached row
+- `src/features/Library/Dropdown.tsx` - clean, import and export; clears OPFS on clean
 - `src/features/Library/ConfigureModal.tsx` - Cached section toggle
 - `src/features/List/index.tsx` - mark mode removal
 - `src/components/ActionsMenu/CollectionSelector.tsx` - on-demand add

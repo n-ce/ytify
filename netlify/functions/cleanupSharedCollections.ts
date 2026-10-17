@@ -39,5 +39,5 @@ export default async () => {
 };
 
 export const config: Config = {
-  schedule: "0 0 * * *", // Runs daily at midnight UTC
+  schedule: "0 0 1 * *", // Runs monthly at midnight UTC on the 1st of every month
 };

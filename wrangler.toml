@@ -6,10 +6,28 @@ compatibility_flags = [ "nodejs_compat" ]
 [observability]
 enabled = true
 
+[triggers]
+# Weekly Moods & Genres refresh (Sunday 00:00 UTC). The cron handler discovers
+# the categories and parks them in CatalogDO, whose alarm drains them a few at a
+# time. No Cloudflare Queues binding: the alarm path needs no paid add-on.
+crons = ["0 0 * * 0"]
+
 [[durable_objects.bindings]]
 name = "USER_SYNC_DO"
 class_name = "UserSyncDO"
 
+[[durable_objects.bindings]]
+name = "CATALOG_DO"
+class_name = "CatalogDO"
+
+[[durable_objects.bindings]]
+name = "STREAM_GATE_DO"
+class_name = "StreamGateDO"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["UserSyncDO"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["CatalogDO", "StreamGateDO"]

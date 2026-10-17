@@ -88,6 +88,7 @@ export let config = {
   cachingMode: "auto" as CachingMode,
   cacheLimit: DEFAULT_CACHE_LIMIT_MB as number,
   librarySections: { ...defaultLibrarySections },
+  sponsorblock: false,
 };
 
 type AppConfig = typeof config;

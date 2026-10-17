@@ -44,6 +44,7 @@ export async function getList(
 
   setListStore("isLoading", true);
   openSubView("list");
+  navStore.list.ref?.scrollIntoView({ behavior: "smooth" });
 
   if (!all) updateParam(type, id);
 

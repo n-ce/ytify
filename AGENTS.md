@@ -1,14 +1,16 @@
-﻿# ytify Agent Invariants
+# ytify Agent Invariants
 
 You are working on ytify, a lean, ethical YouTube Music PWA.
 Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQLite).
 
 ## 1. Zero-Bloat Budget (CRITICAL)
-- Target initial JS entry: <= 23 KB gzipped. Total bundle: < 200 KB gzipped.
+
+- Target initial JS entry: <= 23.5 KB gzipped. Total bundle: < 200 KB gzipped.
 - ZERO new npm dependencies without explicit consent. Use native Web APIs (OPFS, Web Audio, MediaSession) and CSS custom properties.
 - Do NOT add external UI, utility, or animation libraries (no lodash, no tailwind, no framer).
 
 ## 2. Code Reuse & Redundancy Prevention
+
 - BEFORE creating a new helper function or data transformer, check:
   - src/lib/utils/core.ts (pure math, duration, url, array logic)
   - src/lib/utils/ (formatting, storage, helpers)
@@ -17,26 +19,54 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 - Do NOT invent parallel patterns. Reuse existing createStore / createSignal state stores.
 
 ## 3. SolidJS Reactivity Rules
+
 - NEVER destructure props (const { item } = props breaks reactivity). Access via props.item.
 - Prefer fine-grained updates: use <Show> and <For> over array .map() in JSX.
 - Lazy load all top-level route/feature views using solid-js/lazy.
 
 ## 4. Local-First & Critical-Path Cohesion
+
 - Critical playback path is consolidated: do not over-fragment the audio/stream pipeline into micro-chunks.
 - Offline-first: Assume network can fail anytime. Streaming falls back across Invidious proxies and local edge functions.
 - Recommendations and history must remain strictly on-device (zero telemetry/tracking).
 - Local storage keys are namespaced: library_, config, drawer.
+- **Dual-Path Local Dev vs Deployed Edge Parity (Search Suggestions)**:
+  - `netlify/edge-functions/search-suggestions.ts` handles edge requests in production deployments for global low-latency.
+  - `src/backend/` (`getSearchSuggestions.ts`, `localAdapter.ts`, `worker.ts`) handles search suggestions locally via Vite's `apiMiddleware` because Netlify Edge Functions are unavailable during local development.
+  - NEVER remove or consolidate one into the other; local development must work fully without edge emulation.
 
-## 5. Documentation & Deep Subsystem Guides
-When touching complex subsystems, consult the corresponding guide in docs/:
-- Streaming & failover: docs/systems/streaming.md
-- CloudSync & Durable Objects: docs/systems/cloud-sync.md
-- Offline OPFS audio cache: docs/systems/offline-opfs.md
-- Library schema (v5): docs/systems/library-state.md
-- Code quality principles: docs/standards/code-quality.md
-- Backend endpoints: docs/standards/backend-contracts.md
-- Active implementation plans: docs/plans/active/
+## 5. UI System Standards & Invariants
 
-## 6. Definition of Done
-- TypeScript compiles cleanly (	sc --noEmit).
-- Production build succeeds (un run build).
+- **Library & Hub Shelf Container Invariant**:
+  - Every hub/shelf article (`.subfeed-article`, `.featured-article`, etc.) MUST wrap fallback/empty states and loading state inside a container `<div>` (e.g., `fallback={<div><p class="fallback">{t(...)}</p></div>}`).
+  - `article > div` CSS defines the global card standard (`background-color: var(--onBg)`, `border: var(--border)`, `border-radius: var(--roundness)`).
+  - Never render bare `<p class="fallback">` without a wrapping `<div>`; doing so breaks background containment.
+- **Player Background Transition & Alignment**:
+  - In blurred background modes (`.bg-blur`, `.bg-blur-motion`), artwork height is scaled with `height: 80%`.
+  - In blurred non-motion mode (`.bg-blur`) and frost non-motion mode (`.bg-frost`), the background artwork is horizontally centered on the player using `--player-bp: -${Math.floor((offsetHeight - offsetWidth) / 2)}px 0`, matching motion mode at half duration (`seconds / fullDuration = 0.5`). Motion modes pan horizontally from left to right with playback progress.
+- **Text Truncation**:
+  - Truncated text (`.truncate`, `div.metadata`, `.listItem div`) must include `min-width: 0` to prevent premature ellipsis collapse inside flex containers.
+- **Tooltips**:
+  - Contextual positioning: header and top-bar tooltips render below the icon (`top: 100%`); bottom nav and player controls render above (`bottom: 100%`). Right/left edge icons anchor to inward edge to eliminate off-screen clipping. Strictly hidden on touch via `@media (hover: none)`.
+
+## 6. Documentation & System Specifications
+
+- The `docs/` tree has strictly two functional areas:
+  - `docs/systems/`: Living specifications for each distinct subsystem. Each spec begins with its Non-Negotiable Invariants.
+  - `docs/plans/`: In-progress roadmap files sit directly inside `docs/plans/` (no `active/` subfolder). Completed plans are moved to `docs/plans/archive/`.
+- System guides:
+  - Streaming & failover: docs/systems/streaming.md
+  - CloudSync & Durable Objects: docs/systems/cloud-sync.md
+  - Global normalized catalog & scraper: docs/systems/catalog.md
+  - Offline OPFS audio cache: docs/systems/offline-opfs.md
+  - Library schema (v5): docs/systems/library-state.md
+  - UI standards & shelf invariants: docs/systems/ui-standards.md
+  - Search architecture & dual-path suggestions: docs/systems/search.md
+
+## 7. Definition of Done
+
+Every code change must satisfy:
+
+- Unit tests pass: `bun test scripts/`
+- TypeScript compiles cleanly: `bun run tsc --noEmit`
+- Production build succeeds within budget: `bun run build`

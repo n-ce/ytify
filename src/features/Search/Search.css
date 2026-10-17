@@ -1,13 +1,11 @@
 .search {
-    
-
-    --inputround: var(--roundness);
-
-    &:has(li) {
-        --inputround: var(--roundness) var(--roundness) 0 0;
-    }
-
     .superInputContainer {
+        --inputround: var(--roundness);
+
+        &:has(.suggestions li) {
+            --inputround: var(--roundness) var(--roundness) 0 0;
+        }
+
         height: auto;
         margin: 0;
         margin-bottom: var(--size-4);

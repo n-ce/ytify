@@ -1,7 +1,7 @@
 /*
 * Auto-generated RemixIcon subset
-* Total icons: 65
-* Generated at: 2026-09-30T08:30:36.924Z
+* Total icons: 66
+* Generated at: 2026-10-17T13:21:43.902Z
 */
 
 @font-face {
@@ -72,6 +72,10 @@
 
 .ri-compass-3-fill:before {
   content: "\ebbd";
+}
+
+.ri-compass-3-line:before {
+  content: "\ebbe";
 }
 
 .ri-delete-bin-2-line:before {

@@ -7,7 +7,6 @@ import {
   getTracksMap,
   librarySections,
   RESERVED_COLLECTIONS,
-  RESERVED_ORDER,
   cachingMode,
   type LibrarySectionKey,
 } from "@utils";
@@ -46,12 +45,6 @@ export default function () {
     }, 300);
     setSearchText(searchBar.value);
   };
-
-  if (getCollectionsKeys().length === 0) {
-    for (const collection of RESERVED_ORDER) {
-      localStorage.setItem("library_" + collection, "[]");
-    }
-  }
 
   // Reserved collection names match their librarySections key, so the
   // per-section toggles in the configure modal drive visibility directly.

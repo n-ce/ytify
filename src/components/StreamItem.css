@@ -1,128 +1,131 @@
 .streamItem {
-	width: 100%;
-	user-select: none;
-	margin-bottom: calc(var(--gap) - var(--size-2));
-	padding: var(--size-1);
-	display: flex;
-	align-items: center;
-	position: relative;
-	text-decoration: none;
-	overflow: hidden;
-	background-color: transparent;
-	border: var(--border-size-1) solid transparent;
+    width: 100%;
+    user-select: none;
+    margin-bottom: calc(var(--gap) - var(--size-2));
+    padding: var(--size-1);
+    display: flex;
+    align-items: center;
+    position: relative;
+    text-decoration: none;
+    overflow: hidden;
+    background-color: transparent;
+    border: var(--border-size-1) solid transparent;
 
-	&:hover {
-		background-color: var(--onBg2);
-		color: var(--text2);
-		border: var(--border);
-	}
+    &:hover {
+        background-color: var(--onBg2);
+        color: var(--text2);
+        border: var(--border);
+    }
 
-	&.ravel {
-		* {
-			opacity: 0;
-		}
+    &.ravel {
+        * {
+            opacity: 0;
+        }
 
-		background-color: var(--onBg) !important;
-		border: var(--border) !important;
-	}
+        background-color: var(--onBg) !important;
+        border: var(--border) !important;
+    }
 
-	&.marked {
-		background-color: var(--onBg);
-		color: var(--text);
-	}
+    &.marked {
+        background-color: var(--onBg);
+        color: var(--text);
+    }
 
-	&.delete {
-		background-color: color-mix(in srgb, #f22, var(--onBg) 80%);
-	}
+    &.delete {
+        background-color: color-mix(in srgb, #f22, var(--onBg) 80%);
+    }
 
-	div,
-	span {
-		pointer-events: none;
-		transition: opacity 0.4s;
-	}
+    div,
+    span {
+        pointer-events: none;
+        transition: opacity 0.4s;
+    }
 
-	span {
-		position: relative;
-		z-index: 0;
-		margin-right: var(--size-2);
+    span {
+        position: relative;
+        z-index: 0;
+        margin-right: var(--size-2);
 
-		img {
-			max-height: var(--size-9);
-			max-width: var(--size-11);
-			border-radius: calc(var(--roundness) * 0.8);
-			border: var(--border);
-			box-shadow: var(--shadow-1);
-		}
+        img {
+            max-height: var(--size-9);
+            max-width: var(--size-11);
+            border-radius: calc(var(--roundness) * 0.8);
+            border: var(--border);
+            box-shadow: var(--shadow-1);
+        }
 
-		.duration {
-			position: absolute;
-			padding: 0 var(--size-1);
-			bottom: var(--size-1);
-			right: var(--size-1);
-			background-color: #000a;
-			color: #fffc;
-			border-radius: calc(var(--roundness) * 0.5);
-			font-size: var(--font-size-0);
-			font-weight: var(--font-weight-6);
-		}
-	}
+        .duration {
+            position: absolute;
+            padding: 0 var(--size-1);
+            bottom: var(--size-1);
+            right: var(--size-1);
+            background-color: #000a;
+            color: #fffc;
+            border-radius: calc(var(--roundness) * 0.5);
+            font-size: var(--font-size-0);
+            font-weight: var(--font-weight-6);
+        }
+    }
 
-	div.metadata {
-		height: 100%;
-		width: calc(100% - var(--size-11));
-		display: flex;
-		flex-direction: column;
-		justify-content: space-evenly;
-		row-gap: var(--size-1);
+    div.metadata {
+        height: 100%;
+        flex: 1;
+        min-width: 0;
+        width: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        row-gap: var(--size-1);
 
-		.title {
-			max-height: 100%;
-			line-height: var(--size-4);
-			font-size: var(--font-size-1);
-			overflow: hidden;
-			font-weight: var(--font-weight-5);
-			letter-spacing: var(--font-letterspacing-1);
-			margin: 0;
-		}
+        .title {
+            max-height: 100%;
+            min-width: 0;
+            line-height: var(--size-4);
+            font-size: var(--font-size-1);
+            overflow: hidden;
+            font-weight: var(--font-weight-5);
+            letter-spacing: var(--font-letterspacing-1);
+            margin: 0;
+        }
 
-		.avu {
-			height: var(--size-7);
-			line-height: var(--size-3);
-			width: 100%;
-			overflow: hidden;
+        .avu {
+            height: var(--size-7);
+            line-height: var(--size-3);
+            width: 100%;
+            overflow: hidden;
 
-			p {
-				font-size: var(--font-size-0);
-				font-weight: var(--font-weight-4);
-				letter-spacing: var(--font-letterspacing-1);
-				opacity: 0.9
-			}
-		}
-	}
+            p {
+                font-size: var(--font-size-0);
+                font-weight: var(--font-weight-4);
+                letter-spacing: var(--font-letterspacing-1);
+                opacity: 0.9;
+            }
+        }
+    }
 
-	i {
-		height: var(--size-9);
-		aspect-ratio: 1;
-		font-size: var(--font-size-3);
-		z-index: 2;
-		position: absolute;
-		right: calc(var(--size-2) - var(--size-6));
-		bottom: calc(var(--size-1) - var(--size-4));
-		border-radius: 50%;
-		opacity: 0.5;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		cursor: pointer;
-		transition: all 0.3s;
+    i {
+        height: var(--size-9);
+        aspect-ratio: 1;
+        font-size: var(--font-size-3);
+        z-index: 2;
+        position: absolute;
+        right: calc(var(--size-2) - var(--size-6));
+        bottom: calc(var(--size-1) - var(--size-4));
+        border-radius: 50%;
+        opacity: 0.5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s;
 
-		&:hover {
-			opacity: 1;
-			background-image: radial-gradient(var(--onBg), var(--onBg2) 80%);
-		}
-	}
+        &:hover {
+            opacity: 1;
+            background-image: radial-gradient(var(--onBg), var(--onBg2) 80%);
+        }
+    }
 }
 
-#queuelist>a {
-	transition: initial;
+#queuelist > a {
+    transition: initial;
 }

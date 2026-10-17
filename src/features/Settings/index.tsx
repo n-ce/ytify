@@ -67,7 +67,7 @@ export default function () {
   return (
     <section ref={settingsSection} class="settingsSection">
       <header>
-        <p>ytify {Build}</p>
+        <p>ytify</p>
         <i
           aria-label={t("close")}
           class="ri-close-large-line"
@@ -145,6 +145,14 @@ export default function () {
           checked={Boolean(config.watchMode)}
           onclick={() => {
             setConfig("watchMode", config.watchMode ? "" : "144p");
+          }}
+        />
+
+        <Toggle
+          name="settings_sponsorblock"
+          checked={Boolean(config.sponsorblock)}
+          onclick={() => {
+            setConfig("sponsorblock", !config.sponsorblock);
           }}
         />
 

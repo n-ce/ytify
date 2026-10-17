@@ -1,6 +1,8 @@
 import { YTNodes } from "youtubei.js";
 import { getClient, getVideoId } from "./utils.js";
-import type { Env } from "./worker.js";
+import { readTracks, upsertTracks } from "./catalogClient.js";
+import type { CanonicalTrack } from "./catalog.js";
+import type { Env } from "./env.js";
 
 export interface FixTarget {
   id: string;
@@ -14,7 +16,6 @@ export interface ResolvedMetadata {
 }
 
 const fastCache = new Map<string, ResolvedMetadata>();
-const DO_NAME = "global:metadata_fix_cache";
 
 /**
  * Strips common clutter from song titles to increase YouTube Music search precision.
@@ -111,7 +112,8 @@ export async function resolveTrackMetadataViaSearch(
 }
 
 /**
- * Batch-resolves metadata targets with multi-tier caching (in-memory -> DO SQLite -> Music Search).
+ * Batch-resolves metadata targets with multi-tier caching
+ * (in-memory -> global catalog -> Music Search).
  */
 export async function handleFixMetadata(
   targets: FixTarget[],
@@ -134,43 +136,33 @@ export async function handleFixMetadata(
     return { resolved, failed };
   }
 
-  // Step 2: Check Durable Object SQLite store if available
-  const missingFromDO: FixTarget[] = [];
-  let doStub: any = null;
+  // Step 2: Check the shared global catalog, which is also what link previews
+  // and user sync read from, so every repair benefits all consumers at once.
+  const missingFromCatalog: FixTarget[] = [];
 
-  if (env?.USER_SYNC_DO) {
-    try {
-      const doId = env.USER_SYNC_DO.idFromName(DO_NAME);
-      doStub = env.USER_SYNC_DO.get(doId);
+  if (env?.CATALOG_DO) {
+    const idsToFetch = missingFromMemory.map((t) => t.id).filter(Boolean);
+    const cached = await readTracks(env, idsToFetch);
 
-      const idsToFetch = missingFromMemory.map((t) => t.id).filter(Boolean);
-      if (idsToFetch.length > 0) {
-        const doRes = await doStub.fetch(
-          new Request(`http://do/metadata-fix?ids=${encodeURIComponent(idsToFetch.join(","))}`),
-        );
-        if (doRes.ok) {
-          const cachedMap = (await doRes.json()) as Record<string, ResolvedMetadata>;
-          for (const t of missingFromMemory) {
-            if (cachedMap[t.id]) {
-              resolved[t.id] = cachedMap[t.id];
-              fastCache.set(t.id, cachedMap[t.id]);
-            } else {
-              missingFromDO.push(t);
-            }
-          }
-        } else {
-          missingFromDO.push(...missingFromMemory);
-        }
+    for (const t of missingFromMemory) {
+      const track = cached[t.id];
+      if (track && !isCorruptedArtist(track.author)) {
+        const entry: ResolvedMetadata = {
+          author: track.author,
+          authorId: track.authorId,
+          title: track.title,
+        };
+        resolved[t.id] = entry;
+        fastCache.set(t.id, entry);
+      } else {
+        missingFromCatalog.push(t);
       }
-    } catch (e) {
-      console.warn("[fixMetadata] Error reading from DO cache:", e);
-      missingFromDO.push(...missingFromMemory);
     }
   } else {
-    missingFromDO.push(...missingFromMemory);
+    missingFromCatalog.push(...missingFromMemory);
   }
 
-  if (missingFromDO.length === 0) {
+  if (missingFromCatalog.length === 0) {
     return { resolved, failed };
   }
 
@@ -178,8 +170,8 @@ export async function handleFixMetadata(
   const newlyResolved: Record<string, ResolvedMetadata> = {};
   const CONCURRENCY = 3;
 
-  for (let i = 0; i < missingFromDO.length; i += CONCURRENCY) {
-    const slice = missingFromDO.slice(i, i + CONCURRENCY);
+  for (let i = 0; i < missingFromCatalog.length; i += CONCURRENCY) {
+    const slice = missingFromCatalog.slice(i, i + CONCURRENCY);
     await Promise.all(
       slice.map(async (target) => {
         const result = await resolveTrackMetadataViaSearch(target);
@@ -194,19 +186,25 @@ export async function handleFixMetadata(
     );
   }
 
-  // Step 4: Persist newly resolved records to DO SQLite store
-  if (doStub && Object.keys(newlyResolved).length > 0) {
-    try {
-      await doStub.fetch(
-        new Request("http://do/metadata-fix", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newlyResolved),
-        }),
-      );
-    } catch (e) {
-      console.warn("[fixMetadata] Error persisting to DO cache:", e);
+  // Step 4: Persist newly resolved records into the global catalog
+  if (env?.CATALOG_DO && Object.keys(newlyResolved).length > 0) {
+    const now = Date.now();
+    const records: CanonicalTrack[] = [];
+    for (const [id, item] of Object.entries(newlyResolved)) {
+      records.push({
+        id,
+        title: item.title || "",
+        author: item.author,
+        authorId: item.authorId || "",
+        duration: 0,
+        durationStr: "",
+        isSong: true,
+        thumbnailId: id,
+        source: "fix_metadata",
+        updatedAt: now,
+      });
     }
+    await upsertTracks(env, records);
   }
 
   return { resolved, failed };

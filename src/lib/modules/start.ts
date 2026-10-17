@@ -98,6 +98,17 @@ export default async function () {
       });
     });
 
+  if (
+    localStorage.getItem("library_favorites") === null &&
+    localStorage.getItem("library_history") === null
+  ) {
+    for (const c of ["history", "favorites", "liked", "listenLater"]) {
+      if (localStorage.getItem("library_" + c) === null) {
+        localStorage.setItem("library_" + c, "[]");
+      }
+    }
+  }
+
   cleanseLibraryData();
 
   // Must follow cleanseLibraryData, which can strip ids from the cached list.

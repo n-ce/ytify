@@ -34,9 +34,11 @@ function generatePreviewHtml(data: {
 
 function escapeHtml(str: string): string {
   return str
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/>/g, ">");
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 export default async (req: Request, context: Context) => {
@@ -114,7 +116,24 @@ export default async (req: Request, context: Context) => {
       headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=3600" },
     });
   } catch {
-    return context.next();
+    // The metadata worker is unavailable: still hand crawlers a valid card
+    // instead of falling through to the splash page with no Open Graph tags.
+    const kind = path.startsWith("/artist/") || path.startsWith("/channel/") ? "Artist" : "Collection";
+    return new Response(
+      generatePreviewHtml({
+        title: `${kind} on ytify`,
+        description: `Listen on ytify`,
+        image: "",
+        url: url.href,
+        type: "website",
+      }),
+      {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "public, max-age=300",
+        },
+      },
+    );
   }
 };
 

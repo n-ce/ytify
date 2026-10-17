@@ -19,12 +19,16 @@ export default function () {
     queueSection.scrollIntoView();
   });
 
+  const scrollToTop = () => {
+    queueSection.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <section class="queueSection" ref={queueSection}>
       <header class="sticky-bar">
         <HeaderNav
           title={
-            <p>
+            <p onclick={scrollToTop} style={{ cursor: "pointer" }}>
               {queueStore.list.length === 0
                 ? t("nav_queue")
                 : totalQueueDuration(queueStore.list)}
@@ -32,7 +36,11 @@ export default function () {
           }
           extra={
             <Show when={queueStore.list.length > 0}>
-              <span class="header-nav-badge queue-duration-badge">
+              <span
+                class="header-nav-badge queue-duration-badge"
+                onclick={scrollToTop}
+                style={{ cursor: "pointer" }}
+              >
                 {totalQueueDuration(queueStore.list)}
               </span>
             </Show>

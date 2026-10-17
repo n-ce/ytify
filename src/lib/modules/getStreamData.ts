@@ -9,17 +9,115 @@ const instances = shuffle([
   "https://echostreamz.com"
 ]);
 
+const SESSION_KEY = 'ytify_session';
+const SESSION_MIN_AGE_MS = 10000;
+const SESSION_TTL_MS = 30 * 60 * 1000;
+/**
+ * The stream gate allows one in-flight call per key and answers 429 otherwise.
+ * A 503 means the gate itself was unreachable, so the request is retried the
+ * same way: both are "try again in a moment", never "try the next proxy".
+ */
+const LEASE_MAX_RETRIES = 2;
+const LEASE_RETRY_DELAY_MS = 1500;
+const GATE_RETRYABLE_STATUS = [429, 503];
+
+type Session = { sessionId: string; createdAt: number };
+
+// Shared so concurrent callers (queue prefetch, bulk capture) open one session
+// instead of each burning their own 10s warm-up.
+let pendingSession: Promise<string> | null = null;
+
+function readSession(): Session | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const session = JSON.parse(raw) as Session;
+    if (typeof session?.sessionId !== 'string' || typeof session?.createdAt !== 'number') return null;
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+function clearSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
+
+async function openSession(signal?: AbortSignal): Promise<string> {
+  const res = await fetch('/s/', { headers: { 'Accept': 'application/json' }, signal });
+  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+  const { sessionId } = await res.json();
+  if (!sessionId) throw new Error('Invalid response: sessionId missing');
+
+  const session: Session = { sessionId, createdAt: Date.now() };
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+
+  setPlayerStore('status', 'Opening secure fallback session...');
+  await sleep(SESSION_MIN_AGE_MS);
+  return sessionId;
+}
+
+// The edge function requires a session older than 10s and under 30min old, so we
+// mint one on demand and reuse it. A rejected session is dropped and re-opened once.
+async function getOrCreateSession(signal?: AbortSignal): Promise<string> {
+  const session = readSession();
+  const age = session ? Date.now() - session.createdAt : Infinity;
+
+  if (session && age >= SESSION_MIN_AGE_MS && age < SESSION_TTL_MS) return session.sessionId;
+
+  pendingSession ??= openSession(signal).finally(() => { pendingSession = null; });
+  return pendingSession;
+}
+
 export default async function(
   id: string,
   signal?: AbortSignal
 ): Promise<Invidious | Record<'error' | 'message', string>> {
 
   const fetchData = async (proxy: string): Promise<Invidious> => {
-    const path = proxy ? '/api/v1/videos/' : '/s/';
-    const res = await fetch(proxy + path + id, {
-      headers: { 'Accept': 'application/json' },
-      signal
-    });
+    const isFallback = !proxy;
+    const path = isFallback ? '/s/' : '/api/v1/videos/';
+    let leaseRetries = LEASE_MAX_RETRIES;
+
+    const request = async (sessionId?: string): Promise<Response> => {
+      const res = await fetch(proxy + path + id, {
+        headers: {
+          'Accept': 'application/json',
+          ...(sessionId && { 'x-session-id': sessionId })
+        },
+        signal
+      });
+
+      // A bodyless 403 is the 20s cooldown, not a session rejection, so it is left alone.
+      // A JSON 403 means the session was rejected: drop it and re-open once.
+      const isSessionRejection =
+        res.status === 403 &&
+        !!res.headers.get('content-type')?.includes('application/json');
+
+      if (isFallback && isSessionRejection && !sessionId) {
+        clearSession();
+        return request(await getOrCreateSession(signal));
+      }
+
+      // Another request from this session still holds the upstream lease (429),
+      // or the gate could not be reached (503). Both clear within seconds, so
+      // wait them out instead of failing through to the next proxy, which would
+      // burn its own lease.
+      if (isFallback && GATE_RETRYABLE_STATUS.includes(res.status) && leaseRetries-- > 0) {
+        const retryAfter = parseInt(res.headers.get('retry-after') || '0', 10);
+        const delay = retryAfter * 1000 || LEASE_RETRY_DELAY_MS;
+        await sleep(Math.min(delay, LEASE_RETRY_DELAY_MS * 2));
+        return request(sessionId);
+      }
+
+      return res;
+    };
+
+    const sessionId = isFallback ? await getOrCreateSession(signal) : undefined;
+    const res = await request(sessionId);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();
 

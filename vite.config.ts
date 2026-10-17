@@ -34,7 +34,6 @@ export default defineConfig(({ command }) => ({
   },
   plugins: [
     solidPlugin(),
-    injectEruda(command === "serve"),
     apiMiddleware(command === "serve"),
     VitePWA({
       manifest: {
@@ -129,30 +128,6 @@ export default defineConfig(({ command }) => ({
   },
 }));
 
-const injectEruda = (serve: boolean) =>
-  serve
-    ? <PluginOption>{
-        name: "erudaInjector",
-        transformIndexHtml: (html) => ({
-          html,
-          tags: [
-            {
-              tag: "script",
-              attrs: {
-                src: "/node_modules/eruda/eruda",
-              },
-              injectTo: "body-prepend",
-            },
-            {
-              tag: "script",
-              injectTo: "body-prepend",
-              children: "eruda.init()",
-            },
-          ],
-        }),
-      }
-    : [];
-
 const apiMiddleware = (serve: boolean): PluginOption =>
   serve
     ? {
@@ -161,13 +136,17 @@ const apiMiddleware = (serve: boolean): PluginOption =>
           const endpoints = [
             "album",
             "artist",
+            "catalog",
             "channel",
+            "cron",
             "fix-metadata",
             "gallery",
             "playlist",
+            "recommend",
             "search",
             "search-suggestions",
             "similar",
+            "stream-gate",
             "subfeed",
             "sync",
             "syncHash",

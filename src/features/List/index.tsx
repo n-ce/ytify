@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show, onCleanup } from "solid-js";
+import { createSignal, For, onMount, Show, onCleanup, createEffect } from "solid-js";
 import "./List.css";
 import {
   addToQueue,
@@ -9,6 +9,7 @@ import {
   t,
   setQueueStore,
   openSubView,
+  store,
 } from "@stores";
 import {
   DISCOVERY_COLLECTION,
@@ -28,6 +29,24 @@ import ListItem from "@components/ListItem";
 import HeaderNav from "@components/HeaderNav";
 
 type SortBy = "modified" | "name" | "artist" | "duration";
+
+
+function ArtistRow(props: { artists: Channel[] }) {
+  return (
+    <div class="list-carousel">
+      <For each={props.artists}>
+        {(artist) => (
+          <ListItem
+            name={artist.name}
+            img={artist.img}
+            id={artist.id}
+            type="artist"
+          />
+        )}
+      </For>
+    </div>
+  );
+}
 
 function AlbumRow(props: { albums: YTAlbumItem[] }) {
   return (
@@ -60,6 +79,52 @@ export default function () {
   );
   const [showSortable, setShowSortable] = createSignal(false);
   const [searchQuery, setSearchQuery] = createSignal("");
+  const [favoriteArtists, setFavoriteArtists] = createSignal<Channel[]>([]);
+
+  createEffect(() => {
+    if (listStore.id === "favorites" && listStore.type === "collection") {
+      const source = getSourceItems();
+      const artistCounts: Record<string, { count: number; name: string; img?: string }> = {};
+      source.forEach((track) => {
+        if (track && track.authorId) {
+          const prev = artistCounts[track.authorId];
+          artistCounts[track.authorId] = {
+            count: (prev?.count || 0) + 1,
+            name: track.author?.replace(/ - Topic$/, "") || prev?.name || "",
+            img: (track as any).img || prev?.img || "",
+          };
+        }
+      });
+      const sorted = Object.entries(artistCounts).sort(([, a], [, b]) => b.count - a.count);
+      const artistIds = sorted.map(([id]) => id);
+
+      if (artistIds.length === 0) {
+        setFavoriteArtists([]);
+        return;
+      }
+
+      setFavoriteArtists(
+        sorted.slice(0, 15).map(([id, info]) => ({
+          id,
+          name: info.name,
+          img: info.img || "",
+          type: "artist",
+        }))
+      );
+
+      fetch(`${store.api}/gallery?id=${artistIds.slice(0, 10).join(",")}`)
+        .then((res) => res.json())
+        .then((data: any) => {
+          if (Array.isArray(data?.userArtists) && data.userArtists.length > 0) {
+            setFavoriteArtists(data.userArtists);
+          }
+        })
+        .catch(() => {});
+    } else {
+      setFavoriteArtists([]);
+    }
+  });
+
 
   const getSourceItems = () => {
     let source =
@@ -336,6 +401,12 @@ export default function () {
           <Show when={listStore.artistEps.length > 3}>
             <AlbumRow albums={listStore.artistEps} />
           </Show>
+        </div>
+      </Show>
+
+      <Show when={listStore.id === "favorites" && listStore.type === "collection" && favoriteArtists().length > 0}>
+        <div class="list-carousels">
+          <ArtistRow artists={favoriteArtists()} />
         </div>
       </Show>
 

@@ -1,8 +1,4 @@
-import {
-  addToCollection,
-  getCollection,
-  removeFromCollection,
-} from "@utils";
+import { addToCollection, getCollection, removeFromCollection } from "@utils";
 import "./ActionsMenu.css";
 import { onMount, Show, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
@@ -47,9 +43,8 @@ export default function () {
     <dialog
       id="actionsMenu"
       ref={dialog}
-      onclick={() =>
-        !isViewingAuthor() && !isViewingAlbum() && closeDialog()
-      }
+      classList={{ "is-music": Boolean(isMusic) }}
+      onclick={() => !isViewingAuthor() && !isViewingAlbum() && closeDialog()}
     >
       <StreamItem
         id={store.actionsMenu?.id || ""}
@@ -57,7 +52,7 @@ export default function () {
         authorId={store.actionsMenu?.authorId || ""}
         author={store.actionsMenu?.author || ""}
         duration={store.actionsMenu?.duration || ""}
-        type="video"
+        type={isMusic ? "song" : "video"}
         context={store.actionsMenu?.context}
       />
 

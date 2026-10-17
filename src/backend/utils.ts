@@ -124,8 +124,9 @@ export function getLockupMeta(lockup: YTNodes.LockupView): {
         const textObj = p.text as any;
         authorId =
           textObj?.endpoint?.payload?.browseId ||
-          textObj?.runs?.find((r: any) => (r as any)?.endpoint?.payload?.browseId)
-            ?.endpoint?.payload?.browseId ||
+          textObj?.runs?.find(
+            (r: any) => (r as any)?.endpoint?.payload?.browseId,
+          )?.endpoint?.payload?.browseId ||
           "";
       }
     }
@@ -198,7 +199,10 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
   if (node.is(YTNodes.LockupView)) {
     const lockup = node.as(YTNodes.LockupView);
     // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
-    if (lockup.content_id && (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")) {
+    if (
+      lockup.content_id &&
+      (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")
+    ) {
       const { views, published, duration, author, authorId } =
         getLockupMeta(lockup);
       const subtext = (views || "") + (published ? " • " + published : "");
@@ -237,8 +241,8 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
       song.album?.id ||
       "";
 
-    const browseAuthorRun = song.flex_columns?.[1]?.title?.runs?.find((r: any) =>
-      r?.endpoint?.payload?.browseId?.startsWith("UC"),
+    const browseAuthorRun = song.flex_columns?.[1]?.title?.runs?.find(
+      (r: any) => r?.endpoint?.payload?.browseId?.startsWith("UC"),
     ) as any;
 
     const rawAuthor =
@@ -272,6 +276,7 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
       author,
       authorId,
       albumId: playlistId,
+      albumTitle: album || undefined,
       duration: formatDuration(song.duration?.text),
       img: formatThumbnailId(song.thumbnail?.contents?.[0]?.url),
       subtext,
@@ -288,8 +293,14 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
 
     if (lockup.content_id?.startsWith("RD")) return null;
 
-    // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
-    if (lockup.content_id && (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")) {
+    // 18.1.0: LockupView can have content_type "PLAYLIST", "COLLECTION", "SHOW", or "VIDEO"
+    if (
+      lockup.content_id &&
+      (lockup.content_type === "PLAYLIST" ||
+        (lockup.content_type as string) === "COLLECTION" ||
+        lockup.content_type === "VIDEO" ||
+        lockup.content_type === "SHOW")
+    ) {
       const metadata = lockup.metadata?.as(YTNodes.LockupMetadataView);
       const contentImage = lockup.content_image?.as(
         YTNodes.CollectionThumbnailView,

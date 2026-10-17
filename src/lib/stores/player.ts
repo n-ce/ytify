@@ -18,12 +18,14 @@ import {
   themer,
   addToCollection,
   recordTrackPlay,
+  cacheTrackOnFinished,
   player,
   applyAudioStreams,
   shuffle,
 } from "@utils";
 import { streamCache } from "@modules/audioCache";
 import { isQueuePrefetchActive } from "@modules/queuePrefetch";
+import { checkSponsorBlock, clearSponsorSegments } from "@modules/sponsorBlock";
 
 const blankImage =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
@@ -141,6 +143,7 @@ createRoot(() => {
   playerStore.audio.volume = playerStore.volume;
 
   playerStore.audio.onended = () => {
+    cacheTrackOnFinished(playerStore.stream);
     if (queueStore.list.length) playNext();
     else {
       updateParam("s");
@@ -210,6 +213,7 @@ createRoot(() => {
   }, 500);
 
   playerStore.audio.onloadstart = () => {
+    clearSponsorSegments();
     setPlayerStore("playbackState", "paused");
     setPlayerStore("status", "");
     if (isPlayable) playerStore.audio.play();
@@ -235,6 +239,7 @@ createRoot(() => {
     const seconds = Math.floor(audio.currentTime);
 
     setPlayerStore("currentTime", seconds);
+    checkSponsorBlock(audio.currentTime);
 
     // Artwork background pans with the progress, motion backgrounds only.
     if (isMusic && playerBackground().endsWith("-motion") && fullDuration > 0) {

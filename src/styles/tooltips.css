@@ -1,21 +1,38 @@
-i[aria-label]::after {
+/* Contextual Tooltip System for ytify */
+
+:is(i, button)[aria-label] {
+    position: relative;
+    --tt-x: -50%;
+    --tt-y: calc(var(--size-1) * -1);
+}
+
+:is(i, button)[aria-label]::after {
     position: absolute;
     content: attr(aria-label);
     font-size: var(--font-size-0);
     font-family: var(--font);
     font-weight: var(--font-weight-6);
+    font-style: normal;
+    letter-spacing: normal;
+    line-height: 1.4;
     background: var(--text);
     color: var(--bg);
-    right: var(--size-8);
-    z-index: 100;
+    top: calc(100% + var(--size-1));
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translate(var(--tt-x), var(--tt-y));
+    z-index: 1000;
     padding: var(--size-px-1) var(--size-px-2) !important;
     border-radius: var(--roundness);
     white-space: nowrap;
+    max-width: min(calc(100vw - var(--size-6)), 300px);
+    overflow: hidden;
+    text-overflow: ellipsis;
     visibility: hidden;
-
     opacity: 0;
-    transform: translateX(var(--size-2));
     pointer-events: none;
+    box-shadow: var(--shadow-2);
     transition:
         opacity 0.15s ease-out,
         transform 0.15s ease-out,
@@ -24,29 +41,140 @@ i[aria-label]::after {
 }
 
 @media (hover: hover) {
-    i[aria-label]:hover:not(:active)::after {
+    :is(i, button)[aria-label]:hover:not(:active)::after {
         opacity: 1 !important;
         visibility: visible !important;
-        transform: translateX(0);
+        transform: translate(var(--tt-x), 0);
         transition-property: opacity, transform;
         transition-duration: 0.2s;
         transition-timing-function: ease-out;
-        transition-delay: 0.5s;
+        transition-delay: 0.4s;
     }
 }
 
-i[aria-label].show::after {
+:is(i, button)[aria-label].show::after {
     opacity: 1 !important;
     visibility: visible !important;
-    transform: translateX(0);
+    transform: translate(var(--tt-x), 0);
     transition-property: opacity, transform;
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
-    transition-delay: 0.5s;
+    transition-delay: 0.4s;
 }
 
-i[aria-label]:active::after {
+:is(i, button)[aria-label]:active::after {
     opacity: 0 !important;
     visibility: hidden !important;
     transition: none !important;
+}
+
+/* Hide tooltips when parent dropdown menu is open */
+details[open] > summary :is(i, button)[aria-label]::after {
+    display: none !important;
+}
+
+/* Suppress tooltips inside list items (preserves strict overflow: hidden on stream rows) */
+.streamItem :is(i, button)[aria-label]::after {
+    display: none !important;
+}
+
+/* Touch devices: disable tooltips completely to prevent sticky tap popups */
+@media (hover: none) {
+    :is(i, button)[aria-label]::after {
+        display: none !important;
+    }
+}
+
+/* --- Vertical Contextual Positioning --- */
+
+/* Bottom-anchored bars & player controls: display tooltips ABOVE the element */
+nav.app-navbar :is(i, button)[aria-label],
+.miniplayer :is(i, button)[aria-label],
+#playerSection article :is(i, button)[aria-label],
+.playerControls :is(i, button)[aria-label],
+.controls :is(i, button)[aria-label],
+.bottomShelf :is(i, button)[aria-label],
+.mainShelf :is(i, button)[aria-label] {
+    --tt-y: var(--size-1);
+}
+
+nav.app-navbar :is(i, button)[aria-label]::after,
+.miniplayer :is(i, button)[aria-label]::after,
+#playerSection article :is(i, button)[aria-label]::after,
+.playerControls :is(i, button)[aria-label]::after,
+.controls :is(i, button)[aria-label]::after,
+.bottomShelf :is(i, button)[aria-label]::after,
+.mainShelf :is(i, button)[aria-label]::after {
+    top: auto;
+    bottom: calc(100% + var(--size-1));
+}
+
+/* --- Horizontal Edge Safety Anchors --- */
+
+/* Right-anchored icons: expand inward towards the left so tooltips never clip off-screen */
+.right-group :is(i, button)[aria-label],
+.header-actions :is(i, button)[aria-label],
+.header-nav-extra :is(i, button)[aria-label],
+header details summary :is(i, button)[aria-label],
+header .ri-more-2-fill,
+header > .ri-close-large-line,
+.sticky-bar details summary :is(i, button)[aria-label],
+.sticky-bar .ri-more-2-fill,
+#playerSection header :is(i, button)[aria-label],
+#playerSection .ri-more-2-fill,
+.configure-modal-header > :is(i, button)[aria-label]:last-child,
+dialog :is(i, button)[aria-label].ri-close-large-line,
+nav.app-navbar > :is(i, button)[aria-label]:last-child,
+.bottomShelf > :is(i, button)[aria-label]:last-child,
+.mainShelf > :is(i, button)[aria-label]:last-child,
+:is(i, button)[aria-label].tooltip-right {
+    --tt-x: 0;
+}
+
+.right-group :is(i, button)[aria-label]::after,
+.header-actions :is(i, button)[aria-label]::after,
+.header-nav-extra :is(i, button)[aria-label]::after,
+header details summary :is(i, button)[aria-label]::after,
+header .ri-more-2-fill::after,
+header > .ri-close-large-line::after,
+.sticky-bar details summary :is(i, button)[aria-label]::after,
+.sticky-bar .ri-more-2-fill::after,
+#playerSection header :is(i, button)[aria-label]::after,
+#playerSection .ri-more-2-fill::after,
+.configure-modal-header > :is(i, button)[aria-label]:last-child::after,
+dialog :is(i, button)[aria-label].ri-close-large-line::after,
+nav.app-navbar > :is(i, button)[aria-label]:last-child::after,
+.bottomShelf > :is(i, button)[aria-label]:last-child::after,
+.mainShelf > :is(i, button)[aria-label]:last-child::after,
+:is(i, button)[aria-label].tooltip-right::after {
+    left: auto;
+    right: 0;
+}
+
+/* Left-anchored icons: expand inward towards the right so tooltips never clip off-screen */
+.sticky-bar > :is(i, button)[aria-label]:first-child,
+.sticky-bar > .ri-close-large-line,
+.header-title > :is(i, button)[aria-label]:first-child,
+.markBar > :is(i, button)[aria-label]:first-child,
+.markBar > .ri-close-large-line,
+.configure-modal-header > :is(i, button)[aria-label]:first-child,
+nav.app-navbar > :is(i, button)[aria-label]:first-child,
+.bottomShelf > :is(i, button)[aria-label]:first-child,
+.mainShelf > :is(i, button)[aria-label]:first-child,
+:is(i, button)[aria-label].tooltip-left {
+    --tt-x: 0;
+}
+
+.sticky-bar > :is(i, button)[aria-label]:first-child::after,
+.sticky-bar > .ri-close-large-line::after,
+.header-title > :is(i, button)[aria-label]:first-child::after,
+.markBar > :is(i, button)[aria-label]:first-child::after,
+.markBar > .ri-close-large-line::after,
+.configure-modal-header > :is(i, button)[aria-label]:first-child::after,
+nav.app-navbar > :is(i, button)[aria-label]:first-child::after,
+.bottomShelf > :is(i, button)[aria-label]:first-child::after,
+.mainShelf > :is(i, button)[aria-label]:first-child::after,
+:is(i, button)[aria-label].tooltip-left::after {
+    left: 0;
+    right: auto;
 }

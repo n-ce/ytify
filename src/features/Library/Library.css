@@ -134,6 +134,53 @@
     .featured-article {
         grid-column: span 2;
 
+        .official-shelf,
+        .community-shelf {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin: var(--size-2) 0;
+            border-radius: var(--roundness);
+            background-color: var(--onBg);
+            border: var(--border);
+            overflow: hidden;
+
+            .shelf-label {
+                font-size: var(--font-size-1);
+                font-weight: var(--font-weight-5);
+                color: var(--text2);
+                opacity: 0.8;
+                padding: var(--size-2) var(--size-2) 0;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: var(--size-1);
+            }
+
+            .list-carousel {
+                display: flex;
+                overflow-x: scroll;
+                padding: var(--size-2);
+                padding-bottom: 0;
+                gap: var(--size-1);
+                border: none;
+                background: transparent;
+                margin: 0;
+
+                .listItem {
+                    width: var(--size-11);
+                    flex-shrink: 0;
+                    margin: 0;
+                    background-color: transparent;
+                    border: none;
+
+                    p.title {
+                        max-height: var(--size-4) !important;
+                    }
+                }
+            }
+        }
+
         .featuredPlaylists {
             img {
                 border-radius: var(--radius-2);

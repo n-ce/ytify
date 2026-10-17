@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/index.tsx",
+    "src/backend/worker.ts"
+  ],
+  "project": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "ignore": [
+    "src/features/Search/Suggestions.tsx",
+    "src/lib/utils/library.ts",
+    "src/backend/CatalogDO.ts",
+    "src/backend/UserSyncDO.ts",
+    "src/backend/worker.ts",
+    "netlify/**/*.ts"
+  ],
+  "ignoreDependencies": [
+    "youtubei.js",
+    "remixicon"
+  ],
+  "ignoreFiles": [
+    "netlify/**/*.ts"
+  ],
+  "vite": {
+    "config": "vite.config.ts"
+  }
+}

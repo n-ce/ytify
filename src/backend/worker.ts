@@ -8,14 +8,30 @@ import getSearchSuggestions from "./getSearchSuggestions.js";
 import getSimilar from "./getSimilar.js";
 import getSubFeed from "./getSubFeed.js";
 import { handleFixMetadata, type FixTarget } from "./fixMetadata.js";
-import { UserSyncDO } from "./UserSyncDO.ts";
+import {
+  recommend,
+  readCategories,
+  readPlaylists,
+  readScrapeStatus,
+  readTracks,
+  upsertCategories,
+  upsertPlaylists,
+  upsertTracks,
+  getCatalogStub,
+} from "./catalogClient.js";
+import { discoverCategories, scrapeCategory } from "./cron/scraper.js";
+import type { Category, CuratedPlaylist, CanonicalTrack } from "./catalog.js";
+import type { Env } from "./env.js";
 import type {
-  Request,
+  ScheduledController,
   ExecutionContext,
-  DurableObjectNamespace,
+  DurableObjectStub,
 } from "@cloudflare/workers-types";
 
-export { UserSyncDO };
+export { UserSyncDO } from "./UserSyncDO.ts";
+export { CatalogDO } from "./CatalogDO.js";
+export { StreamGateDO } from "./StreamGateDO.js";
+export type { Env };
 
 const ALLOWED_ORIGINS = [
   "https://ytify.pp.ua",
@@ -28,8 +44,82 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
 ];
 
-export interface Env {
-  USER_SYNC_DO?: DurableObjectNamespace;
+const GATE_DO_NAME = "global";
+const MAX_DIRECT_CATEGORIES = 2;
+const MAX_CATALOG_IDS = 100;
+
+function getGateStub(env: Env): DurableObjectStub | null {
+  if (!env.STREAM_GATE_DO) return null;
+  return env.STREAM_GATE_DO.get(env.STREAM_GATE_DO.idFromName(GATE_DO_NAME));
+}
+
+/**
+ * Internal routes (catalog writes, the stream gate, the scraper trigger) are
+ * only meant for the ytify edge functions. When INTERNAL_TOKEN is configured
+ * the caller must present it; unconfigured deployments stay open so local dev
+ * and self-hosting need no extra setup.
+ */
+function isInternalCaller(request: Request, env: Env): boolean {
+  if (!env.INTERNAL_TOKEN) return true;
+  return request.headers.get("x-ytify-token") === env.INTERNAL_TOKEN;
+}
+
+function unauthorized(corsHeaders: Record<string, string>): Response {
+  return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    status: 401,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function jsonResponse(
+  data: unknown,
+  corsHeaders: Record<string, string>,
+  cacheControl?: string,
+): Response {
+  return new Response(JSON.stringify(data), {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+      ...(cacheControl ? { "Cache-Control": cacheControl } : {}),
+    },
+  });
+}
+
+async function ingestScrapeResult(
+  env: Env,
+  category: Category,
+  result: { playlists: CuratedPlaylist[]; tracks: CanonicalTrack[] },
+): Promise<void> {
+  await upsertCategories(env, [category]);
+  await upsertPlaylists(env, result.playlists);
+  await upsertTracks(env, result.tracks);
+}
+
+/**
+ * Hands the categories to the catalog Durable Object, which drains them through
+ * alarms. Returns the number queued, or null when no catalog binding exists.
+ */
+async function scheduleScrapeJobs(
+  env: Env,
+  categories: Category[],
+): Promise<number | null> {
+  const stub = getCatalogStub(env);
+  if (!stub) return null;
+
+  const res = await stub.fetch(
+    new Request("http://do/scrape-jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ categories }),
+    }) as any,
+  );
+  if (!res.ok) {
+    console.warn(`[cron] catalog scrape queue rejected with ${res.status}`);
+    return null;
+  }
+  const data = (await res.json()) as { queued: number };
+  return data.queued || 0;
 }
 
 export default {
@@ -137,6 +227,45 @@ export default {
       });
     }
 
+    // --- Stream Gate Proxy (Durable Object lease coordinator) ---
+    if (path.startsWith("stream-gate")) {
+      if (!isInternalCaller(request, env)) {
+        return unauthorized(corsHeaders);
+      }
+      const stub = getGateStub(env);
+      if (!stub) {
+        return new Response(
+          JSON.stringify({ error: "STREAM_GATE_DO binding not configured." }),
+          {
+            status: 503,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      // The gate only ever carries small JSON, so the body is buffered instead of
+      // forwarded as a stream: a streamed request body needs `duplex: "half"`,
+      // which runtimes disagree about.
+      const gateBody = request.body ? await request.text() : undefined;
+
+      const doResponse = (await stub.fetch(
+        new Request(`http://do/${path.replace(/^stream-gate\/?/, "")}`, {
+          method: request.method,
+          headers: request.headers,
+          body: gateBody,
+        }) as any,
+      )) as any;
+
+      const headers = new Headers(doResponse.headers);
+      for (const [key, value] of Object.entries(corsHeaders)) {
+        headers.set(key, value);
+      }
+      return new Response(doResponse.body, {
+        status: doResponse.status,
+        headers,
+      });
+    }
+
     // --- Durable Object Sync & Library Routes ---
     const syncMatch = path.match(
       /^(sync|library)\/([a-fA-F0-9]{64}|[a-zA-Z0-9_-]+)/,
@@ -166,6 +295,197 @@ export default {
         status: doResponse.status,
         headers: responseHeaders,
       });
+    }
+
+    // --- Global Normalized Catalog ---
+    if (path.startsWith("catalog")) {
+      if (!env.CATALOG_DO) {
+        return new Response(
+          JSON.stringify({ error: "CATALOG_DO binding not configured." }),
+          {
+            status: 503,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      if (path.startsWith("catalog/tracks")) {
+        if (request.method === "GET") {
+          // Bounded so a caller cannot build an unbounded IN clause in the DO.
+          const ids = (searchParams.get("ids") || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .slice(0, MAX_CATALOG_IDS);
+          const tracks = await readTracks(env, ids);
+          return jsonResponse(tracks, corsHeaders, "public, s-maxage=3600");
+        }
+        if (request.method === "POST") {
+          if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
+          const body = (await request.json().catch(() => null)) as {
+            tracks?: CanonicalTrack[];
+          } | null;
+          if (!Array.isArray(body?.tracks)) {
+            return new Response(JSON.stringify({ error: "Missing tracks" }), {
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          await upsertTracks(env, body.tracks.filter((t) => t && t.id));
+          return jsonResponse({ ok: true }, corsHeaders);
+        }
+      }
+
+      if (path.startsWith("catalog/categories")) {
+        if (request.method === "GET") {
+          const categories = await readCategories(
+            env,
+            searchParams.get("type"),
+          );
+          return jsonResponse(categories, corsHeaders, "public, s-maxage=86400");
+        }
+        if (request.method === "POST") {
+          if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
+          const body = (await request.json().catch(() => null)) as {
+            categories?: Category[];
+          } | null;
+          if (!Array.isArray(body?.categories)) {
+            return new Response(
+              JSON.stringify({ error: "Missing categories" }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            );
+          }
+          await upsertCategories(
+            env,
+            body.categories.filter((c) => c && c.slug && c.title),
+          );
+          return jsonResponse({ ok: true }, corsHeaders);
+        }
+      }
+
+      if (path.startsWith("catalog/playlists")) {
+        if (request.method === "GET") {
+          const playlists = await readPlaylists(
+            env,
+            searchParams.get("category"),
+          );
+          return jsonResponse(playlists, corsHeaders, "public, s-maxage=3600");
+        }
+        if (request.method === "POST") {
+          if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
+          const body = (await request.json().catch(() => null)) as {
+            playlists?: CuratedPlaylist[];
+          } | null;
+          if (!Array.isArray(body?.playlists)) {
+            return new Response(
+              JSON.stringify({ error: "Missing playlists" }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            );
+          }
+          await upsertPlaylists(
+            env,
+            body.playlists.filter((p) => p && p.id && p.title),
+          );
+          return jsonResponse({ ok: true }, corsHeaders);
+        }
+      }
+    }
+
+    // --- Recommendation endpoint (moods & genres overlap scoring) ---
+    if (path === "recommend") {
+      const ids = (searchParams.get("ids") || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const limit = Math.min(
+        parseInt(searchParams.get("limit") || "10", 10) || 10,
+        20,
+      );
+      const playlists = await recommend(env, ids, limit);
+      return new Response(JSON.stringify({ playlists }), {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+        },
+      });
+    }
+
+    // --- Scraper status (queue depth / next alarm tick) ---
+    if (path === "cron/status") {
+      if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
+      const status = await readScrapeStatus(env);
+      if (!status) {
+        return new Response(
+          JSON.stringify({ error: "CATALOG_DO binding not configured." }),
+          {
+            status: 503,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+      return new Response(JSON.stringify(status), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // --- Manual scraper trigger (wrangler dev / ops debugging) ---
+    if (path === "cron/scrape") {
+      if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
+
+      const mode = searchParams.get("mode") || "schedule";
+      const categories = await discoverCategories();
+      if (categories.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "No categories discovered" }),
+          {
+            status: 502,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      if (mode === "direct") {
+        // Inline run for local verification: one or two categories at most, so
+        // the request stays inside the worker CPU budget.
+        const slice = categories.slice(
+          0,
+          Math.max(
+            1,
+            Math.min(
+              parseInt(searchParams.get("limit") || "1", 10) || 1,
+              MAX_DIRECT_CATEGORIES,
+            ),
+          ),
+        );
+        for (const category of slice) {
+          const result = await scrapeCategory(category);
+          await ingestScrapeResult(env, category, result);
+        }
+        return new Response(
+          JSON.stringify({ scraped: slice.map((c) => c.slug) }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      // Default: park the categories in the catalog Durable Object and let its
+      // alarm drain them one at a time.
+      const queued = await scheduleScrapeJobs(env, categories);
+      if (queued === null) {
+        return new Response(
+          JSON.stringify({ error: "CATALOG_DO binding not configured." }),
+          {
+            status: 503,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+      return new Response(
+        JSON.stringify({ queued, runner: "catalog-alarm" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     try {
@@ -287,5 +607,37 @@ export default {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+  },
+
+  /**
+   * Weekly trigger: discover every Moods & Genres category and park it in the
+   * catalog Durable Object, whose alarm then drains them one at a time. The cron
+   * invocation itself only does discovery, so no single invocation has to scrape
+   * the whole catalogue, and no paid queue binding is involved.
+   */
+  async scheduled(
+    controller: ScheduledController,
+    env: Env,
+    ctx: ExecutionContext,
+  ): Promise<void> {
+    const trigger = controller.cron || "";
+    ctx.waitUntil(
+      (async () => {
+        try {
+          const categories = await discoverCategories();
+          if (categories.length === 0) {
+            console.warn(`[cron] ${trigger}: no categories discovered`);
+            return;
+          }
+
+          const queued = await scheduleScrapeJobs(env, categories);
+          console.log(
+            `[cron] ${trigger}: queued ${queued ?? 0} categories for alarm-driven scraping`,
+          );
+        } catch (err) {
+          console.error(`[cron] ${trigger} failed:`, err);
+        }
+      })(),
+    );
   },
 };
