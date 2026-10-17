@@ -1,6 +1,7 @@
 # Global Normalized Catalog Specification
 
 ## Purpose
+
 Provide one deduplicated, shared record of every track ytify has ever resolved,
 so metadata repairs, user sync, link previews and recommendations all read from
 the same place instead of three disconnected stores.
@@ -8,20 +9,24 @@ the same place instead of three disconnected stores.
 ## Requirements
 
 ### REQ-CAT-001: Single Global Catalog Entity
+
 The catalog MUST live in one Cloudflare Durable Object (`CatalogDO`, DO name
 `global`) and MUST be the only store of canonical track metadata.
+
 - **Schema**: `canonical_tracks`, `categories`, `curated_playlists`,
   `playlist_tracks` (the last one is a relational index, not spec'd duplication:
   `track_ids` ordering is reconstructed from it)
 - **Record shape**: `id, title, author, author_id, duration, duration_str,
-  is_song, thumbnail_id, source, updated_at`
+is_song, thumbnail_id, source, updated_at`
 - **Provenance**: `source` is one of `innertube_scrape`, `user_sync`,
   `fix_metadata`, `oembed`
 - **Per-user DOs never duplicate canonical metadata**: `UserSyncDO` owns user
   relations and projects a copy into the catalog on every ingest
 
 ### REQ-CAT-002: Catalog Write-Through
+
 Every resolution path MUST update the catalog so later readers benefit.
+
 - `fixMetadata` writes `fix_metadata` records with the resolved author
 - `UserSyncDO` projects `addedOrUpdatedTracks` (delta) and full library PUTs as
   `user_sync` records, via `ctx.waitUntil` so sync latency is unaffected
@@ -29,7 +34,9 @@ Every resolution path MUST update the catalog so later readers benefit.
 - The link-preview path writes oEmbed results back on a catalog miss
 
 ### REQ-CAT-003: Merge Semantics
+
 Writes MUST NOT regress a record.
+
 - `updated_at >= stored.updated_at` gates every overwrite
 - A write with `duration = 0` (a metadata repair has no duration) MUST preserve
   the stored duration and duration string
@@ -37,7 +44,9 @@ Writes MUST NOT regress a record.
 - Consequence: a repair never clobbers a richer scrape, and vice versa
 
 ### REQ-CAT-003b: Repair Propagation
+
 A catalog fix MUST reach every user without a manual reset.
+
 - `UserSyncDO.user_tracks` holds the relational view of a library (track id,
   `added_at`, `play_count`, `custom_data`); the JSON snapshot rows are retained
   as the offline/fallback copy, not as the source of truth
@@ -58,13 +67,16 @@ A catalog fix MUST reach every user without a manual reset.
   back to the local snapshot and reseeds the catalog
 
 ### REQ-CAT-003c: Storage
+
 The user DO still stores the snapshot JSON on purpose: the library must render
 offline, and DO SQLite size is not the constraint the duplication critique
 assumed (thousands of small rows are megabytes at most). What was removed is
-the *metadata authority*, which now has exactly one home.
+the _metadata authority_, which now has exactly one home.
 
 ### REQ-CAT-004: Link Previews Never Touch RapidAPI
+
 HTML preview responses MUST be produced without any RapidAPI call.
+
 - **Tier 0 — gating**: any `/s/:id` request whose `Accept` is not
   `application/json` returns HTML and never reaches the audio path
 - **Tier 1**: read `canonical_tracks` and render Open Graph tags (<5ms, zero
@@ -81,16 +93,18 @@ HTML preview responses MUST be produced without any RapidAPI call.
   edge (`s-maxage=120, stale-while-revalidate=600`) so a stampede collapses
 
 ### REQ-CAT-005: In-Worker Moods & Genres Scraper
+
 The external `Moods-And-Genres-Dataset` repository and its GitHub Actions
 workflow are retired; scraping lives in the Worker.
+
 - **Discovery**: Explore → "Moods & genres" → the landing page's headed grids
   (`Moods & moments`, `Genres`) → one job per chip. The grid header is the only
   place the mood/genre distinction is exposed
 - **Browse target**: a category chip resolves to `FEmusic_moods_and_genres_category`,
-  *not* the landing page's `FEmusic_moods_and_genes`-style id. Browsing the parent
+  _not_ the landing page's `FEmusic_moods_and_genes`-style id. Browsing the parent
   id with the chip's params silently returns the parent page again, so each chip's
   own `browseId` is carried alongside its `params`
-- **Schedule**: `crons = ["0 0 * * 0"]` in `wrangler.toml`. The cron invocation
+- **Schedule**: `crons = ["0 0 * * SUN"]` in `wrangler.toml`. The cron invocation
   only discovers and parks — it never scrapes
 - **Execution**: `pending_scrape` rows in `CatalogDO`, drained by its alarm one
   category at a time (REQ-CAT-005b). No Cloudflare Queues: that is a paid add-on
@@ -103,7 +117,9 @@ workflow are retired; scraping lives in the Worker.
   backlog can never be stranded
 
 ### REQ-CAT-005b: Alarm-Driven Scheduling
+
 The scheduler MUST run on features the deployment already has.
+
 - The cron handler (or `POST /api/cron/scrape`) parks categories in
   `pending_scrape` and requests an alarm
 - `alarm()` scrapes one category, upserts it, then reschedules 5s later until the
@@ -116,7 +132,9 @@ The scheduler MUST run on features the deployment already has.
   immaterial for a weekly job
 
 ### REQ-CAT-006: Recommendation Scoring
+
 `GET /api/recommend?ids=...` MUST rank curated playlists by overlap.
+
 - **Score**: +10 per track shared with the request (`SCORE_PER_TRACK`)
 - **Ranking**: score descending, then playlist id ascending for a stable order
 - **Zero-overlap playlists are excluded**
@@ -125,8 +143,10 @@ The scheduler MUST run on features the deployment already has.
 - Each result carries the first three resolved canonical tracks for rendering
 
 ### REQ-CAT-006b: Recommendation Consumer
+
 The client's "For You" carousel MUST read from the worker, not from a retired
 external service.
+
 - `src/features/Library/Featured.tsx` calls `GET /api/recommend` with up to 25
   history/queue track ids and renders `title`, `id`, `thumbnailId` and
   `sectionTitle`
@@ -134,21 +154,27 @@ external service.
 - No other external recommendation service is referenced anywhere in `src/`
 
 ### REQ-CAT-007: Internal Route Authorisation
+
 Catalog writes, the stream gate and the scraper trigger are internal.
+
 - They require `x-ytify-token` to match `INTERNAL_TOKEN` when that secret is
   configured
 - When `INTERNAL_TOKEN` is unset the routes stay open so local dev and
   self-hosting need no extra configuration
 
 ### REQ-CAT-007b: No Paid Dependencies
+
 The backend MUST stay on the base Cloudflare plan.
+
 - Storage: Durable Object SQLite
 - Scheduling: cron triggers plus Durable Object alarms
 - No Cloudflare Queues, Workflows, D1 or Hyperdrive
 
 ### REQ-CAT-008: Stateless Sessions
+
 The emergency fallback's session tokens MUST NOT depend on an eventually
 consistent external store.
+
 - **Signed (preferred)**: `session_secret` is configured → tokens are
   `<issuedAt>.<HMAC-SHA256(issuedAt:ip, secret)>`, URL-safe base64. No storage,
   no round trip, no pre-warmable pool
@@ -162,26 +188,28 @@ consistent external store.
 - Verification uses `crypto.subtle.verify`, which is constant-time
 
 ## Completeness Criteria
-| Criterion | Status |
-|-----------|--------|
-| Catalog holds one deduplicated record per track | ✅ |
-| Metadata repair writes through to the catalog | ✅ |
-| User sync writes through to the catalog | ✅ |
-| Stale/partial writes never regress a record | ✅ |
-| A repair reaches a user who never pushed the fix | ✅ |
-| A repair for a foreign track is never delivered | ✅ |
-| HTML preview renders with zero RapidAPI calls | ✅ |
-| oEmbed fallback populates the catalog | ✅ |
-| Concurrent crawlers share one oEmbed request | ✅ |
-| Weekly cron parks scraper jobs | ✅ |
-| Scraper drains through DO alarms, no paid add-on | ✅ |
-| Discovery finds ~49 categories split into moods/genres | ✅ |
-| Recommendation score is +10 per shared track | ✅ |
-| Internal routes reject an invalid token | ✅ |
-| Signed sessions reject tampering and IP mismatch | ✅ |
-| No paid Cloudflare add-on is required | ✅ |
+
+| Criterion                                              | Status |
+| ------------------------------------------------------ | ------ |
+| Catalog holds one deduplicated record per track        | ✅     |
+| Metadata repair writes through to the catalog          | ✅     |
+| User sync writes through to the catalog                | ✅     |
+| Stale/partial writes never regress a record            | ✅     |
+| A repair reaches a user who never pushed the fix       | ✅     |
+| A repair for a foreign track is never delivered        | ✅     |
+| HTML preview renders with zero RapidAPI calls          | ✅     |
+| oEmbed fallback populates the catalog                  | ✅     |
+| Concurrent crawlers share one oEmbed request           | ✅     |
+| Weekly cron parks scraper jobs                         | ✅     |
+| Scraper drains through DO alarms, no paid add-on       | ✅     |
+| Discovery finds ~49 categories split into moods/genres | ✅     |
+| Recommendation score is +10 per shared track           | ✅     |
+| Internal routes reject an invalid token                | ✅     |
+| Signed sessions reject tampering and IP mismatch       | ✅     |
+| No paid Cloudflare add-on is required                  | ✅     |
 
 ## Related Files
+
 - `src/backend/CatalogDO.ts` - the catalog Durable Object, its SQL and its alarm
 - `src/backend/catalog.ts` - canonical types and track projection
 - `src/backend/catalogClient.ts` - worker-side catalog accessors
@@ -196,6 +224,7 @@ consistent external store.
 - `scripts/stream.test.ts` - signed session round trips and tampering
 
 ## Non-Goals
+
 - Replacing the per-user library blob (offline rendering still needs a local copy)
 - Serving the whole catalog to the browser (only recommendations leave the worker)
 - Any new storage engine: D1 was considered and Durable Object SQLite chosen
