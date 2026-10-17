@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+﻿import { createSignal } from "solid-js";
 
 export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
 
@@ -93,7 +93,8 @@ export let config = {
 
 type AppConfig = typeof config;
 
-const savedStore = localStorage.getItem("config");
+const savedStore =
+  typeof localStorage !== "undefined" ? localStorage.getItem("config") : null;
 if (savedStore) {
   try {
     const parsed = JSON.parse(savedStore) as Record<string, unknown>;
@@ -134,7 +135,9 @@ export function setConfig<K extends keyof AppConfig>(
 ) {
   config[key] = val;
   const str = JSON.stringify(config);
-  localStorage.setItem("config", str);
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem("config", str);
+  }
 }
 
 export const [librarySections, setLibrarySectionsSignal] =
@@ -180,7 +183,8 @@ export let drawer = {
   lastMainFeature: "search" as "search" | "library",
   lastList: null as { id: string; type: string; shared?: boolean } | null,
 };
-const savedDrawer = localStorage.getItem("drawer");
+const savedDrawer =
+  typeof localStorage !== "undefined" ? localStorage.getItem("drawer") : null;
 if (savedDrawer) {
   try {
     const parsed = JSON.parse(savedDrawer) as Record<string, unknown>;
@@ -200,7 +204,7 @@ if (savedDrawer) {
         (drawer as Record<keyof AppDrawer, unknown>)[key] = parsed[key];
       }
     });
-    if (hadLegacyPlays) {
+    if (hadLegacyPlays && typeof localStorage !== "undefined") {
       localStorage.setItem("drawer", JSON.stringify(drawer));
     }
   } catch (e) {
@@ -216,16 +220,15 @@ export function setDrawer<K extends keyof AppDrawer>(
 ) {
   drawer[key] = val;
   const str = JSON.stringify(drawer);
-  localStorage.setItem("drawer", str);
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem("drawer", str);
+  }
 }
 
 export function applyPanelRatio(ratio: PanelRatio | string) {
   const [left, right] = (ratio || "2:5").split(":");
   if (typeof document !== "undefined" && document.documentElement) {
     document.documentElement.style.setProperty("--panelRatioLeft", left || "2");
-    document.documentElement.style.setProperty(
-      "--panelRatioRight",
-      right || "5",
-    );
+    document.documentElement.style.setProperty("--panelRatioRight", right || "5");
   }
 }

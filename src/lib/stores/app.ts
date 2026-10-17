@@ -1,8 +1,13 @@
 import { config } from "../utils/config";
 import { createStore } from "solid-js/store";
 
-const nl = navigator.language.slice(0, 2);
-const initLocale = config.language || (Locales.includes(nl) ? nl : "en");
+const nl =
+  typeof navigator !== "undefined" && navigator.language
+    ? navigator.language.slice(0, 2)
+    : "en";
+const hasLocales = typeof Locales !== "undefined";
+const initLocale =
+  config.language || (hasLocales && Locales.includes(nl) ? nl : "en");
 
 const storeInit: {
   useSaavn: boolean;

@@ -7,7 +7,9 @@ const Queue = lazy(() => import("@features/Queue"));
 const Player = lazy(() => import("@features/Player"));
 const Settings = lazy(() => import("@features/Settings"));
 
-export const params = new URL(location.href).searchParams;
+export const params = new URL(
+  typeof location !== "undefined" ? location.href : "https://ytify.app/",
+).searchParams;
 
 export type MainFeature = "queue" | "search" | "library" | "list" | "settings";
 export type SidePanel = "player";
@@ -44,20 +46,26 @@ export function openSubView(feature: MainFeature) {
       history.replaceState(
         { ...history.state, panel: null },
         "",
-        location.href,
+        typeof location !== "undefined" ? location.href : "",
       );
     }
     setNavStore("active", "search");
     return;
   }
   if (navStore.active !== feature) {
-    history.pushState({ panel: feature }, "", location.href);
+    if (typeof history !== "undefined") {
+      history.pushState(
+        { panel: feature },
+        "",
+        typeof location !== "undefined" ? location.href : "",
+      );
+    }
     setNavStore("active", feature);
   }
 }
 
 export function closeSubView() {
-  if (history.state?.panel) {
+  if (typeof history !== "undefined" && history.state?.panel) {
     history.back();
   } else {
     setNavStore("active", "search");
@@ -119,9 +127,11 @@ export function updateParam(param: Params, value?: string) {
 
   const str = params.toString();
 
-  history.replaceState(
-    history.state || {},
-    "",
-    location.origin + location.pathname + (str && "?") + params.toString(),
-  );
+  if (typeof history !== "undefined" && typeof location !== "undefined") {
+    history.replaceState(
+      history.state || {},
+      "",
+      location.origin + location.pathname + (str && "?") + params.toString(),
+    );
+  }
 }

@@ -55,8 +55,24 @@ type PlayerStore = {
   lrcSync?: (d: number) => void;
 };
 
+const createAudioElement = (): HTMLAudioElement => {
+  if (typeof Audio !== "undefined") return new Audio();
+  return {
+    volume: 1,
+    currentTime: 0,
+    playbackRate: 1,
+    loop: false,
+    src: "",
+    duration: 0,
+    play: async () => {},
+    pause: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  } as unknown as HTMLAudioElement;
+};
+
 const createInitialState = (): PlayerStore => ({
-  audio: new Audio(),
+  audio: createAudioElement(),
   playbackState: "none",
   context: { id: "", src: "" },
   status: "",
@@ -73,14 +89,17 @@ const createInitialState = (): PlayerStore => ({
     duration: "",
   },
   mediaArtwork: blankImage,
-  supportsOpus: navigator.mediaCapabilities
-    .decodingInfo({
-      type: "file",
-      audio: {
-        contentType: "audio/webm;codecs=opus",
-      },
-    })
-    .then((res) => res.supported),
+  supportsOpus:
+    typeof navigator !== "undefined" && navigator.mediaCapabilities
+      ? navigator.mediaCapabilities
+          .decodingInfo({
+            type: "file",
+            audio: {
+              contentType: "audio/webm;codecs=opus",
+            },
+          })
+          .then((res) => res.supported)
+      : Promise.resolve(false),
   data: {},
   isMusic: true,
   audioURL: "",
@@ -137,7 +156,7 @@ createRoot(() => {
   let historyTimeoutId = 0;
   let playCountedForTrackId = "";
 
-  if ("mediaSession" in navigator)
+  if (typeof navigator !== "undefined" && "mediaSession" in navigator)
     import("@modules/mediaSession").then((m) => m.initMediaSession());
 
   playerStore.audio.volume = playerStore.volume;
@@ -148,7 +167,8 @@ createRoot(() => {
     else {
       updateParam("s");
       setPlayerStore("playbackState", "none");
-      if ("mediaSession" in navigator)
+      clearSponsorSegments();
+      if (typeof navigator !== "undefined" && "mediaSession" in navigator)
         import("@modules/mediaSession").then((m) =>
           m.updateMediaSessionPlaybackState("none"),
         );
@@ -157,7 +177,7 @@ createRoot(() => {
 
   playerStore.audio.onplaying = () => {
     setPlayerStore("playbackState", "playing");
-    if ("mediaSession" in navigator)
+    if (typeof navigator !== "undefined" && "mediaSession" in navigator)
       import("@modules/mediaSession").then((m) => {
         m.updateMediaSessionPlaybackState("playing");
         m.updateMediaSessionPosition();
@@ -168,7 +188,7 @@ createRoot(() => {
 
     if (id && playCountedForTrackId !== id) {
       clearTimeout(historyTimeoutId);
-      historyTimeoutId = window.setTimeout(() => {
+      historyTimeoutId = setTimeout(() => {
         if (historyID === id && playCountedForTrackId !== id) {
           playCountedForTrackId = id;
           recordTrackPlay(playerStore.stream);
@@ -184,20 +204,22 @@ createRoot(() => {
             addToCollection("history", [playerStore.stream]);
           }
         }
-      }, 1e4);
+      }, 1e4) as unknown as number;
     }
   };
 
   playerStore.audio.onpause = () => {
     setPlayerStore("playbackState", "paused");
-    if ("mediaSession" in navigator)
+    if (typeof navigator !== "undefined" && "mediaSession" in navigator)
       import("@modules/mediaSession").then((m) => {
         m.updateMediaSessionPlaybackState("paused");
         m.updateMediaSessionPosition();
       });
     clearTimeout(historyTimeoutId);
   };
-  playerStore.audio.addEventListener("loadeddata", themer);
+  if (typeof playerStore.audio.addEventListener === "function") {
+    playerStore.audio.addEventListener("loadeddata", themer);
+  }
 
   let isPlayable = false;
   const playableCheckerID = setInterval(() => {
@@ -213,7 +235,6 @@ createRoot(() => {
   }, 500);
 
   playerStore.audio.onloadstart = () => {
-    clearSponsorSegments();
     setPlayerStore("playbackState", "paused");
     setPlayerStore("status", "");
     if (isPlayable) playerStore.audio.play();
@@ -229,7 +250,11 @@ createRoot(() => {
   };
 
   playerStore.audio.ontimeupdate = () => {
-    if (document.activeElement?.matches('input[type="range"]')) return;
+    if (
+      typeof document !== "undefined" &&
+      document.activeElement?.matches('input[type="range"]')
+    )
+      return;
 
     const { audio, lrcSync, fullDuration, isMusic } = playerStore;
 
@@ -267,10 +292,10 @@ createRoot(() => {
   playerStore.audio.onloadedmetadata = () => {
     setPlayerStore({
       currentTime: 0,
-      fullDuration: Math.floor(playerStore.audio.duration),
+      fullDuration: Math.floor(playerStore.audio.duration || 0),
     });
 
-    if ("mediaSession" in navigator)
+    if (typeof navigator !== "undefined" && "mediaSession" in navigator)
       import("@modules/mediaSession").then((m) =>
         m.updateMediaSessionPosition(),
       );
@@ -281,7 +306,7 @@ createRoot(() => {
 
     if (!nextItem) return;
 
-    const prefetchRef = new Audio();
+    const prefetchRef = createAudioElement();
     prefetchRef.onerror = () =>
       import("@modules/audioErrorHandler").then((mod) =>
         mod.default(prefetchRef, nextItem),

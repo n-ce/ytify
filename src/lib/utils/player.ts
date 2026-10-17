@@ -15,6 +15,7 @@ import {
   streamCache,
 } from "@modules/audioCache";
 import { isQueuePrefetchActive } from "../modules/queuePrefetch";
+import { fetchSponsorSegments } from "@modules/sponsorBlock";
 
 export async function applyMetadata(data: TrackItem) {
   setPlayerStore("stream", data);
@@ -27,6 +28,10 @@ export async function applyMetadata(data: TrackItem) {
   }
 
   setPlayerStore("isMusic", music);
+
+  if (config.sponsorblock && data.id) {
+    fetchSponsorSegments(data.id);
+  }
 
   const metadataObj: MediaMetadataInit = {
     title: data.title,
@@ -108,6 +113,10 @@ export async function player(id?: string) {
   playerAbortController = new AbortController();
 
   if (!id) return;
+
+  if (config.sponsorblock) {
+    fetchSponsorSegments(id);
+  }
 
   const enforceVideo = !playerStore.isMusic && playerStore.isWatching;
 
