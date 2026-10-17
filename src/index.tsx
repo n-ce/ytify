@@ -20,6 +20,8 @@ import {
   playerStore,
   playNext,
   playPrev,
+  stepVolume,
+  toggleMute,
   params,
 } from "@stores";
 import { handleNavClick } from "@components/HeaderNav";
@@ -94,6 +96,14 @@ export default function App() {
       mainRef?.removeEventListener("scrollend", checkScrollCompletion);
     });
 
+    const focusSearchInput = (attempt = 0) => {
+      const searchInput =
+        document.querySelector<HTMLInputElement>(".superInput");
+      if (searchInput) searchInput.focus();
+      else if (attempt < 10)
+        requestAnimationFrame(() => focusSearchInput(attempt + 1));
+    };
+
     const onKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       if (
@@ -141,13 +151,13 @@ export default function App() {
         playPrev();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        playerStore.audio.volume = Math.min(1, playerStore.audio.volume + 0.05);
+        stepVolume(1);
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
-        playerStore.audio.volume = Math.max(0, playerStore.audio.volume - 0.05);
+        stepVolume(-1);
       } else if (e.key === "m" || e.key === "M") {
         e.preventDefault();
-        playerStore.audio.muted = !playerStore.audio.muted;
+        toggleMute();
       } else if (e.key === "1") {
         e.preventDefault();
         handleNavClick("queue");
@@ -160,10 +170,7 @@ export default function App() {
       } else if (e.key === "/") {
         e.preventDefault();
         handleNavClick("search");
-        const searchInput = document.querySelector(
-          ".searchSection input, input#searchBar, input[type='text']",
-        ) as HTMLInputElement | null;
-        searchInput?.focus();
+        focusSearchInput();
       }
     };
 

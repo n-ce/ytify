@@ -12,8 +12,76 @@
     color: var(--text);
   }
 
-  a.underline {
-    text-decoration-line: underline !important
+  .guideTrigger {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: var(--font-size-1);
+    text-decoration-line: underline;
+    cursor: pointer;
+  }
+
+  .usageGuide {
+    ul {
+      margin: var(--size-2) 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .guideFeatures li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      column-gap: var(--size-1);
+      margin-bottom: var(--size-1);
+
+      i {
+        grid-row: span 2;
+        cursor: default;
+      }
+
+      span {
+        opacity: 0.85;
+      }
+    }
+
+    .guideTitle {
+      margin: var(--size-3) 0 var(--size-1);
+      font-weight: var(--font-weight-6);
+    }
+
+    .guideShortcuts li {
+      display: flex;
+      align-items: center;
+      gap: var(--size-1);
+      margin-bottom: var(--size-1);
+
+      > span:last-child {
+        opacity: 0.85;
+      }
+    }
+
+    .guideKeys {
+      display: inline-flex;
+      flex: none;
+      justify-content: flex-start;
+      gap: calc(var(--size-1) / 2);
+      min-width: var(--size-10);
+    }
+
+    kbd {
+      padding: 0 var(--size-1);
+      font-family: inherit;
+      line-height: var(--size-4);
+      background-color: var(--onBg);
+      border: var(--border);
+      border-radius: calc(var(--roundness) * 0.7);
+    }
   }
 
   >p {

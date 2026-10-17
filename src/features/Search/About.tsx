@@ -1,7 +1,12 @@
 import './About.css';
+import { createSignal, lazy, Show } from 'solid-js';
 import { t } from '@stores';
 
+const EasyUsageGuide = lazy(() => import("./EasyUsageGuide"));
+
 export default function() {
+  const [showGuide, setShowGuide] = createSignal(false);
+
   return (
     <div class="about">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4172 4172" width="1rem" height="1rem">
@@ -11,9 +16,18 @@ export default function() {
 
       {t('about_description')}
       <br />
-      <a
-        class="underline"
-        target="_blank" href="https://github.com/n-ce/ytify/wiki/usage">{t('about_learn_more')}</a>
+      <button
+        class="guideTrigger"
+        type="button"
+        aria-expanded={showGuide()}
+        onclick={() => setShowGuide(!showGuide())}
+      >
+        {t('about_learn_more')}
+      </button>
+
+      <Show when={showGuide()}>
+        <EasyUsageGuide />
+      </Show>
       <br />
       <p>
         {t('about_support_project')}&nbsp;

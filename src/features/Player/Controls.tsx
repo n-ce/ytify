@@ -8,11 +8,12 @@ import {
   playPrev,
   queueStore,
   setPlayerStore,
+  setVolume,
   updateParam,
   t,
 } from "@stores";
-import { convertSStoHHMMSS, setConfig } from "@utils";
-import { Accessor, onMount, Setter, Show } from "solid-js";
+import { convertSStoHHMMSS, VOLUME_PRESETS } from "@utils";
+import { Accessor, For, onMount, Setter, Show } from "solid-js";
 
 export default function (_: {
   showLyrics: Accessor<boolean>;
@@ -168,27 +169,13 @@ export default function (_: {
           id="volumeChanger"
           value={playerStore.volume}
           onchange={(e) => {
-            const ref = e.target;
-            const vol = parseFloat(ref.value);
-            playerStore.audio.volume = vol;
-            setConfig("volume", (vol * 100).toString());
-            setPlayerStore("volume", vol);
-            ref.blur();
+            setVolume(parseFloat(e.target.value));
+            e.target.blur();
           }}
         >
-          <option value="0">0%</option>
-          <option value="0.002">0.2%</option>
-          <option value="0.005">0.5%</option>
-          <option value="0.01">1%</option>
-          <option value="0.02">2%</option>
-          <option value="0.03">3%</option>
-          <option value="0.05">5%</option>
-          <option value="0.1">10%</option>
-          <option value="0.15">15%</option>
-          <option value="0.25">25%</option>
-          <option value="0.5">50%</option>
-          <option value="0.75">75%</option>
-          <option value="1">100%</option>
+          <For each={VOLUME_PRESETS}>
+            {(preset) => <option value={preset / 100}>{preset}%</option>}
+          </For>
         </select>
       </div>
     </>

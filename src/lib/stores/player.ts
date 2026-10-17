@@ -22,6 +22,8 @@ import {
   player,
   applyAudioStreams,
   shuffle,
+  setConfig,
+  VOLUME_PRESETS,
 } from "@utils";
 import { streamCache } from "@modules/audioCache";
 import { isQueuePrefetchActive } from "@modules/queuePrefetch";
@@ -153,6 +155,34 @@ export function playPrev() {
   });
   player(prevStream.id);
 }
+export function setVolume(volume: number) {
+  const vol = Math.min(1, Math.max(0, volume));
+  playerStore.audio.volume = vol;
+  setPlayerStore("volume", vol);
+  setConfig("volume", (vol * 100).toString());
+}
+
+export function stepVolume(direction: 1 | -1) {
+  const current = playerStore.volume * 100;
+  const next =
+    direction > 0
+      ? VOLUME_PRESETS.find((preset) => preset > current)
+      : VOLUME_PRESETS.findLast((preset) => preset < current);
+  setVolume((next ?? (direction > 0 ? 100 : 0)) / 100);
+}
+
+let lastAudibleVolume = playerStore.volume > 0 ? playerStore.volume : 1;
+
+export function toggleMute() {
+  if (playerStore.volume > 0) {
+    lastAudibleVolume = playerStore.volume;
+    playerStore.audio.volume = 0;
+    setPlayerStore("volume", 0);
+  } else {
+    setVolume(lastAudibleVolume);
+  }
+}
+
 createRoot(() => {
   let historyID: string | undefined = "";
   let historyTimeoutId = 0;

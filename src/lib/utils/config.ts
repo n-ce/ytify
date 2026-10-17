@@ -33,6 +33,11 @@ export const CACHE_LIMIT_PRESETS = [250, 500, 1000, 2000];
 
 export const DEFAULT_CACHE_LIMIT_MB = 500;
 
+/** Selectable player volume levels, in percent. */
+export const VOLUME_PRESETS = [
+  0, 0.2, 0.5, 1, 2, 3, 5, 10, 15, 25, 50, 75, 100,
+];
+
 export interface LibrarySections {
   subfeed: boolean;
   gallery: boolean;
