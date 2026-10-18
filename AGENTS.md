@@ -3,6 +3,11 @@
 You are working on ytify, a lean, ethical YouTube & YouTube Music audio PWA.
 Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQLite).
 
+## Core Domain & Terminology: Dual-Source Audio (YT & YTM)
+
+- **Audio, Not Just Music / YTM**: ytify plays audio streams from **both** YouTube (videos, podcasts, talks, live audio) and YouTube Music (songs, albums, artists). It is an audio player across the entire YouTube ecosystem, not exclusively a music or YTM client.
+- **Terminology Invariant**: Prefer the term **audio** (or "audio item", "stream") over "music" or "song" when referring to media items, queues, playback, caching, or the stream pipeline. The catalog schema explicitly differentiates `canonical_songs` (with album metadata and square artwork) and `canonical_videos` (channel author without square artwork), both treated as first-class audio streams.
+
 ## 1. Zero-Bloat Budget (CRITICAL)
 
 - Target initial JS entry: <= 23.5 KB gzipped. Total bundle: < 200 KB gzipped.
