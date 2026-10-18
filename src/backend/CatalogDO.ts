@@ -75,12 +75,14 @@ export class CatalogDO {
         thumbnail_id TEXT NOT NULL,
         duration INTEGER NOT NULL DEFAULT 0,
         duration_str TEXT,
+        omv_id TEXT,
         source TEXT NOT NULL,
         updated_at INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);
       CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);
       CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);
+      CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id);
 
       CREATE TABLE IF NOT EXISTS canonical_videos (
         id TEXT PRIMARY KEY,
@@ -89,11 +91,13 @@ export class CatalogDO {
         author_id TEXT,
         duration INTEGER NOT NULL DEFAULT 0,
         duration_str TEXT,
+        atv_id TEXT,
         source TEXT NOT NULL,
         updated_at INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);
       CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);
+      CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id);
 
       CREATE TABLE IF NOT EXISTS canonical_tracks (
         id TEXT PRIMARY KEY,
@@ -147,6 +151,15 @@ export class CatalogDO {
         attempts INTEGER NOT NULL DEFAULT 0
       );
     `);
+
+    // Gracefully handle column additions for existing tables
+    try {
+      this.sql.exec("ALTER TABLE canonical_songs ADD COLUMN omv_id TEXT");
+    } catch {}
+    try {
+      this.sql.exec("ALTER TABLE canonical_videos ADD COLUMN atv_id TEXT");
+    } catch {}
+
     this.initialized = true;
   }
 
@@ -194,8 +207,8 @@ export class CatalogDO {
         if (t.isSong) {
           this.sql.exec(
             `INSERT INTO canonical_songs
-               (id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, source, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+               (id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(id) DO UPDATE SET
                title = excluded.title,
                author = excluded.author,
@@ -205,6 +218,7 @@ export class CatalogDO {
                thumbnail_id = CASE WHEN excluded.thumbnail_id != '' THEN excluded.thumbnail_id ELSE canonical_songs.thumbnail_id END,
                duration = CASE WHEN excluded.duration > 0 THEN excluded.duration ELSE canonical_songs.duration END,
                duration_str = CASE WHEN excluded.duration > 0 THEN excluded.duration_str ELSE canonical_songs.duration_str END,
+               omv_id = CASE WHEN excluded.omv_id IS NOT NULL AND excluded.omv_id != '' THEN excluded.omv_id ELSE canonical_songs.omv_id END,
                source = excluded.source,
                updated_at = excluded.updated_at
              WHERE excluded.updated_at >= canonical_songs.updated_at`,
@@ -217,20 +231,22 @@ export class CatalogDO {
             t.thumbnailId || "",
             t.duration,
             t.durationStr,
+            t.omvId || null,
             t.source,
             t.updatedAt,
           );
         } else {
           this.sql.exec(
             `INSERT INTO canonical_videos
-               (id, title, author, author_id, duration, duration_str, source, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+               (id, title, author, author_id, duration, duration_str, atv_id, source, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(id) DO UPDATE SET
                title = excluded.title,
                author = excluded.author,
                author_id = CASE WHEN excluded.author_id != '' THEN excluded.author_id ELSE canonical_videos.author_id END,
                duration = CASE WHEN excluded.duration > 0 THEN excluded.duration ELSE canonical_videos.duration END,
                duration_str = CASE WHEN excluded.duration > 0 THEN excluded.duration_str ELSE canonical_videos.duration_str END,
+               atv_id = CASE WHEN excluded.atv_id IS NOT NULL AND excluded.atv_id != '' THEN excluded.atv_id ELSE canonical_videos.atv_id END,
                source = excluded.source,
                updated_at = excluded.updated_at
              WHERE excluded.updated_at >= canonical_videos.updated_at`,
@@ -240,6 +256,7 @@ export class CatalogDO {
             t.authorId || "",
             t.duration,
             t.durationStr,
+            t.atvId || null,
             t.source,
             t.updatedAt,
           );
@@ -283,7 +300,7 @@ export class CatalogDO {
     const placeholders = ids.map(() => "?").join(",");
     const out: Record<string, CanonicalTrack> = {};
 
-    // 1. Read songs (with album info & square thumbnail)
+    // 1. Read songs (with album info, square thumbnail, and omv_id)
     const songRows = this.sql
       .exec<{
         id: string;
@@ -295,10 +312,11 @@ export class CatalogDO {
         thumbnail_id: string;
         duration: number;
         duration_str: string;
+        omv_id: string | null;
         source: string;
         updated_at: number;
       }>(
-        `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, source, updated_at
+        `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at
          FROM canonical_songs WHERE id IN (${placeholders})`,
         ...ids,
       )
@@ -316,12 +334,13 @@ export class CatalogDO {
         thumbnailId: r.thumbnail_id,
         albumId: r.album_id || undefined,
         albumTitle: r.album_title || undefined,
+        omvId: r.omv_id || undefined,
         source: r.source as CanonicalTrack["source"],
         updatedAt: r.updated_at,
       };
     }
 
-    // 2. Read videos (without thumbnail_id) for remaining IDs
+    // 2. Read videos (without thumbnail_id, with atv_id) for remaining IDs
     const missingForVideos = ids.filter((id) => !out[id]);
     if (missingForVideos.length > 0) {
       const vPlaceholders = missingForVideos.map(() => "?").join(",");
@@ -333,10 +352,11 @@ export class CatalogDO {
           author_id: string;
           duration: number;
           duration_str: string;
+          atv_id: string | null;
           source: string;
           updated_at: number;
         }>(
-          `SELECT id, title, author, author_id, duration, duration_str, source, updated_at
+          `SELECT id, title, author, author_id, duration, duration_str, atv_id, source, updated_at
            FROM canonical_videos WHERE id IN (${vPlaceholders})`,
           ...missingForVideos,
         )
@@ -352,6 +372,7 @@ export class CatalogDO {
           durationStr: r.duration_str,
           isSong: false,
           thumbnailId: "",
+          atvId: r.atv_id || undefined,
           source: r.source as CanonicalTrack["source"],
           updatedAt: r.updated_at,
         };
@@ -394,6 +415,117 @@ export class CatalogDO {
           source: r.source as CanonicalTrack["source"],
           updatedAt: r.updated_at,
         };
+      }
+    }
+
+    return out;
+  }
+
+  /** Resolves canonical song (ATV) counterparts for an array of video (OMV) IDs. */
+  public resolveSongCounterparts(ids: string[]): Record<string, CanonicalTrack> {
+    if (ids.length === 0) return {};
+    const placeholders = ids.map(() => "?").join(",");
+    const out: Record<string, CanonicalTrack> = {};
+
+    // 1. Join canonical_videos to canonical_songs via atv_id
+    const joinedRows = this.sql
+      .exec<{
+        query_omv_id: string;
+        id: string;
+        title: string;
+        author: string;
+        author_id: string;
+        album_id: string | null;
+        album_title: string | null;
+        thumbnail_id: string;
+        duration: number;
+        duration_str: string;
+        omv_id: string | null;
+        source: string;
+        updated_at: number;
+      }>(
+        `SELECT
+           v.id AS query_omv_id,
+           s.id AS id,
+           s.title AS title,
+           s.author AS author,
+           s.author_id AS author_id,
+           s.album_id AS album_id,
+           s.album_title AS album_title,
+           s.thumbnail_id AS thumbnail_id,
+           s.duration AS duration,
+           s.duration_str AS duration_str,
+           s.omv_id AS omv_id,
+           s.source AS source,
+           s.updated_at AS updated_at
+         FROM canonical_videos v
+         JOIN canonical_songs s ON v.atv_id = s.id
+         WHERE v.id IN (${placeholders})`,
+        ...ids,
+      )
+      .toArray();
+
+    for (const r of joinedRows) {
+      out[r.query_omv_id] = {
+        id: r.id,
+        title: r.title,
+        author: r.author,
+        authorId: r.author_id,
+        duration: r.duration,
+        durationStr: r.duration_str,
+        isSong: true,
+        thumbnailId: r.thumbnail_id,
+        albumId: r.album_id || undefined,
+        albumTitle: r.album_title || undefined,
+        omvId: r.omv_id || r.query_omv_id,
+        source: r.source as CanonicalTrack["source"],
+        updatedAt: r.updated_at,
+      };
+    }
+
+    // 2. Direct omv_id in canonical_songs for remaining unmapped IDs
+    const remaining = ids.filter((id) => !out[id]);
+    if (remaining.length > 0) {
+      const remPlaceholders = remaining.map(() => "?").join(",");
+      const directSongRows = this.sql
+        .exec<{
+          id: string;
+          title: string;
+          author: string;
+          author_id: string;
+          album_id: string | null;
+          album_title: string | null;
+          thumbnail_id: string;
+          duration: number;
+          duration_str: string;
+          omv_id: string | null;
+          source: string;
+          updated_at: number;
+        }>(
+          `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at
+           FROM canonical_songs WHERE omv_id IN (${remPlaceholders})`,
+          ...remaining,
+        )
+        .toArray();
+
+      for (const r of directSongRows) {
+        if (r.omv_id) {
+          out[r.omv_id] = {
+            id: r.id,
+            title: r.title,
+            author: r.author,
+            authorId: r.author_id,
+            duration: r.duration,
+            durationStr: r.duration_str,
+            isSong: true,
+            thumbnailId: r.thumbnail_id,
+            albumId: r.album_id || undefined,
+            albumTitle: r.album_title || undefined,
+            omvId: r.omv_id,
+            source: r.source as CanonicalTrack["source"],
+            updatedAt: r.updated_at,
+          };
+        }
       }
     }
 
@@ -608,6 +740,23 @@ export class CatalogDO {
         }
         return new Response(JSON.stringify(track), {
           status: 200,
+          headers: JSON_HEADER,
+        });
+      }
+
+      case "counterparts": {
+        if (request.method === "GET") {
+          const ids = [...new Set((url.searchParams.get("ids") || "").split(","))]
+            .map((s) => s.trim())
+            .filter(Boolean);
+          const body = this.resolveSongCounterparts(ids);
+          return new Response(JSON.stringify(body), {
+            status: 200,
+            headers: JSON_HEADER,
+          });
+        }
+        return new Response(JSON.stringify({ error: "Method not allowed" }), {
+          status: 405,
           headers: JSON_HEADER,
         });
       }

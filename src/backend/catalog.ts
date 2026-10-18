@@ -22,6 +22,10 @@ export interface CanonicalTrack {
   thumbnailId: string;
   albumId?: string;
   albumTitle?: string;
+  /** Music video ID (OMV) if this track is an official song (ATV). */
+  omvId?: string;
+  /** Canonical song release ID (ATV) if this track is a music video (OMV). */
+  atvId?: string;
   source: CanonicalSource;
   updatedAt: number;
 }
@@ -36,6 +40,8 @@ export interface CanonicalSong {
   duration: number;
   durationStr: string;
   thumbnailId: string;
+  /** Music video ID (OMV) corresponding to this song release. */
+  omvId?: string;
   source: CanonicalSource;
   updatedAt: number;
 }
@@ -47,6 +53,8 @@ export interface CanonicalVideo {
   authorId: string;
   duration: number;
   durationStr: string;
+  /** Canonical song ID (ATV) corresponding to this music video. */
+  atvId?: string;
   source: CanonicalSource;
   updatedAt: number;
 }
@@ -87,6 +95,8 @@ export interface Recommendation extends Omit<CuratedPlaylist, "trackIds"> {
 export type CatalogTrackInput = Partial<TrackItem> & {
   img?: string;
   type?: "video" | "song";
+  omvId?: string;
+  atvId?: string;
 };
 
 /** Overlap weight per shared track, ported from the retired dataset repo. */
@@ -136,6 +146,8 @@ export function trackItemToCanonical(
     thumbnailId: isSong ? track.img || track.id : "",
     albumId: track.albumId || undefined,
     albumTitle: track.albumTitle || undefined,
+    omvId: track.omvId || undefined,
+    atvId: track.atvId || undefined,
     source,
     updatedAt: typeof track.modified === "number" ? track.modified : Date.now(),
   };

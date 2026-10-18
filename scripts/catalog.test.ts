@@ -3,7 +3,12 @@ import { CatalogDO } from "../src/backend/CatalogDO";
 import { StreamGateDO } from "../src/backend/StreamGateDO";
 import { UserSyncDO } from "../src/backend/UserSyncDO";
 import { tracksToCanonical } from "../src/backend/catalog";
-import { fakeDurableState, doFetch, postJson, readJson } from "./durableFixture";
+import {
+  fakeDurableState,
+  doFetch,
+  postJson,
+  readJson,
+} from "./durableFixture";
 
 describe("catalog/canonical_tracks", () => {
   test("upserts and reads tracks by id", async () => {
@@ -108,7 +113,10 @@ describe("catalog/canonical_tracks", () => {
       ],
     });
 
-    const tracks = await readJson(catalog, "/tracks?ids=song1111111,video111111");
+    const tracks = await readJson(
+      catalog,
+      "/tracks?ids=song1111111,video111111",
+    );
     expect(tracks.song1111111).toMatchObject({
       id: "song1111111",
       title: "Official Song",
@@ -127,13 +135,80 @@ describe("catalog/canonical_tracks", () => {
 
     // Verify direct SQLite table contents
     const sql = (catalog as any).sql;
-    const songRow = sql.exec("SELECT * FROM canonical_songs WHERE id = ?", "song1111111").one();
+    const songRow = sql
+      .exec("SELECT * FROM canonical_songs WHERE id = ?", "song1111111")
+      .one();
     expect(songRow.album_title).toBe("Album One");
     expect(songRow.thumbnail_id).toBe("img_song1");
 
-    const videoRow = sql.exec("SELECT * FROM canonical_videos WHERE id = ?", "video111111").one();
+    const videoRow = sql
+      .exec("SELECT * FROM canonical_videos WHERE id = ?", "video111111")
+      .one();
     expect(videoRow.title).toBe("Fan Live Performance");
     expect(videoRow.thumbnail_id).toBeUndefined();
+  });
+
+  test("links and resolves OMV and ATV counterparts", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        {
+          id: "song_atv_1",
+          title: "Levitating",
+          author: "Dua Lipa",
+          authorId: "UC_DUA",
+          duration: 203,
+          durationStr: "03:23",
+          isSong: true,
+          thumbnailId: "dua_thumb",
+          albumId: "OLAK5uy_album",
+          albumTitle: "Future Nostalgia",
+          omvId: "video_omv_1",
+          source: "fix_metadata",
+          updatedAt: now,
+        },
+        {
+          id: "video_omv_1",
+          title: "Dua Lipa - Levitating (Official Music Video)",
+          author: "Dua Lipa",
+          authorId: "UC_DUA",
+          duration: 220,
+          durationStr: "03:40",
+          isSong: false,
+          thumbnailId: "",
+          atvId: "song_atv_1",
+          source: "fix_metadata",
+          updatedAt: now,
+        },
+      ],
+    });
+
+    // 1. Verify tracks read preserves omvId and atvId
+    const tracks = await readJson(
+      catalog,
+      "/tracks?ids=song_atv_1,video_omv_1",
+    );
+    expect(tracks.song_atv_1.omvId).toBe("video_omv_1");
+    expect(tracks.video_omv_1.atvId).toBe("song_atv_1");
+
+    // 2. Query counterparts endpoint for the video ID -> resolves the canonical song
+    const counterparts = await readJson(
+      catalog,
+      "/counterparts?ids=video_omv_1,unknown_video",
+    );
+    expect(counterparts.video_omv_1).toBeDefined();
+    expect(counterparts.video_omv_1).toMatchObject({
+      id: "song_atv_1",
+      title: "Levitating",
+      isSong: true,
+      albumId: "OLAK5uy_album",
+      albumTitle: "Future Nostalgia",
+      thumbnailId: "dua_thumb",
+      omvId: "video_omv_1",
+    });
+    expect(counterparts.unknown_video).toBeUndefined();
   });
 });
 
@@ -141,7 +216,12 @@ describe("catalog/recommend", () => {
   test("scores curated playlists at +10 per shared track", async () => {
     const catalog = new CatalogDO(fakeDurableState() as any);
     const now = Date.now();
-    const [a, b, c, d] = ["aaaaaaaaaaa", "bbbbbbbbbbb", "ccccccccccc", "ddddddddddd"];
+    const [a, b, c, d] = [
+      "aaaaaaaaaaa",
+      "bbbbbbbbbbb",
+      "ccccccccccc",
+      "ddddddddddd",
+    ];
 
     await postJson(catalog, "/tracks", {
       tracks: [
@@ -290,7 +370,9 @@ describe("catalog/scrape queue (queue-free deployments)", () => {
     }));
 
     expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(0);
-    expect((await readJson(catalog, "/track?id=aaaaaaaaaaa")).title).toBe("Song A");
+    expect((await readJson(catalog, "/track?id=aaaaaaaaaaa")).title).toBe(
+      "Song A",
+    );
     const playlists = await readJson(catalog, "/playlists?category=chill");
     expect(playlists[0].title).toBe("Chill Mix");
   });
@@ -322,8 +404,11 @@ describe("stream gate/lease", () => {
   test("a lease is single-writer: the second acquire is rejected", async () => {
     const gate = new StreamGateDO(fakeDurableState() as any);
 
-    expect(await (await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })).json())
-      .toMatchObject({ granted: true });
+    expect(
+      await (
+        await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })
+      ).json(),
+    ).toMatchObject({ granted: true });
 
     const second = await (
       await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })
@@ -338,7 +423,9 @@ describe("stream gate/lease", () => {
 
     await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" });
     expect(
-      await (await post(gate, "acquire", { key: "sess-2", ip: "2.2.2.2" })).json(),
+      await (
+        await post(gate, "acquire", { key: "sess-2", ip: "2.2.2.2" })
+      ).json(),
     ).toMatchObject({ granted: true });
 
     // A fresh session from the same IP is still held back: one call per IP per
@@ -369,7 +456,9 @@ describe("stream gate/lease", () => {
       active_session: null,
       in_flight_until: 0,
     });
-    expect(afterRelease.keys).toEqual([{ idx: 1, remaining: 421, reset_at: resetAt }]);
+    expect(afterRelease.keys).toEqual([
+      { idx: 1, remaining: 421, reset_at: resetAt },
+    ]);
 
     const admitted = await (
       await post(gate, "acquire", { key: "sess-1", ip: "4.4.4.4" })
@@ -390,7 +479,10 @@ describe("user sync/relations and hydration", () => {
         get: () => ({ fetch: (req: Request) => catalog.fetch(req) }),
       },
     };
-    return { catalog, userDO: new UserSyncDO({ ...fakeDurableState(), env } as any) };
+    return {
+      catalog,
+      userDO: new UserSyncDO({ ...fakeDurableState(), env } as any),
+    };
   }
 
   test("a full snapshot records relations and projects into the catalog", async () => {
@@ -417,9 +509,9 @@ describe("user sync/relations and hydration", () => {
       }),
     );
 
-    const rows = (userDO as any).sql
-      ["exec"]("SELECT track_id, added_at FROM user_tracks")
-      .toArray();
+    const rows = (userDO as any).sql["exec"](
+      "SELECT track_id, added_at FROM user_tracks",
+    ).toArray();
     expect(rows).toEqual([{ track_id: "aaaaaaaaaaa", added_at: now }]);
 
     // The write-through runs in waitUntil; a real runtime flushes it before the
@@ -460,7 +552,12 @@ describe("user sync/relations and hydration", () => {
     // fixMetadata repairs the corrupted artist.
     await postJson(catalog, "/tracks", {
       tracks: [
-        canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A - Topic", now + 5_000),
+        canonicalTrack(
+          "aaaaaaaaaaa",
+          "Song A",
+          "Artist A - Topic",
+          now + 5_000,
+        ),
       ],
     });
 
@@ -558,8 +655,18 @@ describe("user sync/relations and hydration", () => {
     // must not appear in this user's delta.
     await postJson(catalog, "/tracks", {
       tracks: [
-        canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A - Topic", now + 5_000),
-        canonicalTrack("privatesong", "Someone Else's Song", "Private Artist", now + 6_000),
+        canonicalTrack(
+          "aaaaaaaaaaa",
+          "Song A",
+          "Artist A - Topic",
+          now + 5_000,
+        ),
+        canonicalTrack(
+          "privatesong",
+          "Someone Else's Song",
+          "Private Artist",
+          now + 6_000,
+        ),
       ],
     });
 
@@ -617,9 +724,9 @@ describe("user sync/relations and hydration", () => {
       }),
     );
 
-    const rows = (userDO as any).sql
-      ["exec"]("SELECT count(*) as c FROM user_tracks")
-      .one().c;
+    const rows = (userDO as any).sql["exec"](
+      "SELECT count(*) as c FROM user_tracks",
+    ).one().c;
     expect(rows).toBe(0);
 
     const snapshot = await userDO
@@ -640,8 +747,20 @@ describe("catalog/tracksToCanonical", () => {
         authorId: "UC_A",
         modified: 1000,
       },
-      { id: "bbbbbbbbbbb", title: "Song B", duration: "04:00", author: "Artist B", authorId: "UC_B" },
-      { id: "bbbbbbbbbbb", title: "Duplicate", duration: "1:00", author: "Dup", authorId: "UC_D" },
+      {
+        id: "bbbbbbbbbbb",
+        title: "Song B",
+        duration: "04:00",
+        author: "Artist B",
+        authorId: "UC_B",
+      },
+      {
+        id: "bbbbbbbbbbb",
+        title: "Duplicate",
+        duration: "1:00",
+        author: "Dup",
+        authorId: "UC_D",
+      },
       { title: "No id", duration: "1:00", author: "Ghost", authorId: "UC_G" },
     ]);
 

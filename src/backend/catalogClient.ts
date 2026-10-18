@@ -88,6 +88,27 @@ export async function readTracks(
   }
 }
 
+export async function readSongCounterparts(
+  env: Env | undefined,
+  ids: string[],
+): Promise<Record<string, CanonicalTrack>> {
+  if (ids.length === 0) return {};
+
+  const stub = getCatalogStub(env);
+  if (!stub) return {};
+
+  try {
+    const res = await stub.fetch(
+      durableRequest(`/counterparts?ids=${encodeURIComponent(ids.join(","))}`),
+    );
+    if (!res.ok) return {};
+    return (await res.json()) as Record<string, CanonicalTrack>;
+  } catch (err) {
+    console.warn("[catalog] counterparts read failed:", err);
+    return {};
+  }
+}
+
 export async function readTracksSince(
   env: Env | undefined,
   since: number,
@@ -245,7 +266,6 @@ export async function recommendPlaylists(
     return [];
   }
 }
-
 
 export async function readScrapeStatus(
   env: Env | undefined,

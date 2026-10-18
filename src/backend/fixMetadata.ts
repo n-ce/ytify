@@ -16,6 +16,7 @@ export interface ResolvedMetadata {
   albumId?: string;
   albumTitle?: string;
   thumbnailId?: string;
+  matchedSongId?: string;
 }
 
 const fastCache = new Map<string, ResolvedMetadata>();
@@ -133,6 +134,7 @@ export async function resolveTrackMetadataViaSearch(
     const thumbnailId = formatThumbnailId(
       matchedSong.thumbnail?.contents?.[0]?.url,
     );
+    const matchedSongId = getVideoId(matchedSong) || target.id;
 
     return {
       author,
@@ -141,6 +143,7 @@ export async function resolveTrackMetadataViaSearch(
       albumId: playlistId || undefined,
       albumTitle: albumTitle || undefined,
       thumbnailId: thumbnailId || undefined,
+      matchedSongId,
     };
   } catch (err) {
     console.error(
@@ -194,6 +197,7 @@ export async function handleFixMetadata(
           albumId: track.albumId,
           albumTitle: track.albumTitle,
           thumbnailId: track.thumbnailId,
+          matchedSongId: track.atvId || track.id,
         };
         resolved[t.id] = entry;
         fastCache.set(t.id, entry);
@@ -234,20 +238,56 @@ export async function handleFixMetadata(
     const now = Date.now();
     const records: CanonicalTrack[] = [];
     for (const [id, item] of Object.entries(newlyResolved)) {
-      records.push({
-        id,
-        title: item.title || "",
-        author: item.author,
-        authorId: item.authorId || "",
-        albumId: item.albumId,
-        albumTitle: item.albumTitle,
-        duration: 0,
-        durationStr: "",
-        isSong: true,
-        thumbnailId: item.thumbnailId || id,
-        source: "fix_metadata",
-        updatedAt: now,
-      });
+      const atvId = item.matchedSongId || id;
+      if (atvId !== id) {
+        // Target is an OMV mapped to a canonical ATV release!
+        // 1. Song record (ATV)
+        records.push({
+          id: atvId,
+          title: item.title || "",
+          author: item.author,
+          authorId: item.authorId || "",
+          albumId: item.albumId,
+          albumTitle: item.albumTitle,
+          duration: 0,
+          durationStr: "",
+          isSong: true,
+          thumbnailId: item.thumbnailId || atvId,
+          omvId: id,
+          source: "fix_metadata",
+          updatedAt: now,
+        });
+        // 2. Video record (OMV) pointing to ATV
+        records.push({
+          id,
+          title: item.title || "",
+          author: item.author,
+          authorId: item.authorId || "",
+          duration: 0,
+          durationStr: "",
+          isSong: false,
+          thumbnailId: "",
+          atvId,
+          source: "fix_metadata",
+          updatedAt: now,
+        });
+      } else {
+        // Target was already an ATV release
+        records.push({
+          id,
+          title: item.title || "",
+          author: item.author,
+          authorId: item.authorId || "",
+          albumId: item.albumId,
+          albumTitle: item.albumTitle,
+          duration: 0,
+          durationStr: "",
+          isSong: true,
+          thumbnailId: item.thumbnailId || id,
+          source: "fix_metadata",
+          updatedAt: now,
+        });
+      }
     }
     await upsertTracks(env, records);
   }

@@ -7,10 +7,13 @@ import {
   getVideoId,
   getLockupMeta,
 } from "./utils.js";
+import { readSongCounterparts } from "./catalogClient.js";
+import type { Env } from "./env.js";
 
 export default async function (
   id: string,
   all?: boolean,
+  env?: Env,
 ): Promise<YTPlaylistItem> {
   const yt = await getClient();
   let playlist: any = null;
@@ -19,50 +22,44 @@ export default async function (
   let author = "";
   let img = "";
 
-  const isMusic = id.startsWith("RD") || id.startsWith("OLAK");
-
-  if (isMusic) {
-    try {
-      const musicPlaylist = await yt.music.getPlaylist(id);
-      if (musicPlaylist) {
-        playlist = musicPlaylist;
-        items = musicPlaylist.items || [];
-        const header = musicPlaylist.header;
-        if (header?.is(YTNodes.MusicDetailHeader)) {
-          const detailHeader = header.as(YTNodes.MusicDetailHeader);
-          name = detailHeader.title.text || name;
-          author = detailHeader.author?.name || author || "YouTube Music";
-          img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
-        } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
-          const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
-          name = responsiveHeader.title.text || name;
-          const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find(
-            (r: any) =>
-              r.text &&
-              !/^\d+/.test(r.text) &&
-              r.text !== "Playlist" &&
-              r.text.trim() !== "•",
-          )?.text;
-          author =
-            foundAuthor?.trim() ||
-            (responsiveHeader as any).strapline_text_one?.text ||
-            author ||
-            "YouTube Music";
-          const thumbContents =
-            (responsiveHeader as any).thumbnail?.contents || [];
-          img = formatThumbnailId(getThumbnail(thumbContents));
-        }
+  // 1. Attempt YouTube Music playlist fetch first (natively returns ATVs/songs for music content)
+  try {
+    const musicPlaylist = await yt.music.getPlaylist(id);
+    if (musicPlaylist) {
+      playlist = musicPlaylist;
+      items = musicPlaylist.items || [];
+      const header = musicPlaylist.header;
+      if (header?.is(YTNodes.MusicDetailHeader)) {
+        const detailHeader = header.as(YTNodes.MusicDetailHeader);
+        name = detailHeader.title.text || name;
+        author = detailHeader.author?.name || author || "YouTube Music";
+        img = formatThumbnailId(getThumbnail(detailHeader.thumbnails || []));
+      } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
+        const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
+        name = responsiveHeader.title.text || name;
+        const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find(
+          (r: any) =>
+            r.text &&
+            !/^\d+/.test(r.text) &&
+            r.text !== "Playlist" &&
+            r.text.trim() !== "•",
+        )?.text;
+        author =
+          foundAuthor?.trim() ||
+          (responsiveHeader as any).strapline_text_one?.text ||
+          author ||
+          "YouTube Music";
+        const thumbContents =
+          (responsiveHeader as any).thumbnail?.contents || [];
+        img = formatThumbnailId(getThumbnail(thumbContents));
       }
-    } catch (e) {
-      console.error("Error fetching music playlist:", e);
     }
+  } catch {
+    // If music playlist fails (e.g. video-only or unmapped category), fallback below
   }
 
-  if (isMusic && (!author || author === "Unknown")) {
-    author = "YouTube Music";
-  }
-
-  if (!playlist) {
+  // 2. Fallback to regular YouTube playlist fetch if music playlist returned no items
+  if (!playlist || !items || items.length === 0) {
     try {
       playlist = await yt.getPlaylist(id);
       items = playlist.videos || [];
@@ -71,55 +68,6 @@ export default async function (
       img = formatThumbnailId(getThumbnail(playlist.info?.thumbnails || []));
     } catch (e) {
       console.error("Error fetching regular playlist:", e);
-    }
-  }
-
-  if (
-    !playlist ||
-    (name === "Unknown Playlist" && (!items || items.length === 0))
-  ) {
-    try {
-      const musicPlaylist = await yt.music.getPlaylist(id);
-      if (musicPlaylist) {
-        playlist = musicPlaylist;
-        items = musicPlaylist.items || [];
-        const header = musicPlaylist.header;
-        if (header?.is(YTNodes.MusicDetailHeader)) {
-          const detailHeader = header.as(YTNodes.MusicDetailHeader);
-          if (name === "Unknown Playlist")
-            name = detailHeader.title.text || name;
-          if (!author || author === "Unknown" || author === " • ")
-            author = detailHeader.author?.name || author || "YouTube Music";
-          if (!img)
-            img = formatThumbnailId(
-              getThumbnail(detailHeader.thumbnails || []),
-            );
-        } else if (header?.is(YTNodes.MusicResponsiveHeader)) {
-          const responsiveHeader = header.as(YTNodes.MusicResponsiveHeader);
-          if (name === "Unknown Playlist")
-            name = responsiveHeader.title.text || name;
-          if (!author || author === "Unknown" || author === " • ") {
-            const foundAuthor = (responsiveHeader as any).subtitle?.runs?.find(
-              (r: any) =>
-                r.text &&
-                !/^\d+/.test(r.text) &&
-                r.text !== "Playlist" &&
-                r.text.trim() !== "•",
-            )?.text;
-            author =
-              foundAuthor?.trim() ||
-              (responsiveHeader as any).strapline_text_one?.text ||
-              "YouTube Music";
-          }
-          if (!img) {
-            const thumbContents =
-              (responsiveHeader as any).thumbnail?.contents || [];
-            img = formatThumbnailId(getThumbnail(thumbContents));
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Error in music playlist fallback:", e);
     }
   }
 
@@ -141,8 +89,11 @@ export default async function (
         });
       } else if (item.is(YTNodes.LockupView)) {
         const lockup = item.as(YTNodes.LockupView);
-        // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
-        if (lockup.content_id && (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")) {
+        // LockupView can have content_type "SHOW" in addition to "VIDEO"
+        if (
+          lockup.content_id &&
+          (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")
+        ) {
           const {
             views,
             published,
@@ -204,8 +155,34 @@ export default async function (
     }
   }
 
+  // 3. Counterpart Normalization: Replace OMVs/videos with canonical ATV songs from CatalogDO
+  const videoItems = allItems.filter((i) => i.type === "video");
+  if (videoItems.length > 0 && env?.CATALOG_DO) {
+    try {
+      const videoIds = videoItems.map((i) => i.id);
+      const counterparts = await readSongCounterparts(env, videoIds);
+      for (const item of allItems) {
+        if (item.type === "video" && counterparts[item.id]) {
+          const song = counterparts[item.id];
+          item.id = song.id;
+          item.title = song.title || item.title;
+          item.author = song.author || item.author;
+          item.authorId = song.authorId || item.authorId;
+          item.duration = song.durationStr || item.duration;
+          item.subtext = song.albumTitle || item.subtext;
+          item.type = "song";
+          if (song.thumbnailId) {
+            item.img = song.thumbnailId;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[getPlaylist] counterpart normalization failed:", err);
+    }
+  }
+
   if (!img && allItems.length > 0 && allItems[0].id) {
-    img = allItems[0].id;
+    img = allItems[0].img || allItems[0].id;
   }
 
   return {

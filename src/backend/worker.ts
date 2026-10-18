@@ -20,7 +20,12 @@ import {
   getCatalogStub,
 } from "./catalogClient.js";
 import { discoverCategories, scrapeCategory } from "./cron/scraper.js";
-import { type Category, type CuratedPlaylist, type CanonicalTrack, tracksToCanonical } from "./catalog.js";
+import {
+  type Category,
+  type CuratedPlaylist,
+  type CanonicalTrack,
+  tracksToCanonical,
+} from "./catalog.js";
 import type { Env } from "./env.js";
 import type {
   ScheduledController,
@@ -641,7 +646,10 @@ export default {
           if (!id) throw new Error("Missing id parameter");
           data = await getArtist(id);
           if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
-            const canonical = tracksToCanonical((data as any).items, "artist_featured");
+            const canonical = tracksToCanonical(
+              (data as any).items,
+              "artist_featured",
+            );
             if (ctx?.waitUntil && canonical.length > 0) {
               ctx.waitUntil(upsertTracks(env, canonical));
             }
@@ -690,9 +698,12 @@ export default {
           const id = searchParams.get("id");
           const all = searchParams.get("all") === "true";
           if (!id) throw new Error("Missing id parameter");
-          data = await getPlaylist(id, all);
+          data = await getPlaylist(id, all, env);
           if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
-            const canonical = tracksToCanonical((data as any).items, "artist_featured");
+            const canonical = tracksToCanonical(
+              (data as any).items,
+              "artist_featured",
+            );
             if (ctx?.waitUntil && canonical.length > 0) {
               ctx.waitUntil(upsertTracks(env, canonical));
             }
