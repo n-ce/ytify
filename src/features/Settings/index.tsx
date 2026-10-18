@@ -67,7 +67,7 @@ export default function () {
   return (
     <section ref={settingsSection} class="settingsSection">
       <header>
-        <p>ytify</p>
+        <p>{t("nav_settings")}</p>
         <i
           aria-label={t("close")}
           class="ri-close-large-line"
