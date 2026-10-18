@@ -6,11 +6,8 @@ compatibility_flags = [ "nodejs_compat" ]
 [observability]
 enabled = true
 
-[triggers]
-# Weekly Moods & Genres refresh (Sunday 00:00 UTC). The cron handler discovers
-# the categories and parks them in CatalogDO, whose alarm drains them a few at a
-# time. No Cloudflare Queues binding: the alarm path needs no paid add-on.
-crons = ["0 0 * * SUN"]
+# [triggers]
+# crons = ["0 0 * * SUN"] # Disabled: rely on external dataset / eliminate 100k SQLite writes
 
 [[durable_objects.bindings]]
 name = "USER_SYNC_DO"

@@ -21,6 +21,7 @@ declare global {
     duration: string;
     author: string;
     authorId: string;
+    img?: string;
     modified?: number;
     albumId?: string;
     albumTitle?: string;

@@ -1,8 +1,8 @@
 import { YTNodes, type Innertube } from "youtubei.js";
 import { getClient, getThumbnail, formatThumbnailId } from "./utils.js";
-import { readFeatured } from "./catalogClient.js";
+import { readFeatured, upsertPlaylists } from "./catalogClient.js";
 import type { Env } from "./env.js";
-import type { Recommendation } from "./catalog.js";
+import type { Recommendation, CuratedPlaylist } from "./catalog.js";
 
 export type FeaturedArtist = Channel & { type: "artist" };
 
@@ -162,6 +162,23 @@ export default async function getFeatured(
 
   // Row 2: Catalog Community playlists
   const communityPlaylists = catalogCommunity.slice(0, limit);
+
+  // Write discovered artist "Featured on" playlists through to CatalogDO
+  if (env && artistFeatured.length > 0) {
+    const curated: CuratedPlaylist[] = artistFeatured.map((p) => ({
+      id: p.id,
+      categorySlug: "artist-featured",
+      categoryType: "genre",
+      sectionTitle: "Featured on",
+      title: p.name,
+      thumbnailId: p.img,
+      trackIds: [],
+      updatedAt: Date.now(),
+    }));
+    upsertPlaylists(env, curated).catch((err) =>
+      console.warn("[featured] playlist upsert failed:", err),
+    );
+  }
 
   return {
     featuredPlaylists,

@@ -40,13 +40,27 @@ export const [navStore, setNavStore] = createStore<
   settings: { ref: null, component: Settings },
 });
 
+export function getCleanHref(targetFeature: MainFeature): string {
+  if (typeof location === "undefined") return "";
+  const url = new URL(location.href);
+  url.searchParams.delete("library");
+  params.delete("library");
+
+  let query = url.searchParams.toString();
+  if (targetFeature === "library") {
+    params.set("library", "");
+    query = query ? `${query}&library` : "library";
+  }
+  return url.pathname + (query ? `?${query}` : "") + url.hash;
+}
+
 export function openSubView(feature: MainFeature) {
   if (feature === "search") {
-    if (typeof history !== "undefined" && history.state?.panel) {
+    if (typeof history !== "undefined") {
       history.replaceState(
-        { ...history.state, panel: null },
+        { ...(history.state || {}), panel: null },
         "",
-        typeof location !== "undefined" ? location.href : "",
+        getCleanHref("search"),
       );
     }
     setNavStore("active", "search");
@@ -54,12 +68,7 @@ export function openSubView(feature: MainFeature) {
   }
   if (navStore.active !== feature) {
     if (typeof history !== "undefined") {
-      let href = typeof location !== "undefined" ? location.href : "";
-      if (feature === "library" && typeof location !== "undefined") {
-        const url = new URL(location.href);
-        url.searchParams.set("library", "");
-        href = url.toString();
-      }
+      const href = getCleanHref(feature);
       history.pushState({ panel: feature }, "", href);
     }
     setNavStore("active", feature);
@@ -70,6 +79,13 @@ export function closeSubView() {
   if (typeof history !== "undefined" && history.state?.panel) {
     history.back();
   } else {
+    if (typeof history !== "undefined") {
+      history.replaceState(
+        { ...(history.state || {}), panel: null },
+        "",
+        getCleanHref("search"),
+      );
+    }
     setNavStore("active", "search");
   }
 }
@@ -77,8 +93,14 @@ export function closeSubView() {
 if (typeof window !== "undefined") {
   window.addEventListener("popstate", (e) => {
     if (e.state?.panel) {
+      if (e.state.panel === "library") {
+        params.set("library", "");
+      } else {
+        params.delete("library");
+      }
       setNavStore("active", e.state.panel);
     } else {
+      params.delete("library");
       setNavStore("active", "search");
     }
   });
@@ -120,20 +142,27 @@ export function updateParam(param: Params, value?: string) {
       listParams.forEach((p) => params.delete(p));
       params.delete("q");
       params.delete("f");
+      params.delete("library");
     }
     if (param === "q" || param === "f") {
       listParams.forEach((p) => params.delete(p));
+      params.delete("library");
     }
     params.set(param, value);
   } else params.delete(param);
 
-  const str = params.toString();
+  params.delete("library");
+  let str = params.toString();
+  if (navStore.active === "library") {
+    params.set("library", "");
+    str = str ? `${str}&library` : "library";
+  }
 
   if (typeof history !== "undefined" && typeof location !== "undefined") {
     history.replaceState(
       history.state || {},
       "",
-      location.origin + location.pathname + (str && "?") + params.toString(),
+      location.origin + location.pathname + (str && "?") + str,
     );
   }
 }

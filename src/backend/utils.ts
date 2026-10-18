@@ -101,12 +101,14 @@ export function getVideoId(song: YTNodes.MusicResponsiveListItem): string {
 }
 
 /**
- * Extract views / published / duration / author / authorId from the modern LockupView layout
+ * Extract views / published / duration / author / authorId from the modern LockupView layout.
+ * In youtubei.js >= 18.2.0, duration (text & seconds) is parsed natively by LockupView.
  */
 export function getLockupMeta(lockup: YTNodes.LockupView): {
   views: string;
   published: string;
   duration: string;
+  durationSeconds: number;
   author: string;
   authorId: string;
 } {
@@ -157,21 +159,11 @@ export function getLockupMeta(lockup: YTNodes.LockupView): {
       published = p;
   }
 
-  let duration = "";
-  const contentImage = lockup.content_image;
-  const thumbnail =
-    contentImage && "primary_thumbnail" in contentImage
-      ? contentImage.primary_thumbnail
-      : contentImage;
-  for (const overlay of thumbnail?.overlays || []) {
-    if (overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
-      duration =
-        overlay.as(YTNodes.ThumbnailBottomOverlayView).badges?.[0]?.text || "";
-      break;
-    }
-  }
+  // youtubei.js 18.2.0 provides native duration getter on LockupView
+  const duration = lockup.duration?.text || "";
+  const durationSeconds = lockup.duration?.seconds || 0;
 
-  return { views, published, duration, author, authorId };
+  return { views, published, duration, durationSeconds, author, authorId };
 }
 
 export function streamMapper(node: Helpers.YTNode): YTItem | null {
@@ -198,13 +190,14 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
 
   if (node.is(YTNodes.LockupView)) {
     const lockup = node.as(YTNodes.LockupView);
-    // 18.1.0: LockupView can have content_type "SHOW" in addition to "VIDEO"
+    // 18.1.0+: LockupView can have content_type "SHOW" in addition to "VIDEO"
     if (
       lockup.content_id &&
       (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")
     ) {
-      const { views, published, duration, author, authorId } =
+      const { views, published, duration, durationSeconds, author, authorId } =
         getLockupMeta(lockup);
+      if (durationSeconds > 0 && durationSeconds < 90) return null;
       const subtext = (views || "") + (published ? " • " + published : "");
 
       return {
@@ -293,7 +286,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
 
     if (lockup.content_id?.startsWith("RD")) return null;
 
-    // 18.1.0: LockupView can have content_type "PLAYLIST", "COLLECTION", "SHOW", or "VIDEO"
+    // 18.1.0+: LockupView can have content_type "PLAYLIST", "COLLECTION", "SHOW", or "VIDEO"
     if (
       lockup.content_id &&
       (lockup.content_type === "PLAYLIST" ||
@@ -301,7 +294,7 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
         lockup.content_type === "VIDEO" ||
         lockup.content_type === "SHOW")
     ) {
-      const metadata = lockup.metadata?.as(YTNodes.LockupMetadataView);
+      const metadata = lockup.metadata;
       const contentImage = lockup.content_image?.as(
         YTNodes.CollectionThumbnailView,
       );

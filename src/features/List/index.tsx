@@ -81,6 +81,7 @@ export default function () {
   const [showSortable, setShowSortable] = createSignal(false);
   const [searchQuery, setSearchQuery] = createSignal("");
   const [favoriteArtists, setFavoriteArtists] = createSignal<Channel[]>([]);
+  let hasAttemptedArtistsFetch = false;
 
   createEffect(() => {
     if (listStore.id === "favorites" && listStore.type === "collection") {
@@ -129,6 +130,8 @@ export default function () {
           }))
         );
 
+        if (hasAttemptedArtistsFetch) return;
+        hasAttemptedArtistsFetch = true;
         fetch(`${store.api}/featured?artistIds=${encodeURIComponent(artistIds.slice(0, 5).join(","))}`)
           .then((res) => res.json())
           .then((data: any) => {

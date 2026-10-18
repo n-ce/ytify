@@ -15,7 +15,7 @@ const MAX_KEY_SLOTS = 32;
 
 export type LeaseRow = {
   lease_key: string;
-  active_session: string;
+  active_session: string | null;
   in_flight_until: number;
   last_completed_at: number;
 };
@@ -65,57 +65,43 @@ type AcquireResult =
  * could never give us: parallel requests with the same session used to all read
  * the pre-write state and fire upstream together.
  *
- * Leases are tracked per key (session id, falling back to IP) so a burst from
- * one client is serialised while unrelated clients stay independent. Quota
- * starvation is covered by the per-IP cooldown, which admits one call per IP
- * per window regardless of how many sessions that IP pre-opened.
+ * Leases and IP cooldowns are transient (10s and 20s TTL) and stored in memory
+ * maps to eliminate disk SQLite row writes on every playback. RapidAPI key quotas
+ * remain persistent in SQLite.
  */
 export class StreamGateDO {
-  private ctx: DurableObjectState;
   private sql: DurableObjectState["storage"]["sql"];
   private initialized = false;
 
+  // In-memory transient locks to save thousands of SQLite row writes daily
+  private memLeases = new Map<string, LeaseRow>();
+  private memCooldowns = new Map<string, number>();
+
   constructor(ctx: DurableObjectState) {
-    this.ctx = ctx;
     this.sql = ctx.storage.sql;
   }
 
   private initSchema(): void {
     if (this.initialized) return;
     this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS stream_lease (\n        lease_key TEXT PRIMARY KEY,
-        active_session TEXT,
-        in_flight_until INTEGER NOT NULL DEFAULT 0,
-        last_completed_at INTEGER NOT NULL DEFAULT 0
-      );
       CREATE TABLE IF NOT EXISTS rapidapi_keys (
         idx INTEGER PRIMARY KEY,
         remaining INTEGER NOT NULL DEFAULT ${KEY_QUOTA},
         reset_at INTEGER NOT NULL DEFAULT 0
-      );
-      CREATE TABLE IF NOT EXISTS ip_cooldown (
-        ip TEXT PRIMARY KEY,
-        last_seen INTEGER NOT NULL
       );
     `);
     this.initialized = true;
   }
 
   private readLease(key: string): LeaseRow {
-    // Note: Cloudflare DO SQL's cursor `.one()` throws if 0 rows are returned.
-    // `.toArray()[0]` safely yields undefined when no lease row exists yet.
-    const row = this.sql
-      .exec<LeaseRow>(
-        "SELECT lease_key, active_session, in_flight_until, last_completed_at FROM stream_lease WHERE lease_key = ?",
-        key,
-      )
-      .toArray()[0];
+    const mem = this.memLeases.get(key);
+    if (mem) return mem;
 
     return {
       lease_key: key,
-      active_session: row?.active_session || "",
-      in_flight_until: row?.in_flight_until || 0,
-      last_completed_at: row?.last_completed_at || 0,
+      active_session: null,
+      in_flight_until: 0,
+      last_completed_at: 0,
     };
   }
 
@@ -178,42 +164,26 @@ export class StreamGateDO {
     }
 
     if (ip) {
-      const row = this.sql
-        .exec<{ last_seen: number }>(
-          "SELECT last_seen FROM ip_cooldown WHERE ip = ?",
-          ip,
-        )
-        .toArray()[0];
-      if (row && now - row.last_seen <= IP_COOLDOWN_MS) {
+      const lastSeen = this.memCooldowns.get(ip) || 0;
+      if (lastSeen && now - lastSeen <= IP_COOLDOWN_MS) {
         return {
           granted: false,
           reason: "cooldown",
-          retryAfterMs: row.last_seen + IP_COOLDOWN_MS - now,
+          retryAfterMs: lastSeen + IP_COOLDOWN_MS - now,
         };
       }
     }
 
-    this.ctx.storage.transactionSync(() => {
-      this.sql.exec(
-        `INSERT INTO stream_lease (lease_key, active_session, in_flight_until, last_completed_at)
-         VALUES (?, ?, ?, ?)
-         ON CONFLICT(lease_key) DO UPDATE SET
-           active_session = excluded.active_session,
-           in_flight_until = excluded.in_flight_until`,
-        key,
-        key,
-        now + ttl,
-        lease.last_completed_at || 0,
-      );
-      if (ip) {
-        this.sql.exec(
-          `INSERT INTO ip_cooldown (ip, last_seen) VALUES (?, ?)
-           ON CONFLICT(ip) DO UPDATE SET last_seen = excluded.last_seen`,
-          ip,
-          now,
-        );
-      }
+    this.memLeases.set(key, {
+      lease_key: key,
+      active_session: key,
+      in_flight_until: now + ttl,
+      last_completed_at: lease.last_completed_at || 0,
     });
+
+    if (ip) {
+      this.memCooldowns.set(ip, now);
+    }
 
     const best = this.bestKey(body.keyCount || 1);
     return {
@@ -234,67 +204,64 @@ export class StreamGateDO {
     const key = body.key || "anonymous";
     const lease = this.readLease(key);
 
-    this.ctx.storage.transactionSync(() => {
-      if (lease.in_flight_until > now) {
-        this.sql.exec(
-          `UPDATE stream_lease
-           SET active_session = NULL, in_flight_until = 0, last_completed_at = ?
-           WHERE lease_key = ?`,
-          now,
-          key,
-        );
-      }
+    if (lease.in_flight_until > now) {
+      this.memLeases.set(key, {
+        lease_key: key,
+        active_session: null,
+        in_flight_until: 0,
+        last_completed_at: now,
+      });
+    }
 
-      if (typeof body.keyIndex === "number" && body.keyIndex >= 0) {
-        const idx = Math.min(body.keyIndex, MAX_KEY_SLOTS - 1);
-        this.sql.exec(
-          `INSERT INTO rapidapi_keys (idx, remaining, reset_at) VALUES (?, ?, ?)
-           ON CONFLICT(idx) DO UPDATE SET
-             remaining = MAX(0, excluded.remaining),
-             reset_at = excluded.reset_at`,
-          idx,
-          typeof body.remaining === "number" ? body.remaining : KEY_QUOTA,
-          typeof body.resetAt === "number" ? body.resetAt : 0,
-        );
-      }
+    if (typeof body.keyIndex === "number" && body.keyIndex >= 0) {
+      const idx = Math.min(body.keyIndex, MAX_KEY_SLOTS - 1);
+      this.sql.exec(
+        `INSERT INTO rapidapi_keys (idx, remaining, reset_at) VALUES (?, ?, ?)
+         ON CONFLICT(idx) DO UPDATE SET
+           remaining = MAX(0, excluded.remaining),
+           reset_at = excluded.reset_at`,
+        idx,
+        typeof body.remaining === "number" ? body.remaining : KEY_QUOTA,
+        typeof body.resetAt === "number" ? body.resetAt : 0,
+      );
+    }
 
-      // The cooldown clock starts when a call completes, not when it begins.
-      if (body.ip) {
-        this.sql.exec(
-          `INSERT INTO ip_cooldown (ip, last_seen) VALUES (?, ?)
-           ON CONFLICT(ip) DO UPDATE SET last_seen = excluded.last_seen`,
-          body.ip,
-          now,
-        );
-      }
-    });
+    // The cooldown clock starts when a call completes, not when it begins.
+    if (body.ip) {
+      this.memCooldowns.set(body.ip, now);
+    }
 
     return { ok: true };
   }
 
   private readState(): GateState {
-    const leases = this.sql
-      .exec<LeaseRow>(
-        `SELECT lease_key, active_session, in_flight_until, last_completed_at
-         FROM stream_lease WHERE in_flight_until > 0 OR last_completed_at > 0
-         ORDER BY last_completed_at DESC LIMIT 50`,
-      )
-      .toArray();
+    const now = Date.now();
+    const leases: LeaseRow[] = [];
+    for (const l of this.memLeases.values()) {
+      if (l.in_flight_until > 0 || l.last_completed_at > 0) {
+        leases.push(l);
+      }
+    }
+    leases.sort((a, b) => b.last_completed_at - a.last_completed_at);
+
     const keys = this.sql
       .exec<KeyRow>(
         "SELECT idx, remaining, reset_at FROM rapidapi_keys ORDER BY idx",
       )
       .toArray();
-    const cooldowns = this.sql
-      .exec<{ ip: string; last_seen: number }>(
-        "SELECT ip, last_seen FROM ip_cooldown ORDER BY last_seen DESC LIMIT 50",
-      )
-      .toArray();
+
+    const cooldowns: { ip: string; lastSeen: number }[] = [];
+    for (const [ip, lastSeen] of this.memCooldowns.entries()) {
+      if (now - lastSeen < 60000) {
+        cooldowns.push({ ip, lastSeen });
+      }
+    }
+    cooldowns.sort((a, b) => b.lastSeen - a.lastSeen);
 
     return {
-      leases,
+      leases: leases.slice(0, 50),
       keys,
-      cooldowns: cooldowns.map((r) => ({ ip: r.ip, lastSeen: r.last_seen })),
+      cooldowns: cooldowns.slice(0, 50),
     };
   }
 

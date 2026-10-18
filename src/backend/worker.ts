@@ -20,7 +20,7 @@ import {
   getCatalogStub,
 } from "./catalogClient.js";
 import { discoverCategories, scrapeCategory } from "./cron/scraper.js";
-import type { Category, CuratedPlaylist, CanonicalTrack } from "./catalog.js";
+import { type Category, type CuratedPlaylist, type CanonicalTrack, tracksToCanonical } from "./catalog.js";
 import type { Env } from "./env.js";
 import type {
   ScheduledController,
@@ -51,6 +51,16 @@ const MAX_CATALOG_IDS = 100;
 function getGateStub(env: Env): DurableObjectStub | null {
   if (!env.STREAM_GATE_DO) return null;
   return env.STREAM_GATE_DO.get(env.STREAM_GATE_DO.idFromName(GATE_DO_NAME));
+}
+
+function getEdgeCache(): Cache | null {
+  try {
+    return typeof caches !== "undefined" && (caches as any).default
+      ? (caches as any).default
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -84,6 +94,29 @@ function jsonResponse(
       ...(cacheControl ? { "Cache-Control": cacheControl } : {}),
     },
   });
+}
+
+function jsonCachedResponse(
+  data: unknown,
+  corsHeaders: Record<string, string>,
+  cacheControl: string,
+  request?: Request,
+  ctx?: ExecutionContext,
+): Response {
+  const response = new Response(JSON.stringify(data), {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+      "Cache-Control": cacheControl,
+    },
+  });
+
+  const edgeCache = getEdgeCache();
+  if (edgeCache && request && ctx?.waitUntil && request.method === "GET") {
+    ctx.waitUntil(edgeCache.put(request, response.clone()));
+  }
+  return response;
 }
 
 async function ingestScrapeResult(
@@ -126,7 +159,7 @@ export default {
   async fetch(
     request: Request,
     env: Env,
-    _ctx: ExecutionContext,
+    ctx: ExecutionContext,
   ): Promise<Response> {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin");
@@ -152,6 +185,32 @@ export default {
 
     const path = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
     const searchParams = url.searchParams;
+
+    // --- Edge Cache Verification for Read-Only Catalog Routes ---
+    const edgeCache = getEdgeCache();
+    if (
+      edgeCache &&
+      request.method === "GET" &&
+      (path.startsWith("catalog/") ||
+        path === "featured" ||
+        path === "recommend")
+    ) {
+      try {
+        const cached = await edgeCache.match(request);
+        if (cached) {
+          const headers = new Headers(cached.headers);
+          headers.set("Access-Control-Allow-Origin", allowedOrigin);
+          headers.set("CF-Cache-Status", "HIT");
+          return new Response(cached.body, {
+            status: cached.status,
+            statusText: cached.statusText,
+            headers,
+          });
+        }
+      } catch (err) {
+        console.warn("[edge-cache] match failed:", err);
+      }
+    }
 
     // --- Sync Hash Route (Stateless SHA-256) ---
     if (path === "syncHash" || path === "hash") {
@@ -332,7 +391,13 @@ export default {
             .filter(Boolean)
             .slice(0, MAX_CATALOG_IDS);
           const tracks = await readTracks(env, ids);
-          return jsonResponse(tracks, corsHeaders, "public, s-maxage=3600");
+          return jsonCachedResponse(
+            tracks,
+            corsHeaders,
+            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
+            request,
+            ctx,
+          );
         }
         if (request.method === "POST") {
           if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
@@ -359,10 +424,12 @@ export default {
             env,
             searchParams.get("type"),
           );
-          return jsonResponse(
+          return jsonCachedResponse(
             categories,
             corsHeaders,
-            "public, s-maxage=86400",
+            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
+            request,
+            ctx,
           );
         }
         if (request.method === "POST") {
@@ -393,7 +460,13 @@ export default {
             env,
             searchParams.get("category"),
           );
-          return jsonResponse(playlists, corsHeaders, "public, s-maxage=3600");
+          return jsonCachedResponse(
+            playlists,
+            corsHeaders,
+            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
+            request,
+            ctx,
+          );
         }
         if (request.method === "POST") {
           if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
@@ -433,15 +506,13 @@ export default {
         30,
       );
       const result = await getFeatured(env, ids, artistIds, limit);
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "public, s-maxage=3600, stale-while-revalidate=1800",
-        },
-      });
+      return jsonCachedResponse(
+        result,
+        corsHeaders,
+        "public, max-age=3600, s-maxage=3600, stale-while-revalidate=1800",
+        request,
+        ctx,
+      );
     }
 
     // --- Recommendation endpoint (moods & genres overlap scoring) ---
@@ -455,15 +526,13 @@ export default {
         20,
       );
       const playlists = await recommend(env, ids, limit);
-      return new Response(JSON.stringify({ playlists }), {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-          "Cache-Control":
-            "public, s-maxage=86400, stale-while-revalidate=3600",
-        },
-      });
+      return jsonCachedResponse(
+        { playlists },
+        corsHeaders,
+        "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600",
+        request,
+        ctx,
+      );
     }
 
     // --- Scraper status (queue depth / next alarm tick) ---
@@ -553,12 +622,30 @@ export default {
           const id = searchParams.get("id");
           if (!id) throw new Error("Missing id parameter");
           data = await getAlbum(id);
+          if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
+            const albumTitle = (data as any).name || (data as any).title;
+            const albumTracks = (data as any).items.map((item: any) => ({
+              ...item,
+              albumId: id,
+              albumTitle: albumTitle || item.albumTitle,
+            }));
+            const canonical = tracksToCanonical(albumTracks, "artist_featured");
+            if (ctx?.waitUntil && canonical.length > 0) {
+              ctx.waitUntil(upsertTracks(env, canonical));
+            }
+          }
           break;
         }
         case "artist": {
           const id = searchParams.get("id");
           if (!id) throw new Error("Missing id parameter");
           data = await getArtist(id);
+          if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
+            const canonical = tracksToCanonical((data as any).items, "artist_featured");
+            if (ctx?.waitUntil && canonical.length > 0) {
+              ctx.waitUntil(upsertTracks(env, canonical));
+            }
+          }
           break;
         }
         case "channel": {
@@ -604,6 +691,12 @@ export default {
           const all = searchParams.get("all") === "true";
           if (!id) throw new Error("Missing id parameter");
           data = await getPlaylist(id, all);
+          if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
+            const canonical = tracksToCanonical((data as any).items, "artist_featured");
+            if (ctx?.waitUntil && canonical.length > 0) {
+              ctx.waitUntil(upsertTracks(env, canonical));
+            }
+          }
           break;
         }
         case "search": {
@@ -611,6 +704,12 @@ export default {
           const f = searchParams.get("f");
           if (!q) throw new Error("Missing q parameter");
           data = await getSearch({ q, f: f || undefined });
+          if (env.CATALOG_DO && Array.isArray(data)) {
+            const canonical = tracksToCanonical(data as any, "search");
+            if (ctx?.waitUntil && canonical.length > 0) {
+              ctx.waitUntil(upsertTracks(env, canonical));
+            }
+          }
           break;
         }
         case "search-suggestions": {
@@ -647,7 +746,8 @@ export default {
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
-          "Cache-Control": "s-maxage=86400, stale-while-revalidate=3600",
+          "Cache-Control":
+            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600",
         },
       });
     } catch (err) {

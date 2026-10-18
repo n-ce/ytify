@@ -9,6 +9,12 @@ interface FeaturedResponse {
   artists?: Channel[];
 }
 
+interface CachedFeatured {
+  featuredPlaylists: YTPlaylistItem[];
+  communityPlaylists: YTPlaylistItem[];
+  timestamp: number;
+}
+
 export default function () {
   const [featuredPlaylists, setFeaturedPlaylists] = createSignal<
     YTPlaylistItem[]
@@ -17,8 +23,25 @@ export default function () {
     YTPlaylistItem[]
   >([]);
   const [isLoading, setIsLoading] = createSignal(false);
+  let hasAttemptedFetch = false;
 
   const updateFeatured = async () => {
+    if (hasAttemptedFetch) return;
+    hasAttemptedFetch = true;
+
+    // Check session storage first (valid for 30 minutes)
+    try {
+      const cached = sessionStorage.getItem("featured_cache");
+      if (cached) {
+        const parsed = JSON.parse(cached) as CachedFeatured;
+        if (Date.now() - parsed.timestamp < 30 * 60 * 1000) {
+          setFeaturedPlaylists(parsed.featuredPlaylists || []);
+          setCommunityPlaylists(parsed.communityPlaylists || []);
+          return;
+        }
+      }
+    } catch {}
+
     // Strictly persistent history IDs
     const history = getCollection("history");
     const historyIds = Array.from(new Set(history)).filter(Boolean);
@@ -54,14 +77,27 @@ export default function () {
       );
       if (res.ok) {
         const data = (await res.json()) as FeaturedResponse;
-        setFeaturedPlaylists(
-          Array.isArray(data.featuredPlaylists) ? data.featuredPlaylists : [],
-        );
-        setCommunityPlaylists(
-          Array.isArray(data.communityPlaylists) ? data.communityPlaylists : [],
-        );
+        const feat = Array.isArray(data.featuredPlaylists)
+          ? data.featuredPlaylists
+          : [];
+        const comm = Array.isArray(data.communityPlaylists)
+          ? data.communityPlaylists
+          : [];
+        setFeaturedPlaylists(feat);
+        setCommunityPlaylists(comm);
 
-        if (Array.isArray(data.artists) && data.artists.length > 0) {
+        try {
+          sessionStorage.setItem(
+            "featured_cache",
+            JSON.stringify({
+              featuredPlaylists: feat,
+              communityPlaylists: comm,
+              timestamp: Date.now(),
+            }),
+          );
+        } catch {}
+
+        if (Array.isArray(data.artists)) {
           try {
             sessionStorage.setItem(
               "featured_artists",
@@ -78,9 +114,7 @@ export default function () {
   };
 
   onMount(() => {
-    if (featuredPlaylists().length === 0 && communityPlaylists().length === 0) {
-      updateFeatured();
-    }
+    updateFeatured();
   });
 
   return (

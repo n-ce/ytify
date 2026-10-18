@@ -21,7 +21,6 @@ import {
   getCachedThumbnailUrl,
   streamCache,
 } from "@modules/audioCache";
-import { isQueuePrefetchActive } from "../modules/queuePrefetch";
 import { fetchSponsorSegments } from "@modules/sponsorBlock";
 
 export async function applyMetadata(data: TrackItem) {
@@ -212,7 +211,7 @@ export async function player(id?: string) {
       .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate)),
   );
 
-  if (config.similarContent && !enforceVideo && !isQueuePrefetchActive())
+  if (config.similarContent && !enforceVideo)
     import("../modules/enqueueRelatedStreams").then((mod) =>
       mod.default(invidiousData.recommendedVideos),
     );

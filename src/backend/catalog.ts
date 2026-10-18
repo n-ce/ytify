@@ -5,6 +5,8 @@ export type CanonicalSource =
   | "innertube_scrape"
   | "user_sync"
   | "fix_metadata"
+  | "artist_featured"
+  | "search"
   | "oembed";
 
 export interface CanonicalTrack {
@@ -16,8 +18,35 @@ export interface CanonicalTrack {
   duration: number;
   durationStr: string;
   isSong: boolean;
-  /** Bare 11-char video id; empty for non-song art. */
+  /** Bare 11-char video id or cover art id; empty for non-song art. */
   thumbnailId: string;
+  albumId?: string;
+  albumTitle?: string;
+  source: CanonicalSource;
+  updatedAt: number;
+}
+
+export interface CanonicalSong {
+  id: string;
+  title: string;
+  author: string;
+  authorId: string;
+  albumId?: string;
+  albumTitle?: string;
+  duration: number;
+  durationStr: string;
+  thumbnailId: string;
+  source: CanonicalSource;
+  updatedAt: number;
+}
+
+export interface CanonicalVideo {
+  id: string;
+  title: string;
+  author: string;
+  authorId: string;
+  duration: number;
+  durationStr: string;
   source: CanonicalSource;
   updatedAt: number;
 }
@@ -35,7 +64,7 @@ export type Category = {
   browseId?: string;
   /** Grid the chip was discovered in ("Moods & moments", "Genres", ...). */
   sectionTitle?: string;
-}
+};
 
 export interface CuratedPlaylist {
   id: string;
@@ -72,10 +101,17 @@ export function slugify(title: string): string {
   );
 }
 
-/** The "Artist - Topic" suffix is the only reliable song signal on a library row. */
-function looksLikeSong(track: CatalogTrackInput): boolean {
+/** The "Artist - Topic" suffix or album info is the reliable song signal. */
+export function looksLikeSong(track: CatalogTrackInput): boolean {
   if (track.type) return track.type === "song";
+  if (track.albumId || track.albumTitle) return true;
   return / - Topic$/i.test(track.author || "");
+}
+
+/** Clean author name by stripping " - Topic" for song storage */
+export function cleanAuthor(author?: string): string {
+  if (!author) return "Unknown";
+  return author.replace(/ - Topic$/i, "").trim() || "Unknown";
 }
 
 /**
@@ -88,6 +124,7 @@ export function trackItemToCanonical(
 ): CanonicalTrack | null {
   if (!track?.id) return null;
   const duration = parseDuration(track.duration || "");
+  const isSong = looksLikeSong(track);
   return {
     id: track.id,
     title: track.title || "Unknown",
@@ -95,8 +132,10 @@ export function trackItemToCanonical(
     authorId: track.authorId || "",
     duration,
     durationStr: track.duration || "",
-    isSong: looksLikeSong(track),
-    thumbnailId: track.img || track.id,
+    isSong,
+    thumbnailId: isSong ? track.img || track.id : "",
+    albumId: track.albumId || undefined,
+    albumTitle: track.albumTitle || undefined,
     source,
     updatedAt: typeof track.modified === "number" ? track.modified : Date.now(),
   };

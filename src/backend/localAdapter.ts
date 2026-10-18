@@ -169,8 +169,15 @@ export function createLocalAdapter() {
     });
 
     try {
+      const ctx = {
+        waitUntil: (p: Promise<any>) => {
+          void Promise.resolve(p).catch((err) =>
+            console.warn("[local-adapter] waitUntil error:", err),
+          );
+        },
+      };
       // @ts-ignore
-      const response = await worker.fetch(request, localEnv, {});
+      const response = await worker.fetch(request, localEnv, ctx);
 
       res.statusCode = response.status;
       response.headers.forEach((value, key) => res.setHeader(key, value));

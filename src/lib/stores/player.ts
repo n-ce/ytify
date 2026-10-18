@@ -20,13 +20,10 @@ import {
   recordTrackPlay,
   cacheTrackOnFinished,
   player,
-  applyAudioStreams,
   shuffle,
   setConfig,
   VOLUME_PRESETS,
 } from "@utils";
-import { streamCache } from "@modules/audioCache";
-import { isQueuePrefetchActive } from "@modules/queuePrefetch";
 import { checkSponsorBlock, clearSponsorSegments } from "@modules/sponsorBlock";
 
 const blankImage =
@@ -227,11 +224,7 @@ createRoot(() => {
           playCountedForTrackId = id;
           recordTrackPlay(playerStore.stream);
 
-          if (
-            config.similarContent &&
-            playerStore.isMusic &&
-            !isQueuePrefetchActive()
-          )
+          if (config.similarContent && playerStore.isMusic)
             getRecommendations();
 
           if (config.history) {
@@ -338,31 +331,6 @@ createRoot(() => {
       import("@modules/mediaSession").then((m) =>
         m.updateMediaSessionPosition(),
       );
-  };
-
-  playerStore.audio.oncanplaythrough = async function () {
-    const nextItem = isQueuePrefetchActive() && queueStore.list[0]?.id;
-
-    if (!nextItem) return;
-
-    const prefetchRef = createAudioElement();
-    prefetchRef.onerror = () =>
-      import("@modules/audioErrorHandler").then((mod) =>
-        mod.default(prefetchRef, nextItem),
-      );
-
-    const data =
-      streamCache.get(nextItem) ||
-      (await import("@modules/getStreamData").then((mod) =>
-        mod.default(nextItem),
-      ));
-
-    if (data && "adaptiveFormats" in data) {
-      const formats = (data as Invidious).adaptiveFormats
-        .filter((f) => f.type.startsWith("audio"))
-        .sort((a, b) => parseInt(a.bitrate) - parseInt(b.bitrate));
-      applyAudioStreams(formats, prefetchRef);
-    }
   };
 
   playerStore.audio.onerror = () =>

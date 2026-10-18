@@ -1,10 +1,6 @@
 import type { DurableObjectState } from "@cloudflare/workers-types";
 import { tracksToCanonical } from "./catalog.js";
-import {
-  readTracks,
-  readTracksSince,
-  upsertTracks,
-} from "./catalogClient.js";
+import { readTracks, readTracksSince, upsertTracks } from "./catalogClient.js";
 import type { CanonicalTrack } from "./catalog.js";
 import type { Env } from "./env.js";
 
@@ -64,6 +60,9 @@ function overlayCanonical(
     author: record.author,
     authorId: record.authorId,
     duration: record.durationStr || snapshot.duration,
+    img: record.isSong && record.thumbnailId ? record.thumbnailId : snapshot.img,
+    albumId: record.albumId || snapshot.albumId,
+    albumTitle: record.albumTitle || snapshot.albumTitle,
     // The newer of the two keeps a client that already has the fixed value from
     // treating the row as an update during its LWW merge.
     modified: Math.max(record.updatedAt, snapshot.modified || 0),
@@ -75,11 +74,13 @@ export class UserSyncDO {
   private sql: DurableObjectState["storage"]["sql"];
   private env?: Env;
   private initialized = false;
+  private lastRepairCheck = 0;
+  private lastCheckedTracksTs = -1;
 
-  constructor(ctx: DurableObjectState) {
+  constructor(ctx: DurableObjectState, env?: Env) {
     this.ctx = ctx;
     this.sql = ctx.storage.sql;
-    this.env = (ctx as { env?: Env }).env;
+    this.env = env || (ctx as { env?: Env }).env;
   }
 
   private initSchema(): void {
@@ -157,7 +158,10 @@ export class UserSyncDO {
    */
   private writeThroughToCatalog(tracks: TrackItem[]): void {
     if (!this.env?.CATALOG_DO || tracks.length === 0) return;
-    const write = upsertTracks(this.env, tracksToCanonical(tracks, "user_sync"));
+    const write = upsertTracks(
+      this.env,
+      tracksToCanonical(tracks, "user_sync"),
+    );
     this.ctx.waitUntil?.(write);
   }
 
@@ -441,9 +445,23 @@ export class UserSyncDO {
 
         // A repair bumps the canonical row without touching the user's snapshot,
         // so also deliver canonical changes made after the client's watermark.
-        const repaired = clientTracksTs > 0
-          ? await this.repairedSince(clientTracksTs, MAX_REPAIRED_PER_PULL)
-          : {};
+        // Throttle repair checks so rapid client syncs (e.g. within 5 minutes) on an unchanged watermark don't repeatedly query CatalogDO.
+        const now = Date.now();
+        const shouldCheckRepairs =
+          clientTracksTs > 0 &&
+          (clientTracksTs !== this.lastCheckedTracksTs ||
+            now - this.lastRepairCheck > 5 * 60 * 1000);
+
+        let repaired: Record<string, TrackItem> = {};
+        if (shouldCheckRepairs) {
+          repaired = await this.repairedSince(
+            clientTracksTs,
+            MAX_REPAIRED_PER_PULL,
+          );
+          this.lastRepairCheck = now;
+          this.lastCheckedTracksTs = clientTracksTs;
+        }
+
         for (const [id, track] of Object.entries(repaired)) {
           delta.addedOrUpdatedTracks[id] = track;
           hasChanges = true;

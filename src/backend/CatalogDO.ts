@@ -65,7 +65,38 @@ export class CatalogDO {
   private initSchema(): void {
     if (this.initialized) return;
     this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS canonical_tracks (\n        id TEXT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS canonical_songs (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        author TEXT NOT NULL,
+        author_id TEXT,
+        album_id TEXT,
+        album_title TEXT,
+        thumbnail_id TEXT NOT NULL,
+        duration INTEGER NOT NULL DEFAULT 0,
+        duration_str TEXT,
+        source TEXT NOT NULL,
+        updated_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);
+      CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);
+      CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);
+
+      CREATE TABLE IF NOT EXISTS canonical_videos (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        author TEXT NOT NULL,
+        author_id TEXT,
+        duration INTEGER NOT NULL DEFAULT 0,
+        duration_str TEXT,
+        source TEXT NOT NULL,
+        updated_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);
+      CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);
+
+      CREATE TABLE IF NOT EXISTS canonical_tracks (
+        id TEXT PRIMARY KEY,
         title TEXT NOT NULL,
         author TEXT NOT NULL,
         author_id TEXT,
@@ -160,6 +191,61 @@ export class CatalogDO {
     let written = 0;
     this.ctx.storage.transactionSync(() => {
       for (const t of tracks) {
+        if (t.isSong) {
+          this.sql.exec(
+            `INSERT INTO canonical_songs
+               (id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, source, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+               title = excluded.title,
+               author = excluded.author,
+               author_id = CASE WHEN excluded.author_id != '' THEN excluded.author_id ELSE canonical_songs.author_id END,
+               album_id = CASE WHEN excluded.album_id IS NOT NULL AND excluded.album_id != '' THEN excluded.album_id ELSE canonical_songs.album_id END,
+               album_title = CASE WHEN excluded.album_title IS NOT NULL AND excluded.album_title != '' THEN excluded.album_title ELSE canonical_songs.album_title END,
+               thumbnail_id = CASE WHEN excluded.thumbnail_id != '' THEN excluded.thumbnail_id ELSE canonical_songs.thumbnail_id END,
+               duration = CASE WHEN excluded.duration > 0 THEN excluded.duration ELSE canonical_songs.duration END,
+               duration_str = CASE WHEN excluded.duration > 0 THEN excluded.duration_str ELSE canonical_songs.duration_str END,
+               source = excluded.source,
+               updated_at = excluded.updated_at
+             WHERE excluded.updated_at >= canonical_songs.updated_at`,
+            t.id,
+            t.title,
+            t.author,
+            t.authorId || "",
+            t.albumId || null,
+            t.albumTitle || null,
+            t.thumbnailId || "",
+            t.duration,
+            t.durationStr,
+            t.source,
+            t.updatedAt,
+          );
+        } else {
+          this.sql.exec(
+            `INSERT INTO canonical_videos
+               (id, title, author, author_id, duration, duration_str, source, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+               title = excluded.title,
+               author = excluded.author,
+               author_id = CASE WHEN excluded.author_id != '' THEN excluded.author_id ELSE canonical_videos.author_id END,
+               duration = CASE WHEN excluded.duration > 0 THEN excluded.duration ELSE canonical_videos.duration END,
+               duration_str = CASE WHEN excluded.duration > 0 THEN excluded.duration_str ELSE canonical_videos.duration_str END,
+               source = excluded.source,
+               updated_at = excluded.updated_at
+             WHERE excluded.updated_at >= canonical_videos.updated_at`,
+            t.id,
+            t.title,
+            t.author,
+            t.authorId || "",
+            t.duration,
+            t.durationStr,
+            t.source,
+            t.updatedAt,
+          );
+        }
+
+        // Backward compatibility table for legacy queries and existing tests
         this.sql.exec(
           `INSERT INTO canonical_tracks
              (id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at)
@@ -195,27 +281,30 @@ export class CatalogDO {
   private readTracks(ids: string[]): Record<string, CanonicalTrack> {
     if (ids.length === 0) return {};
     const placeholders = ids.map(() => "?").join(",");
-    const rows = this.sql
+    const out: Record<string, CanonicalTrack> = {};
+
+    // 1. Read songs (with album info & square thumbnail)
+    const songRows = this.sql
       .exec<{
         id: string;
         title: string;
         author: string;
         author_id: string;
+        album_id: string | null;
+        album_title: string | null;
+        thumbnail_id: string;
         duration: number;
         duration_str: string;
-        is_song: number;
-        thumbnail_id: string;
         source: string;
         updated_at: number;
       }>(
-        `SELECT id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at
-         FROM canonical_tracks WHERE id IN (${placeholders})`,
+        `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, source, updated_at
+         FROM canonical_songs WHERE id IN (${placeholders})`,
         ...ids,
       )
       .toArray();
 
-    const out: Record<string, CanonicalTrack> = {};
-    for (const r of rows) {
+    for (const r of songRows) {
       out[r.id] = {
         id: r.id,
         title: r.title,
@@ -223,12 +312,91 @@ export class CatalogDO {
         authorId: r.author_id,
         duration: r.duration,
         durationStr: r.duration_str,
-        isSong: !!r.is_song,
+        isSong: true,
         thumbnailId: r.thumbnail_id,
+        albumId: r.album_id || undefined,
+        albumTitle: r.album_title || undefined,
         source: r.source as CanonicalTrack["source"],
         updatedAt: r.updated_at,
       };
     }
+
+    // 2. Read videos (without thumbnail_id) for remaining IDs
+    const missingForVideos = ids.filter((id) => !out[id]);
+    if (missingForVideos.length > 0) {
+      const vPlaceholders = missingForVideos.map(() => "?").join(",");
+      const videoRows = this.sql
+        .exec<{
+          id: string;
+          title: string;
+          author: string;
+          author_id: string;
+          duration: number;
+          duration_str: string;
+          source: string;
+          updated_at: number;
+        }>(
+          `SELECT id, title, author, author_id, duration, duration_str, source, updated_at
+           FROM canonical_videos WHERE id IN (${vPlaceholders})`,
+          ...missingForVideos,
+        )
+        .toArray();
+
+      for (const r of videoRows) {
+        out[r.id] = {
+          id: r.id,
+          title: r.title,
+          author: r.author,
+          authorId: r.author_id,
+          duration: r.duration,
+          durationStr: r.duration_str,
+          isSong: false,
+          thumbnailId: "",
+          source: r.source as CanonicalTrack["source"],
+          updatedAt: r.updated_at,
+        };
+      }
+    }
+
+    // 3. Fallback to canonical_tracks for any remaining legacy IDs
+    const missingForTracks = ids.filter((id) => !out[id]);
+    if (missingForTracks.length > 0) {
+      const tPlaceholders = missingForTracks.map(() => "?").join(",");
+      const rows = this.sql
+        .exec<{
+          id: string;
+          title: string;
+          author: string;
+          author_id: string;
+          duration: number;
+          duration_str: string;
+          is_song: number;
+          thumbnail_id: string;
+          source: string;
+          updated_at: number;
+        }>(
+          `SELECT id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at
+           FROM canonical_tracks WHERE id IN (${tPlaceholders})`,
+          ...missingForTracks,
+        )
+        .toArray();
+
+      for (const r of rows) {
+        out[r.id] = {
+          id: r.id,
+          title: r.title,
+          author: r.author,
+          authorId: r.author_id,
+          duration: r.duration,
+          durationStr: r.duration_str,
+          isSong: !!r.is_song,
+          thumbnailId: r.thumbnail_id,
+          source: r.source as CanonicalTrack["source"],
+          updatedAt: r.updated_at,
+        };
+      }
+    }
+
     return out;
   }
 
@@ -271,7 +439,8 @@ export class CatalogDO {
     this.ctx.storage.transactionSync(() => {
       for (const c of categories) {
         this.sql.exec(
-          `INSERT INTO categories (slug, type, title, params) VALUES (?, ?, ?, ?)\n           ON CONFLICT(slug, type) DO UPDATE SET title = excluded.title, params = excluded.params`,
+          `INSERT INTO categories (slug, type, title, params) VALUES (?, ?, ?, ?)
+           ON CONFLICT(slug, type) DO UPDATE SET title = excluded.title, params = excluded.params`,
           c.slug,
           c.type,
           c.title,

@@ -1,6 +1,6 @@
 # ytify Agent Invariants
 
-You are working on ytify, a lean, ethical YouTube Music PWA.
+You are working on ytify, a lean, ethical YouTube & YouTube Music audio PWA.
 Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQLite).
 
 ## 1. Zero-Bloat Budget (CRITICAL)
@@ -27,7 +27,7 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 ## 4. Local-First & Critical-Path Cohesion
 
 - Critical playback path is consolidated: do not over-fragment the audio/stream pipeline into micro-chunks.
-- Offline-first: Assume network can fail anytime. Streaming falls back across Invidious proxies and local edge functions.
+- Offline-first: Assume network can fail anytime. Streaming prioritizes Cobalt API with Netlify Edge signed token fallback.
 - Recommendations and history must remain strictly on-device (zero telemetry/tracking).
 - Local storage keys are namespaced: library_, config, drawer.
 - **Dual-Path Local Dev vs Deployed Edge Parity (Search Suggestions)**:
@@ -51,17 +51,20 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 
 ## 6. Documentation & System Specifications
 
-- The `docs/` tree has strictly two functional areas:
-  - `docs/systems/`: Living specifications for each distinct subsystem. Each spec begins with its Non-Negotiable Invariants.
-  - `docs/plans/`: In-progress roadmap files sit directly inside `docs/plans/` (no `active/` subfolder). Completed plans are moved to `docs/plans/archive/`.
+- The `docs/` tree has strictly three functional areas:
+  - `docs/systems/`: Living specifications, contracts, and engineering standards for each subsystem.
+  - `docs/plan-*.md`: Active implementation plans and RFCs located directly in `docs/` prefixed with `plan-` (no separate `plans/` folder).
+  - `docs/archive/`: Historical records (issue tracking history, incident postmortems, completed plans, and legacy design specs).
 - System guides:
-  - Streaming & failover: docs/systems/streaming.md
-  - CloudSync & Durable Objects: docs/systems/cloud-sync.md
-  - Global normalized catalog & scraper: docs/systems/catalog.md
-  - Offline OPFS audio cache: docs/systems/offline-opfs.md
-  - Library schema (v5): docs/systems/library-state.md
-  - UI standards & shelf invariants: docs/systems/ui-standards.md
-  - Search architecture & dual-path suggestions: docs/systems/search.md
+  - Streaming & failover: `docs/systems/streaming.md`
+  - CloudSync & Durable Objects: `docs/systems/cloud-sync.md`
+  - Global normalized catalog & scraper: `docs/systems/catalog.md`
+  - Backend API contracts & schemas: `docs/systems/backend-contracts.md`
+  - Offline OPFS audio cache: `docs/systems/offline-opfs.md`
+  - Library schema (v5) & routing: `docs/systems/library-state.md`
+  - UI standards & shelf invariants: `docs/systems/ui.md`
+  - Code quality standards & review checklist: `docs/systems/code-quality.md`
+  - Search architecture & dual-path suggestions: `docs/systems/search.md`
 
 ## 7. Definition of Done
 

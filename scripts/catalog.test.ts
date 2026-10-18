@@ -72,6 +72,69 @@ describe("catalog/canonical_tracks", () => {
     expect(track.author).toBe("Real Artist");
     expect(track.duration).toBe(180);
   });
+
+  test("stores songs in canonical_songs with album info and videos in canonical_videos without thumbnail", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        {
+          id: "song1111111",
+          title: "Official Song",
+          author: "Official Artist",
+          authorId: "UC_SONG",
+          duration: 200,
+          durationStr: "03:20",
+          isSong: true,
+          thumbnailId: "img_song1",
+          albumId: "MPREb_album1",
+          albumTitle: "Album One",
+          source: "artist_featured",
+          updatedAt: now,
+        },
+        {
+          id: "video111111",
+          title: "Fan Live Performance",
+          author: "FanChannel",
+          authorId: "UC_FAN",
+          duration: 350,
+          durationStr: "05:50",
+          isSong: false,
+          thumbnailId: "",
+          source: "search",
+          updatedAt: now,
+        },
+      ],
+    });
+
+    const tracks = await readJson(catalog, "/tracks?ids=song1111111,video111111");
+    expect(tracks.song1111111).toMatchObject({
+      id: "song1111111",
+      title: "Official Song",
+      isSong: true,
+      thumbnailId: "img_song1",
+      albumId: "MPREb_album1",
+      albumTitle: "Album One",
+    });
+    expect(tracks.video111111).toMatchObject({
+      id: "video111111",
+      title: "Fan Live Performance",
+      isSong: false,
+      thumbnailId: "",
+    });
+    expect(tracks.video111111.albumId).toBeUndefined();
+
+    // Verify direct SQLite table contents
+    const sql = (catalog as any).sql;
+    const songRow = sql.exec("SELECT * FROM canonical_songs WHERE id = ?", "song1111111").one();
+    expect(songRow.album_title).toBe("Album One");
+    expect(songRow.thumbnail_id).toBe("img_song1");
+
+    const videoRow = sql.exec("SELECT * FROM canonical_videos WHERE id = ?", "video111111").one();
+    expect(videoRow.title).toBe("Fan Live Performance");
+    expect(videoRow.thumbnail_id).toBeUndefined();
+  });
 });
 
 describe("catalog/recommend", () => {

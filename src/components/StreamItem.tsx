@@ -183,7 +183,6 @@ export default function (
 
           if (
             config.contextualFill &&
-            !queueStore.isSession &&
             (data.context?.src === "collection" ||
               data.context?.src === "playlists") &&
             data.context?.id !== "history"

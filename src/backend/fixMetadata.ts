@@ -1,5 +1,5 @@
 import { YTNodes } from "youtubei.js";
-import { getClient, getVideoId } from "./utils.js";
+import { getClient, getVideoId, formatThumbnailId } from "./utils.js";
 import { readTracks, upsertTracks } from "./catalogClient.js";
 import type { CanonicalTrack } from "./catalog.js";
 import type { Env } from "./env.js";
@@ -13,6 +13,9 @@ export interface ResolvedMetadata {
   author: string;
   authorId: string;
   title: string;
+  albumId?: string;
+  albumTitle?: string;
+  thumbnailId?: string;
 }
 
 const fastCache = new Map<string, ResolvedMetadata>();
@@ -23,7 +26,10 @@ const fastCache = new Map<string, ResolvedMetadata>();
 function cleanSearchTitle(title: string): string {
   if (!title) return "";
   let clean = title
-    .replace(/\s*[\(\[](?:official\s+)?(?:music\s+)?(?:audio|video|lyric\s+video|visualizer|hd|hq|extended|clean|explicit|remaster(?:ed)?)[\)\]]/gi, "")
+    .replace(
+      /\s*[\(\[](?:official\s+)?(?:music\s+)?(?:audio|video|lyric\s+video|visualizer|hd|hq|extended|clean|explicit|remaster(?:ed)?)[\]\)]/gi,
+      "",
+    )
     .replace(/\.(mp3|opus|m4a|wav|flac)$/i, "")
     .replace(/\s+/g, " ")
     .trim();
@@ -39,10 +45,12 @@ export function isCorruptedArtist(name?: string): boolean {
   const n = name.trim().toLowerCase();
   return (
     n === "release - topic" ||
-    n === "release" ||
+    n === "release-topic" ||
     n === "various artists - topic" ||
     n === "various artists" ||
-    n === "unknown"
+    n === "unknown artist" ||
+    n === "unknown" ||
+    n === ""
   );
 }
 
@@ -82,7 +90,8 @@ export async function resolveTrackMetadataViaSearch(
       for (const node of contents) {
         if (node.is(YTNodes.MusicResponsiveListItem)) {
           const item = node.as(YTNodes.MusicResponsiveListItem);
-          const artistName = item.artists?.[0]?.name || (item as any).authors?.[0]?.name;
+          const artistName =
+            item.artists?.[0]?.name || (item as any).authors?.[0]?.name;
           if (artistName && !isCorruptedArtist(artistName)) {
             matchedSong = item;
             break;
@@ -93,20 +102,51 @@ export async function resolveTrackMetadataViaSearch(
 
     if (!matchedSong) return null;
 
-    const rawArtist = (matchedSong.artists?.[0]?.name || (matchedSong as any).authors?.[0]?.name)?.trim();
+    const rawArtist = (
+      matchedSong.artists?.[0]?.name || (matchedSong as any).authors?.[0]?.name
+    )?.trim();
     if (!rawArtist || isCorruptedArtist(rawArtist)) return null;
 
-    const authorId = matchedSong.artists?.[0]?.channel_id || (matchedSong as any).authors?.[0]?.channel_id || "";
+    const authorId =
+      matchedSong.artists?.[0]?.channel_id ||
+      (matchedSong as any).authors?.[0]?.channel_id ||
+      "";
     const cleanTitle = matchedSong.title?.toString() || target.title;
-    const author = rawArtist.endsWith(" - Topic") ? rawArtist : `${rawArtist} - Topic`;
+    const author = rawArtist.endsWith(" - Topic")
+      ? rawArtist
+      : `${rawArtist} - Topic`;
+
+    const playlistId =
+      matchedSong.menu?.items
+        ?.find(
+          (i: any) =>
+            i.is?.(YTNodes.MenuNavigationItem) &&
+            i
+              .as(YTNodes.MenuNavigationItem)
+              .endpoint?.payload?.playlistId?.startsWith("OLAK"),
+        )
+        ?.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId ||
+      matchedSong.album?.id ||
+      "";
+
+    const albumTitle = matchedSong.album?.name;
+    const thumbnailId = formatThumbnailId(
+      matchedSong.thumbnail?.contents?.[0]?.url,
+    );
 
     return {
       author,
       authorId,
       title: cleanTitle,
+      albumId: playlistId || undefined,
+      albumTitle: albumTitle || undefined,
+      thumbnailId: thumbnailId || undefined,
     };
   } catch (err) {
-    console.error(`[fixMetadata] Error searching music for ${target.id} (${target.title}):`, err);
+    console.error(
+      `[fixMetadata] Error searching music for ${target.id} (${target.title}):`,
+      err,
+    );
     return null;
   }
 }
@@ -151,6 +191,9 @@ export async function handleFixMetadata(
           author: track.author,
           authorId: track.authorId,
           title: track.title,
+          albumId: track.albumId,
+          albumTitle: track.albumTitle,
+          thumbnailId: track.thumbnailId,
         };
         resolved[t.id] = entry;
         fastCache.set(t.id, entry);
@@ -196,10 +239,12 @@ export async function handleFixMetadata(
         title: item.title || "",
         author: item.author,
         authorId: item.authorId || "",
+        albumId: item.albumId,
+        albumTitle: item.albumTitle,
         duration: 0,
         durationStr: "",
         isSong: true,
-        thumbnailId: id,
+        thumbnailId: item.thumbnailId || id,
         source: "fix_metadata",
         updatedAt: now,
       });

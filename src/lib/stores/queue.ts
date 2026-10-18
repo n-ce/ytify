@@ -1,10 +1,5 @@
 import { createStore } from "solid-js/store";
-import {
-  config,
-  convertSStoHHMMSS,
-  parseDuration,
-  shuffle,
-} from "@utils";
+import { config, convertSStoHHMMSS, parseDuration, shuffle } from "@utils";
 import { playerStore } from "./player";
 
 export const [queueStore, setQueueStore] = createStore({
@@ -12,8 +7,6 @@ export const [queueStore, setQueueStore] = createStore({
   history: [] as TrackItem[],
   removeMode: false,
   isLoading: false,
-  isSession: false,
-  sessionMap: new Map<string, HTMLAudioElement>(),
 });
 
 /**
@@ -61,10 +54,6 @@ export function addToQueue(
     prepend?: boolean;
   } = {},
 ) {
-  if (queueStore.isSession && !items.some((item) => item.context?.src === "")) {
-    return;
-  }
-
   // Items with context.src === '' bypass all config filters
   let itemsToAdd = filterItemsByConfig(items);
 

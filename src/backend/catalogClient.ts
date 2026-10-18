@@ -24,6 +24,25 @@ export function getCatalogStub(env: Env | undefined): DurableObjectStub | null {
   return env.CATALOG_DO.get(env.CATALOG_DO.idFromName(CATALOG_DO_NAME));
 }
 
+// ---------------------------------------------------------------------------
+// In-Memory Isolate Caching & Dedup Latch
+// ---------------------------------------------------------------------------
+
+const CATEGORY_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+const memoryCategoryCache = new Map<
+  string,
+  { categories: Category[]; expires: number }
+>();
+
+// In-memory latch of recently written tracks (prevents redundant SQLite writes)
+const recentlyWrittenTracks = new Set<string>();
+const RECENT_WRITE_LIMIT = 2000;
+
+export function _clearTrackLatchForTests() {
+  recentlyWrittenTracks.clear();
+}
+
 async function post(
   stub: DurableObjectStub,
   path: string,
@@ -52,8 +71,10 @@ export async function readTracks(
   env: Env | undefined,
   ids: string[],
 ): Promise<Record<string, CanonicalTrack>> {
+  if (ids.length === 0) return {};
+
   const stub = getCatalogStub(env);
-  if (!stub || ids.length === 0) return {};
+  if (!stub) return {};
 
   try {
     const res = await stub.fetch(
@@ -91,6 +112,13 @@ export async function readCategories(
   env: Env | undefined,
   type?: string | null,
 ): Promise<Category[]> {
+  const cacheKey = type || "all";
+  const now = Date.now();
+  const cached = memoryCategoryCache.get(cacheKey);
+  if (cached && cached.expires > now) {
+    return cached.categories;
+  }
+
   const stub = getCatalogStub(env);
   if (!stub) return [];
 
@@ -98,7 +126,12 @@ export async function readCategories(
     const query = type ? `?type=${encodeURIComponent(type)}` : "";
     const res = await stub.fetch(durableRequest(`/categories${query}`));
     if (!res.ok) return [];
-    return (await res.json()) as Category[];
+    const categories = (await res.json()) as Category[];
+    memoryCategoryCache.set(cacheKey, {
+      categories,
+      expires: now + CATEGORY_CACHE_TTL_MS,
+    });
+    return categories;
   } catch (err) {
     console.warn("[catalog] category read failed:", err);
     return [];
@@ -108,13 +141,16 @@ export async function readCategories(
 export async function readPlaylists(
   env: Env | undefined,
   category?: string | null,
+  limit = 100,
 ): Promise<CuratedPlaylist[]> {
   const stub = getCatalogStub(env);
   if (!stub) return [];
 
   try {
-    const query = category ? `?category=${encodeURIComponent(category)}` : "";
-    const res = await stub.fetch(durableRequest(`/playlists${query}`));
+    const query = new URLSearchParams();
+    if (category) query.set("category", category);
+    if (limit) query.set("limit", limit.toString());
+    const res = await stub.fetch(durableRequest(`/playlists?${query}`));
     if (!res.ok) return [];
     return (await res.json()) as CuratedPlaylist[];
   } catch (err) {
@@ -128,8 +164,27 @@ export function upsertTracks(
   tracks: CanonicalTrack[],
 ): Promise<boolean> {
   if (tracks.length === 0) return Promise.resolve(true);
+
+  // Filter out tracks written recently in this isolate to prevent SQLite row-write thrashing
+  const tracksToWrite: CanonicalTrack[] = [];
+  for (const t of tracks) {
+    if (!t?.id) continue;
+    if (!recentlyWrittenTracks.has(t.id)) {
+      tracksToWrite.push(t);
+      recentlyWrittenTracks.add(t.id);
+      if (recentlyWrittenTracks.size > RECENT_WRITE_LIMIT) {
+        const first = recentlyWrittenTracks.values().next().value;
+        if (first) recentlyWrittenTracks.delete(first);
+      }
+    }
+  }
+
+  if (tracksToWrite.length === 0) return Promise.resolve(true);
+
   const stub = getCatalogStub(env);
-  return stub ? post(stub, "/tracks", { tracks }) : Promise.resolve(false);
+  return stub
+    ? post(stub, "/tracks", { tracks: tracksToWrite })
+    : Promise.resolve(false);
 }
 
 export function upsertCategories(
@@ -137,6 +192,7 @@ export function upsertCategories(
   categories: Category[],
 ): Promise<boolean> {
   if (categories.length === 0) return Promise.resolve(true);
+  memoryCategoryCache.clear();
   const stub = getCatalogStub(env);
   return stub
     ? post(stub, "/categories", { categories })
@@ -154,43 +210,57 @@ export function upsertPlaylists(
     : Promise.resolve(false);
 }
 
-export async function readScrapeStatus(
+export function parkCategories(
   env: Env,
+  categories: Category[],
+): Promise<boolean> {
+  if (categories.length === 0) return Promise.resolve(true);
+  const stub = getCatalogStub(env);
+  return stub
+    ? post(stub, "/scrape-jobs", { categories })
+    : Promise.resolve(false);
+}
+
+export async function recommendPlaylists(
+  env: Env | undefined,
+  trackIds: string[],
+  limit = 20,
+): Promise<Recommendation[]> {
+  if (trackIds.length === 0) return [];
+  const stub = getCatalogStub(env);
+  if (!stub) return [];
+
+  try {
+    const res = await stub.fetch(
+      durableRequest(`/recommend?limit=${limit}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ trackIds }),
+      }),
+    );
+    if (!res.ok) return [];
+    return (await res.json()) as Recommendation[];
+  } catch (err) {
+    console.warn("[catalog] recommend failed:", err);
+    return [];
+  }
+}
+
+
+export async function readScrapeStatus(
+  env: Env | undefined,
 ): Promise<{ pending: number; alarmAt: number | null } | null> {
   const stub = getCatalogStub(env);
   if (!stub) return null;
-
   try {
     const res = await stub.fetch(durableRequest("/scrape-jobs"));
     if (!res.ok) return null;
     return (await res.json()) as { pending: number; alarmAt: number | null };
   } catch (err) {
-    console.warn("[catalog] scrape status failed:", err);
+    console.warn("[catalog] readScrapeStatus failed:", err);
     return null;
   }
 }
 
-export async function readFeatured(
-  env: Env,
-  ids: string[],
-  limit = 10,
-): Promise<Recommendation[]> {
-  const stub = getCatalogStub(env);
-  if (!stub || ids.length === 0) return [];
-
-  try {
-    const res = await stub.fetch(
-      durableRequest(
-        `/featured?ids=${encodeURIComponent(ids.join(","))}&limit=${limit}`,
-      ),
-    );
-    if (!res.ok) return [];
-    const data = (await res.json()) as { playlists: Recommendation[] };
-    return data.playlists || [];
-  } catch (err) {
-    console.warn("[catalog] featured failed:", err);
-    return [];
-  }
-}
-
-export const recommend = readFeatured;
+export const recommend = recommendPlaylists;
+export const readFeatured = recommendPlaylists;

@@ -282,8 +282,18 @@ function previewHtml(id: string, preview: CatalogPreview | null): Response {
   );
 }
 
+const catalogPreviewCache = new Map<
+  string,
+  { preview: CatalogPreview | null; expires: number }
+>();
+
 /** Tier 1: the shared global catalog, in <5ms and at zero upstream cost. */
 async function readCatalogPreview(id: string): Promise<CatalogPreview | null> {
+  const cached = catalogPreviewCache.get(id);
+  if (cached && cached.expires > Date.now()) {
+    return cached.preview;
+  }
+
   try {
     const res = await fetch(
       `${apiBase()}/api/catalog/tracks?ids=${encodeURIComponent(id)}`,
@@ -298,7 +308,12 @@ async function readCatalogPreview(id: string): Promise<CatalogPreview | null> {
     const track = map?.[id];
     if (!track?.title) return null;
 
-    return { title: track.title, author: track.author || "" };
+    const result = { title: track.title, author: track.author || "" };
+    catalogPreviewCache.set(id, {
+      preview: result,
+      expires: Date.now() + 15 * 60 * 1000,
+    });
+    return result;
   } catch (e) {
     return null;
   }
@@ -382,6 +397,10 @@ async function handlePreview(id: string, context: Context): Promise<Response> {
 
   const oembed = await loadPreviewOnce(id);
   if (oembed) {
+    catalogPreviewCache.set(id, {
+      preview: oembed,
+      expires: Date.now() + 15 * 60 * 1000,
+    });
     context.waitUntil(writeThroughToCatalog(id, oembed));
     return previewHtml(id, oembed);
   }
@@ -621,6 +640,10 @@ export default async (request: Request, context: Context) => {
     const maxAttempts = Math.min(allKeys.length, 3);
     let lastError: Error | null = null;
     let successResponse: Response | null = null;
+    let telemetryKeyIdx = lease.keyIndex;
+    let telemetryRemaining = 0;
+    let telemetryResetAt = 0;
+    let hasTelemetry = false;
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const keyIdx = (lease.keyIndex + attempt) % allKeys.length;
@@ -642,22 +665,15 @@ export default async (request: Request, context: Context) => {
           "x-ratelimit-requests-remaining",
         );
         const resetHeader = res.headers.get("x-ratelimit-requests-reset");
-        const remaining =
+        telemetryKeyIdx = keyIdx;
+        telemetryRemaining =
           remainingHeader !== null
             ? parseInt(remainingHeader, 10)
             : res.ok
               ? 500
               : 0;
-        const resetSec = resetHeader !== null ? parseInt(resetHeader, 10) : 0;
-
-        // Release lease telemetry for this key
-        void releaseLease(
-          clientIp,
-          sessionId,
-          keyIdx,
-          remaining,
-          Date.now() + resetSec * 1000,
-        ).catch((e) => console.error("Lease release failed:", e));
+        telemetryResetAt = resetHeader !== null ? parseInt(resetHeader, 10) : 0;
+        hasTelemetry = true;
 
         if (res.status === 403 || res.status === 429) {
           console.warn(
@@ -725,6 +741,19 @@ export default async (request: Request, context: Context) => {
         }
         break;
       }
+    }
+
+    // Release lease telemetry once for the final key used
+    if (hasTelemetry) {
+      context.waitUntil(
+        releaseLease(
+          clientIp,
+          sessionId,
+          telemetryKeyIdx,
+          telemetryRemaining,
+          Date.now() + telemetryResetAt * 1000,
+        ).catch((e) => console.error("Lease release failed:", e)),
+      );
     }
 
     if (successResponse) {
