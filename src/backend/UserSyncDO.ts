@@ -36,6 +36,8 @@ interface DeltaPayload {
 const JSON_HEADER = { "Content-Type": "application/json" };
 /** Repairs delivered per delta pull, so one cycle can never flood a client. */
 const MAX_REPAIRED_PER_PULL = 200;
+/** Cloudflare SQLite limit on bind variables is 99. Batches of 50 are safe. */
+const SQL_CHUNK_SIZE = 50;
 
 const parse = <T>(val: string, fallback: T): T => {
   try {
@@ -60,7 +62,8 @@ function overlayCanonical(
     author: record.author,
     authorId: record.authorId,
     duration: record.durationStr || snapshot.duration,
-    img: record.isSong && record.thumbnailId ? record.thumbnailId : snapshot.img,
+    img:
+      record.isSong && record.thumbnailId ? record.thumbnailId : snapshot.img,
     albumId: record.albumId || snapshot.albumId,
     albumTitle: record.albumTitle || snapshot.albumTitle,
     // The newer of the two keeps a client that already has the fixed value from
@@ -85,23 +88,27 @@ export class UserSyncDO {
 
   private initSchema(): void {
     if (this.initialized) return;
-    this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value REAL NOT NULL);
-      CREATE TABLE IF NOT EXISTS tracks (id TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
-      CREATE INDEX IF NOT EXISTS idx_tracks_mod ON tracks(modified);
-      CREATE TABLE IF NOT EXISTS collections (name TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
-      CREATE TABLE IF NOT EXISTS deleted_tracks (id TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
-      CREATE INDEX IF NOT EXISTS idx_del_tracks ON deleted_tracks(deleted_at);
-      CREATE TABLE IF NOT EXISTS deleted_collections (name TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
-      -- Relational view of the same library: the user's ownership of a track,
-      -- independent of whatever metadata snapshot happens to be stored locally.
-      CREATE TABLE IF NOT EXISTS user_tracks (
-        track_id TEXT PRIMARY KEY,
-        added_at REAL NOT NULL,
-        play_count INTEGER NOT NULL DEFAULT 0,
-        custom_data TEXT
-      );
-    `);
+    try {
+      this.sql.exec(`
+        CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value REAL NOT NULL);
+        CREATE TABLE IF NOT EXISTS tracks (id TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
+        CREATE INDEX IF NOT EXISTS idx_tracks_mod ON tracks(modified);
+        CREATE TABLE IF NOT EXISTS collections (name TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
+        CREATE TABLE IF NOT EXISTS deleted_tracks (id TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
+        CREATE INDEX IF NOT EXISTS idx_del_tracks ON deleted_tracks(deleted_at);
+        CREATE TABLE IF NOT EXISTS deleted_collections (name TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
+        -- Relational view of the same library: the user's ownership of a track,
+        -- independent of whatever metadata snapshot happens to be stored locally.
+        CREATE TABLE IF NOT EXISTS user_tracks (
+          track_id TEXT PRIMARY KEY,
+          added_at REAL NOT NULL,
+          play_count INTEGER NOT NULL DEFAULT 0,
+          custom_data TEXT
+        );
+      `);
+    } catch (err) {
+      console.warn("[userSync] schema init:", err);
+    }
     this.migrateRelations();
     this.initialized = true;
   }
@@ -231,17 +238,19 @@ export class UserSyncDO {
     const records = await readTracksSince(this.env, since, limit);
     if (records.length === 0) return {};
 
-    const owned = new Set(
-      this.sql
+    const owned = new Set<string>();
+    for (let i = 0; i < records.length; i += SQL_CHUNK_SIZE) {
+      const slice = records.slice(i, i + SQL_CHUNK_SIZE);
+      const placeholders = slice.map(() => "?").join(",");
+      const ids = this.sql
         .exec<{ track_id: string }>(
-          "SELECT track_id FROM user_tracks WHERE track_id IN (" +
-            records.map(() => "?").join(",") +
-            ")",
-          ...records.map((r) => r.id),
+          `SELECT track_id FROM user_tracks WHERE track_id IN (${placeholders})`,
+          ...slice.map((r) => r.id),
         )
         .toArray()
-        .map((r) => r.track_id),
-    );
+        .map((r) => r.track_id);
+      for (const id of ids) owned.add(id);
+    }
 
     const out: Record<string, TrackItem> = {};
     for (const record of records) {
@@ -420,10 +429,10 @@ export class UserSyncDO {
             .toArray()) {
             delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
           }
-          delta.meta.tracks = serverMeta.tracks || Date.now();
+          delta.meta.tracks = serverMeta.tracks;
           hasChanges = true;
           isFullTrackSync = true;
-        } else if (clientTracksTs > 0) {
+        } else if (trackCount > 0) {
           for (const r of this.sql
             .exec<{ id: string; data: string; modified: number }>(
               "SELECT id, data, modified FROM tracks WHERE modified > ?",
@@ -433,54 +442,38 @@ export class UserSyncDO {
             delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
             hasChanges = true;
           }
+          if (hasChanges) delta.meta.tracks = serverMeta.tracks;
         }
 
-        // Overlay canonical metadata so a repair made elsewhere reaches this
-        // client even though its own snapshot never changed.
-        if (hasChanges) {
-          delta.addedOrUpdatedTracks = await this.hydrateTracks(
-            delta.addedOrUpdatedTracks,
-          );
-        }
-
-        // A repair bumps the canonical row without touching the user's snapshot,
-        // so also deliver canonical changes made after the client's watermark.
-        // Throttle repair checks so rapid client syncs (e.g. within 5 minutes) on an unchanged watermark don't repeatedly query CatalogDO.
+        // Canonical overlay for tracks repaired in the global catalog.
+        // Capped per pull so one repair cycle cannot saturate a mobile client.
         const now = Date.now();
-        const shouldCheckRepairs =
-          clientTracksTs > 0 &&
-          (clientTracksTs !== this.lastCheckedTracksTs ||
-            now - this.lastRepairCheck > 5 * 60 * 1000);
+        const isClientStale = clientTracksTs < serverMeta.tracks;
+        const intervalPassed = now - this.lastRepairCheck > 60_000;
+        const tracksTsChanged = clientTracksTs !== this.lastCheckedTracksTs;
 
-        let repaired: Record<string, TrackItem> = {};
-        if (shouldCheckRepairs) {
-          repaired = await this.repairedSince(
+        if (
+          !isFullTrackSync &&
+          clientTracksTs > 0 &&
+          (isClientStale || intervalPassed || tracksTsChanged)
+        ) {
+          const repaired = await this.repairedSince(
             clientTracksTs,
             MAX_REPAIRED_PER_PULL,
           );
+          for (const [id, track] of Object.entries(repaired)) {
+            if (!delta.addedOrUpdatedTracks[id]) {
+              delta.addedOrUpdatedTracks[id] = track;
+              hasChanges = true;
+            }
+          }
           this.lastRepairCheck = now;
           this.lastCheckedTracksTs = clientTracksTs;
         }
 
-        for (const [id, track] of Object.entries(repaired)) {
-          delta.addedOrUpdatedTracks[id] = track;
-          hasChanges = true;
-        }
-
-        // The watermark becomes the newest row this pull actually delivered, so
-        // a batch larger than MAX_REPAIRED_PER_PULL resumes on the next pull
-        // instead of being skipped.
-        if (hasChanges) {
-          const newest = Math.max(
-            0,
-            ...Object.values(delta.addedOrUpdatedTracks).map(
-              (track) => track?.modified || 0,
-            ),
-          );
-          delta.meta.tracks = Math.max(
-            serverMeta.tracks || 0,
-            delta.meta.tracks || 0,
-            newest,
+        if (isFullTrackSync && Object.keys(delta.addedOrUpdatedTracks).length) {
+          delta.addedOrUpdatedTracks = await this.hydrateTracks(
+            delta.addedOrUpdatedTracks,
           );
         }
 

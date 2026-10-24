@@ -17,6 +17,8 @@ const SCRAPE_BATCH_SIZE = 1;
 /** Pause between alarm ticks so the scraper looks human-paced to InnerTube. */
 const SCRAPE_TICK_DELAY_MS = 5000;
 const SCRAPE_MAX_ATTEMPTS = 3;
+/** Cloudflare SQLite limit on bind variables is 99. Batches of 50 are safe. */
+const SQL_CHUNK_SIZE = 50;
 
 type PlaylistRow = {
   id: string;
@@ -65,21 +67,125 @@ export class CatalogDO {
 
   private initSchema(): void {
     if (this.initialized) return;
-    this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS canonical_songs (\n        id TEXT PRIMARY KEY,\n        title TEXT NOT NULL,\n        author TEXT NOT NULL,\n        author_id TEXT,\n        album_id TEXT,\n        album_title TEXT,\n        thumbnail_id TEXT NOT NULL,\n        duration INTEGER NOT NULL DEFAULT 0,\n        duration_str TEXT,\n        omv_id TEXT,\n        source TEXT NOT NULL,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);\n      CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);\n      CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);\n\n      CREATE TABLE IF NOT EXISTS canonical_videos (\n        id TEXT PRIMARY KEY,\n        title TEXT NOT NULL,\n        author TEXT NOT NULL,\n        author_id TEXT,\n        duration INTEGER NOT NULL DEFAULT 0,\n        duration_str TEXT,\n        atv_id TEXT,\n        source TEXT NOT NULL,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);\n      CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);\n\n      CREATE TABLE IF NOT EXISTS canonical_tracks (\n        id TEXT PRIMARY KEY,\n        title TEXT NOT NULL,\n        author TEXT NOT NULL,\n        author_id TEXT,\n        duration INTEGER NOT NULL DEFAULT 0,\n        duration_str TEXT,\n        is_song BOOLEAN NOT NULL DEFAULT 0,\n        thumbnail_id TEXT,\n        source TEXT NOT NULL,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_tracks_author ON canonical_tracks(author);\n      CREATE INDEX IF NOT EXISTS idx_tracks_updated ON canonical_tracks(updated_at);\n\n      CREATE TABLE IF NOT EXISTS categories (\n        slug TEXT NOT NULL,\n        type TEXT NOT NULL,\n        title TEXT NOT NULL,\n        params TEXT NOT NULL,\n        PRIMARY KEY (slug, type)\n      );\n\n      CREATE TABLE IF NOT EXISTS curated_playlists (\n        id TEXT PRIMARY KEY,\n        category_slug TEXT NOT NULL,\n        category_type TEXT NOT NULL,\n        section_title TEXT NOT NULL,\n        title TEXT NOT NULL,\n        thumbnail_id TEXT,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_playlists_category ON curated_playlists(category_slug, category_type);\n\n      CREATE TABLE IF NOT EXISTS playlist_tracks (\n        playlist_id TEXT NOT NULL,\n        track_id TEXT NOT NULL,\n        position INTEGER NOT NULL,\n        PRIMARY KEY (playlist_id, track_id)\n      );\n      CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON playlist_tracks(track_id);\n\n      CREATE TABLE IF NOT EXISTS pending_scrape (\n        slug TEXT PRIMARY KEY,\n        type TEXT NOT NULL,\n        title TEXT NOT NULL,\n        params TEXT NOT NULL,\n        browse_id TEXT,\n        section_title TEXT,\n        attempts INTEGER NOT NULL DEFAULT 0\n      );\n    `);
 
-    // Gracefully handle column additions for existing tables
+    try {
+      this.sql.exec(`
+        CREATE TABLE IF NOT EXISTS canonical_songs (
+          id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          author TEXT NOT NULL,
+          author_id TEXT,
+          album_id TEXT,
+          album_title TEXT,
+          thumbnail_id TEXT NOT NULL,
+          duration INTEGER NOT NULL DEFAULT 0,
+          duration_str TEXT,
+          omv_id TEXT,
+          source TEXT NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);
+        CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);
+        CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);
+      `);
+    } catch (err) {
+      console.warn("[catalog] canonical_songs table init:", err);
+    }
+
+    // Explicitly add columns for existing databases deployed prior to counterpart indexing
     try {
       this.sql.exec("ALTER TABLE canonical_songs ADD COLUMN omv_id TEXT");
     } catch {}
+
+    try {
+      this.sql.exec("CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id)");
+    } catch {}
+
+    try {
+      this.sql.exec(`
+        CREATE TABLE IF NOT EXISTS canonical_videos (
+          id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          author TEXT NOT NULL,
+          author_id TEXT,
+          duration INTEGER NOT NULL DEFAULT 0,
+          duration_str TEXT,
+          atv_id TEXT,
+          source TEXT NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);
+        CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);
+      `);
+    } catch (err) {
+      console.warn("[catalog] canonical_videos table init:", err);
+    }
+
     try {
       this.sql.exec("ALTER TABLE canonical_videos ADD COLUMN atv_id TEXT");
     } catch {}
 
-    this.sql.exec(`
-      CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id);
-      CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id);
-    `);
+    try {
+      this.sql.exec("CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id)");
+    } catch {}
+
+    try {
+      this.sql.exec(`
+        CREATE TABLE IF NOT EXISTS canonical_tracks (
+          id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          author TEXT NOT NULL,
+          author_id TEXT,
+          duration INTEGER NOT NULL DEFAULT 0,
+          duration_str TEXT,
+          is_song BOOLEAN NOT NULL DEFAULT 0,
+          thumbnail_id TEXT,
+          source TEXT NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_tracks_author ON canonical_tracks(author);
+        CREATE INDEX IF NOT EXISTS idx_tracks_updated ON canonical_tracks(updated_at);
+
+        CREATE TABLE IF NOT EXISTS categories (
+          slug TEXT NOT NULL,
+          type TEXT NOT NULL,
+          title TEXT NOT NULL,
+          params TEXT NOT NULL,
+          PRIMARY KEY (slug, type)
+        );
+
+        CREATE TABLE IF NOT EXISTS curated_playlists (
+          id TEXT PRIMARY KEY,
+          category_slug TEXT NOT NULL,
+          category_type TEXT NOT NULL,
+          section_title TEXT NOT NULL,
+          title TEXT NOT NULL,
+          thumbnail_id TEXT,
+          updated_at INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_playlists_category ON curated_playlists(category_slug, category_type);
+
+        CREATE TABLE IF NOT EXISTS playlist_tracks (
+          playlist_id TEXT NOT NULL,
+          track_id TEXT NOT NULL,
+          position INTEGER NOT NULL,
+          PRIMARY KEY (playlist_id, track_id)
+        );
+        CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON playlist_tracks(track_id);
+
+        CREATE TABLE IF NOT EXISTS pending_scrape (
+          slug TEXT PRIMARY KEY,
+          type TEXT NOT NULL,
+          title TEXT NOT NULL,
+          params TEXT NOT NULL,
+          browse_id TEXT,
+          section_title TEXT,
+          attempts INTEGER NOT NULL DEFAULT 0
+        );
+      `);
+    } catch (err) {
+      console.warn("[catalog] schema init:", err);
+    }
 
     this.initialized = true;
   }
@@ -87,14 +193,19 @@ export class CatalogDO {
   /** Fetches playlist rows by id, preserving the caller's ordering. */
   private readPlaylistRows(ids: string[]): PlaylistRow[] {
     if (ids.length === 0) return [];
-    const placeholders = ids.map(() => "?").join(",");
-    const rows = this.sql
-      .exec<PlaylistRow>(
-        `SELECT id, category_slug, category_type, section_title, title, thumbnail_id, updated_at
-         FROM curated_playlists WHERE id IN (${placeholders})`,
-        ...ids,
-      )
-      .toArray();
+    const rows: PlaylistRow[] = [];
+    for (let i = 0; i < ids.length; i += SQL_CHUNK_SIZE) {
+      const chunk = ids.slice(i, i + SQL_CHUNK_SIZE);
+      const placeholders = chunk.map(() => "?").join(",");
+      const batch = this.sql
+        .exec<PlaylistRow>(
+          `SELECT id, category_slug, category_type, section_title, title, thumbnail_id, updated_at
+           FROM curated_playlists WHERE id IN (${placeholders})`,
+          ...chunk,
+        )
+        .toArray();
+      rows.push(...batch);
+    }
     const byId = new Map(rows.map((r) => [r.id, r]));
     return ids.map((id) => byId.get(id)).filter((r): r is PlaylistRow => !!r);
   }
@@ -104,19 +215,22 @@ export class CatalogDO {
     const out = new Map<string, string[]>();
     if (ids.length === 0) return out;
 
-    const placeholders = ids.map(() => "?").join(",");
-    const rows = this.sql
-      .exec<{ playlist_id: string; track_id: string }>(
-        `SELECT playlist_id, track_id FROM playlist_tracks
-         WHERE playlist_id IN (${placeholders}) ORDER BY playlist_id, position`,
-        ...ids,
-      )
-      .toArray();
+    for (let i = 0; i < ids.length; i += SQL_CHUNK_SIZE) {
+      const chunk = ids.slice(i, i + SQL_CHUNK_SIZE);
+      const placeholders = chunk.map(() => "?").join(",");
+      const rows = this.sql
+        .exec<{ playlist_id: string; track_id: string }>(
+          `SELECT playlist_id, track_id FROM playlist_tracks
+           WHERE playlist_id IN (${placeholders}) ORDER BY playlist_id, position`,
+          ...chunk,
+        )
+        .toArray();
 
-    for (const r of rows) {
-      const list = out.get(r.playlist_id) || [];
-      list.push(r.track_id);
-      out.set(r.playlist_id, list);
+      for (const r of rows) {
+        const list = out.get(r.playlist_id) || [];
+        list.push(r.track_id);
+        out.set(r.playlist_id, list);
+      }
     }
     return out;
   }
@@ -226,53 +340,57 @@ export class CatalogDO {
 
   private readTracks(ids: string[]): Record<string, CanonicalTrack> {
     if (ids.length === 0) return {};
-    const placeholders = ids.map(() => "?").join(",");
     const out: Record<string, CanonicalTrack> = {};
 
-    // 1. Read songs (with album info, square thumbnail, and omv_id)
-    const songRows = this.sql
-      .exec<{
-        id: string;
-        title: string;
-        author: string;
-        author_id: string;
-        album_id: string | null;
-        album_title: string | null;
-        thumbnail_id: string;
-        duration: number;
-        duration_str: string;
-        omv_id: string | null;
-        source: string;
-        updated_at: number;
-      }>(
-        `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at
-         FROM canonical_songs WHERE id IN (${placeholders})`,
-        ...ids,
-      )
-      .toArray();
+    // 1. Read songs (with album info, square thumbnail, and omv_id) in chunks
+    for (let i = 0; i < ids.length; i += SQL_CHUNK_SIZE) {
+      const chunk = ids.slice(i, i + SQL_CHUNK_SIZE);
+      const placeholders = chunk.map(() => "?").join(",");
+      const songRows = this.sql
+        .exec<{
+          id: string;
+          title: string;
+          author: string;
+          author_id: string;
+          album_id: string | null;
+          album_title: string | null;
+          thumbnail_id: string;
+          duration: number;
+          duration_str: string;
+          omv_id: string | null;
+          source: string;
+          updated_at: number;
+        }>(
+          `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at
+           FROM canonical_songs WHERE id IN (${placeholders})`,
+          ...chunk,
+        )
+        .toArray();
 
-    for (const r of songRows) {
-      out[r.id] = {
-        id: r.id,
-        title: r.title,
-        author: r.author,
-        authorId: r.author_id,
-        duration: r.duration,
-        durationStr: r.duration_str,
-        isSong: true,
-        thumbnailId: isSquareThumbnail(r.thumbnail_id) ? r.thumbnail_id : "",
-        albumId: r.album_id || undefined,
-        albumTitle: r.album_title || undefined,
-        omvId: r.omv_id || undefined,
-        source: r.source as CanonicalTrack["source"],
-        updatedAt: r.updated_at,
-      };
+      for (const r of songRows) {
+        out[r.id] = {
+          id: r.id,
+          title: r.title,
+          author: r.author,
+          authorId: r.author_id,
+          duration: r.duration,
+          durationStr: r.duration_str,
+          isSong: true,
+          thumbnailId: isSquareThumbnail(r.thumbnail_id) ? r.thumbnail_id : "",
+          albumId: r.album_id || undefined,
+          albumTitle: r.album_title || undefined,
+          omvId: r.omv_id || undefined,
+          source: r.source as CanonicalTrack["source"],
+          updatedAt: r.updated_at,
+        };
+      }
     }
 
-    // 2. Read videos (without thumbnail_id, with atv_id) for remaining IDs
+    // 2. Read videos (without thumbnail_id, with atv_id) for remaining IDs in chunks
     const missingForVideos = ids.filter((id) => !out[id]);
-    if (missingForVideos.length > 0) {
-      const vPlaceholders = missingForVideos.map(() => "?").join(",");
+    for (let i = 0; i < missingForVideos.length; i += SQL_CHUNK_SIZE) {
+      const chunk = missingForVideos.slice(i, i + SQL_CHUNK_SIZE);
+      const vPlaceholders = chunk.map(() => "?").join(",");
       const videoRows = this.sql
         .exec<{
           id: string;
@@ -287,7 +405,7 @@ export class CatalogDO {
         }>(
           `SELECT id, title, author, author_id, duration, duration_str, atv_id, source, updated_at
            FROM canonical_videos WHERE id IN (${vPlaceholders})`,
-          ...missingForVideos,
+          ...chunk,
         )
         .toArray();
 
@@ -308,10 +426,11 @@ export class CatalogDO {
       }
     }
 
-    // 3. Fallback to canonical_tracks for any remaining legacy IDs
+    // 3. Fallback to canonical_tracks for any remaining legacy IDs in chunks
     const missingForTracks = ids.filter((id) => !out[id]);
-    if (missingForTracks.length > 0) {
-      const tPlaceholders = missingForTracks.map(() => "?").join(",");
+    for (let i = 0; i < missingForTracks.length; i += SQL_CHUNK_SIZE) {
+      const chunk = missingForTracks.slice(i, i + SQL_CHUNK_SIZE);
+      const tPlaceholders = chunk.map(() => "?").join(",");
       const rows = this.sql
         .exec<{
           id: string;
@@ -327,7 +446,7 @@ export class CatalogDO {
         }>(
           `SELECT id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at
            FROM canonical_tracks WHERE id IN (${tPlaceholders})`,
-          ...missingForTracks,
+          ...chunk,
         )
         .toArray();
 
@@ -339,7 +458,7 @@ export class CatalogDO {
           authorId: r.author_id,
           duration: r.duration,
           durationStr: r.duration_str,
-          isSong: !!r.is_song,
+          isSong: !(!r.is_song),
           thumbnailId: r.is_song
             ? isSquareThumbnail(r.thumbnail_id)
               ? r.thumbnail_id
@@ -355,73 +474,75 @@ export class CatalogDO {
   }
 
   /** Resolves canonical song (ATV) counterparts for an array of video (OMV) IDs. */
-  public resolveSongCounterparts(
-    ids: string[],
-  ): Record<string, CanonicalTrack> {
+  public resolveSongCounterparts(ids: string[]): Record<string, CanonicalTrack> {
     if (ids.length === 0) return {};
-    const placeholders = ids.map(() => "?").join(",");
     const out: Record<string, CanonicalTrack> = {};
 
-    // 1. Join canonical_videos to canonical_songs via atv_id
-    const joinedRows = this.sql
-      .exec<{
-        query_omv_id: string;
-        id: string;
-        title: string;
-        author: string;
-        author_id: string;
-        album_id: string | null;
-        album_title: string | null;
-        thumbnail_id: string;
-        duration: number;
-        duration_str: string;
-        omv_id: string | null;
-        source: string;
-        updated_at: number;
-      }>(
-        `SELECT
-           v.id AS query_omv_id,
-           s.id AS id,
-           s.title AS title,
-           s.author AS author,
-           s.author_id AS author_id,
-           s.album_id AS album_id,
-           s.album_title AS album_title,
-           s.thumbnail_id AS thumbnail_id,
-           s.duration AS duration,
-           s.duration_str AS duration_str,
-           s.omv_id AS omv_id,
-           s.source AS source,
-           s.updated_at AS updated_at
-         FROM canonical_videos v
-         JOIN canonical_songs s ON v.atv_id = s.id
-         WHERE v.id IN (${placeholders})`,
-        ...ids,
-      )
-      .toArray();
+    // 1. Join canonical_videos to canonical_songs via atv_id in chunks
+    for (let i = 0; i < ids.length; i += SQL_CHUNK_SIZE) {
+      const chunk = ids.slice(i, i + SQL_CHUNK_SIZE);
+      const placeholders = chunk.map(() => "?").join(",");
+      const joinedRows = this.sql
+        .exec<{
+          query_omv_id: string;
+          id: string;
+          title: string;
+          author: string;
+          author_id: string;
+          album_id: string | null;
+          album_title: string | null;
+          thumbnail_id: string;
+          duration: number;
+          duration_str: string;
+          omv_id: string | null;
+          source: string;
+          updated_at: number;
+        }>(
+          `SELECT
+             v.id AS query_omv_id,
+             s.id AS id,
+             s.title AS title,
+             s.author AS author,
+             s.author_id AS author_id,
+             s.album_id AS album_id,
+             s.album_title AS album_title,
+             s.thumbnail_id AS thumbnail_id,
+             s.duration AS duration,
+             s.duration_str AS duration_str,
+             s.omv_id AS omv_id,
+             s.source AS source,
+             s.updated_at AS updated_at
+           FROM canonical_videos v
+           JOIN canonical_songs s ON v.atv_id = s.id
+           WHERE v.id IN (${placeholders})`,
+          ...chunk,
+        )
+        .toArray();
 
-    for (const r of joinedRows) {
-      out[r.query_omv_id] = {
-        id: r.id,
-        title: r.title,
-        author: r.author,
-        authorId: r.author_id,
-        duration: r.duration,
-        durationStr: r.duration_str,
-        isSong: true,
-        thumbnailId: isSquareThumbnail(r.thumbnail_id) ? r.thumbnail_id : "",
-        albumId: r.album_id || undefined,
-        albumTitle: r.album_title || undefined,
-        omvId: r.omv_id || r.query_omv_id,
-        source: r.source as CanonicalTrack["source"],
-        updatedAt: r.updated_at,
-      };
+      for (const r of joinedRows) {
+        out[r.query_omv_id] = {
+          id: r.id,
+          title: r.title,
+          author: r.author,
+          authorId: r.author_id,
+          duration: r.duration,
+          durationStr: r.duration_str,
+          isSong: true,
+          thumbnailId: isSquareThumbnail(r.thumbnail_id) ? r.thumbnail_id : "",
+          albumId: r.album_id || undefined,
+          albumTitle: r.album_title || undefined,
+          omvId: r.omv_id || r.query_omv_id,
+          source: r.source as CanonicalTrack["source"],
+          updatedAt: r.updated_at,
+        };
+      }
     }
 
-    // 2. Direct omv_id in canonical_songs for remaining unmapped IDs
+    // 2. Direct omv_id in canonical_songs for remaining unmapped IDs in chunks
     const remaining = ids.filter((id) => !out[id]);
-    if (remaining.length > 0) {
-      const remPlaceholders = remaining.map(() => "?").join(",");
+    for (let i = 0; i < remaining.length; i += SQL_CHUNK_SIZE) {
+      const chunk = remaining.slice(i, i + SQL_CHUNK_SIZE);
+      const remPlaceholders = chunk.map(() => "?").join(",");
       const directSongRows = this.sql
         .exec<{
           id: string;
@@ -439,7 +560,7 @@ export class CatalogDO {
         }>(
           `SELECT id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at
            FROM canonical_songs WHERE omv_id IN (${remPlaceholders})`,
-          ...remaining,
+          ...chunk,
         )
         .toArray();
 
@@ -497,7 +618,7 @@ export class CatalogDO {
       authorId: r.author_id,
       duration: r.duration,
       durationStr: r.duration_str,
-      isSong: !!r.is_song,
+      isSong: !(!r.is_song),
       thumbnailId: r.is_song
         ? isSquareThumbnail(r.thumbnail_id)
           ? r.thumbnail_id
@@ -570,13 +691,14 @@ export class CatalogDO {
    * instead of pulling every playlist into the isolate.
    */
   private recommend(ids: string[], limit: number): Recommendation[] {
-    const placeholders = ids.map(() => "?").join(",");
+    const safeIds = ids.slice(0, SQL_CHUNK_SIZE);
+    const placeholders = safeIds.map(() => "?").join(",");
     const matches = this.sql
       .exec<{ playlist_id: string; matches: number }>(
         `SELECT playlist_id, COUNT(*) as matches
          FROM playlist_tracks WHERE track_id IN (${placeholders})
          GROUP BY playlist_id ORDER BY matches DESC, playlist_id ASC LIMIT ?`,
-        ...ids,
+        ...safeIds,
         limit,
       )
       .toArray();
@@ -687,9 +809,7 @@ export class CatalogDO {
 
       case "counterparts": {
         if (request.method === "GET") {
-          const ids = [
-            ...new Set((url.searchParams.get("ids") || "").split(",")),
-          ]
+          const ids = [...new Set((url.searchParams.get("ids") || "").split(","))]
             .map((s) => s.trim())
             .filter(Boolean);
           const body = this.resolveSongCounterparts(ids);
