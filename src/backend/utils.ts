@@ -60,6 +60,14 @@ export function formatDuration(durationText?: string): string {
   return durationText || "00:00";
 }
 
+export function formatTopicAuthor(rawAuthor?: string): string {
+  if (!rawAuthor) return "Unknown";
+  if (rawAuthor.endsWith(" - Topic")) return rawAuthor;
+  if (rawAuthor.endsWith("- Topic")) return rawAuthor.replace(/- Topic$/, " - Topic");
+  return `${rawAuthor} - Topic`;
+}
+
+
 export function parsePublished(text: string): number {
   if (!text) return 0;
   const now = Date.now();
@@ -191,9 +199,12 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
   if (node.is(YTNodes.LockupView)) {
     const lockup = node.as(YTNodes.LockupView);
     // 18.1.0+: LockupView can have content_type "SHOW" in addition to "VIDEO"
+    // 18.3.0+: LockupView can have content_type "COURSE"
     if (
       lockup.content_id &&
-      (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")
+      (lockup.content_type === "VIDEO" ||
+        lockup.content_type === "SHOW" ||
+        (lockup.content_type as string) === "COURSE")
     ) {
       const { views, published, duration, durationSeconds, author, authorId } =
         getLockupMeta(lockup);
@@ -287,12 +298,14 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
     if (lockup.content_id?.startsWith("RD")) return null;
 
     // 18.1.0+: LockupView can have content_type "PLAYLIST", "COLLECTION", "SHOW", or "VIDEO"
+    // 18.3.0+: LockupView can have content_type "COURSE"
     if (
       lockup.content_id &&
       (lockup.content_type === "PLAYLIST" ||
         (lockup.content_type as string) === "COLLECTION" ||
         lockup.content_type === "VIDEO" ||
-        lockup.content_type === "SHOW")
+        lockup.content_type === "SHOW" ||
+        (lockup.content_type as string) === "COURSE")
     ) {
       const metadata = lockup.metadata;
       const contentImage = lockup.content_image?.as(

@@ -492,6 +492,7 @@ export class UserSyncDO {
           const clientColTs = clientMeta[r.name] || 0;
           if (r.modified > clientColTs) {
             delta.updatedCollections[r.name] = parse(r.data, []);
+            delta.meta[r.name] = r.modified;
             hasChanges = true;
           }
         }

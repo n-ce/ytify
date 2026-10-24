@@ -15,24 +15,24 @@
     "solid-js": "^1.9.17"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261018.1",
-    "@netlify/blobs": "^11.1.4",
-    "@netlify/edge-functions": "^4.0.2",
-    "@netlify/functions": "^6.0.2",
-    "@types/bun": "^1.4.3",
+    "@cloudflare/workers-types": "^5.20261024.1",
+    "@netlify/blobs": "^11.1.6",
+    "@netlify/edge-functions": "^4.0.3",
+    "@netlify/functions": "^6.0.3",
+    "@types/bun": "^1.4.4",
     "@types/node": "^26.6.5",
     "@types/subset-font": "^2.3.0",
     "autoprefixer": "^10.6.1",
-    "knip": "^6.41.0",
+    "knip": "^6.43.0",
     "open-props": "1.7.23",
     "postcss-jit-props": "1.0.16",
     "remixicon": "^4.9.1",
     "subset-font": "^2.9.0",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0",
     "vite-plugin-solid": "^2.11.14",
-    "youtubei.js": "18.2.0"
+    "youtubei.js": "18.3.0"
   },
   "browserslist": [
     "defaults"

@@ -6,6 +6,7 @@ import {
   formatThumbnailId,
   getVideoId,
   getLockupMeta,
+  formatTopicAuthor,
 } from "./utils.js";
 import { readSongCounterparts } from "./catalogClient.js";
 import type { Env } from "./env.js";
@@ -89,10 +90,12 @@ export default async function (
         });
       } else if (item.is(YTNodes.LockupView)) {
         const lockup = item.as(YTNodes.LockupView);
-        // LockupView can have content_type "SHOW" in addition to "VIDEO"
+        // LockupView can have content_type "SHOW" or "COURSE" in addition to "VIDEO"
         if (
           lockup.content_id &&
-          (lockup.content_type === "VIDEO" || lockup.content_type === "SHOW")
+          (lockup.content_type === "VIDEO" ||
+            lockup.content_type === "SHOW" ||
+            (lockup.content_type as string) === "COURSE")
         ) {
           const {
             views,
@@ -119,7 +122,7 @@ export default async function (
         const videoId = getVideoId(song);
         if (videoId) {
           const rawArtists = (song as any).artists || (song as any).authors;
-          const itemAuthor =
+          const rawAuthor =
             Array.isArray(rawArtists) && rawArtists.length > 0
               ? rawArtists
                   .map((a: any) => a.name)
@@ -127,6 +130,11 @@ export default async function (
                   .join(", ")
               : (song as any).author?.name ||
                 (author && author !== "Unknown" ? author : "YouTube Music");
+          const itemType = (
+            (song as any).item_type === "video" ? "video" : "song"
+          ) as "video" | "song";
+          const itemAuthor =
+            itemType === "song" ? formatTopicAuthor(rawAuthor) : rawAuthor;
           const itemAuthorId =
             Array.isArray(rawArtists) && rawArtists.length > 0
               ? rawArtists[0]?.channel_id || ""
@@ -138,8 +146,7 @@ export default async function (
             authorId: itemAuthorId,
             duration: formatDuration(song.duration?.text),
             subtext: song.album?.name || name || "",
-            type: ((song as any).item_type === "video" ? "video" : "song") as
-              "video" | "song",
+            type: itemType,
           });
         }
       }
@@ -166,7 +173,7 @@ export default async function (
           const song = counterparts[item.id];
           item.id = song.id;
           item.title = song.title || item.title;
-          item.author = song.author || item.author;
+          item.author = formatTopicAuthor(song.author || item.author);
           item.authorId = song.authorId || item.authorId;
           item.duration = song.durationStr || item.duration;
           item.subtext = song.albumTitle || item.subtext;
@@ -178,6 +185,13 @@ export default async function (
       }
     } catch (err) {
       console.warn("[getPlaylist] counterpart normalization failed:", err);
+    }
+  }
+
+  // 4. Ensure all items of type "song" have an author with the " - Topic" suffix
+  for (const item of allItems) {
+    if (item.type === "song") {
+      item.author = formatTopicAuthor(item.author);
     }
   }
 

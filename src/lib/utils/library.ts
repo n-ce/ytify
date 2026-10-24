@@ -51,7 +51,7 @@ const NON_COLLECTION_KEYS = [
  * Built-in collections: seeded into localStorage on a fresh install and pinned
  * to the top of the library in this order.
  */
-export const RESERVED_ORDER = ["history", "favorites", "liked", "listenLater"];
+const RESERVED_ORDER = ["history", "favorites", "liked", "listenLater"];
 
 /** Reserved collections always render with a fixed icon and translated label. */
 export const RESERVED_COLLECTIONS: Record<
@@ -234,7 +234,7 @@ export function saveLists<T extends "channels" | "playlists">(
   rehydrateStores();
 }
 
-export function saveLibraryAlbums(albums: LibraryAlbums) {
+function saveLibraryAlbums(albums: LibraryAlbums) {
   localStorage.setItem("library_albums", JSON.stringify(albums));
 }
 

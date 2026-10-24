@@ -1,7 +1,8 @@
 import type { DurableObjectState } from "@cloudflare/workers-types";
-import { scrapeCategory, type ScrapedCategory } from "./cron/scraper.js";
+import { scrapeCategory, type ScrapedCategory } from "./scraper.js";
 import {
   SCORE_PER_TRACK,
+  isSquareThumbnail,
   type CanonicalTrack,
   type Category,
   type CuratedPlaylist,
@@ -65,92 +66,7 @@ export class CatalogDO {
   private initSchema(): void {
     if (this.initialized) return;
     this.sql.exec(`
-      CREATE TABLE IF NOT EXISTS canonical_songs (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        author TEXT NOT NULL,
-        author_id TEXT,
-        album_id TEXT,
-        album_title TEXT,
-        thumbnail_id TEXT NOT NULL,
-        duration INTEGER NOT NULL DEFAULT 0,
-        duration_str TEXT,
-        omv_id TEXT,
-        source TEXT NOT NULL,
-        updated_at INTEGER NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);
-      CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);
-      CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);
-      CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id);
-
-      CREATE TABLE IF NOT EXISTS canonical_videos (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        author TEXT NOT NULL,
-        author_id TEXT,
-        duration INTEGER NOT NULL DEFAULT 0,
-        duration_str TEXT,
-        atv_id TEXT,
-        source TEXT NOT NULL,
-        updated_at INTEGER NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);
-      CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);
-      CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id);
-
-      CREATE TABLE IF NOT EXISTS canonical_tracks (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        author TEXT NOT NULL,
-        author_id TEXT,
-        duration INTEGER NOT NULL DEFAULT 0,
-        duration_str TEXT,
-        is_song BOOLEAN NOT NULL DEFAULT 0,
-        thumbnail_id TEXT,
-        source TEXT NOT NULL,
-        updated_at INTEGER NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_tracks_author ON canonical_tracks(author);
-      CREATE INDEX IF NOT EXISTS idx_tracks_updated ON canonical_tracks(updated_at);
-
-      CREATE TABLE IF NOT EXISTS categories (
-        slug TEXT NOT NULL,
-        type TEXT NOT NULL,
-        title TEXT NOT NULL,
-        params TEXT NOT NULL,
-        PRIMARY KEY (slug, type)
-      );
-
-      CREATE TABLE IF NOT EXISTS curated_playlists (
-        id TEXT PRIMARY KEY,
-        category_slug TEXT NOT NULL,
-        category_type TEXT NOT NULL,
-        section_title TEXT NOT NULL,
-        title TEXT NOT NULL,
-        thumbnail_id TEXT,
-        updated_at INTEGER NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_playlists_category ON curated_playlists(category_slug, category_type);
-
-      CREATE TABLE IF NOT EXISTS playlist_tracks (
-        playlist_id TEXT NOT NULL,
-        track_id TEXT NOT NULL,
-        position INTEGER NOT NULL,
-        PRIMARY KEY (playlist_id, track_id)
-      );
-      CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON playlist_tracks(track_id);
-
-      CREATE TABLE IF NOT EXISTS pending_scrape (
-        slug TEXT PRIMARY KEY,
-        type TEXT NOT NULL,
-        title TEXT NOT NULL,
-        params TEXT NOT NULL,
-        browse_id TEXT,
-        section_title TEXT,
-        attempts INTEGER NOT NULL DEFAULT 0
-      );
-    `);
+      CREATE TABLE IF NOT EXISTS canonical_songs (\n        id TEXT PRIMARY KEY,\n        title TEXT NOT NULL,\n        author TEXT NOT NULL,\n        author_id TEXT,\n        album_id TEXT,\n        album_title TEXT,\n        thumbnail_id TEXT NOT NULL,\n        duration INTEGER NOT NULL DEFAULT 0,\n        duration_str TEXT,\n        omv_id TEXT,\n        source TEXT NOT NULL,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);\n      CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);\n      CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);\n\n      CREATE TABLE IF NOT EXISTS canonical_videos (\n        id TEXT PRIMARY KEY,\n        title TEXT NOT NULL,\n        author TEXT NOT NULL,\n        author_id TEXT,\n        duration INTEGER NOT NULL DEFAULT 0,\n        duration_str TEXT,\n        atv_id TEXT,\n        source TEXT NOT NULL,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);\n      CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);\n\n      CREATE TABLE IF NOT EXISTS canonical_tracks (\n        id TEXT PRIMARY KEY,\n        title TEXT NOT NULL,\n        author TEXT NOT NULL,\n        author_id TEXT,\n        duration INTEGER NOT NULL DEFAULT 0,\n        duration_str TEXT,\n        is_song BOOLEAN NOT NULL DEFAULT 0,\n        thumbnail_id TEXT,\n        source TEXT NOT NULL,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_tracks_author ON canonical_tracks(author);\n      CREATE INDEX IF NOT EXISTS idx_tracks_updated ON canonical_tracks(updated_at);\n\n      CREATE TABLE IF NOT EXISTS categories (\n        slug TEXT NOT NULL,\n        type TEXT NOT NULL,\n        title TEXT NOT NULL,\n        params TEXT NOT NULL,\n        PRIMARY KEY (slug, type)\n      );\n\n      CREATE TABLE IF NOT EXISTS curated_playlists (\n        id TEXT PRIMARY KEY,\n        category_slug TEXT NOT NULL,\n        category_type TEXT NOT NULL,\n        section_title TEXT NOT NULL,\n        title TEXT NOT NULL,\n        thumbnail_id TEXT,\n        updated_at INTEGER NOT NULL\n      );\n      CREATE INDEX IF NOT EXISTS idx_playlists_category ON curated_playlists(category_slug, category_type);\n\n      CREATE TABLE IF NOT EXISTS playlist_tracks (\n        playlist_id TEXT NOT NULL,\n        track_id TEXT NOT NULL,\n        position INTEGER NOT NULL,\n        PRIMARY KEY (playlist_id, track_id)\n      );\n      CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON playlist_tracks(track_id);\n\n      CREATE TABLE IF NOT EXISTS pending_scrape (\n        slug TEXT PRIMARY KEY,\n        type TEXT NOT NULL,\n        title TEXT NOT NULL,\n        params TEXT NOT NULL,\n        browse_id TEXT,\n        section_title TEXT,\n        attempts INTEGER NOT NULL DEFAULT 0\n      );\n    `);
 
     // Gracefully handle column additions for existing tables
     try {
@@ -159,6 +75,11 @@ export class CatalogDO {
     try {
       this.sql.exec("ALTER TABLE canonical_videos ADD COLUMN atv_id TEXT");
     } catch {}
+
+    this.sql.exec(`
+      CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id);
+      CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id);
+    `);
 
     this.initialized = true;
   }
@@ -205,6 +126,9 @@ export class CatalogDO {
     this.ctx.storage.transactionSync(() => {
       for (const t of tracks) {
         if (t.isSong) {
+          const songThumb = isSquareThumbnail(t.thumbnailId)
+            ? t.thumbnailId
+            : "";
           this.sql.exec(
             `INSERT INTO canonical_songs
                (id, title, author, author_id, album_id, album_title, thumbnail_id, duration, duration_str, omv_id, source, updated_at)
@@ -228,7 +152,7 @@ export class CatalogDO {
             t.authorId || "",
             t.albumId || null,
             t.albumTitle || null,
-            t.thumbnailId || "",
+            songThumb,
             t.duration,
             t.durationStr,
             t.omvId || null,
@@ -263,6 +187,11 @@ export class CatalogDO {
         }
 
         // Backward compatibility table for legacy queries and existing tests
+        const legacyThumb = t.isSong
+          ? isSquareThumbnail(t.thumbnailId)
+            ? t.thumbnailId
+            : ""
+          : t.thumbnailId || "";
         this.sql.exec(
           `INSERT INTO canonical_tracks
              (id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at)
@@ -285,7 +214,7 @@ export class CatalogDO {
           t.duration,
           t.durationStr,
           t.isSong ? 1 : 0,
-          t.thumbnailId,
+          legacyThumb,
           t.source,
           t.updatedAt,
         );
@@ -331,7 +260,7 @@ export class CatalogDO {
         duration: r.duration,
         durationStr: r.duration_str,
         isSong: true,
-        thumbnailId: r.thumbnail_id,
+        thumbnailId: isSquareThumbnail(r.thumbnail_id) ? r.thumbnail_id : "",
         albumId: r.album_id || undefined,
         albumTitle: r.album_title || undefined,
         omvId: r.omv_id || undefined,
@@ -411,7 +340,11 @@ export class CatalogDO {
           duration: r.duration,
           durationStr: r.duration_str,
           isSong: !!r.is_song,
-          thumbnailId: r.thumbnail_id,
+          thumbnailId: r.is_song
+            ? isSquareThumbnail(r.thumbnail_id)
+              ? r.thumbnail_id
+              : ""
+            : r.thumbnail_id,
           source: r.source as CanonicalTrack["source"],
           updatedAt: r.updated_at,
         };
@@ -422,7 +355,9 @@ export class CatalogDO {
   }
 
   /** Resolves canonical song (ATV) counterparts for an array of video (OMV) IDs. */
-  public resolveSongCounterparts(ids: string[]): Record<string, CanonicalTrack> {
+  public resolveSongCounterparts(
+    ids: string[],
+  ): Record<string, CanonicalTrack> {
     if (ids.length === 0) return {};
     const placeholders = ids.map(() => "?").join(",");
     const out: Record<string, CanonicalTrack> = {};
@@ -474,7 +409,7 @@ export class CatalogDO {
         duration: r.duration,
         durationStr: r.duration_str,
         isSong: true,
-        thumbnailId: r.thumbnail_id,
+        thumbnailId: isSquareThumbnail(r.thumbnail_id) ? r.thumbnail_id : "",
         albumId: r.album_id || undefined,
         albumTitle: r.album_title || undefined,
         omvId: r.omv_id || r.query_omv_id,
@@ -518,7 +453,9 @@ export class CatalogDO {
             duration: r.duration,
             durationStr: r.duration_str,
             isSong: true,
-            thumbnailId: r.thumbnail_id,
+            thumbnailId: isSquareThumbnail(r.thumbnail_id)
+              ? r.thumbnail_id
+              : "",
             albumId: r.album_id || undefined,
             albumTitle: r.album_title || undefined,
             omvId: r.omv_id,
@@ -561,7 +498,11 @@ export class CatalogDO {
       duration: r.duration,
       durationStr: r.duration_str,
       isSong: !!r.is_song,
-      thumbnailId: r.thumbnail_id,
+      thumbnailId: r.is_song
+        ? isSquareThumbnail(r.thumbnail_id)
+          ? r.thumbnail_id
+          : ""
+        : r.thumbnail_id,
       source: r.source as CanonicalTrack["source"],
       updatedAt: r.updated_at,
     }));
@@ -746,7 +687,9 @@ export class CatalogDO {
 
       case "counterparts": {
         if (request.method === "GET") {
-          const ids = [...new Set((url.searchParams.get("ids") || "").split(","))]
+          const ids = [
+            ...new Set((url.searchParams.get("ids") || "").split(",")),
+          ]
             .map((s) => s.trim())
             .filter(Boolean);
           const body = this.resolveSongCounterparts(ids);
@@ -1010,7 +953,7 @@ export class CatalogDO {
     try {
       const result = await scrape({
         ...category,
-        browseId: category.browseId || category.browse_id,
+        browseId: category.browseId || (category as any).browse_id,
         sectionTitle: category.sectionTitle || category.type,
       });
       this.upsertCategories([category]);

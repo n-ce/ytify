@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/backend/worker.ts!",
+    "src/backend/localAdapter.ts!",
+    "netlify/edge-functions/*.ts!",
+    "netlify/functions/*.ts!"
+  ],
+  "project": ["src/**/*.ts", "src/**/*.tsx", "netlify/**/*.ts"],
+  "ignoreDependencies": ["remixicon"]
+}

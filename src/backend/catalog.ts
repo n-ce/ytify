@@ -18,7 +18,7 @@ export interface CanonicalTrack {
   duration: number;
   durationStr: string;
   isSong: boolean;
-  /** Bare 11-char video id or cover art id; empty for non-song art. */
+  /** Square cover art ID (starting with "/"); empty for non-song art or video thumbnails. */
   thumbnailId: string;
   albumId?: string;
   albumTitle?: string;
@@ -125,6 +125,19 @@ export function cleanAuthor(author?: string): string {
 }
 
 /**
+ * Determines whether a thumbnail identifier represents a square cover art ID.
+ * Square cover art originates from Google CDN (lh3/yt3.googleusercontent.com)
+ * and starts with "/", without being an 11-character video ID or /vi/ path.
+ */
+export function isSquareThumbnail(id?: string): boolean {
+  if (!id) return false;
+  if (/^[a-zA-Z0-9_-]{11}$/.test(id) || /^\/[a-zA-Z0-9_-]{11}$/.test(id))
+    return false;
+  if (id.startsWith("/vi/") || id.startsWith("/vi_webp/")) return false;
+  return id.startsWith("/");
+}
+
+/**
  * Projects a client-side track (library entry or search result) onto the
  * canonical schema. Returns null for ids that can never be resolved.
  */
@@ -143,7 +156,7 @@ export function trackItemToCanonical(
     duration,
     durationStr: track.duration || "",
     isSong,
-    thumbnailId: isSong ? track.img || track.id : "",
+    thumbnailId: isSong && isSquareThumbnail(track.img) ? track.img! : "",
     albumId: track.albumId || undefined,
     albumTitle: track.albumTitle || undefined,
     omvId: track.omvId || undefined,

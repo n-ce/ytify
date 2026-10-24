@@ -1,7 +1,7 @@
 import { YTNodes } from "youtubei.js";
 import { getClient, getVideoId, formatThumbnailId } from "./utils.js";
 import { readTracks, upsertTracks } from "./catalogClient.js";
-import type { CanonicalTrack } from "./catalog.js";
+import { isSquareThumbnail, type CanonicalTrack } from "./catalog.js";
 import type { Env } from "./env.js";
 
 export interface FixTarget {
@@ -28,7 +28,7 @@ function cleanSearchTitle(title: string): string {
   if (!title) return "";
   let clean = title
     .replace(
-      /\s*[\(\[](?:official\s+)?(?:music\s+)?(?:audio|video|lyric\s+video|visualizer|hd|hq|extended|clean|explicit|remaster(?:ed)?)[\]\)]/gi,
+      /\s*[\(\[](?:official\s+)?(?:music\s+)?(?:audio|video|lyric\s+video|visualizer|hd|hq|extended|clean|explicit|remaster(?:ed)?)[\Content\]\)]/gi,
       "",
     )
     .replace(/\.(mp3|opus|m4a|wav|flac)$/i, "")
@@ -131,9 +131,10 @@ export async function resolveTrackMetadataViaSearch(
       "";
 
     const albumTitle = matchedSong.album?.name;
-    const thumbnailId = formatThumbnailId(
+    const rawThumb = formatThumbnailId(
       matchedSong.thumbnail?.contents?.[0]?.url,
     );
+    const thumbnailId = isSquareThumbnail(rawThumb) ? rawThumb : undefined;
     const matchedSongId = getVideoId(matchedSong) || target.id;
 
     return {
@@ -142,7 +143,7 @@ export async function resolveTrackMetadataViaSearch(
       title: cleanTitle,
       albumId: playlistId || undefined,
       albumTitle: albumTitle || undefined,
-      thumbnailId: thumbnailId || undefined,
+      thumbnailId,
       matchedSongId,
     };
   } catch (err) {
@@ -252,7 +253,9 @@ export async function handleFixMetadata(
           duration: 0,
           durationStr: "",
           isSong: true,
-          thumbnailId: item.thumbnailId || atvId,
+          thumbnailId: isSquareThumbnail(item.thumbnailId)
+            ? item.thumbnailId!
+            : "",
           omvId: id,
           source: "fix_metadata",
           updatedAt: now,
@@ -283,7 +286,9 @@ export async function handleFixMetadata(
           duration: 0,
           durationStr: "",
           isSong: true,
-          thumbnailId: item.thumbnailId || id,
+          thumbnailId: isSquareThumbnail(item.thumbnailId)
+            ? item.thumbnailId!
+            : "",
           source: "fix_metadata",
           updatedAt: now,
         });

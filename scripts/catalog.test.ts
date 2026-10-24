@@ -92,7 +92,7 @@ describe("catalog/canonical_tracks", () => {
           duration: 200,
           durationStr: "03:20",
           isSong: true,
-          thumbnailId: "img_song1",
+          thumbnailId: "/img_song1",
           albumId: "MPREb_album1",
           albumTitle: "Album One",
           source: "artist_featured",
@@ -121,7 +121,7 @@ describe("catalog/canonical_tracks", () => {
       id: "song1111111",
       title: "Official Song",
       isSong: true,
-      thumbnailId: "img_song1",
+      thumbnailId: "/img_song1",
       albumId: "MPREb_album1",
       albumTitle: "Album One",
     });
@@ -139,13 +139,87 @@ describe("catalog/canonical_tracks", () => {
       .exec("SELECT * FROM canonical_songs WHERE id = ?", "song1111111")
       .one();
     expect(songRow.album_title).toBe("Album One");
-    expect(songRow.thumbnail_id).toBe("img_song1");
+    expect(songRow.thumbnail_id).toBe("/img_song1");
 
     const videoRow = sql
       .exec("SELECT * FROM canonical_videos WHERE id = ?", "video111111")
       .one();
     expect(videoRow.title).toBe("Fan Live Performance");
     expect(videoRow.thumbnail_id).toBeUndefined();
+  });
+
+  test("ATV tracks store only square thumbnails and reject rectangular video IDs", async () => {
+    const catalog = new CatalogDO(fakeDurableState() as any);
+    const now = Date.now();
+
+    // 1. Song with 11-char video id as thumbnailId (rectangular)
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        {
+          id: "song_rect",
+          title: "Song With Rectangular Thumb",
+          author: "Artist",
+          authorId: "UC_ARTIST",
+          duration: 180,
+          durationStr: "03:00",
+          isSong: true,
+          thumbnailId: "dQw4w9WgXcQ", // 11-char video ID (rectangular)
+          source: "innertube_scrape",
+          updatedAt: now,
+        },
+        {
+          id: "song_square",
+          title: "Song With Square Thumb",
+          author: "Artist",
+          authorId: "UC_ARTIST",
+          duration: 180,
+          durationStr: "03:00",
+          isSong: true,
+          thumbnailId: "/a-/AOh14Gh8_square", // square Google CDN path
+          source: "innertube_scrape",
+          updatedAt: now,
+        },
+      ],
+    });
+
+    const res = await readJson(catalog, "/tracks?ids=song_rect,song_square");
+    expect(res.song_rect.thumbnailId).toBe("");
+    expect(res.song_square.thumbnailId).toBe("/a-/AOh14Gh8_square");
+
+    const sql = (catalog as any).sql;
+    const rectRow = sql
+      .exec("SELECT * FROM canonical_songs WHERE id = ?", "song_rect")
+      .one();
+    expect(rectRow.thumbnail_id).toBe("");
+
+    const squareRow = sql
+      .exec("SELECT * FROM canonical_songs WHERE id = ?", "song_square")
+      .one();
+    expect(squareRow.thumbnail_id).toBe("/a-/AOh14Gh8_square");
+
+    // 2. An update with rectangular thumbnail should not overwrite an existing square thumbnail
+    await postJson(catalog, "/tracks", {
+      tracks: [
+        {
+          id: "song_square",
+          title: "Song With Square Thumb (Updated)",
+          author: "Artist",
+          authorId: "UC_ARTIST",
+          duration: 180,
+          durationStr: "03:00",
+          isSong: true,
+          thumbnailId: "new_rect_id",
+          source: "user_sync",
+          updatedAt: now + 1000,
+        },
+      ],
+    });
+
+    const squareRowAfter = sql
+      .exec("SELECT * FROM canonical_songs WHERE id = ?", "song_square")
+      .one();
+    expect(squareRowAfter.thumbnail_id).toBe("/a-/AOh14Gh8_square");
+    expect(squareRowAfter.title).toBe("Song With Square Thumb (Updated)");
   });
 
   test("links and resolves OMV and ATV counterparts", async () => {
@@ -162,7 +236,7 @@ describe("catalog/canonical_tracks", () => {
           duration: 203,
           durationStr: "03:23",
           isSong: true,
-          thumbnailId: "dua_thumb",
+          thumbnailId: "/dua_thumb",
           albumId: "OLAK5uy_album",
           albumTitle: "Future Nostalgia",
           omvId: "video_omv_1",
@@ -205,7 +279,7 @@ describe("catalog/canonical_tracks", () => {
       isSong: true,
       albumId: "OLAK5uy_album",
       albumTitle: "Future Nostalgia",
-      thumbnailId: "dua_thumb",
+      thumbnailId: "/dua_thumb",
       omvId: "video_omv_1",
     });
     expect(counterparts.unknown_video).toBeUndefined();
@@ -774,6 +848,32 @@ describe("catalog/tracksToCanonical", () => {
     });
     expect(records[1]).toMatchObject({ id: "bbbbbbbbbbb", isSong: false });
     expect(typeof records[1].updatedAt).toBe("number");
+  });
+
+  test("rejects rectangular thumbnails and only keeps square thumbnails for songs", () => {
+    const records = tracksToCanonical([
+      {
+        id: "song_with_rect",
+        title: "Song Rect",
+        author: "Artist - Topic",
+        img: "dQw4w9WgXcQ", // 11-char video ID (rectangular)
+      },
+      {
+        id: "song_with_no_img",
+        title: "Song No Img",
+        author: "Artist - Topic",
+      },
+      {
+        id: "song_with_square",
+        title: "Song Square",
+        author: "Artist - Topic",
+        img: "/a-/AOh14Gh8_square", // square Google CDN path
+      },
+    ]);
+
+    expect(records[0].thumbnailId).toBe("");
+    expect(records[1].thumbnailId).toBe("");
+    expect(records[2].thumbnailId).toBe("/a-/AOh14Gh8_square");
   });
 });
 

@@ -19,7 +19,7 @@ import {
   upsertTracks,
   getCatalogStub,
 } from "./catalogClient.js";
-import { discoverCategories, scrapeCategory } from "./cron/scraper.js";
+import { discoverCategories, scrapeCategory } from "./scraper.js";
 import {
   type Category,
   type CuratedPlaylist,
@@ -541,7 +541,7 @@ export default {
     }
 
     // --- Scraper status (queue depth / next alarm tick) ---
-    if (path === "cron/status") {
+    if (path === "cron/status" || path === "scraper/status") {
       if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
       const status = await readScrapeStatus(env);
       if (!status) {
@@ -560,7 +560,7 @@ export default {
     }
 
     // --- Manual scraper trigger (wrangler dev / ops debugging) ---
-    if (path === "cron/scrape") {
+    if (path === "cron/scrape" || path === "scraper/scrape") {
       if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
 
       const mode = searchParams.get("mode") || "schedule";

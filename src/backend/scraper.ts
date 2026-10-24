@@ -1,5 +1,5 @@
 import { YTNodes, type Innertube } from "youtubei.js";
-import { getClient, formatThumbnailId, streamMapper } from "../utils.js";
+import { getClient, formatThumbnailId, streamMapper } from "./utils.js";
 import {
   slugify,
   trackItemToCanonical,
@@ -7,7 +7,7 @@ import {
   type Category,
   type CategoryType,
   type CuratedPlaylist,
-} from "../catalog.js";
+} from "./catalog.js";
 
 /** YouTube Music "Moods & Genres" landing page. */
 const MOODS_BROWSE_ID = "FEmusic_moods_and_genres";
