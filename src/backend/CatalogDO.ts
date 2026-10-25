@@ -1,5 +1,4 @@
 import type { DurableObjectState } from "@cloudflare/workers-types";
-import { scrapeCategory, type ScrapedCategory } from "./scraper.js";
 import {
   SCORE_PER_TRACK,
   isSquareThumbnail,
@@ -12,11 +11,6 @@ import {
 const JSON_HEADER = { "Content-Type": "application/json" };
 const MAX_TRACK_PREVIEW = 3;
 const MAX_RECOMMENDATIONS = 20;
-/** Categories scraped per alarm tick: keeps a tick well inside the CPU budget. */
-const SCRAPE_BATCH_SIZE = 1;
-/** Pause between alarm ticks so the scraper looks human-paced to InnerTube. */
-const SCRAPE_TICK_DELAY_MS = 5000;
-const SCRAPE_MAX_ATTEMPTS = 3;
 /** Cloudflare SQLite limit on bind variables is 99. Batches of 50 are safe. */
 const SQL_CHUNK_SIZE = 50;
 
@@ -49,11 +43,10 @@ function toCuratedPlaylist(
 
 /**
  * Single global Durable Object holding the deduplicated catalog: canonical
- * track metadata plus the moods & genres taxonomy curated by the scraper.
+ * track metadata plus the moods & genres taxonomy.
  *
- * Every consumer (link previews, fixMetadata, user sync hydration, the
- * recommendation endpoint) reads from this one store, so a repair or a scrape
- * benefits all of them at once.
+ * Every consumer (link previews, fixMetadata, user sync hydration) reads from
+ * this one store, so a repair benefits all of them at once.
  */
 export class CatalogDO {
   private ctx: DurableObjectState;
@@ -172,16 +165,6 @@ export class CatalogDO {
           PRIMARY KEY (playlist_id, track_id)
         );
         CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON playlist_tracks(track_id);
-
-        CREATE TABLE IF NOT EXISTS pending_scrape (
-          slug TEXT PRIMARY KEY,
-          type TEXT NOT NULL,
-          title TEXT NOT NULL,
-          params TEXT NOT NULL,
-          browse_id TEXT,
-          section_title TEXT,
-          attempts INTEGER NOT NULL DEFAULT 0
-        );
       `);
     } catch (err) {
       console.warn("[catalog] schema init:", err);
@@ -959,155 +942,8 @@ export class CatalogDO {
           { status: 200, headers: JSON_HEADER },
         );
       }
-
-      case "scrape-jobs": {
-        if (request.method === "GET") {
-          const alarmAt = await this.ctx.storage.getAlarm();
-          return new Response(
-            JSON.stringify({
-              pending: this.countPending(),
-              alarmAt: alarmAt ?? null,
-            }),
-            { status: 200, headers: JSON_HEADER },
-          );
-        }
-        if (request.method === "POST") {
-          const body = (await request.json().catch(() => null)) as {
-            categories?: Category[];
-            start?: boolean;
-          } | null;
-          if (!Array.isArray(body?.categories)) {
-            return new Response(
-              JSON.stringify({ error: "Missing categories" }),
-              { status: 400, headers: JSON_HEADER },
-            );
-          }
-          const queued = this.parkScrapeJobs(body.categories);
-          if (body.start !== false) await this.ctx.storage.setAlarm(Date.now());
-          return new Response(JSON.stringify({ queued }), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
-        }
-        break;
-      }
     }
 
     return new Response("Not Found", { status: 404 });
-  }
-
-  private countPending(): number {
-    return this.sql
-      .exec<{ c: number }>("SELECT count(*) as c FROM pending_scrape")
-      .one().c;
-  }
-
-  /**
-   * Parks categories in SQLite for alarm-driven scraping. A Durable Object alarm
-   * is the whole scheduler, so the weekly refresh needs no paid queue binding:
-   * the cron handler discovers, this parks, and `alarm()` drains one at a time.
-   */
-  private parkScrapeJobs(categories: Category[]): number {
-    let queued = 0;
-    this.ctx.storage.transactionSync(() => {
-      for (const category of categories) {
-        if (!category || !category.slug || !category.params) continue;
-        this.sql.exec(
-          `INSERT INTO pending_scrape (slug, type, title, params, browse_id, section_title, attempts)
-           VALUES (?, ?, ?, ?, ?, ?, 0)
-           ON CONFLICT(slug) DO UPDATE SET
-             type = excluded.type,
-             title = excluded.title,
-             params = excluded.params,
-             browse_id = excluded.browse_id,
-             section_title = excluded.section_title,
-             attempts = 0`,
-          category.slug,
-          category.type,
-          category.title,
-          category.params,
-          category.browseId || "",
-          category.sectionTitle || category.type,
-        );
-        queued++;
-      }
-    });
-    return queued;
-  }
-
-  async alarm(): Promise<void> {
-    this.initSchema();
-
-    const next = this.sql
-      .exec<Category & { params: string; browse_id: string }>(
-        `SELECT slug, type, title, params, browse_id FROM pending_scrape
-         ORDER BY attempts ASC, slug ASC LIMIT ${SCRAPE_BATCH_SIZE}`,
-      )
-      .toArray();
-
-    if (next.length === 0) return;
-
-    try {
-      for (const category of next) {
-        await this.processScrapeJob(category);
-      }
-    } catch (err) {
-      console.error("[scraper] alarm tick failed:", err);
-    } finally {
-      // Always reschedule while work remains. Losing this line on an unexpected
-      // throw would strand the backlog with nothing left to wake it up.
-      if (this.countPending() > 0) {
-        await this.ctx.storage.setAlarm(Date.now() + SCRAPE_TICK_DELAY_MS);
-      }
-    }
-  }
-
-  /**
-   * One queued category. `scrape` is injectable so the retry/drop bookkeeping
-   * can be exercised without touching InnerTube.
-   */
-  private async processScrapeJob(
-    category: Category & { params: string; browse_id?: string },
-    scrape: (category: Category) => Promise<ScrapedCategory> = scrapeCategory,
-  ): Promise<void> {
-    try {
-      const result = await scrape({
-        ...category,
-        browseId: category.browseId || (category as any).browse_id,
-        sectionTitle: category.sectionTitle || category.type,
-      });
-      this.upsertCategories([category]);
-      this.upsertPlaylists(result.playlists);
-      this.upsertTracks(result.tracks);
-      this.sql.exec("DELETE FROM pending_scrape WHERE slug = ?", category.slug);
-      console.log(
-        `[scraper] ${category.slug}: ${result.playlists.length} playlists, ${result.tracks.length} tracks`,
-      );
-    } catch (err) {
-      // A poisoned category is dropped after a few tries rather than being
-      // retried forever on every weekly cycle.
-      this.sql.exec(
-        "UPDATE pending_scrape SET attempts = attempts + 1 WHERE slug = ?",
-        category.slug,
-      );
-      const attempts = this.sql
-        .exec<{ attempts: number }>(
-          "SELECT attempts FROM pending_scrape WHERE slug = ?",
-          category.slug,
-        )
-        .toArray()[0];
-      if ((attempts?.attempts || 0) >= SCRAPE_MAX_ATTEMPTS) {
-        console.error(
-          `[scraper] ${category.slug} failed ${SCRAPE_MAX_ATTEMPTS} times, dropping`,
-          err,
-        );
-        this.sql.exec(
-          "DELETE FROM pending_scrape WHERE slug = ?",
-          category.slug,
-        );
-      } else {
-        console.warn(`[scraper] ${category.slug} failed:`, err);
-      }
-    }
   }
 }

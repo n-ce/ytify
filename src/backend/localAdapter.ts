@@ -8,8 +8,8 @@ import { DatabaseSync } from "node:sqlite";
 /**
  * Durable Objects are backed by embedded SQLite plus a small KV surface, which
  * node:sqlite and a Map reproduce closely enough for local development. Alarms
- * are the one extra piece: they are stored and fired on a real timer so the
- * alarm-driven scraper can be exercised with `vite dev``.
+ * are the one extra piece: they are stored and fired on a real timer so
+ * alarm-driven work can be exercised with `vite dev`.
  */
 function createFakeState() {
   const db = new DatabaseSync(":memory:");

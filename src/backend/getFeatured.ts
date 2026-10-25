@@ -89,7 +89,7 @@ export default async function getFeatured(
 ): Promise<FeaturedResult> {
   const ytPromise = artistIds.length > 0 ? getClient() : Promise.resolve(null);
   const catalogPromise =
-    env && trackIds.length > 0
+    trackIds.length > 0
       ? readFeatured(env, trackIds, limit)
       : Promise.resolve([] as Recommendation[]);
 
@@ -183,6 +183,6 @@ export default async function getFeatured(
   return {
     featuredPlaylists,
     communityPlaylists,
-    artists,
+    artists: artists.slice(0, limit),
   };
 }

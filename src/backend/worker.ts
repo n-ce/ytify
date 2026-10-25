@@ -12,14 +12,11 @@ import {
   recommend,
   readCategories,
   readPlaylists,
-  readScrapeStatus,
   readTracks,
   upsertCategories,
   upsertPlaylists,
   upsertTracks,
-  getCatalogStub,
 } from "./catalogClient.js";
-import { discoverCategories, scrapeCategory } from "./scraper.js";
 import {
   type Category,
   type CuratedPlaylist,
@@ -28,7 +25,6 @@ import {
 } from "./catalog.js";
 import type { Env } from "./env.js";
 import type {
-  ScheduledController,
   ExecutionContext,
   DurableObjectStub,
 } from "@cloudflare/workers-types";
@@ -50,7 +46,6 @@ const ALLOWED_ORIGINS = [
 ];
 
 const GATE_DO_NAME = "global";
-const MAX_DIRECT_CATEGORIES = 2;
 const MAX_CATALOG_IDS = 100;
 
 function getGateStub(env: Env): DurableObjectStub | null {
@@ -69,10 +64,10 @@ function getEdgeCache(): Cache | null {
 }
 
 /**
- * Internal routes (catalog writes, the stream gate, the scraper trigger) are
- * only meant for the ytify edge functions. When INTERNAL_TOKEN is configured
- * the caller must present it; unconfigured deployments stay open so local dev
- * and self-hosting need no extra setup.
+ * Internal routes (catalog writes and the stream gate) are only meant for the
+ * ytify edge functions. When INTERNAL_TOKEN is configured the caller must
+ * present it; unconfigured deployments stay open so local dev and self-hosting
+ * need no extra setup.
  */
 function isInternalCaller(request: Request, env: Env): boolean {
   if (!env.INTERNAL_TOKEN) return true;
@@ -122,42 +117,6 @@ function jsonCachedResponse(
     ctx.waitUntil(edgeCache.put(request, response.clone()));
   }
   return response;
-}
-
-async function ingestScrapeResult(
-  env: Env,
-  category: Category,
-  result: { playlists: CuratedPlaylist[]; tracks: CanonicalTrack[] },
-): Promise<void> {
-  await upsertCategories(env, [category]);
-  await upsertPlaylists(env, result.playlists);
-  await upsertTracks(env, result.tracks);
-}
-
-/**
- * Hands the categories to the catalog Durable Object, which drains them through
- * alarms. Returns the number queued, or null when no catalog binding exists.
- */
-async function scheduleScrapeJobs(
-  env: Env,
-  categories: Category[],
-): Promise<number | null> {
-  const stub = getCatalogStub(env);
-  if (!stub) return null;
-
-  const res = await stub.fetch(
-    new Request("http://do/scrape-jobs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ categories }),
-    }) as any,
-  );
-  if (!res.ok) {
-    console.warn(`[cron] catalog scrape queue rejected with ${res.status}`);
-    return null;
-  }
-  const data = (await res.json()) as { queued: number };
-  return data.queued || 0;
 }
 
 export default {
@@ -540,85 +499,6 @@ export default {
       );
     }
 
-    // --- Scraper status (queue depth / next alarm tick) ---
-    if (path === "cron/status" || path === "scraper/status") {
-      if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
-      const status = await readScrapeStatus(env);
-      if (!status) {
-        return new Response(
-          JSON.stringify({ error: "CATALOG_DO binding not configured." }),
-          {
-            status: 503,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-      return new Response(JSON.stringify(status), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // --- Manual scraper trigger (wrangler dev / ops debugging) ---
-    if (path === "cron/scrape" || path === "scraper/scrape") {
-      if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
-
-      const mode = searchParams.get("mode") || "schedule";
-      const categories = await discoverCategories();
-      if (categories.length === 0) {
-        return new Response(
-          JSON.stringify({ error: "No categories discovered" }),
-          {
-            status: 502,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      if (mode === "direct") {
-        // Inline run for local verification: one or two categories at most, so
-        // the request stays inside the worker CPU budget.
-        const slice = categories.slice(
-          0,
-          Math.max(
-            1,
-            Math.min(
-              parseInt(searchParams.get("limit") || "1", 10) || 1,
-              MAX_DIRECT_CATEGORIES,
-            ),
-          ),
-        );
-        for (const category of slice) {
-          const result = await scrapeCategory(category);
-          await ingestScrapeResult(env, category, result);
-        }
-        return new Response(
-          JSON.stringify({ scraped: slice.map((c) => c.slug) }),
-          {
-            status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      // Default: park the categories in the catalog Durable Object and let its
-      // alarm drain them one at a time.
-      const queued = await scheduleScrapeJobs(env, categories);
-      if (queued === null) {
-        return new Response(
-          JSON.stringify({ error: "CATALOG_DO binding not configured." }),
-          {
-            status: 503,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-      return new Response(JSON.stringify({ queued, runner: "catalog-alarm" }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     try {
       let data: unknown;
 
@@ -769,37 +649,5 @@ export default {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-  },
-
-  /**
-   * Weekly trigger: discover every Moods & Genres category and park it in the
-   * catalog Durable Object, whose alarm then drains them one at a time. The cron
-   * invocation itself only does discovery, so no single invocation has to scrape
-   * the whole catalogue, and no paid queue binding is involved.
-   */
-  async scheduled(
-    controller: ScheduledController,
-    env: Env,
-    ctx: ExecutionContext,
-  ): Promise<void> {
-    const trigger = controller.cron || "";
-    ctx.waitUntil(
-      (async () => {
-        try {
-          const categories = await discoverCategories();
-          if (categories.length === 0) {
-            console.warn(`[cron] ${trigger}: no categories discovered`);
-            return;
-          }
-
-          const queued = await scheduleScrapeJobs(env, categories);
-          console.log(
-            `[cron] ${trigger}: queued ${queued ?? 0} categories for alarm-driven scraping`,
-          );
-        } catch (err) {
-          console.error(`[cron] ${trigger} failed:`, err);
-        }
-      })(),
-    );
   },
 };

@@ -127,12 +127,10 @@ Backed by Cloudflare Durable Objects (`CatalogDO`, `StreamGateDO`, `UserSyncDO`)
 | `GET /api/catalog/categories?type=`                | `Category[]`                                              |
 | `GET /api/catalog/playlists?category=`             | `CuratedPlaylist[]` (public shape, with `trackIds`)       |
 | `GET /api/featured?ids=a,b&artistIds=c,d&limit=20` | `{ featuredPlaylists, communityPlaylists, artists }`      |
-| `GET /api/recommend?ids=a,b&limit=10`              | `{ playlists: Recommendation[] }` (catalog scoring alias) |
+| `GET /api/recommend?ids=a,b&limit=10`              | `{ playlists: Recommendation[] }` (ytmgr service)         |
 | `POST /api/stream-gate/acquire`                    | `{ granted, keyIndex, ... }` or rejection                 |
 | `POST /api/stream-gate/release`                    | `{ ok: true }` + key telemetry                            |
 | `GET /api/stream-gate/state`                       | Lease, key, and cooldown diagnostics                      |
-| `POST /api/cron/scrape?mode=direct\|schedule`      | Scraper trigger                                           |
-| `GET /api/cron/status`                             | `{ pending, alarmAt }` for alarm-driven scraper           |
 
 **Canonical Track Schema**:
 

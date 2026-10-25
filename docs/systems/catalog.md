@@ -87,7 +87,7 @@ Replaces the legacy `/recommend` and retired `Gallery` endpoints with a single u
   - `artistIds`: Up to 5 favorite artist IDs (from tracks with `- Topic`).
   - `limit`: Optional max items per shelf (default 20, max 30).
 - **Parallel Retrieval**:
-  1. `CatalogDO`: Curated "Featured playlists" and "Community playlists" scored by history track overlap (+10 per shared track).
+  1. `ytmgr`: External recommendation service returning "Featured playlists" and "Community playlists" matched by history track overlap.
   2. `yt.music.getArtist`: In parallel for each favorite artist ID, extracting artist `Featured on` playlists and resolving real channel avatars from `MusicImmersiveHeader` / `MusicVisualHeader`.
 - **Response**:
   ```typescript

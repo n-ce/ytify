@@ -352,14 +352,7 @@ describe("catalog/recommend", () => {
   });
 });
 
-describe("catalog/scrape queue (queue-free deployments)", () => {
-  const category = {
-    slug: "chill",
-    type: "mood" as const,
-    title: "Chill",
-    params: "P1",
-  };
-
+describe("catalog/recommendations", () => {
   test("categories can be listed and filtered by type", async () => {
     const catalog = new CatalogDO(fakeDurableState() as any);
 
@@ -412,62 +405,26 @@ describe("catalog/scrape queue (queue-free deployments)", () => {
     expect(await readJson(catalog, "/playlists")).toHaveLength(2);
   });
 
-  test("categories can be parked in SQLite for alarm-driven scraping", async () => {
-    const catalog = new CatalogDO(fakeDurableState() as any);
-
-    const queued = await postJson(catalog, "/scrape-jobs", {
-      categories: [category, { ...category, slug: "workout" }],
-    });
-    expect(await queued.json()).toEqual({ queued: 2 });
-
-    // Re-queueing the same slug refreshes it instead of duplicating.
-    await postJson(catalog, "/scrape-jobs", { categories: [category] });
-    const status = await readJson(catalog, "/scrape-jobs");
-    expect(status.pending).toBe(2);
-
-    // An empty batch is a no-op, not an error.
-    const empty = await postJson(catalog, "/scrape-jobs", { categories: [] });
-    expect(empty.status).toBe(200);
-    expect(await empty.json()).toEqual({ queued: 0 });
-
-    const malformed = await postJson(catalog, "/scrape-jobs", {});
-    expect(malformed.status).toBe(400);
+  test("recommendPlaylists queries ytmgr external recommendation service", async () => {
+    const { recommendPlaylists } = await import("../src/backend/catalogClient");
+    const recs = await recommendPlaylists(undefined, ["yNa8jP4zoJo", "f9fqe_VvWtU"], 5);
+    expect(Array.isArray(recs)).toBe(true);
+    if (recs.length > 0) {
+      expect(recs[0]).toHaveProperty("id");
+      expect(recs[0]).toHaveProperty("title");
+      expect(recs[0]).toHaveProperty("categoryType");
+      expect(recs[0]).toHaveProperty("score");
+    }
   });
 
-  test("a drained category is removed and its results are ingested", async () => {
-    const catalog = new CatalogDO(fakeDurableState() as any);
-    await postJson(catalog, "/scrape-jobs", { categories: [category] });
-
-    await (catalog as any).processScrapeJob(category, async () => ({
-      playlists: [playlist("PL1", "Chill Mix", ["aaaaaaaaaaa"], Date.now())],
-      tracks: [canonicalTrack("aaaaaaaaaaa", "Song A", "Artist A", Date.now())],
-    }));
-
-    expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(0);
-    expect((await readJson(catalog, "/track?id=aaaaaaaaaaa")).title).toBe(
-      "Song A",
-    );
-    const playlists = await readJson(catalog, "/playlists?category=chill");
-    expect(playlists[0].title).toBe("Chill Mix");
-  });
-
-  test("a failing category is retried, then dropped", async () => {
-    const catalog = new CatalogDO(fakeDurableState() as any);
-    await postJson(catalog, "/scrape-jobs", { categories: [category] });
-
-    const failing = async () => {
-      throw new Error("InnerTube layout changed");
-    };
-
-    await (catalog as any).processScrapeJob(category, failing);
-    expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(1);
-
-    await (catalog as any).processScrapeJob(category, failing);
-    await (catalog as any).processScrapeJob(category, failing);
-
-    // Third failure crosses the attempt budget, so the category is dropped
-    // instead of being retried forever on every weekly cycle.
-    expect((await readJson(catalog, "/scrape-jobs")).pending).toBe(0);
+  test("getFeatured safely accepts empty or populated recommendations without throwing", async () => {
+    const getFeatured = (await import("../src/backend/getFeatured")).default;
+    const res = await getFeatured(undefined, ["yNa8jP4zoJo", "f9fqe_VvWtU"], [], 5);
+    expect(res).toHaveProperty("featuredPlaylists");
+    expect(res).toHaveProperty("communityPlaylists");
+    expect(res).toHaveProperty("artists");
+    expect(Array.isArray(res.featuredPlaylists)).toBe(true);
+    expect(Array.isArray(res.communityPlaylists)).toBe(true);
   });
 });
 

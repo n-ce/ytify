@@ -8,6 +8,8 @@ import type {
 } from "./catalog.js";
 const CATALOG_DO_NAME = "global";
 
+export const YTMGR_API_URL = "https://ytmgr-seven.vercel.app";
+
 /**
  * A Durable Object stub takes the Cloudflare flavour of `Request`, which
  * carries a `fetcher` field the DOM type has no notion of. The runtime object
@@ -231,54 +233,45 @@ export function upsertPlaylists(
     : Promise.resolve(false);
 }
 
-export function parkCategories(
-  env: Env,
-  categories: Category[],
-): Promise<boolean> {
-  if (categories.length === 0) return Promise.resolve(true);
-  const stub = getCatalogStub(env);
-  return stub
-    ? post(stub, "/scrape-jobs", { categories })
-    : Promise.resolve(false);
-}
-
 export async function recommendPlaylists(
-  env: Env | undefined,
+  _env: Env | undefined,
   trackIds: string[],
   limit = 20,
 ): Promise<Recommendation[]> {
   if (trackIds.length === 0) return [];
-  const stub = getCatalogStub(env);
-  if (!stub) return [];
 
   try {
-    const res = await stub.fetch(
-      durableRequest(`/recommend?limit=${limit}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ trackIds }),
-      }),
-    );
+    const url = `${YTMGR_API_URL}/?ids=${encodeURIComponent(trackIds.join(","))}&limit=${limit}`;
+    const res = await fetch(url);
     if (!res.ok) return [];
-    return (await res.json()) as Recommendation[];
+    const data = (await res.json()) as {
+      playlists?: Array<{
+        id: string;
+        name: string;
+        thumbnailId: string;
+        categoryType: Category["type"];
+        categorySlug: string;
+        section: string;
+        score: number;
+        matchedTrackIds?: string[];
+      }>;
+    };
+    if (!Array.isArray(data?.playlists)) return [];
+    return data.playlists.map((p) => ({
+      id: p.id,
+      title: p.name,
+      thumbnailId: p.thumbnailId,
+      categoryType: p.categoryType,
+      categorySlug: p.categorySlug,
+      sectionTitle: p.section,
+      score: p.score,
+      trackCount: p.matchedTrackIds?.length || 0,
+      tracks: [],
+      updatedAt: Date.now(),
+    }));
   } catch (err) {
-    console.warn("[catalog] recommend failed:", err);
+    console.warn("[recommend] ytmgr fetch failed:", err);
     return [];
-  }
-}
-
-export async function readScrapeStatus(
-  env: Env | undefined,
-): Promise<{ pending: number; alarmAt: number | null } | null> {
-  const stub = getCatalogStub(env);
-  if (!stub) return null;
-  try {
-    const res = await stub.fetch(durableRequest("/scrape-jobs"));
-    if (!res.ok) return null;
-    return (await res.json()) as { pending: number; alarmAt: number | null };
-  } catch (err) {
-    console.warn("[catalog] readScrapeStatus failed:", err);
-    return null;
   }
 }
 

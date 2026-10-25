@@ -1,11 +1,35 @@
-import { Innertube, UniversalCache, YTNodes, type Helpers } from "youtubei.js";
+import { Innertube, YTNodes, type Helpers } from "youtubei.js";
+
+interface ICache {
+  cache_dir: string;
+  get(key: string): Promise<ArrayBuffer | undefined>;
+  set(key: string, value: ArrayBuffer): Promise<void>;
+  remove(key: string): Promise<void>;
+}
+
+class MemoryCache implements ICache {
+  private store = new Map<string, ArrayBuffer>();
+  cache_dir = "memory";
+
+  async get(key: string): Promise<ArrayBuffer | undefined> {
+    return this.store.get(key);
+  }
+
+  async set(key: string, value: ArrayBuffer): Promise<void> {
+    this.store.set(key, value);
+  }
+
+  async remove(key: string): Promise<void> {
+    this.store.delete(key);
+  }
+}
 
 let youtube: Innertube | null = null;
 
 export async function getClient(): Promise<Innertube> {
   if (!youtube)
     youtube = await Innertube.create({
-      cache: new UniversalCache(false),
+      cache: new MemoryCache(),
       generate_session_locally: true,
       retrieve_player: false,
       fetch: fetch.bind(globalThis),
@@ -63,10 +87,10 @@ export function formatDuration(durationText?: string): string {
 export function formatTopicAuthor(rawAuthor?: string): string {
   if (!rawAuthor) return "Unknown";
   if (rawAuthor.endsWith(" - Topic")) return rawAuthor;
-  if (rawAuthor.endsWith("- Topic")) return rawAuthor.replace(/- Topic$/, " - Topic");
+  if (rawAuthor.endsWith("- Topic"))
+    return rawAuthor.replace(/- Topic$/, " - Topic");
   return `${rawAuthor} - Topic`;
 }
-
 
 export function parsePublished(text: string): number {
   if (!text) return 0;
@@ -162,7 +186,9 @@ export function getLockupMeta(lockup: YTNodes.LockupView): {
     if (!views && /^\d*\.?\d+[KMB]?\s+views?$/.test(p)) views = p;
     else if (
       !published &&
-      /\b\d{1,2}\s+(second|minute|hour|day|week|month|year)s?\s+ago$/.test(p)
+      /\b\d{1,2}\s+(second|minute|hour|day|week|month|year)s?\s+ago$/.test(
+        p,
+      )
     )
       published = p;
   }

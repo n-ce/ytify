@@ -5,10 +5,10 @@ export interface Env {
   CATALOG_DO?: DurableObjectNamespace;
   STREAM_GATE_DO?: DurableObjectNamespace;
   /**
-   * Shared secret for the internal catalog/stream-gate/scraper routes. When
-   * unset the routes stay open so local dev and self-hosting need no extra
+   * Shared secret for the internal catalog and stream-gate routes. When unset
+   * the routes stay open so local dev and self-hosting need no extra
    * configuration; set it in production so only the ytify edge functions may
-   * write or drive the scraper.
+   * write to the catalog or drive the stream gate.
    */
   INTERNAL_TOKEN?: string;
 }
