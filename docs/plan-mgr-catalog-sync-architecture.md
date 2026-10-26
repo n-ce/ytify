@@ -1,5 +1,7 @@
 # Architecture Plan: Moods & Genres (MGR) Catalog & CloudSync Sync
 
+> **Status: Superseded.** The ytmgr external scraper dependency and its recommendation path were intentionally removed. This document is retained as historical design context; do not implement its ytmgr/GitHub Actions sync steps without a new RFC.
+
 ## 1. Executive Summary & Goals
 
 ### Context & Problems

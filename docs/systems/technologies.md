@@ -100,18 +100,16 @@ Durable Object classes:
 | Technology | Role | Where |
 | --- | --- | --- |
 | Netlify hosting | Static frontend deployment and previews | `dist/` |
-| Netlify Edge Functions (Deno) | Stream fallback, search suggestions, link previews, shared collections | `netlify/edge-functions/` |
-| Netlify Blobs | Session storage fallback and immutable shared collections | `stream.ts`, `static.ts` |
+| Netlify Edge Functions (Deno) | Stream fallback, search suggestions, shared collections | `netlify/edge-functions/` |
+| Netlify Blobs | RapidAPI quota/cooldown state and immutable shared collections | `stream.ts`, `static.ts` |
 | Netlify Scheduled Functions | Monthly cleanup of old shared collections | `netlify/functions/cleanupSharedCollections.ts` |
-| Web Crypto API | HMAC-SHA256 signed sessions and constant-time verification | `netlify/edge-functions/stream.ts` |
 | `@netlify/edge-functions`, `@netlify/functions`, `@netlify/blobs` | Platform types and storage clients | `netlify/` |
 
 Netlify edge routes:
 
-- `/s/:id` and `/s/` — RapidAPI stream fallback, signed sessions, lease-gated upstream calls, link previews.
+- `/s/:id` — RapidAPI stream fallback with Blobs-backed quota/cooldown and HTML previews.
 - `/ss` and `/ss/:id` — shared collection storage and retrieval.
 - Search suggestions — YouTube/YouTube Music suggestions at the edge.
-- Album/artist/channel/playlist preview routes — social/link preview HTML.
 
 ## Local Development
 
@@ -128,7 +126,6 @@ Netlify edge routes:
 | Service/API | Use |
 | --- | --- |
 | YouTube InnerTube via `youtubei.js` 18 | Search, albums, artists, channels, playlists, recommendations, metadata, and suggestions |
-| YouTube oEmbed | Free link-preview fallback |
 | YouTube Music search suggestions (`WEB_REMIX`) | Music-specific autocomplete at the Netlify edge |
 | YouTube image CDNs (`i.ytimg.com`, `yt3.googleusercontent.com`, `lh3.googleusercontent.com`) | Artwork and thumbnails |
 | wsrv.nl | Image resizing/proxying and WebP conversion |
@@ -138,7 +135,7 @@ Netlify edge routes:
 | SponsorBlock (`sponsor.ajay.app`) | Segment skip data |
 | LRCLIB (`lrclib.net`) | Synced lyrics |
 | JioSaavn API proxy + `aac.saavncdn.com` | Optional alternate audio source |
-| Netlify Blobs | Server-side session/shared-collection storage |
+| Netlify Blobs | Server-side RapidAPI quota/cooldown and shared-collection storage |
 | Weblate | Community translation workflow for `src/locales/` |
 
 ## Data Formats

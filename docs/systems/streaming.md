@@ -60,5 +60,5 @@ RapidAPI coordination is handled entirely inside the Netlify Edge Function using
 | RapidAPI key selection by remaining quota               | ?     |
 | Blobs-backed IP cooldown and violation decay            | ?     |
 | Hard-banned subnet fast path                            | ?     |
-| Client-side in-memory LRU stream caching                | ?     |
+| Client-side in-memory stream caching                        | ?     |
 | Collection link-preview edge function retired           | ?     |

@@ -132,7 +132,7 @@ Instead of running scheduled background scrapers that hammer Cloudflare:
 
 1. **`metadataFixer`:**
    Queries `canonical_songs` to instantly clean corrupted song titles, attach real album names, and restore square release covers without hitting YouTube.
-2. **`StreamGateDO` (Stream Fallback):**
+2. **Netlify Stream Fallback:**
    When streaming audio fallback, looks up `canonical_songs` to attach official album cover art and release titles.
 3. **`UserSyncDO` (Cloud Sync):**
    User sync stays fast and lightweight. Sync pulls automatically hydrate tracks from `canonical_songs`.
