@@ -1,7 +1,7 @@
 import { Accessor, For, Show, lazy } from "solid-js";
 import { listStore, loadAll, setListStore, t } from "@stores";
 import StreamItem from "@components/StreamItem";
-import { getCollection, metaUpdater, saveCollection } from "@utils";
+import { getCollection, metaUpdater, saveCollection } from "@modules/library";
 
 const SortableList = lazy(() => import("@modules/sortable"));
 

@@ -1,7 +1,7 @@
-import { config } from "@utils";
+import { config } from "@config";
 import { playerStore } from "@stores";
 
-export type SponsorSegment = [number, number];
+type SponsorSegment = [number, number];
 
 let currentVideoId: string = "";
 let segments: SponsorSegment[] = [];

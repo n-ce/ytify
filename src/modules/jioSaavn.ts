@@ -1,5 +1,6 @@
 import { playerStore, setPlayerStore, setStore, updateParam } from "@stores";
-import { config, player, applyMetadata } from "@utils";
+import { config } from "@config";
+import { player, applyMetadata } from "@modules/playback";
 
 export default function () {
   setPlayerStore("status", "Loading music information...");

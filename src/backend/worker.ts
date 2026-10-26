@@ -9,7 +9,7 @@ import getSimilar from "./getSimilar.js";
 import getSubFeed from "./getSubFeed.js";
 import { handleFixMetadata, type FixTarget } from "./fixMetadata.js";
 import {
-  recommend,
+  type Env,
   readCategories,
   readPlaylists,
   readTracks,
@@ -23,15 +23,10 @@ import {
   type CanonicalTrack,
   tracksToCanonical,
 } from "./catalog.js";
-import type { Env } from "./env.js";
-import type {
-  ExecutionContext,
-  DurableObjectStub,
-} from "@cloudflare/workers-types";
+import type { ExecutionContext } from "@cloudflare/workers-types";
 
 export { UserSyncDO } from "./UserSyncDO.ts";
 export { CatalogDO } from "./CatalogDO.js";
-export { StreamGateDO } from "./StreamGateDO.js";
 export type { Env };
 
 const ALLOWED_ORIGINS = [
@@ -45,13 +40,7 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
 ];
 
-const GATE_DO_NAME = "global";
 const MAX_CATALOG_IDS = 100;
-
-function getGateStub(env: Env): DurableObjectStub | null {
-  if (!env.STREAM_GATE_DO) return null;
-  return env.STREAM_GATE_DO.get(env.STREAM_GATE_DO.idFromName(GATE_DO_NAME));
-}
 
 function getEdgeCache(): Cache | null {
   try {
@@ -64,7 +53,7 @@ function getEdgeCache(): Cache | null {
 }
 
 /**
- * Internal routes (catalog writes and the stream gate) are only meant for the
+ * Internal routes (catalog writes) are only meant for the
  * ytify edge functions. When INTERNAL_TOKEN is configured the caller must
  * present it; unconfigured deployments stay open so local dev and self-hosting
  * need no extra setup.
@@ -155,9 +144,7 @@ export default {
     if (
       edgeCache &&
       request.method === "GET" &&
-      (path.startsWith("catalog/") ||
-        path === "featured" ||
-        path === "recommend")
+      (path.startsWith("catalog/") || path === "featured")
     ) {
       try {
         const cached = await edgeCache.match(request);
@@ -248,59 +235,6 @@ export default {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "text/plain" },
       });
-    }
-
-    // --- Stream Gate Proxy (Durable Object lease coordinator) ---
-    if (path.startsWith("stream-gate")) {
-      if (!isInternalCaller(request, env)) {
-        return unauthorized(corsHeaders);
-      }
-      const stub = getGateStub(env);
-      if (!stub) {
-        return new Response(
-          JSON.stringify({ error: "STREAM_GATE_DO binding not configured." }),
-          {
-            status: 503,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      // The gate only ever carries small JSON, so the body is buffered instead of
-      // forwarded as a stream: a streamed request body needs `duplex: "half"`,
-      // which runtimes disagree about.
-      const gateBody = request.body ? await request.text() : undefined;
-
-      try {
-        const doResponse = (await stub.fetch(
-          new Request(`http://do/${path.replace(/^stream-gate\/?/, "")}`, {
-            method: request.method,
-            headers: request.headers,
-            body: gateBody,
-          }) as any,
-        )) as any;
-
-        const headers = new Headers(doResponse.headers);
-        for (const [key, value] of Object.entries(corsHeaders)) {
-          headers.set(key, value);
-        }
-        return new Response(doResponse.body, {
-          status: doResponse.status,
-          headers,
-        });
-      } catch (err: any) {
-        console.error("[stream-gate] DO invocation error:", err);
-        return new Response(
-          JSON.stringify({
-            error: "Stream gate DO error",
-            details: err?.message,
-          }),
-          {
-            status: 502,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
     }
 
     // --- Durable Object Sync & Library Routes ---
@@ -455,12 +389,8 @@ export default {
       }
     }
 
-    // --- Featured endpoint (two-row shelf: featured + community playlists + artists) ---
+    // --- Featured endpoint (artist "Featured on" shelf) ---
     if (path === "featured") {
-      const ids = (searchParams.get("ids") || "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
       const artistIds = (searchParams.get("artistIds") || "")
         .split(",")
         .map((s) => s.trim())
@@ -469,31 +399,11 @@ export default {
         parseInt(searchParams.get("limit") || "20", 10) || 20,
         30,
       );
-      const result = await getFeatured(env, ids, artistIds, limit);
+      const result = await getFeatured(env, artistIds, limit);
       return jsonCachedResponse(
         result,
         corsHeaders,
         "public, max-age=3600, s-maxage=3600, stale-while-revalidate=1800",
-        request,
-        ctx,
-      );
-    }
-
-    // --- Recommendation endpoint (moods & genres overlap scoring) ---
-    if (path === "recommend") {
-      const ids = (searchParams.get("ids") || "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      const limit = Math.min(
-        parseInt(searchParams.get("limit") || "10", 10) || 10,
-        20,
-      );
-      const playlists = await recommend(env, ids, limit);
-      return jsonCachedResponse(
-        { playlists },
-        corsHeaders,
-        "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600",
         request,
         ctx,
       );

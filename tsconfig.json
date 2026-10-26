@@ -19,9 +19,10 @@
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "paths": {
-      "@stores": ["./src/lib/stores"],
-      "@utils": ["./src/lib/utils"],
-      "@modules/*": ["./src/lib/modules/*"],
+      "@stores": ["./src/store.ts"],
+      "@config": ["./src/config.ts"],
+      "@utils": ["./src/utils.ts"],
+      "@modules/*": ["./src/modules/*"],
       "@components/*": ["./src/components/*"],
       "@features/*": ["./src/features/*"],
     },

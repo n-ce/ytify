@@ -1,6 +1,6 @@
-import { proxyHandler } from "../utils/helpers";
-import { config } from "../utils/config";
-import { generateArtworkUrl, generateImageUrl } from "../utils/image";
+import { proxyHandler } from "@modules/playback";
+import { config } from "@config";
+import { generateArtworkUrl, generateImageUrl } from "@utils";
 
 const OPFS_DIR = "opus_cache";
 const CACHED_STORAGE_KEY = "library_cached";
@@ -28,6 +28,19 @@ function thumbIdFromFileName(name: string): string {
   return name.replace(/\.thumb$/, "").replace(/\.sq$/, "");
 }
 
+async function removeThumbnailFiles(
+  dir: FileSystemDirectoryHandle,
+  id: string,
+) {
+  for (const name of thumbFileNames(id)) {
+    await dir.removeEntry(name).catch(() => {});
+    if (thumbnailObjectUrls.has(name)) {
+      URL.revokeObjectURL(thumbnailObjectUrls.get(name)!);
+      thumbnailObjectUrls.delete(name);
+    }
+  }
+}
+
 function readCachedIds(): string[] {
   try {
     const parsed = JSON.parse(localStorage.getItem(CACHED_STORAGE_KEY) || "[]");
@@ -44,7 +57,7 @@ function writeCachedIds(ids: string[]) {
 /**
  * Returns the FileSystemDirectoryHandle for the OPFS opus audio cache, or null if unsupported.
  */
-export async function getOpfsAudioDir(): Promise<FileSystemDirectoryHandle | null> {
+async function getOpfsAudioDir(): Promise<FileSystemDirectoryHandle | null> {
   if (
     typeof navigator === "undefined" ||
     !("storage" in navigator) ||
@@ -72,7 +85,7 @@ export function getCachedTrackIdsSync(): string[] {
 /**
  * Moves a track to the head of the recency list, marking it as most recently used.
  */
-export function touchCachedTrack(id: string) {
+function touchCachedTrack(id: string) {
   if (!id) return;
   const ids = readCachedIds();
   const index = ids.indexOf(id);
@@ -164,7 +177,7 @@ export async function getCachedOpusUrl(id: string): Promise<string | null> {
 /**
  * Checks whether a track's audio is already cached in OPFS.
  */
-export async function isTrackCached(id: string): Promise<boolean> {
+async function isTrackCached(id: string): Promise<boolean> {
   if (!id) return false;
   try {
     const dir = await getOpfsAudioDir();
@@ -180,7 +193,7 @@ export async function isTrackCached(id: string): Promise<boolean> {
 /**
  * Checks whether a track's thumbnail image is cached in OPFS for the given variant.
  */
-export async function isThumbnailCached(
+async function isThumbnailCached(
   id: string,
   music?: boolean,
 ): Promise<boolean> {
@@ -230,7 +243,7 @@ export async function getCachedThumbnailUrl(
  * The primary source is the exact wsrv url the player renders, so a cached thumbnail
  * is never a different crop or aspect ratio than the live one.
  */
-export async function cacheTrackThumbnail(
+async function cacheTrackThumbnail(
   id: string,
   music?: boolean,
 ): Promise<boolean> {
@@ -282,32 +295,11 @@ export async function cacheTrackThumbnail(
 }
 
 /**
- * Deletes every cached thumbnail variant for a track and revokes its memory URLs.
- */
-export async function deleteCachedThumbnail(id: string): Promise<boolean> {
-  if (!id) return false;
-  try {
-    const dir = await getOpfsAudioDir();
-    if (!dir) return false;
-    for (const name of thumbFileNames(id)) {
-      await dir.removeEntry(name).catch(() => {});
-      if (thumbnailObjectUrls.has(name)) {
-        URL.revokeObjectURL(thumbnailObjectUrls.get(name)!);
-        thumbnailObjectUrls.delete(name);
-      }
-    }
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Fetches and saves the highest-quality Opus audio stream directly to OPFS.
  * Prioritizes itag 251 (~160 kbps Opus), with fallbacks to other Opus bitrates.
  * Also caches the track thumbnail alongside the audio track.
  */
-export async function cacheHighestQualityOpus(
+async function cacheHighestQualityOpus(
   id: string,
   music?: boolean,
 ): Promise<boolean> {
@@ -455,15 +447,7 @@ export async function enforceCacheLimit(): Promise<string[]> {
     try {
       await dir.removeEntry(`${id}.opus`);
     } catch {}
-    for (const name of thumbFileNames(id)) {
-      try {
-        await dir.removeEntry(name);
-      } catch {}
-      if (thumbnailObjectUrls.has(name)) {
-        URL.revokeObjectURL(thumbnailObjectUrls.get(name)!);
-        thumbnailObjectUrls.delete(name);
-      }
-    }
+    await removeThumbnailFiles(dir, id);
     totalBytes -= sizes.get(id) || 0;
     evicted.push(id);
   }
@@ -487,13 +471,7 @@ export async function deleteCachedOpus(id: string): Promise<boolean> {
     const dir = await getOpfsAudioDir();
     if (!dir) return false;
     await dir.removeEntry(`${id}.opus`).catch(() => {});
-    for (const name of thumbFileNames(id)) {
-      await dir.removeEntry(name).catch(() => {});
-      if (thumbnailObjectUrls.has(name)) {
-        URL.revokeObjectURL(thumbnailObjectUrls.get(name)!);
-        thumbnailObjectUrls.delete(name);
-      }
-    }
+    await removeThumbnailFiles(dir, id);
     writeCachedIds(readCachedIds().filter((item) => item !== id));
     return true;
   } catch {
@@ -515,35 +493,6 @@ export async function clearOpusCache(): Promise<void> {
     writeCachedIds([]);
   } catch (err) {
     console.warn("[OPFS] Failed to clear opus cache:", err);
-  }
-}
-
-/**
- * Returns cache statistics (total files and approximate bytes used).
- */
-export async function getOpusCacheStats(): Promise<{
-  count: number;
-  totalBytes: number;
-}> {
-  try {
-    const dir = await getOpfsAudioDir();
-    if (!dir) return { count: 0, totalBytes: 0 };
-
-    let count = 0;
-    let totalBytes = 0;
-
-    // @ts-ignore - values() iterator exists on modern FileSystemDirectoryHandle
-    for await (const entry of dir.values()) {
-      if (entry.kind === "file") {
-        if (entry.name.endsWith(".opus")) count++;
-        const file = await entry.getFile();
-        totalBytes += file.size;
-      }
-    }
-
-    return { count, totalBytes };
-  } catch {
-    return { count: 0, totalBytes: 0 };
   }
 }
 

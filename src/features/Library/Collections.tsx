@@ -1,15 +1,6 @@
 import { createSignal, For, Show, createMemo } from "solid-js";
-import {
-  CACHED_COLLECTION,
-  DISCOVERY_COLLECTION,
-  fetchCollection,
-  getCollectionsKeys,
-  getTracksMap,
-  librarySections,
-  RESERVED_COLLECTIONS,
-  cachingMode,
-  type LibrarySectionKey,
-} from "@utils";
+import { librarySections, cachingMode, type LibrarySectionKey } from "@config";
+import { CACHED_COLLECTION, DISCOVERY_COLLECTION, fetchCollection, getCollectionsKeys, getTracksMap, RESERVED_COLLECTIONS } from "@modules/library";
 import { t, store } from "@stores";
 import StreamItem from "@components/StreamItem";
 

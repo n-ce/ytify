@@ -31,13 +31,13 @@ if (typeof (globalThis as any).navigator === "undefined") {
 }
 
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
-import { config } from "../src/lib/utils/config";
-import { playerStore } from "../src/lib/stores/player";
+import { config } from "../src/config";
+import { playerStore } from "../src/store";
 import {
   fetchSponsorSegments,
   checkSponsorBlock,
   clearSponsorSegments,
-} from "../src/lib/modules/sponsorBlock";
+} from "../src/modules/sponsorBlock";
 
 describe("sponsorBlock module", () => {
   const originalFetch = globalThis.fetch;

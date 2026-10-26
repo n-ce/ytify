@@ -1,8 +1,12 @@
 import type { DurableObjectState } from "@cloudflare/workers-types";
 import { tracksToCanonical } from "./catalog.js";
-import { readTracks, readTracksSince, upsertTracks } from "./catalogClient.js";
+import {
+  readTracks,
+  readTracksSince,
+  upsertTracks,
+  type Env,
+} from "./catalogClient.js";
 import type { CanonicalTrack } from "./catalog.js";
-import type { Env } from "./env.js";
 
 interface TrackItem {
   id: string;
@@ -22,7 +26,12 @@ interface LibrarySnapshot {
   meta: Meta;
   tracks: Collection;
   [key: string]:
-    Collection | Meta | CollectionData | number | string | undefined;
+    | Collection
+    | Meta
+    | CollectionData
+    | number
+    | string
+    | undefined;
 }
 
 interface DeltaPayload {

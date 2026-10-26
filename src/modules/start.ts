@@ -8,14 +8,14 @@ import {
   playerStore,
   t,
 } from "@stores";
+import { idFromURL } from "@utils";
+import { config, setConfig } from "@config";
 import {
-  config,
-  idFromURL,
   fetchCollection,
-  player,
-  setConfig,
   cleanseLibraryData,
-} from "@utils";
+  seedReservedCollections,
+} from "@modules/library";
+import { player } from "@modules/playback";
 import { getCachedTrackIds } from "@modules/audioCache";
 
 export default async function () {
@@ -102,17 +102,7 @@ export default async function () {
       });
     });
 
-  if (
-    localStorage.getItem("library_favorites") === null &&
-    localStorage.getItem("library_history") === null
-  ) {
-    for (const c of ["history", "favorites", "liked", "listenLater"]) {
-      if (localStorage.getItem("library_" + c) === null) {
-        localStorage.setItem("library_" + c, "[]");
-      }
-    }
-  }
-
+  seedReservedCollections();
   cleanseLibraryData();
 
   // Must follow cleanseLibraryData, which can strip ids from the cached list.

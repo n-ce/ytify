@@ -1,26 +1,47 @@
-import { getTracksMap, saveTracksMap, syncLibrary } from "@utils";
+import { getTracksMap, saveTracksMap, syncLibrary } from "@modules/library";
 import { setStore, store } from "@stores";
 
-/**
- * Checks whether an author string is a placeholder/corrupted "Release - Topic" or "Release".
- */
-export function isCorruptedAuthor(author?: string): boolean {
-  if (!author) return true;
-  const a = author.trim().toLowerCase();
-  return (
-    a === "release - topic" ||
-    a === "release" ||
-    a === "various artists - topic" ||
-    a === "various artists" ||
-    a === "unknown"
-  );
+type FixedMetadata = {
+  author: string;
+  authorId: string;
+  title?: string;
+};
+
+const CORRUPTED_AUTHORS = new Set([
+  "release - topic",
+  "release",
+  "various artists - topic",
+  "various artists",
+  "unknown",
+]);
+
+function isCorruptedTrack(track: TrackItem): boolean {
+  const author = track?.author?.trim().toLowerCase();
+  return !author || CORRUPTED_AUTHORS.has(author);
 }
 
-/**
- * Checks whether a track has a corrupted/placeholder author.
- */
-export function isCorruptedTrack(track: TrackItem): boolean {
-  return isCorruptedAuthor(track?.author);
+async function requestMetadataFix(
+  tracks: Array<{ id: string; title: string }>,
+): Promise<Record<string, FixedMetadata>> {
+  const res = await fetch(`${store.api}/fix-metadata`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tracks }),
+  });
+  if (!res.ok) return {};
+
+  const result = (await res.json()) as {
+    resolved?: Record<string, FixedMetadata>;
+  };
+  return result.resolved || {};
+}
+
+function applyMetadataFix(track: TrackItem, fixed: FixedMetadata) {
+  track.author = fixed.author.endsWith(" - Topic")
+    ? fixed.author
+    : `${fixed.author} - Topic`;
+  if (fixed.authorId) track.authorId = fixed.authorId;
+  track.modified = Date.now();
 }
 
 /**
@@ -68,33 +89,11 @@ export async function runMetadataFixer(): Promise<void> {
     for (let i = 0; i < unresolvedTargets.length; i += BATCH_SIZE) {
       const chunk = unresolvedTargets.slice(i, i + BATCH_SIZE);
       try {
-        const res = await fetch(`${store.api}/fix-metadata`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tracks: chunk }),
-        });
-
-        if (res.ok) {
-          const result = (await res.json()) as {
-            resolved?: Record<
-              string,
-              { author: string; authorId: string; title?: string }
-            >;
-          };
-
-          if (result.resolved) {
-            for (const [id, fixed] of Object.entries(result.resolved)) {
-              if (tracksMap[id] && fixed.author) {
-                tracksMap[id].author = fixed.author.endsWith(" - Topic")
-                  ? fixed.author
-                  : `${fixed.author} - Topic`;
-                if (fixed.authorId) {
-                  tracksMap[id].authorId = fixed.authorId;
-                }
-                tracksMap[id].modified = Date.now();
-                backendFixed++;
-              }
-            }
+        const resolved = await requestMetadataFix(chunk);
+        for (const [id, fixed] of Object.entries(resolved)) {
+          if (tracksMap[id] && fixed.author) {
+            applyMetadataFix(tracksMap[id], fixed);
+            backendFixed++;
           }
         }
       } catch (err) {
@@ -121,28 +120,11 @@ export async function fixSingleTrack(track: TrackItem): Promise<TrackItem> {
   if (!isCorruptedTrack(track)) return track;
 
   try {
-    const res = await fetch(`${store.api}/fix-metadata`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tracks: [{ id: track.id, title: track.title }] }),
-    });
-
-    if (res.ok) {
-      const result = (await res.json()) as {
-        resolved?: Record<
-          string,
-          { author: string; authorId: string; title?: string }
-        >;
-      };
-      const fixed = result.resolved?.[track.id];
-      if (fixed?.author) {
-        track.author = fixed.author.endsWith(" - Topic")
-          ? fixed.author
-          : `${fixed.author} - Topic`;
-        if (fixed.authorId) track.authorId = fixed.authorId;
-        track.modified = Date.now();
-      }
-    }
+    const resolved = await requestMetadataFix([
+      { id: track.id, title: track.title },
+    ]);
+    const fixed = resolved[track.id];
+    if (fixed?.author) applyMetadataFix(track, fixed);
   } catch (err) {
     console.warn("[metadataFixer] Failed to fix single track metadata:", err);
   }

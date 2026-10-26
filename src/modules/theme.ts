@@ -1,57 +1,6 @@
 import { playerStore } from "@stores";
-import { config, applyPanelRatio } from "./config";
-
-// Generates both channel and stream thumbnails
-
-export function generateImageUrl(id: string, res: string, music?: boolean) {
-  if (!id || id.includes("maxresdefault")) return "";
-  const proxy = "https://wsrv.nl?url=https://";
-  let suffix = "";
-  let prefix = "";
-  const cleanId =
-    id.startsWith("/") && /^\/[a-zA-Z0-9_-]{11}$/.test(id) ? id.slice(1) : id;
-  if (cleanId.startsWith("/")) {
-    if (music) {
-      prefix = `yt3.googleusercontent.com${cleanId}=s720`;
-      const s = res === "mq" ? "180" : res || "360";
-      suffix = `&output=webp&w=${s}&h=${s}&fit=cover`;
-    } else {
-      prefix = `yt3.googleusercontent.com${cleanId}=s720-c-k-c0x00ffffff-no-rj`;
-      suffix = `&output=webp&w=${res === "mq" ? "180" : res || "360"}`;
-    }
-  } else {
-    prefix = `i.ytimg.com/vi_webp/${cleanId}/${res}default.webp`;
-    if (music) {
-      const s = res === "mq" ? "180" : "720";
-      suffix = `&w=${s}&h=${s}&fit=cover`;
-    }
-  }
-  return proxy + prefix + suffix;
-}
-
-// Artwork the player renders, and therefore what the OPFS thumbnail cache stores
-// so the cached blob and the live url stay byte-identical.
-export function generateArtworkUrl(id: string, music?: boolean) {
-  return generateImageUrl(id, "maxres", music);
-}
-
-export function getThumbIdFromLink(url: string) {
-  if (!url) return "";
-
-  if (url.startsWith("/vi_webp")) url = url.slice(9, 20);
-
-  // for featured playlists
-  if (url.startsWith("/") || url.length === 11) return url;
-  // simplify url
-  if (url.includes("wsrv.nl")) url = url.replace("https://wsrv.nl?url=", "");
-
-  const l = new URL(url);
-  const p = l.pathname;
-
-  return l.search.includes("ytimg") || l.hostname === "i.ytimg.com"
-    ? p.split("/")[2]
-    : p.split("=")[0];
-}
+import { config, type PanelRatio } from "@config";
+import { generateImageUrl } from "@utils";
 
 const style =
   typeof document !== "undefined"
@@ -121,11 +70,22 @@ export function themer() {
   const { stream } = playerStore;
   const { loadImage } = config;
   if (loadImage && stream?.id)
-    import("../modules/extractColorFromImage")
+    import("./extractColorFromImage")
       .then((mod) => mod.default)
       .then((e) => e(generateImageUrl(stream.id, "mq"), true))
       .then(colorInjector);
   else colorInjector(initColor.split(",").map((s) => parseInt(s)));
+}
+
+export function applyPanelRatio(ratio: PanelRatio | string) {
+  const [left, right] = (ratio || "2:5").split(":");
+  if (typeof document !== "undefined" && document.documentElement) {
+    document.documentElement.style.setProperty("--panelRatioLeft", left || "2");
+    document.documentElement.style.setProperty(
+      "--panelRatioRight",
+      right || "5",
+    );
+  }
 }
 
 applyPanelRatio(config?.panelRatio || "2:5");

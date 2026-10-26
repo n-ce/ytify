@@ -2,25 +2,10 @@ import { onMount, createEffect, For, createSignal, Show } from "solid-js";
 import "./Settings.css";
 import { setNavStore, t, setStore, updateLang, closeSubView } from "@stores";
 import { Selector } from "@components/Selector.tsx";
-import {
-  cacheLimit,
-  cachingMode,
-  CACHE_LIMIT_PRESETS,
-  config,
-  setCacheLimit,
-  setCachingMode,
-  setConfig,
-  setPlayerBackground,
-  playerBackground,
-  themer,
-  quickSwitch,
-  deleteCollection,
-  getCollection,
-  PanelRatio,
-  applyPanelRatio,
-  type CachingMode,
-  type PlayerBackground,
-} from "@utils";
+import { cacheLimit, cachingMode, CACHE_LIMIT_PRESETS, config, setConfig, setPlayerBackground, playerBackground, PanelRatio, type CachingMode, type PlayerBackground } from "@config";
+import { setCacheLimit, setCachingMode, deleteCollection, getCollection } from "@modules/library";
+import { quickSwitch } from "@modules/playback";
+import { themer, applyPanelRatio } from "@modules/theme";
 import Dropdown from "./Dropdown";
 
 export default function () {

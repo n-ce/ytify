@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import { CatalogDO } from "../src/backend/CatalogDO";
-import { StreamGateDO } from "../src/backend/StreamGateDO";
 import { UserSyncDO } from "../src/backend/UserSyncDO";
 import { tracksToCanonical } from "../src/backend/catalog";
 import {
@@ -405,96 +404,13 @@ describe("catalog/recommendations", () => {
     expect(await readJson(catalog, "/playlists")).toHaveLength(2);
   });
 
-  test("recommendPlaylists queries ytmgr external recommendation service", async () => {
-    const { recommendPlaylists } = await import("../src/backend/catalogClient");
-    const recs = await recommendPlaylists(undefined, ["yNa8jP4zoJo", "f9fqe_VvWtU"], 5);
-    expect(Array.isArray(recs)).toBe(true);
-    if (recs.length > 0) {
-      expect(recs[0]).toHaveProperty("id");
-      expect(recs[0]).toHaveProperty("title");
-      expect(recs[0]).toHaveProperty("categoryType");
-      expect(recs[0]).toHaveProperty("score");
-    }
-  });
-
-  test("getFeatured safely accepts empty or populated recommendations without throwing", async () => {
+  test("getFeatured returns an empty shelf for no artists", async () => {
     const getFeatured = (await import("../src/backend/getFeatured")).default;
-    const res = await getFeatured(undefined, ["yNa8jP4zoJo", "f9fqe_VvWtU"], [], 5);
+    const res = await getFeatured(undefined, [], 5);
     expect(res).toHaveProperty("featuredPlaylists");
-    expect(res).toHaveProperty("communityPlaylists");
     expect(res).toHaveProperty("artists");
-    expect(Array.isArray(res.featuredPlaylists)).toBe(true);
-    expect(Array.isArray(res.communityPlaylists)).toBe(true);
-  });
-});
-
-describe("stream gate/lease", () => {
-  const post = (gate: any, path: string, body: unknown) =>
-    postJson(gate, `/${path}`, body);
-
-  test("a lease is single-writer: the second acquire is rejected", async () => {
-    const gate = new StreamGateDO(fakeDurableState() as any);
-
-    expect(
-      await (
-        await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })
-      ).json(),
-    ).toMatchObject({ granted: true });
-
-    const second = await (
-      await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" })
-    ).json();
-    expect(second.granted).toBe(false);
-    expect(second.reason).toBe("leased");
-    expect(second.retryAfterMs).toBeGreaterThan(0);
-  });
-
-  test("an unrelated key is independent, but the ip cooldown still applies", async () => {
-    const gate = new StreamGateDO(fakeDurableState() as any);
-
-    await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" });
-    expect(
-      await (
-        await post(gate, "acquire", { key: "sess-2", ip: "2.2.2.2" })
-      ).json(),
-    ).toMatchObject({ granted: true });
-
-    // A fresh session from the same IP is still held back: one call per IP per
-    // window, so pre-opening sessions cannot multiply quota burn.
-    const sameIp = await (
-      await post(gate, "acquire", { key: "sess-3", ip: "1.1.1.1" })
-    ).json();
-    expect(sameIp.granted).toBe(false);
-    expect(sameIp.reason).toBe("cooldown");
-  });
-
-  test("release frees the lease and stores key telemetry", async () => {
-    const gate = new StreamGateDO(fakeDurableState() as any);
-    const resetAt = Date.now() + 3_600_000;
-
-    await post(gate, "acquire", { key: "sess-1", ip: "1.1.1.1" });
-    await post(gate, "release", {
-      key: "sess-1",
-      ip: "3.3.3.3",
-      keyIndex: 1,
-      remaining: 421,
-      resetAt,
-    });
-
-    const afterRelease = await readJson(gate, "/state");
-    expect(afterRelease.leases[0]).toMatchObject({
-      lease_key: "sess-1",
-      active_session: null,
-      in_flight_until: 0,
-    });
-    expect(afterRelease.keys).toEqual([
-      { idx: 1, remaining: 421, reset_at: resetAt },
-    ]);
-
-    const admitted = await (
-      await post(gate, "acquire", { key: "sess-1", ip: "4.4.4.4" })
-    ).json();
-    expect(admitted.granted).toBe(true);
+    expect(res.featuredPlaylists).toEqual([]);
+    expect(res.artists).toEqual([]);
   });
 });
 

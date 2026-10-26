@@ -1,5 +1,7 @@
 import { createSignal, For, createEffect, Show } from "solid-js";
-import { config, generateImageUrl, proxyHandler, setConfig } from "@utils";
+import { generateImageUrl } from "@utils";
+import { config, setConfig } from "@config";
+import { proxyHandler } from "@modules/playback";
 import { playerStore, playNext, setPlayerStore, t, queueStore } from "@stores";
 
 

@@ -1,4 +1,5 @@
-import { CACHED_COLLECTION, getTracksMap, setConfig, config } from "@utils";
+import { setConfig, config } from "@config";
+import { CACHED_COLLECTION, getTracksMap } from "@modules/library";
 import { clearOpusCache } from "@modules/audioCache";
 import { setStore, t } from "@stores";
 import { createSignal, lazy, Show } from "solid-js";

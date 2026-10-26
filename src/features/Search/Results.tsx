@@ -1,6 +1,6 @@
 import { For, Show, createMemo } from "solid-js";
 import { searchStore } from "@stores";
-import { config } from "@utils";
+import { config } from "@config";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
 

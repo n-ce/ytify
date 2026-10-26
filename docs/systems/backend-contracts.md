@@ -111,26 +111,22 @@ interface YTAlbumItem extends ListItem {
 | `GET /api/album`                           | `YTAlbumItem` with `items`                                                                          |
 | `GET /api/artist`                          | `YTArtistItem` with `items` (songs), `albums`, `eps`                                                |
 | `GET /api/channel`                         | `YTChannelItem` with `items`                                                                        |
-| `GET /api/featured?ids=&artistIds=&limit=` | `{ featuredPlaylists: YTPlaylistItem[], communityPlaylists: YTPlaylistItem[], artists: Channel[] }` |
+| `GET /api/featured?artistIds=&limit=` | `{ featuredPlaylists: YTPlaylistItem[], artists: Channel[] }` |
 | `GET /api/subfeed`                         | `YTItem[]` with `publishedMs`                                                                       |
 | `GET /api/similar`                         | `YTItem[]` (stripped fields)                                                                        |
 
-### 3a. Global Catalog & Gate Endpoints
+### 3a. Global Catalog Endpoints
 
-Backed by Cloudflare Durable Objects (`CatalogDO`, `StreamGateDO`, `UserSyncDO`).
+Backed by Cloudflare Durable Objects (`CatalogDO`, `UserSyncDO`).
 
-| Endpoint                                           | Response                                                  |
-| -------------------------------------------------- | --------------------------------------------------------- |
-| `GET /api/catalog/tracks?ids=a,b`                  | `Record<trackId, CanonicalTrack>`                         |
-| `GET /api/catalog/track?id=`                       | `CanonicalTrack` or 404                                   |
-| `POST /api/catalog/tracks`                         | `{ ok: true }` - batch upsert, token-gated                |
-| `GET /api/catalog/categories?type=`                | `Category[]`                                              |
-| `GET /api/catalog/playlists?category=`             | `CuratedPlaylist[]` (public shape, with `trackIds`)       |
-| `GET /api/featured?ids=a,b&artistIds=c,d&limit=20` | `{ featuredPlaylists, communityPlaylists, artists }`      |
-| `GET /api/recommend?ids=a,b&limit=10`              | `{ playlists: Recommendation[] }` (ytmgr service)         |
-| `POST /api/stream-gate/acquire`                    | `{ granted, keyIndex, ... }` or rejection                 |
-| `POST /api/stream-gate/release`                    | `{ ok: true }` + key telemetry                            |
-| `GET /api/stream-gate/state`                       | Lease, key, and cooldown diagnostics                      |
+| Endpoint                                   | Response                                            |
+| ------------------------------------------ | --------------------------------------------------- |
+| `GET /api/catalog/tracks?ids=a,b`          | `Record<trackId, CanonicalTrack>`                   |
+| `GET /api/catalog/track?id=`               | `CanonicalTrack` or 404                             |
+| `POST /api/catalog/tracks`                 | `{ ok: true }` - batch upsert, token-gated          |
+| `GET /api/catalog/categories?type=`        | `Category[]`                                        |
+| `GET /api/catalog/playlists?category=`     | `CuratedPlaylist[]` (public shape, with `trackIds`) |
+| `GET /api/featured?artistIds=c,d&limit=20` | `{ featuredPlaylists, artists }`                    |
 
 **Canonical Track Schema**:
 
@@ -151,7 +147,7 @@ interface CanonicalTrack {
 }
 ```
 
-Write routes (`POST /api/catalog/tracks`, `/api/stream-gate/*`, `/api/cron/*`) require `x-ytify-token` matching `INTERNAL_TOKEN` when configured. Reads are public.
+Write routes (`POST /api/catalog/tracks`, `/api/cron/*`) require `x-ytify-token` matching `INTERNAL_TOKEN` when configured. Reads are public.
 
 ---
 

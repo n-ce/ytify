@@ -1,4 +1,5 @@
-import { config, hostResolver, generateImageUrl } from "@utils";
+import { hostResolver, generateImageUrl } from "@utils";
+import { config } from "@config";
 import "./ListItem.css";
 import { Show, createSignal } from "solid-js";
 import { getList, setListStore } from "@stores";

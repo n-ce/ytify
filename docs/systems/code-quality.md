@@ -223,7 +223,7 @@ Operationalize code quality standards into actionable review criteria.
 
 ## Architecture Alignment
 
-- [ ] Follows feature-based organization (src/features/, src/lib/modules/)
+- [ ] Follows feature-based organization (src/features/, src/modules/)
 - [ ] Uses SolidJS signals/stores reactively
 - [ ] Lazy loading for new features (solid-js/lazy)
 - [ ] localStorage namespaced correctly (library_, config, drawer)

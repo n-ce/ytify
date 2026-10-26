@@ -272,12 +272,12 @@ observing a real OPFS directory.
 ## Related Files
 
 - `vite.config.ts` - PWA plugin config
-- `src/lib/modules/audioCache.ts` - OPFS audio caching, artwork variants, LRU order, eviction, startup reconciliation + sessionStorage stream metadata cache
-- `src/lib/utils/config.ts` - `CachingMode`, `cachingMode`, `cacheLimit`
-- `src/lib/utils/image.ts` - `generateArtworkUrl`, the player's image source of truth
-- `src/lib/utils/library.ts` - reserved collection registry, mode orchestration
-- `src/lib/modules/start.ts` - invokes reconciliation after `cleanseLibraryData`
-- `src/lib/modules/cloudSync.ts` - device-local `library_cached` guards
+- `src/modules/audioCache.ts` - OPFS audio caching, artwork variants, LRU order, eviction, startup reconciliation + sessionStorage stream metadata cache
+- `src/config.ts` - `CachingMode`, `cachingMode`, `cacheLimit`
+- `src/utils.ts` - `generateArtworkUrl`, the player's image source of truth
+- `src/modules/library.ts` - reserved collection registry, mode orchestration
+- `src/modules/start.ts` - invokes reconciliation after `cleanseLibraryData`
+- `src/modules/cloudSync.ts` - device-local `library_cached` guards
 - `src/features/Library/Collections.tsx` - single Cached row
 - `src/features/Library/Dropdown.tsx` - clean, import and export; clears OPFS on clean
 - `src/features/Library/ConfigureModal.tsx` - Cached section toggle

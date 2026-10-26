@@ -1,5 +1,5 @@
 import { getSearchResults, searchStore, setSearchStore, updateParam, t } from "@stores";
-import { config, setConfig } from "@utils";
+import { config, setConfig } from "@config";
 
 export default function() {
 

@@ -81,3 +81,65 @@ export function reorderItem<T>(
   next.splice(toIndex, 0, moved);
   return next;
 }
+
+export function generateImageUrl(id: string, res: string, music?: boolean) {
+  if (!id || id.includes("maxresdefault")) return "";
+  const proxy = "https://wsrv.nl?url=https://";
+  let suffix = "";
+  let prefix = "";
+  const cleanId =
+    id.startsWith("/") && /^\/[a-zA-Z0-9_-]{11}$/.test(id) ? id.slice(1) : id;
+  if (cleanId.startsWith("/")) {
+    if (music) {
+      prefix = `yt3.googleusercontent.com${cleanId}=s720`;
+      const s = res === "mq" ? "180" : res || "360";
+      suffix = `&output=webp&w=${s}&h=${s}&fit=cover`;
+    } else {
+      prefix = `yt3.googleusercontent.com${cleanId}=s720-c-k-c0x00ffffff-no-rj`;
+      suffix = `&output=webp&w=${res === "mq" ? "180" : res || "360"}`;
+    }
+  } else {
+    prefix = `i.ytimg.com/vi_webp/${cleanId}/${res}default.webp`;
+    if (music) {
+      const s = res === "mq" ? "180" : "720";
+      suffix = `&w=${s}&h=${s}&fit=cover`;
+    }
+  }
+  return proxy + prefix + suffix;
+}
+
+export function generateArtworkUrl(id: string, music?: boolean) {
+  return generateImageUrl(id, "maxres", music);
+}
+
+export type SortBy = "modified" | "name" | "artist" | "duration";
+
+export function sortCollection(
+  list: TrackItem[],
+  sortBy: SortBy,
+  sortOrder: "asc" | "desc",
+): TrackItem[] {
+  const listToSort = [...list];
+
+  if (sortBy === "modified") {
+    return sortOrder === "asc" ? listToSort.reverse() : listToSort;
+  }
+
+  listToSort.sort((a, b) => {
+    let result = 0;
+    switch (sortBy) {
+      case "name":
+        result = a.title.localeCompare(b.title);
+        break;
+      case "artist":
+        result = (a.author || "").localeCompare(b.author || "");
+        break;
+      case "duration":
+        result = parseDuration(a.duration) - parseDuration(b.duration);
+        break;
+    }
+    return sortOrder === "asc" ? result : -result;
+  });
+
+  return listToSort;
+}

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide robust, high-quality audio streaming from YouTube/YouTube Music with minimal buffering, protected by format validation, client IP binding, and single-flight lease gating to prevent rate-limit exhaustion.
+Provide robust, high-quality audio streaming from YouTube/YouTube Music with minimal buffering, protected by format validation, client IP binding, RapidAPI key selection, and a Blobs-backed abuse cooldown.
 
 ---
 
@@ -18,29 +18,31 @@ The system MUST support user-configurable audio quality tiers:
 
 ### REQ-AS-002: Fallback Streaming via Netlify Edge (`stream.ts`)
 
-When primary stream endpoints fail or hit rate limits, streaming falls back to the Netlify Edge Function (`/stream`):
+When primary stream endpoints fail or hit rate limits, streaming falls back to the Netlify Edge Function at `/s/:id`:
 
-- **Signed Session Tokens (HMAC-SHA256)**:
-  Tokens format as `<issuedAt>.<HMAC-SHA256(issuedAt:ip, secret)>` (URL-safe base64). No database round-trip required.
-- **Client IP Binding**:
-  Tokens are cryptographically bound to the issuing client IP (supporting both IPv4 and colon-delimited IPv6 without breaking parsing).
-- **Server-Enforced Warm-Up & TTL**:
-  Enforces a 10-second warm-up window (`SESSION_MIN_AGE_MS`) before a session can be used, and a 30-minute expiration (`SESSION_TTL_MS`), defeating automated scrapers.
-- **Constant-Time Verification**:
-  Token signatures are verified using `crypto.subtle.verify` in constant time to prevent timing attacks.
+- **JSON Requests**:
+  Clients send `Accept: application/json`. The function resolves the video through RapidAPI and returns the Invidious-compatible payload with `adaptiveFormats`.
+- **HTML Requests**:
+  Non-JSON requests receive a redirect/preview HTML page. Preview responses are cached for seven days.
+- **No Session Handshake**:
+  `/s/` session creation and signed session tokens are retired. Clients call `/s/:id` directly.
+- **Hard-Banned Subnets**:
+  Known abusive subnets are rejected before any RapidAPI or storage access.
 
-### REQ-AS-003: Single-Flight Stream Gate (`StreamGateDO`)
+### REQ-AS-003: RapidAPI Quota State & Abuse Cooldown
 
-Cloudflare Durable Object `StreamGateDO` serializes upstream requests and prevents rate-limit burns:
+RapidAPI coordination is handled entirely inside the Netlify Edge Function using Netlify Blobs (`rapidapi/data`):
 
-- **In-Memory Transient Leases**:
-  Leases are held exclusively in the DO isolate memory (`Map<string, Lease>`) with a 10-second TTL. **Zero SQLite writes** are performed for transient leases, keeping DO storage usage safely at zero writes.
-- **Single-Flight Concurrency**:
-  At most one upstream call can be in flight per key at any given moment (`429 Too Many Requests` with `retryAfterMs` returned for concurrent calls on the same key).
+- **Key Selection**:
+  The `keys` array tracks `remaining` quota and `resetsat` per configured key. The key with the most remaining quota is selected; exhausted keys reset after their advertised window.
 - **Client IP Cooldown**:
-  Enforces a 500ms cooldown per client IP to mitigate thundering herd retries.
-- **Telemetry & Key Rotation**:
-  Tracks remaining capacity and auto-rotates across available keys when exhaustion occurs.
+  JSON requests from the same client IP within 20 seconds receive a bodyless `403` cached for 24 hours. Repeated violations increment `totalViolations`.
+- **Violation Decay**:
+  `totalViolations` decays by one every six hours and the IP record is removed when it reaches zero.
+- **Quota Telemetry**:
+  After each upstream response, the function persists `x-ratelimit-requests-remaining` and `x-ratelimit-requests-reset` for the selected key.
+- **Best-Effort Scope**:
+  Blobs state is eventually consistent, so the cooldown and quota counters are not a strict global lock. StreamGateDO and its cross-isolate single-flight lease are retired.
 
 ### REQ-AS-004: In-Memory Stream Caching
 
@@ -53,10 +55,10 @@ Cloudflare Durable Object `StreamGateDO` serializes upstream requests and preven
 
 | Criterion                                               | Status |
 | ------------------------------------------------------- | ------ |
-| User-configurable bitrate tiers (Opus/WebM prioritized) | ✅     |
-| Fallback edge stream function with HMAC-SHA256 tokens   | ✅     |
-| IPv4 and IPv6 client IP token binding                   | ✅     |
-| Server-enforced 10s warm-up window and 30m TTL          | ✅     |
-| StreamGateDO single-flight lease serialization          | ✅     |
-| Zero SQLite writes on DO for audio leases               | ✅     |
-| Client-side in-memory LRU stream caching                | ✅     |
+| User-configurable bitrate tiers (Opus/WebM prioritized) | ?     |
+| Fallback edge stream function at `/s/:id`               | ?     |
+| RapidAPI key selection by remaining quota               | ?     |
+| Blobs-backed IP cooldown and violation decay            | ?     |
+| Hard-banned subnet fast path                            | ?     |
+| Client-side in-memory LRU stream caching                | ?     |
+| Collection link-preview edge function retired           | ?     |

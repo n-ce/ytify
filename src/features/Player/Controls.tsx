@@ -12,7 +12,8 @@ import {
   updateParam,
   t,
 } from "@stores";
-import { convertSStoHHMMSS, VOLUME_PRESETS } from "@utils";
+import { convertSStoHHMMSS } from "@utils";
+import { VOLUME_PRESETS } from "@config";
 import { Accessor, For, onMount, Setter, Show } from "solid-js";
 
 export default function (_: {

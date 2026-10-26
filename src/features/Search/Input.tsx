@@ -8,7 +8,9 @@ import {
   setSearchStore,
   t,
 } from "@stores";
-import { config, drawer, idFromURL, player } from "@utils";
+import { idFromURL } from "@utils";
+import { config, drawer } from "@config";
+import { player } from "@modules/playback";
 
 export default function () {
   let superInput!: HTMLInputElement;

@@ -17,10 +17,6 @@ class_name = "UserSyncDO"
 name = "CATALOG_DO"
 class_name = "CatalogDO"
 
-[[durable_objects.bindings]]
-name = "STREAM_GATE_DO"
-class_name = "StreamGateDO"
-
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["UserSyncDO"]
@@ -28,3 +24,7 @@ new_sqlite_classes = ["UserSyncDO"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["CatalogDO", "StreamGateDO"]
+
+[[migrations]]
+tag = "v3"
+deleted_classes = ["StreamGateDO"]

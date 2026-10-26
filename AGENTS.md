@@ -17,10 +17,10 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 ## 2. Code Reuse & Redundancy Prevention
 
 - BEFORE creating a new helper function or data transformer, check:
-  - src/lib/utils/core.ts (pure math, duration, url, array logic)
-  - src/lib/utils/ (formatting, storage, helpers)
-  - src/lib/modules/ (sync, streaming, caching)
-  - src/lib/stores/ (app, player, queue, search, list state)
+  - src/utils.ts (pure math, duration, url, array, image-url logic)
+  - src/config.ts (config, drawer, persisted signals)
+  - src/modules/ (library, playback, storage, sync, streaming, caching)
+  - src/store.ts (single app store: app, navigation, player, queue, search, list state)
 - Do NOT invent parallel patterns. Reuse existing createStore / createSignal state stores.
 
 ## 3. SolidJS Reactivity Rules
@@ -61,6 +61,7 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
   - `docs/plan-*.md`: Active implementation plans and RFCs located directly in `docs/` prefixed with `plan-` (no separate `plans/` folder).
   - `docs/archive/`: Historical records (issue tracking history, incident postmortems, completed plans, and legacy design specs).
 - System guides:
+  - Technology inventory: `docs/systems/technologies.md`
   - Streaming & failover: `docs/systems/streaming.md`
   - CloudSync & Durable Objects: `docs/systems/cloud-sync.md`
   - Global normalized catalog & scraper: `docs/systems/catalog.md`

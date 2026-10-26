@@ -395,15 +395,11 @@ async function main() {
   // --- getFeatured ---
   results.push(
     await runTest("getFeatured", async () => {
-      const data = await getFeatured(undefined, [], [TEST_IDS.artist]);
+      const data = await getFeatured(undefined, [TEST_IDS.artist]);
       assert(typeof data === "object", "should return object");
       assert(
         Array.isArray(data.featuredPlaylists),
         "should have featuredPlaylists",
-      );
-      assert(
-        Array.isArray(data.communityPlaylists),
-        "should have communityPlaylists",
       );
       assert(Array.isArray(data.artists), "should have artists");
       data.featuredPlaylists
@@ -418,7 +414,6 @@ async function main() {
         );
       return {
         featuredPlaylists: data.featuredPlaylists.length,
-        communityPlaylists: data.communityPlaylists.length,
         artists: data.artists.length,
       };
     }),

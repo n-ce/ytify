@@ -7,7 +7,7 @@ import {
   setQueueStore,
   groupQueueByAuthor,
 } from "@stores";
-import { config, setConfig } from "@utils";
+import { config, setConfig } from "@config";
 
 export default function Dropdown() {
   return (

@@ -1,4 +1,4 @@
-import { parseDuration } from "../lib/utils/core.js";
+import { parseDuration } from "../utils.js";
 
 /** Where a canonical record came from; later writes win over earlier ones. */
 export type CanonicalSource =

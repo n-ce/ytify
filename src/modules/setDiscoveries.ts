@@ -1,20 +1,9 @@
 import { playerStore } from "@stores";
-import { convertSStoHHMMSS, getCollection } from "@utils";
-import { drawer, setDrawer } from "@utils";
+import { convertSStoHHMMSS, shuffle } from "@utils";
+import { getCollection } from "@modules/library";
+import { drawer, setDrawer } from "@config";
 
-type RecommendedVideo = {
-  title: string;
-  author: string;
-  lengthSeconds: number;
-  videoId: string;
-  authorUrl: string;
-  authorId: string;
-};
-
-export default function(
-  id: string,
-  relatedStreams: RecommendedVideo[]
-) {
+export default function(id: string, relatedStreams: RecommendedVideo[]) {
   if (id !== playerStore.stream.id) return;
 
   const discovery = [...(drawer.discovery || [])];
@@ -43,15 +32,9 @@ export default function(
       }
     });
 
-  // Randomize Array
-  for (let i = discovery.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [discovery[i], discovery[j]] = [discovery[j], discovery[i]];
-  }
-
   // remove if exists in history
   const history = getCollection('history');
-  const filteredDiscovery = discovery.filter(e => !history.includes(e.id));
+  const filteredDiscovery = shuffle(discovery).filter(e => !history.includes(e.id));
 
   // randomly remove items from array when limit crossed
   let len = filteredDiscovery.length;

@@ -1,6 +1,6 @@
 
 import { listStore, setListStore, setStore, t } from "@stores";
-import { addToCollection, createCollection } from "@utils";
+import { addToCollection, createCollection } from "@modules/library";
 
 
 export function importList() {

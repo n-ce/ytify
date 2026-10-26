@@ -124,4 +124,6 @@ declare global {
     liveNow: boolean;
     proxy?: string;
   };
+
+  type RecommendedVideo = Invidious["recommendedVideos"][number];
 }

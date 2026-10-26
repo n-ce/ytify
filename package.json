@@ -15,7 +15,7 @@
     "solid-js": "^1.9.17"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261024.1",
+    "@cloudflare/workers-types": "^5.20261026.1",
     "@netlify/blobs": "^11.1.6",
     "@netlify/edge-functions": "^4.0.3",
     "@netlify/functions": "^6.0.3",

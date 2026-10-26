@@ -1,5 +1,5 @@
 import { For, Show, createSignal, onMount } from "solid-js";
-import { getLists } from "@utils";
+import { getLists } from "@modules/library";
 import StreamItem from "@components/StreamItem";
 import ListItem from "@components/ListItem";
 import { t, store } from "@stores";

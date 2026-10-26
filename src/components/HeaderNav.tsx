@@ -7,7 +7,8 @@ import {
   listStore,
   setListStore,
 } from "@stores";
-import { drawer, fetchCollection } from "@utils";
+import { drawer } from "@config";
+import { fetchCollection } from "@modules/library";
 
 interface HeaderNavProps {
   title?: JSX.Element;

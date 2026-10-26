@@ -139,12 +139,12 @@ The Library view exposes modular shelves toggled in `config.librarySections`:
 
 ## Related Files
 
-- `src/lib/utils/library.ts` - Core library logic
+- `src/modules/library.ts` - Core library logic
 - `src/features/Library/` - UI components
 - `src/features/Library/Featured.tsx` - Consolidated featured shelf
 - `src/features/List/index.tsx` - Favorites collection & coupled Artist carousel
-- `src/lib/modules/cloudSync.ts` - Sync integration
-- `src/lib/modules/audioCache.ts` - OPFS-backed `cached` collection
+- `src/modules/cloudSync.ts` - Sync integration
+- `src/modules/audioCache.ts` - OPFS-backed `cached` collection
 
 ## Non-Goals
 

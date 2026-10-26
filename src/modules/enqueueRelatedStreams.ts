@@ -8,14 +8,6 @@
 import { playerStore, addToQueue } from "@stores";
 import { convertSStoHHMMSS } from "@utils";
 
-type RecommendedVideo = {
-  title: string;
-  author: string;
-  lengthSeconds: number;
-  videoId: string;
-  authorId: string;
-};
-
 export default function(data: RecommendedVideo[]) {
 
   const { isMusic, stream } = playerStore;

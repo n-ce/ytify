@@ -10,7 +10,8 @@ import {
   Match,
 } from "solid-js";
 import { render } from "solid-js/web";
-import { themer, syncLibrary } from "@utils";
+import { syncLibrary } from "@modules/library";
+import { themer } from "@modules/theme";
 import {
   updateLang,
   setStore,

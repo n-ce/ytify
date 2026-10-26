@@ -1,14 +1,12 @@
 import { YTNodes, type Innertube } from "youtubei.js";
 import { getClient, getThumbnail, formatThumbnailId } from "./utils.js";
-import { readFeatured, upsertPlaylists } from "./catalogClient.js";
-import type { Env } from "./env.js";
-import type { Recommendation, CuratedPlaylist } from "./catalog.js";
+import { upsertPlaylists, type Env } from "./catalogClient.js";
+import type { CuratedPlaylist } from "./catalog.js";
 
 export type FeaturedArtist = Channel & { type: "artist" };
 
 export interface FeaturedResult {
   featuredPlaylists: YTPlaylistItem[];
-  communityPlaylists: YTPlaylistItem[];
   artists: FeaturedArtist[];
 }
 
@@ -83,27 +81,20 @@ async function fetchArtistData(
 
 export default async function getFeatured(
   env: Env | undefined,
-  trackIds: string[],
   artistIds: string[],
   limit = 20,
 ): Promise<FeaturedResult> {
-  const ytPromise = artistIds.length > 0 ? getClient() : Promise.resolve(null);
-  const catalogPromise =
-    trackIds.length > 0
-      ? readFeatured(env, trackIds, limit)
-      : Promise.resolve([] as Recommendation[]);
-
-  const [yt, catalogRecommendations] = await Promise.all([
-    ytPromise,
-    catalogPromise,
-  ]);
-
-  let artistResults: FetchArtistResult[] = [];
-  if (yt && artistIds.length > 0) {
-    artistResults = await Promise.all(
-      artistIds.map((id) => fetchArtistData(yt, id)),
-    );
+  if (artistIds.length === 0) {
+    return {
+      featuredPlaylists: [],
+      artists: [],
+    };
   }
+
+  const yt = await getClient();
+  const artistResults: FetchArtistResult[] = await Promise.all(
+    artistIds.map((id) => fetchArtistData(yt, id)),
+  );
 
   // 1. Extract artists with real avatars for Favorites shelf
   const artists: FeaturedArtist[] = artistResults
@@ -129,39 +120,7 @@ export default async function getFeatured(
     .sort((a, b) => b.count - a.count)
     .map(({ count, ...playlist }) => playlist);
 
-  // 3. Partition catalog playlists into Featured and Community
-  const catalogFeatured: YTPlaylistItem[] = [];
-  const catalogCommunity: YTPlaylistItem[] = [];
-  const seenPlaylistIds = new Set<string>(artistFeatured.map((p) => p.id));
-
-  for (const rec of catalogRecommendations) {
-    if (seenPlaylistIds.has(rec.id)) continue;
-    seenPlaylistIds.add(rec.id);
-
-    const playlistItem: YTPlaylistItem = {
-      id: rec.id,
-      name: rec.title,
-      img: rec.thumbnailId,
-      author: rec.sectionTitle || "YouTube Music",
-      type: "playlist",
-    };
-
-    const sectionLower = (rec.sectionTitle || "").toLowerCase();
-    if (sectionLower.includes("community")) {
-      catalogCommunity.push(playlistItem);
-    } else {
-      catalogFeatured.push(playlistItem);
-    }
-  }
-
-  // Row 1: Artist Featured on + Catalog Featured playlists
-  const featuredPlaylists = [...artistFeatured, ...catalogFeatured].slice(
-    0,
-    limit,
-  );
-
-  // Row 2: Catalog Community playlists
-  const communityPlaylists = catalogCommunity.slice(0, limit);
+  const featuredPlaylists = artistFeatured.slice(0, limit);
 
   // Write discovered artist "Featured on" playlists through to CatalogDO
   if (env && artistFeatured.length > 0) {
@@ -182,7 +141,6 @@ export default async function getFeatured(
 
   return {
     featuredPlaylists,
-    communityPlaylists,
     artists: artists.slice(0, limit),
   };
 }

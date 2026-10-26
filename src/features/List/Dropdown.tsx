@@ -1,15 +1,6 @@
 import { Show, createEffect, createSignal } from "solid-js";
-import {
-  deleteCollection,
-  getLists,
-  saveLists,
-  getCollectionItems,
-  renameCollection,
-  getLibraryAlbums,
-  saveAlbumToLibrary,
-  removeAlbumFromLibrary,
-  player,
-} from "@utils";
+import { deleteCollection, getLists, saveLists, getCollectionItems, renameCollection, getLibraryAlbums, saveAlbumToLibrary, removeAlbumFromLibrary } from "@modules/library";
+import { player } from "@modules/playback";
 import {
   listStore,
   resetList,

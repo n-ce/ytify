@@ -25,9 +25,10 @@ export default defineConfig(({ command }) => ({
   },
   resolve: {
     alias: {
-      "@stores": path.resolve(import.meta.dirname, "./src/lib/stores"),
-      "@modules": path.resolve(import.meta.dirname, "./src/lib/modules"),
-      "@utils": path.resolve(import.meta.dirname, "./src/lib/utils"),
+      "@stores": path.resolve(import.meta.dirname, "./src/store.ts"),
+      "@config": path.resolve(import.meta.dirname, "./src/config.ts"),
+      "@modules": path.resolve(import.meta.dirname, "./src/modules"),
+      "@utils": path.resolve(import.meta.dirname, "./src/utils.ts"),
       "@components": path.resolve(import.meta.dirname, "./src/components"),
       "@features": path.resolve(import.meta.dirname, "./src/features"),
     },

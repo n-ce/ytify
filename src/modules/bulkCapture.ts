@@ -1,4 +1,5 @@
-import { convertSStoHHMMSS, addToCollection } from "@utils";
+import { convertSStoHHMMSS } from "@utils";
+import { addToCollection } from "@modules/library";
 import { setStore } from "@stores";
 
 export default function(ids: string[]): Promise<void> {

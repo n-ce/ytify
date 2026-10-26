@@ -38,9 +38,8 @@ if (typeof (globalThis as any).navigator === "undefined") {
 }
 
 import { describe, expect, test, beforeEach } from "bun:test";
-import { playerStore, setPlayerStore } from "../src/lib/stores/player";
-import { params, updateParam } from "../src/lib/stores/navigation";
-import { applyMetadata } from "../src/lib/utils/player";
+import { playerStore, setPlayerStore, params, updateParam } from "../src/store";
+import { applyMetadata } from "../src/modules/playback";
 
 describe("player save progress and URL params", () => {
   beforeEach(() => {

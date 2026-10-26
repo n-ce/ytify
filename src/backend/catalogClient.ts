@@ -1,14 +1,26 @@
-import type { DurableObjectStub } from "@cloudflare/workers-types";
-import type { Env } from "./env.js";
+import type {
+  DurableObjectNamespace,
+  DurableObjectStub,
+} from "@cloudflare/workers-types";
 import type {
   CanonicalTrack,
   Category,
   CuratedPlaylist,
-  Recommendation,
 } from "./catalog.js";
-const CATALOG_DO_NAME = "global";
 
-export const YTMGR_API_URL = "https://ytmgr-seven.vercel.app";
+export interface Env {
+  USER_SYNC_DO?: DurableObjectNamespace;
+  CATALOG_DO?: DurableObjectNamespace;
+  /**
+   * Shared secret for internal catalog routes. When unset
+   * the routes stay open so local dev and self-hosting need no extra
+   * configuration; set it in production so only the ytify edge functions may
+   * write to the catalog.
+   */
+  INTERNAL_TOKEN?: string;
+}
+
+const CATALOG_DO_NAME = "global";
 
 /**
  * A Durable Object stub takes the Cloudflare flavour of `Request`, which
@@ -232,48 +244,3 @@ export function upsertPlaylists(
     ? post(stub, "/playlists", { playlists })
     : Promise.resolve(false);
 }
-
-export async function recommendPlaylists(
-  _env: Env | undefined,
-  trackIds: string[],
-  limit = 20,
-): Promise<Recommendation[]> {
-  if (trackIds.length === 0) return [];
-
-  try {
-    const url = `${YTMGR_API_URL}/?ids=${encodeURIComponent(trackIds.join(","))}&limit=${limit}`;
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const data = (await res.json()) as {
-      playlists?: Array<{
-        id: string;
-        name: string;
-        thumbnailId: string;
-        categoryType: Category["type"];
-        categorySlug: string;
-        section: string;
-        score: number;
-        matchedTrackIds?: string[];
-      }>;
-    };
-    if (!Array.isArray(data?.playlists)) return [];
-    return data.playlists.map((p) => ({
-      id: p.id,
-      title: p.name,
-      thumbnailId: p.thumbnailId,
-      categoryType: p.categoryType,
-      categorySlug: p.categorySlug,
-      sectionTitle: p.section,
-      score: p.score,
-      trackCount: p.matchedTrackIds?.length || 0,
-      tracks: [],
-      updatedAt: Date.now(),
-    }));
-  } catch (err) {
-    console.warn("[recommend] ytmgr fetch failed:", err);
-    return [];
-  }
-}
-
-export const recommend = recommendPlaylists;
-export const readFeatured = recommendPlaylists;

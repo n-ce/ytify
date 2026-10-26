@@ -9,7 +9,7 @@ export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
  */
 export type CachingMode = "auto" | "on-demand" | "off";
 
-export const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
+const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
 
 /**
  * Artwork background of the music player.
@@ -20,7 +20,7 @@ export const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
 export type PlayerBackground =
   "none" | "frost" | "frost-motion" | "blur" | "blur-motion";
 
-export const PLAYER_BACKGROUNDS: PlayerBackground[] = [
+const PLAYER_BACKGROUNDS: PlayerBackground[] = [
   "none",
   "frost",
   "frost-motion",
@@ -31,14 +31,14 @@ export const PLAYER_BACKGROUNDS: PlayerBackground[] = [
 /** Selectable audio cache ceilings, in megabytes. */
 export const CACHE_LIMIT_PRESETS = [250, 500, 1000, 2000];
 
-export const DEFAULT_CACHE_LIMIT_MB = 500;
+const DEFAULT_CACHE_LIMIT_MB = 500;
 
 /** Selectable player volume levels, in percent. */
 export const VOLUME_PRESETS = [
   0, 0.2, 0.5, 1, 2, 3, 5, 10, 15, 25, 50, 75, 100,
 ];
 
-export interface LibrarySections {
+interface LibrarySections {
   subfeed: boolean;
   featured: boolean;
   listenLater: boolean;
@@ -51,7 +51,7 @@ export interface LibrarySections {
 
 export type LibrarySectionKey = keyof LibrarySections;
 
-export const defaultLibrarySections: LibrarySections = {
+const defaultLibrarySections: LibrarySections = {
   subfeed: true,
   featured: true,
   listenLater: true,
@@ -144,10 +144,11 @@ export function setConfig<K extends keyof AppConfig>(
   }
 }
 
-export const [librarySections, setLibrarySectionsSignal] =
+const [librarySections, setLibrarySectionsSignal] =
   createSignal<LibrarySections>({
     ...config.librarySections,
   });
+export { librarySections };
 
 export function setLibrarySection(key: LibrarySectionKey, val: boolean) {
   const updated = {
@@ -170,8 +171,9 @@ export const [cacheLimit, setCacheLimitSignal] = createSignal<number>(
 
 /* Player artwork background */
 
-export const [playerBackground, setPlayerBackgroundSignal] =
+const [playerBackground, setPlayerBackgroundSignal] =
   createSignal<PlayerBackground>(config.playerBackground);
+export { playerBackground };
 
 export function setPlayerBackground(background: PlayerBackground) {
   if (!PLAYER_BACKGROUNDS.includes(background)) return;
@@ -229,13 +231,3 @@ export function setDrawer<K extends keyof AppDrawer>(
   }
 }
 
-export function applyPanelRatio(ratio: PanelRatio | string) {
-  const [left, right] = (ratio || "2:5").split(":");
-  if (typeof document !== "undefined" && document.documentElement) {
-    document.documentElement.style.setProperty("--panelRatioLeft", left || "2");
-    document.documentElement.style.setProperty(
-      "--panelRatioRight",
-      right || "5",
-    );
-  }
-}

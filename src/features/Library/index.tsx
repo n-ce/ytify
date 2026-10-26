@@ -2,7 +2,8 @@ import { For, Show, lazy, onMount, createMemo } from "solid-js";
 import "./Library.css";
 import Collections from "./Collections";
 
-import { getLibraryAlbums, getLists, librarySections } from "@utils";
+import { librarySections } from "@config";
+import { getLibraryAlbums, getLists } from "@modules/library";
 import { t, setNavStore, store } from "@stores";
 import ListItem from "@components/ListItem";
 import HeaderActions from "@components/HeaderActions";

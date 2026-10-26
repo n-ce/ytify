@@ -2,7 +2,6 @@ import { Connect } from "vite";
 import worker from "./worker.js";
 import { UserSyncDO } from "./UserSyncDO.ts";
 import { CatalogDO } from "./CatalogDO.ts";
-import { StreamGateDO } from "./StreamGateDO.ts";
 import { DatabaseSync } from "node:sqlite";
 
 /**
@@ -101,13 +100,12 @@ type LocalDurableObject = {
 
 const localDODatabases = new Map<string, LocalDurableObject>();
 
-type DOClassName = "UserSyncDO" | "CatalogDO" | "StreamGateDO";
+type DOClassName = "UserSyncDO" | "CatalogDO";
 
 const DO_CLASSES: Record<DOClassName, new (state: any) => LocalDurableObject> =
   {
     UserSyncDO,
     CatalogDO,
-    StreamGateDO,
   };
 
 function getLocalDO(name: string, className: DOClassName) {
@@ -132,7 +130,6 @@ const namespace = (className: DOClassName) => ({
 const localEnv = {
   USER_SYNC_DO: namespace("UserSyncDO"),
   CATALOG_DO: namespace("CatalogDO"),
-  STREAM_GATE_DO: namespace("StreamGateDO"),
 };
 
 /**

@@ -1,5 +1,5 @@
 import { Show } from "solid-js";
-import { config } from "@utils";
+import { config } from "@config";
 import { store, navStore, t, openSubView } from "@stores";
 import Dropdown from "@features/Library/Dropdown";
 

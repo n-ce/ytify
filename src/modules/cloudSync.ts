@@ -1,11 +1,5 @@
-import {
-  CACHED_COLLECTION,
-  getTracksMap,
-  getMeta,
-  metaUpdater,
-  rehydrateStores,
-  config,
-} from "@utils";
+import { config } from "@config";
+import { CACHED_COLLECTION, getTracksMap, getMeta, metaUpdater, rehydrateStores } from "@modules/library";
 import { getCachedTrackIdsSync } from "@modules/audioCache";
 import { store, setStore, t } from "@stores";
 
@@ -606,8 +600,6 @@ export const markCollectionDeleted = (collectionName: string) => {
   }
   scheduleSync();
 };
-
-export const addDeletedCollection = markCollectionDeleted;
 
 export const clearDeletedCollections = (deletedNames: string[]) => {
   const current = getDirtyCollections();

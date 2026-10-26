@@ -1,12 +1,7 @@
 import { For, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 import { t } from "@stores";
-import {
-  cachingMode,
-  librarySections,
-  setLibrarySection,
-  LibrarySectionKey,
-} from "@utils";
+import { cachingMode, librarySections, setLibrarySection, LibrarySectionKey } from "@config";
 
 interface SectionConfigItem {
   key: LibrarySectionKey;

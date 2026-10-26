@@ -6,7 +6,7 @@ import {
   hostResolver,
   shuffle,
   reorderItem,
-} from "../src/lib/utils/core";
+} from "../src/utils";
 
 describe("core/time", () => {
   test("parseDuration parses HH:MM:SS, MM:SS, SS, and empty correctly", () => {

@@ -1,4 +1,4 @@
-import { convertSStoHHMMSS, shuffle } from '@utils';
+import { convertSStoHHMMSS, shuffle } from "@utils";
 
 interface InvidiousMix {
   title: string;

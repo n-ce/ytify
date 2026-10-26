@@ -1,8 +1,7 @@
 import { YTNodes } from "youtubei.js";
 import { getClient, getVideoId, formatThumbnailId } from "./utils.js";
-import { readTracks, upsertTracks } from "./catalogClient.js";
+import { readTracks, upsertTracks, type Env } from "./catalogClient.js";
 import { isSquareThumbnail, type CanonicalTrack } from "./catalog.js";
-import type { Env } from "./env.js";
 
 export interface FixTarget {
   id: string;
@@ -28,7 +27,7 @@ function cleanSearchTitle(title: string): string {
   if (!title) return "";
   let clean = title
     .replace(
-      /\s*[\(\[](?:official\s+)?(?:music\s+)?(?:audio|video|lyric\s+video|visualizer|hd|hq|extended|clean|explicit|remaster(?:ed)?)[\Content\]\)]/gi,
+      /\s*[\(\[](?:official\s+)?(?:music\s+)?(?:audio|video|lyric\s+video|visualizer|hd|hq|extended|clean|explicit|remaster(?:ed)?)[^\)\]]*[\)\]]/gi,
       "",
     )
     .replace(/\.(mp3|opus|m4a|wav|flac)$/i, "")

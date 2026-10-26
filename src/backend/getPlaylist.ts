@@ -8,8 +8,7 @@ import {
   getLockupMeta,
   formatTopicAuthor,
 } from "./utils.js";
-import { readSongCounterparts } from "./catalogClient.js";
-import type { Env } from "./env.js";
+import { readSongCounterparts, type Env } from "./catalogClient.js";
 
 export default async function (
   id: string,

@@ -27,7 +27,7 @@ This document establishes the architecture, query lifecycle, and invariants for 
 
 ### 1.3 Debouncing and Cancellation Lifecycle
 
-- Search suggestions employ a 400ms debounce timer (`DEBOUNCE_TIME = 400`) in `src/lib/stores/search.ts`.
+- Search suggestions employ a 400ms debounce timer (`DEBOUNCE_TIME = 400`) in `src/store.ts`.
 - Every incoming keystroke aborts previous inflight controllers via `AbortController.abort()`.
 - Upon submitting a search query or pressing Enter/Escape, `clearSuggestions()` cancels pending timers, aborts active requests, and resets the suggestion array to prevent stale dropdown re-population.
 

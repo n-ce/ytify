@@ -1,6 +1,6 @@
 import { lazy } from "solid-js";
 import { queueStore, setQueueStore, groupQueueByAuthor } from "@stores";
-import { config } from "@utils";
+import { config } from "@config";
 import StreamItem from "@components/StreamItem";
 
 const SortableList = lazy(() => import("@modules/sortable"));

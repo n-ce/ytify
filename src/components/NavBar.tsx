@@ -1,5 +1,6 @@
 import { navStore, openSubView, t, getList } from "@stores";
-import { drawer, fetchCollection } from "@utils";
+import { drawer } from "@config";
+import { fetchCollection } from "@modules/library";
 
 export default function NavBar() {
   return (

@@ -1,5 +1,5 @@
 import { lazy, Show } from "solid-js";
-import { config } from "@utils";
+import { config } from "@config";
 import {
   LikeButton,
   MediaDetails,

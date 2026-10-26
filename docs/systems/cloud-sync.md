@@ -203,13 +203,13 @@ guards has not been reproduced against a live Durable Object.
 
 ## Related Files
 
-- `src/lib/modules/cloudSync.ts` - Client sync logic, device-local guards
-- `src/lib/modules/audioCache.ts` - `getCachedTrackIdsSync`, the source of the
+- `src/modules/cloudSync.ts` - Client sync logic, device-local guards
+- `src/modules/audioCache.ts` - `getCachedTrackIdsSync`, the source of the
   exempt set in `applyDelta`
 - `src/backend/UserSyncDO.ts` - Server DO logic and `overlayCanonical`
 - `src/backend/worker.ts` - Worker routing
-- `src/lib/utils/library.ts` - syncLibrary integration
-- `src/lib/stores/app.ts` - config.dbsync
+- `src/modules/library.ts` - syncLibrary integration
+- `src/store.ts` - config.dbsync
 - `docs/systems/offline-opfs.md` - REQ-CCH-006, REQ-CCH-010 (the other half of
   this contract)
 

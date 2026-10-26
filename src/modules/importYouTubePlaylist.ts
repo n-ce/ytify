@@ -1,4 +1,4 @@
-import { getLists, saveLists } from "@utils";
+import { getLists, saveLists } from "@modules/library";
 import { store, setStore, t } from "@stores";
 
 /** Playlist ids are URL-safe tokens: no dots, slashes or spaces. */

@@ -14,12 +14,12 @@ import {
   config,
   CACHE_LIMIT_PRESETS,
   drawer,
-  parseDuration,
   setCachingModeSignal,
   setCacheLimitSignal,
   setConfig,
   type CachingMode,
-} from "@utils";
+} from "@config";
+import { sortCollection } from "@utils";
 import {
   cacheTracks,
   clearOpusCache,
@@ -148,21 +148,33 @@ export const getLists = <T extends "channels" | "playlists">(
 export const getLibraryAlbums = (): LibraryAlbums =>
   JSON.parse(localStorage.getItem("library_albums") || "[]");
 
-export function getCollectionItems(
-  collectionId: string,
-): (TrackItem & { type?: "video" | "song" })[] {
+function toCollectionItems(
+  ids: string[],
+  tracks: Collection,
+  collection: string,
+): YTItem[] {
+  return ids.flatMap((id) => {
+    const track = tracks[id];
+    return track
+      ? [
+          {
+            ...track,
+            type: "video" as const,
+            context: { src: "collection" as const, id: collection },
+          },
+        ]
+      : [];
+  });
+}
+
+export function getCollectionItems(collectionId: string): YTItem[] {
   if (collectionId === CACHED_COLLECTION) {
     if (cachingMode() === "off") return [];
-    const tracks = getTracksMap();
-    const cachedIds = getCachedTrackIdsSync();
-    return cachedIds
-      .filter((id) => tracks[id])
-      .map((id) => ({
-        ...tracks[id],
-        type: "video" as const,
-        context: { src: "collection" as const, id: CACHED_COLLECTION },
-      }))
-      .filter((item) => item.id);
+    return toCollectionItems(
+      getCachedTrackIdsSync(),
+      getTracksMap(),
+      CACHED_COLLECTION,
+    );
   }
 
   if (collectionId === DISCOVERY_COLLECTION) {
@@ -175,15 +187,11 @@ export function getCollectionItems(
     );
   }
 
-  const collectionIds = getCollection(collectionId);
-  const tracksMap = getTracksMap();
-  return collectionIds
-    .map((id: string) => ({
-      ...tracksMap[id],
-      type: "video" as const,
-      context: { src: "collection" as const, id: collectionId },
-    }))
-    .filter((item) => item.id);
+  return toCollectionItems(
+    getCollection(collectionId),
+    getTracksMap(),
+    collectionId,
+  );
 }
 
 /**
@@ -223,6 +231,20 @@ export function saveTracksMap(tracks: Collection) {
 
 export function saveCollection(name: string, collection: string[]) {
   localStorage.setItem("library_" + name, JSON.stringify(collection));
+}
+
+/** Seeds the built-in collections on a fresh install. */
+export function seedReservedCollections() {
+  if (
+    localStorage.getItem("library_favorites") !== null &&
+    localStorage.getItem("library_history") !== null
+  )
+    return;
+
+  for (const name of RESERVED_ORDER) {
+    if (localStorage.getItem(`library_${name}`) === null)
+      saveCollection(name, []);
+  }
 }
 
 export function saveLists<T extends "channels" | "playlists">(
@@ -420,7 +442,7 @@ export function deleteCollection(name: string) {
 
   if (!deviceLocal) {
     if (config.dbsync) {
-      import("@modules/cloudSync").then((m) => m.addDeletedCollection(name));
+      import("@modules/cloudSync").then((m) => m.markCollectionDeleted(name));
     }
     metaUpdater(name, true);
   }
@@ -622,11 +644,7 @@ function getLocalCollection(collection: string) {
     let loadedCount = 20;
     setListStore(
       "list",
-      sortedIds.slice(0, loadedCount).map((id) => ({
-        ...tracks[id],
-        type: "video" as const,
-        context: { src: "collection" as const, id: collection },
-      })),
+      toCollectionItems(sortedIds.slice(0, loadedCount), tracks, collection),
     );
 
     const observerCallback = () => {
@@ -636,25 +654,14 @@ function getLocalCollection(collection: string) {
 
       setListStore("list", (l) => [
         ...l,
-        ...nextBatch.map((id) => ({
-          ...tracks[id],
-          type: "video" as const,
-          context: { src: "collection" as const, id: collection },
-        })),
+        ...toCollectionItems(nextBatch, tracks, collection),
       ]);
       return sortedIds.length - loadedCount;
     };
 
     setTimeout(() => setObserver(observerCallback), 100);
   } else {
-    setListStore(
-      "list",
-      sortedIds.map((id) => ({
-        ...tracks[id],
-        type: "video" as const,
-        context: { src: "collection" as const, id: collection },
-      })),
-    );
+    setListStore("list", toCollectionItems(sortedIds, tracks, collection));
   }
 
   setListStore("id", decodeURI(collection));
@@ -678,38 +685,6 @@ async function getSharedCollection(id: string) {
   } else setStore("snackbar", `Collection does not exist`);
 
   setListStore("isLoading", false);
-}
-
-export type SortBy = "modified" | "name" | "artist" | "duration";
-
-export function sortCollection(
-  list: TrackItem[],
-  sortBy: SortBy,
-  sortOrder: "asc" | "desc",
-): TrackItem[] {
-  const listToSort = [...list];
-
-  if (sortBy === "modified") {
-    return sortOrder === "asc" ? listToSort.reverse() : listToSort;
-  }
-
-  listToSort.sort((a, b) => {
-    let result = 0;
-    switch (sortBy) {
-      case "name":
-        result = a.title.localeCompare(b.title);
-        break;
-      case "artist":
-        result = (a.author || "").localeCompare(b.author || "");
-        break;
-      case "duration":
-        result = parseDuration(a.duration) - parseDuration(b.duration);
-        break;
-    }
-    return sortOrder === "asc" ? result : -result;
-  });
-
-  return listToSort;
 }
 
 export function cleanseLibraryData() {

@@ -1,4 +1,4 @@
-import { setConfig } from "@utils";
+import { setConfig } from "@config";
 import { store, setStore, t } from "@stores";
 import { createSignal, onMount, Show } from "solid-js";
 

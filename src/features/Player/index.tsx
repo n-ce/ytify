@@ -9,12 +9,8 @@ import {
 } from "solid-js";
 import "./Player.css";
 import { MediaDetails } from "@components/MediaPartials";
-import {
-  config,
-  cssVar,
-  playerBackground,
-  type PlayerBackground,
-} from "@utils";
+import { config, playerBackground, type PlayerBackground } from "@config";
+import { cssVar } from "@modules/theme";
 import {
   params,
   playerStore,

@@ -1,4 +1,4 @@
-import { addToCollection, getCollection, removeFromCollection } from "@utils";
+import { addToCollection, getCollection, removeFromCollection } from "@modules/library";
 import "./ActionsMenu.css";
 import { onMount, Show, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";

@@ -1,7 +1,7 @@
 import { For, JSX, onCleanup, onMount } from "solid-js";
 import { reorderItem } from "@utils";
 
-export interface SortableProps<T> {
+interface SortableProps<T> {
   items: T[];
   setItems?: (items: T[]) => void;
   onReorder?: (items: T[]) => void;
@@ -13,7 +13,7 @@ export interface SortableProps<T> {
   children: (item: T, index: () => number) => JSX.Element;
 }
 
-export function SortableList<T>(props: SortableProps<T>) {
+function SortableList<T>(props: SortableProps<T>) {
   let containerRef: HTMLDivElement | undefined;
   const handleSelector = () => props.handle || ".ri-draggable";
 
@@ -369,5 +369,4 @@ export function SortableList<T>(props: SortableProps<T>) {
   );
 }
 
-export const Sortable = SortableList;
 export default SortableList;

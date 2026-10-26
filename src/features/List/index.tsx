@@ -11,18 +11,9 @@ import {
   openSubView,
   store,
 } from "@stores";
-import {
-  librarySections,
-  DISCOVERY_COLLECTION,
-  fetchCollection,
-  removeFromCollection,
-  setConfig,
-  config,
-  generateImageUrl,
-  setDrawer,
-  getCollectionItems,
-  sortCollection,
-} from "@utils";
+import { generateImageUrl, sortCollection } from "@utils";
+import { librarySections, setConfig, config, setDrawer } from "@config";
+import { DISCOVERY_COLLECTION, fetchCollection, removeFromCollection, getCollectionItems } from "@modules/library";
 import Dropdown from "./Dropdown";
 import Results from "./Results";
 import CollectionSelector from "@components/ActionsMenu/CollectionSelector";

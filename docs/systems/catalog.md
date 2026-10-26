@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provide a normalized, deduplicated, single-source-of-truth record of every track ytify has resolved, so metadata repairs, user sync, link previews, and recommendations read from the same store while strictly adhering to Cloudflare Durable Object SQLite write limits (100,000 writes/day).
+Provide a normalized, deduplicated, single-source-of-truth record of every track ytify has resolved, so metadata repairs, user sync, and catalog reads share the same store while strictly adhering to Cloudflare Durable Object SQLite write limits (100,000 writes/day).
 
 ---
 
@@ -48,7 +48,7 @@ The catalog lives in one global Cloudflare Durable Object (`CatalogDO`, DO name 
    - **`thumbnail_id` is omitted**: Video thumbnails follow deterministic YouTube CDN URLs (`https://i.ytimg.com/vi/<id>/mqdefault.jpg`) and need no database storage.
 3. **Relational Indexing**:
    - `categories`: Curated Moods & Genres categories.
-   - `curated_playlists`: Curated playlists referencing `section_title` ("Featured playlists" vs "Community playlists").
+   - `curated_playlists`: Curated playlists referencing `section_title` (for example artist "Featured on" rows).
    - `playlist_tracks`: Relational join index mapping `playlist_id` to `track_id` with ordering preserved.
 
 ### REQ-CAT-002: Catalog Write-Through & Isolate Latching
@@ -59,7 +59,7 @@ Every resolution path writes through to the catalog, protected by in-memory rate
   `catalogClient.ts` maintains an in-memory 60-second lease map of recently written track IDs per worker isolate. Repeated requests for the same track within the TTL window bypass SQLite write calls entirely, preventing duplicate write exhaustion against Cloudflare DO quotas.
 - `fixMetadata`: Writes `fix_metadata` records with resolved square cover art, `albumId`, and `albumTitle`.
 - `UserSyncDO`: Projects delta tracks and full library PUTs as `user_sync` records via `ctx.waitUntil`.
-- The link-preview path writes oEmbed results back on a catalog miss.
+- Edge link previews are self-contained and do not write through to the catalog.
 
 ### REQ-CAT-003: Merge Semantics
 
@@ -78,22 +78,19 @@ A catalog fix MUST reach every user without a manual library reset:
 - Reads call `overlayCanonical` in `UserSyncDO`, hydrating `img`, `albumId`, and `albumTitle` onto the local snapshot while keeping client-specific fields (e.g. `context`).
 - A delta pull queries `/tracks-since` to deliver canonical updates for tracks the user owns.
 
-### REQ-CAT-004: Consolidated `/featured` Route
+### REQ-CAT-004: Artist-Only `/featured` Route
 
-Replaces the legacy `/recommend` and retired `Gallery` endpoints with a single unified orchestrator in `src/backend/getFeatured.ts`:
+The retired `/recommend`, Gallery, and ytmgr recommendation paths are replaced by `src/backend/getFeatured.ts`:
 
 - **Input**:
-  - `ids`: Up to 25 history track IDs.
   - `artistIds`: Up to 5 favorite artist IDs (from tracks with `- Topic`).
   - `limit`: Optional max items per shelf (default 20, max 30).
-- **Parallel Retrieval**:
-  1. `ytmgr`: External recommendation service returning "Featured playlists" and "Community playlists" matched by history track overlap.
-  2. `yt.music.getArtist`: In parallel for each favorite artist ID, extracting artist `Featured on` playlists and resolving real channel avatars from `MusicImmersiveHeader` / `MusicVisualHeader`.
+- **Retrieval**:
+  - `yt.music.getArtist`: In parallel for each favorite artist ID, extracting artist `Featured on` playlists and resolving real channel avatars from `MusicImmersiveHeader` / `MusicVisualHeader`.
 - **Response**:
   ```typescript
   interface FeaturedResult {
     featuredPlaylists: YTPlaylistItem[];
-    communityPlaylists: YTPlaylistItem[];
     artists: Channel[];
   }
   ```
@@ -114,5 +111,5 @@ Replaces the legacy `/recommend` and retired `Gallery` endpoints with a single u
 | Isolate latching prevents redundant SQLite writes          | ✅     |
 | Metadata repair writes albumId and albumTitle through      | ✅     |
 | User sync hydrates canonical metadata (`overlayCanonical`) | ✅     |
-| Consolidated `/featured` endpoint with artist resolution   | ✅     |
+| Artist-only `/featured` endpoint   | ✅     |
 | Local Vite adapter supports async `ctx.waitUntil`          | ✅     |

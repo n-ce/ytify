@@ -1,5 +1,5 @@
 import { playerStore, store } from '@stores';
-import { addToCollection, getCollection, removeFromCollection } from '@utils';
+import { addToCollection, getCollection, removeFromCollection } from "@modules/library";
 import { createEffect, createSignal } from 'solid-js';
 
 export default function() {
