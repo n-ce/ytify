@@ -76,6 +76,7 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 
 Every code change must satisfy:
 
+- Linter checks pass: `bun run lint`
 - Unit tests pass: `bun test scripts/`
 - TypeScript compiles cleanly: `bun run tsc --noEmit`
 - Production build succeeds within budget: `bun run build`

@@ -155,6 +155,7 @@ When deadlines demand pragmatism:
 
 - Code review checklist (see below in this document)
 - TypeScript strict mode
+- Linter checks via `bun run lint`
 - Bundle size via `bun run build`
 - Architectural decision records for major abstractions
 
@@ -176,7 +177,7 @@ Operationalize code quality standards into actionable review criteria.
 ## Pre-Review (Author)
 
 - [ ] Self-reviewed against this checklist
-- [ ] All CI gates pass (typecheck, backend tests, build)
+- [ ] All CI gates pass (lint, typecheck, backend tests, build)
 - [ ] Bundle size impact assessed (<200KB gzipped)
 - [ ] Manual testing: mobile, offline, accessibility
 

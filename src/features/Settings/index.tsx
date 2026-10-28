@@ -2,8 +2,8 @@ import { onMount, createEffect, For, createSignal, Show } from "solid-js";
 import "./Settings.css";
 import { setNavStore, t, setStore, updateLang, closeSubView } from "@stores";
 import { Selector } from "@components/Selector.tsx";
-import { cacheLimit, cachingMode, CACHE_LIMIT_PRESETS, config, setConfig, setPlayerBackground, playerBackground, PanelRatio, type CachingMode, type PlayerBackground } from "@config";
-import { setCacheLimit, setCachingMode, deleteCollection, getCollection } from "@modules/library";
+import { cachingMode, config, setConfig, setPlayerBackground, playerBackground, PanelRatio, type CachingMode, type PlayerBackground } from "@config";
+import { setCachingMode, deleteCollection, getCollection } from "@modules/library";
 import { quickSwitch } from "@modules/playback";
 import { themer, applyPanelRatio } from "@modules/theme";
 import Dropdown from "./Dropdown";
@@ -172,19 +172,6 @@ export default function () {
           </option>
           <option value="off">{t("settings_caching_mode_off")}</option>
         </Selector>
-
-        <Show when={cachingMode() !== "off"}>
-          <Selector
-            label="settings_cache_limit"
-            id="cacheLimitSelector"
-            onchange={(e) => setCacheLimit(Number(e.target.value))}
-            value={cacheLimit().toString()}
-          >
-            <For each={CACHE_LIMIT_PRESETS}>
-              {(preset) => <option value={preset}>{preset} MB</option>}
-            </For>
-          </Selector>
-        </Show>
 
         {/* Search Settings */}
         <Toggle

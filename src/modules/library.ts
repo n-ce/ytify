@@ -12,10 +12,8 @@ import {
 import {
   cachingMode,
   config,
-  CACHE_LIMIT_PRESETS,
   drawer,
   setCachingModeSignal,
-  setCacheLimitSignal,
   setConfig,
   type CachingMode,
 } from "@config";
@@ -352,13 +350,9 @@ export function setCachingMode(mode: CachingMode) {
   if (navStore.active === "library") setNavStore("active", "library");
 }
 
-/** Persists a new audio cache ceiling and evicts down to it. */
-export function setCacheLimit(megabytes: number) {
-  if (!CACHE_LIMIT_PRESETS.includes(megabytes)) return;
-
-  setCacheLimitSignal(megabytes);
-  setConfig("cacheLimit", megabytes);
-  syncAudioCache([]);
+/** Cache limit removed - no-op for backward compatibility */
+export function setCacheLimit(_megabytes: number) {
+  // Cache limiting has been removed
 }
 
 export function addToCollection(name: string, data: TrackItem[]) {

@@ -1,7 +1,6 @@
 import { Connect } from "vite";
 import worker from "./worker.js";
 import { UserSyncDO } from "./UserSyncDO.ts";
-import { CatalogDO } from "./CatalogDO.ts";
 import { DatabaseSync } from "node:sqlite";
 
 /**
@@ -100,12 +99,11 @@ type LocalDurableObject = {
 
 const localDODatabases = new Map<string, LocalDurableObject>();
 
-type DOClassName = "UserSyncDO" | "CatalogDO";
+type DOClassName = "UserSyncDO";
 
 const DO_CLASSES: Record<DOClassName, new (state: any) => LocalDurableObject> =
   {
     UserSyncDO,
-    CatalogDO,
   };
 
 function getLocalDO(name: string, className: DOClassName) {
@@ -113,8 +111,7 @@ function getLocalDO(name: string, className: DOClassName) {
   if (localDODatabases.has(key)) return localDODatabases.get(key)!;
 
   const { state, setOwner } = createFakeState();
-  const fakeState: any = { ...state, env: localEnv };
-  const instance = new DO_CLASSES[className](fakeState);
+  const instance = new DO_CLASSES[className](state as any);
   setOwner(instance);
   localDODatabases.set(key, instance);
   return instance;
@@ -129,7 +126,6 @@ const namespace = (className: DOClassName) => ({
 
 const localEnv = {
   USER_SYNC_DO: namespace("UserSyncDO"),
-  CATALOG_DO: namespace("CatalogDO"),
 };
 
 /**
@@ -138,68 +134,59 @@ const localEnv = {
 export function createLocalAdapter() {
   return async (req: Connect.IncomingMessage, res: any) => {
     const protocol = (req.socket as any).encrypted ? "https" : "http";
-    const host = req.headers.host || "localhost";
-    const url = new URL(req.url || "", `${protocol}://${host}`);
-
-    let body: Buffer | null = null;
-    if (req.method !== "GET" && req.method !== "HEAD") {
-      const chunks: Buffer[] = [];
-      for await (const chunk of req)
-        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
-      body = Buffer.concat(chunks);
-    }
+    const host = req.headers.host || "localhost:3000";
+    const url = `${protocol}://${host}${req.url}`;
 
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {
-      if (value !== undefined) {
-        if (Array.isArray(value)) for (const v of value) headers.append(key, v);
-        else headers.set(key, value);
+      if (value) {
+        if (Array.isArray(value)) {
+          value.forEach((v) => headers.append(key, v));
+        } else {
+          headers.set(key, value);
+        }
       }
     }
 
-    const request = new Request(url.toString(), {
+    let body: Buffer | undefined = undefined;
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+      }
+      body = Buffer.concat(chunks);
+    }
+
+    const request = new Request(url, {
       method: req.method,
       headers,
       body: body as any,
       // @ts-ignore
-      duplex: body ? "half" : undefined,
+      duplex: "half",
     });
 
     try {
-      const ctx = {
-        waitUntil: (p: Promise<any>) => {
-          void Promise.resolve(p).catch((err) =>
-            console.warn("[local-adapter] waitUntil error:", err),
-          );
-        },
-      };
-      // @ts-ignore
-      const response = await worker.fetch(request, localEnv, ctx);
+      const response = await worker.fetch(
+        request,
+        localEnv as any,
+        {
+          waitUntil: () => {},
+          passThroughOnException: () => {},
+        } as any,
+      );
 
       res.statusCode = response.status;
-      response.headers.forEach((value, key) => res.setHeader(key, value));
+      response.headers.forEach((value, key) => {
+        res.setHeader(key, value);
+      });
 
-      if (response.body) {
-        const reader = response.body.getReader();
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          res.write(value);
-        }
-      }
-      res.end();
-    } catch (err) {
-      console.error("Local Worker Error:", err);
-      if (!res.headersSent) {
-        res.statusCode = 500;
-        res.setHeader("Content-Type", "application/json");
-        res.end(
-          JSON.stringify({
-            error: "Internal Server Error",
-            message: (err as Error).message,
-          }),
-        );
-      }
+      const responseBody = await response.arrayBuffer();
+      res.end(Buffer.from(responseBody));
+    } catch (e: any) {
+      console.error("[localAdapter] Worker error:", e);
+      res.statusCode = 500;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify({ error: e.message || "Internal Server Error" }));
     }
   };
 }

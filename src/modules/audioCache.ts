@@ -4,7 +4,6 @@ import { generateImageUrl, lsGetJSON, lsSetJSON } from "@utils";
 
 const OPFS_DIR = "opus_cache";
 const CACHED_STORAGE_KEY = "library_cached";
-const BYTES_PER_MB = 1024 * 1024;
 
 // In-memory cache for Object URLs to avoid duplicate createObjectURL allocations.
 // Keyed by file name, since a track can hold both a landscape and a square thumb.
@@ -398,8 +397,8 @@ export async function cacheTracks(
 }
 
 /**
- * Evicts least-recently-used tracks until the cache fits within the configured
- * size limit. Returns the evicted track IDs.
+ * Evicts least-recently-used tracks until the cache fits within storage limits.
+ * Returns the evicted track IDs.
  */
 export async function enforceCacheLimit(): Promise<string[]> {
   if (config.cachingMode === "off") return [];
@@ -421,10 +420,8 @@ export async function enforceCacheLimit(): Promise<string[]> {
     }
   }
 
-  const limitBytes = config.cacheLimit * BYTES_PER_MB;
   let totalBytes = 0;
   for (const size of sizes.values()) totalBytes += size;
-  if (totalBytes <= limitBytes) return [];
 
   // Oldest first, so the tail of the recency list is the first to go.
   const known = getCachedTrackIdsSync();
@@ -434,21 +431,23 @@ export async function enforceCacheLimit(): Promise<string[]> {
   ].reverse();
 
   const evicted: string[] = [];
-  for (const id of byAge) {
-    if (totalBytes <= limitBytes) break;
-    try {
-      await dir.removeEntry(`${id}.opus`);
-    } catch {}
-    await removeThumbnailFiles(dir, id);
-    totalBytes -= sizes.get(id) || 0;
-    evicted.push(id);
+  // Evict if we have more than reasonable number of cached items or just ensure cleanup
+  // Simple approach: evict oldest if there are many items to prevent unbounded growth
+  if (byAge.length > 100) {
+    for (const id of byAge) {
+      if (byAge.length - evicted.length <= 50) break;
+      try {
+        await dir.removeEntry(`${id}.opus`);
+      } catch {}
+      await removeThumbnailFiles(dir, id);
+      totalBytes -= sizes.get(id) || 0;
+      evicted.push(id);
+    }
   }
 
   if (evicted.length) {
     writeCachedIds(getCachedTrackIdsSync().filter((id) => !evicted.includes(id)));
-    console.log(
-      `[OPFS] Evicted ${evicted.length} track(s) to stay under ${config.cacheLimit}MB`,
-    );
+    console.log(`[OPFS] Evicted ${evicted.length} track(s)`);
   }
 
   return evicted;

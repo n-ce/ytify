@@ -1,7 +1,5 @@
 import { YTNodes, type Innertube } from "youtubei.js";
 import { getClient, getThumbnail, formatThumbnailId } from "./utils.js";
-import { upsertPlaylists, type Env } from "./catalogClient.js";
-import type { CuratedPlaylist } from "./catalog.js";
 
 export type FeaturedArtist = Channel & { type: "artist" };
 
@@ -80,10 +78,22 @@ async function fetchArtistData(
 }
 
 export default async function getFeatured(
-  env: Env | undefined,
-  artistIds: string[],
-  limit = 20,
+  envOrArtistIds: any,
+  artistIdsOrLimit?: any,
+  maybeLimit = 20,
 ): Promise<FeaturedResult> {
+  const artistIds: string[] = Array.isArray(envOrArtistIds)
+    ? envOrArtistIds
+    : Array.isArray(artistIdsOrLimit)
+      ? artistIdsOrLimit
+      : [];
+  const limit: number =
+    typeof artistIdsOrLimit === "number"
+      ? artistIdsOrLimit
+      : typeof maybeLimit === "number"
+        ? maybeLimit
+        : 20;
+
   if (artistIds.length === 0) {
     return {
       featuredPlaylists: [],
@@ -121,23 +131,6 @@ export default async function getFeatured(
     .map(({ count, ...playlist }) => playlist);
 
   const featuredPlaylists = artistFeatured.slice(0, limit);
-
-  // Write discovered artist "Featured on" playlists through to CatalogDO
-  if (env && artistFeatured.length > 0) {
-    const curated: CuratedPlaylist[] = artistFeatured.map((p) => ({
-      id: p.id,
-      categorySlug: "artist-featured",
-      categoryType: "genre",
-      sectionTitle: "Featured on",
-      title: p.name,
-      thumbnailId: p.img,
-      trackIds: [],
-      updatedAt: Date.now(),
-    }));
-    upsertPlaylists(env, curated).catch((err) =>
-      console.warn("[featured] playlist upsert failed:", err),
-    );
-  }
 
   return {
     featuredPlaylists,

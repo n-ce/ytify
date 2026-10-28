@@ -7,6 +7,8 @@
     "icons": "bun scripts/generate-icons.ts",
     "backend": "bun scripts/test-backend.ts",
     "test": "bun test scripts/",
+    "lint": "bun lint",
+    "lint:fix": "bun lint --fix",
     "build": "bun run icons && tsc && vite build",
     "preview": "vite preview",
     "knip": "knip"

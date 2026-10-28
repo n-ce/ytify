@@ -1,12 +1,4 @@
 import type { DurableObjectState } from "@cloudflare/workers-types";
-import { tracksToCanonical } from "./catalog.js";
-import {
-  readTracks,
-  readTracksSince,
-  upsertTracks,
-  type Env,
-} from "./catalogClient.js";
-import type { CanonicalTrack } from "./catalog.js";
 
 interface TrackItem {
   id: string;
@@ -38,8 +30,6 @@ interface DeltaPayload {
 }
 
 const JSON_HEADER = { "Content-Type": "application/json" };
-/** Repairs delivered per delta pull, so one cycle can never flood a client. */
-const MAX_REPAIRED_PER_PULL = 200;
 /** Cloudflare SQLite limit on bind variables is 99. Batches of 50 are safe. */
 const SQL_CHUNK_SIZE = 50;
 
@@ -52,61 +42,52 @@ const parse = <T>(val: string, fallback: T): T => {
 };
 
 /**
- * Canonical values win over the local snapshot; the snapshot's own fields are
- * kept so client-only data (and the fallback for an absent record) survives.
+ * UserSyncDO
+ *
+ * Cloudflare Durable Object managing per-user synchronized library state,
+ * playlists, favorites, and delta syncs.
  */
-function overlayCanonical(
-  snapshot: TrackItem,
-  record: CanonicalTrack,
-): TrackItem {
-  return {
-    ...snapshot,
-    id: record.id,
-    title: record.title,
-    author: record.author,
-    authorId: record.authorId,
-    duration: record.durationStr || snapshot.duration,
-    img:
-      record.isSong && record.thumbnailId ? record.thumbnailId : snapshot.img,
-    albumId: record.albumId || snapshot.albumId,
-    albumTitle: record.albumTitle || snapshot.albumTitle,
-    // The newer of the two keeps a client that already has the fixed value from
-    // treating the row as an update during its LWW merge.
-    modified: Math.max(record.updatedAt, snapshot.modified || 0),
-  };
-}
-
 export class UserSyncDO {
   private ctx: DurableObjectState;
   private sql: DurableObjectState["storage"]["sql"];
-  private env?: Env;
   private initialized = false;
-  private lastRepairCheck = 0;
-  private lastCheckedTracksTs = -1;
 
-  constructor(ctx: DurableObjectState, env?: Env) {
+  constructor(ctx: DurableObjectState) {
     this.ctx = ctx;
     this.sql = ctx.storage.sql;
-    this.env = env || (ctx as { env?: Env }).env;
   }
 
   private initSchema(): void {
     if (this.initialized) return;
     try {
       this.sql.exec(`
-        CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value REAL NOT NULL);
-        CREATE TABLE IF NOT EXISTS tracks (id TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
-        CREATE INDEX IF NOT EXISTS idx_tracks_mod ON tracks(modified);
-        CREATE TABLE IF NOT EXISTS collections (name TEXT PRIMARY KEY, data TEXT NOT NULL, modified REAL NOT NULL);
-        CREATE TABLE IF NOT EXISTS deleted_tracks (id TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
-        CREATE INDEX IF NOT EXISTS idx_del_tracks ON deleted_tracks(deleted_at);
-        CREATE TABLE IF NOT EXISTS deleted_collections (name TEXT PRIMARY KEY, deleted_at REAL NOT NULL);
-        -- Relational view of the same library: the user's ownership of a track,
-        -- independent of whatever metadata snapshot happens to be stored locally.
+        CREATE TABLE IF NOT EXISTS meta (
+          key TEXT PRIMARY KEY,
+          value INTEGER
+        );
+        CREATE TABLE IF NOT EXISTS tracks (
+          id TEXT PRIMARY KEY,
+          data TEXT,
+          modified INTEGER
+        );
+        CREATE TABLE IF NOT EXISTS collections (
+          name TEXT PRIMARY KEY,
+          data TEXT,
+          modified INTEGER
+        );
+        CREATE TABLE IF NOT EXISTS deleted_tracks (
+          id TEXT PRIMARY KEY,
+          deleted_at INTEGER
+        );
+        CREATE TABLE IF NOT EXISTS deleted_collections (
+          name TEXT PRIMARY KEY,
+          deleted_at INTEGER
+        );
         CREATE TABLE IF NOT EXISTS user_tracks (
           track_id TEXT PRIMARY KEY,
-          added_at REAL NOT NULL,
-          play_count INTEGER NOT NULL DEFAULT 0,
+          added_at INTEGER,
+          custom_title TEXT,
+          custom_artist TEXT,
           custom_data TEXT
         );
       `);
@@ -122,7 +103,7 @@ export class UserSyncDO {
   }
 
   /**
-   * Backfills \`user_tracks\` from the pre-relation \`tracks\` rows so libraries that
+   * Backfills `user_tracks` from the pre-relation `tracks` rows so libraries that
    * predate the relational view keep working without a manual reset.
    */
   private migrateRelations(): void {
@@ -148,39 +129,24 @@ export class UserSyncDO {
   private recordRelations(tracks: TrackItem[]): void {
     if (tracks.length === 0) return;
     const now = Date.now();
-    for (const track of tracks) {
-      if (!track?.id) continue;
+    for (const t of tracks) {
       this.sql.exec(
-        `INSERT INTO user_tracks (track_id, added_at, play_count) VALUES (?, ?, 0)
-         ON CONFLICT(track_id) DO NOTHING`,
-        track.id,
-        typeof track.modified === "number" ? track.modified : now,
+        "INSERT OR REPLACE INTO user_tracks (track_id, added_at) VALUES (?, ?)",
+        t.id,
+        t.modified || now,
       );
     }
   }
 
   private dropRelations(ids: string[]): void {
-    for (const id of ids) {
-      this.sql.exec("DELETE FROM user_tracks WHERE track_id = ?", id);
-    }
-  }
-
-  /**
-   * Every track a user syncs is projected into the global catalog, so the
-   * metadata fighters resolve once and every user (plus link previews) benefits.
-   * A catalog failure must never affect the user's own sync result, so the write
-   * is fire-and-forget and \`upsertTracks\` never rejects.
-   */
-  private writeThroughToCatalog(tracks: TrackItem[]): void {
-    if (!this.env?.CATALOG_DO || tracks.length === 0) return;
-    try {
-      const write = upsertTracks(
-        this.env,
-        tracksToCanonical(tracks, "user_sync"),
+    if (ids.length === 0) return;
+    for (let i = 0; i < ids.length; i += SQL_CHUNK_SIZE) {
+      const slice = ids.slice(i, i + SQL_CHUNK_SIZE);
+      const placeholders = slice.map(() => "?").join(",");
+      this.sql.exec(
+        `DELETE FROM user_tracks WHERE track_id IN (${placeholders})`,
+        ...slice,
       );
-      this.ctx.waitUntil?.(write);
-    } catch (err) {
-      console.warn("[userSync] writeThroughToCatalog failed:", err);
     }
   }
 
@@ -203,91 +169,9 @@ export class UserSyncDO {
     return meta;
   }
 
-  /**
-   * Overlays canonical catalog metadata onto locally stored snapshots.
-   *
-   * This is what makes a repair land everywhere: the catalog is authoritative for
-   * \`title\`/\`author\`/\`authorId\`/\`duration\`, so every device sees a fix on its next
-   * pull instead of keeping its own corrupted copy. The local snapshot is spread
-   * first so client-only fields (\`context\`, anything a future client adds) survive
-   * the overlay, and it is still the fallback when the catalog has no record.
-   */
-  private async hydrateTracks(
-    tracks: Record<string, TrackItem>,
-    shouldBackfillCatalog = false,
-  ): Promise<Record<string, TrackItem>> {
-    const ids = Object.keys(tracks);
-    if (ids.length === 0) return tracks;
-
-    const canonical = (await readTracks(this.env, ids)) || {};
-    const missing: TrackItem[] = [];
-
-    for (const id of ids) {
-      const record = canonical[id];
-      if (!record) {
-        missing.push(tracks[id]);
-        continue;
-      }
-      tracks[id] = overlayCanonical(tracks[id], record);
-    }
-
-    // Only backfill to catalog if explicitly requested (e.g. full snapshot reads)
-    // Never on periodic delta pulls to avoid redundant write thrashing.
-    if (shouldBackfillCatalog && missing.length > 0) {
-      this.writeThroughToCatalog(missing);
-    }
-
-    return tracks;
-  }
-
-  /**
-   * Canonical records changed since the client's watermark that this user also
-   * owns. Without this a repair would only ever reach clients whose own rows were
-   * already changing, which is exactly the drift the catalog exists to remove.
-   */
-  private async repairedSince(
-    since: number,
-    limit: number,
-  ): Promise<Record<string, TrackItem>> {
-    const records = await readTracksSince(this.env, since, limit);
-    if (records.length === 0) return {};
-
-    const owned = new Set<string>();
-    for (let i = 0; i < records.length; i += SQL_CHUNK_SIZE) {
-      const slice = records.slice(i, i + SQL_CHUNK_SIZE);
-      const placeholders = slice.map(() => "?").join(",");
-      const ids = this.sql
-        .exec<{ track_id: string }>(
-          `SELECT track_id FROM user_tracks WHERE track_id IN (${placeholders})`,
-          ...slice.map((r) => r.id),
-        )
-        .toArray()
-        .map((r) => r.track_id);
-      for (const id of ids) owned.add(id);
-    }
-
-    const out: Record<string, TrackItem> = {};
-    for (const record of records) {
-      if (!owned.has(record.id)) continue;
-      out[record.id] = overlayCanonical(
-        {
-          id: record.id,
-          title: record.title,
-          duration: record.durationStr,
-          author: record.author,
-          authorId: record.authorId,
-        },
-        record,
-      );
-    }
-    return out;
-  }
-
-  private async getFullSnapshot(): Promise<LibrarySnapshot> {
+  private getFullSnapshot(): LibrarySnapshot {
     const snapshot: LibrarySnapshot = { meta: this.getMeta(), tracks: {} };
 
-    // Membership comes from the relational table; the snapshot rows supply the
-    // fallback metadata for anything the catalog cannot resolve.
     const ids = this.sql
       .exec<{ track_id: string }>("SELECT track_id FROM user_tracks")
       .toArray()
@@ -319,7 +203,6 @@ export class UserSyncDO {
       snapshot[r.name] = parse(r.data, []);
     }
 
-    snapshot.tracks = await this.hydrateTracks(snapshot.tracks, true);
     return snapshot;
   }
 
@@ -344,7 +227,6 @@ export class UserSyncDO {
           trk.modified || now,
         );
       }
-      this.writeThroughToCatalog(Object.values(snapshot.tracks || {}));
       this.recordRelations(Object.values(snapshot.tracks || {}));
       for (const [k, v] of Object.entries(snapshot)) {
         if (
@@ -362,25 +244,27 @@ export class UserSyncDO {
         }
       }
     });
-    this.touch();
   }
 
   private touch(): void {
-    void this.ctx.storage.put("last_active", Date.now());
-    void this.ctx.storage.setAlarm(Date.now() + 30 * 86400000);
+    const now = Date.now();
+    this.sql.exec(
+      "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
+      now,
+    );
   }
 
   async fetch(request: Request): Promise<Response> {
     try {
       this.initSchema();
       const url = new URL(request.url);
-      const m = request.method.toUpperCase();
-      const p = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
+      const p = url.pathname.replace(/^\/+/, "");
+      const m = request.method;
 
       if (p.startsWith("library")) {
         if (m === "GET") {
           const snapshot = this.hasLibrary()
-            ? await this.getFullSnapshot()
+            ? this.getFullSnapshot()
             : { meta: { version: 5, tracks: 0 }, tracks: {} };
           return new Response(JSON.stringify(snapshot), {
             status: 200,
@@ -463,42 +347,6 @@ export class UserSyncDO {
             if (hasChanges) delta.meta.tracks = serverMeta.tracks;
           }
 
-          // Canonical overlay for tracks repaired in the global catalog.
-          // Capped per pull so one repair cycle cannot saturate a mobile client.
-          const now = Date.now();
-          const isClientStale = clientTracksTs < serverMeta.tracks;
-          const intervalPassed = now - this.lastRepairCheck > 60_000;
-          const tracksTsChanged = clientTracksTs !== this.lastCheckedTracksTs;
-
-          if (
-            !isFullTrackSync &&
-            clientTracksTs > 0 &&
-            (isClientStale || intervalPassed || tracksTsChanged)
-          ) {
-            const repaired = await this.repairedSince(
-              clientTracksTs,
-              MAX_REPAIRED_PER_PULL,
-            );
-            for (const [id, track] of Object.entries(repaired)) {
-              if (!delta.addedOrUpdatedTracks[id]) {
-                delta.addedOrUpdatedTracks[id] = track;
-                hasChanges = true;
-              }
-            }
-            this.lastRepairCheck = now;
-            this.lastCheckedTracksTs = clientTracksTs;
-          }
-
-          if (
-            isFullTrackSync &&
-            Object.keys(delta.addedOrUpdatedTracks).length
-          ) {
-            delta.addedOrUpdatedTracks = await this.hydrateTracks(
-              delta.addedOrUpdatedTracks,
-              false,
-            );
-          }
-
           for (const r of this.sql
             .exec<{ name: string; data: string; modified: number }>(
               "SELECT name, data, modified FROM collections",
@@ -577,9 +425,6 @@ export class UserSyncDO {
               this.sql.exec(
                 "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
                 now,
-              );
-              this.writeThroughToCatalog(
-                Object.values(delta.addedOrUpdatedTracks),
               );
               this.recordRelations(Object.values(delta.addedOrUpdatedTracks));
             }
@@ -688,21 +533,5 @@ export class UserSyncDO {
         },
       );
     }
-  }
-
-  async alarm(): Promise<void> {
-    const now = Date.now();
-    const lastActive = (await this.ctx.storage.get<number>("last_active")) || 0;
-    if (lastActive && now - lastActive > 100 * 86400000) {
-      await this.ctx.storage.deleteAll();
-      return;
-    }
-    this.initSchema();
-    const cutoff = now - 30 * 86400000;
-    this.sql.exec("DELETE FROM deleted_tracks WHERE deleted_at < ?", cutoff);
-    this.sql.exec(
-      "DELETE FROM deleted_collections WHERE deleted_at < ?",
-      cutoff,
-    );
   }
 }

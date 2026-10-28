@@ -8,12 +8,10 @@ import {
   getLockupMeta,
   formatTopicAuthor,
 } from "./utils.js";
-import { readSongCounterparts, type Env } from "./catalogClient.js";
 
 export default async function (
   id: string,
   all?: boolean,
-  env?: Env,
 ): Promise<YTPlaylistItem> {
   const yt = await getClient();
   let playlist: any = null;
@@ -161,50 +159,19 @@ export default async function (
     }
   }
 
-  // 3. Counterpart Normalization: Replace OMVs/videos with canonical ATV songs from CatalogDO
-  const videoItems = allItems.filter((i) => i.type === "video");
-  if (videoItems.length > 0 && env?.CATALOG_DO) {
-    try {
-      const videoIds = videoItems.map((i) => i.id);
-      const counterparts = await readSongCounterparts(env, videoIds);
-      for (const item of allItems) {
-        if (item.type === "video" && counterparts[item.id]) {
-          const song = counterparts[item.id];
-          item.id = song.id;
-          item.title = song.title || item.title;
-          item.author = formatTopicAuthor(song.author || item.author);
-          item.authorId = song.authorId || item.authorId;
-          item.duration = song.durationStr || item.duration;
-          item.subtext = song.albumTitle || item.subtext;
-          item.type = "song";
-          if (song.thumbnailId) {
-            item.img = song.thumbnailId;
-          }
-        }
-      }
-    } catch (err) {
-      console.warn("[getPlaylist] counterpart normalization failed:", err);
-    }
-  }
-
-  // 4. Ensure all items of type "song" have an author with the " - Topic" suffix
+  // 3. Ensure all items of type "song" have an author with the " - Topic" suffix
   for (const item of allItems) {
     if (item.type === "song") {
       item.author = formatTopicAuthor(item.author);
     }
   }
 
-  if (!img && allItems.length > 0 && allItems[0].id) {
-    img = allItems[0].img || allItems[0].id;
-  }
-
   return {
-    id: id,
+    id: playlist?.id || id,
     name,
-    author: author || "Unknown",
+    author,
     img,
-    type: "playlist" as const,
+    type: "playlist",
     items: allItems,
-    hasContinuation: playlist?.has_continuation || false,
   };
 }

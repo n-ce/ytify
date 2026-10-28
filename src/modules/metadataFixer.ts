@@ -22,7 +22,12 @@ function isCorruptedTrack(track: TrackItem): boolean {
 }
 
 async function requestMetadataFix(
-  tracks: Array<{ id: string; title: string }>,
+  tracks: Array<{
+    id: string;
+    title: string;
+    author?: string;
+    isTopic?: boolean;
+  }>,
 ): Promise<Record<string, FixedMetadata>> {
   const res = await fetch(`${store.api}/fix-metadata`, {
     method: "POST",
@@ -60,15 +65,26 @@ export async function runMetadataFixer(): Promise<void> {
   let backendFixed = 0;
 
   // Step 1: Build a local cross-reference map of known valid authors by authorId
-  const validByAuthorId = new Map<string, { author: string; authorId: string }>();
+  const validByAuthorId = new Map<
+    string,
+    { author: string; authorId: string }
+  >();
   for (const id of allIds) {
     const t = tracksMap[id];
     if (t?.authorId && !isCorruptedTrack(t) && t.author?.trim()) {
-      validByAuthorId.set(t.authorId, { author: t.author, authorId: t.authorId });
+      validByAuthorId.set(t.authorId, {
+        author: t.author,
+        authorId: t.authorId,
+      });
     }
   }
 
-  const unresolvedTargets: Array<{ id: string; title: string }> = [];
+  const unresolvedTargets: Array<{
+    id: string;
+    title: string;
+    author?: string;
+    isTopic?: boolean;
+  }> = [];
 
   for (const id of corruptedIds) {
     const track = tracksMap[id];
@@ -78,7 +94,12 @@ export async function runMetadataFixer(): Promise<void> {
       track.modified = Date.now();
       localFixed++;
     } else {
-      unresolvedTargets.push({ id: track.id, title: track.title });
+      unresolvedTargets.push({
+        id: track.id,
+        title: track.title,
+        author: track.author,
+        isTopic: true,
+      });
     }
   }
 
@@ -120,7 +141,12 @@ export async function fixSingleTrack(track: TrackItem): Promise<TrackItem> {
 
   try {
     const resolved = await requestMetadataFix([
-      { id: track.id, title: track.title },
+      {
+        id: track.id,
+        title: track.title,
+        author: track.author,
+        isTopic: true,
+      },
     ]);
     const fixed = resolved[track.id];
     if (fixed?.author) applyMetadataFix(track, fixed);

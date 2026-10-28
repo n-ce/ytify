@@ -6,16 +6,9 @@ compatibility_flags = ["nodejs_compat"]
 [observability]
 enabled = true
 
-# [triggers]
-# crons = ["0 0 * * SUN"] # Disabled: rely on external dataset / eliminate 100k SQLite writes
-
 [[durable_objects.bindings]]
 name = "USER_SYNC_DO"
 class_name = "UserSyncDO"
-
-[[durable_objects.bindings]]
-name = "CATALOG_DO"
-class_name = "CatalogDO"
 
 [[migrations]]
 tag = "v1"
@@ -28,3 +21,7 @@ new_sqlite_classes = ["CatalogDO", "StreamGateDO"]
 [[migrations]]
 tag = "v3"
 deleted_classes = ["StreamGateDO"]
+
+[[migrations]]
+tag = "v4"
+deleted_classes = ["CatalogDO"]

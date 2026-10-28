@@ -1,0 +1,3 @@
+[lint]
+# Ignore build artifacts and generated assets
+ignorePatterns = ["dist/**"]

@@ -8,25 +8,17 @@ import getSearchSuggestions from "./getSearchSuggestions.js";
 import getSimilar from "./getSimilar.js";
 import getSubFeed from "./getSubFeed.js";
 import { handleFixMetadata, type FixTarget } from "./fixMetadata.js";
-import {
-  type Env,
-  readCategories,
-  readPlaylists,
-  readTracks,
-  upsertCategories,
-  upsertPlaylists,
-  upsertTracks,
-} from "./catalogClient.js";
-import {
-  type Category,
-  type CuratedPlaylist,
-  type CanonicalTrack,
-} from "./catalog.js";
-import type { ExecutionContext } from "@cloudflare/workers-types";
+import type {
+  DurableObjectNamespace,
+  ExecutionContext,
+} from "@cloudflare/workers-types";
 
 export { UserSyncDO } from "./UserSyncDO.ts";
-export { CatalogDO } from "./CatalogDO.js";
-export type { Env };
+
+export interface Env {
+  USER_SYNC_DO?: DurableObjectNamespace;
+  INTERNAL_TOKEN?: string;
+}
 
 const ALLOWED_ORIGINS = [
   "https://ytify.pp.ua",
@@ -39,8 +31,6 @@ const ALLOWED_ORIGINS = [
   "http://localhost:5173",
 ];
 
-const MAX_CATALOG_IDS = 100;
-
 function getEdgeCache(): Cache | null {
   try {
     return typeof caches !== "undefined" && (caches as any).default
@@ -49,39 +39,6 @@ function getEdgeCache(): Cache | null {
   } catch {
     return null;
   }
-}
-
-/**
- * Internal routes (catalog writes) are only meant for the
- * ytify edge functions. When INTERNAL_TOKEN is configured the caller must
- * present it; unconfigured deployments stay open so local dev and self-hosting
- * need no extra setup.
- */
-function isInternalCaller(request: Request, env: Env): boolean {
-  if (!env.INTERNAL_TOKEN) return true;
-  return request.headers.get("x-ytify-token") === env.INTERNAL_TOKEN;
-}
-
-function unauthorized(corsHeaders: Record<string, string>): Response {
-  return new Response(JSON.stringify({ error: "Unauthorized" }), {
-    status: 401,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-function jsonResponse(
-  data: unknown,
-  corsHeaders: Record<string, string>,
-  cacheControl?: string,
-): Response {
-  return new Response(JSON.stringify(data), {
-    status: 200,
-    headers: {
-      ...corsHeaders,
-      "Content-Type": "application/json",
-      ...(cacheControl ? { "Cache-Control": cacheControl } : {}),
-    },
-  });
 }
 
 function jsonCachedResponse(
@@ -122,28 +79,26 @@ export default {
 
     const corsHeaders: Record<string, string> = {
       "Access-Control-Allow-Origin": allowedOrigin,
-      "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, If-Match",
-      "Access-Control-Max-Age": "86400",
-      Vary: "Origin",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, x-ytify-token",
     };
 
     if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders,
-      });
+      return new Response(null, { headers: corsHeaders });
     }
 
-    const path = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
+    const path = url.pathname.replace(/^\/+/, "");
     const searchParams = url.searchParams;
 
-    // --- Edge Cache Verification for Read-Only Catalog Routes ---
+    // Edge cache lookup for public GET queries
     const edgeCache = getEdgeCache();
     if (
       edgeCache &&
       request.method === "GET" &&
-      (path.startsWith("catalog/") || path === "featured")
+      !path.startsWith("sync") &&
+      !path.startsWith("library") &&
+      path !== "syncHash" &&
+      path !== "hash"
     ) {
       try {
         const cached = await edgeCache.match(request);
@@ -287,125 +242,17 @@ export default {
       }
     }
 
-    // --- Global Normalized Catalog ---
+    // --- Retired Catalog Route Guard ---
     if (path.startsWith("catalog")) {
-      if (!env.CATALOG_DO) {
-        return new Response(
-          JSON.stringify({ error: "CATALOG_DO binding not configured." }),
-          {
-            status: 503,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      if (path.startsWith("catalog/tracks")) {
-        if (request.method === "GET") {
-          // Bounded so a caller cannot build an unbounded IN clause in the DO.
-          const ids = (searchParams.get("ids") || "")
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-            .slice(0, MAX_CATALOG_IDS);
-          const tracks = await readTracks(env, ids);
-          return jsonCachedResponse(
-            tracks,
-            corsHeaders,
-            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
-            request,
-            ctx,
-          );
-        }
-        if (request.method === "POST") {
-          if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
-          const body = (await request.json().catch(() => null)) as {
-            tracks?: CanonicalTrack[];
-          } | null;
-          if (!Array.isArray(body?.tracks)) {
-            return new Response(JSON.stringify({ error: "Missing tracks" }), {
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-          await upsertTracks(
-            env,
-            body.tracks.filter((t) => t && t.id),
-          );
-          return jsonResponse({ ok: true }, corsHeaders);
-        }
-      }
-
-      if (path.startsWith("catalog/categories")) {
-        if (request.method === "GET") {
-          const categories = await readCategories(
-            env,
-            searchParams.get("type"),
-          );
-          return jsonCachedResponse(
-            categories,
-            corsHeaders,
-            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
-            request,
-            ctx,
-          );
-        }
-        if (request.method === "POST") {
-          if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
-          const body = (await request.json().catch(() => null)) as {
-            categories?: Category[];
-          } | null;
-          if (!Array.isArray(body?.categories)) {
-            return new Response(
-              JSON.stringify({ error: "Missing categories" }),
-              {
-                status: 400,
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-              },
-            );
-          }
-          await upsertCategories(
-            env,
-            body.categories.filter((c) => c && c.slug && c.title),
-          );
-          return jsonResponse({ ok: true }, corsHeaders);
-        }
-      }
-
-      if (path.startsWith("catalog/playlists")) {
-        if (request.method === "GET") {
-          const playlists = await readPlaylists(
-            env,
-            searchParams.get("category"),
-          );
-          return jsonCachedResponse(
-            playlists,
-            corsHeaders,
-            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
-            request,
-            ctx,
-          );
-        }
-        if (request.method === "POST") {
-          if (!isInternalCaller(request, env)) return unauthorized(corsHeaders);
-          const body = (await request.json().catch(() => null)) as {
-            playlists?: CuratedPlaylist[];
-          } | null;
-          if (!Array.isArray(body?.playlists)) {
-            return new Response(
-              JSON.stringify({ error: "Missing playlists" }),
-              {
-                status: 400,
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-              },
-            );
-          }
-          await upsertPlaylists(
-            env,
-            body.playlists.filter((p) => p && p.id && p.title),
-          );
-          return jsonResponse({ ok: true }, corsHeaders);
-        }
-      }
+      return new Response(
+        JSON.stringify({
+          error: "Catalog Durable Object is retired for future plans.",
+        }),
+        {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     // --- Featured endpoint (artist "Featured on" shelf) ---
@@ -418,7 +265,7 @@ export default {
         parseInt(searchParams.get("limit") || "20", 10) || 20,
         30,
       );
-      const result = await getFeatured(env, artistIds, limit);
+      const result = await getFeatured(artistIds, limit);
       return jsonCachedResponse(
         result,
         corsHeaders,
@@ -457,16 +304,27 @@ export default {
               tracks?: FixTarget[];
               id?: string;
               title?: string;
+              author?: string;
+              isTopic?: boolean;
             };
             if (Array.isArray(body.tracks)) {
               targets = body.tracks.filter((t) => t && (t.id || t.title));
             } else if (body.id) {
-              targets = [{ id: body.id, title: body.title || "" }];
+              targets = [
+                {
+                  id: body.id,
+                  title: body.title || "",
+                  author: body.author,
+                  isTopic: body.isTopic,
+                },
+              ];
             }
           } else {
             const id = searchParams.get("id");
             const title = searchParams.get("title") || "";
-            if (id) targets = [{ id, title }];
+            const author = searchParams.get("author") || "";
+            const isTopic = searchParams.get("isTopic") === "true";
+            if (id) targets = [{ id, title, author, isTopic }];
           }
 
           if (targets.length === 0) {
@@ -479,14 +337,14 @@ export default {
             );
           }
 
-          data = await handleFixMetadata(targets, env);
+          data = await handleFixMetadata(targets);
           break;
         }
         case "playlist": {
           const id = searchParams.get("id");
           const all = searchParams.get("all") === "true";
           if (!id) throw new Error("Missing id parameter");
-          data = await getPlaylist(id, all, env);
+          data = await getPlaylist(id, all);
           break;
         }
         case "search": {
@@ -531,16 +389,22 @@ export default {
           ...corsHeaders,
           "Content-Type": "application/json",
           "Cache-Control":
-            "public, max-age=86400, s-maxage=86400, stale-while-revalidate=3600",
+            path === "search" || path === "search-suggestions"
+              ? "public, max-age=3600, s-maxage=3600, stale-while-revalidate=1800"
+              : "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
         },
       });
-    } catch (err) {
-      console.error(err);
-      const message = err instanceof Error ? err.message : "Unknown error";
-      return new Response(JSON.stringify({ error: message }), {
-        status: message.startsWith("Missing") ? 400 : 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    } catch (error: any) {
+      console.error(`Error processing path ${path}:`, error);
+      return new Response(
+        JSON.stringify({
+          error: error.message || "Internal Server Error",
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
   },
 };

@@ -430,11 +430,63 @@ main {
         display: none !important;
     }
 
-    /* Safe area inset support for navigation bar in portrait mode */
+    body:has(#listSection) .miniplayer,
+    main:has(#listSection) .miniplayer,
+    body:has(.settingsSection) .miniplayer,
+    main:has(.settingsSection) .miniplayer {
+        bottom: calc(var(--size-2) + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* Centred pill-like navigation bar in portrait mode (floating over content) */
     nav.app-navbar {
-        padding-bottom: calc(var(--size-1) + env(safe-area-inset-bottom, 0px));
-        padding-left: env(safe-area-inset-left, 0px);
-        padding-right: env(safe-area-inset-right, 0px);
+        position: absolute;
+        left: 50%;
+        bottom: calc(var(--size-2) + env(safe-area-inset-bottom, 0px));
+        transform: translateX(-50%);
+        justify-content: center;
+        gap: var(--size-1);
+        width: fit-content;
+        max-width: calc(100vw - var(--gap) * 2);
+        padding: var(--size-1) var(--size-2);
+        border-radius: 9999px;
+        background-color: rgb(from var(--onBg) r g b / 0.65);
+        backdrop-filter: blur(var(--size-px-4));
+        border: var(--border);
+        box-shadow: var(--shadow-2);
+        transition: background-color 0.4s ease;
+    }
+
+    nav.app-navbar i {
+        padding: var(--size-2) var(--size-3);
+        font-size: var(--font-size-3);
+    }
+
+    .right-panel {
+        position: relative;
+    }
+
+    /* Position miniplayer above floating navbar in portrait */
+    .right-panel .miniplayer {
+        position: absolute;
+        left: var(--gap);
+        right: var(--gap);
+        width: calc(100vw - var(--gap) * 2);
+        bottom: calc(var(--size-2) + env(safe-area-inset-bottom, 0px));
+        margin: 0;
+        border-radius: var(--roundness);
+        padding: var(--size-2);
+        background: linear-gradient(
+            rgb(from var(--onBg) r g b / 0.65),
+            var(--trueBg)
+        );
+        backdrop-filter: blur(var(--size-px-4));
+        border: var(--border);
+        box-shadow: var(--shadow-2);
+        box-sizing: border-box;
+    }
+
+    .right-panel:has(nav.app-navbar:not([style*="display: none"])) .miniplayer {
+        bottom: calc(var(--size-2) + env(safe-area-inset-bottom, 0px) + var(--size-9) + var(--size-2));
     }
 
     .left-panel,
