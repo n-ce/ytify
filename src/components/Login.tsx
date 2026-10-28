@@ -39,6 +39,15 @@ export default function Login() {
                 setConfig("dbsync", hash);
                 dialogRef.close();
                 dialogRef.remove();
+              } else if (
+                result.message.toLowerCase().includes("quota") ||
+                result.message.includes("429") ||
+                result.message.includes("503")
+              ) {
+                // Credentials verified via syncHash; preserve login even if backend quota is temporarily busy
+                setConfig("dbsync", hash);
+                dialogRef.close();
+                dialogRef.remove();
               } else {
                 setConfig("dbsync", "");
               }

@@ -11,7 +11,7 @@ import {
   openSubView,
   store,
 } from "@stores";
-import { generateImageUrl, sortCollection } from "@utils";
+import { generateImageUrl, sortCollection, normalizeText, stripTopic, type SortBy } from "@utils";
 import { librarySections, setConfig, config, setDrawer } from "@config";
 import { DISCOVERY_COLLECTION, fetchCollection, removeFromCollection, getCollectionItems } from "@modules/library";
 import Dropdown from "./Dropdown";
@@ -19,9 +19,6 @@ import Results from "./Results";
 import CollectionSelector from "@components/ActionsMenu/CollectionSelector";
 import ListItem from "@components/ListItem";
 import HeaderNav from "@components/HeaderNav";
-
-type SortBy = "modified" | "name" | "artist" | "duration";
-
 
 function ArtistRow(props: { artists: Channel[] }) {
   return (
@@ -89,7 +86,7 @@ export default function () {
           const prev = artistCounts[track.authorId];
           artistCounts[track.authorId] = {
             count: (prev?.count || 0) + 1,
-            name: track.author?.replace(/ - Topic$/, "") || prev?.name || "",
+            name: stripTopic(track.author) || prev?.name || "",
             img: (track as any).img || prev?.img || "",
           };
         }
@@ -164,21 +161,13 @@ export default function () {
 
     const source = getSourceItems();
 
-    const query = rawQuery
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLowerCase();
+    const query = normalizeText(rawQuery);
 
     return source.filter((item) => {
       if (!item) return false;
-      const normalize = (str?: string) =>
-        (str || "")
-          .normalize("NFD")
-          .replace(/\p{Diacritic}/gu, "")
-          .toLowerCase();
       return (
-        normalize(item.title).includes(query) ||
-        normalize(item.author).includes(query)
+        normalizeText(item.title).includes(query) ||
+        normalizeText(item.author).includes(query)
       );
     });
   };

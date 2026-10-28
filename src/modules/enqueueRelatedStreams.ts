@@ -6,7 +6,7 @@
 */
 
 import { playerStore, addToQueue } from "@stores";
-import { convertSStoHHMMSS } from "@utils";
+import { convertSStoHHMMSS, isTopicAuthor } from "@utils";
 
 export default function(data: RecommendedVideo[]) {
 
@@ -19,7 +19,7 @@ export default function(data: RecommendedVideo[]) {
       return (
         item.lengthSeconds > 45 &&
         !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
-        (!isMusic || item.author.endsWith(' - Topic'))
+        (!isMusic || isTopicAuthor(item.author))
       );
     })
     .map(item => ({

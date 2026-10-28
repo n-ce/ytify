@@ -1,10 +1,9 @@
+import { normalizeText } from "@utils";
+
 const SEARCH_RESULT_LIMIT = 50;
 
-const removeDiacritics = (str: string) =>
-  str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
 export default (searchTerm: string, tracksMap: Collection) => {
-  const toFind = removeDiacritics(searchTerm.toLowerCase());
+  const toFind = normalizeText(searchTerm);
   const results: TrackItem[] = [];
   let isTruncated = false;
 
@@ -20,9 +19,9 @@ export default (searchTerm: string, tracksMap: Collection) => {
       break;
     }
     if (!('title' in v && typeof v.title === 'string')) continue;
-    const title = removeDiacritics(v.title.toLowerCase()).includes(toFind);
+    const title = normalizeText(v.title).includes(toFind);
     if (!('author' in v && typeof v.author === 'string')) continue;
-    const author = removeDiacritics(v.author.toLowerCase()).includes(toFind);
+    const author = normalizeText(v.author).includes(toFind);
 
     if (title || author) {
       results.push(v);

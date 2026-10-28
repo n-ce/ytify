@@ -1,5 +1,5 @@
 import { YTNodes } from "youtubei.js";
-import { getClient, getVideoId, formatThumbnailId } from "./utils.js";
+import { getClient, getVideoId, formatThumbnailId, formatTopicAuthor } from "./utils.js";
 import { readTracks, upsertTracks, type Env } from "./catalogClient.js";
 import { isSquareThumbnail, type CanonicalTrack } from "./catalog.js";
 
@@ -112,9 +112,7 @@ export async function resolveTrackMetadataViaSearch(
       (matchedSong as any).authors?.[0]?.channel_id ||
       "";
     const cleanTitle = matchedSong.title?.toString() || target.title;
-    const author = rawArtist.endsWith(" - Topic")
-      ? rawArtist
-      : `${rawArtist} - Topic`;
+    const author = formatTopicAuthor(rawArtist);
 
     const playlistId =
       matchedSong.menu?.items

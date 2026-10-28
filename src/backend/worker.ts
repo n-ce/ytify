@@ -21,7 +21,6 @@ import {
   type Category,
   type CuratedPlaylist,
   type CanonicalTrack,
-  tracksToCanonical,
 } from "./catalog.js";
 import type { ExecutionContext } from "@cloudflare/workers-types";
 
@@ -256,16 +255,36 @@ export default {
       const doId = env.USER_SYNC_DO.idFromName(userHash);
       const stub = env.USER_SYNC_DO.get(doId);
 
-      const doResponse = (await stub.fetch(request as any)) as any;
-      const responseHeaders = new Headers(doResponse.headers);
-      for (const [key, value] of Object.entries(corsHeaders)) {
-        responseHeaders.set(key, value);
-      }
+      try {
+        const doResponse = (await stub.fetch(request as any)) as any;
+        const responseHeaders = new Headers(doResponse.headers);
+        for (const [key, value] of Object.entries(corsHeaders)) {
+          responseHeaders.set(key, value);
+        }
 
-      return new Response(doResponse.body, {
-        status: doResponse.status,
-        headers: responseHeaders,
-      });
+        return new Response(doResponse.body, {
+          status: doResponse.status,
+          headers: responseHeaders,
+        });
+      } catch (err: any) {
+        console.error("[userSync] DO fetch failed:", err);
+        const errMsg = err?.message || "Sync service error";
+        const isQuota =
+          errMsg.toLowerCase().includes("quota") ||
+          errMsg.toLowerCase().includes("limit");
+        return new Response(
+          JSON.stringify({
+            error: isQuota
+              ? "Sync storage quota reached"
+              : "Sync service temporarily unavailable",
+            details: errMsg,
+          }),
+          {
+            status: isQuota ? 429 : 503,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
     }
 
     // --- Global Normalized Catalog ---
@@ -417,33 +436,12 @@ export default {
           const id = searchParams.get("id");
           if (!id) throw new Error("Missing id parameter");
           data = await getAlbum(id);
-          if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
-            const albumTitle = (data as any).name || (data as any).title;
-            const albumTracks = (data as any).items.map((item: any) => ({
-              ...item,
-              albumId: id,
-              albumTitle: albumTitle || item.albumTitle,
-            }));
-            const canonical = tracksToCanonical(albumTracks, "artist_featured");
-            if (ctx?.waitUntil && canonical.length > 0) {
-              ctx.waitUntil(upsertTracks(env, canonical));
-            }
-          }
           break;
         }
         case "artist": {
           const id = searchParams.get("id");
           if (!id) throw new Error("Missing id parameter");
           data = await getArtist(id);
-          if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
-            const canonical = tracksToCanonical(
-              (data as any).items,
-              "artist_featured",
-            );
-            if (ctx?.waitUntil && canonical.length > 0) {
-              ctx.waitUntil(upsertTracks(env, canonical));
-            }
-          }
           break;
         }
         case "channel": {
@@ -489,15 +487,6 @@ export default {
           const all = searchParams.get("all") === "true";
           if (!id) throw new Error("Missing id parameter");
           data = await getPlaylist(id, all, env);
-          if (env.CATALOG_DO && Array.isArray((data as any)?.items)) {
-            const canonical = tracksToCanonical(
-              (data as any).items,
-              "artist_featured",
-            );
-            if (ctx?.waitUntil && canonical.length > 0) {
-              ctx.waitUntil(upsertTracks(env, canonical));
-            }
-          }
           break;
         }
         case "search": {
@@ -505,12 +494,6 @@ export default {
           const f = searchParams.get("f");
           if (!q) throw new Error("Missing q parameter");
           data = await getSearch({ q, f: f || undefined });
-          if (env.CATALOG_DO && Array.isArray(data)) {
-            const canonical = tracksToCanonical(data as any, "search");
-            if (ctx?.waitUntil && canonical.length > 0) {
-              ctx.waitUntil(upsertTracks(env, canonical));
-            }
-          }
           break;
         }
         case "search-suggestions": {

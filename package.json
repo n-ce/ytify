@@ -15,14 +15,14 @@
     "solid-js": "^1.9.17"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261026.1",
-    "@netlify/blobs": "^11.1.6",
+    "@cloudflare/workers-types": "^5.20261028.1",
+    "@netlify/blobs": "^11.1.7",
     "@netlify/edge-functions": "^4.0.3",
     "@netlify/functions": "^6.0.3",
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.5",
     "@types/subset-font": "^2.3.0",
-    "autoprefixer": "^10.6.1",
+    "autoprefixer": "^10.6.2",
     "knip": "^6.43.0",
     "open-props": "1.7.23",
     "postcss-jit-props": "1.0.16",

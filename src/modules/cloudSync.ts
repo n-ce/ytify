@@ -1,7 +1,22 @@
 import { config } from "@config";
-import { CACHED_COLLECTION, getTracksMap, getMeta, metaUpdater, rehydrateStores } from "@modules/library";
+import {
+  CACHED_COLLECTION,
+  getTracksMap,
+  getMeta,
+  metaUpdater,
+  rehydrateStores,
+} from "@modules/library";
 import { getCachedTrackIdsSync } from "@modules/audioCache";
 import { store, setStore, t } from "@stores";
+import {
+  lsGet,
+  lsGetJSON,
+  lsKeys,
+  lsRemove,
+  lsSet,
+  lsSetJSON,
+  unique,
+} from "@utils";
 
 /**
  * The cached collection indexes audio held in this device's OPFS, so it must
@@ -59,37 +74,8 @@ function mergeTrackIds(
   server: string[],
   prepend: boolean,
 ): string[] {
-  const seen = new Set<string>();
-  const result: string[] = [];
-
-  if (prepend) {
-    for (const id of local) {
-      if (id && !seen.has(id)) {
-        seen.add(id);
-        result.push(id);
-      }
-    }
-    for (const id of server) {
-      if (id && !seen.has(id)) {
-        seen.add(id);
-        result.push(id);
-      }
-    }
-  } else {
-    for (const id of server) {
-      if (id && !seen.has(id)) {
-        seen.add(id);
-        result.push(id);
-      }
-    }
-    for (const id of local) {
-      if (id && !seen.has(id)) {
-        seen.add(id);
-        result.push(id);
-      }
-    }
-  }
-  return result;
+  const ordered = prepend ? [...local, ...server] : [...server, ...local];
+  return unique(ordered.filter(Boolean));
 }
 
 // --- Full Sync ---
@@ -101,10 +87,9 @@ export async function pullFullLibrary(userId: string): Promise<void> {
   }
   const snapshot = (await response.json()) as LibrarySnapshot;
 
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("library_") && !isDeviceLocalKey(key))
-      localStorage.removeItem(key);
-  });
+  for (const key of lsKeys("library_")) {
+    if (!isDeviceLocalKey(key)) lsRemove(key);
+  }
 
   for (const key in snapshot) {
     if (key === "deletedCollections" || key === "deletedTracks") continue;
@@ -112,7 +97,7 @@ export async function pullFullLibrary(userId: string): Promise<void> {
     const value = snapshot[key];
     if (value !== undefined) {
       const storageKey = key.startsWith("library_") ? key : `library_${key}`;
-      localStorage.setItem(storageKey, JSON.stringify(value));
+      lsSetJSON(storageKey, value);
     }
   }
 }
@@ -121,20 +106,19 @@ export async function pushFullLibrary(userId: string): Promise<void> {
   const snapshot: Partial<LibrarySnapshot> = {};
   const now = Date.now();
 
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("library_") && !isDeviceLocalKey(key)) {
-      try {
-        const val = localStorage.getItem(key);
-        if (val) {
-          const parsed = JSON.parse(val);
-          const snapKey = key.slice(8);
-          (snapshot as Record<string, unknown>)[snapKey] = parsed;
-        }
-      } catch (e) {
-        console.warn(`Failed to parse ${key} during sync push`, e);
+  for (const key of lsKeys("library_")) {
+    if (isDeviceLocalKey(key)) continue;
+    try {
+      const val = lsGet(key);
+      if (val) {
+        const parsed = JSON.parse(val);
+        const snapKey = key.slice(8);
+        (snapshot as Record<string, unknown>)[snapKey] = parsed;
       }
+    } catch (e) {
+      console.warn(`Failed to parse ${key} during sync push`, e);
     }
-  });
+  }
 
   if (!snapshot.meta) {
     snapshot.meta = getMeta();
@@ -148,7 +132,7 @@ export async function pushFullLibrary(userId: string): Promise<void> {
         snapshot.tracks[id].modified = now;
       }
     }
-    localStorage.setItem("library_tracks", JSON.stringify(snapshot.tracks));
+    lsSetJSON("library_tracks", snapshot.tracks);
   }
   for (const key in snapshot) {
     if (
@@ -157,7 +141,7 @@ export async function pushFullLibrary(userId: string): Promise<void> {
       snapshot.meta[key] = Math.max(snapshot.meta[key] || 0, now);
     }
   }
-  localStorage.setItem("library_meta", JSON.stringify(snapshot.meta));
+  lsSetJSON("library_meta", snapshot.meta);
 
   const response = await fetch(`${store.api}/library/${userId}`, {
     method: "PUT",
@@ -190,7 +174,7 @@ export async function runSync(
   if (retryCount === 0) setStore("syncState", "syncing");
 
   try {
-    const isInitialSync = localStorage.getItem("dbsync_account") !== userId;
+    const isInitialSync = lsGet("dbsync_account") !== userId;
     const initialLocalMeta = isInitialSync
       ? { version: 5, tracks: 0 }
       : getMeta();
@@ -202,7 +186,7 @@ export async function runSync(
     });
 
     if (
-      [502, 503, 504].includes(pullResponse.status) &&
+      [429, 502, 503, 504].includes(pullResponse.status) &&
       retryCount < MAX_RETRIES
     ) {
       await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
@@ -211,9 +195,9 @@ export async function runSync(
 
     if (pullResponse.status === 404) {
       await pushFullLibrary(userId);
-      localStorage.setItem("dbsync_account", userId);
-      localStorage.removeItem("dbsync_dirty_tracks");
-      localStorage.removeItem("dbsync_dirty_collections");
+      lsSet("dbsync_account", userId);
+      lsRemove("dbsync_dirty_tracks");
+      lsRemove("dbsync_dirty_collections");
       setStore("syncState", "synced");
       lastSyncTime = Date.now();
       return { success: true, message: t("sync_initial_complete") };
@@ -243,7 +227,7 @@ export async function runSync(
       rehydrateStores();
     }
 
-    localStorage.setItem("dbsync_account", userId);
+    lsSet("dbsync_account", userId);
 
     // Re-read current state after applyDelta
     const currentDirtyTracks = getDirtyTracks();
@@ -278,11 +262,9 @@ export async function runSync(
       if (key === "version" || key === "tracks") continue;
       if (isDeviceLocalKey(`library_${key}`)) continue;
       if ((postSyncMeta[key] || 0) > (remoteMeta[key] || 0)) {
-        const rawData = localStorage.getItem(`library_${key}`);
-        if (rawData) {
-          deltaPayload.updatedCollections[key] = JSON.parse(
-            rawData,
-          ) as CollectionData;
+        const data = lsGetJSON<CollectionData | null>(`library_${key}`, null);
+        if (data !== null) {
+          deltaPayload.updatedCollections[key] = data;
           deltaPayload.meta[key] = postSyncMeta[key];
         }
       }
@@ -311,7 +293,7 @@ export async function runSync(
     });
 
     if (
-      [502, 503, 504].includes(putResponse.status) &&
+      [429, 502, 503, 504].includes(putResponse.status) &&
       retryCount < MAX_RETRIES
     ) {
       await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retryCount)));
@@ -330,6 +312,7 @@ export async function runSync(
     return { success: true, message: t("sync_changes_synced") };
   } catch (error) {
     console.error("Sync failure:", error);
+    lastSyncTime = Date.now();
     const message = error instanceof Error ? error.message : String(error);
     setStore("syncState", "error");
     return { success: false, message: `${t("sync_failed")} ${message}` };
@@ -339,7 +322,7 @@ export async function runSync(
       syncQueued = false;
       setTimeout(() => {
         if (config.dbsync) runSync(config.dbsync);
-      }, 50);
+      }, 5000);
     }
   }
 }
@@ -402,16 +385,16 @@ function applyDelta(
     });
   }
 
-  localStorage.setItem("library_tracks", JSON.stringify(localTracks));
+  lsSetJSON("library_tracks", localTracks);
 
   const currentMeta = getMeta();
 
   // Process updated collections with intelligent merging
   for (const [key, remoteData] of Object.entries(delta.updatedCollections)) {
     if (isDeviceLocalKey(`library_${key}`)) continue;
-    const localRaw = localStorage.getItem(`library_${key}`);
+    const localRaw = lsGet(`library_${key}`);
     if (!localRaw) {
-      localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+      lsSetJSON(`library_${key}`, remoteData);
       currentMeta[key] = delta.meta[key] || now;
       continue;
     }
@@ -440,7 +423,7 @@ function applyDelta(
         } else {
           merged = remoteData;
         }
-        localStorage.setItem(`library_${key}`, JSON.stringify(merged));
+        lsSetJSON(`library_${key}`, merged);
 
         // If local contained items that were not on the server, ensure timestamp is fresh so it will be pushed back
         const hasLocalItemsNotOnServer =
@@ -460,13 +443,13 @@ function applyDelta(
           currentMeta[key] = Math.max(localTimestamp, serverTimestamp);
         }
       } catch {
-        localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+        lsSetJSON(`library_${key}`, remoteData);
         currentMeta[key] = Math.max(localTimestamp, serverTimestamp);
       }
     } else {
       // Last-write-wins: apply newer server snapshot
       if (serverTimestamp >= localTimestamp) {
-        localStorage.setItem(`library_${key}`, JSON.stringify(remoteData));
+        lsSetJSON(`library_${key}`, remoteData);
         currentMeta[key] = serverTimestamp;
       }
     }
@@ -475,7 +458,7 @@ function applyDelta(
   // Handle deleted collections from server
   for (const key of delta.deletedCollectionNames) {
     if (isDeviceLocalKey(`library_${key}`)) continue;
-    localStorage.removeItem(`library_${key}`);
+    lsRemove(`library_${key}`);
     delete currentMeta[key];
   }
 
@@ -485,7 +468,7 @@ function applyDelta(
     }
   }
 
-  localStorage.setItem("library_meta", JSON.stringify(currentMeta));
+  lsSetJSON("library_meta", currentMeta);
 }
 
 let syncTimeout: NodeJS.Timeout | null = null;
@@ -500,9 +483,9 @@ export function scheduleSync() {
 }
 
 export function cleanupSyncState() {
-  localStorage.removeItem("dbsync_account");
-  localStorage.removeItem("dbsync_dirty_tracks");
-  localStorage.removeItem("dbsync_dirty_collections");
+  lsRemove("dbsync_account");
+  lsRemove("dbsync_dirty_tracks");
+  lsRemove("dbsync_dirty_collections");
   if (syncTimeout) {
     clearTimeout(syncTimeout);
     syncTimeout = null;
@@ -537,16 +520,17 @@ export function initSyncLifecycle() {
 
 // --- Dirty Track Tracking ---
 
-export const getDirtyTracks = (): { added: string[]; deleted: string[] } => {
-  const dirty = localStorage.getItem("dbsync_dirty_tracks");
-  return dirty ? JSON.parse(dirty) : { added: [], deleted: [] };
-};
+export const getDirtyTracks = (): { added: string[]; deleted: string[] } =>
+  lsGetJSON("dbsync_dirty_tracks", { added: [], deleted: [] } as {
+    added: string[];
+    deleted: string[];
+  });
 
 export const saveDirtyTracks = (dirtyTracks: {
   added: string[];
   deleted: string[];
 }) => {
-  localStorage.setItem("dbsync_dirty_tracks", JSON.stringify(dirtyTracks));
+  lsSetJSON("dbsync_dirty_tracks", dirtyTracks);
 };
 
 export const addDirtyTrack = (id: string) => {
@@ -579,7 +563,7 @@ export const clearDirtyTracks = (pushed: {
     (id) => !pushed.deleted.includes(id),
   );
   if (current.added.length === 0 && current.deleted.length === 0) {
-    localStorage.removeItem("dbsync_dirty_tracks");
+    lsRemove("dbsync_dirty_tracks");
   } else {
     saveDirtyTracks(current);
   }
@@ -587,16 +571,16 @@ export const clearDirtyTracks = (pushed: {
 
 // --- Dirty Collection Tracking ---
 
-export const getDirtyCollections = (): { deleted: string[] } => {
-  const dirty = localStorage.getItem("dbsync_dirty_collections");
-  return dirty ? JSON.parse(dirty) : { deleted: [] };
-};
+export const getDirtyCollections = (): { deleted: string[] } =>
+  lsGetJSON("dbsync_dirty_collections", { deleted: [] } as {
+    deleted: string[];
+  });
 
 export const markCollectionDeleted = (collectionName: string) => {
   const dirty = getDirtyCollections();
   if (!dirty.deleted.includes(collectionName)) {
     dirty.deleted.push(collectionName);
-    localStorage.setItem("dbsync_dirty_collections", JSON.stringify(dirty));
+    lsSetJSON("dbsync_dirty_collections", dirty);
   }
   scheduleSync();
 };
@@ -607,8 +591,8 @@ export const clearDeletedCollections = (deletedNames: string[]) => {
     (name) => !deletedNames.includes(name),
   );
   if (current.deleted.length === 0) {
-    localStorage.removeItem("dbsync_dirty_collections");
+    lsRemove("dbsync_dirty_collections");
   } else {
-    localStorage.setItem("dbsync_dirty_collections", JSON.stringify(current));
+    lsSetJSON("dbsync_dirty_collections", current);
   }
 };

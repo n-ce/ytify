@@ -1,6 +1,6 @@
 import { Accessor, Show, createSignal } from "solid-js";
 import "./StreamItem.css";
-import { hostResolver, generateImageUrl } from "@utils";
+import { hostResolver, generateImageUrl, isTopicAuthor, stripTopic } from "@utils";
 import { config } from "@config";
 import { removeFromCollection, getCollectionItems } from "@modules/library";
 import { player } from "@modules/playback";
@@ -97,7 +97,7 @@ export default function (
   const isAlbum =
     data.context?.id.startsWith("MPREb") || listStore.type === "album";
   const isFromArtist = data.context?.id?.startsWith("Artist - ");
-  const isMusic = data.author?.endsWith("- Topic");
+  const isMusic = isTopicAuthor(data.author);
   const music =
     data.type === "song" ||
     data.context?.id === "favorites" ||
@@ -259,7 +259,7 @@ export default function (
       <div class="metadata">
         <p class="title">{data.title}</p>
         <div class="avu">
-          <p class="author truncate">{data.author?.replace(" - Topic", "")}</p>
+          <p class="author truncate">{stripTopic(data.author)}</p>
           <Show when={!isAlbum}>
             <p class="viewsXuploaded truncate">{data.subtext}</p>
           </Show>

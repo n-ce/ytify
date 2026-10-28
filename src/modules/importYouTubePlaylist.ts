@@ -1,5 +1,6 @@
 import { getLists, saveLists } from "@modules/library";
 import { store, setStore, t } from "@stores";
+import { pickImage, unique } from "@utils";
 
 /** Playlist ids are URL-safe tokens: no dots, slashes or spaces. */
 const RAW_ID = /^[a-zA-Z0-9_-]{2,}$/;
@@ -63,14 +64,13 @@ async function fetchPlaylist(id: string): Promise<Playlist | null> {
       return null;
 
     // maxresdefault 404s for most videos, so it is never a usable thumbnail.
-    const apiImg =
-      data.img && !data.img.includes("maxresdefault") ? data.img : "";
+    const apiImg = pickImage(data.img, data.items?.[0]?.id);
 
     return {
       id,
       name: data.name || "YouTube Playlist",
       author: data.author || "YouTube Music",
-      img: apiImg || data.items?.[0]?.id || "",
+      img: apiImg,
     };
   } catch (e) {
     console.error("Failed to import YouTube playlist:", e);
@@ -85,14 +85,12 @@ export default async function importYouTubePlaylist() {
   );
   if (!input) return;
 
-  const ids = [
-    ...new Set(
-      input
-        .split(/[\n,]+/)
-        .map(extractPlaylistId)
-        .filter((id): id is string => !!id),
-    ),
-  ];
+  const ids = unique(
+    input
+      .split(/[\n,]+/)
+      .map(extractPlaylistId)
+      .filter((id): id is string => !!id),
+  );
 
   if (!ids.length) {
     setStore("snackbar", t("library_import_yt_playlist_invalid"));

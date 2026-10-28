@@ -1,4 +1,5 @@
 ﻿import { createSignal } from "solid-js";
+import { lsGetJSON, lsSetJSON } from "@utils";
 
 export type PanelRatio = "1:1" | "2:3" | "3:4" | "1:2" | "2:5";
 
@@ -96,33 +97,27 @@ export let config = {
 
 type AppConfig = typeof config;
 
-const savedStore =
-  typeof localStorage !== "undefined" ? localStorage.getItem("config") : null;
+const savedStore = lsGetJSON<Record<string, unknown> | null>("config", null);
 if (savedStore) {
-  try {
-    const parsed = JSON.parse(savedStore) as Record<string, unknown>;
-    (Object.keys(config) as (keyof AppConfig)[]).forEach((key) => {
-      if (parsed[key] !== undefined) {
-        if (
-          key === "librarySections" &&
-          typeof parsed[key] === "object" &&
-          parsed[key] !== null
-        ) {
-          const sections = parsed[key] as Record<string, unknown>;
-          delete sections.frequentlyPlayed;
-          delete sections.gallery;
-          config.librarySections = {
-            ...defaultLibrarySections,
-            ...(sections as Partial<LibrarySections>),
-          };
-        } else {
-          (config as Record<keyof AppConfig, unknown>)[key] = parsed[key];
-        }
+  (Object.keys(config) as (keyof AppConfig)[]).forEach((key) => {
+    if (savedStore[key] !== undefined) {
+      if (
+        key === "librarySections" &&
+        typeof savedStore[key] === "object" &&
+        savedStore[key] !== null
+      ) {
+        const sections = savedStore[key] as Record<string, unknown>;
+        delete sections.frequentlyPlayed;
+        delete sections.gallery;
+        config.librarySections = {
+          ...defaultLibrarySections,
+          ...(sections as Partial<LibrarySections>),
+        };
+      } else {
+        (config as Record<keyof AppConfig, unknown>)[key] = savedStore[key];
       }
-    });
-  } catch (e) {
-    console.error(e);
-  }
+    }
+  });
 }
 
 // Guard against hand-edited or stale values before they can drive cache writes.
@@ -138,10 +133,7 @@ export function setConfig<K extends keyof AppConfig>(
   val: AppConfig[K],
 ) {
   config[key] = val;
-  const str = JSON.stringify(config);
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem("config", str);
-  }
+  lsSetJSON("config", config);
 }
 
 const [librarySections, setLibrarySectionsSignal] =
@@ -189,32 +181,26 @@ export let drawer = {
   lastMainFeature: "search" as "search" | "library",
   lastList: null as { id: string; type: string; shared?: boolean } | null,
 };
-const savedDrawer =
-  typeof localStorage !== "undefined" ? localStorage.getItem("drawer") : null;
+const savedDrawer = lsGetJSON<Record<string, unknown> | null>("drawer", null);
 if (savedDrawer) {
-  try {
-    const parsed = JSON.parse(savedDrawer) as Record<string, unknown>;
-    let hadLegacyPlays = false;
-    if ("libraryPlays" in parsed) {
-      delete parsed.libraryPlays;
-      hadLegacyPlays = true;
+  let hadLegacyPlays = false;
+  if ("libraryPlays" in savedDrawer) {
+    delete savedDrawer.libraryPlays;
+    hadLegacyPlays = true;
+  }
+  (Object.keys(drawer) as (keyof AppDrawer)[]).forEach((key) => {
+    if (savedDrawer[key] !== undefined) {
+      if (
+        key === "lastMainFeature" &&
+        savedDrawer[key] !== "search" &&
+        savedDrawer[key] !== "library"
+      )
+        return;
+      (drawer as Record<keyof AppDrawer, unknown>)[key] = savedDrawer[key];
     }
-    (Object.keys(drawer) as (keyof AppDrawer)[]).forEach((key) => {
-      if (parsed[key] !== undefined) {
-        if (
-          key === "lastMainFeature" &&
-          parsed[key] !== "search" &&
-          parsed[key] !== "library"
-        )
-          return;
-        (drawer as Record<keyof AppDrawer, unknown>)[key] = parsed[key];
-      }
-    });
-    if (hadLegacyPlays && typeof localStorage !== "undefined") {
-      localStorage.setItem("drawer", JSON.stringify(drawer));
-    }
-  } catch (e) {
-    console.error(e);
+  });
+  if (hadLegacyPlays) {
+    lsSetJSON("drawer", drawer);
   }
 }
 
@@ -225,9 +211,6 @@ export function setDrawer<K extends keyof AppDrawer>(
   val: AppDrawer[K],
 ) {
   drawer[key] = val;
-  const str = JSON.stringify(drawer);
-  if (typeof localStorage !== "undefined") {
-    localStorage.setItem("drawer", str);
-  }
+  lsSetJSON("drawer", drawer);
 }
 

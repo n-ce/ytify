@@ -2,6 +2,7 @@ import { For, Show, createSignal, onMount } from "solid-js";
 import { getCollection, getTracksMap } from "@modules/library";
 import ListItem from "@components/ListItem";
 import { t, store } from "@stores";
+import { unique, isTopicAuthor } from "@utils";
 
 interface FeaturedResponse {
   featuredPlaylists?: YTPlaylistItem[];
@@ -37,7 +38,7 @@ export default function () {
     } catch {}
 
     const history = getCollection("history");
-    const historyIds = Array.from(new Set(history)).filter(Boolean);
+    const historyIds = unique(history).filter(Boolean);
 
     const tracksMap = getTracksMap();
     const favorites = getCollection("favorites")
@@ -46,14 +47,14 @@ export default function () {
 
     const artistCounts: Record<string, number> = {};
     favorites
-      .filter((track) => track.author?.includes("- Topic") && track.authorId)
+      .filter((track) => isTopicAuthor(track.author) && track.authorId)
       .forEach((track) => {
         artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 2;
       });
 
     historyIds
       .map((id) => tracksMap[id])
-      .filter((track) => track?.author?.includes("- Topic") && track?.authorId)
+      .filter((track) => isTopicAuthor(track?.author) && track?.authorId)
       .forEach((track) => {
         artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
       });

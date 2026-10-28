@@ -1,5 +1,6 @@
 import { getTracksMap, saveTracksMap, syncLibrary } from "@modules/library";
 import { setStore, store } from "@stores";
+import { withTopicSuffix } from "@utils";
 
 type FixedMetadata = {
   author: string;
@@ -37,9 +38,7 @@ async function requestMetadataFix(
 }
 
 function applyMetadataFix(track: TrackItem, fixed: FixedMetadata) {
-  track.author = fixed.author.endsWith(" - Topic")
-    ? fixed.author
-    : `${fixed.author} - Topic`;
+  track.author = withTopicSuffix(fixed.author);
   if (fixed.authorId) track.authorId = fixed.authorId;
   track.modified = Date.now();
 }

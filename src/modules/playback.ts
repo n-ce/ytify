@@ -7,7 +7,7 @@ import {
   updateParam,
 } from "@stores";
 import { config } from "@config";
-import { convertSStoHHMMSS, generateArtworkUrl } from "@utils";
+import { convertSStoHHMMSS, generateImageUrl, isTopicAuthor, stripTopic } from "@utils";
 import { getTracksMap, saveTracksMap } from "@modules/library";
 import {
   getCachedOpusUrl,
@@ -18,7 +18,7 @@ import { fetchSponsorSegments } from "@modules/sponsorBlock";
 
 export function proxyHandler(url: string, prefetch?: boolean) {
   const isVideo = Boolean(document.querySelector("video"));
-  const useProxy = playerStore.stream.author?.endsWith("- Topic") && !isVideo;
+  const useProxy = isTopicAuthor(playerStore.stream.author) && !isVideo;
 
   if (!prefetch) setPlayerStore("status", t("player_audiostreams_insert"));
 
@@ -87,10 +87,9 @@ export async function applyMetadata(data: TrackItem) {
   setPlayerStore("stream", data);
 
   let music = false;
-  let authorText = playerStore.stream.author || "";
-  if (data.author?.endsWith(" - Topic")) {
+  let authorText = stripTopic(playerStore.stream.author);
+  if (isTopicAuthor(data.author)) {
     music = true;
-    authorText = data.author.slice(0, -8);
   }
 
   setPlayerStore("isMusic", music);
@@ -111,7 +110,7 @@ export async function applyMetadata(data: TrackItem) {
     album: playerStore.context.src,
   };
 
-  let img = generateArtworkUrl(data.id, music);
+  let img = generateImageUrl(data.id, "maxres", music);
   try {
     const cachedThumb = await getCachedThumbnailUrl(data.id, music);
     if (cachedThumb) img = cachedThumb;
@@ -232,7 +231,7 @@ export async function player(id?: string) {
   }
 
   if (!store.useSaavn) setStore("useSaavn", true);
-  else if (playerStore.stream.author?.endsWith("Topic") && !streamCache.get(id))
+  else if (isTopicAuthor(playerStore.stream.author) && !streamCache.get(id))
     return import("../modules/jioSaavn").then((mod) => mod.default());
 
   const getStreamData = await import("@modules/getStreamData").then(

@@ -82,6 +82,18 @@ export function reorderItem<T>(
   return next;
 }
 
+/** Picks the first candidate that is safe to hand to the artwork pipeline. */
+export function pickImage(
+  ...candidates: Array<string | null | undefined>
+): string {
+  return (
+    candidates.find(
+      (candidate): candidate is string =>
+        Boolean(candidate) && !candidate!.includes("maxresdefault"),
+    ) || ""
+  );
+}
+
 export function generateImageUrl(id: string, res: string, music?: boolean) {
   if (!id || id.includes("maxresdefault")) return "";
   const proxy = "https://wsrv.nl?url=https://";
@@ -106,10 +118,6 @@ export function generateImageUrl(id: string, res: string, music?: boolean) {
     }
   }
   return proxy + prefix + suffix;
-}
-
-export function generateArtworkUrl(id: string, music?: boolean) {
-  return generateImageUrl(id, "maxres", music);
 }
 
 export type SortBy = "modified" | "name" | "artist" | "duration";
@@ -142,4 +150,113 @@ export function sortCollection(
   });
 
   return listToSort;
+}
+
+/* localStorage helpers - safe, guarded boundary for persisted state */
+
+export function hasLS(): boolean {
+  return typeof localStorage !== "undefined";
+}
+
+export function lsGet(key: string): string | null {
+  if (!hasLS()) return null;
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+export function lsGetJSON<T>(key: string, fallback: T): T {
+  if (!hasLS()) return fallback;
+  try {
+    const value = localStorage.getItem(key);
+    if (value === null) return fallback;
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+export function lsSet(key: string, value: string): void {
+  if (!hasLS()) return;
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* ignore quota/security errors */
+  }
+}
+
+export function lsSetJSON(key: string, value: unknown): void {
+  lsSet(key, JSON.stringify(value));
+}
+
+export function lsRemove(key: string): void {
+  if (!hasLS()) return;
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Every localStorage key that starts with `prefix`, in storage order. */
+export function lsKeys(prefix = ""): string[] {
+  if (!hasLS()) return [];
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(prefix)) keys.push(key);
+    }
+    return keys;
+  } catch {
+    return [];
+  }
+}
+
+/* Array helpers */
+
+export function unique<T>(arr: T[]): T[] {
+  return [...new Set(arr)];
+}
+
+/* Text helpers */
+
+/** Case/diacritic-insensitive form used for local search and grouping. */
+export function normalizeText(value?: string): string {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+/** True for both "Artist - Topic" and the compact "Artist- Topic" variant. */
+export function isTopicAuthor(author?: string): boolean {
+  return /-\s*Topic$/i.test(author || "");
+}
+
+/** Strips a trailing "- Topic" suffix. Non-topic authors pass through trimmed. */
+export function stripTopic(author?: string): string {
+  return (author || "").replace(/\s*-\s*Topic$/i, "").trim();
+}
+
+/** Normalizes an author name to exactly one " - Topic" suffix. */
+export function withTopicSuffix(author?: string): string {
+  const name = (author || "").trim();
+  if (!name) return "";
+  return isTopicAuthor(name)
+    ? name.replace(/\s*-\s*Topic$/i, " - Topic")
+    : `${name} - Topic`;
+}
+
+/** Stable grouping key for an author, ignoring topic suffix, diacritics and case. */
+export function normalizeAuthorKey(author?: string): string {
+  return normalizeText(stripTopic(author));
+}
+
+/* Misc */
+
+export function clamp(n: number, min: number, max: number): number {
+  return Math.min(Math.max(n, min), max);
 }

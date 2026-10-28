@@ -1,6 +1,15 @@
 import { Component, createRoot, lazy } from "solid-js";
 import { createStore } from "solid-js/store";
-import { shuffle, convertSStoHHMMSS, parseDuration } from "@utils";
+import {
+  shuffle,
+  convertSStoHHMMSS,
+  parseDuration,
+  clamp,
+  isTopicAuthor,
+  normalizeAuthorKey,
+  pickImage,
+  withTopicSuffix,
+} from "@utils";
 import { config, playerBackground, setConfig, VOLUME_PRESETS, drawer, setDrawer } from "@config";
 import { addToCollection, recordTrackPlay, cacheTrackOnFinished, getLibraryAlbums } from "@modules/library";
 import { player } from "@modules/playback";
@@ -336,7 +345,7 @@ export function playPrev() {
   player(prevStream.id);
 }
 export function setVolume(volume: number) {
-  const vol = Math.min(1, Math.max(0, volume));
+  const vol = clamp(volume, 0, 1);
   playerStore.audio.volume = vol;
   setPlayerStore("volume", vol);
   setConfig("volume", (vol * 100).toString());
@@ -615,14 +624,6 @@ export function addToQueue(
   });
 }
 
-function normalizeAuthor(author?: string): string {
-  if (!author) return "";
-  return author
-    .replace(/\s*-\s*Topic$/i, "")
-    .trim()
-    .toLowerCase();
-}
-
 export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
   if (list.length <= 1) return [...list];
   const result: TrackItem[] = [];
@@ -631,10 +632,10 @@ export function groupQueueByAuthor(list: TrackItem[]): TrackItem[] {
   while (remaining.length > 0) {
     const current = remaining.shift()!;
     result.push(current);
-    const currentNorm = normalizeAuthor(current.author);
+    const currentNorm = normalizeAuthorKey(current.author);
     if (currentNorm) {
       for (let i = 0; i < remaining.length; i++) {
-        if (normalizeAuthor(remaining[i].author) === currentNorm) {
+        if (normalizeAuthorKey(remaining[i].author) === currentNorm) {
           result.push(remaining.splice(i, 1)[0]);
           i--;
         }
@@ -861,9 +862,7 @@ export async function getList(
           (v) =>
             ({
               ...v,
-              author: v.author.endsWith(" - Topic")
-                ? v.author
-                : `${v.author} - Topic`,
+              author: withTopicSuffix(v.author),
               context: { src: "channels" as const, id: contextId },
             }) as YTItem,
         ),
@@ -879,12 +878,11 @@ export async function getList(
           ? "album"
           : "playlists";
 
-      const validApiImg =
-        listData.img && !listData.img.includes("maxresdefault")
-          ? listData.img
-          : "";
-      const playlistImg =
-        validApiImg || listStore.img || listData.items?.[0]?.id || "";
+      const playlistImg = pickImage(
+        listData.img,
+        listStore.img,
+        listData.items?.[0]?.id,
+      );
 
       setListStore({
         name: listData.name,
@@ -910,8 +908,8 @@ export async function getList(
             ({
               ...v,
               author:
-                data.type === "album" && !v.author.endsWith(" - Topic")
-                  ? `${v.author} - Topic`
+                data.type === "album" && !isTopicAuthor(v.author)
+                  ? withTopicSuffix(v.author)
                   : v.author,
               context: { src: listType as Context, id: listData.name },
             }) as YTItem,

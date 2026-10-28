@@ -1,11 +1,12 @@
 import { playerStore, store } from '@stores';
 import { addToCollection, getCollection, removeFromCollection } from "@modules/library";
 import { createEffect, createSignal } from 'solid-js';
+import { isTopicAuthor } from "@utils";
 
 export default function() {
 
   const item = () => store.actionsMenu || playerStore.stream;
-  const isMusic = () => item().author?.endsWith(' - Topic');
+  const isMusic = () => isTopicAuthor(item().author);
   const collection = () => isMusic() ? 'favorites' : 'liked';
   const icon = () => isMusic() ? 'ri-heart' : 'ri-thumb-up';
 

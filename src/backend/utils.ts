@@ -285,13 +285,7 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
         ? song.flex_columns[1].title.runs[0].text
         : undefined);
 
-    const author = rawAuthor
-      ? rawAuthor.endsWith(" - Topic")
-        ? rawAuthor
-        : rawAuthor.endsWith("- Topic")
-          ? rawAuthor.replace(/- Topic$/, " - Topic")
-          : `${rawAuthor} - Topic`
-      : "Unknown";
+    const author = formatTopicAuthor(rawAuthor);
 
     const authorId =
       song.artists?.[0]?.channel_id ||

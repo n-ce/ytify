@@ -19,7 +19,14 @@ import {
   setConfig,
   type CachingMode,
 } from "@config";
-import { sortCollection } from "@utils";
+import {
+  sortCollection,
+  lsGetJSON,
+  lsSetJSON,
+  lsRemove,
+  lsKeys,
+  isTopicAuthor,
+} from "@utils";
 import {
   cacheTracks,
   clearOpusCache,
@@ -82,9 +89,9 @@ export const syncLibrary = (
 // New Library V2 utils
 
 export const getMeta = (): Meta => {
-  const meta = localStorage.getItem("library_meta");
+  const meta = lsGetJSON<Meta | null>("library_meta", null);
   if (meta) {
-    return JSON.parse(meta);
+    return meta;
   }
 
   const newMeta: Meta = { version: 5, tracks: 0 };
@@ -115,8 +122,7 @@ export const getMeta = (): Meta => {
  * entries rather than from this list.
  */
 export const getCollectionsKeys = () => {
-  const allKeys = Object.keys(localStorage)
-    .filter((key) => key.startsWith("library_"))
+  const allKeys = lsKeys("library_")
     .map((key) => key.slice(8))
     .filter(
       (key) =>
@@ -124,7 +130,7 @@ export const getCollectionsKeys = () => {
         !PSEUDO_COLLECTIONS.includes(key),
     );
 
-  const meta = JSON.parse(localStorage.getItem("library_meta") || "{}");
+  const meta = lsGetJSON<Record<string, number>>("library_meta", {});
 
   return [
     ...RESERVED_ORDER.filter((key) => allKeys.includes(key)),
@@ -135,18 +141,18 @@ export const getCollectionsKeys = () => {
 };
 
 export const getTracksMap = (): Collection =>
-  JSON.parse(localStorage.getItem("library_tracks") || "{}");
+  lsGetJSON<Collection>("library_tracks", {});
 
 export const getCollection = (name: string) =>
-  JSON.parse(localStorage.getItem("library_" + name) || "[]") as string[];
+  lsGetJSON<string[]>("library_" + name, []);
 
 export const getLists = <T extends "channels" | "playlists">(
   type: T,
 ): T extends "channels" ? Channel[] : Playlist[] =>
-  JSON.parse(localStorage.getItem("library_" + type) || "[]");
+  lsGetJSON<T extends "channels" ? Channel[] : Playlist[]>("library_" + type, [] as any);
 
 export const getLibraryAlbums = (): LibraryAlbums =>
-  JSON.parse(localStorage.getItem("library_albums") || "[]");
+  lsGetJSON<LibraryAlbums>("library_albums", []);
 
 function toCollectionItems(
   ids: string[],
@@ -226,23 +232,23 @@ const pruneOrphanTracks = (ids: string[]) => {
 };
 
 export function saveTracksMap(tracks: Collection) {
-  localStorage.setItem("library_tracks", JSON.stringify(tracks));
+  lsSetJSON("library_tracks", tracks);
 }
 
 export function saveCollection(name: string, collection: string[]) {
-  localStorage.setItem("library_" + name, JSON.stringify(collection));
+  lsSetJSON("library_" + name, collection);
 }
 
 /** Seeds the built-in collections on a fresh install. */
 export function seedReservedCollections() {
   if (
-    localStorage.getItem("library_favorites") !== null &&
-    localStorage.getItem("library_history") !== null
+    lsGetJSON("library_favorites", null) !== null &&
+    lsGetJSON("library_history", null) !== null
   )
     return;
 
   for (const name of RESERVED_ORDER) {
-    if (localStorage.getItem(`library_${name}`) === null)
+    if (lsGetJSON(`library_${name}`, null) === null)
       saveCollection(name, []);
   }
 }
@@ -251,13 +257,13 @@ export function saveLists<T extends "channels" | "playlists">(
   type: T,
   data: T extends "channels" ? Channel[] : Playlist[],
 ) {
-  localStorage.setItem(`library_${type}`, JSON.stringify(data));
+  lsSetJSON(`library_${type}`, data);
   metaUpdater(type);
   rehydrateStores();
 }
 
 function saveLibraryAlbums(albums: LibraryAlbums) {
-  localStorage.setItem("library_albums", JSON.stringify(albums));
+  lsSetJSON("library_albums", albums);
 }
 
 export function saveAlbumToLibrary(albumId: string, albumData: Album) {
@@ -301,7 +307,7 @@ export function recordTrackPlay(track: TrackItem) {
 export function cacheTrackOnFinished(track: TrackItem) {
   if (!track?.id) return;
   if (cachingMode() === "auto") {
-    syncAudioCache([track.id], Boolean(track.author?.endsWith(" - Topic")));
+    syncAudioCache([track.id], isTopicAuthor(track.author));
   }
 }
 
@@ -332,7 +338,7 @@ export function setCachingMode(mode: CachingMode) {
 
   if (mode === "off") {
     const ids = getCollection(CACHED_COLLECTION);
-    localStorage.removeItem("library_cached");
+    lsRemove("library_cached");
     clearOpusCache();
     pruneOrphanTracks(ids);
   } else syncAudioCache([]);
@@ -425,7 +431,7 @@ export function deleteCollection(name: string) {
   const ids = getCollection(name);
   const deviceLocal = name === CACHED_COLLECTION;
 
-  localStorage.removeItem("library_" + name);
+  lsRemove("library_" + name);
   if (deviceLocal) clearOpusCache();
 
   const references = getReferencedTrackIds(name);
@@ -460,7 +466,7 @@ export const metaUpdater = (key: string, remove?: boolean) => {
   if (remove) delete meta[key];
   else meta[key] = timestamp;
 
-  localStorage.setItem("library_meta", JSON.stringify(meta));
+  lsSetJSON("library_meta", meta);
   setStore("syncState", "dirty");
   syncLibrary("schedule");
 };
@@ -489,7 +495,7 @@ export function renameCollection(oldName: string, newName: string) {
 
   const collectionItems = getCollection(oldName);
   saveCollection(newName, collectionItems);
-  localStorage.removeItem("library_" + oldName);
+  lsRemove("library_" + oldName);
   metaUpdater(oldName, true);
   metaUpdater(newName);
   rehydrateStores();
@@ -689,17 +695,15 @@ async function getSharedCollection(id: string) {
 
 export function cleanseLibraryData() {
   // Purge deprecated frequently played data
-  localStorage.removeItem("library_frequently_played");
-  const storedDrawer = JSON.parse(localStorage.getItem("drawer") || "{}");
+  lsRemove("library_frequently_played");
+  const storedDrawer = lsGetJSON<any>("drawer", {});
   if (storedDrawer.libraryPlays) {
     delete storedDrawer.libraryPlays;
-    localStorage.setItem("drawer", JSON.stringify(storedDrawer));
+    lsSetJSON("drawer", storedDrawer);
   }
 
   // 1. Get all tracks from library_tracks
-  const rawTracks = JSON.parse(
-    localStorage.getItem("library_tracks") || "{}",
-  ) as Collection;
+  const rawTracks = lsGetJSON<Collection>("library_tracks", {});
 
   // 2. Identify all valid track IDs by checking all collections and cached tracks
   const collections = getCollectionsKeys();
@@ -738,9 +742,7 @@ export function cleanseLibraryData() {
 
   // 4. Cleanse all other collections from empty or missing IDs
   for (const key of [...collections, CACHED_COLLECTION]) {
-    const collection = JSON.parse(
-      localStorage.getItem("library_" + key) || "[]",
-    ) as string[];
+    const collection = lsGetJSON<string[]>("library_" + key, []);
     const validCollection = collection.filter((id) => id && rawTracks[id]);
     if (validCollection.length < collection.length) {
       console.log(

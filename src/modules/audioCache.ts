@@ -1,6 +1,6 @@
 import { proxyHandler } from "@modules/playback";
 import { config } from "@config";
-import { generateArtworkUrl, generateImageUrl } from "@utils";
+import { generateImageUrl, lsGetJSON, lsSetJSON } from "@utils";
 
 const OPFS_DIR = "opus_cache";
 const CACHED_STORAGE_KEY = "library_cached";
@@ -41,17 +41,17 @@ async function removeThumbnailFiles(
   }
 }
 
-function readCachedIds(): string[] {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(CACHED_STORAGE_KEY) || "[]");
-    return Array.isArray(parsed) ? (parsed as string[]) : [];
-  } catch {
-    return [];
-  }
+/**
+ * Returns the track IDs currently cached in local cache state, synchronously.
+ * The list is kept most-recently-used first and doubles as the LRU eviction order.
+ */
+export function getCachedTrackIdsSync(): string[] {
+  const parsed = lsGetJSON<unknown>(CACHED_STORAGE_KEY, []);
+  return Array.isArray(parsed) ? (parsed as string[]) : [];
 }
 
 function writeCachedIds(ids: string[]) {
-  localStorage.setItem(CACHED_STORAGE_KEY, JSON.stringify(ids));
+  lsSetJSON(CACHED_STORAGE_KEY, ids);
 }
 
 /**
@@ -75,19 +75,11 @@ async function getOpfsAudioDir(): Promise<FileSystemDirectoryHandle | null> {
 }
 
 /**
- * Returns an array of track IDs currently cached in local cache state synchronously.
- * The list is kept most-recently-used first and doubles as the LRU eviction order.
- */
-export function getCachedTrackIdsSync(): string[] {
-  return readCachedIds();
-}
-
-/**
  * Moves a track to the head of the recency list, marking it as most recently used.
  */
 function touchCachedTrack(id: string) {
   if (!id) return;
-  const ids = readCachedIds();
+  const ids = getCachedTrackIdsSync();
   const index = ids.indexOf(id);
   if (index === 0) return;
   if (index > 0) ids.splice(index, 1);
@@ -103,7 +95,7 @@ function touchCachedTrack(id: string) {
  * Returns the surviving ids in recency order.
  */
 export async function getCachedTrackIds(): Promise<string[]> {
-  const known = readCachedIds();
+  const known = getCachedTrackIdsSync();
   try {
     const dir = await getOpfsAudioDir();
     if (!dir) return known;
@@ -255,7 +247,7 @@ async function cacheTrackThumbnail(
     if (!dir) return false;
 
     const candidates = [
-      generateArtworkUrl(id, music),
+      generateImageUrl(id, "maxres", music),
       generateImageUrl(id, "hq", music),
       generateImageUrl(id, "mq", music),
     ];
@@ -435,7 +427,7 @@ export async function enforceCacheLimit(): Promise<string[]> {
   if (totalBytes <= limitBytes) return [];
 
   // Oldest first, so the tail of the recency list is the first to go.
-  const known = readCachedIds();
+  const known = getCachedTrackIdsSync();
   const byAge = [
     ...known.filter((id) => sizes.has(id)),
     ...[...sizes.keys()].filter((id) => !known.includes(id)),
@@ -453,7 +445,7 @@ export async function enforceCacheLimit(): Promise<string[]> {
   }
 
   if (evicted.length) {
-    writeCachedIds(readCachedIds().filter((id) => !evicted.includes(id)));
+    writeCachedIds(getCachedTrackIdsSync().filter((id) => !evicted.includes(id)));
     console.log(
       `[OPFS] Evicted ${evicted.length} track(s) to stay under ${config.cacheLimit}MB`,
     );
@@ -472,7 +464,7 @@ export async function deleteCachedOpus(id: string): Promise<boolean> {
     if (!dir) return false;
     await dir.removeEntry(`${id}.opus`).catch(() => {});
     await removeThumbnailFiles(dir, id);
-    writeCachedIds(readCachedIds().filter((item) => item !== id));
+    writeCachedIds(getCachedTrackIdsSync().filter((item) => item !== id));
     return true;
   } catch {
     return false;

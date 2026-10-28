@@ -164,9 +164,9 @@ The system MUST cache the same image the player renders, in the shape it is disp
 - One track id therefore needs two files — `<id>.thumb` and `<id>.sq.thumb`. A
   single file per id cannot satisfy both consumers, and serving a landscape blob
   to a square frame is the defect this requirement exists to prevent
-- `generateArtworkUrl(id, music)` is the single source of truth for the player's
-  image. The cache writes that exact URL, so the cached blob and the live URL
-  cannot drift apart
+- `generateImageUrl(id, "maxres", music)` is the single source of truth for the
+  player's image. The cache writes that exact URL, so the cached blob and the
+  live URL cannot drift apart
 - `getCachedThumbnailUrl`, `isThumbnailCached` and `cacheTrackThumbnail` are all
   variant-aware. Callers MUST pass the same `music` flag they used to build the
   URL they are about to render
@@ -274,7 +274,7 @@ observing a real OPFS directory.
 - `vite.config.ts` - PWA plugin config
 - `src/modules/audioCache.ts` - OPFS audio caching, artwork variants, LRU order, eviction, startup reconciliation + sessionStorage stream metadata cache
 - `src/config.ts` - `CachingMode`, `cachingMode`, `cacheLimit`
-- `src/utils.ts` - `generateArtworkUrl`, the player's image source of truth
+- `src/utils.ts` - `generateImageUrl`, the player's image source of truth
 - `src/modules/library.ts` - reserved collection registry, mode orchestration
 - `src/modules/start.ts` - invokes reconciliation after `cleanseLibraryData`
 - `src/modules/cloudSync.ts` - device-local `library_cached` guards

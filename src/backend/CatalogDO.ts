@@ -52,6 +52,8 @@ export class CatalogDO {
   private ctx: DurableObjectState;
   private sql: DurableObjectState["storage"]["sql"];
   private initialized = false;
+  private trackWriteCache = new Map<string, number>();
+  private readonly MAX_TRACK_CACHE = 50000;
 
   constructor(ctx: DurableObjectState) {
     this.ctx = ctx;
@@ -63,20 +65,7 @@ export class CatalogDO {
 
     try {
       this.sql.exec(`
-        CREATE TABLE IF NOT EXISTS canonical_songs (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          author TEXT NOT NULL,
-          author_id TEXT,
-          album_id TEXT,
-          album_title TEXT,
-          thumbnail_id TEXT NOT NULL,
-          duration INTEGER NOT NULL DEFAULT 0,
-          duration_str TEXT,
-          omv_id TEXT,
-          source TEXT NOT NULL,
-          updated_at INTEGER NOT NULL
-        );
+        CREATE TABLE IF NOT EXISTS canonical_songs (\n          id TEXT PRIMARY KEY,\n          title TEXT NOT NULL,\n          author TEXT NOT NULL,\n          author_id TEXT,\n          album_id TEXT,\n          album_title TEXT,\n          thumbnail_id TEXT NOT NULL,\n          duration INTEGER NOT NULL DEFAULT 0,\n          duration_str TEXT,\n          omv_id TEXT,\n          source TEXT NOT NULL,\n          updated_at INTEGER NOT NULL\n        );
         CREATE INDEX IF NOT EXISTS idx_songs_album ON canonical_songs(album_id);
         CREATE INDEX IF NOT EXISTS idx_songs_author ON canonical_songs(author);
         CREATE INDEX IF NOT EXISTS idx_songs_updated ON canonical_songs(updated_at);
@@ -91,22 +80,14 @@ export class CatalogDO {
     } catch {}
 
     try {
-      this.sql.exec("CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id)");
+      this.sql.exec(
+        "CREATE INDEX IF NOT EXISTS idx_songs_omv ON canonical_songs(omv_id)",
+      );
     } catch {}
 
     try {
       this.sql.exec(`
-        CREATE TABLE IF NOT EXISTS canonical_videos (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          author TEXT NOT NULL,
-          author_id TEXT,
-          duration INTEGER NOT NULL DEFAULT 0,
-          duration_str TEXT,
-          atv_id TEXT,
-          source TEXT NOT NULL,
-          updated_at INTEGER NOT NULL
-        );
+        CREATE TABLE IF NOT EXISTS canonical_videos (\n          id TEXT PRIMARY KEY,\n          title TEXT NOT NULL,\n          author TEXT NOT NULL,\n          author_id TEXT,\n          duration INTEGER NOT NULL DEFAULT 0,\n          duration_str TEXT,\n          atv_id TEXT,\n          source TEXT NOT NULL,\n          updated_at INTEGER NOT NULL\n        );
         CREATE INDEX IF NOT EXISTS idx_videos_author ON canonical_videos(author);
         CREATE INDEX IF NOT EXISTS idx_videos_updated ON canonical_videos(updated_at);
       `);
@@ -119,51 +100,23 @@ export class CatalogDO {
     } catch {}
 
     try {
-      this.sql.exec("CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id)");
+      this.sql.exec(
+        "CREATE INDEX IF NOT EXISTS idx_videos_atv ON canonical_videos(atv_id)",
+      );
     } catch {}
 
     try {
       this.sql.exec(`
-        CREATE TABLE IF NOT EXISTS canonical_tracks (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          author TEXT NOT NULL,
-          author_id TEXT,
-          duration INTEGER NOT NULL DEFAULT 0,
-          duration_str TEXT,
-          is_song BOOLEAN NOT NULL DEFAULT 0,
-          thumbnail_id TEXT,
-          source TEXT NOT NULL,
-          updated_at INTEGER NOT NULL
-        );
+        CREATE TABLE IF NOT EXISTS canonical_tracks (\n          id TEXT PRIMARY KEY,\n          title TEXT NOT NULL,\n          author TEXT NOT NULL,\n          author_id TEXT,\n          duration INTEGER NOT NULL DEFAULT 0,\n          duration_str TEXT,\n          is_song BOOLEAN NOT NULL DEFAULT 0,\n          thumbnail_id TEXT,\n          source TEXT NOT NULL,\n          updated_at INTEGER NOT NULL\n        );
         CREATE INDEX IF NOT EXISTS idx_tracks_author ON canonical_tracks(author);
         CREATE INDEX IF NOT EXISTS idx_tracks_updated ON canonical_tracks(updated_at);
 
-        CREATE TABLE IF NOT EXISTS categories (
-          slug TEXT NOT NULL,
-          type TEXT NOT NULL,
-          title TEXT NOT NULL,
-          params TEXT NOT NULL,
-          PRIMARY KEY (slug, type)
-        );
+        CREATE TABLE IF NOT EXISTS categories (\n          slug TEXT NOT NULL,\n          type TEXT NOT NULL,\n          title TEXT NOT NULL,\n          params TEXT NOT NULL,\n          PRIMARY KEY (slug, type)\n        );
 
-        CREATE TABLE IF NOT EXISTS curated_playlists (
-          id TEXT PRIMARY KEY,
-          category_slug TEXT NOT NULL,
-          category_type TEXT NOT NULL,
-          section_title TEXT NOT NULL,
-          title TEXT NOT NULL,
-          thumbnail_id TEXT,
-          updated_at INTEGER NOT NULL
-        );
+        CREATE TABLE IF NOT EXISTS curated_playlists (\n          id TEXT PRIMARY KEY,\n          category_slug TEXT NOT NULL,\n          category_type TEXT NOT NULL,\n          section_title TEXT NOT NULL,\n          title TEXT NOT NULL,\n          thumbnail_id TEXT,\n          updated_at INTEGER NOT NULL\n        );
         CREATE INDEX IF NOT EXISTS idx_playlists_category ON curated_playlists(category_slug, category_type);
 
-        CREATE TABLE IF NOT EXISTS playlist_tracks (
-          playlist_id TEXT NOT NULL,
-          track_id TEXT NOT NULL,
-          position INTEGER NOT NULL,
-          PRIMARY KEY (playlist_id, track_id)
-        );
+        CREATE TABLE IF NOT EXISTS playlist_tracks (\n          playlist_id TEXT NOT NULL,\n          track_id TEXT NOT NULL,\n          position INTEGER NOT NULL,\n          PRIMARY KEY (playlist_id, track_id)\n        );
         CREATE INDEX IF NOT EXISTS idx_playlist_tracks_track ON playlist_tracks(track_id);
       `);
     } catch (err) {
@@ -222,6 +175,13 @@ export class CatalogDO {
     let written = 0;
     this.ctx.storage.transactionSync(() => {
       for (const t of tracks) {
+        if (!t?.id) continue;
+        const lastUpdated = this.trackWriteCache.get(t.id);
+        if (lastUpdated !== undefined && t.updatedAt <= lastUpdated) {
+          // Already in memory cache with equal or newer timestamp; skip duplicate SQLite write
+          continue;
+        }
+
         if (t.isSong) {
           const songThumb = isSquareThumbnail(t.thumbnailId)
             ? t.thumbnailId
@@ -283,38 +243,11 @@ export class CatalogDO {
           );
         }
 
-        // Backward compatibility table for legacy queries and existing tests
-        const legacyThumb = t.isSong
-          ? isSquareThumbnail(t.thumbnailId)
-            ? t.thumbnailId
-            : ""
-          : t.thumbnailId || "";
-        this.sql.exec(
-          `INSERT INTO canonical_tracks
-             (id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT(id) DO UPDATE SET
-             title = excluded.title,
-             author = excluded.author,
-             author_id = excluded.author_id,
-             duration = CASE WHEN excluded.duration > 0 THEN excluded.duration ELSE canonical_tracks.duration END,
-             duration_str = CASE WHEN excluded.duration > 0 THEN excluded.duration_str ELSE canonical_tracks.duration_str END,
-             is_song = excluded.is_song,
-             thumbnail_id = CASE WHEN excluded.thumbnail_id != '' THEN excluded.thumbnail_id ELSE canonical_tracks.thumbnail_id END,
-             source = excluded.source,
-             updated_at = excluded.updated_at
-           WHERE excluded.updated_at >= canonical_tracks.updated_at`,
-          t.id,
-          t.title,
-          t.author,
-          t.authorId,
-          t.duration,
-          t.durationStr,
-          t.isSong ? 1 : 0,
-          legacyThumb,
-          t.source,
-          t.updatedAt,
-        );
+        this.trackWriteCache.set(t.id, t.updatedAt);
+        if (this.trackWriteCache.size > this.MAX_TRACK_CACHE) {
+          const first = this.trackWriteCache.keys().next().value;
+          if (first) this.trackWriteCache.delete(first);
+        }
         written++;
       }
     });
@@ -441,7 +374,7 @@ export class CatalogDO {
           authorId: r.author_id,
           duration: r.duration,
           durationStr: r.duration_str,
-          isSong: !(!r.is_song),
+          isSong: !!r.is_song,
           thumbnailId: r.is_song
             ? isSquareThumbnail(r.thumbnail_id)
               ? r.thumbnail_id
@@ -457,7 +390,9 @@ export class CatalogDO {
   }
 
   /** Resolves canonical song (ATV) counterparts for an array of video (OMV) IDs. */
-  public resolveSongCounterparts(ids: string[]): Record<string, CanonicalTrack> {
+  public resolveSongCounterparts(
+    ids: string[],
+  ): Record<string, CanonicalTrack> {
     if (ids.length === 0) return {};
     const out: Record<string, CanonicalTrack> = {};
 
@@ -587,8 +522,17 @@ export class CatalogDO {
         source: string;
         updated_at: number;
       }>(
-        `SELECT id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at
-         FROM canonical_tracks WHERE updated_at > ? ORDER BY updated_at ASC LIMIT ?`,
+        `SELECT id, title, author, author_id, duration, duration_str, 1 as is_song, thumbnail_id, source, updated_at
+         FROM canonical_songs WHERE updated_at > ?
+         UNION ALL
+         SELECT id, title, author, author_id, duration, duration_str, 0 as is_song, '' as thumbnail_id, source, updated_at
+         FROM canonical_videos WHERE updated_at > ?
+         UNION ALL
+         SELECT id, title, author, author_id, duration, duration_str, is_song, thumbnail_id, source, updated_at
+         FROM canonical_tracks WHERE updated_at > ? AND id NOT IN (SELECT id FROM canonical_songs UNION ALL SELECT id FROM canonical_videos)
+         ORDER BY updated_at ASC LIMIT ?`,
+        since,
+        since,
         since,
         limit,
       )
@@ -601,7 +545,7 @@ export class CatalogDO {
       authorId: r.author_id,
       duration: r.duration,
       durationStr: r.duration_str,
-      isSong: !(!r.is_song),
+      isSong: !!r.is_song,
       thumbnailId: r.is_song
         ? isSquareThumbnail(r.thumbnail_id)
           ? r.thumbnail_id
@@ -707,7 +651,7 @@ export class CatalogDO {
       const row = rows[index];
       if (!row) return [];
       const ordered = orderedIds.get(row.id) || [];
-      // Deliberately not `trackIds`: a recommendation carries the count and a
+      // Deliberately not \`trackIds\`: a recommendation carries the count and a
       // short preview, not the whole ordering.
       return [
         {
@@ -730,220 +674,243 @@ export class CatalogDO {
   }
 
   async fetch(request: Request): Promise<Response> {
-    this.initSchema();
-    const url = new URL(request.url);
-    const path = url.pathname.replace(/^\/+/, "");
+    try {
+      this.initSchema();
+      const url = new URL(request.url);
+      const path = url.pathname.replace(/^\/+/, "");
 
-    switch (path) {
-      case "tracks": {
-        if (request.method === "GET") {
-          const body = this.readTracks(
-            [...new Set((url.searchParams.get("ids") || "").split(","))]
-              .map((s) => s.trim())
-              .filter(Boolean),
-          );
-          return new Response(JSON.stringify(body), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
+      switch (path) {
+        case "tracks": {
+          if (request.method === "GET") {
+            const body = this.readTracks(
+              [...new Set((url.searchParams.get("ids") || "").split(","))]
+                .map((s) => s.trim())
+                .filter(Boolean),
+            );
+            return new Response(JSON.stringify(body), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
+          if (request.method === "POST") {
+            const body = (await request.json().catch(() => null)) as {
+              tracks?: CanonicalTrack[];
+            } | null;
+            const tracks = body?.tracks;
+            if (!Array.isArray(tracks)) {
+              return new Response(JSON.stringify({ error: "Missing tracks" }), {
+                status: 400,
+                headers: JSON_HEADER,
+              });
+            }
+            const written = this.upsertTracks(
+              tracks.filter((t) => t && typeof t.id === "string"),
+            );
+            return new Response(JSON.stringify({ written }), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
+          break;
         }
-        if (request.method === "POST") {
-          const body = (await request.json().catch(() => null)) as {
-            tracks?: CanonicalTrack[];
-          } | null;
-          const tracks = body?.tracks;
-          if (!Array.isArray(tracks)) {
-            return new Response(JSON.stringify({ error: "Missing tracks" }), {
+
+        case "track": {
+          const id = url.searchParams.get("id") || "";
+          if (!id) {
+            return new Response(JSON.stringify({ error: "Missing id" }), {
               status: 400,
               headers: JSON_HEADER,
             });
           }
-          const written = this.upsertTracks(
-            tracks.filter((t) => t && typeof t.id === "string"),
+          const track = this.readTracks([id])[id];
+          if (!track) {
+            return new Response(JSON.stringify({ error: "Not found" }), {
+              status: 404,
+              headers: JSON_HEADER,
+            });
+          }
+          return new Response(JSON.stringify(track), {
+            status: 200,
+            headers: JSON_HEADER,
+          });
+        }
+
+        case "counterparts": {
+          if (request.method === "GET") {
+            const ids = [
+              ...new Set((url.searchParams.get("ids") || "").split(",")),
+            ]
+              .map((s) => s.trim())
+              .filter(Boolean);
+            const body = this.resolveSongCounterparts(ids);
+            return new Response(JSON.stringify(body), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
+          return new Response(JSON.stringify({ error: "Method not allowed" }), {
+            status: 405,
+            headers: JSON_HEADER,
+          });
+        }
+
+        case "tracks-since": {
+          // Repair propagation: a syncing client asks for canonical records that
+          // changed after its watermark so a fixed artist reaches every library.
+          const since = parseInt(url.searchParams.get("since") || "0", 10) || 0;
+          const limit = Math.min(
+            parseInt(url.searchParams.get("limit") || "200", 10) || 200,
+            500,
           );
-          return new Response(JSON.stringify({ written }), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
+          return new Response(
+            JSON.stringify(this.readTracksSince(since, limit)),
+            {
+              status: 200,
+              headers: JSON_HEADER,
+            },
+          );
         }
-        break;
-      }
 
-      case "track": {
-        const id = url.searchParams.get("id") || "";
-        if (!id) {
-          return new Response(JSON.stringify({ error: "Missing id" }), {
-            status: 400,
-            headers: JSON_HEADER,
-          });
+        case "categories": {
+          if (request.method === "GET") {
+            const type = url.searchParams.get("type");
+            const rows = type
+              ? this.sql
+                  .exec<Category>(
+                    "SELECT slug, type, title, params FROM categories WHERE type = ? ORDER BY title",
+                    type,
+                  )
+                  .toArray()
+              : this.sql
+                  .exec<Category>(
+                    "SELECT slug, type, title, params FROM categories ORDER BY type, title",
+                  )
+                  .toArray();
+            return new Response(JSON.stringify(rows), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
+          if (request.method === "POST") {
+            const body = (await request.json().catch(() => null)) as {
+              categories?: Category[];
+            } | null;
+            if (!Array.isArray(body?.categories)) {
+              return new Response(
+                JSON.stringify({ error: "Missing categories" }),
+                { status: 400, headers: JSON_HEADER },
+              );
+            }
+            const written = this.upsertCategories(
+              body.categories.filter((c) => c && c.slug && c.title),
+            );
+            return new Response(JSON.stringify({ written }), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
+          break;
         }
-        const track = this.readTracks([id])[id];
-        if (!track) {
-          return new Response(JSON.stringify({ error: "Not found" }), {
-            status: 404,
-            headers: JSON_HEADER,
-          });
-        }
-        return new Response(JSON.stringify(track), {
-          status: 200,
-          headers: JSON_HEADER,
-        });
-      }
 
-      case "counterparts": {
-        if (request.method === "GET") {
-          const ids = [...new Set((url.searchParams.get("ids") || "").split(","))]
-            .map((s) => s.trim())
-            .filter(Boolean);
-          const body = this.resolveSongCounterparts(ids);
-          return new Response(JSON.stringify(body), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
-        }
-        return new Response(JSON.stringify({ error: "Method not allowed" }), {
-          status: 405,
-          headers: JSON_HEADER,
-        });
-      }
+        case "playlists": {
+          if (request.method === "GET") {
+            const categorySlug = url.searchParams.get("category");
+            const limit = Math.min(
+              parseInt(url.searchParams.get("limit") || "100", 10) || 100,
+              200,
+            );
+            const rows = categorySlug
+              ? this.sql
+                  .exec<PlaylistRow>(
+                    `SELECT id, category_slug, category_type, section_title, title, thumbnail_id, updated_at
+                     FROM curated_playlists WHERE category_slug = ? ORDER BY title LIMIT ?`,
+                    categorySlug,
+                    limit,
+                  )
+                  .toArray()
+              : this.sql
+                  .exec<PlaylistRow>(
+                    `SELECT id, category_slug, category_type, section_title, title, thumbnail_id, updated_at
+                     FROM curated_playlists ORDER BY category_type, title LIMIT ?`,
+                    limit,
+                  )
+                  .toArray();
 
-      case "tracks-since": {
-        // Repair propagation: a syncing client asks for canonical records that
-        // changed after its watermark so a fixed artist reaches every library.
-        const since = parseInt(url.searchParams.get("since") || "0", 10) || 0;
-        const limit = Math.min(
-          parseInt(url.searchParams.get("limit") || "200", 10) || 200,
-          500,
-        );
-        return new Response(
-          JSON.stringify(this.readTracksSince(since, limit)),
-          {
-            status: 200,
-            headers: JSON_HEADER,
-          },
-        );
-      }
-
-      case "categories": {
-        if (request.method === "GET") {
-          const type = url.searchParams.get("type");
-          const rows = type
-            ? this.sql
-                .exec<Category>(
-                  "SELECT slug, type, title, params FROM categories WHERE type = ? ORDER BY title",
-                  type,
-                )
-                .toArray()
-            : this.sql
-                .exec<Category>(
-                  "SELECT slug, type, title, params FROM categories ORDER BY type, title",
-                )
-                .toArray();
-          return new Response(JSON.stringify(rows), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
-        }
-        if (request.method === "POST") {
-          const body = (await request.json().catch(() => null)) as {
-            categories?: Category[];
-          } | null;
-          if (!Array.isArray(body?.categories)) {
+            const trackIds = this.readPlaylistTrackIds(rows.map((r) => r.id));
             return new Response(
-              JSON.stringify({ error: "Missing categories" }),
-              { status: 400, headers: JSON_HEADER },
+              JSON.stringify(
+                rows.map((row) =>
+                  toCuratedPlaylist(row, trackIds.get(row.id) || []),
+                ),
+              ),
+              { status: 200, headers: JSON_HEADER },
             );
           }
-          const written = this.upsertCategories(
-            body.categories.filter((c) => c && c.slug && c.title),
-          );
-          return new Response(JSON.stringify({ written }), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
+          if (request.method === "POST") {
+            const body = (await request.json().catch(() => null)) as {
+              playlists?: CuratedPlaylist[];
+            } | null;
+            if (!Array.isArray(body?.playlists)) {
+              return new Response(
+                JSON.stringify({ error: "Missing playlists" }),
+                { status: 400, headers: JSON_HEADER },
+              );
+            }
+            const written = this.upsertPlaylists(
+              body.playlists.filter((p) => p && p.id && p.title),
+            );
+            return new Response(JSON.stringify({ written }), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
+          break;
         }
-        break;
-      }
 
-      case "playlists": {
-        if (request.method === "GET") {
-          const categorySlug = url.searchParams.get("category");
+        case "featured":
+        case "recommend": {
+          const ids = (url.searchParams.get("ids") || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          if (ids.length === 0) {
+            return new Response(JSON.stringify({ playlists: [] }), {
+              status: 200,
+              headers: JSON_HEADER,
+            });
+          }
           const limit = Math.min(
-            parseInt(url.searchParams.get("limit") || "100", 10) || 100,
-            200,
+            parseInt(url.searchParams.get("limit") || "10", 10) ||
+              MAX_RECOMMENDATIONS,
+            MAX_RECOMMENDATIONS,
           );
-          const rows = categorySlug
-            ? this.sql
-                .exec<PlaylistRow>(
-                  `SELECT id, category_slug, category_type, section_title, title, thumbnail_id, updated_at
-                   FROM curated_playlists WHERE category_slug = ? ORDER BY title LIMIT ?`,
-                  categorySlug,
-                  limit,
-                )
-                .toArray()
-            : this.sql
-                .exec<PlaylistRow>(
-                  `SELECT id, category_slug, category_type, section_title, title, thumbnail_id, updated_at
-                   FROM curated_playlists ORDER BY category_type, title LIMIT ?`,
-                  limit,
-                )
-                .toArray();
-
-          const trackIds = this.readPlaylistTrackIds(rows.map((r) => r.id));
           return new Response(
-            JSON.stringify(
-              rows.map((row) =>
-                toCuratedPlaylist(row, trackIds.get(row.id) || []),
-              ),
-            ),
+            JSON.stringify({ playlists: this.recommend(ids, limit) }),
             { status: 200, headers: JSON_HEADER },
           );
         }
-        if (request.method === "POST") {
-          const body = (await request.json().catch(() => null)) as {
-            playlists?: CuratedPlaylist[];
-          } | null;
-          if (!Array.isArray(body?.playlists)) {
-            return new Response(
-              JSON.stringify({ error: "Missing playlists" }),
-              { status: 400, headers: JSON_HEADER },
-            );
-          }
-          const written = this.upsertPlaylists(
-            body.playlists.filter((p) => p && p.id && p.title),
-          );
-          return new Response(JSON.stringify({ written }), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
-        }
-        break;
       }
 
-      case "featured":
-      case "recommend": {
-        const ids = (url.searchParams.get("ids") || "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-        if (ids.length === 0) {
-          return new Response(JSON.stringify({ playlists: [] }), {
-            status: 200,
-            headers: JSON_HEADER,
-          });
-        }
-        const limit = Math.min(
-          parseInt(url.searchParams.get("limit") || "10", 10) ||
-            MAX_RECOMMENDATIONS,
-          MAX_RECOMMENDATIONS,
-        );
-        return new Response(
-          JSON.stringify({ playlists: this.recommend(ids, limit) }),
-          { status: 200, headers: JSON_HEADER },
-        );
-      }
+      return new Response("Not Found", { status: 404 });
+    } catch (err: any) {
+      console.error("[catalog] DO fetch failed:", err);
+      const isQuota =
+        err?.message?.toLowerCase().includes("quota") ||
+        err?.message?.toLowerCase().includes("limit") ||
+        err?.message?.toLowerCase().includes("full");
+      return new Response(
+        JSON.stringify({
+          error: isQuota
+            ? "Catalog storage quota temporarily exceeded"
+            : err instanceof Error
+              ? err.message
+              : "Catalog error",
+        }),
+        {
+          status: isQuota ? 429 : 500,
+          headers: JSON_HEADER,
+        },
+      );
     }
-
-    return new Response("Not Found", { status: 404 });
   }
 }

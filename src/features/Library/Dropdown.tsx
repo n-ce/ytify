@@ -2,6 +2,7 @@ import { setConfig, config } from "@config";
 import { CACHED_COLLECTION, getTracksMap } from "@modules/library";
 import { clearOpusCache } from "@modules/audioCache";
 import { setStore, t } from "@stores";
+import { lsGetJSON, lsKeys, lsRemove, lsSetJSON } from "@utils";
 import { createSignal, lazy, Show } from "solid-js";
 import { render } from "solid-js/web";
 import ConfigureModal from "./ConfigureModal";
@@ -23,17 +24,14 @@ export default function Dropdown() {
         if (importedData.hasOwnProperty(key)) {
           // Device-local: it indexes OPFS audio that never travels with the file.
           if (key === CACHED_COLLECTION) continue;
-          localStorage.setItem(
-            "library_" + key,
-            JSON.stringify(importedData[key]),
-          );
+          lsSetJSON("library_" + key, importedData[key]);
         }
       }
       setStore("snackbar", t("library_imported")); // Reusing existing translation key
       location.reload();
     } else {
       // Assume V1 library
-      localStorage.setItem("library", JSON.stringify(importedData));
+      lsSetJSON("library", importedData);
       setStore("snackbar", t("library_migration_v1_v2"));
       location.reload(); // Trigger migration
     }
@@ -45,14 +43,11 @@ export default function Dropdown() {
     link.download = `ytify_library_${date}.json`;
 
     const exportedData: { [key: string]: any } = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("library_")) {
-        const name = key.slice(8);
-        // Device-local: the cached ids point at audio absent on any other device.
-        if (name === CACHED_COLLECTION) continue;
-        exportedData[name] = JSON.parse(localStorage.getItem(key)!);
-      }
+    for (const key of lsKeys("library_")) {
+      const name = key.slice(8);
+      // Device-local: the cached ids point at audio absent on any other device.
+      if (name === CACHED_COLLECTION) continue;
+      exportedData[name] = lsGetJSON(key, null);
     }
 
     link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(exportedData, undefined, 2))}`;
@@ -66,18 +61,9 @@ export default function Dropdown() {
     count = Object.keys(tracksMap).length;
 
     if (confirm(t("library_clean_prompt", count.toString()))) {
-      // Get all keys to remove
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith("library")) {
-          keysToRemove.push(key);
-        }
-      }
-
       // Remove all V2 library_ keys
-      for (const key of keysToRemove) {
-        localStorage.removeItem(key);
+      for (const key of lsKeys("library")) {
+        lsRemove(key);
       }
 
       // Cached audio lives in OPFS, which a localStorage wipe does not touch.

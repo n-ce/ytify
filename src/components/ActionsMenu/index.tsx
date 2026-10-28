@@ -5,6 +5,7 @@ import { render } from "solid-js/web";
 import { LikeButton } from "@components/MediaPartials";
 import CollectionSelector from "./CollectionSelector";
 import StreamItem from "@components/StreamItem";
+import { isTopicAuthor, stripTopic } from "@utils";
 import {
   setStore,
   store,
@@ -19,7 +20,7 @@ import {
 } from "@stores";
 
 export default function () {
-  const isMusic = store.actionsMenu?.author?.endsWith("- Topic");
+  const isMusic = isTopicAuthor(store.actionsMenu?.author);
   let dialog!: HTMLDialogElement;
 
   function closeDialog() {
@@ -172,9 +173,7 @@ export default function () {
             if (author)
               setListStore(
                 "name",
-                author.endsWith("- Topic")
-                  ? "Artist - " + author.replace("- Topic", "")
-                  : "",
+                isTopicAuthor(author) ? "Artist - " + stripTopic(author) : "",
               );
 
             if (authorId) {

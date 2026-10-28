@@ -1,6 +1,7 @@
 import { playerStore, setPlayerStore, setStore, updateParam } from "@stores";
 import { config } from "@config";
 import { player, applyMetadata } from "@modules/playback";
+import { stripTopic } from "@utils";
 
 export default function () {
   setPlayerStore("status", "Loading music information...");
@@ -9,7 +10,7 @@ export default function () {
   const { author, id, title } = stream;
 
   fetch(
-    `https://fast-saavn.vercel.app/api?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(author?.replace(" - Topic", "") ?? "")}&duration=${encodeURIComponent(stream.duration)}`,
+    `https://fast-saavn.vercel.app/api?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(stripTopic(author))}&duration=${encodeURIComponent(stream.duration)}`,
   )
     .then(async (res) => {
       if (!res.ok) {

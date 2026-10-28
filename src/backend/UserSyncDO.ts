@@ -26,12 +26,7 @@ interface LibrarySnapshot {
   meta: Meta;
   tracks: Collection;
   [key: string]:
-    | Collection
-    | Meta
-    | CollectionData
-    | number
-    | string
-    | undefined;
+    Collection | Meta | CollectionData | number | string | undefined;
 }
 
 interface DeltaPayload {
@@ -118,12 +113,16 @@ export class UserSyncDO {
     } catch (err) {
       console.warn("[userSync] schema init:", err);
     }
-    this.migrateRelations();
+    try {
+      this.migrateRelations();
+    } catch (err) {
+      console.warn("[userSync] migrateRelations failed:", err);
+    }
     this.initialized = true;
   }
 
   /**
-   * Backfills `user_tracks` from the pre-relation `tracks` rows so libraries that
+   * Backfills \`user_tracks\` from the pre-relation \`tracks\` rows so libraries that
    * predate the relational view keep working without a manual reset.
    */
   private migrateRelations(): void {
@@ -170,15 +169,19 @@ export class UserSyncDO {
    * Every track a user syncs is projected into the global catalog, so the
    * metadata fighters resolve once and every user (plus link previews) benefits.
    * A catalog failure must never affect the user's own sync result, so the write
-   * is fire-and-forget and `upsertTracks` never rejects.
+   * is fire-and-forget and \`upsertTracks\` never rejects.
    */
   private writeThroughToCatalog(tracks: TrackItem[]): void {
     if (!this.env?.CATALOG_DO || tracks.length === 0) return;
-    const write = upsertTracks(
-      this.env,
-      tracksToCanonical(tracks, "user_sync"),
-    );
-    this.ctx.waitUntil?.(write);
+    try {
+      const write = upsertTracks(
+        this.env,
+        tracksToCanonical(tracks, "user_sync"),
+      );
+      this.ctx.waitUntil?.(write);
+    } catch (err) {
+      console.warn("[userSync] writeThroughToCatalog failed:", err);
+    }
   }
 
   private hasLibrary(): boolean {
@@ -204,13 +207,14 @@ export class UserSyncDO {
    * Overlays canonical catalog metadata onto locally stored snapshots.
    *
    * This is what makes a repair land everywhere: the catalog is authoritative for
-   * `title`/`author`/`authorId`/`duration`, so every device sees a fix on its next
+   * \`title\`/\`author\`/\`authorId\`/\`duration\`, so every device sees a fix on its next
    * pull instead of keeping its own corrupted copy. The local snapshot is spread
-   * first so client-only fields (`context`, anything a future client adds) survive
+   * first so client-only fields (\`context\`, anything a future client adds) survive
    * the overlay, and it is still the fallback when the catalog has no record.
    */
   private async hydrateTracks(
     tracks: Record<string, TrackItem>,
+    shouldBackfillCatalog = false,
   ): Promise<Record<string, TrackItem>> {
     const ids = Object.keys(tracks);
     if (ids.length === 0) return tracks;
@@ -227,10 +231,11 @@ export class UserSyncDO {
       tracks[id] = overlayCanonical(tracks[id], record);
     }
 
-    // A relation with no catalog row means the write-through never ran for it
-    // (older library, or a catalog that was reset). Seed it now so the next read
-    // hydrates from the catalog like every other track.
-    if (missing.length > 0) this.writeThroughToCatalog(missing);
+    // Only backfill to catalog if explicitly requested (e.g. full snapshot reads)
+    // Never on periodic delta pulls to avoid redundant write thrashing.
+    if (shouldBackfillCatalog && missing.length > 0) {
+      this.writeThroughToCatalog(missing);
+    }
 
     return tracks;
   }
@@ -314,7 +319,7 @@ export class UserSyncDO {
       snapshot[r.name] = parse(r.data, []);
     }
 
-    snapshot.tracks = await this.hydrateTracks(snapshot.tracks);
+    snapshot.tracks = await this.hydrateTracks(snapshot.tracks, true);
     return snapshot;
   }
 
@@ -366,295 +371,323 @@ export class UserSyncDO {
   }
 
   async fetch(request: Request): Promise<Response> {
-    this.initSchema();
-    const url = new URL(request.url);
-    const m = request.method.toUpperCase();
-    const p = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
+    try {
+      this.initSchema();
+      const url = new URL(request.url);
+      const m = request.method.toUpperCase();
+      const p = url.pathname.replace(/^\/api\//, "").replace(/^\//, "");
 
-    if (p.startsWith("library")) {
-      if (m === "GET") {
-        const snapshot = this.hasLibrary()
-          ? await this.getFullSnapshot()
-          : { meta: { version: 5, tracks: 0 }, tracks: {} };
-        return new Response(JSON.stringify(snapshot), {
-          status: 200,
-          headers: JSON_HEADER,
-        });
-      }
-      if (m === "PUT") {
-        this.setFullSnapshot((await request.json()) as LibrarySnapshot);
-        return new Response(null, { status: 204, headers: JSON_HEADER });
-      }
-      return new Response(`Method ${m} not allowed`, { status: 405 });
-    }
-
-    if (p.startsWith("sync")) {
-      if (m === "GET") {
-        if (!this.hasLibrary())
-          return new Response("No library found. Perform a full sync first.", {
-            status: 404,
+      if (p.startsWith("library")) {
+        if (m === "GET") {
+          const snapshot = this.hasLibrary()
+            ? await this.getFullSnapshot()
+            : { meta: { version: 5, tracks: 0 }, tracks: {} };
+          return new Response(JSON.stringify(snapshot), {
+            status: 200,
             headers: JSON_HEADER,
           });
-        return new Response(JSON.stringify(this.getMeta()), {
-          status: 200,
-          headers: JSON_HEADER,
-        });
+        }
+        if (m === "PUT") {
+          this.setFullSnapshot((await request.json()) as LibrarySnapshot);
+          return new Response(null, { status: 204, headers: JSON_HEADER });
+        }
+        return new Response(`Method ${m} not allowed`, { status: 405 });
       }
 
-      if (m === "POST") {
-        if (!this.hasLibrary())
-          return new Response("No library found.", {
-            status: 404,
+      if (p.startsWith("sync")) {
+        if (m === "GET") {
+          if (!this.hasLibrary())
+            return new Response(
+              "No library found. Perform a full sync first.",
+              {
+                status: 404,
+                headers: JSON_HEADER,
+              },
+            );
+          return new Response(JSON.stringify(this.getMeta()), {
+            status: 200,
             headers: JSON_HEADER,
           });
-        const body = (await request.json().catch(() => ({}))) as {
-          meta?: Meta;
-        };
-        const clientMeta = body?.meta || { version: 5, tracks: 0 };
-        const serverMeta = this.getMeta();
-        const delta: DeltaPayload = {
-          meta: {},
-          addedOrUpdatedTracks: {},
-          deletedTrackIds: [],
-          updatedCollections: {},
-          deletedCollectionNames: [],
-        };
-        let hasChanges = false,
-          isFullTrackSync = false;
-
-        if ((serverMeta.version || 5) > (clientMeta.version || 5)) {
-          delta.meta.version = serverMeta.version;
-          hasChanges = true;
         }
 
-        const clientTracksTs = clientMeta.tracks || 0;
-        const trackCount = this.sql
-          .exec<{ c: number }>("SELECT count(*) as c FROM tracks")
-          .one().c;
+        if (m === "POST") {
+          if (!this.hasLibrary())
+            return new Response("No library found.", {
+              status: 404,
+              headers: JSON_HEADER,
+            });
+          const body = (await request.json().catch(() => ({}))) as {
+            meta?: Meta;
+          };
+          const clientMeta = body?.meta || { version: 5, tracks: 0 };
+          const serverMeta = this.getMeta();
+          const delta: DeltaPayload = {
+            meta: {},
+            addedOrUpdatedTracks: {},
+            deletedTrackIds: [],
+            updatedCollections: {},
+            deletedCollectionNames: [],
+          };
+          let hasChanges = false,
+            isFullTrackSync = false;
 
-        if (clientTracksTs === 0 && trackCount > 0) {
-          for (const r of this.sql
-            .exec<{ id: string; data: string }>("SELECT id, data FROM tracks")
-            .toArray()) {
-            delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
-          }
-          delta.meta.tracks = serverMeta.tracks;
-          hasChanges = true;
-          isFullTrackSync = true;
-        } else if (trackCount > 0) {
-          for (const r of this.sql
-            .exec<{ id: string; data: string; modified: number }>(
-              "SELECT id, data, modified FROM tracks WHERE modified > ?",
-              clientTracksTs,
-            )
-            .toArray()) {
-            delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
+          if ((serverMeta.version || 5) > (clientMeta.version || 5)) {
+            delta.meta.version = serverMeta.version;
             hasChanges = true;
           }
-          if (hasChanges) delta.meta.tracks = serverMeta.tracks;
-        }
 
-        // Canonical overlay for tracks repaired in the global catalog.
-        // Capped per pull so one repair cycle cannot saturate a mobile client.
-        const now = Date.now();
-        const isClientStale = clientTracksTs < serverMeta.tracks;
-        const intervalPassed = now - this.lastRepairCheck > 60_000;
-        const tracksTsChanged = clientTracksTs !== this.lastCheckedTracksTs;
+          const clientTracksTs = clientMeta.tracks || 0;
+          const trackCount = this.sql
+            .exec<{ c: number }>("SELECT count(*) as c FROM tracks")
+            .one().c;
 
-        if (
-          !isFullTrackSync &&
-          clientTracksTs > 0 &&
-          (isClientStale || intervalPassed || tracksTsChanged)
-        ) {
-          const repaired = await this.repairedSince(
-            clientTracksTs,
-            MAX_REPAIRED_PER_PULL,
-          );
-          for (const [id, track] of Object.entries(repaired)) {
-            if (!delta.addedOrUpdatedTracks[id]) {
-              delta.addedOrUpdatedTracks[id] = track;
+          if (clientTracksTs === 0 && trackCount > 0) {
+            for (const r of this.sql
+              .exec<{ id: string; data: string }>("SELECT id, data FROM tracks")
+              .toArray()) {
+              delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
+            }
+            delta.meta.tracks = serverMeta.tracks;
+            hasChanges = true;
+            isFullTrackSync = true;
+          } else if (trackCount > 0) {
+            for (const r of this.sql
+              .exec<{ id: string; data: string; modified: number }>(
+                "SELECT id, data, modified FROM tracks WHERE modified > ?",
+                clientTracksTs,
+              )
+              .toArray()) {
+              delta.addedOrUpdatedTracks[r.id] = parse(r.data, null as any);
               hasChanges = true;
             }
+            if (hasChanges) delta.meta.tracks = serverMeta.tracks;
           }
-          this.lastRepairCheck = now;
-          this.lastCheckedTracksTs = clientTracksTs;
-        }
 
-        if (isFullTrackSync && Object.keys(delta.addedOrUpdatedTracks).length) {
-          delta.addedOrUpdatedTracks = await this.hydrateTracks(
-            delta.addedOrUpdatedTracks,
-          );
-        }
+          // Canonical overlay for tracks repaired in the global catalog.
+          // Capped per pull so one repair cycle cannot saturate a mobile client.
+          const now = Date.now();
+          const isClientStale = clientTracksTs < serverMeta.tracks;
+          const intervalPassed = now - this.lastRepairCheck > 60_000;
+          const tracksTsChanged = clientTracksTs !== this.lastCheckedTracksTs;
 
-        for (const r of this.sql
-          .exec<{ name: string; data: string; modified: number }>(
-            "SELECT name, data, modified FROM collections",
-          )
-          .toArray()) {
-          const clientColTs = clientMeta[r.name] || 0;
-          if (r.modified > clientColTs) {
-            delta.updatedCollections[r.name] = parse(r.data, []);
-            delta.meta[r.name] = r.modified;
-            hasChanges = true;
-          }
-        }
-
-        if (clientTracksTs > 0 && !isFullTrackSync) {
-          for (const r of this.sql
-            .exec<{ id: string }>(
-              "SELECT id FROM deleted_tracks WHERE deleted_at > ?",
+          if (
+            !isFullTrackSync &&
+            clientTracksTs > 0 &&
+            (isClientStale || intervalPassed || tracksTsChanged)
+          ) {
+            const repaired = await this.repairedSince(
               clientTracksTs,
-            )
-            .toArray()) {
-            delta.deletedTrackIds.push(r.id);
-            hasChanges = true;
-          }
-        }
-
-        for (const [name] of Object.entries(clientMeta)) {
-          if (name !== "version" && name !== "tracks") {
-            const clientColTs = clientMeta[name];
-            if (typeof clientColTs === "number" && clientColTs > 0) {
-              for (const r of this.sql
-                .exec<{ name: string }>(
-                  "SELECT name FROM deleted_collections WHERE name = ? AND deleted_at > ?",
-                  name,
-                  clientColTs,
-                )
-                .toArray()) {
-                delta.deletedCollectionNames.push(r.name);
+              MAX_REPAIRED_PER_PULL,
+            );
+            for (const [id, track] of Object.entries(repaired)) {
+              if (!delta.addedOrUpdatedTracks[id]) {
+                delta.addedOrUpdatedTracks[id] = track;
                 hasChanges = true;
               }
             }
+            this.lastRepairCheck = now;
+            this.lastCheckedTracksTs = clientTracksTs;
           }
-        }
 
-        return new Response(
-          JSON.stringify({
-            serverMeta,
-            delta: hasChanges ? delta : null,
-            fullSyncRequired: false,
-            isFullTrackSync,
-          }),
-          { status: 200, headers: JSON_HEADER },
-        );
-      }
-
-      if (m === "PUT") {
-        const delta = (await request.json()) as DeltaPayload;
-        const now = Date.now();
-
-        this.ctx.storage.transactionSync(() => {
           if (
-            delta.addedOrUpdatedTracks &&
-            Object.keys(delta.addedOrUpdatedTracks).length > 0
+            isFullTrackSync &&
+            Object.keys(delta.addedOrUpdatedTracks).length
           ) {
-            for (const [id, track] of Object.entries(
+            delta.addedOrUpdatedTracks = await this.hydrateTracks(
               delta.addedOrUpdatedTracks,
-            )) {
-              track.modified = Math.max(track.modified || 0, now);
-              this.sql.exec(
-                "INSERT OR REPLACE INTO tracks (id, data, modified) VALUES (?, ?, ?)",
-                id,
-                JSON.stringify(track),
-                track.modified,
-              );
-              this.sql.exec("DELETE FROM deleted_tracks WHERE id = ?", id);
-            }
-            this.sql.exec(
-              "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
-              now,
-            );
-            this.writeThroughToCatalog(
-              Object.values(delta.addedOrUpdatedTracks),
-            );
-            this.recordRelations(Object.values(delta.addedOrUpdatedTracks));
-          }
-
-          if (delta.deletedTrackIds?.length) {
-            for (const id of delta.deletedTrackIds) {
-              this.sql.exec("DELETE FROM tracks WHERE id = ?", id);
-              this.sql.exec(
-                "INSERT OR REPLACE INTO deleted_tracks (id, deleted_at) VALUES (?, ?)",
-                id,
-                now,
-              );
-            }
-            this.dropRelations(delta.deletedTrackIds);
-            this.sql.exec(
-              "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
-              now,
+              false,
             );
           }
 
-          if (delta.updatedCollections) {
-            for (const [name, data] of Object.entries(
-              delta.updatedCollections,
-            )) {
-              const mod =
-                typeof delta.meta?.[name] === "number"
-                  ? delta.meta[name]!
-                  : now;
-              this.sql.exec(
-                "INSERT OR REPLACE INTO collections (name, data, modified) VALUES (?, ?, ?)",
-                name,
-                JSON.stringify(data),
-                mod,
-              );
-              this.sql.exec(
-                "DELETE FROM deleted_collections WHERE name = ?",
-                name,
-              );
-              this.sql.exec(
-                "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
-                name,
-                mod,
-              );
+          for (const r of this.sql
+            .exec<{ name: string; data: string; modified: number }>(
+              "SELECT name, data, modified FROM collections",
+            )
+            .toArray()) {
+            const clientColTs = clientMeta[r.name] || 0;
+            if (r.modified > clientColTs) {
+              delta.updatedCollections[r.name] = parse(r.data, []);
+              delta.meta[r.name] = r.modified;
+              hasChanges = true;
             }
           }
 
-          if (delta.deletedCollectionNames?.length) {
-            for (const name of delta.deletedCollectionNames) {
-              this.sql.exec("DELETE FROM collections WHERE name = ?", name);
-              this.sql.exec("DELETE FROM meta WHERE key = ?", name);
-              this.sql.exec(
-                "INSERT OR REPLACE INTO deleted_collections (name, deleted_at) VALUES (?, ?)",
-                name,
-                now,
-              );
+          if (clientTracksTs > 0 && !isFullTrackSync) {
+            for (const r of this.sql
+              .exec<{ id: string }>(
+                "SELECT id FROM deleted_tracks WHERE deleted_at > ?",
+                clientTracksTs,
+              )
+              .toArray()) {
+              delta.deletedTrackIds.push(r.id);
+              hasChanges = true;
             }
           }
 
-          if (delta.meta) {
-            for (const [k, ts] of Object.entries(delta.meta)) {
-              if (typeof ts === "number") {
-                const cur = this.sql
-                  .exec<{ value: number }>(
-                    "SELECT value FROM meta WHERE key = ?",
-                    k,
+          for (const [name] of Object.entries(clientMeta)) {
+            if (name !== "version" && name !== "tracks") {
+              const clientColTs = clientMeta[name];
+              if (typeof clientColTs === "number" && clientColTs > 0) {
+                for (const r of this.sql
+                  .exec<{ name: string }>(
+                    "SELECT name FROM deleted_collections WHERE name = ? AND deleted_at > ?",
+                    name,
+                    clientColTs,
                   )
-                  .toArray();
-                this.sql.exec(
-                  "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
-                  k,
-                  cur.length ? Math.max(cur[0].value, ts) : ts,
-                );
+                  .toArray()) {
+                  delta.deletedCollectionNames.push(r.name);
+                  hasChanges = true;
+                }
               }
             }
           }
-        });
 
-        this.touch();
-        return new Response(JSON.stringify({ serverMeta: this.getMeta() }), {
-          status: 200,
-          headers: JSON_HEADER,
-        });
+          return new Response(
+            JSON.stringify({
+              serverMeta,
+              delta: hasChanges ? delta : null,
+              fullSyncRequired: false,
+              isFullTrackSync,
+            }),
+            { status: 200, headers: JSON_HEADER },
+          );
+        }
+
+        if (m === "PUT") {
+          const delta = (await request.json()) as DeltaPayload;
+          const now = Date.now();
+
+          this.ctx.storage.transactionSync(() => {
+            if (
+              delta.addedOrUpdatedTracks &&
+              Object.keys(delta.addedOrUpdatedTracks).length > 0
+            ) {
+              for (const [id, track] of Object.entries(
+                delta.addedOrUpdatedTracks,
+              )) {
+                track.modified = Math.max(track.modified || 0, now);
+                this.sql.exec(
+                  "INSERT OR REPLACE INTO tracks (id, data, modified) VALUES (?, ?, ?)",
+                  id,
+                  JSON.stringify(track),
+                  track.modified,
+                );
+                this.sql.exec("DELETE FROM deleted_tracks WHERE id = ?", id);
+              }
+              this.sql.exec(
+                "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
+                now,
+              );
+              this.writeThroughToCatalog(
+                Object.values(delta.addedOrUpdatedTracks),
+              );
+              this.recordRelations(Object.values(delta.addedOrUpdatedTracks));
+            }
+
+            if (delta.deletedTrackIds?.length) {
+              for (const id of delta.deletedTrackIds) {
+                this.sql.exec("DELETE FROM tracks WHERE id = ?", id);
+                this.sql.exec(
+                  "INSERT OR REPLACE INTO deleted_tracks (id, deleted_at) VALUES (?, ?)",
+                  id,
+                  now,
+                );
+              }
+              this.dropRelations(delta.deletedTrackIds);
+              this.sql.exec(
+                "INSERT OR REPLACE INTO meta (key, value) VALUES ('tracks', ?)",
+                now,
+              );
+            }
+
+            if (delta.updatedCollections) {
+              for (const [name, data] of Object.entries(
+                delta.updatedCollections,
+              )) {
+                const mod =
+                  typeof delta.meta?.[name] === "number"
+                    ? delta.meta[name]!
+                    : now;
+                this.sql.exec(
+                  "INSERT OR REPLACE INTO collections (name, data, modified) VALUES (?, ?, ?)",
+                  name,
+                  JSON.stringify(data),
+                  mod,
+                );
+                this.sql.exec(
+                  "DELETE FROM deleted_collections WHERE name = ?",
+                  name,
+                );
+                this.sql.exec(
+                  "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+                  name,
+                  mod,
+                );
+              }
+            }
+
+            if (delta.deletedCollectionNames?.length) {
+              for (const name of delta.deletedCollectionNames) {
+                this.sql.exec("DELETE FROM collections WHERE name = ?", name);
+                this.sql.exec("DELETE FROM meta WHERE key = ?", name);
+                this.sql.exec(
+                  "INSERT OR REPLACE INTO deleted_collections (name, deleted_at) VALUES (?, ?)",
+                  name,
+                  now,
+                );
+              }
+            }
+
+            if (delta.meta) {
+              for (const [k, ts] of Object.entries(delta.meta)) {
+                if (typeof ts === "number") {
+                  const cur = this.sql
+                    .exec<{ value: number }>(
+                      "SELECT value FROM meta WHERE key = ?",
+                      k,
+                    )
+                    .toArray();
+                  this.sql.exec(
+                    "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+                    k,
+                    cur.length ? Math.max(cur[0].value, ts) : ts,
+                  );
+                }
+              }
+            }
+          });
+
+          this.touch();
+          return new Response(JSON.stringify({ serverMeta: this.getMeta() }), {
+            status: 200,
+            headers: JSON_HEADER,
+          });
+        }
+
+        return new Response(`Method ${m} not allowed`, { status: 405 });
       }
 
-      return new Response(`Method ${m} not allowed`, { status: 405 });
+      return new Response("Not Found", { status: 404 });
+    } catch (err: any) {
+      console.error("[userSync] fetch error:", err);
+      const isQuota =
+        err?.message?.toLowerCase().includes("quota") ||
+        err?.message?.toLowerCase().includes("limit") ||
+        err?.message?.toLowerCase().includes("full");
+      return new Response(
+        JSON.stringify({
+          error: isQuota
+            ? "Sync storage quota temporarily exceeded"
+            : err instanceof Error
+              ? err.message
+              : "UserSync error",
+        }),
+        {
+          status: isQuota ? 429 : 500,
+          headers: JSON_HEADER,
+        },
+      );
     }
-
-    return new Response("Not Found", { status: 404 });
   }
 
   async alarm(): Promise<void> {
