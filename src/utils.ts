@@ -255,6 +255,54 @@ export function normalizeAuthorKey(author?: string): string {
   return normalizeText(stripTopic(author));
 }
 
+/**
+ * Selects and orders the artists shown by the favorites shelf.
+ *
+ * Only `- Topic` authors with an `authorId` qualify, and an artist needs at
+ * least two favorites. Ranking combines representation and recency: the
+ * favorites array is newest-first, so each track adds `1 / (1 + index / 30)`.
+ * The top `limit` artists are then re-sorted in collection order (lowest
+ * position first), which is also the order callers must pass them to APIs.
+ */
+export function rankFavoriteArtists(
+  items: readonly TrackItem[] | undefined,
+  limit = 10,
+): Channel[] {
+  const RANK_DECAY = 30;
+  const byAuthor: Record<
+    string,
+    { count: number; score: number; best: number; name: string; img?: string }
+  > = {};
+
+  (items || []).forEach((track, index) => {
+    if (!track?.authorId || !isTopicAuthor(track.author)) return;
+
+    const prev = byAuthor[track.authorId];
+    byAuthor[track.authorId] = {
+      count: (prev?.count || 0) + 1,
+      score: (prev?.score || 0) + 1 / (1 + index / RANK_DECAY),
+      best: prev ? Math.min(prev.best, index) : index,
+      name: stripTopic(track.author) || prev?.name || "",
+      img: (track as any).img || prev?.img || "",
+    };
+  });
+
+  return Object.entries(byAuthor)
+    .filter(([, info]) => info.count > 1)
+    .sort(
+      ([, a], [, b]) =>
+        b.score - a.score || b.count - a.count || a.best - b.best,
+    )
+    .slice(0, limit)
+    .sort(([, a], [, b]) => a.best - b.best)
+    .map(([id, info]) => ({
+      id,
+      name: info.name,
+      img: info.img || "",
+      type: "artist",
+    }));
+}
+
 /* Misc */
 
 export function clamp(n: number, min: number, max: number): number {

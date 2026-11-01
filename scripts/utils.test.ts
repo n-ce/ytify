@@ -17,6 +17,7 @@ import {
   normalizeText,
   parseDuration,
   pickImage,
+  rankFavoriteArtists,
   reorderItem,
   shuffle,
   sortCollection,
@@ -268,6 +269,47 @@ describe("text helpers", () => {
     expect(normalizeAuthorKey("Beyonce- Topic")).toBe("beyonce");
     expect(normalizeAuthorKey("  BEYONCE  ")).toBe("beyonce");
     expect(normalizeAuthorKey(undefined)).toBe("");
+  });
+
+  const track = (id: string, authorId: string, author: string): TrackItem => ({
+    id,
+    title: id,
+    duration: "00:00",
+    author,
+    authorId,
+  });
+
+  test("rankFavoriteArtists skips single favorites and non-topic authors", () => {
+    const items = [
+      track("a1", "UC_A", "A - Topic"),
+      track("a2", "UC_A", "A - Topic"),
+      track("b1", "UC_B", "B - Topic"),
+      track("v1", "UC_B", "B"),
+    ];
+
+    expect(rankFavoriteArtists(items).map((a) => a.id)).toEqual(["UC_A"]);
+  });
+
+  test("rankFavoriteArtists selects by score but orders by collection position", () => {
+    const items = [
+      track("b1", "UC_B", "B - Topic"),
+      track("b2", "UC_B", "B - Topic"),
+      track("pad", "UC_P", "Video channel"),
+      track("a1", "UC_A", "A - Topic"),
+      track("a2", "UC_A", "A - Topic"),
+      track("a3", "UC_A", "A - Topic"),
+      track("a4", "UC_A", "A - Topic"),
+      track("a5", "UC_A", "A - Topic"),
+    ];
+
+    // A's five recent favorites score higher, so it wins a single slot...
+    expect(rankFavoriteArtists(items, 1).map((a) => a.id)).toEqual(["UC_A"]);
+
+    // ...but the shelf follows the collection, where B appears first.
+    expect(rankFavoriteArtists(items).map((a) => a.id)).toEqual([
+      "UC_B",
+      "UC_A",
+    ]);
   });
 });
 

@@ -3,6 +3,9 @@ import { getClient, getThumbnail, formatThumbnailId } from "./utils.js";
 
 export type FeaturedArtist = Channel & { type: "artist" };
 
+/** The Featured shelf shows at most this many playlists. */
+const FEATURED_PLAYLIST_LIMIT = 10;
+
 export interface FeaturedResult {
   featuredPlaylists: YTPlaylistItem[];
   artists: FeaturedArtist[];
@@ -123,35 +126,54 @@ export default async function getFeatured(
   }
 
   const yt = await getClient();
-  const artistResults: FetchArtistResult[] = await Promise.all(
-    artistIds.map((id) => fetchArtistData(yt, id)),
-  );
+  // Resolve in small sequential batches. A burst of parallel `music.getArtist`
+  // calls can get some of them dropped/rate-limited, which used to leave the
+  // favorites shelf with only the couple of artists that got through.
+  const ARTIST_BATCH_SIZE = 5;
+  const artistResults: FetchArtistResult[] = [];
+  for (let i = 0; i < artistIds.length; i += ARTIST_BATCH_SIZE) {
+    const batch = artistIds.slice(i, i + ARTIST_BATCH_SIZE);
+    artistResults.push(
+      ...(await Promise.all(batch.map((id) => fetchArtistData(yt, id)))),
+    );
+  }
 
   // 1. Extract artists with real avatars for Favorites shelf
   const artists: FeaturedArtist[] = artistResults
     .map((r) => r.artist)
     .filter((a): a is FeaturedArtist => a !== null && !!a.id && !!a.name);
 
-  // 2. Aggregate artist Featured On playlists
-  const artistFeaturedPlaylistMap: Record<
+  // 2. Aggregate every artist's "Featured on" playlists, counting how many of
+  //    the passed artists feature each one. `order` is the index of the first
+  //    artist (in request order) that features the playlist; it is used to
+  //    restore the caller's artist order after the count-based selection.
+  const playlistCounts = new Map<
     string,
-    YTPlaylistItem & { count: number }
-  > = {};
-  for (const r of artistResults) {
+    { playlist: YTPlaylistItem; count: number; order: number }
+  >();
+
+  artistResults.forEach((r, artistIndex) => {
     for (const playlist of r.featuredOnPlaylists) {
-      if (artistFeaturedPlaylistMap[playlist.id]) {
-        artistFeaturedPlaylistMap[playlist.id].count++;
-      } else {
-        artistFeaturedPlaylistMap[playlist.id] = { ...playlist, count: 1 };
-      }
+      if (!playlist.id) continue;
+      const existing = playlistCounts.get(playlist.id);
+      if (existing) existing.count++;
+      else
+        playlistCounts.set(playlist.id, {
+          playlist,
+          count: 1,
+          order: artistIndex,
+        });
     }
-  }
+  });
 
-  const artistFeatured = Object.values(artistFeaturedPlaylistMap)
+  // 3. Pick the 10 most-shared playlists, then display them in the order the
+  //    caller passed the artists: a playlist belongs where the first of its
+  //    artists sits in `artistIds`.
+  const featuredPlaylists = [...playlistCounts.values()]
     .sort((a, b) => b.count - a.count)
-    .map(({ count, ...playlist }) => playlist);
-
-  const featuredPlaylists = artistFeatured.slice(0, limit);
+    .slice(0, FEATURED_PLAYLIST_LIMIT)
+    .sort((a, b) => a.order - b.order)
+    .map(({ playlist }) => playlist);
 
   return {
     featuredPlaylists,

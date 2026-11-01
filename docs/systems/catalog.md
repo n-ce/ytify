@@ -83,10 +83,12 @@ A catalog fix MUST reach every user without a manual library reset:
 The retired `/recommend`, Gallery, and ytmgr recommendation paths are replaced by `src/backend/getFeatured.ts`:
 
 - **Input**:
-  - `artistIds`: Up to 5 favorite artist IDs (from tracks with `- Topic`).
-  - `limit`: Optional max items per shelf (default 20, max 30).
+  - `artistIds`: Up to 10 favorite artist IDs (from tracks with `- Topic`, at least two favorites per artist), passed in the favorites-shelf order.
+  - `limit`: Optional max artists returned (default 20, max 30). Featured playlists are always capped at 10.
 - **Retrieval**:
-  - `yt.music.getArtist`: In parallel for each favorite artist ID, extracting artist `Featured on` playlists and resolving real channel avatars from `MusicImmersiveHeader` / `MusicVisualHeader`.
+  - `yt.music.getArtist`: In sequential batches of 5 for each favorite artist ID, extracting artist `Featured on` playlists and resolving real channel avatars from `MusicImmersiveHeader` / `MusicVisualHeader`.
+- **Ordering**:
+  - All `Featured on` playlists are deduplicated and counted by how many of the passed artists feature them; the top 10 by count are selected, then those 10 are displayed in `artistIds` order (each playlist is placed at the position of the first artist, in request order, that features it).
 - **Response**:
   ```typescript
   interface FeaturedResult {

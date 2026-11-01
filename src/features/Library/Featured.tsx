@@ -1,8 +1,8 @@
 import { createSignal, onMount, Show } from "solid-js";
-import { getCollection, getTracksMap } from "@modules/library";
+import { getCollectionItems } from "@modules/library";
 import Carousel from "@components/Carousel";
 import { t, store } from "@stores";
-import { unique, stripTopic } from "@utils";
+import { rankFavoriteArtists } from "@utils";
 
 interface FeaturedResponse {
   featuredPlaylists?: YTPlaylistItem[];
@@ -12,6 +12,7 @@ interface FeaturedResponse {
 interface CachedFeatured {
   featuredPlaylists: YTPlaylistItem[];
   timestamp: number;
+  artistIds?: string[];
 }
 
 export default function () {
@@ -24,7 +25,14 @@ export default function () {
     if (hasAttemptedFetch) return;
     hasAttemptedFetch = true;
 
-    // Check session storage first (valid for 30 minutes, must be non-empty)
+    // Same selection and order as the favorites artist shelf. The backend
+    // returns playlists grouped in this exact artist order.
+    const artistIds = rankFavoriteArtists(
+      getCollectionItems("favorites"),
+    ).map((artist) => artist.id);
+
+    // The session cache is only valid for the same artist list (same IDs in
+    // the same order), so favorites changes show up immediately.
     try {
       const cached = sessionStorage.getItem("featured_cache");
       if (cached) {
@@ -32,64 +40,14 @@ export default function () {
         if (
           Array.isArray(parsed.featuredPlaylists) &&
           parsed.featuredPlaylists.length > 0 &&
-          Date.now() - parsed.timestamp < 30 * 60 * 1000
+          Date.now() - parsed.timestamp < 30 * 60 * 1000 &&
+          parsed.artistIds?.join(",") === artistIds.join(",")
         ) {
           setFeaturedPlaylists(parsed.featuredPlaylists);
           return;
         }
       }
     } catch {}
-
-    const history = getCollection("history");
-    const historyIds = unique(history).filter(Boolean);
-
-    const tracksMap = getTracksMap();
-    const favorites = getCollection("favorites")
-      .map((id) => tracksMap[id])
-      .filter(Boolean);
-
-    // Build author -> authorId fallback map from all known tracks with valid authorId
-    const authorToIdMap: Record<string, string> = {};
-    for (const t of Object.values(tracksMap)) {
-      if (t?.author && t?.authorId) {
-        const cleanAuthor = stripTopic(t.author).toLowerCase();
-        if (cleanAuthor && !authorToIdMap[cleanAuthor]) {
-          authorToIdMap[cleanAuthor] = t.authorId;
-        }
-      }
-    }
-
-    const getTrackAuthorId = (track: TrackItem | undefined): string => {
-      if (track?.authorId) return track.authorId;
-      if (track?.author) {
-        const clean = stripTopic(track.author).toLowerCase();
-        return authorToIdMap[clean] || "";
-      }
-      return "";
-    };
-
-    const artistCounts: Record<string, number> = {};
-    favorites.forEach((track) => {
-      const authorId = getTrackAuthorId(track);
-      if (authorId) {
-        artistCounts[authorId] = (artistCounts[authorId] || 0) + 2;
-      }
-    });
-
-    historyIds
-      .map((id) => tracksMap[id])
-      .filter(Boolean)
-      .forEach((track) => {
-        const authorId = getTrackAuthorId(track);
-        if (authorId) {
-          artistCounts[authorId] = (artistCounts[authorId] || 0) + 1;
-        }
-      });
-
-    const artistIds = Object.entries(artistCounts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([id]) => id)
-      .slice(0, 5);
 
     if (artistIds.length === 0) {
       setFeaturedPlaylists([]);
@@ -98,8 +56,10 @@ export default function () {
 
     try {
       const artistParam = artistIds.join(",");
+      // Byte-identical to the favorites artist shelf's request. Sharing the URL
+      // means one edge/browser cache entry for both views instead of two.
       const res = await fetch(
-        `${store.api}/featured?artistIds=${encodeURIComponent(artistParam)}&limit=20`,
+        `${store.api}/featured?artistIds=${encodeURIComponent(artistParam)}`,
       );
       if (res.ok) {
         const data = (await res.json()) as FeaturedResponse;
@@ -115,6 +75,7 @@ export default function () {
               JSON.stringify({
                 featuredPlaylists: feat,
                 timestamp: Date.now(),
+                artistIds,
               }),
             );
           } catch {}

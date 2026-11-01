@@ -110,10 +110,10 @@ The Library view exposes modular shelves toggled in `config.librarySections`:
 
 - **Unified `/api/featured` Backend**:
   - Populates both **Featured Playlists** (Moods & Genres official + artist `Featured on` playlists) and **Community Playlists** in a single network round-trip.
-  - Passes user's top history track IDs and top favorite artist IDs (`authorId` from `favorites`).
+  - Both the Library hub and the Favorites artist carousel share `rankFavoriteArtists()` (`src/utils.ts`): favorites-only, at least two tracks per artist, top 10 in collection order. The same ordered artist IDs are sent to `/api/featured`.
 - **Favorites Shelf Coupling**:
-  - The Artist carousel within the Favorites view (`src/features/List/index.tsx`) is strictly coupled to `config.librarySections().featured`.
-  - When `librarySections().featured` is false or toggled off, the Artist carousel in Favorites is unmounted and all artist channel network queries are skipped.
+  - The Artist carousel is a lazily imported component (`src/features/List/ArtistCarousel.tsx`) rendered by `src/features/List/index.tsx` only for the `favorites` collection.
+  - It is strictly coupled to `config.librarySections().featured`. When that is false or toggled off, the carousel is unmounted and all artist channel network queries are skipped.
 
 ---
 

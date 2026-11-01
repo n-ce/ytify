@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show, onCleanup, createEffect } from "solid-js";
+import { createSignal, onMount, Show, onCleanup, lazy } from "solid-js";
 import "./List.css";
 import {
   addToQueue,
@@ -9,13 +9,11 @@ import {
   t,
   setQueueStore,
   openSubView,
-  store,
 } from "@stores";
 import {
   generateImageUrl,
   sortCollection,
   normalizeText,
-  stripTopic,
   type SortBy,
 } from "@utils";
 import { librarySections, setConfig, config, setDrawer } from "@config";
@@ -32,6 +30,10 @@ import Carousel from "@components/Carousel";
 import ListItem from "@components/ListItem";
 import HeaderNav from "@components/HeaderNav";
 
+// Favorites-only shelf: keep its ranking/cache/enrichment code out of every
+// other collection's chunk.
+const ArtistCarousel = lazy(() => import("./ArtistCarousel"));
+
 export default function () {
   let listSection!: HTMLElement;
 
@@ -44,84 +46,6 @@ export default function () {
   );
   const [showSortable, setShowSortable] = createSignal(false);
   const [searchQuery, setSearchQuery] = createSignal("");
-  const [favoriteArtists, setFavoriteArtists] = createSignal<Channel[]>([]);
-  let hasAttemptedArtistsFetch = false;
-
-  createEffect(() => {
-    if (listStore.id === "favorites" && listStore.type === "collection") {
-      // Gate artist shelf behind librarySections().featured
-      if (!librarySections().featured) {
-        setFavoriteArtists([]);
-        return;
-      }
-
-      const source = getSourceItems();
-      const artistCounts: Record<
-        string,
-        { count: number; name: string; img?: string }
-      > = {};
-      source.forEach((track) => {
-        if (track && track.authorId) {
-          const prev = artistCounts[track.authorId];
-          artistCounts[track.authorId] = {
-            count: (prev?.count || 0) + 1,
-            name: stripTopic(track.author) || prev?.name || "",
-            img: (track as any).img || prev?.img || "",
-          };
-        }
-      });
-      const sorted = Object.entries(artistCounts).sort(
-        ([, a], [, b]) => b.count - a.count,
-      );
-      const artistIds = sorted.map(([id]) => id);
-
-      if (artistIds.length === 0) {
-        setFavoriteArtists([]);
-        return;
-      }
-
-      // Check session cache first
-      let cachedArtists: Channel[] = [];
-      try {
-        const stored = sessionStorage.getItem("featured_artists");
-        if (stored) cachedArtists = JSON.parse(stored);
-      } catch {}
-
-      if (cachedArtists.length > 0) {
-        setFavoriteArtists(cachedArtists);
-      } else {
-        setFavoriteArtists(
-          sorted.slice(0, 15).map(([id, info]) => ({
-            id,
-            name: info.name,
-            img: info.img || "",
-            type: "artist",
-          })),
-        );
-
-        if (hasAttemptedArtistsFetch) return;
-        hasAttemptedArtistsFetch = true;
-        fetch(
-          `${store.api}/featured?artistIds=${encodeURIComponent(artistIds.slice(0, 5).join(","))}`,
-        )
-          .then((res) => res.json())
-          .then((data: any) => {
-            if (Array.isArray(data?.artists) && data.artists.length > 0) {
-              setFavoriteArtists(data.artists);
-              try {
-                sessionStorage.setItem(
-                  "featured_artists",
-                  JSON.stringify(data.artists),
-                );
-              } catch {}
-            }
-          })
-          .catch(() => {});
-      }
-    } else {
-      setFavoriteArtists([]);
-    }
-  });
 
   const getSourceItems = () => {
     let source =
@@ -423,23 +347,10 @@ export default function () {
         when={
           librarySections().featured &&
           listStore.id === "favorites" &&
-          listStore.type === "collection" &&
-          favoriteArtists().length > 0
+          listStore.type === "collection"
         }
       >
-        <div class="list-carousels">
-          <Carousel
-            items={favoriteArtists()}
-            renderItem={(artist) => (
-              <ListItem
-                name={artist.name}
-                img={artist.img}
-                id={artist.id}
-                type="artist"
-              />
-            )}
-          />
-        </div>
+        <ArtistCarousel items={getSourceItems()} />
       </Show>
 
       <Show when={config.loadImage && listStore.id.startsWith("MPREb")}>
