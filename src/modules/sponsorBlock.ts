@@ -1,5 +1,6 @@
 import { config } from "@config";
 import { playerStore } from "@stores";
+import { isTopicAuthor } from "@utils";
 
 type SponsorSegment = [number, number];
 
@@ -18,7 +19,10 @@ const DEFAULT_CATEGORIES = JSON.stringify([
   "music_offtopic",
 ]);
 
-export async function fetchSponsorSegments(videoId: string): Promise<void> {
+export async function fetchSponsorSegments(
+  videoId: string,
+  author?: string,
+): Promise<void> {
   if (fetchAbortController) {
     fetchAbortController.abort();
     fetchAbortController = null;
@@ -32,7 +36,8 @@ export async function fetchSponsorSegments(videoId: string): Promise<void> {
   segments = [];
   skippingToEnd = null;
 
-  if (!config.sponsorblock || !videoId) {
+  // "- Topic" / music uploads are excluded: SponsorBlock data on them is noise.
+  if (!config.sponsorblock || !videoId || isTopicAuthor(author)) {
     return;
   }
 
@@ -54,7 +59,8 @@ export async function fetchSponsorSegments(videoId: string): Promise<void> {
 }
 
 export function checkSponsorBlock(currentTime: number): void {
-  if (!config.sponsorblock || segments.length === 0) {
+  // Never skip inside music ("- Topic") playback.
+  if (!config.sponsorblock || playerStore.isMusic || segments.length === 0) {
     return;
   }
 

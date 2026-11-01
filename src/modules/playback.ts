@@ -106,7 +106,8 @@ export async function applyMetadata(data: TrackItem) {
   }
 
   if (config.sponsorblock && data.id) {
-    fetchSponsorSegments(data.id);
+    // fetchSponsorSegments clears previous segments and skips "- Topic" items.
+    fetchSponsorSegments(data.id, data.author);
   }
 
   const metadataObj: MediaMetadataInit = {
@@ -190,10 +191,6 @@ export async function player(id?: string) {
 
   if (!id) return;
 
-  if (config.sponsorblock) {
-    fetchSponsorSegments(id);
-  }
-
   const enforceVideo = !playerStore.isMusic && playerStore.isWatching;
 
   if (!enforceVideo) {
@@ -211,6 +208,8 @@ export async function player(id?: string) {
             duration: track.duration,
             authorId: track.authorId,
           });
+        } else if (config.sponsorblock) {
+          fetchSponsorSegments(id, playerStore.stream.author);
         }
 
         delete playerStore.audio.dataset.retried;

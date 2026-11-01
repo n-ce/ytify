@@ -45,6 +45,7 @@ describe("sponsorBlock module", () => {
   beforeEach(() => {
     config.sponsorblock = true;
     clearSponsorSegments();
+    playerStore.isMusic = false;
     playerStore.audio.currentTime = 0;
   });
 
@@ -84,8 +85,25 @@ describe("sponsorBlock module", () => {
     expect(playerStore.audio.currentTime).toBe(60);
   });
 
-  test("does nothing when config.sponsorblock is false", async () => {
-    config.sponsorblock = false;
+  test("skips fetching and skipping for - Topic authors", async () => {
+    let fetchCalled = false;
+    globalThis.fetch = (async () => {
+      fetchCalled = true;
+      return new Response(
+        JSON.stringify([{ category: "sponsor", segment: [10, 20] }]),
+        { status: 200 },
+      );
+    }) as any;
+
+    await fetchSponsorSegments("music123", "Some Artist - Topic");
+
+    expect(fetchCalled).toBe(false);
+    playerStore.audio.currentTime = 12;
+    checkSponsorBlock(12);
+    expect(playerStore.audio.currentTime).toBe(12);
+  });
+
+  test("never skips while playerStore.isMusic is true", async () => {
     globalThis.fetch = (async () => {
       return new Response(
         JSON.stringify([{ category: "sponsor", segment: [10, 20] }]),
@@ -94,6 +112,26 @@ describe("sponsorBlock module", () => {
     }) as any;
 
     await fetchSponsorSegments("test123");
+    playerStore.isMusic = true;
+
+    playerStore.audio.currentTime = 12;
+    checkSponsorBlock(12);
+    expect(playerStore.audio.currentTime).toBe(12);
+  });
+
+  test("does nothing when config.sponsorblock is false", async () => {
+    config.sponsorblock = false;
+    let fetchCalled = false;
+    globalThis.fetch = (async () => {
+      fetchCalled = true;
+      return new Response(
+        JSON.stringify([{ category: "sponsor", segment: [10, 20] }]),
+        { status: 200 },
+      );
+    }) as any;
+
+    await fetchSponsorSegments("test123");
+    expect(fetchCalled).toBe(false);
     playerStore.audio.currentTime = 12;
     checkSponsorBlock(12);
     expect(playerStore.audio.currentTime).toBe(12);

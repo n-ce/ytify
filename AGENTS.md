@@ -1,7 +1,7 @@
 # ytify Agent Invariants
 
 You are working on ytify, a lean, ethical YouTube & YouTube Music audio PWA.
-Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQLite).
+Tech stack: TypeScript, SolidJS, Vite, Bun, Cloudflare Workers (Durable Objects + SQLite).
 
 ## Core Domain & Terminology: Dual-Source Audio (YT & YTM)
 
@@ -32,7 +32,7 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 ## 4. Local-First & Critical-Path Cohesion
 
 - Critical playback path is consolidated: do not over-fragment the audio/stream pipeline into micro-chunks.
-- Offline-first: Assume network can fail anytime. Streaming prioritizes Cobalt API with Netlify Edge signed token fallback.
+- Offline-first: Assume network can fail anytime. Streaming resolves audio via the InnerTube API with Invidious multi-instance failover and OPFS caching.
 - Recommendations and history must remain strictly on-device (zero telemetry/tracking).
 - Local storage keys are namespaced: library_, config, drawer.
 - **Prohibition on YouTube getInfo / Direct Player Calls**: NEVER use `yt.getInfo`, `yt.music.getInfo`, or video player endpoints to resolve or scrape track metadata. YouTube heavily restricts and rate-limits these endpoints (triggering 429s, SABR blocks, and bot-detection challenges). Metadata resolution MUST come from the local OPFS catalog, the Moods & Genres dataset, or natural browse/search payloads (albums, artist discography, search results)—never individual video info calls.
@@ -77,7 +77,7 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 
 Every code change must satisfy:
 
-- Linter checks pass: `bun run lint`
+- Linter checks pass: `bun lint` (Bun's built-in zero-config linter; add once Bun officially releases it — the project has completed its migration to Bun)
 - Unit tests pass: `bun test scripts/`
 - TypeScript compiles cleanly: `bun run tsc --noEmit`
 - Production build succeeds within budget: `bun run build`

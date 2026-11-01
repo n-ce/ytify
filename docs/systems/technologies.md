@@ -38,15 +38,15 @@ No Tailwind, CSS-in-JS, component library, animation library, or external state-
 
 ## Audio and Playback
 
-| Technology         | Role                                                        | Where                                                    |
-| ------------------ | ----------------------------------------------------------- | -------------------------------------------------------- |
-| `HTMLAudioElement` | Audio playback engine                                       | `src/store.ts`, player features                          |
-| Media Session API  | Lock-screen/OS media controls, metadata, and position state | `src/modules/mediaSession.ts`, `src/modules/playback.ts` |
-| Opus audio streams | Preferred cached audio format                               | `src/modules/audioCache.ts`                              |
-| AAC/MP4 audio      | JioSaavn fallback streams                                   | `src/modules/jioSaavn.ts`                                |
-| Blob URLs          | Playback of cached OPFS audio and artwork                   | `src/modules/audioCache.ts`                              |
-| SponsorBlock API   | Sponsor/self-promo/intro/outro segment skipping             | `src/modules/sponsorBlock.ts`                            |
-| LRCLIB API         | Synced lyrics lookup                                        | `src/features/Player/Lyrics.tsx`                         |
+| Technology         | Role                                                           | Where                                                    |
+| ------------------ | -------------------------------------------------------------- | -------------------------------------------------------- |
+| `HTMLAudioElement` | Audio playback engine                                          | `src/store.ts`, player features                          |
+| Media Session API  | Lock-screen/OS media controls, metadata, and position state    | `src/modules/mediaSession.ts`, `src/modules/playback.ts` |
+| Opus audio streams | Preferred cached audio format                                  | `src/modules/audioCache.ts`                              |
+| AAC/MP4 audio      | JioSaavn fallback streams                                      | `src/modules/jioSaavn.ts`                                |
+| Blob URLs          | Playback of cached OPFS audio and artwork                      | `src/modules/audioCache.ts`                              |
+| SponsorBlock API   | Segment skipping for non-music items only ("- Topic" excluded) | `src/modules/sponsorBlock.ts`                            |
+| LRCLIB API         | Synced lyrics lookup                                           | `src/features/Player/Lyrics.tsx`                         |
 
 ## Local-First Storage and Browser APIs
 
