@@ -7,7 +7,7 @@
     "icons": "bun scripts/generate-icons.ts",
     "backend": "bun scripts/test-backend.ts",
     "test": "bun test scripts/",
-    "build": "bun fmt && bun run icons && tsc && vite build",
+    "build": "bun run icons && tsc && vite build",
     "preview": "vite preview",
     "knip": "knip"
   },

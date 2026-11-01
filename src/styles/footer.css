@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   height: var(--size-9);
-  padding: var(--size-1) var(--size-2);
+  padding: var(--size-1);
   background: linear-gradient(rgb(from var(--onBg) r g b / 0.4), var(--trueBg));
   backdrop-filter: blur(var(--size-px-3));
   box-shadow: none;

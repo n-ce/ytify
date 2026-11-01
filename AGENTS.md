@@ -77,7 +77,7 @@ Tech stack: TypeScript, SolidJS, Vite, Bun, Cloudflare Workers (Durable Objects 
 
 Every code change must satisfy:
 
-- Linter checks pass: `bun lint` (Bun's built-in zero-config linter; add once Bun officially releases it — the project has completed its migration to Bun)
+- Linter checks pass: `bun fmt && bun lint` (Bun's built-in zero-config linter; add once Bun officially releases it — the project has completed its migration to Bun)
 - Unit tests pass: `bun test scripts/`
 - TypeScript compiles cleanly: `bun run tsc --noEmit`
 - Production build succeeds within budget: `bun run build`

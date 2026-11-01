@@ -444,11 +444,8 @@ main {
     bottom: calc(var(--size-2) + env(safe-area-inset-bottom, 0px));
     transform: translateX(-50%);
     justify-content: center;
-    gap: var(--size-1);
     width: fit-content;
-    max-width: calc(100vw - var(--gap) * 2);
-    padding: var(--size-1) var(--size-2);
-    border-radius: 9999px;
+    border-radius: var(--radius-round);
     background-color: rgb(from var(--onBg) r g b / 0.65);
     backdrop-filter: blur(var(--size-px-4));
     border: var(--border);
@@ -457,7 +454,6 @@ main {
   }
 
   nav.app-navbar i {
-    padding: var(--size-2) var(--size-3);
     font-size: var(--font-size-3);
   }
 
