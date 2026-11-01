@@ -1,51 +1,81 @@
 import { YTNodes } from "youtubei.js";
 import {
   getClient,
+  getLockupMeta,
   formatDuration,
   parsePublished,
-  getLockupMeta,
 } from "./utils.js";
 
-export default async function (ids: string[]) {
+export type SubFeedTarget = string | { id: string; name?: string };
+
+export default async function (channels: SubFeedTarget[]) {
   const yt = await getClient();
+  const allVideos: (YTItem & { publishedMs: number })[] = [];
+
+  const targets = channels
+    .map((c) =>
+      typeof c === "string"
+        ? { id: c.trim(), name: "" }
+        : { id: c.id.trim(), name: c.name || "" },
+    )
+    .filter((t) => Boolean(t.id));
 
   const results = await Promise.all(
-    ids.map(async (id) => {
+    targets.map(async (c) => {
       try {
-        const channel = await yt.getChannel(id);
+        let channelId = c.id;
+        if (channelId.startsWith("@")) {
+          try {
+            const resolved = await yt.resolveURL(
+              `https://youtube.com/${channelId}`,
+            );
+            channelId = resolved?.payload?.browseId || channelId;
+          } catch (err) {
+            console.error(`Error resolving channel handle ${channelId}:`, err);
+          }
+        }
+        const channel = await yt.getChannel(channelId);
         const videos = await channel.getVideos();
-        return { name: channel.metadata.title?.toString() || "", id, videos };
+        const channelName = c.name || channel.metadata?.title?.toString() || "";
+        return {
+          id: channelId,
+          name: channelName,
+          videos: videos?.videos || [],
+        };
       } catch (e) {
-        return null;
+        console.error(`Error fetching channel ${c.id}:`, e);
+        return {
+          id: c.id,
+          name: c.name,
+          videos: [],
+        };
       }
     }),
   );
 
-  const allVideos: (YTItem & { publishedMs: number })[] = [];
-
   for (const result of results) {
-    if (!result) continue;
-
-    for (const node of result.videos.videos || []) {
+    for (const node of result.videos) {
       if (node.is(YTNodes.Video)) {
         const video = node.as(YTNodes.Video);
         const views =
-          video.short_view_count?.toString() || video.view_count?.toString();
-        if ((video.duration?.seconds || 0) > 90 && views) {
-          const published = video.published
-            ?.toString()
-            ?.replace("Streamed ", "");
+          video.short_view_count?.toString() ||
+          video.view_count?.toString() ||
+          "";
+        if ((video.duration?.seconds || 0) > 90) {
+          const published =
+            video.published?.toString()?.replace("Streamed ", "") || "";
           allVideos.push({
             id: video.id,
             title: video.title?.toString() || "",
             author: result.name || video.author?.name?.toString() || "",
             authorId: result.id || video.author?.id || "",
             duration: formatDuration(video.duration?.text?.toString()),
-            subtext: (views || "") + (published ? " • " + published : ""),
+            subtext:
+              views && published
+                ? `${views} • ${published}`
+                : views || published || "",
             type: "video",
-            publishedMs: video.published?.toString()
-              ? parsePublished(video.published.toString())
-              : 0,
+            publishedMs: published ? parsePublished(published) : 0,
           });
         }
       } else if (node.is(YTNodes.LockupView)) {
@@ -53,14 +83,17 @@ export default async function (ids: string[]) {
         if (lockup.content_id) {
           const { views, published, duration, durationSeconds } =
             getLockupMeta(lockup);
-          if (durationSeconds > 90 && views) {
+          if ((durationSeconds || 0) > 90) {
             allVideos.push({
               id: lockup.content_id,
               title: lockup.metadata?.title?.toString() || "",
               author: result.name,
               authorId: result.id,
               duration: formatDuration(duration),
-              subtext: (views || "") + (published ? " • " + published : ""),
+              subtext:
+                views && published
+                  ? `${views} • ${published}`
+                  : views || published || "",
               type: "video",
               publishedMs: published ? parsePublished(published) : 0,
             });

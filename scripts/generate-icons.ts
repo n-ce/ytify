@@ -13,7 +13,12 @@ const SRC_DIR = path.join(ROOT_DIR, "src");
 const OUTPUT_FONT_PATH = path.join(ROOT_DIR, "public", "remixicon.woff2");
 const OUTPUT_CSS_PATH = path.join(SRC_DIR, "styles", "remixicon.css");
 
-const REMIXICON_FONTS_DIR = path.join(ROOT_DIR, "node_modules", "remixicon", "fonts");
+const REMIXICON_FONTS_DIR = path.join(
+  ROOT_DIR,
+  "node_modules",
+  "remixicon",
+  "fonts",
+);
 const MASTER_FONT_PATH = path.join(REMIXICON_FONTS_DIR, "remixicon.woff2");
 const GLYPH_MAP_PATH = path.join(REMIXICON_FONTS_DIR, "remixicon.glyph.json");
 
@@ -30,7 +35,11 @@ function findSourceFiles(dir: string): string[] {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (entry.name === "node_modules" || entry.name === "dist" || entry.name === ".git") {
+      if (
+        entry.name === "node_modules" ||
+        entry.name === "dist" ||
+        entry.name === ".git"
+      ) {
         continue;
       }
       files = files.concat(findSourceFiles(fullPath));
@@ -88,11 +97,15 @@ async function main() {
   console.log("🔍 Scanning codebase for RemixIcon usages...");
 
   if (!fs.existsSync(MASTER_FONT_PATH) || !fs.existsSync(GLYPH_MAP_PATH)) {
-    console.error("❌ 'remixicon' package not found in node_modules. Run: npm install -D remixicon");
+    console.error(
+      "❌ 'remixicon' package not found in node_modules. Run: npm install -D remixicon",
+    );
     process.exit(1);
   }
 
-  const glyphMap: RemixGlyphMap = JSON.parse(fs.readFileSync(GLYPH_MAP_PATH, "utf8"));
+  const glyphMap: RemixGlyphMap = JSON.parse(
+    fs.readFileSync(GLYPH_MAP_PATH, "utf8"),
+  );
   const usedIconsSet = scanUsedIcons(glyphMap);
 
   // Validate and collect unicode points
@@ -109,18 +122,26 @@ async function main() {
     }
   }
 
-  console.log(`✨ Found ${matchedIcons.length} active icons used in the project.`);
+  console.log(
+    `✨ Found ${matchedIcons.length} active icons used in the project.`,
+  );
   console.log(matchedIcons.map((i) => i.name).join(", "));
 
   // 1. Subset the WOFF2 font
   console.log("⚡ Generating subsetted WOFF2 font...");
   const masterFontBuffer = fs.readFileSync(MASTER_FONT_PATH);
-  const subsetBuffer = await subsetFont(masterFontBuffer, unicodeChars.join(""), {
-    targetFormat: "woff2",
-  });
+  const subsetBuffer = await subsetFont(
+    masterFontBuffer,
+    unicodeChars.join(""),
+    {
+      targetFormat: "woff2",
+    },
+  );
 
   fs.writeFileSync(OUTPUT_FONT_PATH, subsetBuffer);
-  console.log(`✅ Saved ${path.relative(ROOT_DIR, OUTPUT_FONT_PATH)} (${(subsetBuffer.length / 1024).toFixed(2)} KB)`);
+  console.log(
+    `✅ Saved ${path.relative(ROOT_DIR, OUTPUT_FONT_PATH)} (${(subsetBuffer.length / 1024).toFixed(2)} KB)`,
+  );
 
   // 2. Generate matching CSS file
   console.log("📝 Generating remixicon.css...");

@@ -1,33 +1,32 @@
-import { playerStore, store } from '@stores';
-import { addToCollection, getCollection, removeFromCollection } from "@modules/library";
-import { createEffect, createSignal } from 'solid-js';
+import { playerStore, store } from "@stores";
+import {
+  addToCollection,
+  getCollection,
+  removeFromCollection,
+} from "@modules/library";
+import { createEffect, createSignal } from "solid-js";
 import { isTopicAuthor } from "@utils";
 
-export default function() {
-
+export default function () {
   const item = () => store.actionsMenu || playerStore.stream;
   const isMusic = () => isTopicAuthor(item().author);
-  const collection = () => isMusic() ? 'favorites' : 'liked';
-  const icon = () => isMusic() ? 'ri-heart' : 'ri-thumb-up';
+  const collection = () => (isMusic() ? "favorites" : "liked");
+  const icon = () => (isMusic() ? "ri-heart" : "ri-thumb-up");
 
   const [isLiked, setIsLiked] = createSignal(false);
 
-
   createEffect(() => {
-    if (item().id)
-      setIsLiked(getCollection(collection()).includes(item().id));
-  })
+    if (item().id) setIsLiked(getCollection(collection()).includes(item().id));
+  });
 
   return (
     <i
       aria-label={`${collection()}`}
-      class={`${icon()}-${isLiked() ? 'fill' : 'line'}`}
+      class={`${icon()}-${isLiked() ? "fill" : "line"}`}
       onclick={async (e) => {
         e.stopPropagation();
-        if (isLiked())
-          removeFromCollection(collection(), [item().id]);
-        else
-          addToCollection(collection(), [item()]);
+        if (isLiked()) removeFromCollection(collection(), [item().id]);
+        else addToCollection(collection(), [item()]);
 
         setIsLiked(!isLiked());
       }}

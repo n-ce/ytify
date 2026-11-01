@@ -21,19 +21,13 @@ function isCorruptedTrack(track: TrackItem): boolean {
   return !author || CORRUPTED_AUTHORS.has(author);
 }
 
-async function requestMetadataFix(
-  tracks: Array<{
-    id: string;
-    title: string;
-    author?: string;
-    isTopic?: boolean;
-  }>,
+async function requestSongData(
+  ids: string[],
 ): Promise<Record<string, FixedMetadata>> {
-  const res = await fetch(`${store.api}/fix-metadata`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ tracks }),
-  });
+  if (ids.length === 0) return {};
+  const res = await fetch(
+    `${store.api}/songdata?ids=${encodeURIComponent(ids.join(","))}`,
+  );
   if (!res.ok) return {};
 
   const result = (await res.json()) as {
@@ -79,12 +73,7 @@ export async function runMetadataFixer(): Promise<void> {
     }
   }
 
-  const unresolvedTargets: Array<{
-    id: string;
-    title: string;
-    author?: string;
-    isTopic?: boolean;
-  }> = [];
+  const unresolvedIds: string[] = [];
 
   for (const id of corruptedIds) {
     const track = tracksMap[id];
@@ -94,22 +83,17 @@ export async function runMetadataFixer(): Promise<void> {
       track.modified = Date.now();
       localFixed++;
     } else {
-      unresolvedTargets.push({
-        id: track.id,
-        title: track.title,
-        author: track.author,
-        isTopic: true,
-      });
+      unresolvedIds.push(track.id);
     }
   }
 
   // Step 2: Query backend YouTube Music Search Songs API in batches
-  if (unresolvedTargets.length > 0) {
+  if (unresolvedIds.length > 0) {
     const BATCH_SIZE = 15;
-    for (let i = 0; i < unresolvedTargets.length; i += BATCH_SIZE) {
-      const chunk = unresolvedTargets.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < unresolvedIds.length; i += BATCH_SIZE) {
+      const chunk = unresolvedIds.slice(i, i + BATCH_SIZE);
       try {
-        const resolved = await requestMetadataFix(chunk);
+        const resolved = await requestSongData(chunk);
         for (const [id, fixed] of Object.entries(resolved)) {
           if (tracksMap[id] && fixed.author) {
             applyMetadataFix(tracksMap[id], fixed);
@@ -140,14 +124,7 @@ export async function fixSingleTrack(track: TrackItem): Promise<TrackItem> {
   if (!isCorruptedTrack(track)) return track;
 
   try {
-    const resolved = await requestMetadataFix([
-      {
-        id: track.id,
-        title: track.title,
-        author: track.author,
-        isTopic: true,
-      },
-    ]);
+    const resolved = await requestSongData([track.id]);
     const fixed = resolved[track.id];
     if (fixed?.author) applyMetadataFix(track, fixed);
   } catch (err) {

@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show, onCleanup, createEffect } from "solid-js";
+import { createSignal, onMount, Show, onCleanup, createEffect } from "solid-js";
 import "./List.css";
 import {
   addToQueue,
@@ -11,50 +11,26 @@ import {
   openSubView,
   store,
 } from "@stores";
-import { generateImageUrl, sortCollection, normalizeText, stripTopic, type SortBy } from "@utils";
+import {
+  generateImageUrl,
+  sortCollection,
+  normalizeText,
+  stripTopic,
+  type SortBy,
+} from "@utils";
 import { librarySections, setConfig, config, setDrawer } from "@config";
-import { DISCOVERY_COLLECTION, fetchCollection, removeFromCollection, getCollectionItems } from "@modules/library";
+import {
+  DISCOVERY_COLLECTION,
+  fetchCollection,
+  removeFromCollection,
+  getCollectionItems,
+} from "@modules/library";
 import Dropdown from "./Dropdown";
 import Results from "./Results";
 import CollectionSelector from "@components/ActionsMenu/CollectionSelector";
+import Carousel from "@components/Carousel";
 import ListItem from "@components/ListItem";
 import HeaderNav from "@components/HeaderNav";
-
-function ArtistRow(props: { artists: Channel[] }) {
-  return (
-    <div class="list-carousel">
-      <For each={props.artists}>
-        {(artist) => (
-          <ListItem
-            name={artist.name}
-            img={artist.img}
-            id={artist.id}
-            type="artist"
-          />
-        )}
-      </For>
-    </div>
-  );
-}
-
-function AlbumRow(props: { albums: YTAlbumItem[] }) {
-  return (
-    <div class="list-carousel">
-      <For each={props.albums}>
-        {(album) => (
-          <ListItem
-            name={album.name}
-            year={album.year}
-            img={album.img}
-            author={album.author}
-            id={album.id}
-            type="album"
-          />
-        )}
-      </For>
-    </div>
-  );
-}
 
 export default function () {
   let listSection!: HTMLElement;
@@ -80,7 +56,10 @@ export default function () {
       }
 
       const source = getSourceItems();
-      const artistCounts: Record<string, { count: number; name: string; img?: string }> = {};
+      const artistCounts: Record<
+        string,
+        { count: number; name: string; img?: string }
+      > = {};
       source.forEach((track) => {
         if (track && track.authorId) {
           const prev = artistCounts[track.authorId];
@@ -91,7 +70,9 @@ export default function () {
           };
         }
       });
-      const sorted = Object.entries(artistCounts).sort(([, a], [, b]) => b.count - a.count);
+      const sorted = Object.entries(artistCounts).sort(
+        ([, a], [, b]) => b.count - a.count,
+      );
       const artistIds = sorted.map(([id]) => id);
 
       if (artistIds.length === 0) {
@@ -115,18 +96,23 @@ export default function () {
             name: info.name,
             img: info.img || "",
             type: "artist",
-          }))
+          })),
         );
 
         if (hasAttemptedArtistsFetch) return;
         hasAttemptedArtistsFetch = true;
-        fetch(`${store.api}/featured?artistIds=${encodeURIComponent(artistIds.slice(0, 5).join(","))}`)
+        fetch(
+          `${store.api}/featured?artistIds=${encodeURIComponent(artistIds.slice(0, 5).join(","))}`,
+        )
           .then((res) => res.json())
           .then((data: any) => {
             if (Array.isArray(data?.artists) && data.artists.length > 0) {
               setFavoriteArtists(data.artists);
               try {
-                sessionStorage.setItem("featured_artists", JSON.stringify(data.artists));
+                sessionStorage.setItem(
+                  "featured_artists",
+                  JSON.stringify(data.artists),
+                );
               } catch {}
             }
           })
@@ -136,7 +122,6 @@ export default function () {
       setFavoriteArtists([]);
     }
   });
-
 
   const getSourceItems = () => {
     let source =
@@ -395,22 +380,65 @@ export default function () {
       </Show>
 
       <Show
-        when={listStore.artistAlbums.length > 0 || listStore.artistEps.length > 3}
+        when={
+          listStore.artistAlbums.length > 0 || listStore.artistEps.length > 3
+        }
       >
         <div class="list-carousels">
           <Show when={listStore.artistAlbums.length}>
-            <AlbumRow albums={listStore.artistAlbums} />
+            <Carousel
+              items={listStore.artistAlbums}
+              renderItem={(album) => (
+                <ListItem
+                  name={album.name}
+                  year={album.year}
+                  img={album.img}
+                  author={album.author}
+                  id={album.id}
+                  type="album"
+                />
+              )}
+            />
           </Show>
 
           <Show when={listStore.artistEps.length > 3}>
-            <AlbumRow albums={listStore.artistEps} />
+            <Carousel
+              items={listStore.artistEps}
+              renderItem={(album) => (
+                <ListItem
+                  name={album.name}
+                  year={album.year}
+                  img={album.img}
+                  author={album.author}
+                  id={album.id}
+                  type="album"
+                />
+              )}
+            />
           </Show>
         </div>
       </Show>
 
-      <Show when={librarySections().featured && listStore.id === "favorites" && listStore.type === "collection" && favoriteArtists().length > 0}>
+      <Show
+        when={
+          librarySections().featured &&
+          listStore.id === "favorites" &&
+          listStore.type === "collection" &&
+          favoriteArtists().length > 0
+        }
+      >
         <div class="list-carousels">
-          <ArtistRow artists={favoriteArtists()} />
+          <Carousel
+            items={favoriteArtists()}
+            renderItem={(artist) => (
+              <ListItem
+                name={artist.name}
+                img={artist.img}
+                id={artist.id}
+                type="artist"
+              />
+            )}
+          />
         </div>
       </Show>
 

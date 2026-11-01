@@ -84,7 +84,7 @@
     }
   }
 
-  >p {
+  > p {
     font-size: var(--font-size-1);
 
     a {
@@ -102,5 +102,4 @@
       margin-right: 1ch;
     }
   }
-
 }

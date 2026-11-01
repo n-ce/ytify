@@ -111,5 +111,5 @@ The retired `/recommend`, Gallery, and ytmgr recommendation paths are replaced b
 | Isolate latching prevents redundant SQLite writes          | ✅     |
 | Metadata repair writes albumId and albumTitle through      | ✅     |
 | User sync hydrates canonical metadata (`overlayCanonical`) | ✅     |
-| Artist-only `/featured` endpoint   | ✅     |
+| Artist-only `/featured` endpoint                           | ✅     |
 | Local Vite adapter supports async `ctx.waitUntil`          | ✅     |

@@ -1,11 +1,11 @@
-import { For, Show, lazy, onMount, createMemo } from "solid-js";
+import { Show, lazy, onMount, createMemo } from "solid-js";
 import "./Library.css";
 import Collections from "./Collections";
 
 import { librarySections } from "@config";
 import { getLibraryAlbums, getLists } from "@modules/library";
 import { t, setNavStore, store } from "@stores";
-import ListItem from "@components/ListItem";
+import Carousel from "@components/Carousel";
 import HeaderActions from "@components/HeaderActions";
 import HeaderNav from "@components/HeaderNav";
 
@@ -46,48 +46,22 @@ export default function () {
       <Collections />
       <br />
       <Show when={libraryAlbums().length > 0}>
-        <article>
-          <p>
-            <i class="ri-album-fill"></i>&nbsp;
-            {t("library_albums")}
-          </p>
-          <div>
-            <For each={libraryAlbums()}>
-              {(item) => (
-                <ListItem
-                  name={item.name}
-                  id={item.id}
-                  img={item.img}
-                  author={item.author}
-                  type="album"
-                />
-              )}
-            </For>
-          </div>
-        </article>
+        <Carousel
+          title={t("library_albums")}
+          icon="ri-album-fill"
+          items={libraryAlbums()}
+          itemType="album"
+        />
       </Show>
       <br />
 
       <Show when={libraryPlaylists().length > 0}>
-        <article>
-          <p>
-            <i class="ri-youtube-fill"></i>&nbsp;
-            {t("library_playlists")}
-          </p>
-          <div>
-            <For each={libraryPlaylists()}>
-              {(item) => (
-                <ListItem
-                  name={item.name}
-                  id={item.id}
-                  img={item.img}
-                  author={item.author}
-                  type="playlist"
-                />
-              )}
-            </For>
-          </div>
-        </article>
+        <Carousel
+          title={t("library_playlists")}
+          icon="ri-youtube-fill"
+          items={libraryPlaylists()}
+          itemType="playlist"
+        />
       </Show>
 
       <br />

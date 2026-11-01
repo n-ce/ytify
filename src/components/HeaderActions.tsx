@@ -12,8 +12,7 @@ export default function HeaderActions() {
             id="syncNow"
             classList={{
               "ri-cloud-fill": store.syncState === "synced",
-              "ri-loader-3-line loading-spinner":
-                store.syncState === "syncing",
+              "ri-loader-3-line loading-spinner": store.syncState === "syncing",
               "ri-cloud-off-fill":
                 store.syncState === "dirty" || store.syncState === "error",
               error: store.syncState === "error",

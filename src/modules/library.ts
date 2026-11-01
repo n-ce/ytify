@@ -124,8 +124,7 @@ export const getCollectionsKeys = () => {
     .map((key) => key.slice(8))
     .filter(
       (key) =>
-        !NON_COLLECTION_KEYS.includes(key) &&
-        !PSEUDO_COLLECTIONS.includes(key),
+        !NON_COLLECTION_KEYS.includes(key) && !PSEUDO_COLLECTIONS.includes(key),
     );
 
   const meta = lsGetJSON<Record<string, number>>("library_meta", {});
@@ -147,7 +146,10 @@ export const getCollection = (name: string) =>
 export const getLists = <T extends "channels" | "playlists">(
   type: T,
 ): T extends "channels" ? Channel[] : Playlist[] =>
-  lsGetJSON<T extends "channels" ? Channel[] : Playlist[]>("library_" + type, [] as any);
+  lsGetJSON<T extends "channels" ? Channel[] : Playlist[]>(
+    "library_" + type,
+    [] as any,
+  );
 
 export const getLibraryAlbums = (): LibraryAlbums =>
   lsGetJSON<LibraryAlbums>("library_albums", []);
@@ -246,8 +248,7 @@ export function seedReservedCollections() {
     return;
 
   for (const name of RESERVED_ORDER) {
-    if (lsGetJSON(`library_${name}`, null) === null)
-      saveCollection(name, []);
+    if (lsGetJSON(`library_${name}`, null) === null) saveCollection(name, []);
   }
 }
 

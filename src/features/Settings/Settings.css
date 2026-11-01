@@ -6,11 +6,11 @@
     }
   }
 
-  >div {
+  > div {
     width: 100%;
     margin-bottom: var(--size-8);
 
-    >span {
+    > span {
       display: flex;
       justify-content: space-between;
       align-items: center;

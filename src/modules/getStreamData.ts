@@ -1,38 +1,52 @@
-import { playerStore, setPlayerStore } from '@stores';
+import { playerStore, setPlayerStore } from "@stores";
 import { shuffle } from "@utils";
-import { streamCache } from './audioCache';
+import { streamCache } from "./audioCache";
 
 const instances = shuffle([
   "https://yt.omada.cafe",
   "https://invidious.schenkel.eti.br",
   "https://invidious.kemonomimi.nl",
-  "https://echostreamz.com"
+  "https://echostreamz.com",
 ]);
 
-export default async function(
+export default async function (
   id: string,
-  signal?: AbortSignal
-): Promise<Invidious | Record<'error' | 'message', string>> {
-
+  signal?: AbortSignal,
+): Promise<Invidious | Record<"error" | "message", string>> {
   const fetchData = async (proxy: string): Promise<Invidious> => {
-    const path = proxy ? '/api/v1/videos/' : '/s/';
+    const path = proxy ? "/api/v1/videos/" : "/s/";
     const res = await fetch(proxy + path + id, {
-      headers: { 'Accept': 'application/json' },
-      signal
+      headers: { Accept: "application/json" },
+      signal,
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();
 
-    if (!data || !('adaptiveFormats' in data) || !Array.isArray(data.adaptiveFormats)) {
-      throw new Error(data?.error || 'Invalid response: adaptiveFormats missing or not an array');
+    if (
+      !data ||
+      !("adaptiveFormats" in data) ||
+      !Array.isArray(data.adaptiveFormats)
+    ) {
+      throw new Error(
+        data?.error ||
+          "Invalid response: adaptiveFormats missing or not an array",
+      );
     }
 
-    if (!data.adaptiveFormats.every((f: { type: string }) => typeof f.type === 'string')) {
-      throw new Error('Invalid response: formats missing type property');
+    if (
+      !data.adaptiveFormats.every(
+        (f: { type: string }) => typeof f.type === "string",
+      )
+    ) {
+      throw new Error("Invalid response: formats missing type property");
     }
 
-    if (!data.adaptiveFormats.some((f: { type: string }) => f.type.startsWith('audio'))) {
-      throw new Error('Invalid response: no audio streams found');
+    if (
+      !data.adaptiveFormats.some((f: { type: string }) =>
+        f.type.startsWith("audio"),
+      )
+    ) {
+      throw new Error("Invalid response: no audio streams found");
     }
 
     return data;
@@ -47,7 +61,9 @@ export default async function(
         data.proxy = p;
         return data;
       } catch (e) {
-        console.warn(`Prefetch failed with error ${(e as Error).message} on ${p}, starting retries...`);
+        console.warn(
+          `Prefetch failed with error ${(e as Error).message} on ${p}, starting retries...`,
+        );
       }
     }
 
@@ -65,24 +81,27 @@ export default async function(
 
     // 3. Last resort: Emergency Fallback (Local Edge Function)
     try {
-      console.warn('All proxies failed, attempting emergency fallback...');
-      const data = await fetchData('');
-      data.proxy = '';
+      console.warn("All proxies failed, attempting emergency fallback...");
+      const data = await fetchData("");
+      data.proxy = "";
       // reset proxy to use local fallback
       return data;
     } catch (e) {
-      console.error('Emergency fallback failed:', e);
+      console.error("Emergency fallback failed:", e);
     }
   }
   const cached = streamCache.get(id) as Invidious;
 
-  const data = cached || await getData();
+  const data = cached || (await getData());
 
   if (data) {
     streamCache.set(id, data);
-    setPlayerStore('proxy', data.proxy || '');
+    setPlayerStore("proxy", data.proxy || "");
     return data;
   }
 
-  return { error: 'All proxies failed', message: 'Failed to fetch stream data from all available instances' };
+  return {
+    error: "All proxies failed",
+    message: "Failed to fetch stream data from all available instances",
+  };
 }

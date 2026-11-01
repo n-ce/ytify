@@ -103,51 +103,48 @@ interface YTAlbumItem extends ListItem {
 
 ### 3. Specific API Responses
 
-| Endpoint                                   | Response                                                                                            |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `GET /api/search`                          | `(YTItem \| YTListItem)[]` - mixed by filter                                                        |
-| `GET /api/suggestions`                     | `string[]`                                                                                          |
-| `GET /api/playlist`                        | `YTPlaylistItem` with `items`, `hasContinuation`                                                    |
-| `GET /api/album`                           | `YTAlbumItem` with `items`                                                                          |
-| `GET /api/artist`                          | `YTArtistItem` with `items` (songs), `albums`, `eps`                                                |
-| `GET /api/channel`                         | `YTChannelItem` with `items`                                                                        |
+| Endpoint                              | Response                                                      |
+| ------------------------------------- | ------------------------------------------------------------- |
+| `GET /api/search`                     | `(YTItem \| YTListItem)[]` - mixed by filter                  |
+| `GET /api/suggestions`                | `string[]`                                                    |
+| `GET /api/playlist`                   | `YTPlaylistItem` with `items`, `hasContinuation`              |
+| `GET /api/album`                      | `YTAlbumItem` with `items`                                    |
+| `GET /api/artist`                     | `YTArtistItem` with `items` (songs), `albums`, `eps`          |
+| `GET /api/channel`                    | `YTChannelItem` with `items`                                  |
 | `GET /api/featured?artistIds=&limit=` | `{ featuredPlaylists: YTPlaylistItem[], artists: Channel[] }` |
-| `GET /api/subfeed`                         | `YTItem[]` with `publishedMs`                                                                       |
-| `GET /api/similar`                         | `YTItem[]` (stripped fields)                                                                        |
+| `GET /api/subfeed`                    | `YTItem[]` with `publishedMs`                                 |
+| `GET /api/similar`                    | `YTItem[]` (stripped fields)                                  |
 
-### 3a. Global Catalog Endpoints
+### 3a. Global Catalog Endpoint
 
-Backed by Cloudflare Durable Objects (`CatalogDO`, `UserSyncDO`).
+Backed by static dataset shards from the online `Moods-And-Genres-Dataset` repository (`songs/` and `videos/`) resolved on-demand over HTTP with in-memory memoized caching.
 
-| Endpoint                                   | Response                                            |
-| ------------------------------------------ | --------------------------------------------------- |
-| `GET /api/catalog/tracks?ids=a,b`          | `Record<trackId, CanonicalTrack>`                   |
-| `GET /api/catalog/track?id=`               | `CanonicalTrack` or 404                             |
-| `POST /api/catalog/tracks`                 | `{ ok: true }` - batch upsert, token-gated          |
-| `GET /api/catalog/categories?type=`        | `Category[]`                                        |
-| `GET /api/catalog/playlists?category=`     | `CuratedPlaylist[]` (public shape, with `trackIds`) |
-| `GET /api/featured?artistIds=c,d&limit=20` | `{ featuredPlaylists, artists }`                    |
+| Endpoint                            | Method | Request Body                      | Response                                                           |
+| ----------------------------------- | ------ | --------------------------------- | ------------------------------------------------------------------ |
+| `POST /catalog` (or `/api/catalog`) | `POST` | `{ ids: string[] }` or `string[]` | `{ resolved: Record<string, CatalogTrack>, unresolved: string[] }` |
 
-**Canonical Track Schema**:
+> [!NOTE]
+> The catalog endpoint is strictly `POST` with `ids[]`. Other methods (such as `GET`) return `405 Method Not Allowed`, and missing/empty `ids` arrays return `400 Bad Request`.
+
+**Resolved Track Schema (`CatalogTrack`)**:
 
 ```typescript
-interface CanonicalTrack {
+interface CatalogTrack {
   id: string;
   title: string;
   author: string;
-  authorId?: string;
-  duration?: number;
-  durationStr?: string;
-  isSong?: boolean;
-  thumbnailId?: string; // Required for songs, omitted for videos
+  authorId: string;
+  duration: string; // "MM:SS" or "HH:MM:SS"
+  durationSeconds: number;
+  type: "song" | "video";
+  isSong: boolean;
+  img?: string; // Square cover art ID with leading "/" for songs
+  thumbnailId?: string; // Raw Google CDN thumbnail ID
   albumId?: string; // For songs
-  albumTitle?: string; // For songs
-  source?: string;
-  updatedAt?: number;
+  albumTitle?: string; // Resolved from albums.json
+  source: "catalog_shard";
 }
 ```
-
-Write routes (`POST /api/catalog/tracks`, `/api/cron/*`) require `x-ytify-token` matching `INTERNAL_TOKEN` when configured. Reads are public.
 
 ---
 

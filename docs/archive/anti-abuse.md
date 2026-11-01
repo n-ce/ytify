@@ -3,6 +3,7 @@
 ## 1. Context
 
 The user operates a Netlify Edge Function at path `/s/:id` (the "ytify fallback service") that acts as a proxy to RapidAPI's `yt-api.p.rapidapi.com/dl` endpoint. It's used for:
+
 - **Link previews** (HTML response for social media bots + browsers)
 - **JSON API responses** (for the ytify app, gated behind a 20-second per-IP cooldown tracked in Netlify Blobs)
 
@@ -13,6 +14,7 @@ The function has been suffering sustained abuse from a small number of IPs makin
 ## 2. History of the Conversation
 
 ### Phase 1 — Expanding the ban list
+
 User had a `HARD_BANNED_SUBNETS` array of ~22 entries and wanted to add new offenders from a violations dataset. Provided data:
 
 ```
@@ -30,7 +32,9 @@ User had a `HARD_BANNED_SUBNETS` array of ~22 entries and wanted to add new offe
 **Action taken:** Added 100+ violators as full IPs, aggregated `76.81.148.72` + `.73` into subnet `76.81.148.`, and used `startsWith()` matching (which naturally handles both full IPs and prefixes).
 
 ### Phase 2 — Threshold tuning
+
 User asked to "add all 50+". Final additions:
+
 - `45.4.36.18` (1147)
 - `105.114.36.194` (151)
 - `201.28.218.83` (132)
@@ -40,23 +44,27 @@ User asked to "add all 50+". Final additions:
 - `167.7.248.164` (57)
 
 ### Phase 3 — Subnet aggregation analysis
+
 User asked whether aggregating individual IPs into `/24` subnets would reveal hidden 50+ offenders. Analysis of full dataset by `/24`:
 
-| Subnet | Sum | Status |
-|---|---|---|
-| `76.81.148.` | 74 | ✅ Already added as subnet |
-| All others | <50 or single-IP | Already covered individually |
+| Subnet       | Sum              | Status                       |
+| ------------ | ---------------- | ---------------------------- |
+| `76.81.148.` | 74               | ✅ Already added as subnet   |
+| All others   | <50 or single-IP | Already covered individually |
 
 **No new subnets qualified.** The only case where aggregation pushed a group over 50 was `76.81.148.` — already handled.
 
 ### Phase 4 — Old dataset review
+
 User provided a second, older dataset dominated by Cloudflare anycast IPs (`162.158.x`, `172.68.x`, `172.69.x`, `172.70.x`, `172.71.x`, `104.22.x`, `104.23.x`). Aggregation revealed:
+
 - **One new candidate:** `162.158.193.` (sum 56) — but flagged as Cloudflare WARP/proxy anycast, risky to block
 - **`203.28.67.`** — user already banned this subnet, but old data showed only 30 violations. Flagged as possibly stale.
 
 **Conclusion:** Old data is dramatically more Cloudflare-heavy than new data, suggesting the existing Cloudflare bans are working as intended and pushing abusers toward direct-connect IPs.
 
 ### Phase 5 — CDN rules review
+
 User had two site-wide CDN block rules:
 
 **Rule 1:** `203.28.67.142`, `210.14.11.154`, `190.107.19.30`
@@ -65,18 +73,22 @@ User had two site-wide CDN block rules:
 **Finding:** 5 of 6 were already in `HARD_BANNED_SUBNETS`. Only `47.150.43.97` was unaccounted for — not in either dataset. Ghost entry.
 
 ### Phase 6 — Live log analysis
+
 User provided one day of live `[FAST-DROP]` logs:
+
 - `50.86.10.234` — 6 hits
 - `103.161.250.10` — 5 hits
 - `173.235.97.34` — 1 hit
 
 **Key observations:**
+
 - Only 3 of 30 banned entries triggered in 24 hours
 - Zero Cloudflare-range hits — supports removing them
 - One `[VALIDATION ERROR]` from RapidAPI returning `{"status":"fail","error":"Retry","code":504}` — transient upstream failure being logged as validation error
 - Both top offenders hit repeatedly in bursts (08:30, 08:47, 08:50, 08:51, 08:53) — automated retry loop
 
 ### Phase 7 — The `45.4.36.18` mystery
+
 User questioned why 1147 violations didn't decay. **Analysis of the decay mechanism:**
 
 ```ts
@@ -90,7 +102,9 @@ const newViolations = Math.max(0, record.totalViolations - periodsPassed);
 - **Potential bug:** if `lastSeen` is `NaN` (legacy numeric schema), decay silently never fires
 
 ### Phase 8 — The rate limiting impossibility
+
 User proposed alternatives to fix abuse:
+
 1. **Add "matched subnet" logging** — accepted
 2. **Tiered promotion system** (tier 1 cooldown → tier 2 soft-ban → tier 3 hard-ban → tier 4 permanent) — good design, but doesn't solve bursts
 3. **Two-blob lock system** (Blob A main, Blob B lock) — user's idea to prevent stampedes
@@ -108,20 +122,24 @@ t=200ms  Req 1000: read BlobB → empty → proceed → write BlobB
 **By the time BlobB is written, all 1000 requests have already passed the check.** Reads aren't linearizable across edge isolates, and Blob writes are async/buffered. The lock arrives after the stampede.
 
 Netlify official docs explicitly state:
+
 > **Do not build counters, balances, or read-modify-write logic on a blob key — even with `onlyIfMatch` retries.**
 
 The only true fixes were:
+
 - **Upstash Redis** with atomic `INCR` (paid external service)
 - **Netlify's native rateLimit config** (not on legacy free plan)
 
 Neither was acceptable to the user.
 
 ### Phase 9 — The breakthrough
+
 User proposed a fundamentally different approach:
 
 > "We can introduce a blob writer which temporarily allows an IP address using the app after 10 seconds of opening. For link previews we specifically only allow the social media bots."
 
 **Why this works:**
+
 - It's not a **rate limiter** — it's an **admission gate**
 - The gate writes only **one boolean per session**, not a counter per request
 - Race conditions become **benign** — 1000 concurrent "opens" all read `null` and all write "opened", but the outcome is identical regardless of who wins
@@ -163,6 +181,7 @@ User proposed a fundamentally different approach:
 When a user "opens the app," a **cryptographically random session ID** is generated at runtime and stored in Netlify Blobs with a 10-second TTL. Only after the TTL expires (verified against the stored timestamp) does the ID grant access to the edge function. Without a valid, unexpired session ID, requests to `/s/:id` are rejected.
 
 ### Why cryptographic randomness matters
+
 - **Unguessable** — prevents clients from fabricating valid IDs
 - **Unique per session** — no collisions, no accidental shares
 - **Server-verified** — the blob is the source of truth, not the client
@@ -243,6 +262,7 @@ The abuser's pattern was: **1000 concurrent requests to `/s/:id`**. Now:
 4. By the time 10 seconds pass, their session IDs are stale — they'd need to spam `/open` again, endlessly
 
 To abuse the system now, they'd need to:
+
 - Call `/open` 10 seconds ahead of time, hold the ID, then burst
 - Which means **they can only burst once every 10 seconds**
 - Which is exactly the throttle you want
@@ -268,6 +288,7 @@ To abuse the system now, they'd need to:
 **Problem:** Netlify Edge Function at `/s/:id` is being abused by concurrent bursts from a small set of IPs. Existing `HARD_BANNED_SUBNETS` + 20-second cooldown is insufficient because Netlify Blobs has no atomic operations, so concurrent requests all pass the check before any write lands.
 
 **Solution:** Replace the per-request rate limiter with a **session admission gate**:
+
 1. Client calls `/open`
 2. Server generates `crypto.randomUUID()` (cryptographic session ID)
 3. Server stores `{sessionId, createdAt, ip}` in Blobs

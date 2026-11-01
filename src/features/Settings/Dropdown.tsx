@@ -1,22 +1,25 @@
-import { t } from '@stores';
-import { lsGet, lsRemove, lsSet } from '@utils';
+import { t } from "@stores";
+import { downloadJSON, lsGet, lsRemove, lsSet } from "@utils";
 
 export default function Dropdown() {
-
   async function clearCache(e: Event) {
-    await self.caches.keys().then(s => { s.forEach(k => { self.caches.delete(k) }) });
-    await navigator.serviceWorker.getRegistrations().then(s => { s.forEach(r => { r.unregister() }) });
+    await self.caches.keys().then((s) => {
+      s.forEach((k) => {
+        self.caches.delete(k);
+      });
+    });
+    await navigator.serviceWorker.getRegistrations().then((s) => {
+      s.forEach((r) => {
+        r.unregister();
+      });
+    });
 
-    if (e?.type === 'click') location.reload();
+    if (e?.type === "click") location.reload();
   }
 
-
   function exportSettings() {
-    const link = document.createElement('a');
-    const date = new Date().toISOString().split('T')[0];
-    link.download = `ytify_settings_${date}.json`;
-    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(lsGet('config') || '{}')}`;
-    link.click();
+    const date = new Date().toISOString().split("T")[0];
+    downloadJSON(`ytify_settings_${date}.json`, lsGet("config") || "{}");
   }
 
   async function importSettings(e: Event) {
@@ -25,32 +28,32 @@ export default function Dropdown() {
       (e.target as HTMLInputElement).files as FileList
     )[0].text();
 
-    if (confirm(t('settings_import_prompt')))
-      lsSet('config', newSettings);
+    if (confirm(t("settings_import_prompt"))) lsSet("config", newSettings);
   }
 
   return (
     <details>
-      <summary><i
-        aria-label={t('settings_more_options')}
-        class="ri-more-2-fill"
-      ></i></summary>
+      <summary>
+        <i aria-label={t("settings_more_options")} class="ri-more-2-fill"></i>
+      </summary>
       <ul>
         <li onclick={clearCache}>
-          <i class="ri-delete-bin-2-line"></i>&nbsp;{t('settings_clear_cache')}
+          <i class="ri-delete-bin-2-line"></i>&nbsp;{t("settings_clear_cache")}
         </li>
-        <li onclick={() => {
-          lsRemove('config');
-          location.reload();
-        }}>
-          <i class="ri-refresh-line"></i>&nbsp;{t('settings_restore')}
+        <li
+          onclick={() => {
+            lsRemove("config");
+            location.reload();
+          }}
+        >
+          <i class="ri-refresh-line"></i>&nbsp;{t("settings_restore")}
         </li>
         <li onclick={exportSettings}>
-          <i class="ri-export-line"></i>&nbsp;{t('settings_export')}
+          <i class="ri-export-line"></i>&nbsp;{t("settings_export")}
         </li>
         <li>
           <label for="importSettingsBtn">
-            <i class="ri-import-line"></i>&nbsp;{t('settings_import')}
+            <i class="ri-import-line"></i>&nbsp;{t("settings_import")}
           </label>
           <input
             type="file"
@@ -63,4 +66,3 @@ export default function Dropdown() {
     </details>
   );
 }
-

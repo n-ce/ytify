@@ -5,6 +5,7 @@
 ## 1. Executive Summary & Goals
 
 ### Context & Problems
+
 1. **Cloudflare SQLite 100k Row Write Limit**:
    Attempting to scrape and maintain the complete Moods & Genres (MGR) catalogue inside Cloudflare Durable Object (`CatalogDO`) SQLite repeatedly exceeded Cloudflare's daily cap of 100,000 write operations.
 2. **External Vercel Dependency**:
@@ -15,10 +16,11 @@
    Users listening on standard YouTube accumulate Official Music Video (`OMV`) IDs, whereas MGR playlists contain Audio Track Video (`ATV` / `- Topic`) IDs. Exact string matching on track IDs caused recommendations to miss legitimate overlaps.
 
 ### Goals
-* **Zero Cloudflare SQLite Limit Issues**: Offload permanent catalogue storage and heavy InnerTube scraping to a weekly GitHub Actions workflow in the scraper repository (`ytmgr`).
-* **Sub-Millisecond In-Memory Recommendations**: Store the normalized dataset in Git as partitioned JSON and load it into Cloudflare Worker edge memory, providing `< 0.1ms` recommendation matching and eliminating Vercel entirely.
-* **Unified OMV/ATV Counterpart & Album Normalization**: Ensure all songs map to their `albumId`, square cover art, and counterpart video/audio IDs.
-* **Bi-Directional Sync Flow**:
+
+- **Zero Cloudflare SQLite Limit Issues**: Offload permanent catalogue storage and heavy InnerTube scraping to a weekly GitHub Actions workflow in the scraper repository (`ytmgr`).
+- **Sub-Millisecond In-Memory Recommendations**: Store the normalized dataset in Git as partitioned JSON and load it into Cloudflare Worker edge memory, providing `< 0.1ms` recommendation matching and eliminating Vercel entirely.
+- **Unified OMV/ATV Counterpart & Album Normalization**: Ensure all songs map to their `albumId`, square cover art, and counterpart video/audio IDs.
+- **Bi-Directional Sync Flow**:
   1. Cloudflare buffers user metadata repairs and newly discovered tracks during the week.
   2. The weekly GitHub Action extracts the Cloudflare buffer via an authenticated admin API (`x-ytify-token`).
   3. The GitHub Action merges Cloudflare's buffer with the fresh MGR scrape into the Git repository.
@@ -160,6 +162,7 @@ export interface CatalogDataset {
 ## 4. `ytify` Backend Implementation Details
 
 ### 4.1 `src/backend/CatalogDO.ts`: Buffer, Export, and Prune
+
 Add a temporary buffer table and admin routes to `CatalogDO`:
 
 ```sql
@@ -172,16 +175,18 @@ CREATE TABLE IF NOT EXISTS pending_export (
 CREATE INDEX IF NOT EXISTS idx_pending_updated ON pending_export(updated_at);
 ```
 
-* **Route `GET /admin/catalog-export`**:
-  * First run (migration): Selects all historical records from `canonical_songs` and `canonical_videos`.
-  * Subsequent runs: Selects all records from `pending_export`.
-* **Route `POST /admin/catalog-prune`**:
-  * Deletes exported records: `DELETE FROM pending_export WHERE updated_at <= ?`.
-* **Method `queuePendingExport(tracks)`**:
-  * Invoked by `fixMetadata` and `UserSyncDO` to buffer newly discovered/repaired tracks.
+- **Route `GET /admin/catalog-export`**:
+  - First run (migration): Selects all historical records from `canonical_songs` and `canonical_videos`.
+  - Subsequent runs: Selects all records from `pending_export`.
+- **Route `POST /admin/catalog-prune`**:
+  - Deletes exported records: `DELETE FROM pending_export WHERE updated_at <= ?`.
+- **Method `queuePendingExport(tracks)`**:
+  - Invoked by `fixMetadata` and `UserSyncDO` to buffer newly discovered/repaired tracks.
 
 ### 4.2 `src/backend/worker.ts`: Token Protection
+
 Expose the export and prune endpoints protected by `INTERNAL_TOKEN`:
+
 ```typescript
 if (path === "admin/catalog-export" || path === "admin/catalog-prune") {
   if (!isInternalCaller(request, env)) {
@@ -192,14 +197,18 @@ if (path === "admin/catalog-export" || path === "admin/catalog-prune") {
 ```
 
 ### 4.3 `src/backend/getPlaylist.ts`: Fix Missing Album Metadata
+
 Update the `MusicResponsiveListItem` node mapping (lines 140–155):
+
 ```typescript
 const playlistId =
   song.menu?.items
     ?.find(
       (i: any) =>
         i.is?.(YTNodes.MenuNavigationItem) &&
-        i.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId?.startsWith("OLAK"),
+        i
+          .as(YTNodes.MenuNavigationItem)
+          .endpoint?.payload?.playlistId?.startsWith("OLAK"),
     )
     ?.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId ||
   song.album?.id ||
@@ -219,9 +228,10 @@ allItems.push({
 ```
 
 ### 4.4 `src/backend/catalogClient.ts`: In-Memory Matching & Vercel Retirement
-* Remove `YTMGR_API_URL = "https://ytmgr-seven.vercel.app"`.
-* Load the compiled `data/*.json` into Worker isolate memory (with edge caching).
-* Overlap scoring algorithm:
+
+- Remove `YTMGR_API_URL = "https://ytmgr-seven.vercel.app"`.
+- Load the compiled `data/*.json` into Worker isolate memory (with edge caching).
+- Overlap scoring algorithm:
   ```typescript
   export async function recommendPlaylists(
     env: Env | undefined,
@@ -231,7 +241,7 @@ allItems.push({
     if (trackIds.length === 0) return [];
 
     const dataset = await getDataset(env);
-    
+
     // 1. Expand input IDs with OMV/ATV counterparts
     const searchIds = new Set<string>();
     for (const id of trackIds) {
@@ -275,16 +285,19 @@ allItems.push({
 ## 5. Scraper Repository Implementation (`ytmgr`)
 
 ### 5.1 Playlist Scraper Updates
+
 When walking YouTube Music playlists via InnerTube:
+
 1. **Extract Album**:
-   * `albumTitle`: `song.album?.name`
-   * `albumId`: `song.menu.items` navigation item with `OLAK5uy_...`
-   * `thumbnailId`: `formatThumbnailId(song.thumbnail?.contents?.[0]?.url)`
+   - `albumTitle`: `song.album?.name`
+   - `albumId`: `song.menu.items` navigation item with `OLAK5uy_...`
+   - `thumbnailId`: `formatThumbnailId(song.thumbnail?.contents?.[0]?.url)`
 2. **Extract Counterparts**:
-   * Song → Video: `song.menu.items` navigation item with icon `MUSIC_VIDEO`
-   * Video → Song: `video.menu.items` navigation item with icon `AUDIO_QUALITY`
+   - Song → Video: `song.menu.items` navigation item with icon `MUSIC_VIDEO`
+   - Video → Song: `video.menu.items` navigation item with icon `AUDIO_QUALITY`
 
 ### 5.2 Build Script (`scripts/build-dataset.ts`)
+
 1. Scrape YouTube Music Explore → Moods & Genres categories and playlists.
 2. Fetch Cloudflare buffer:
    ```bash
@@ -292,10 +305,10 @@ When walking YouTube Music playlists via InnerTube:
    Header: x-ytify-token: <INTERNAL_TOKEN>
    ```
 3. Merge records:
-   * Populate `albums`: Save unique album ID, title, and square thumbnail ID.
-   * Populate `songs` and `videos`.
-   * Populate `counterparts`: Link `omvId <-> atvId`.
-   * Populate `trackIndex`: Build mapping from each track ID to its containing playlists.
+   - Populate `albums`: Save unique album ID, title, and square thumbnail ID.
+   - Populate `songs` and `videos`.
+   - Populate `counterparts`: Link `omvId <-> atvId`.
+   - Populate `trackIndex`: Build mapping from each track ID to its containing playlists.
 4. Save deterministic, key-sorted JSON to `data/*.json`.
 5. Call Cloudflare prune:
    ```bash
@@ -304,12 +317,13 @@ When walking YouTube Music playlists via InnerTube:
    ```
 
 ### 5.3 GitHub Actions Workflow (`.github/workflows/weekly-sync.yml`)
+
 ```yaml
 name: Weekly Catalog & MGR Sync
 
 on:
   schedule:
-    - cron: '0 3 * * 0' # Every Sunday at 03:00 UTC
+    - cron: "0 3 * * 0" # Every Sunday at 03:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -350,8 +364,8 @@ jobs:
    ```
 3. **Configure in GitHub Scraper Repository**:
    Add Repository Secret under **Settings → Secrets and variables → Actions**:
-   * Name: `INTERNAL_TOKEN`
-   * Value: `<your generated secret>`
+   - Name: `INTERNAL_TOKEN`
+   - Value: `<your generated secret>`
 
 ---
 

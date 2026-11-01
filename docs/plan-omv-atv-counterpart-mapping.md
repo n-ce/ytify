@@ -10,6 +10,7 @@
 
 Playlists on YouTube (including user-created playlists and many official channel playlists) frequently contain Official Music Videos (OMVs) or generic video items rather than official Audio Track Videos (ATVs / Art Tracks).
 When loaded in ytify:
+
 - Video items lack square album art (falling back to 16:9 thumbnails).
 - Video items lack `albumId` and `albumTitle`.
 - Audio playback streams the music video version, which often includes video intros, dialogue, sound effects, or altered arrangements.
@@ -22,6 +23,7 @@ YouTube Music maintains an internal relationship between OMVs and ATVs (the "Son
 ## 2. Goals & Invariants
 
 ### 2.1 Goals
+
 1. **Bidirectional OMV $\leftrightarrow$ ATV Mapping**:
    - `canonical_songs` stores `omv_id` referencing the music video.
    - `canonical_videos` stores `atv_id` referencing the canonical song release.
@@ -35,6 +37,7 @@ YouTube Music maintains an internal relationship between OMVs and ATVs (the "Son
    - Maintain isolate latching and in-memory caches to protect Cloudflare DO SQLite budgets.
 
 ### 2.2 Non-Goals
+
 - Real-time blocking resolution for 100+ uncached video items per playlist (unresolved videos remain as `type: "video"` on first view, queuing background resolution).
 - Modifying audio caching or OPFS storage formats.
 

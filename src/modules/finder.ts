@@ -18,9 +18,9 @@ export default (searchTerm: string, tracksMap: Collection) => {
       isTruncated = true;
       break;
     }
-    if (!('title' in v && typeof v.title === 'string')) continue;
+    if (!("title" in v && typeof v.title === "string")) continue;
     const title = normalizeText(v.title).includes(toFind);
-    if (!('author' in v && typeof v.author === 'string')) continue;
+    if (!("author" in v && typeof v.author === "string")) continue;
     const author = normalizeText(v.author).includes(toFind);
 
     if (title || author) {

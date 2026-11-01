@@ -55,10 +55,10 @@ RapidAPI coordination is handled entirely inside the Netlify Edge Function using
 
 | Criterion                                               | Status |
 | ------------------------------------------------------- | ------ |
-| User-configurable bitrate tiers (Opus/WebM prioritized) | ?     |
-| Fallback edge stream function at `/s/:id`               | ?     |
-| RapidAPI key selection by remaining quota               | ?     |
-| Blobs-backed IP cooldown and violation decay            | ?     |
-| Hard-banned subnet fast path                            | ?     |
-| Client-side in-memory stream caching                        | ?     |
-| Collection link-preview edge function retired           | ?     |
+| User-configurable bitrate tiers (Opus/WebM prioritized) | ?      |
+| Fallback edge stream function at `/s/:id`               | ?      |
+| RapidAPI key selection by remaining quota               | ?      |
+| Blobs-backed IP cooldown and violation decay            | ?      |
+| Hard-banned subnet fast path                            | ?      |
+| Client-side in-memory stream caching                    | ?      |
+| Collection link-preview edge function retired           | ?      |

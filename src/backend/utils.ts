@@ -79,6 +79,15 @@ export function formatThumbnailId(rawUrl?: string): string {
   return id.startsWith("/") ? id : "/" + id;
 }
 
+/**
+ * Computes the 2-digit lowercase hex shard name from the first character of an entity ID.
+ * Matches Moods-And-Genres-Dataset partitioning (e.g. '-' -> '2d', '0' -> '30', 'A' -> '41', 'a' -> '61').
+ */
+export function getShardName(id?: string): string {
+  if (!id) return "00";
+  return id.charCodeAt(0).toString(16).toLowerCase();
+}
+
 export function formatDuration(durationText?: string): string {
   if (durationText?.length === 4) durationText = "0" + durationText;
   return durationText || "00:00";
@@ -90,6 +99,40 @@ export function formatTopicAuthor(rawAuthor?: string): string {
   if (rawAuthor.endsWith("- Topic"))
     return rawAuthor.replace(/- Topic$/, " - Topic");
   return `${rawAuthor} - Topic`;
+}
+
+export function isCorruptedArtist(name?: string): boolean {
+  if (!name) return true;
+  const n = name.trim().toLowerCase();
+  return (
+    n === "release - topic" ||
+    n === "release-topic" ||
+    n === "release" ||
+    n === "various artists - topic" ||
+    n === "various artists" ||
+    n === "unknown artist" ||
+    n === "unknown" ||
+    n === ""
+  );
+}
+
+export function stripTopic(author?: string): string {
+  if (!author) return "";
+  return author.replace(/\s*-\s*Topic$/i, "").trim();
+}
+
+export function unique<T>(array: T[]): T[] {
+  return Array.from(new Set(array));
+}
+
+export function convertSStoHHMMSS(seconds: number): string {
+  if (seconds < 0 || !Number.isFinite(seconds)) return "00:00";
+  const hh = Math.floor(seconds / 3600);
+  const mm = Math.floor((seconds % 3600) / 60);
+  const ss = Math.floor(seconds % 60);
+  const mmStr = mm < 10 ? "0" + mm : String(mm);
+  const ssStr = ss < 10 ? "0" + ss : String(ss);
+  return (hh > 0 ? `${hh}:` : "") + `${mmStr}:${ssStr}`;
 }
 
 export function parsePublished(text: string): number {
@@ -134,68 +177,87 @@ export function getVideoId(song: YTNodes.MusicResponsiveListItem): string {
 
 /**
  * Extract views / published / duration / author / authorId from the modern LockupView layout.
- * In youtubei.js >= 18.2.0, duration (text & seconds) is parsed natively by LockupView.
+ *
+ * In youtubei.js 18.2.0+, LockupView metadata structure changed:
+ * - lockup.duration.seconds and lockup.duration.text provide native duration.
+ * - metadata.metadata.metadata_rows contains metadata badges and text runs.
  */
 export function getLockupMeta(lockup: YTNodes.LockupView): {
   views: string;
   published: string;
   duration: string;
-  durationSeconds: number;
+  durationSeconds?: number;
   author: string;
   authorId: string;
 } {
-  const parts: string[] = [];
+  const metadata = lockup.metadata as any;
+  const rows =
+    metadata?.metadata?.metadata_rows ||
+    metadata?.metadata?.rows ||
+    metadata?.metadata_rows ||
+    metadata?.rows ||
+    [];
+
+  let views = "";
+  let published = "";
+  let duration = "";
+  let durationSeconds: number | undefined;
   let author = "";
   let authorId = "";
 
-  const rows = lockup.metadata?.metadata?.metadata_rows || [];
+  // 1. Author and channel ID from author run
   for (const row of rows) {
-    for (const p of row.metadata_parts || []) {
-      const text = p.text?.toString()?.trim();
-      if (text) parts.push(text);
-
-      if (!authorId) {
-        const textObj = p.text as any;
-        authorId =
-          textObj?.endpoint?.payload?.browseId ||
-          textObj?.runs?.find(
-            (r: any) => (r as any)?.endpoint?.payload?.browseId,
-          )?.endpoint?.payload?.browseId ||
-          "";
+    if (row.metadata_parts) {
+      for (const part of row.metadata_parts) {
+        const browseRun = part?.text?.runs?.find(
+          (run: any) =>
+            run.endpoint?.payload?.browseId?.startsWith("UC") ||
+            run.endpoint?.metadata?.api_url?.includes("browse"),
+        );
+        if (browseRun && !author) {
+          author = browseRun.text || "";
+          authorId = browseRun.endpoint?.payload?.browseId || "";
+        }
       }
     }
   }
 
-  if (rows.length > 0 && rows[0]?.metadata_parts?.[0]?.text) {
-    author = rows[0].metadata_parts[0].text.toString()?.trim() || "";
+  // 2. Views and published date from subsequent metadata parts
+  for (const row of rows) {
+    if (row.metadata_parts) {
+      for (const part of row.metadata_parts) {
+        const text = part?.text?.toString() || "";
+        if (text.includes("view")) {
+          views = text.split("view")[0].trim() + " views";
+        } else if (text.includes("ago")) {
+          published = text;
+        }
+      }
+    }
   }
 
-  if (
-    !authorId &&
-    (lockup.metadata?.image as any)?.renderer_context?.command_context?.on_tap
-      ?.payload?.browseId
-  ) {
-    authorId = (lockup.metadata?.image as any).renderer_context.command_context
-      .on_tap.payload.browseId;
+  // 3. Duration: youtubei.js 18.2.0 natively exposes duration on LockupView
+  if (lockup.duration) {
+    duration = lockup.duration.text || "";
+    durationSeconds = lockup.duration.seconds;
   }
 
-  let views = "";
-  let published = "";
-  for (const part of parts) {
-    const p = part.replace(/^Streamed /, "");
-    if (!views && /^\d*\.?\d+[KMB]?\s+views?$/.test(p)) views = p;
-    else if (
-      !published &&
-      /\b\d{1,2}\s+(second|minute|hour|day|week|month|year)s?\s+ago$/.test(
-        p,
-      )
-    )
-      published = p;
+  // Fallback to overlay badge if duration wasn't on LockupView directly
+  if (!duration) {
+    const badge = (lockup.content_image as any)?.primary_thumbnail?.overlays
+      ?.find((o: any) => o.is?.(YTNodes.ThumbnailOverlayBadgeView))
+      ?.as?.(YTNodes.ThumbnailOverlayBadgeView)?.badges?.[0]?.text;
+    if (badge && /^\d+:\d+/.test(badge)) {
+      duration = badge;
+    }
   }
 
-  // youtubei.js 18.2.0 provides native duration getter on LockupView
-  const duration = lockup.duration?.text || "";
-  const durationSeconds = lockup.duration?.seconds || 0;
+  if (duration && !durationSeconds) {
+    const parts = duration.split(":").map(Number);
+    if (parts.length === 3)
+      durationSeconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    else if (parts.length === 2) durationSeconds = parts[0] * 60 + parts[1];
+  }
 
   return { views, published, duration, durationSeconds, author, authorId };
 }
@@ -204,19 +266,23 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
   if (node.is(YTNodes.Video)) {
     const video = node.as(YTNodes.Video);
 
-    if ((video.duration?.seconds || 0) < 90) return null;
+    // Filter out Shorts (videos < 90 seconds)
+    if (video.duration?.seconds && video.duration.seconds < 90) return null;
 
-    const views =
-      video.short_view_count?.toString() || video.view_count?.toString();
-    const published = video.published?.toString()?.replace("Streamed ", "");
-    const subtext = (views || "") + (published ? " • " + published : "");
+    let subtext = "";
+    if (video.view_count?.toString()) {
+      subtext = video.view_count.toString();
+      if (video.published?.toString()) {
+        subtext += " • " + video.published.toString();
+      }
+    }
 
     return {
       id: video.id,
       title: video.title?.toString() || "Unknown",
+      duration: formatDuration(video.duration?.text),
       author: video.author?.name || "Unknown",
-      authorId: video.author?.id || "",
-      duration: formatDuration(video.duration?.text?.toString()),
+      authorId: video.author?.id || (video.author as any)?.channel_id || "",
       subtext,
       type: "video",
     };
@@ -224,84 +290,165 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
 
   if (node.is(YTNodes.LockupView)) {
     const lockup = node.as(YTNodes.LockupView);
-    // 18.1.0+: LockupView can have content_type "SHOW" in addition to "VIDEO"
-    // 18.3.0+: LockupView can have content_type "COURSE"
-    if (
-      lockup.content_id &&
-      (lockup.content_type === "VIDEO" ||
-        lockup.content_type === "SHOW" ||
-        (lockup.content_type as string) === "COURSE")
-    ) {
-      const { views, published, duration, durationSeconds, author, authorId } =
-        getLockupMeta(lockup);
-      if (durationSeconds > 0 && durationSeconds < 90) return null;
-      const subtext = (views || "") + (published ? " • " + published : "");
+    if (!lockup.content_id) return null;
 
-      return {
-        id: lockup.content_id,
-        title: lockup.metadata?.title?.toString() || "Unknown",
-        author: author || "Unknown",
-        authorId: authorId || "",
-        duration: formatDuration(duration),
-        subtext,
-        type: "video",
-      };
+    // Only process VIDEO content type
+    if (lockup.content_type && lockup.content_type !== "VIDEO") return null;
+
+    const meta = getLockupMeta(lockup);
+
+    // Filter out Shorts (< 90 seconds)
+    if (meta.durationSeconds && meta.durationSeconds < 90) return null;
+
+    let subtext = "";
+    if (meta.views) {
+      subtext = meta.views;
+      if (meta.published) {
+        subtext += " • " + meta.published;
+      }
     }
+
+    return {
+      id: lockup.content_id,
+      title: lockup.metadata?.title?.toString() || "Unknown",
+      duration: formatDuration(meta.duration),
+      author: meta.author || "Unknown",
+      authorId: meta.authorId || "",
+      subtext,
+      type: "video",
+    };
   }
 
   if (node.is(YTNodes.MusicResponsiveListItem)) {
     const song = node.as(YTNodes.MusicResponsiveListItem);
-    const album = song.album?.name;
-    const views = song.views?.toString();
-    const subtext = (album || "") + (views ? (album ? " • " : "") + views : "");
 
-    const videoId = getVideoId(song);
+    let albumId: string | undefined;
+    let albumTitle: string | undefined;
 
-    // Try to get playlistId (OLAK...) from menu items for the albumId field
-    const playlistId =
-      song.menu?.items
-        ?.find(
-          (i: any) =>
-            i.is(YTNodes.MenuNavigationItem) &&
-            i
-              .as(YTNodes.MenuNavigationItem)
-              .endpoint?.payload?.playlistId?.startsWith("OLAK"),
-        )
-        ?.as(YTNodes.MenuNavigationItem).endpoint?.payload?.playlistId ||
-      song.album?.id ||
-      "";
+    const album = song.album;
+    if (album?.name) {
+      albumId = album.id;
+      albumTitle = album.name;
+    }
 
-    const browseAuthorRun = song.flex_columns?.[1]?.title?.runs?.find(
-      (r: any) => r?.endpoint?.payload?.browseId?.startsWith("UC"),
-    ) as any;
+    if (!albumId) {
+      const albumItem = song.menu?.items?.find((i: any) =>
+        i.endpoint?.payload?.browseId?.startsWith("MPRE"),
+      );
+      if (albumItem) {
+        albumId = (albumItem as any).endpoint.payload.browseId;
+        albumTitle = (albumItem as any).text?.toString();
+      }
+    }
 
-    const rawAuthor =
-      song.artists?.[0]?.name ||
-      song.authors?.[0]?.name ||
-      song.author?.name ||
-      browseAuthorRun?.text ||
-      (song.flex_columns?.[1]?.title?.runs?.[0]?.text &&
-      song.flex_columns?.[1]?.title?.runs?.[0]?.text !== " • "
-        ? song.flex_columns[1].title.runs[0].text
-        : undefined);
+    let artistName = "";
+    let artistId = "";
+    let flexAlbumTitle = "";
+    let flexAlbumId = "";
+    let flexDuration = "";
 
-    const author = formatTopicAuthor(rawAuthor);
+    if (
+      song.artists?.length &&
+      song.artists[0]?.name &&
+      !isCorruptedArtist(song.artists[0].name)
+    ) {
+      artistName = song.artists
+        .map((a: any) => a.name)
+        .filter(Boolean)
+        .join(", ");
+      artistId = song.artists[0]?.channel_id || "";
+    } else if (
+      (song as any).authors?.length &&
+      (song as any).authors[0]?.name &&
+      !isCorruptedArtist((song as any).authors[0].name)
+    ) {
+      artistName = (song as any).authors
+        .map((a: any) => a.name)
+        .filter(Boolean)
+        .join(", ");
+      artistId = (song as any).authors[0]?.channel_id || "";
+    } else if (song.author?.name && !isCorruptedArtist(song.author.name)) {
+      artistName = song.author.name;
+      artistId =
+        (song.author as any).channel_id || (song.author as any).id || "";
+    }
 
-    const authorId =
-      song.artists?.[0]?.channel_id ||
-      song.authors?.[0]?.channel_id ||
-      song.author?.channel_id ||
-      browseAuthorRun?.endpoint?.payload?.browseId ||
-      "";
+    const flexRuns =
+      song.flex_columns?.[1]?.title?.runs || song.subtitle?.runs || [];
+    if (flexRuns.length > 0) {
+      const artistRuns: string[] = [];
+      let bulletIndex = 0;
+      for (const r of flexRuns as any[]) {
+        const text = r.text || "";
+        if (text === " • ") {
+          bulletIndex++;
+          continue;
+        }
+        if (bulletIndex === 0) {
+          artistRuns.push(text);
+          if (!artistId && r.endpoint?.payload?.browseId?.startsWith("UC")) {
+            artistId = r.endpoint.payload.browseId;
+          }
+        } else {
+          const trimmed = text.trim();
+          if (/^\d+:\d+(?::\d+)?$/.test(trimmed)) {
+            flexDuration = trimmed;
+          } else if (r.endpoint?.payload?.browseId?.startsWith("MPRE")) {
+            flexAlbumTitle = trimmed;
+            flexAlbumId = r.endpoint.payload.browseId;
+          }
+        }
+      }
+      if (!artistName && artistRuns.length > 0) {
+        const joined = artistRuns.join("").trim();
+        if (!isCorruptedArtist(joined)) {
+          artistName = joined;
+        }
+      }
+    }
+
+    if (!artistId && song.menu?.items) {
+      for (const m of song.menu.items as any[]) {
+        const browseId = m.endpoint?.payload?.browseId;
+        if (browseId?.startsWith("UC")) {
+          artistId = browseId;
+          break;
+        }
+      }
+    }
+
+    if (!albumId && flexAlbumId) {
+      albumId = flexAlbumId;
+      albumTitle = albumTitle || flexAlbumTitle;
+    }
+
+    const duration =
+      song.duration?.text ||
+      flexDuration ||
+      song.subtitle?.runs
+        ?.find((r: any) => r.text && /^\d+:\d+$/.test(r.text.trim()))
+        ?.text?.trim();
+
+    let subtext = "";
+    if (albumTitle) {
+      subtext = albumTitle;
+      const views = song.views?.toString();
+      if (views) {
+        subtext += " • " + views;
+      }
+    }
 
     return {
-      id: videoId,
-      title: song.title?.toString() || "Unknown",
-      author,
-      authorId,
-      albumId: playlistId,
-      albumTitle: album || undefined,
-      duration: formatDuration(song.duration?.text),
+      id: getVideoId(song),
+      title:
+        song.title?.toString() ||
+        song.flex_columns?.[0]?.title?.toString() ||
+        "Unknown",
+      duration: formatDuration(duration),
+      author: formatTopicAuthor(artistName),
+      authorId: artistId,
+      albumId,
+      albumTitle,
       img: formatThumbnailId(song.thumbnail?.contents?.[0]?.url),
       subtext,
       type: "song",
@@ -314,28 +461,23 @@ export function streamMapper(node: Helpers.YTNode): YTItem | null {
 export function listMapper(node: Helpers.YTNode): YTListItem | null {
   if (node.is(YTNodes.LockupView)) {
     const lockup = node.as(YTNodes.LockupView);
+    if (!lockup.content_id) return null;
 
-    if (lockup.content_id?.startsWith("RD")) return null;
+    if (lockup.content_id.startsWith("RD")) return null;
 
     // 18.1.0+: LockupView can have content_type "PLAYLIST", "COLLECTION", "SHOW", or "VIDEO"
-    // 18.3.0+: LockupView can have content_type "COURSE"
     if (
-      lockup.content_id &&
-      (lockup.content_type === "PLAYLIST" ||
-        (lockup.content_type as string) === "COLLECTION" ||
-        lockup.content_type === "VIDEO" ||
-        lockup.content_type === "SHOW" ||
-        (lockup.content_type as string) === "COURSE")
+      lockup.content_type === "PLAYLIST" ||
+      (lockup.content_type as string) === "COLLECTION" ||
+      lockup.content_type === "SHOW"
     ) {
-      const metadata = lockup.metadata;
-      const contentImage = lockup.content_image?.as(
-        YTNodes.CollectionThumbnailView,
-      );
+      const metadata = lockup.metadata as any;
+      const contentImage = lockup.content_image as any;
       const thumbUrl = contentImage?.primary_thumbnail?.image?.[0]?.url || "";
       const videoCountBadge =
         contentImage?.primary_thumbnail?.overlays
-          ?.find((o) => o.is(YTNodes.ThumbnailOverlayBadgeView))
-          ?.as(YTNodes.ThumbnailOverlayBadgeView)?.badges?.[0]?.text ||
+          ?.find((o: any) => o.is?.(YTNodes.ThumbnailOverlayBadgeView))
+          ?.as?.(YTNodes.ThumbnailOverlayBadgeView)?.badges?.[0]?.text ||
         "0 videos";
 
       return {
@@ -369,15 +511,20 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
       channel.description_snippet?.runs?.map((r) => r.text).join("") ||
       "";
 
-    let subscribers = channel.subscriber_count.toString();
-    let videoCount = channel.video_count.toString();
+    let subscribers = channel.subscriber_count?.toString() || "";
+    let videoCount = channel.video_count?.toString() || "";
 
-    if (
-      videoCount.includes("subscribers") &&
-      (subscribers.startsWith("@") || !subscribers)
-    ) {
-      subscribers = videoCount;
-      videoCount = "";
+    if (videoCount.toLowerCase().includes("subscriber")) {
+      const actualSubscribers = videoCount;
+      videoCount = subscribers.toLowerCase().includes("video")
+        ? subscribers
+        : "";
+      subscribers = actualSubscribers;
+    } else if (subscribers.toLowerCase().includes("video") && !videoCount) {
+      videoCount = subscribers;
+      subscribers = "";
+    } else if (subscribers.startsWith("@")) {
+      subscribers = "";
     }
 
     return {
@@ -432,6 +579,9 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
         item.subtitle?.runs?.find((r: any) =>
           (r as any)?.endpoint?.payload?.browseId?.startsWith("UC"),
         )?.text ||
+        item.flex_columns?.[1]?.title?.runs?.find((r: any) =>
+          (r as any)?.endpoint?.payload?.browseId?.startsWith("UC"),
+        )?.text ||
         "Unknown Artist";
 
       return {
@@ -442,7 +592,10 @@ export function listMapper(node: Helpers.YTNode): YTListItem | null {
         year:
           item.year ||
           item.subtitle?.runs?.find(
-            (r: any) => r.text && /^\d{4}$/.test(r.text),
+            (r: any) => r.text && /^\\d{4}$/.test(r.text),
+          )?.text ||
+          item.flex_columns?.[1]?.title?.runs?.find(
+            (r: any) => r.text && /^\\d{4}$/.test(r.text),
           )?.text ||
           "",
         img: formatThumbnailId(item.thumbnail?.contents?.[0]?.url),

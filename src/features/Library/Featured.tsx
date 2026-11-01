@@ -1,8 +1,8 @@
-import { For, Show, createSignal, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { getCollection, getTracksMap } from "@modules/library";
-import ListItem from "@components/ListItem";
+import Carousel from "@components/Carousel";
 import { t, store } from "@stores";
-import { unique, isTopicAuthor } from "@utils";
+import { unique, stripTopic } from "@utils";
 
 interface FeaturedResponse {
   featuredPlaylists?: YTPlaylistItem[];
@@ -18,20 +18,23 @@ export default function () {
   const [featuredPlaylists, setFeaturedPlaylists] = createSignal<
     YTPlaylistItem[]
   >([]);
-  const [isLoading, setIsLoading] = createSignal(false);
   let hasAttemptedFetch = false;
 
   const updateFeatured = async () => {
     if (hasAttemptedFetch) return;
     hasAttemptedFetch = true;
 
-    // Check session storage first (valid for 30 minutes)
+    // Check session storage first (valid for 30 minutes, must be non-empty)
     try {
       const cached = sessionStorage.getItem("featured_cache");
       if (cached) {
         const parsed = JSON.parse(cached) as CachedFeatured;
-        if (Date.now() - parsed.timestamp < 30 * 60 * 1000) {
-          setFeaturedPlaylists(parsed.featuredPlaylists || []);
+        if (
+          Array.isArray(parsed.featuredPlaylists) &&
+          parsed.featuredPlaylists.length > 0 &&
+          Date.now() - parsed.timestamp < 30 * 60 * 1000
+        ) {
+          setFeaturedPlaylists(parsed.featuredPlaylists);
           return;
         }
       }
@@ -45,18 +48,42 @@ export default function () {
       .map((id) => tracksMap[id])
       .filter(Boolean);
 
+    // Build author -> authorId fallback map from all known tracks with valid authorId
+    const authorToIdMap: Record<string, string> = {};
+    for (const t of Object.values(tracksMap)) {
+      if (t?.author && t?.authorId) {
+        const cleanAuthor = stripTopic(t.author).toLowerCase();
+        if (cleanAuthor && !authorToIdMap[cleanAuthor]) {
+          authorToIdMap[cleanAuthor] = t.authorId;
+        }
+      }
+    }
+
+    const getTrackAuthorId = (track: TrackItem | undefined): string => {
+      if (track?.authorId) return track.authorId;
+      if (track?.author) {
+        const clean = stripTopic(track.author).toLowerCase();
+        return authorToIdMap[clean] || "";
+      }
+      return "";
+    };
+
     const artistCounts: Record<string, number> = {};
-    favorites
-      .filter((track) => isTopicAuthor(track.author) && track.authorId)
-      .forEach((track) => {
-        artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 2;
-      });
+    favorites.forEach((track) => {
+      const authorId = getTrackAuthorId(track);
+      if (authorId) {
+        artistCounts[authorId] = (artistCounts[authorId] || 0) + 2;
+      }
+    });
 
     historyIds
       .map((id) => tracksMap[id])
-      .filter((track) => isTopicAuthor(track?.author) && track?.authorId)
+      .filter(Boolean)
       .forEach((track) => {
-        artistCounts[track.authorId] = (artistCounts[track.authorId] || 0) + 1;
+        const authorId = getTrackAuthorId(track);
+        if (authorId) {
+          artistCounts[authorId] = (artistCounts[authorId] || 0) + 1;
+        }
       });
 
     const artistIds = Object.entries(artistCounts)
@@ -69,7 +96,6 @@ export default function () {
       return;
     }
 
-    setIsLoading(true);
     try {
       const artistParam = artistIds.join(",");
       const res = await fetch(
@@ -82,17 +108,19 @@ export default function () {
           : [];
         setFeaturedPlaylists(feat);
 
-        try {
-          sessionStorage.setItem(
-            "featured_cache",
-            JSON.stringify({
-              featuredPlaylists: feat,
-              timestamp: Date.now(),
-            }),
-          );
-        } catch {}
+        if (feat.length > 0) {
+          try {
+            sessionStorage.setItem(
+              "featured_cache",
+              JSON.stringify({
+                featuredPlaylists: feat,
+                timestamp: Date.now(),
+              }),
+            );
+          } catch {}
+        }
 
-        if (Array.isArray(data.artists)) {
+        if (Array.isArray(data.artists) && data.artists.length > 0) {
           try {
             sessionStorage.setItem(
               "featured_artists",
@@ -103,8 +131,6 @@ export default function () {
       }
     } catch (e) {
       console.error("Failed to fetch featured shelves", e);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -113,44 +139,13 @@ export default function () {
   });
 
   return (
-    <article class="featured-article">
-      <p>
-        <i class="ri-star-fill"></i>&nbsp;{t("hub_featured")}
-      </p>
-
-      <Show
-        when={!isLoading()}
-        fallback={
-          <div class="loading-container">
-            <i class="ri-loader-3-line loading-spinner"></i>
-          </div>
-        }
-      >
-        <Show
-          when={featuredPlaylists().length > 0}
-          fallback={
-            <div>
-              <p class="fallback">{t("hub_featured_fallback")}</p>
-            </div>
-          }
-        >
-          <div class="official-shelf">
-            <div class="list-carousel">
-              <For each={featuredPlaylists()}>
-                {(item) => (
-                  <ListItem
-                    name={item.name}
-                    id={item.id}
-                    img={item.img}
-                    author={item.author || "YouTube Music"}
-                    type="playlist"
-                  />
-                )}
-              </For>
-            </div>
-          </div>
-        </Show>
-      </Show>
-    </article>
+    <Show when={featuredPlaylists().length > 0}>
+      <Carousel
+        title={t("hub_featured")}
+        icon="ri-star-fill"
+        items={featuredPlaylists()}
+        itemType="playlist"
+      />
+    </Show>
   );
 }

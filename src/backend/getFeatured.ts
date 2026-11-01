@@ -22,15 +22,25 @@ async function fetchArtistData(
     let name = "";
     let thumbnails: { url: string; width: number; height: number }[] = [];
 
-    const header = artist.header;
+    const header = artist.header as any;
     if (header?.is(YTNodes.MusicImmersiveHeader)) {
       const h = header.as(YTNodes.MusicImmersiveHeader);
-      name = h.title.text || "";
+      name = h.title?.text || h.title?.toString() || "";
       thumbnails = h.thumbnail?.contents || [];
     } else if (header?.is(YTNodes.MusicVisualHeader)) {
       const h = header.as(YTNodes.MusicVisualHeader);
-      name = h.title.text || "";
+      name = h.title?.text || h.title?.toString() || "";
       thumbnails = h.thumbnail || [];
+    } else if (header?.is(YTNodes.MusicHeader)) {
+      const h = header.as(YTNodes.MusicHeader);
+      name = h.title?.text || h.title?.toString() || "";
+      thumbnails = h.thumbnails || [];
+    } else if (header) {
+      name = header.title?.text || header.title?.toString() || "";
+      thumbnails =
+        header.thumbnail?.contents ||
+        header.thumbnails ||
+        (Array.isArray(header.thumbnail) ? header.thumbnail : []);
     }
 
     const artistChannel: FeaturedArtist = {
@@ -44,7 +54,10 @@ async function fetchArtistData(
       if (!section.is(YTNodes.MusicCarouselShelf)) return false;
       const h = section.header;
       if (h?.is(YTNodes.MusicCarouselShelfBasicHeader)) {
-        return h.title?.toString() === "Featured on";
+        const title = h.title?.toString() || "";
+        return (
+          title === "Featured on" || title.toLowerCase().includes("featured")
+        );
       }
       return false;
     }) as YTNodes.MusicCarouselShelf | undefined;
@@ -55,11 +68,19 @@ async function fetchArtistData(
       .map((item): YTPlaylistItem | null => {
         if (item.is(YTNodes.MusicTwoRowItem)) {
           const musicItem = item.as(YTNodes.MusicTwoRowItem);
+          const rawThumbs = Array.isArray(musicItem.thumbnail)
+            ? musicItem.thumbnail
+            : (musicItem.thumbnail as any)?.contents || [];
+          let author =
+            musicItem.subtitle?.toString() || name || "YouTube Music";
+          if (author.trim().toLowerCase() === "playlist • youtube music") {
+            author = "";
+          }
           return {
             id: musicItem.id || "",
             name: musicItem.title?.toString() || "",
-            img: formatThumbnailId(getThumbnail(musicItem.thumbnail || [])),
-            author: musicItem.subtitle?.toString() || name || "YouTube Music",
+            img: formatThumbnailId(getThumbnail(rawThumbs)),
+            author,
             type: "playlist",
           };
         }
@@ -78,18 +99,18 @@ async function fetchArtistData(
 }
 
 export default async function getFeatured(
-  envOrArtistIds: any,
-  artistIdsOrLimit?: any,
+  artistIdsOrEnv: string[] | any,
+  limitOrArtistIds?: number | string[],
   maybeLimit = 20,
 ): Promise<FeaturedResult> {
-  const artistIds: string[] = Array.isArray(envOrArtistIds)
-    ? envOrArtistIds
-    : Array.isArray(artistIdsOrLimit)
-      ? artistIdsOrLimit
+  const artistIds: string[] = Array.isArray(artistIdsOrEnv)
+    ? artistIdsOrEnv
+    : Array.isArray(limitOrArtistIds)
+      ? limitOrArtistIds
       : [];
   const limit: number =
-    typeof artistIdsOrLimit === "number"
-      ? artistIdsOrLimit
+    typeof limitOrArtistIds === "number"
+      ? limitOrArtistIds
       : typeof maybeLimit === "number"
         ? maybeLimit
         : 20;

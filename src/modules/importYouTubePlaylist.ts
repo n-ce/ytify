@@ -108,9 +108,9 @@ export default async function importYouTubePlaylist() {
 
   setStore("snackbar", t("loading"));
 
-  const imported = (
-    await Promise.all(pending.map(fetchPlaylist))
-  ).filter(Boolean) as Playlist[];
+  const imported = (await Promise.all(pending.map(fetchPlaylist))).filter(
+    Boolean,
+  ) as Playlist[];
 
   if (!imported.length) {
     setStore("snackbar", t("fetchlist_error"));

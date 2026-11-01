@@ -16,31 +16,33 @@ The journey began with a frustration. As a regular user of NewPipe in 2021, I re
 -> As covered in https://blog.csdn.net/gitblog_00024/article/details/139895018 and https://medevel.com/ytify-youtube/
 
 ## What else are you getting ?
--   **High-Performance Audio Streaming:** Play audio from YouTube with minimal buffering, even on low-speed networks.
--   **Comprehensive Queue Management:** Full control over your listening queue, including adding, removing, and reordering tracks.
--   **Playlists and Collections:** Create and manage your own playlists (`collections`) and import YouTube playlists.
--   **Dynamic Theming:** The UI automatically adapts its theme based on the artwork of the currently playing stream.
--   **Progressive Web App (PWA):** Install ytify as a standalone application on your device for a native-like experience and offline support.
--   **Radio Mode:** Automatically discover and queue similar tracks for a continuous listening experience.
--   **Personalized Library:** Keep track of your listening history, favorites, and subscriptions.
--   **Audio Downloads:** Download audio streams for offline playback.
--   **Synced Lyrics:** View time-synced lyrics for your favorite songs.
--   **"For You" Recommendations:** Get personalized audio recommendations based on your favorites, generated on-device to protect your privacy.
--   **Search:** A powerful search functionality with suggestions and filters for both YouTube and YouTube Music.
+
+- **High-Performance Audio Streaming:** Play audio from YouTube with minimal buffering, even on low-speed networks.
+- **Comprehensive Queue Management:** Full control over your listening queue, including adding, removing, and reordering tracks.
+- **Playlists and Collections:** Create and manage your own playlists (`collections`) and import YouTube playlists.
+- **Dynamic Theming:** The UI automatically adapts its theme based on the artwork of the currently playing stream.
+- **Progressive Web App (PWA):** Install ytify as a standalone application on your device for a native-like experience and offline support.
+- **Radio Mode:** Automatically discover and queue similar tracks for a continuous listening experience.
+- **Personalized Library:** Keep track of your listening history, favorites, and subscriptions.
+- **Audio Downloads:** Download audio streams for offline playback.
+- **Synced Lyrics:** View time-synced lyrics for your favorite songs.
+- **"For You" Recommendations:** Get personalized audio recommendations based on your favorites, generated on-device to protect your privacy.
+- **Search:** A powerful search functionality with suggestions and filters for both YouTube and YouTube Music.
 
 <img width="3000" height="3600" alt="1000067919" src="https://github.com/user-attachments/assets/14ec1a13-3e04-4ca4-a005-eb33f53cdb67" />
 
-
 ## Usage 👆
+
 - Official Instance - https://ytify.pp.ua
 - Full Usage Guide is available at [wiki>usage](https://github.com/n-ce/ytify/wiki/usage)
 - Join our Community [@ytifytg](https://t.me/ytifytg)
 
-
 ## License 📝
+
 > [Read More](https://github.com/n-ce/ytify/blob/main/LICENSE).
 
 ## Contributing 📋
+
 > This project is actively seeking contributors, [Read More Here](https://github.com/n-ce/ytify/blob/main/CONTRIBUTING.md).
 
 ## Donations
@@ -50,35 +52,44 @@ The journey began with a frustration. As a regular user of NewPipe in 2021, I re
 - **Monero / XMR** `87BtajHDsoGD5acvkKgi2j385ZKUbJkH4QBoCQtFGgTARKWRAVEo28RLs1S3P3w6AgMkjcNLmSST7CLuxKFuzXciJiNBQqH`
 
 ## Development 🔧
-1. Prerequisites : Fundamental understanding of SolidJS. 
+
+1. Prerequisites : Fundamental understanding of SolidJS.
 2. Clone repository with
+
 ```
 git clone https://github.com/n-ce/ytify
 ```
+
 or
+
 ```
  gh repo clone n-ce/ytify
 ```
+
 3. Move to Directory, Install Dependencies
+
 ```
 cd ytify && npm i
 ```
-4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts)
-`injectEruda(false),`
 
-5. Start the development server and open localhost 
+4. If you prefer using DevTools, you may disable eruda in [`vite.config.ts`](https://github.com/n-ce/ytify/blob/main/vite.config.ts)
+   `injectEruda(false),`
+
+5. Start the development server and open localhost
+
 ```
 npm run dev -- --open
 ```
+
 6. Learn More at our [wiki](https://github.com/n-ce/ytify/wiki).
 
-
-
 ## Translations 🗺️
+
 [![Translation status](https://hosted.weblate.org/widget/ytify/multi-auto.svg)](https://hosted.weblate.org/engage/ytify/)
 ytify is being translated into multiple languages using [Weblate](https://hosted.weblate.org/projects/ytify/web).
- 
+
 ## Acknowledgements 🙏
+
 - [Shashwat](https://github.com/Shashwat-CODING) - Maintainer / Developer of Streaming services
 - [InnerTube API](https://github.com/LuanRT/YouTube.js) - Powers the ytify backend.
 - [Solid.js](https://www.solidjs.com/) - Performant UI Library

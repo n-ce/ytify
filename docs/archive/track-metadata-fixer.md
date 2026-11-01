@@ -3,7 +3,7 @@
 **Date**: 2026-09-26  
 **Status**: Completed & Archived  
 **Priority**: High  
-**Scope**: Client-side library self-healing & Backend metadata resolution service  
+**Scope**: Client-side library self-healing & Backend metadata resolution service
 
 ---
 
@@ -12,6 +12,7 @@
 Many music releases on YouTube/YouTube Music are automated uploads (Art Tracks) delivered by digital distributors (DistroKid, TuneCore, Believe, CDBaby, etc.).
 
 ### Critical Findings & Constraints
+
 1. **The `authorId` is NOT a fixed, shared ID**: YouTube creates unique, ephemeral, or pseudo-channel IDs for different automated releases under the "Release - Topic" banner.
 2. **The channel is completely empty**: When navigating to any of those `authorId` channels in ytify or YouTube, it loads an empty channel page titled "Release - Topic" with zero browseable tracks.
 3. **`getInfo` Method is Heavily Restricted**: Direct `getInfo` and `music.getInfo` calls are heavily bot-detected, throttled, or blocked by YouTube's player integrity checks (cipher/poToken requirements) on cloud/datacenter IPs.
@@ -27,16 +28,16 @@ Many music releases on YouTube/YouTube Music are automated uploads (Art Tracks) 
 
 ## 2. Intent Verification & Requirement Mapping
 
-| User Requirement / Constraint | Implementation Mechanism | Status |
-| :--- | :--- | :---: |
-| **Fix tracks with author "Release - Topic"** | Detect tracks where `author === "Release - Topic"` or cleaned `author === "Release"` | ✅ Completed |
-| **Fix both locally & backend separately** | `src/lib/modules/metadataFixer.ts` (client) + `src/backend/fixMetadata.ts` (backend) | ✅ Completed |
-| **No `getInfo`; use Music Search Songs API** | Query `yt.music.search(title, { type: 'song' })` to avoid player/bot restrictions | ✅ Completed |
-| **Client fixer module on every start** | Asynchronous call in `src/lib/modules/start.ts` right after `cleanseLibraryData()` | ✅ Completed |
-| **First check locally if other tracks with same `authorId` have valid author** | Local `validAuthorByAuthorId` map checked first before network calls | ✅ Completed |
-| **If not available, call backend fixer API** | Batch request `POST /api/fix-metadata` with `[{ id, title }]` | ✅ Completed |
-| **Backend store to persist corrected metadata** | Durable Object SQLite table / KV store keyed by `track_id` | ✅ Completed |
-| **Store index: `authorId` vs `trackId`** | Confirmed: `trackId` as primary key (dummy `authorId`s are unique & dead) | ✅ Completed |
+| User Requirement / Constraint                                                  | Implementation Mechanism                                                             |    Status    |
+| :----------------------------------------------------------------------------- | :----------------------------------------------------------------------------------- | :----------: |
+| **Fix tracks with author "Release - Topic"**                                   | Detect tracks where `author === "Release - Topic"` or cleaned `author === "Release"` | ✅ Completed |
+| **Fix both locally & backend separately**                                      | `src/lib/modules/metadataFixer.ts` (client) + `src/backend/fixMetadata.ts` (backend) | ✅ Completed |
+| **No `getInfo`; use Music Search Songs API**                                   | Query `yt.music.search(title, { type: 'song' })` to avoid player/bot restrictions    | ✅ Completed |
+| **Client fixer module on every start**                                         | Asynchronous call in `src/lib/modules/start.ts` right after `cleanseLibraryData()`   | ✅ Completed |
+| **First check locally if other tracks with same `authorId` have valid author** | Local `validAuthorByAuthorId` map checked first before network calls                 | ✅ Completed |
+| **If not available, call backend fixer API**                                   | Batch request `POST /api/fix-metadata` with `[{ id, title }]`                        | ✅ Completed |
+| **Backend store to persist corrected metadata**                                | Durable Object SQLite table / KV store keyed by `track_id`                           | ✅ Completed |
+| **Store index: `authorId` vs `trackId`**                                       | Confirmed: `trackId` as primary key (dummy `authorId`s are unique & dead)            | ✅ Completed |
 
 ---
 
@@ -81,12 +82,14 @@ Many music releases on YouTube/YouTube Music are automated uploads (Art Tracks) 
 ```
 
 ### 3.1 Resolving via `yt.music.search` (`src/backend/fixMetadata.ts`)
+
 - Cleans the track title query.
 - Queries `yt.music.search(query, { type: 'song' })`.
 - Matches exact video ID in results, or falls back to the top non-corrupted music song.
 - Extracts `author` and `authorId`.
 
 ### 3.2 Persistent Backend Cache Schema
+
 - Implemented in `UserSyncDO.ts`:
   ```sql
   CREATE TABLE IF NOT EXISTS track_metadata_fix (
@@ -100,12 +103,14 @@ Many music releases on YouTube/YouTube Music are automated uploads (Art Tracks) 
   ```
 
 ### 3.3 API Route Specification
+
 - Mounted in `src/backend/worker.ts` at `/fix-metadata`.
 - Accepts both `POST /fix-metadata` with `{ tracks: [{ id, title }] }` and `GET /fix-metadata?id=...`.
 
 ---
 
 ## 4. Client-Side Self-Healing Module (`src/lib/modules/metadataFixer.ts`)
+
 - **Stage 1**: Checks `library_tracks` for valid authors sharing the same `authorId`.
 - **Stage 2**: Dispatches batch requests to `store.api + "/fix-metadata"`.
 - Updates `library_tracks`, triggers reactive `libraryUpdated` counter, and schedules sync if `config.dbsync` is active.

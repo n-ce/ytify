@@ -260,3 +260,18 @@ export function normalizeAuthorKey(author?: string): string {
 export function clamp(n: number, min: number, max: number): number {
   return Math.min(Math.max(n, min), max);
 }
+
+/** Triggers a client-side file download of JSON data compatible with iOS Safari and desktop browsers. */
+export function downloadJSON(filename: string, data: unknown): void {
+  const content =
+    typeof data === "string" ? data : JSON.stringify(data, undefined, 2);
+  const blob = new Blob([content], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}

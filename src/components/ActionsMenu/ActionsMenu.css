@@ -1,147 +1,147 @@
 #actionsMenu {
-    padding: 0;
+  padding: 0;
+  width: 100%;
+  max-width: min(calc(100dvw - var(--gap) * 2), 24rem);
+  margin: auto;
+  border: var(--border);
+  border-radius: var(--roundness);
+  background: rgb(from var(--onBg) r g b / 0.8);
+  backdrop-filter: blur(var(--size-px-2));
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  > .streamItem {
+    margin: 0;
+    pointer-events: none;
+    border: none;
     width: 100%;
-    max-width: min(calc(100dvw - var(--gap) * 2), 24rem);
-    margin: auto;
-    border: var(--border);
-    border-radius: var(--roundness);
-    background: rgb(from var(--onBg) r g b / 0.8);
-    backdrop-filter: blur(var(--size-px-2));
-    overflow-x: hidden;
-    overflow-y: auto;
+    max-width: 100%;
+    min-width: 0;
     box-sizing: border-box;
 
-    > .streamItem {
-        margin: 0;
-        pointer-events: none;
-        border: none;
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
+    .metadata {
+      min-width: 0;
+      overflow: hidden;
 
-        .metadata {
-            min-width: 0;
-            overflow: hidden;
+      .title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-            .title {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+      .avu {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
-            .avu {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-
-                p {
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
+        p {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-
-        .ri-more-2-fill {
-            display: none;
-        }
+      }
     }
 
-    &.is-music > .streamItem span img {
-        width: var(--size-9);
-        height: var(--size-9);
-        aspect-ratio: 1;
-        object-fit: cover;
+    .ri-more-2-fill {
+      display: none;
     }
+  }
+
+  &.is-music > .streamItem span img {
+    width: var(--size-9);
+    height: var(--size-9);
+    aspect-ratio: 1;
+    object-fit: cover;
+  }
+
+  &[open],
+  &:open {
+    animation: var(--animation-slide-in-up);
+  }
+
+  @media (orientation: portrait) {
+    margin-bottom: var(--size-4);
+    max-width: min(calc(100dvw - var(--gap) * 2), 24rem);
+  }
+
+  @media (orientation: landscape) {
+    margin-right: var(--size-fluid-2);
+    width: 100%;
+    max-width: min(24rem, calc(100dvw - var(--size-fluid-4)));
 
     &[open],
     &:open {
-        animation: var(--animation-slide-in-up);
+      animation: var(--animation-slide-in-left);
+    }
+  }
+
+  &::backdrop {
+    background-color: var(--blurMix);
+    backdrop-filter: blur(var(--size-px-1));
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  li {
+    cursor: pointer;
+    color: var(--text);
+    user-select: none;
+    font-size: var(--font-size-2);
+    font-weight: var(--font-weight-6);
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    padding: var(--size-1) var(--size-5);
+    border-top: var(--border);
+    transition: background-color 0.2s;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+
+    &:hover {
+      background: var(--onBg2);
+      color: var(--text2);
     }
 
-    @media (orientation: portrait) {
-        margin-bottom: var(--size-4);
-        max-width: min(calc(100dvw - var(--gap) * 2), 24rem);
+    & i {
+      font-size: var(--font-size-3);
+      font-weight: var(--font-weight-3);
+      flex-shrink: 0;
     }
+  }
 
-    @media (orientation: landscape) {
-        margin-right: var(--size-fluid-2);
-        width: 100%;
-        max-width: min(24rem, calc(100dvw - var(--size-fluid-4)));
+  .clxnShelf {
+    display: flex;
+    cursor: initial;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
 
-        &[open],
-        &:open {
-            animation: var(--animation-slide-in-left);
-        }
-    }
+    i {
+      max-width: 34%;
+      text-align: center;
+      flex: 1;
+      font-style: inherit !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-    &::backdrop {
-        background-color: var(--blurMix);
-        backdrop-filter: blur(var(--size-px-1));
-    }
-
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    li {
-        cursor: pointer;
-        color: var(--text);
-        user-select: none;
-        font-size: var(--font-size-2);
-        font-weight: var(--font-weight-6);
-        display: flex;
-        align-items: center;
-        gap: var(--gap);
-        padding: var(--size-1) var(--size-5);
-        border-top: var(--border);
-        transition: background-color 0.2s;
-        box-sizing: border-box;
+      select {
+        appearance: none;
+        margin: 0 !important;
+        padding: 0 !important;
         max-width: 100%;
-        min-width: 0;
-
-        &:hover {
-            background: var(--onBg2);
-            color: var(--text2);
-        }
-
-        & i {
-            font-size: var(--font-size-3);
-            font-weight: var(--font-weight-3);
-            flex-shrink: 0;
-        }
+        text-align: right;
+        color: inherit !important;
+      }
     }
-
-    .clxnShelf {
-        display: flex;
-        cursor: initial;
-        border: none;
-        width: 100%;
-        box-sizing: border-box;
-
-        i {
-            max-width: 34%;
-            text-align: center;
-            flex: 1;
-            font-style: inherit !important;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            select {
-                appearance: none;
-                margin: 0 !important;
-                padding: 0 !important;
-                max-width: 100%;
-                text-align: right;
-                color: inherit !important;
-            }
-        }
-    }
+  }
 }

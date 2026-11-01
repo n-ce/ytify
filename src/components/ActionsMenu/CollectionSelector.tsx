@@ -1,5 +1,12 @@
 import { config } from "@config";
-import { addToCollection, CACHED_COLLECTION, createCollection, getCollection, getCollectionsKeys, removeFromCollection } from "@modules/library";
+import {
+  addToCollection,
+  CACHED_COLLECTION,
+  createCollection,
+  getCollection,
+  getCollectionsKeys,
+  removeFromCollection,
+} from "@modules/library";
 import { t } from "@stores";
 import { For, Show } from "solid-js";
 

@@ -1,5 +1,6 @@
 import getAlbum from "./getAlbum.js";
 import getArtist from "./getArtist.js";
+import getCatalog from "./getCatalog.js";
 import getChannel from "./getChannel.js";
 import getFeatured from "./getFeatured.js";
 import getPlaylist from "./getPlaylist.js";
@@ -7,7 +8,7 @@ import getSearch from "./getSearch.js";
 import getSearchSuggestions from "./getSearchSuggestions.js";
 import getSimilar from "./getSimilar.js";
 import getSubFeed from "./getSubFeed.js";
-import { handleFixMetadata, type FixTarget } from "./fixMetadata.js";
+import getSongData from "./getSongData.js";
 import type {
   DurableObjectNamespace,
   ExecutionContext,
@@ -18,15 +19,13 @@ export { UserSyncDO } from "./UserSyncDO.ts";
 export interface Env {
   USER_SYNC_DO?: DurableObjectNamespace;
   INTERNAL_TOKEN?: string;
+  CATALOG_BASE_URL?: string;
 }
 
 const ALLOWED_ORIGINS = [
   "https://ytify.pp.ua",
   "https://ytify.netlify.app",
-  "https://ytify.zeabur.app",
   "https://ytify-zeta.vercel.app",
-  "https://ytify-legacy.vercel.app",
-  "https://ytify-2nx7.onrender.com",
   "http://localhost:3000",
   "http://localhost:5173",
 ];
@@ -87,7 +86,7 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    const path = url.pathname.replace(/^\/+/, "");
+    const path = url.pathname.replace(/^\/api\//, "").replace(/^\/+/, "");
     const searchParams = url.searchParams;
 
     // Edge cache lookup for public GET queries
@@ -242,37 +241,37 @@ export default {
       }
     }
 
-    // --- Retired Catalog Route Guard ---
-    if (path.startsWith("catalog")) {
-      return new Response(
-        JSON.stringify({
-          error: "Catalog Durable Object is retired for future plans.",
-        }),
-        {
-          status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
-    }
-
     // --- Featured endpoint (artist "Featured on" shelf) ---
     if (path === "featured") {
-      const artistIds = (searchParams.get("artistIds") || "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
-      const limit = Math.min(
-        parseInt(searchParams.get("limit") || "20", 10) || 20,
-        30,
-      );
-      const result = await getFeatured(artistIds, limit);
-      return jsonCachedResponse(
-        result,
-        corsHeaders,
-        "public, max-age=3600, s-maxage=3600, stale-while-revalidate=1800",
-        request,
-        ctx,
-      );
+      try {
+        const artistIds = (searchParams.get("artistIds") || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+        const limit = Math.min(
+          parseInt(searchParams.get("limit") || "20", 10) || 20,
+          30,
+        );
+        const result = await getFeatured(artistIds, limit);
+        return jsonCachedResponse(
+          result,
+          corsHeaders,
+          "public, max-age=3600, s-maxage=3600, stale-while-revalidate=1800",
+          request,
+          ctx,
+        );
+      } catch (error: any) {
+        console.error(`Error processing path ${path}:`, error);
+        return new Response(
+          JSON.stringify({
+            error: error.message || "Internal Server Error",
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
     }
 
     try {
@@ -291,45 +290,68 @@ export default {
           data = await getArtist(id);
           break;
         }
+        case "catalog": {
+          if (request.method !== "POST") {
+            return new Response(
+              JSON.stringify({ error: "Method Not Allowed" }),
+              {
+                status: 405,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+          const body = (await request.json().catch(() => null)) as any;
+          const raw = Array.isArray(body) ? body : body?.ids;
+          if (!Array.isArray(raw) || raw.length === 0) {
+            return new Response(
+              JSON.stringify({ error: "Missing ids array" }),
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+          data = await getCatalog(raw, env);
+          break;
+        }
         case "channel": {
           const id = searchParams.get("id");
           if (!id) throw new Error("Missing id parameter");
           data = await getChannel(id);
           break;
         }
-        case "fix-metadata": {
-          let targets: FixTarget[] = [];
-          if (request.method === "POST") {
-            const body = (await request.json().catch(() => ({}))) as {
-              tracks?: FixTarget[];
-              id?: string;
-              title?: string;
-              author?: string;
-              isTopic?: boolean;
-            };
-            if (Array.isArray(body.tracks)) {
-              targets = body.tracks.filter((t) => t && (t.id || t.title));
-            } else if (body.id) {
-              targets = [
-                {
-                  id: body.id,
-                  title: body.title || "",
-                  author: body.author,
-                  isTopic: body.isTopic,
-                },
-              ];
-            }
-          } else {
-            const id = searchParams.get("id");
-            const title = searchParams.get("title") || "";
-            const author = searchParams.get("author") || "";
-            const isTopic = searchParams.get("isTopic") === "true";
-            if (id) targets = [{ id, title, author, isTopic }];
-          }
-
-          if (targets.length === 0) {
+        case "featured": {
+          const artistIds = (searchParams.get("artistIds") || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          const limit = Math.min(
+            parseInt(searchParams.get("limit") || "20", 10) || 20,
+            30,
+          );
+          data = await getFeatured(artistIds, limit);
+          break;
+        }
+        case "songdata": {
+          if (request.method !== "GET") {
             return new Response(
-              JSON.stringify({ error: "Missing tracks or id parameter" }),
+              JSON.stringify({ error: "Method Not Allowed" }),
+              {
+                status: 405,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+          const idsParam =
+            searchParams.get("ids") || searchParams.get("id") || "";
+          const ids = idsParam
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          if (ids.length === 0) {
+            return new Response(
+              JSON.stringify({ error: "Missing ids parameter" }),
               {
                 status: 400,
                 headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -337,7 +359,7 @@ export default {
             );
           }
 
-          data = await handleFixMetadata(targets);
+          data = await getSongData(ids);
           break;
         }
         case "playlist": {
@@ -372,8 +394,15 @@ export default {
         }
         case "subfeed": {
           const id = searchParams.get("id");
-          if (!id) throw new Error("Missing id parameter");
-          data = await getSubFeed(id.split(","));
+          if (!id || !id.trim()) {
+            data = [];
+          } else {
+            const channelIds = id
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            data = channelIds.length ? await getSubFeed(channelIds) : [];
+          }
           break;
         }
         default:

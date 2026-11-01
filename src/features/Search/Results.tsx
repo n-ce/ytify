@@ -1,6 +1,7 @@
 import { For, Show, createMemo } from "solid-js";
 import { searchStore } from "@stores";
 import { config } from "@config";
+import Carousel from "@components/Carousel";
 import ListItem from "@components/ListItem";
 import StreamItem from "@components/StreamItem";
 
@@ -34,11 +35,7 @@ export default function SearchResults() {
       </Show>
 
       <Show when={carouselItems().length > 0}>
-        <div class="list-carousel">
-          <For each={carouselItems()}>
-            {(item) => <ListItem {...(item as YTListItem)} />}
-          </For>
-        </div>
+        <Carousel items={carouselItems()} />
       </Show>
 
       <div class="searchlist">

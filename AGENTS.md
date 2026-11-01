@@ -35,6 +35,7 @@ Tech stack: TypeScript, SolidJS, Vite, Cloudflare Workers (Durable Objects + SQL
 - Offline-first: Assume network can fail anytime. Streaming prioritizes Cobalt API with Netlify Edge signed token fallback.
 - Recommendations and history must remain strictly on-device (zero telemetry/tracking).
 - Local storage keys are namespaced: library_, config, drawer.
+- **Prohibition on YouTube getInfo / Direct Player Calls**: NEVER use `yt.getInfo`, `yt.music.getInfo`, or video player endpoints to resolve or scrape track metadata. YouTube heavily restricts and rate-limits these endpoints (triggering 429s, SABR blocks, and bot-detection challenges). Metadata resolution MUST come from the local OPFS catalog, the Moods & Genres dataset, or natural browse/search payloads (albums, artist discography, search results)—never individual video info calls.
 - **Dual-Path Local Dev vs Deployed Edge Parity (Search Suggestions)**:
   - `netlify/edge-functions/search-suggestions.ts` handles edge requests in production deployments for global low-latency.
   - `src/backend/` (`getSearchSuggestions.ts`, `localAdapter.ts`, `worker.ts`) handles search suggestions locally via Vite's `apiMiddleware` because Netlify Edge Functions are unavailable during local development.

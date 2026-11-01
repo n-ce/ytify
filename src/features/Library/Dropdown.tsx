@@ -2,7 +2,7 @@ import { setConfig, config } from "@config";
 import { CACHED_COLLECTION, getTracksMap } from "@modules/library";
 import { clearOpusCache } from "@modules/audioCache";
 import { setStore, t } from "@stores";
-import { lsGetJSON, lsKeys, lsRemove, lsSetJSON } from "@utils";
+import { downloadJSON, lsGetJSON, lsKeys, lsRemove, lsSetJSON } from "@utils";
 import { createSignal, lazy, Show } from "solid-js";
 import { render } from "solid-js/web";
 import ConfigureModal from "./ConfigureModal";
@@ -38,9 +38,8 @@ export default function Dropdown() {
   }
 
   function exportLibrary() {
-    const link = document.createElement("a");
     const date = new Date().toISOString().split("T")[0];
-    link.download = `ytify_library_${date}.json`;
+    const filename = `ytify_library_${date}.json`;
 
     const exportedData: { [key: string]: any } = {};
     for (const key of lsKeys("library_")) {
@@ -50,8 +49,7 @@ export default function Dropdown() {
       exportedData[name] = lsGetJSON(key, null);
     }
 
-    link.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(exportedData, undefined, 2))}`;
-    link.click();
+    downloadJSON(filename, exportedData);
   }
 
   async function cleanLibrary() {

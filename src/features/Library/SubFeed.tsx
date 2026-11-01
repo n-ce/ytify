@@ -1,21 +1,19 @@
 import { For, Show, createSignal, onMount } from "solid-js";
 import { getLists } from "@modules/library";
 import StreamItem from "@components/StreamItem";
-import ListItem from "@components/ListItem";
+import Carousel from "@components/Carousel";
 import { t, store } from "@stores";
 
 export default function () {
   const channels = getLists("channels");
-  const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(
-    Boolean(channels && channels.length > 0),
-  );
+  if (!channels || channels.length === 0) {
+    return null;
+  }
+
+  const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(true);
   const [subfeed, setSubfeed] = createSignal<YTItem[]>([]);
 
   const updateSubfeed = async () => {
-    if (!channels || channels.length === 0) {
-      setSubfeed([]);
-      return;
-    }
     setIsSubfeedLoading(true);
     const channelIds = channels.map((channel) => channel.id).join(",");
     try {
@@ -40,41 +38,21 @@ export default function () {
       <p>
         <i class="ri-tv-fill"></i>&nbsp;{t("hub_subfeed")}
       </p>
-      <Show
-        when={channels && channels.length > 0}
-        fallback={
-          <div>
-            <p class="fallback">{t("hub_subfeed_fallback")}</p>
-          </div>
-        }
-      >
-        <div class="list-carousel">
-          <For each={channels}>
-            {(channel) => (
-              <ListItem
-                name={channel.name}
-                img={channel.img}
-                id={channel.id}
-                type="channel"
-              />
-            )}
-          </For>
-        </div>
+      <Carousel items={channels} itemType="channel" />
 
-        <Show when={isSubfeedLoading() || subfeed().length > 0}>
-          <div class="subfeed-list">
-            <Show
-              when={!isSubfeedLoading()}
-              fallback={
-                <div class="loading-container">
-                  <i class="ri-loader-3-line loading-spinner"></i>
-                </div>
-              }
-            >
-              <For each={subfeed()}>{(item) => <StreamItem {...item} />}</For>
-            </Show>
-          </div>
-        </Show>
+      <Show when={isSubfeedLoading() || subfeed().length > 0}>
+        <div class="subfeed-list">
+          <Show
+            when={!isSubfeedLoading()}
+            fallback={
+              <div class="loading-container">
+                <i class="ri-loader-3-line loading-spinner"></i>
+              </div>
+            }
+          >
+            <For each={subfeed()}>{(item) => <StreamItem {...item} />}</For>
+          </Show>
+        </div>
       </Show>
     </article>
   );

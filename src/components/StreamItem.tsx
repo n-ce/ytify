@@ -1,6 +1,11 @@
 import { Accessor, Show, createSignal } from "solid-js";
 import "./StreamItem.css";
-import { hostResolver, generateImageUrl, isTopicAuthor, stripTopic } from "@utils";
+import {
+  hostResolver,
+  generateImageUrl,
+  isTopicAuthor,
+  stripTopic,
+} from "@utils";
 import { config } from "@config";
 import { removeFromCollection, getCollectionItems } from "@modules/library";
 import { player } from "@modules/playback";

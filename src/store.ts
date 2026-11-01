@@ -10,8 +10,20 @@ import {
   pickImage,
   withTopicSuffix,
 } from "@utils";
-import { config, playerBackground, setConfig, VOLUME_PRESETS, drawer, setDrawer } from "@config";
-import { addToCollection, recordTrackPlay, cacheTrackOnFinished, getLibraryAlbums } from "@modules/library";
+import {
+  config,
+  playerBackground,
+  setConfig,
+  VOLUME_PRESETS,
+  drawer,
+  setDrawer,
+} from "@config";
+import {
+  addToCollection,
+  recordTrackPlay,
+  cacheTrackOnFinished,
+  getLibraryAlbums,
+} from "@modules/library";
 import { player } from "@modules/playback";
 import { cssVar, themer } from "@modules/theme";
 import { checkSponsorBlock, clearSponsorSegments } from "@modules/sponsorBlock";

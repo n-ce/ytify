@@ -24,8 +24,8 @@
       "@utils": ["./src/utils.ts"],
       "@modules/*": ["./src/modules/*"],
       "@components/*": ["./src/components/*"],
-      "@features/*": ["./src/features/*"],
-    },
+      "@features/*": ["./src/features/*"]
+    }
   },
-  "include": ["src", "netlify", "api", "scripts"],
+  "include": ["src", "netlify", "api", "scripts"]
 }

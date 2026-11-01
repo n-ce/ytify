@@ -95,7 +95,9 @@ describe("url helpers", () => {
 
   test("hostResolver rewrites internal watch and playlist URLs", () => {
     const origin = "https://ytify.app";
-    expect(hostResolver("/watch?v=123", origin)).toBe("https://ytify.app?s=123");
+    expect(hostResolver("/watch?v=123", origin)).toBe(
+      "https://ytify.app?s=123",
+    );
     expect(hostResolver("/playlists=123", origin)).toBe(
       "https://ytify.app?playlists=123",
     );

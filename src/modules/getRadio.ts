@@ -27,28 +27,31 @@ const instances = shuffle([
   "invidious.schenkel.eti.br",
   "invidious.kemonomimi.nl",
   "inv.thepixora.com",
-  "invidious.darkness.services"
+  "invidious.darkness.services",
 ]);
 
-export default async function(id: string): Promise<TrackItem[]> {
+export default async function (id: string): Promise<TrackItem[]> {
   for (const instance of instances) {
     try {
       const res = await fetch(`https://${instance}/api/v1/mixes/RD${id}`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      
-      const data = await res.json() as InvidiousMix;
-      
-      return (data.videos || []).map(v => ({
-        id: v.videoId,
-        title: v.title,
-        authorId: v.authorId,
-        author: v.author,
-        duration: convertSStoHHMMSS(v.lengthSeconds)
-      }) as TrackItem);
+
+      const data = (await res.json()) as InvidiousMix;
+
+      return (data.videos || []).map(
+        (v) =>
+          ({
+            id: v.videoId,
+            title: v.title,
+            authorId: v.authorId,
+            author: v.author,
+            duration: convertSStoHHMMSS(v.lengthSeconds),
+          }) as TrackItem,
+      );
     } catch (e) {
       console.warn(`Instance ${instance} failed, trying next...`);
     }
   }
 
-  throw new Error('All instances failed to generate radio');
+  throw new Error("All instances failed to generate radio");
 }

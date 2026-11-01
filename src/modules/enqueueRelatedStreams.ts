@@ -8,30 +8,29 @@
 import { playerStore, addToQueue } from "@stores";
 import { convertSStoHHMMSS, isTopicAuthor } from "@utils";
 
-export default function(data: RecommendedVideo[]) {
-
+export default function (data: RecommendedVideo[]) {
   const { isMusic, stream } = playerStore;
   const currentTitle = stream.title;
 
   const tracksToAdd: TrackItem[] = data
-    .filter(item => {
+    .filter((item) => {
       const id = item.videoId;
       return (
         item.lengthSeconds > 45 &&
-        !(sessionStorage.getItem('trashHistory') || '').includes(id) &&
+        !(sessionStorage.getItem("trashHistory") || "").includes(id) &&
         (!isMusic || isTopicAuthor(item.author))
       );
     })
-    .map(item => ({
+    .map((item) => ({
       id: item.videoId,
       title: item.title,
       author: item.author,
       authorId: item.authorId,
       duration: convertSStoHHMMSS(item.lengthSeconds),
       context: {
-        src: 'queue',
-        id: `Related to ${currentTitle}`
-      }
+        src: "queue",
+        id: `Related to ${currentTitle}`,
+      },
     }));
 
   if (tracksToAdd.length > 0) {

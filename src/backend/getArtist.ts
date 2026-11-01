@@ -1,7 +1,13 @@
-import { YTNodes, type Helpers, type Innertube } from 'youtubei.js';
-import { getClient, getThumbnail, formatThumbnailId, formatDuration, getVideoId } from './utils.js';
+import { YTNodes, type Helpers, type Innertube } from "youtubei.js";
+import {
+  getClient,
+  getThumbnail,
+  formatThumbnailId,
+  formatDuration,
+  getVideoId,
+} from "./utils.js";
 
-const DISCOGRAPHY_PAGE = 'MUSIC_PAGE_TYPE_ARTIST_DISCOGRAPHY';
+const DISCOGRAPHY_PAGE = "MUSIC_PAGE_TYPE_ARTIST_DISCOGRAPHY";
 
 // The artist page's Albums / Singles & EPs carousels are capped at 10 items and
 // carry no continuation, so long discographies are silently truncated. The full
@@ -10,7 +16,7 @@ const DISCOGRAPHY_PAGE = 'MUSIC_PAGE_TYPE_ARTIST_DISCOGRAPHY';
 // endpoint nor the chips are modelled by youtubei.js, so the raw payload is
 // walked structurally.
 function walkRaw(node: unknown, visit: (node: any) => void): void {
-  if (!node || typeof node !== 'object') return;
+  if (!node || typeof node !== "object") return;
   if (Array.isArray(node)) {
     for (const child of node) walkRaw(child, visit);
     return;
@@ -20,7 +26,7 @@ function walkRaw(node: unknown, visit: (node: any) => void): void {
 }
 
 const rawText = (node?: { runs?: { text?: string }[] }): string =>
-  node?.runs?.map((run) => run.text || '').join('') || '';
+  node?.runs?.map((run) => run.text || "").join("") || "";
 
 function findDiscographyEndpoint(
   payload: unknown,
@@ -29,8 +35,11 @@ function findDiscographyEndpoint(
   walkRaw(payload, (node) => {
     const endpoint = node.browseEndpoint;
     if (found || !endpoint?.browseId || !endpoint?.params) return;
-    const pageType = endpoint.browseEndpointContextSupportedConfigs?.browseEndpointContextMusicConfig?.pageType;
-    if (pageType === DISCOGRAPHY_PAGE) found = { browseId: endpoint.browseId, params: endpoint.params };
+    const pageType =
+      endpoint.browseEndpointContextSupportedConfigs
+        ?.browseEndpointContextMusicConfig?.pageType;
+    if (pageType === DISCOGRAPHY_PAGE)
+      found = { browseId: endpoint.browseId, params: endpoint.params };
   });
   return found;
 }
@@ -41,7 +50,9 @@ function findChipContinuation(payload: unknown, label: RegExp): string | null {
     if (found || !node.chipCloudChipRenderer) return;
     const chip = node.chipCloudChipRenderer;
     if (!label.test(rawText(chip.text))) return;
-    found = chip.navigationEndpoint?.browseSectionListReloadEndpoint?.continuation?.reloadContinuationData?.continuation || null;
+    found =
+      chip.navigationEndpoint?.browseSectionListReloadEndpoint?.continuation
+        ?.reloadContinuationData?.continuation || null;
   });
   return found;
 }
@@ -51,13 +62,18 @@ function findChipContinuation(payload: unknown, label: RegExp): string | null {
 function mapDiscographyRow(row: any, author: string) {
   const subtitle = rawText(row.subtitle);
   return {
-    kind: /^(Album|EP|Single)\b/.exec(subtitle)?.[1] || 'Album',
+    kind: /^(Album|EP|Single)\b/.exec(subtitle)?.[1] || "Album",
     album: {
-      id: row.navigationEndpoint?.browseEndpoint?.browseId || '',
+      id: row.navigationEndpoint?.browseEndpoint?.browseId || "",
       name: rawText(row.title),
-      img: formatThumbnailId(getThumbnail(row.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails || [])),
-      year: row.year || /\b(?:19|20)\d{2}\b/.exec(subtitle)?.[0] || '',
-      type: 'album' as const,
+      img: formatThumbnailId(
+        getThumbnail(
+          row.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail
+            ?.thumbnails || [],
+        ),
+      ),
+      year: row.year || /\b(?:19|20)\d{2}\b/.exec(subtitle)?.[0] || "",
+      type: "album" as const,
       author,
     },
   };
@@ -65,12 +81,21 @@ function mapDiscographyRow(row: any, author: string) {
 
 async function getDiscography(yt: Innertube, id: string, author: string) {
   const browse = async (args: Record<string, unknown>) =>
-    (await yt.actions.execute('/browse', { ...args, client: 'YTMUSIC', parse: false })).data as any;
+    (
+      await yt.actions.execute("/browse", {
+        ...args,
+        client: "YTMUSIC",
+        parse: false,
+      })
+    ).data as any;
 
   const endpoint = findDiscographyEndpoint(await browse({ browseId: id }));
   if (!endpoint) return null;
 
-  const discography = { browseId: endpoint.browseId, params: decodeURIComponent(endpoint.params) };
+  const discography = {
+    browseId: endpoint.browseId,
+    params: decodeURIComponent(endpoint.params),
+  };
   const page = await browse(discography);
 
   const albumsToken = findChipContinuation(page, /^Albums$/);
@@ -80,39 +105,44 @@ async function getDiscography(yt: Innertube, id: string, author: string) {
   const rows = (payload: unknown) => {
     const mapped: ReturnType<typeof mapDiscographyRow>[] = [];
     walkRaw(payload, (node) => {
-      if (node.musicTwoRowItemRenderer) mapped.push(mapDiscographyRow(node.musicTwoRowItemRenderer, author));
+      if (node.musicTwoRowItemRenderer)
+        mapped.push(mapDiscographyRow(node.musicTwoRowItemRenderer, author));
     });
     return mapped;
   };
 
   const [albumsPage, singlesPage] = await Promise.all([
     browse({ ...discography, continuation: albumsToken }),
-    singlesToken ? browse({ ...discography, continuation: singlesToken }) : null,
+    singlesToken
+      ? browse({ ...discography, continuation: singlesToken })
+      : null,
   ]);
 
   return {
     albums: rows(albumsPage).map((row) => row.album),
     eps: singlesPage
-      ? rows(singlesPage).filter((row) => row.kind === 'EP').map((row) => row.album)
+      ? rows(singlesPage)
+          .filter((row) => row.kind === "EP")
+          .map((row) => row.album)
       : [],
   };
 }
 
-export default async function(id: string) {
+export default async function (id: string) {
   const yt = await getClient();
   const artist = await yt.music.getArtist(id);
 
-  let name = '';
+  let name = "";
   let thumbnails: { url: string; width: number; height: number }[] = [];
 
   const header = artist.header;
   if (header?.is(YTNodes.MusicImmersiveHeader)) {
     const immersiveHeader = header.as(YTNodes.MusicImmersiveHeader);
-    name = immersiveHeader.title.text || '';
+    name = immersiveHeader.title.text || "";
     thumbnails = immersiveHeader.thumbnail?.contents || [];
   } else if (header?.is(YTNodes.MusicVisualHeader)) {
     const visualHeader = header.as(YTNodes.MusicVisualHeader);
-    name = visualHeader.title.text || '';
+    name = visualHeader.title.text || "";
     thumbnails = visualHeader.thumbnail || [];
   }
 
@@ -123,47 +153,66 @@ export default async function(id: string) {
       songItems = songs.contents;
     }
   } catch (e) {
-    console.error('Error fetching all songs:', e);
-    const songsSection = artist.sections?.find(s => s.is(YTNodes.MusicShelf) && s.as(YTNodes.MusicShelf).title?.text?.toLowerCase().includes('songs'))?.as(YTNodes.MusicShelf);
+    console.error("Error fetching all songs:", e);
+    const songsSection = artist.sections
+      ?.find(
+        (s) =>
+          s.is(YTNodes.MusicShelf) &&
+          s.as(YTNodes.MusicShelf).title?.text?.toLowerCase().includes("songs"),
+      )
+      ?.as(YTNodes.MusicShelf);
     if (songsSection) {
       songItems = songsSection.contents;
     }
   }
 
-  const items = songItems.map((item) => {
-    if (item.is(YTNodes.MusicResponsiveListItem)) {
-      const musicItem = item.as(YTNodes.MusicResponsiveListItem);
-      const album = musicItem.album?.name;
-      const views = musicItem.views?.toString();
-      const subtext = (album || '') + (views ? (album ? ' • ' : '') + views : '');
+  const items = songItems
+    .map((item) => {
+      if (item.is(YTNodes.MusicResponsiveListItem)) {
+        const musicItem = item.as(YTNodes.MusicResponsiveListItem);
+        const album = musicItem.album?.name;
+        const views = musicItem.views?.toString();
+        const subtext =
+          (album || "") + (views ? (album ? " • " : "") + views : "");
 
-      let duration = musicItem.duration?.text;
-      if (!duration && musicItem.subtitle) {
-        duration = musicItem.subtitle.runs?.find(r => r.text && /^(\d+:)?\d+:\d+$/.test(r.text))?.text;
-      }
-      if (!duration && musicItem.fixed_columns) {
-        const fixedColumn = musicItem.fixed_columns.find(c => c.is(YTNodes.MusicResponsiveListItemFixedColumn));
-        if (fixedColumn) {
-          duration = fixedColumn.as(YTNodes.MusicResponsiveListItemFixedColumn).title.toString();
+        let duration = musicItem.duration?.text;
+        if (!duration && musicItem.subtitle) {
+          duration = musicItem.subtitle.runs?.find(
+            (r) => r.text && /^(\d+:)?\d+:\d+$/.test(r.text),
+          )?.text;
         }
+        if (!duration && musicItem.fixed_columns) {
+          const fixedColumn = musicItem.fixed_columns.find((c) =>
+            c.is(YTNodes.MusicResponsiveListItemFixedColumn),
+          );
+          if (fixedColumn) {
+            duration = fixedColumn
+              .as(YTNodes.MusicResponsiveListItemFixedColumn)
+              .title.toString();
+          }
+        }
+
+        return {
+          id: getVideoId(musicItem),
+          title: musicItem.title || "",
+          author:
+            musicItem.author?.name || musicItem.artists?.[0]?.name || name,
+          authorId:
+            musicItem.author?.channel_id ||
+            musicItem.artists?.[0]?.channel_id ||
+            id,
+          duration: formatDuration(duration),
+          albumId: musicItem.album?.id || "",
+          type: "song" as const,
+          subtext,
+        };
       }
+      return null;
+    })
+    .filter((i): i is NonNullable<typeof i> => i !== null);
 
-      return {
-        id: getVideoId(musicItem),
-        title: musicItem.title || '',
-        author: musicItem.author?.name || musicItem.artists?.[0]?.name || name,
-        authorId: musicItem.author?.channel_id || musicItem.artists?.[0]?.channel_id || id,
-        duration: formatDuration(duration),
-        albumId: musicItem.album?.id || '',
-        type: 'song' as const,
-        subtext
-      };
-    }
-    return null;
-  }).filter((i): i is NonNullable<typeof i> => i !== null);
-
-  let albums: NonNullable<YTArtistItem['albums']> = [];
-  let eps: NonNullable<YTArtistItem['eps']> = [];
+  let albums: NonNullable<YTArtistItem["albums"]> = [];
+  let eps: NonNullable<YTArtistItem["eps"]> = [];
 
   try {
     const discography = await getDiscography(yt, id, name);
@@ -173,19 +222,47 @@ export default async function(id: string) {
   }
 
   if (!albums.length) {
-    const albumsSection = artist.sections?.find(s => s.is(YTNodes.MusicCarouselShelf) && s.as(YTNodes.MusicCarouselShelf).header?.is(YTNodes.MusicCarouselShelfBasicHeader) && s.as(YTNodes.MusicCarouselShelf).header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text === 'Albums')?.as(YTNodes.MusicCarouselShelf);
-    const singlesSection = artist.sections?.find(s => s.is(YTNodes.MusicCarouselShelf) && s.as(YTNodes.MusicCarouselShelf).header?.is(YTNodes.MusicCarouselShelfBasicHeader) && (s.as(YTNodes.MusicCarouselShelf).header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text === 'Singles' || s.as(YTNodes.MusicCarouselShelf).header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text?.includes('Singles')))?.as(YTNodes.MusicCarouselShelf);
+    const albumsSection = artist.sections
+      ?.find(
+        (s) =>
+          s.is(YTNodes.MusicCarouselShelf) &&
+          s
+            .as(YTNodes.MusicCarouselShelf)
+            .header?.is(YTNodes.MusicCarouselShelfBasicHeader) &&
+          s
+            .as(YTNodes.MusicCarouselShelf)
+            .header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text ===
+            "Albums",
+      )
+      ?.as(YTNodes.MusicCarouselShelf);
+    const singlesSection = artist.sections
+      ?.find(
+        (s) =>
+          s.is(YTNodes.MusicCarouselShelf) &&
+          s
+            .as(YTNodes.MusicCarouselShelf)
+            .header?.is(YTNodes.MusicCarouselShelfBasicHeader) &&
+          (s
+            .as(YTNodes.MusicCarouselShelf)
+            .header?.as(YTNodes.MusicCarouselShelfBasicHeader).title?.text ===
+            "Singles" ||
+            s
+              .as(YTNodes.MusicCarouselShelf)
+              .header?.as(YTNodes.MusicCarouselShelfBasicHeader)
+              .title?.text?.includes("Singles")),
+      )
+      ?.as(YTNodes.MusicCarouselShelf);
 
     const mapAlbum = (item: Helpers.YTNode) => {
       if (item.is(YTNodes.MusicTwoRowItem)) {
         const musicItem = item.as(YTNodes.MusicTwoRowItem);
         return {
-          id: musicItem.id || '',
-          name: musicItem.title.toString() || '',
+          id: musicItem.id || "",
+          name: musicItem.title.toString() || "",
           img: formatThumbnailId(getThumbnail(musicItem.thumbnail || [])),
-          year: musicItem.year || '',
-          type: 'album' as const,
-          author: name
+          year: musicItem.year || "",
+          type: "album" as const,
+          author: name,
         };
       }
       return null;
@@ -194,15 +271,22 @@ export default async function(id: string) {
     const collect = (section: typeof albumsSection) =>
       (section?.contents || [])
         .map(mapAlbum)
-        .filter((i): i is NonNullable<ReturnType<typeof mapAlbum>> => i !== null);
+        .filter(
+          (i): i is NonNullable<ReturnType<typeof mapAlbum>> => i !== null,
+        );
 
     albums = collect(albumsSection);
     eps = collect(singlesSection).filter((album) =>
-      singlesSection?.contents?.some((item) =>
-        item.is(YTNodes.MusicTwoRowItem) &&
-        item.as(YTNodes.MusicTwoRowItem).id === album.id &&
-        item.as(YTNodes.MusicTwoRowItem).subtitle?.toString()?.toLowerCase().includes('ep')
-      )
+      singlesSection?.contents?.some(
+        (item) =>
+          item.is(YTNodes.MusicTwoRowItem) &&
+          item.as(YTNodes.MusicTwoRowItem).id === album.id &&
+          item
+            .as(YTNodes.MusicTwoRowItem)
+            .subtitle?.toString()
+            ?.toLowerCase()
+            .includes("ep"),
+      ),
     );
   }
 
@@ -213,6 +297,6 @@ export default async function(id: string) {
     items,
     albums,
     eps,
-    type: 'artist' as const
+    type: "artist" as const,
   };
 }

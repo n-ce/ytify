@@ -446,7 +446,9 @@ export async function enforceCacheLimit(): Promise<string[]> {
   }
 
   if (evicted.length) {
-    writeCachedIds(getCachedTrackIdsSync().filter((id) => !evicted.includes(id)));
+    writeCachedIds(
+      getCachedTrackIdsSync().filter((id) => !evicted.includes(id)),
+    );
     console.log(`[OPFS] Evicted ${evicted.length} track(s)`);
   }
 

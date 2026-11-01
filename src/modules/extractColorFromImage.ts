@@ -1,17 +1,20 @@
-
-export default async function(src: string, useOffscreenCanvas: boolean): Promise<number[]> {
-
-  const canvas = useOffscreenCanvas ?
-    new OffscreenCanvas(512, 512) :
-    document.createElement('canvas');
-  const context = <OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D>canvas.getContext('2d', { alpha: false });
+export default async function (
+  src: string,
+  useOffscreenCanvas: boolean,
+): Promise<number[]> {
+  const canvas = useOffscreenCanvas
+    ? new OffscreenCanvas(512, 512)
+    : document.createElement("canvas");
+  const context = <
+    OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D
+  >canvas.getContext("2d", { alpha: false });
 
   const canvasImg = new Image();
 
   await new Promise((resolve, reject) => {
     canvasImg.onload = resolve;
     canvasImg.onerror = reject;
-    canvasImg.crossOrigin = '';
+    canvasImg.crossOrigin = "";
     canvasImg.src = src;
   });
 
@@ -26,7 +29,9 @@ export default async function(src: string, useOffscreenCanvas: boolean): Promise
 
   const data = context.getImageData(0, 0, side, side).data;
   const len = data.length;
-  let r = 0, g = 0, b = 0;
+  let r = 0,
+    g = 0,
+    b = 0;
 
   for (let i = 0; i < len; i += 4) {
     r += data[i];
@@ -34,9 +39,9 @@ export default async function(src: string, useOffscreenCanvas: boolean): Promise
     b += data[i + 2];
   }
   const amount = len / 4;
-  r = Math.floor(r / amount),
-    g = Math.floor(g / amount),
-    b = Math.floor(b / amount);
+  ((r = Math.floor(r / amount)),
+    (g = Math.floor(g / amount)),
+    (b = Math.floor(b / amount)));
 
   return [r, g, b];
 }

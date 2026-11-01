@@ -1,58 +1,47 @@
 /* Contextual Tooltip System for ytify */
 
 :is(i, button)[aria-label] {
-    position: relative;
-    --tt-x: -50%;
-    --tt-y: calc(var(--size-1) * -1);
+  position: relative;
+  --tt-x: -50%;
+  --tt-y: calc(var(--size-1) * -1);
 }
 
 :is(i, button)[aria-label]::after {
-    position: absolute;
-    content: attr(aria-label);
-    font-size: var(--font-size-0);
-    font-family: var(--font);
-    font-weight: var(--font-weight-6);
-    font-style: normal;
-    letter-spacing: normal;
-    line-height: 1.4;
-    background: var(--text);
-    color: var(--bg);
-    top: calc(100% + var(--size-1));
-    bottom: auto;
-    left: 50%;
-    right: auto;
-    transform: translate(var(--tt-x), var(--tt-y));
-    z-index: 1000;
-    padding: var(--size-px-1) var(--size-px-2) !important;
-    border-radius: var(--roundness);
-    white-space: nowrap;
-    max-width: min(calc(100vw - var(--size-6)), 300px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-    box-shadow: var(--shadow-2);
-    transition:
-        opacity 0.15s ease-out,
-        transform 0.15s ease-out,
-        visibility 0.15s ease-out;
-    transition-delay: 0s;
+  position: absolute;
+  content: attr(aria-label);
+  font-size: var(--font-size-0);
+  font-family: var(--font);
+  font-weight: var(--font-weight-6);
+  font-style: normal;
+  letter-spacing: normal;
+  line-height: 1.4;
+  background: var(--text);
+  color: var(--bg);
+  top: calc(100% + var(--size-1));
+  bottom: auto;
+  left: 50%;
+  right: auto;
+  transform: translate(var(--tt-x), var(--tt-y));
+  z-index: 1000;
+  padding: var(--size-px-1) var(--size-px-2) !important;
+  border-radius: var(--roundness);
+  white-space: nowrap;
+  max-width: min(calc(100vw - var(--size-6)), 300px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: var(--shadow-2);
+  transition:
+    opacity 0.15s ease-out,
+    transform 0.15s ease-out,
+    visibility 0.15s ease-out;
+  transition-delay: 0s;
 }
 
 @media (hover: hover) {
-    :is(i, button)[aria-label]:hover:not(:active)::after {
-        opacity: 1 !important;
-        visibility: visible !important;
-        transform: translate(var(--tt-x), 0);
-        transition-property: opacity, transform;
-        transition-duration: 0.2s;
-        transition-timing-function: ease-out;
-        transition-delay: 0.4s;
-    }
-}
-
-:is(i, button)[aria-label].show::after {
+  :is(i, button)[aria-label]:hover:not(:active)::after {
     opacity: 1 !important;
     visibility: visible !important;
     transform: translate(var(--tt-x), 0);
@@ -60,29 +49,40 @@
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
     transition-delay: 0.4s;
+  }
+}
+
+:is(i, button)[aria-label].show::after {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translate(var(--tt-x), 0);
+  transition-property: opacity, transform;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-out;
+  transition-delay: 0.4s;
 }
 
 :is(i, button)[aria-label]:active::after {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transition: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: none !important;
 }
 
 /* Hide tooltips when parent dropdown menu is open */
 details[open] > summary :is(i, button)[aria-label]::after {
-    display: none !important;
+  display: none !important;
 }
 
 /* Suppress tooltips inside list items (preserves strict overflow: hidden on stream rows) */
 .streamItem :is(i, button)[aria-label]::after {
-    display: none !important;
+  display: none !important;
 }
 
 /* Touch devices: disable tooltips completely to prevent sticky tap popups */
 @media (hover: none) {
-    :is(i, button)[aria-label]::after {
-        display: none !important;
-    }
+  :is(i, button)[aria-label]::after {
+    display: none !important;
+  }
 }
 
 /* --- Vertical Contextual Positioning --- */
@@ -95,7 +95,7 @@ nav.app-navbar :is(i, button)[aria-label],
 .controls :is(i, button)[aria-label],
 .bottomShelf :is(i, button)[aria-label],
 .mainShelf :is(i, button)[aria-label] {
-    --tt-y: var(--size-1);
+  --tt-y: var(--size-1);
 }
 
 nav.app-navbar :is(i, button)[aria-label]::after,
@@ -105,8 +105,8 @@ nav.app-navbar :is(i, button)[aria-label]::after,
 .controls :is(i, button)[aria-label]::after,
 .bottomShelf :is(i, button)[aria-label]::after,
 .mainShelf :is(i, button)[aria-label]::after {
-    top: auto;
-    bottom: calc(100% + var(--size-1));
+  top: auto;
+  bottom: calc(100% + var(--size-1));
 }
 
 /* --- Horizontal Edge Safety Anchors --- */
@@ -128,7 +128,7 @@ nav.app-navbar > :is(i, button)[aria-label]:last-child,
 .bottomShelf > :is(i, button)[aria-label]:last-child,
 .mainShelf > :is(i, button)[aria-label]:last-child,
 :is(i, button)[aria-label].tooltip-right {
-    --tt-x: 0;
+  --tt-x: 0;
 }
 
 .right-group :is(i, button)[aria-label]::after,
@@ -147,8 +147,8 @@ nav.app-navbar > :is(i, button)[aria-label]:last-child::after,
 .bottomShelf > :is(i, button)[aria-label]:last-child::after,
 .mainShelf > :is(i, button)[aria-label]:last-child::after,
 :is(i, button)[aria-label].tooltip-right::after {
-    left: auto;
-    right: 0;
+  left: auto;
+  right: 0;
 }
 
 /* Left-anchored icons: expand inward towards the right so tooltips never clip off-screen */
@@ -162,7 +162,7 @@ nav.app-navbar > :is(i, button)[aria-label]:first-child,
 .bottomShelf > :is(i, button)[aria-label]:first-child,
 .mainShelf > :is(i, button)[aria-label]:first-child,
 :is(i, button)[aria-label].tooltip-left {
-    --tt-x: 0;
+  --tt-x: 0;
 }
 
 .sticky-bar > :is(i, button)[aria-label]:first-child::after,
@@ -175,6 +175,6 @@ nav.app-navbar > :is(i, button)[aria-label]:first-child::after,
 .bottomShelf > :is(i, button)[aria-label]:first-child::after,
 .mainShelf > :is(i, button)[aria-label]:first-child::after,
 :is(i, button)[aria-label].tooltip-left::after {
-    left: 0;
-    right: auto;
+  left: 0;
+  right: auto;
 }
