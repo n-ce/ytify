@@ -128,7 +128,7 @@ export function openSubView(feature: MainFeature) {
   if (feature === "search") {
     if (typeof history !== "undefined") {
       history.replaceState(
-        { ...(history.state || {}), panel: null },
+        { ...history.state, panel: null },
         "",
         getCleanHref("search"),
       );
@@ -151,7 +151,7 @@ export function closeSubView() {
   } else {
     if (typeof history !== "undefined") {
       history.replaceState(
-        { ...(history.state || {}), panel: null },
+        { ...history.state, panel: null },
         "",
         getCleanHref("search"),
       );
