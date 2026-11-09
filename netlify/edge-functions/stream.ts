@@ -16,6 +16,7 @@ interface RapidAPIState {
 
 // 🛡️ The Heavy Offender Wall - Kicked out before any database or API interaction
 const HARD_BANNED_SUBNETS = [
+  "5.188.124.9",
   "27.121.6.",
   "27.121.41.",
   "38.133.204.210",     // 153
