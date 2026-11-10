@@ -1,5 +1,18 @@
 import { Context, Config } from "@netlify/edge-functions";
 
+/**
+ * Safely parse JSON, returning `fallback` instead of throwing when the body
+ * is not valid JSON (e.g. YouTube returns an HTML error page:
+ * SyntaxError: Unexpected token '<', "<!DOCTYPE ... is not valid JSON).
+ */
+function safeParseJson(text: string, fallback: unknown = []): any {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return fallback;
+  }
+}
+
 export default async (request: Request, _context: Context) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
@@ -44,7 +57,8 @@ export default async (request: Request, _context: Context) => {
         },
       );
 
-      const data = await res.json();
+      const text = await res.text();
+      const data = safeParseJson(text, []);
 
       // Parse YTMUSIC response
       const suggestions =
@@ -86,8 +100,10 @@ export default async (request: Request, _context: Context) => {
 
       // youtubei.js parses window.google.ac.h(...)
       const jsonText = text.replace("window.google.ac.h(", "").slice(0, -1);
-      const data = JSON.parse(jsonText);
-      const suggestions = data[1].map((s: any) => s[0]);
+      const data = safeParseJson(jsonText, []);
+      const suggestions = Array.isArray(data) && Array.isArray(data[1])
+        ? data[1].map((s: any) => s[0])
+        : [];
 
       return new Response(JSON.stringify(suggestions), {
         headers: cacheHeaders,

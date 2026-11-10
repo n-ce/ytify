@@ -3,10 +3,10 @@ import { shuffle } from "@utils";
 import { streamCache } from "./audioCache";
 
 const instances = shuffle([
-  "https://yt.omada.cafe",
   "https://invidious.schenkel.eti.br",
   "https://invidious.kemonomimi.nl",
   "https://echostreamz.com",
+  "https://yt.chocolatemoo53.com",
 ]);
 
 export default async function (
