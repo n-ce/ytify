@@ -9,6 +9,7 @@ Status of all items F through Z:
 - [x] **G. Local Library Search sometimes creates empty collections**
   - Removed side-effect generation loops from `Collections.tsx`.
   - Moved single-pass initial seeding of default collections (`favorites`, `listenLater`) to boot in `start.ts`.
+  - Real root cause: search results use `context.src === "search"` with the query as `context.id`; when a result's thumbnail resolved to the deleted-video 120x90 placeholder, `StreamItem` called `removeFromCollection(query, ...)`, and the unconditional `saveCollection` in `removeFromCollection` persisted an empty `library_<partial query>` entry. Thumbnail cleanup is now limited to `context.src === "collection"`, and `removeFromCollection` / `addToCollection` no-op instead of writing when there is nothing to remove or add.
 
 - [x] **H. Make the queue timer click scroll to the top of the queue**
   - Updated duration badge in `Queue/index.tsx` (both header title and extra slot) with smooth scroll to top (`scrollTo({ top: 0, behavior: "smooth" })`).

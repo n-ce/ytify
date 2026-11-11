@@ -61,8 +61,11 @@ export default function (
         setImage(src.replace(".webp", ".jpg").replace("vi_webp", "vi"));
         return;
       }
-      if (data.context?.src) {
-        removeFromCollection(data.context?.id, [data.id]);
+      // Only local collections can own library entries. Other contexts (e.g.
+      // search queries, channels, playlists, albums) use arbitrary ids that
+      // are not collection keys.
+      if (data.context?.src === "collection") {
+        removeFromCollection(data.context.id, [data.id]);
       }
       return;
     }

@@ -357,6 +357,9 @@ export function setCacheLimit(_megabytes: number) {
 }
 
 export function addToCollection(name: string, data: TrackItem[]) {
+  // Nothing to add means nothing to create; avoid empty collection entries.
+  if (!data.some((item) => item?.id)) return;
+
   const collection = getCollection(name);
   const tracks = getTracksMap();
   const prepend = ["history", "favorites", "liked"].includes(name);
@@ -396,6 +399,10 @@ export function removeFromCollection(name: string, ids: string[]) {
   const tracks = getTracksMap();
   const deviceLocal = name === CACHED_COLLECTION;
   const removed = ids.filter((id) => collection.includes(id));
+
+  // Removing from a collection that does not hold any of the ids (including a
+  // nonexistent collection) must not write a new empty collection entry.
+  if (removed.length === 0) return;
 
   for (const id of removed) {
     const idx = collection.indexOf(id);
