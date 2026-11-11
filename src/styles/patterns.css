@@ -105,6 +105,59 @@
   opacity: 0.7;
 }
 
+/* Sortable drag & drop list */
+.sortable-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.sortable-item {
+  width: 100%;
+  position: relative;
+  user-select: none;
+  transition: opacity 0.15s ease;
+
+  &.is-dragging {
+    opacity: 0.35;
+  }
+
+  &.is-drop-target > * {
+    background-color: var(--onBg2);
+  }
+
+  /* Pseudo-elements mark the drop edge without shifting the list mid-drag. */
+  &.drop-before::before,
+  &.drop-after::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--text2);
+    border-radius: var(--size-px-1);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  &.drop-before::before {
+    top: 0;
+  }
+
+  &.drop-after::after {
+    bottom: 0;
+  }
+}
+
+.ri-draggable {
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
 /* Animations */
 @keyframes spinner {
   from {
@@ -156,9 +209,5 @@
     margin: 0;
     background-color: transparent;
     border: none;
-
-    p.title {
-      max-height: var(--size-4) !important;
-    }
   }
 }
