@@ -121,11 +121,6 @@ export default function () {
     return (
       <div class="markBar">
         <i
-          aria-label={t("close")}
-          class="ri-close-large-line"
-          onclick={() => setMarkMode(false)}
-        ></i>
-        <i
           aria-label={t("list_mark_all")}
           class={"ri-checkbox-multiple-fill"}
           onclick={() => {
@@ -267,6 +262,15 @@ export default function () {
 
         <div class="right-group">
           <i
+            aria-label={t("nav_search")}
+            class={isSearching() ? "ri-close-line" : "ri-search-2-line"}
+            onclick={() => {
+              const next = !isSearching();
+              setIsSearching(next);
+              if (!next) setSearchQuery("");
+            }}
+          ></i>
+          <i
             aria-label={t("list_mark_mode")}
             aria-checked={markMode()}
             class={markMode() ? "ri-checkbox-fill" : "ri-checkbox-line"}
@@ -274,15 +278,6 @@ export default function () {
               const next = !markMode();
               setMarkMode(next);
               if (!next) setMarkList([]);
-            }}
-          ></i>
-          <i
-            aria-label={t("nav_search")}
-            class={isSearching() ? "ri-close-line" : "ri-search-2-line"}
-            onclick={() => {
-              const next = !isSearching();
-              setIsSearching(next);
-              if (!next) setSearchQuery("");
             }}
           ></i>
         </div>
