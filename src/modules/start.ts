@@ -19,7 +19,7 @@ import { player } from "@modules/playback";
 import { getCachedTrackIds } from "@modules/audioCache";
 
 export default async function () {
-  // Handle /s/:id, /album/:id, /artist/:id, /channel/:id, /playlist/:id URLs by transforming them internally
+  // Handle /s/:id, /:prefix/:slug, /album/:id, /artist/:id, /channel/:id, /playlist/:id URLs by transforming them internally
   const pathParts = location.pathname.split("/");
   if (pathParts.length === 3) {
     const [, type, id] = pathParts;
@@ -27,6 +27,10 @@ export default async function () {
       if (type === "s") {
         params.set("s", id);
         history.replaceState({}, "", `/?s=${id}`);
+      } else if (type.length === 1 && id.length === 10) {
+        const fullId = type + id;
+        params.set("s", fullId);
+        history.replaceState({}, "", `/?s=${fullId}`);
       } else if (["album", "artist", "channel", "playlist"].includes(type)) {
         params.set(type, id);
         history.replaceState({}, "", `/?${type}=${id}`);

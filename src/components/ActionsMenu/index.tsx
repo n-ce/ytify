@@ -267,7 +267,7 @@ export default function () {
           onclick={() => {
             const id = store.actionsMenu?.id;
             if (id) {
-              const shareUrl = location.origin + "/s/" + id;
+              const shareUrl = `${location.origin}/${id[0]}/${id.slice(1)}`;
               if (navigator.share) {
                 navigator
                   .share({

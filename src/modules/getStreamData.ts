@@ -14,8 +14,10 @@ export default async function (
   signal?: AbortSignal,
 ): Promise<Invidious | Record<"error" | "message", string>> {
   const fetchData = async (proxy: string): Promise<Invidious> => {
-    const path = proxy ? "/api/v1/videos/" : "/s/";
-    const res = await fetch(proxy + path + id, {
+    const url = proxy
+      ? `${proxy}/api/v1/videos/${id}`
+      : `/${id[0]}/${id.slice(1)}`;
+    const res = await fetch(url, {
       headers: { Accept: "application/json" },
       signal,
     });
