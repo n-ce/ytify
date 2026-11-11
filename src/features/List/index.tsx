@@ -47,6 +47,11 @@ export default function () {
   const [showSortable, setShowSortable] = createSignal(false);
   const [searchQuery, setSearchQuery] = createSignal("");
 
+  const isAlbum = () =>
+    listStore.type === "album" ||
+    listStore.id.startsWith("MPREb") ||
+    listStore.id.startsWith("OLAK5uy");
+
   const getSourceItems = () => {
     let source =
       listStore.type === "collection" && !listStore.isShared
@@ -195,8 +200,37 @@ export default function () {
     />
   );
 
+  const renderResults = () => (
+    <Results
+      items={filteredItems()}
+      draggable={
+        showSortable() &&
+        localSortBy() === "modified" &&
+        !listStore.reservedCollections.includes(listStore.id) &&
+        !isSearching()
+      }
+      mark={{
+        mode: markMode,
+        set: (id: string) => {
+          setMarkList((prev) =>
+            prev.includes(id)
+              ? prev.filter((item) => item !== id)
+              : [...prev, id],
+          );
+        },
+        get: (id: string) => markList().includes(id),
+      }}
+    />
+  );
+
   return (
-    <section ref={listSection} id="listSection">
+    <section
+      ref={listSection}
+      id="listSection"
+      classList={{
+        "album-section": isAlbum(),
+      }}
+    >
       <header class="sticky-bar">
         <HeaderNav
           title={
@@ -353,34 +387,18 @@ export default function () {
         <ArtistCarousel items={getSourceItems()} />
       </Show>
 
-      <Show when={config.loadImage && listStore.id.startsWith("MPREb")}>
-        <img
-          src={generateImageUrl(listStore.img, "720")}
-          alt={listStore.name}
-          class="list-thumbnail"
-        />
+      <Show when={isAlbum()} fallback={renderResults()}>
+        <div class="album-layout">
+          <Show when={config.loadImage}>
+            <img
+              src={generateImageUrl(listStore.img, "720")}
+              alt={listStore.name}
+              class="list-thumbnail"
+            />
+          </Show>
+          {renderResults()}
+        </div>
       </Show>
-
-      <Results
-        items={filteredItems()}
-        draggable={
-          showSortable() &&
-          localSortBy() === "modified" &&
-          !listStore.reservedCollections.includes(listStore.id) &&
-          !isSearching()
-        }
-        mark={{
-          mode: markMode,
-          set: (id: string) => {
-            setMarkList((prev) =>
-              prev.includes(id)
-                ? prev.filter((item) => item !== id)
-                : [...prev, id],
-            );
-          },
-          get: (id: string) => markList().includes(id),
-        }}
-      />
     </section>
   );
 }
