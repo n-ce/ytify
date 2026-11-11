@@ -49,7 +49,9 @@ export default function (data: YTListItem) {
         />
       </Show>
       <div>
-        <p class="title truncate">{data.name}</p>
+        <p class="title truncate" title={data.name}>
+          {data.name}
+        </p>
         <p class="uData truncate">{uploaderData}</p>
         <p class="stats truncate">{stats}</p>
       </div>

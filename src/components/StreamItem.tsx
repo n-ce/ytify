@@ -265,7 +265,9 @@ export default function (
         </Show>
       </span>
       <div class="metadata">
-        <p class="title">{data.title}</p>
+        <p class="title" title={data.title}>
+          {data.title}
+        </p>
         <div class="avu">
           <p class="author truncate">{stripTopic(data.author)}</p>
           <Show when={!isAlbum}>

@@ -39,6 +39,13 @@
     font-weight: var(--font-weight-6);
     line-height: var(--size-4);
     margin-bottom: var(--size-1);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   p.uData,

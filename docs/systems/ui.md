@@ -47,6 +47,9 @@ This document establishes the UI design opinions and layout standards across the
 
 - Every flex container hosting truncated child text (`.truncate`, `div.metadata`, `.listItem div`) must specify `min-width: 0`.
 - This prevents premature text collapse into ellipses (`...`) when horizontal space is available.
+- **No arbitrary width caps**: Titles that share a flex row with actions (`.header-nav-list`, `.header-nav-badge`, `.header-title`) must grow/shrink to the available space (`flex: 0 1 auto; min-width: 0; max-width: 100%`) instead of a fixed pixel `max-width`; ellipsis is a last resort, not a layout default.
+- **Card titles**: `.listItem p.title` reserves up to two lines via `-webkit-line-clamp: 2` so playlist/album/channel names stay readable in grids and carousels. Hover surfaces the full name through a `title` attribute.
+- **Track titles**: `.streamItem p.title` also exposes its full text through a `title` attribute for truncated rows.
 
 ### 1.4 Tooltip Positioning & Overflow Safety
 

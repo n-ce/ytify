@@ -169,6 +169,7 @@ section > header {
     align-items: center;
     gap: var(--size-3);
     min-width: 0;
+    flex: 1 1 auto;
     flex-wrap: nowrap;
 }
 
@@ -186,6 +187,7 @@ section > header {
     position: relative;
     padding: var(--size-1) 0;
     text-decoration: none;
+    flex-shrink: 0;
 
     &:hover {
         opacity: 1;
@@ -211,7 +213,9 @@ section > header {
 }
 
 .header-nav-list {
-    max-width: 200px;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -222,6 +226,7 @@ section > header {
     align-items: center;
     gap: var(--size-2);
     min-width: 0;
+    flex: 0 1 auto;
     margin-left: var(--size-2);
     opacity: 0.8;
     font-size: var(--font-size-2);
@@ -236,7 +241,7 @@ section > header {
     font-size: var(--font-size-2);
     font-weight: var(--font-weight-5);
     color: var(--text);
-    max-width: 250px;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
