@@ -101,9 +101,10 @@ export default async (request: Request, _context: Context) => {
       // youtubei.js parses window.google.ac.h(...)
       const jsonText = text.replace("window.google.ac.h(", "").slice(0, -1);
       const data = safeParseJson(jsonText, []);
-      const suggestions = Array.isArray(data) && Array.isArray(data[1])
-        ? data[1].map((s: any) => s[0])
-        : [];
+      const suggestions =
+        Array.isArray(data) && Array.isArray(data[1])
+          ? data[1].map((s: any) => s[0])
+          : [];
 
       return new Response(JSON.stringify(suggestions), {
         headers: cacheHeaders,

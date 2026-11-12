@@ -95,15 +95,30 @@ The Library view is controlled by a URL boolean flag:
 
 ### REQ-LC-009: Library Shelves & Modularity
 
-The Library view exposes modular shelves toggled in `config.librarySections`:
+The Library view is a single-select tabbed hub. The local search bar is followed
+by a radio chip row (`ChoiceChips`) and exactly one shelf is rendered at a time:
 
-- **Active Shelves**:
-  - `pinned`: Pinned collection quick chips.
-  - `history`: Horizontal carousel of recently played tracks.
+- **Tabs**:
+  - `quickAccess`: Built-in collections (`history`, `favorites`, `liked`,
+    `listenLater`) plus `cached` and `discovery` when enabled.
+  - `myCollections`: User-created collections only. The chip is hidden when no
+    custom collections exist.
+  - `subfeed`: `SubFeed.tsx` — wrapped channel carousel plus a vertical,
+    recently-released audio list.
   - `featured`: Consolidated recommendations shelf (`Featured.tsx`).
-  - `playlists`: User-saved and created playlists.
-  - `albums`: Saved albums.
-  - `artists`: Subscribed channel list.
+  - `playlists`: User-saved and created playlists. Hidden when empty.
+  - `albums`: Saved albums. Hidden when empty.
+- **Visibility**: `config.librarySections` still drives whether `subfeed`,
+  `featured`, `cached`, `discovery` and the reserved collections appear.
+- **Persistence**: The selected tab is stored in `config.libraryTab`. If a
+  persisted tab becomes unavailable, the hub falls back to `quickAccess`.
+- **Ordering**: A sort toggle sits immediately left of the chips and persists
+  `config.librarySort`:
+  - `modified` (default): collections by `library_meta` timestamp descending;
+    playlists/albums newest-saved first.
+  - `name`: ascending alphabetical.
+- **Search override**: While the local search has text, the tab chips and shelf
+  content are hidden and only matching tracks are shown.
 - **Retired Shelves**: The legacy `Gallery.tsx` view and `gallery` config toggle have been completely removed.
 
 ### REQ-LC-010: Featured Shelf Consolidation & Favorites Coupling
@@ -141,7 +156,9 @@ The Library view exposes modular shelves toggled in `config.librarySections`:
 
 - `src/modules/library.ts` - Core library logic
 - `src/features/Library/` - UI components
+- `src/features/Library/LocalSearch.tsx` - Local library search
 - `src/features/Library/Featured.tsx` - Consolidated featured shelf
+- `src/components/ChoiceChips.tsx` - Shared single-select chip row
 - `src/features/List/index.tsx` - Favorites collection & coupled Artist carousel
 - `src/modules/cloudSync.ts` - Sync integration
 - `src/modules/audioCache.ts` - OPFS-backed `cached` collection

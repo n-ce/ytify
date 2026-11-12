@@ -6,11 +6,9 @@ import { t, store } from "@stores";
 
 export default function () {
   const channels = getLists("channels");
-  if (!channels || channels.length === 0) {
-    return null;
-  }
-
-  const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(true);
+  const [isSubfeedLoading, setIsSubfeedLoading] = createSignal(
+    channels.length > 0,
+  );
   const [subfeed, setSubfeed] = createSignal<YTItem[]>([]);
 
   const updateSubfeed = async () => {
@@ -28,17 +26,21 @@ export default function () {
   };
 
   onMount(() => {
-    if (subfeed().length === 0) {
+    if (channels.length > 0 && subfeed().length === 0) {
       updateSubfeed();
     }
   });
 
   return (
-    <article class="subfeed-article">
-      <p>
-        <i class="ri-tv-fill"></i>&nbsp;{t("hub_subfeed")}
-      </p>
-      <Carousel items={channels} itemType="channel" />
+    <Show
+      when={channels.length > 0}
+      fallback={
+        <div class="fallback-card">
+          <p class="fallback">{t("hub_subfeed_fallback")}</p>
+        </div>
+      }
+    >
+      <Carousel items={channels} itemType="channel" wrap />
 
       <Show when={isSubfeedLoading() || subfeed().length > 0}>
         <div class="subfeed-list">
@@ -54,6 +56,6 @@ export default function () {
           </Show>
         </div>
       </Show>
-    </article>
+    </Show>
   );
 }

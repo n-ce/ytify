@@ -2,212 +2,98 @@
   overflow-y: auto;
   width: 100%;
 
-  .subfeed-article {
-    .subfeed-list {
-      max-height: 260px;
-      overflow-y: auto;
-    }
+  .library-tabs-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-1);
+    margin-bottom: var(--size-4);
+  }
 
-    @media (orientation: portrait) {
-      &:has(.subfeed-list) .list-carousel {
-        border-bottom: 0;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
-        margin-bottom: 0;
-      }
+  .library-tabs {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
 
-      .subfeed-list {
-        border-top: 0;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        margin-top: 0;
-      }
-    }
+  .library-sort {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-1) var(--size-2);
+    border: var(--border);
+    border-radius: var(--radius-round);
+    background-color: var(--onBg);
+    color: var(--text);
+    font-size: var(--font-size-1);
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
 
-    @media (orientation: landscape) {
-      &:has(.subfeed-list) {
-        display: grid;
-        grid-template-columns: clamp(160px, 25%, 220px) 1fr;
-        grid-template-rows: auto 1fr;
-        row-gap: var(--size-2);
-
-        > p {
-          grid-column: 1 / -1;
-          grid-row: 1;
-        }
-
-        .list-carousel {
-          grid-column: 1;
-          grid-row: 2;
-          flex-direction: column;
-          overflow-x: hidden;
-          overflow-y: auto;
-          max-height: 260px;
-          height: 100%;
-          margin: 0;
-          border-right: var(--border);
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
-          padding: var(--size-1);
-          gap: var(--size-1);
-
-          .listItem {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            padding: var(--size-1) var(--size-2);
-            gap: var(--size-2);
-            border-radius: var(--roundness);
-            text-align: left;
-
-            &:hover {
-              background-color: var(--onBg2);
-            }
-
-            img {
-              width: var(--size-7);
-              height: var(--size-7);
-              max-width: var(--size-7);
-              aspect-ratio: 1 / 1;
-              border-radius: var(--radius-round);
-              object-fit: cover;
-              flex-shrink: 0;
-              margin: 0;
-              box-shadow: none;
-            }
-
-            div {
-              text-align: left;
-              padding: 0;
-              min-width: 0;
-              flex: 1;
-            }
-
-            p.title {
-              font-size: var(--font-size-1);
-              margin: 0;
-              line-height: var(--size-4);
-            }
-
-            p.stats {
-              font-size: var(--font-size-0);
-              margin: 0;
-              opacity: 0.7;
-            }
-
-            p.uData {
-              display: none;
-            }
-          }
-        }
-
-        .subfeed-list {
-          grid-column: 2;
-          grid-row: 2;
-          margin: 0;
-          border-left: 0;
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
-          height: 100%;
-
-          .loading-container {
-            height: 100%;
-          }
-        }
-      }
+    &:hover {
+      background-color: var(--onBg2);
+      color: var(--text2);
     }
   }
 
-  article {
+  .collection-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-1);
     margin-bottom: var(--size-5);
+    padding: var(--size-2);
+    background-color: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+  }
 
-    .loading-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      padding: var(--size-4);
-    }
+  .fallback-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--size-5);
+    padding: var(--size-3);
+    background-color: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+  }
 
-    > p {
-      display: inline-block;
-      font-size: var(--font-size-3);
-      font-weight: var(--font-weight-4);
-      letter-spacing: var(--font-letterspacing-2);
-      color: var(--text2);
-      opacity: 0.7;
-      width: calc(100% - var(--size-8));
-    }
+  .fallback {
+    margin: 0;
+    padding: var(--size-2);
+    font-size: var(--font-size-1);
+    text-align: center;
+    opacity: 0.7;
+  }
 
-    > i {
-      font-size: var(--font-size-3);
-      cursor: pointer;
-      padding: var(--size-1) var(--size-2);
-      margin-right: var(--size-2);
-      border-radius: var(--roundness);
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: var(--size-4);
+  }
 
-      &:hover {
-        background: var(--onBg2);
-        color: var(--text2);
-      }
-    }
+  .subfeed-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: var(--size-5);
+    background-color: var(--onBg);
+    border: var(--border);
+    border-radius: var(--roundness);
+    overflow: hidden;
 
-    > div {
-      display: flex;
-      border-radius: var(--roundness);
-      background-color: var(--onBg);
-      border: var(--border);
-      margin: var(--size-2) 0;
-    }
-
-    > .userArtists {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      padding-bottom: 0 !important;
-      border-bottom: 0;
+    .streamItem {
       margin-bottom: 0;
-    }
-
-    > .relatedPlaylists {
-      padding-top: 0 !important;
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-      border-top: 0;
-      margin: 0;
-
-      img {
-        border-top-left-radius: var(--radius-4);
-        border-bottom-right-radius: var(--radius-4);
-      }
-    }
-
-    > .relatedArtists {
-      img {
-        border-radius: var(--radius-round) !important;
-      }
-
-      margin: 0;
-      border-radius: 0;
-      border-top: 0;
-      border-bottom: 0;
-      padding-top: 0 !important;
-    }
-
-    > div:has(.streamItem) {
       width: 100%;
-      flex-direction: column;
+      border-radius: 0;
+      flex-shrink: 0;
 
-      .streamItem {
-        margin-bottom: 0;
-        width: 100%;
-        border-radius: 0;
-        flex-shrink: 0;
-
-        .title {
-          height: var(--size-4);
-          text-overflow: clip;
-        }
+      .title {
+        height: var(--size-4);
+        text-overflow: clip;
       }
     }
   }
@@ -229,7 +115,7 @@
     }
 
     &:hover {
-      background-color: var(--onBg);
+      background-color: var(--onBg2);
       border-radius: var(--roundness);
     }
   }
@@ -239,7 +125,7 @@
     outline: none;
     border-radius: var(--roundness);
     margin: 0;
-    margin-bottom: var(--gap);
+    margin-bottom: var(--size-3);
     background: var(--onBg);
     border: var(--border);
     padding: var(--size-1) var(--size-2);

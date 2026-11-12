@@ -13,6 +13,32 @@ export type CachingMode = "auto" | "on-demand" | "off";
 const CACHING_MODES: CachingMode[] = ["auto", "on-demand", "off"];
 
 /**
+ * The library renders one shelf at a time. The selection is persisted so the
+ * hub reopens on the same shelf across reloads.
+ */
+export type LibraryTab =
+  | "quickAccess"
+  | "myCollections"
+  | "subfeed"
+  | "featured"
+  | "playlists"
+  | "albums";
+
+export const LIBRARY_TABS: LibraryTab[] = [
+  "quickAccess",
+  "myCollections",
+  "subfeed",
+  "featured",
+  "playlists",
+  "albums",
+];
+
+/** Ordering for library collection, playlist and album shelves. */
+export type LibrarySort = "name" | "modified";
+
+export const LIBRARY_SORTS: LibrarySort[] = ["modified", "name"];
+
+/**
  * Artwork background of the music player.
  * frost / frost-motion: artwork behind a pane that blurs and veils it.
  * blur / blur-motion: artwork behind a pane that only blurs.
@@ -86,6 +112,8 @@ export let config = {
   sortOrder: "desc" as "asc" | "desc",
   cachingMode: "auto" as CachingMode,
   librarySections: { ...defaultLibrarySections },
+  libraryTab: "quickAccess" as LibraryTab,
+  librarySort: "modified" as LibrarySort,
   sponsorblock: false,
 };
 
@@ -120,6 +148,10 @@ if (!PLAYER_BACKGROUNDS.includes(config.playerBackground))
   config.playerBackground = "none";
 if (config.shareAction !== "play" && config.shareAction !== "watch")
   config.shareAction = "play";
+if (!LIBRARY_TABS.includes(config.libraryTab))
+  config.libraryTab = "quickAccess";
+if (!LIBRARY_SORTS.includes(config.librarySort))
+  config.librarySort = "modified";
 
 export function setConfig<K extends keyof AppConfig>(
   key: K,

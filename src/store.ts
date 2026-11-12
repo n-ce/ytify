@@ -831,13 +831,20 @@ export async function getList(
   setListStore("hasContinuation", false);
 
   setListStore("isLoading", true);
+  setListStore("id", id);
+  if (type === "album") {
+    setListStore("type", "album");
+  }
   openSubView("list");
   navStore.list.ref?.scrollIntoView({ behavior: "smooth" });
 
   if (!all) updateParam(type, id);
 
   // Special case for saved albums
-  if (!all && type === "playlist" && id.startsWith("OLAK5uy")) {
+  if (
+    !all &&
+    (type === "album" || (type === "playlist" && id.startsWith("OLAK5uy")))
+  ) {
     const libraryAlbums = getLibraryAlbums();
     const savedAlbum = libraryAlbums.find((a) => a.id === id);
     if (savedAlbum) {
@@ -845,7 +852,7 @@ export async function getList(
         img: savedAlbum.img,
         id: id,
         url: id,
-        type: "playlists",
+        type: "album",
         name: savedAlbum.name,
         author: savedAlbum.author,
         list: [],

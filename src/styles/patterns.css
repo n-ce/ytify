@@ -210,4 +210,9 @@
     background-color: transparent;
     border: none;
   }
+
+  &.wrap {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
 }

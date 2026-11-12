@@ -51,6 +51,8 @@
   "library_listen_later": "Listen Later",
   "library_liked": "Liked Audios",
   "library_configure": "Configure Library",
+  "library_quick_access": "Quick Access",
+  "library_my_collections": "My Collections",
   "hub_subfeed": "Sub Feed",
   "hub_cached": "Cached",
   "hub_discovery": "Discovery",

@@ -51,7 +51,19 @@ This document establishes the UI design opinions and layout standards across the
 - **Card titles**: `.listItem p.title` reserves up to two lines via `-webkit-line-clamp: 2` so playlist/album/channel names stay readable in grids and carousels. Hover surfaces the full name through a `title` attribute.
 - **Track titles**: `.streamItem p.title` also exposes its full text through a `title` attribute for truncated rows.
 
-### 1.4 Tooltip Positioning & Overflow Safety
+### 1.4 Choice Chips & Library Carousel Wrapping
+
+- Single-select filters use the shared `src/components/ChoiceChips.tsx`
+  component. It renders native `<input type="radio">` elements inside pill
+  labels, so arrow-key selection and screen-reader semantics stay native.
+- Library tabs use the chip row with a sort toggle immediately to its left.
+- Library carousels pass `wrap` to `src/components/Carousel.tsx`. Wrapped
+  carousels (`div.list-carousel.wrap`) collapse onto multiple rows and never
+  scroll horizontally. Search and List carousels keep horizontal scrolling.
+- The generic `Carousel` no longer renders its own header/title; section
+  identity comes from the chip row or the consuming shelf.
+
+### 1.5 Tooltip Positioning & Overflow Safety
 
 - **Vertical Directionality**:
   - Header and top-bar icon tooltips default to **below** the icon (`top: calc(100% + var(--size-1)); bottom: auto;`) so they never render off the top of the browser viewport or get clipped by container overflows.

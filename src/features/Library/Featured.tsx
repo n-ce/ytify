@@ -19,6 +19,7 @@ export default function () {
   const [featuredPlaylists, setFeaturedPlaylists] = createSignal<
     YTPlaylistItem[]
   >([]);
+  const [isLoading, setIsLoading] = createSignal(true);
   let hasAttemptedFetch = false;
 
   const updateFeatured = async () => {
@@ -27,9 +28,9 @@ export default function () {
 
     // Same selection and order as the favorites artist shelf. The backend
     // returns playlists grouped in this exact artist order.
-    const artistIds = rankFavoriteArtists(
-      getCollectionItems("favorites"),
-    ).map((artist) => artist.id);
+    const artistIds = rankFavoriteArtists(getCollectionItems("favorites")).map(
+      (artist) => artist.id,
+    );
 
     // The session cache is only valid for the same artist list (same IDs in
     // the same order), so favorites changes show up immediately.
@@ -44,6 +45,7 @@ export default function () {
           parsed.artistIds?.join(",") === artistIds.join(",")
         ) {
           setFeaturedPlaylists(parsed.featuredPlaylists);
+          setIsLoading(false);
           return;
         }
       }
@@ -51,6 +53,7 @@ export default function () {
 
     if (artistIds.length === 0) {
       setFeaturedPlaylists([]);
+      setIsLoading(false);
       return;
     }
 
@@ -92,6 +95,8 @@ export default function () {
       }
     } catch (e) {
       console.error("Failed to fetch featured shelves", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,13 +105,20 @@ export default function () {
   });
 
   return (
-    <Show when={featuredPlaylists().length > 0}>
-      <Carousel
-        title={t("hub_featured")}
-        icon="ri-star-fill"
-        items={featuredPlaylists()}
-        itemType="playlist"
-      />
+    <Show
+      when={featuredPlaylists().length > 0}
+      fallback={
+        <div class="fallback-card">
+          <Show
+            when={!isLoading()}
+            fallback={<i class="ri-loader-3-line loading-spinner"></i>}
+          >
+            <p class="fallback">{t("hub_featured_fallback")}</p>
+          </Show>
+        </div>
+      }
+    >
+      <Carousel items={featuredPlaylists()} itemType="playlist" wrap />
     </Show>
   );
 }

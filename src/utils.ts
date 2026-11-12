@@ -122,6 +122,23 @@ export function generateImageUrl(id: string, res: string, music?: boolean) {
 
 export type SortBy = "modified" | "name" | "artist" | "duration";
 
+/**
+ * Orders saved library headers (playlists, albums). Items are appended when
+ * saved, so "modified" is newest-first while "name" is ascending alphabetical.
+ */
+export function sortLibraryItems<T extends { name: string }>(
+  items: T[],
+  sortBy: "name" | "modified",
+): T[] {
+  const sorted = [...items];
+  if (sortBy === "name") {
+    sorted.sort((a, b) => a.name.localeCompare(b.name));
+  } else {
+    sorted.reverse();
+  }
+  return sorted;
+}
+
 export function sortCollection(
   list: TrackItem[],
   sortBy: SortBy,

@@ -51,6 +51,8 @@
   "library_listen_later": "稍后收听",
   "library_liked": "喜欢的音频",
   "library_configure": "配置媒体库",
+  "library_quick_access": "快速访问",
+  "library_my_collections": "我的收藏",
   "hub_subfeed": "订阅源",
   "hub_cached": "已缓存",
   "hub_discovery": "发现",

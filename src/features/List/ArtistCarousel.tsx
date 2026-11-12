@@ -64,10 +64,7 @@ export default function ArtistCarousel(props: { items: TrackItem[] }) {
 
         setArtists(mergeResolved(resolved));
         try {
-          sessionStorage.setItem(
-            "featured_artists",
-            JSON.stringify(resolved),
-          );
+          sessionStorage.setItem("featured_artists", JSON.stringify(resolved));
         } catch {}
       })
       .catch(() => {});

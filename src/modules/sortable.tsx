@@ -76,10 +76,7 @@ function SortableList<T>(props: SortableProps<T>) {
   };
 
   const getScrollParent = (): HTMLElement | null => {
-    if (
-      containerRef &&
-      containerRef.scrollHeight > containerRef.clientHeight
-    ) {
+    if (containerRef && containerRef.scrollHeight > containerRef.clientHeight) {
       return containerRef;
     }
     let node = containerRef?.parentElement ?? null;

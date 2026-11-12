@@ -461,22 +461,10 @@ export default async (request: Request, context: Context) => {
       );
     }
 
-    const music = data.channelTitle?.endsWith(" - Topic")
-      ? "https://wsrv.nl?w=180&h=180&fit=cover&url="
-      : "";
-    const thumbnail = `${music}https://i.ytimg.com/vi_webp/${id}/mqdefault.webp`;
-
     return new Response(
       `<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="description" content="${data.title || ""} by ${(data.channelTitle || "").replace(" - Topic", "")} in ytify">
-  <meta property="og:title" content="${data.title || ""}">
-  <meta property="og:description" content="By ${(data.channelTitle || "").replace(" - Topic", "")}">
-  <meta property="og:image" content="${thumbnail}">
-  <meta property="og:type" content="website">
-  <title>${data.title || "Playback"} | ytify</title>
   <script>location.replace('/?s=${id}')</script>
 </head>
 <body>Redirecting...</body>
@@ -484,7 +472,6 @@ export default async (request: Request, context: Context) => {
       {
         headers: {
           "content-type": "text/html",
-          "Cache-Control": "public, s-maxage=604800",
           Vary: "Accept",
         },
       },
