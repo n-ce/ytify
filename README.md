@@ -6,25 +6,29 @@
 
 </div>
 
-_**Experience audio streaming that's built for you, not against you.**_
+_**Experience audio streaming on intention, not attention seeking algorithms or behaviour hacking practices.**_
 
 [**ytify**](https://ytify.pp.ua) is designed to be a lean, modern, and intentional tool. By taking a pragmatic approach to design and resource use, we provide an ethical listening experience that puts you in control, free from the information overload of typical online media applications.
 
 The journey began with a frustration. As a regular user of NewPipe in 2021, I relied on it for background audio, but noticed its failure to stream under poor network conditions. This led to a simple support issue which, when left unresolved, became the seed for a solution. Taking the problem into my own hands, I started the ytify project in January 2022 to build an application that prioritized robust performance and efficient use of resources from the ground up.
 
 ## Features ✨
+- Slow Internet Speed Playback
+- Queue Management with Author Grouping
+- Collection Sharing through shareable links
+- OPFS audio caching support for offline use
+- Sponsor Block support for when listening to videos
+- Dynamic Theming taken from album art
+- Cloud Sync across devices
+- Last FM Music Recommendations for Songs in Queue
+- Support for saving progress on long audio listening sessions
 
-- **High-Performance Audio Streaming:** YouTube audio resolved through the InnerTube API with multi-instance Invidious stream failover for minimal buffering, even on low-speed networks.
-- **Comprehensive Queue Management:** Full control over your listening queue — add, remove, and reorder tracks, plus start an endless radio from any track.
-- **Playlists and Collections:** Create your own collections, import YouTube playlists, and share collection links.
-- **Dynamic Theming:** The UI automatically adapts its theme from the dominant colors of the currently playing artwork.
-- **Offline-First PWA:** Install as a standalone app with a Workbox service worker and OPFS audio cache for offline playback.
-- **SponsorBlock Skipping:** Sponsor segments, intros, and outros are skipped automatically during playback.
-- **Synced Lyrics:** Time-synced lyrics powered by LRCLIB.
-- **"For You" Recommendations:** Personalized recommendations generated on-device from your listening history — strictly private, zero telemetry.
-- **Search:** YouTube and YouTube Music search with suggestions and filters.
+<img width="2526" height="1600" alt="image" src="https://github.com/user-attachments/assets/7e101587-c1f3-49c9-badc-b201f552ec03" />
 
 <img width="3000" height="3600" alt="1000067919" src="https://github.com/user-attachments/assets/14ec1a13-3e04-4ca4-a005-eb33f53cdb67" />
+
+<img width="2526" height="1600" alt="image" src="https://github.com/user-attachments/assets/6cfee9bb-879c-4d96-8135-c65e8cfe9ffb" />
+
 
 ## YouTube Terms & Copyright ℹ️
 
