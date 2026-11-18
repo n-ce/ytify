@@ -7,8 +7,7 @@ const instances = shuffle([
   "https://invidious.kemonomimi.nl",
   "https://echostreamz.com",
   "https://yt.chocolatemoo53.com",
-  "https://eu.yt.chocolatemoo53.com",
-  "https://invi.susurrando.com"
+  "https://eu.yt.chocolatemoo53.com"
 ]);
 
 export default async function (
