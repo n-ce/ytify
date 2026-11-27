@@ -45,6 +45,7 @@ export default function (_: {
           ref={slider}
           onchange={(e) => {
             playerStore.audio.currentTime = parseInt(e.target.value);
+            e.target.blur();
           }}
         />
         <div>
