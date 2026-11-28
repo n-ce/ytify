@@ -45,8 +45,8 @@ export default function (_: {
           ref={slider}
           onchange={(e) => {
             playerStore.audio.currentTime = parseInt(e.target.value);
-            e.target.blur();
           }}
+          onpointerup={() => slider.blur()}
         />
         <div>
           <p id="currentDuration">
